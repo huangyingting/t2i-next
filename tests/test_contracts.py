@@ -659,7 +659,10 @@ def test_frame_rejects_depth_opposed_to_theme_style(
         }
     )
 
-    with pytest.raises(GenerationContractError, match="景深与 Theme.style 冲突"):
+    with pytest.raises(
+        GenerationContractError,
+        match=r"camera\.shot 必须继承 Theme\.style",
+    ):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from typer.testing import CliRunner
 
 from t2i_prompt_pipeline import cli
@@ -14,6 +16,9 @@ from t2i_prompt_pipeline.models import (
     ThemeBook,
 )
 from t2i_prompt_pipeline.renderers import render_book
+from t2i_prompt_pipeline.safe_avant_garde_batch import (
+    SafeAvantGardeBatchResult,
+)
 from t2i_prompt_pipeline.store import InMemoryRunStore, LocalRunStore
 from tests.factories import (
     make_foundation,
@@ -105,15 +110,74 @@ def test_generate_command_reports_batched_call_count(
     )
 
 
-def test_cli_exposes_generate_resume_and_runs_only() -> None:
+def test_cli_exposes_generation_resume_and_runs_commands() -> None:
     result = CliRunner().invoke(cli.app, ["--help"])
 
     assert result.exit_code == 0
     assert "generate" in result.output
+    assert "generate-safe-avant-garde" in result.output
     assert "resume" in result.output
     assert "runs" in result.output
     assert "probe" not in result.output
     assert "validate" not in result.output
+
+
+def test_safe_avant_garde_command_wires_fixed_batch(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    spec = make_spec()
+    config = AppConfig(
+        spec=spec,
+        provider=ProviderSettings(model="test"),
+        runs_directory=tmp_path / "runs",
+        prompts_directory=tmp_path / "prompts",
+        run_settings=make_settings(),
+        rules=make_rules(spec),
+    )
+    captured = {}
+
+    def fake_build_config(generated_spec, **kwargs):
+        captured["spec"] = generated_spec
+        captured["kwargs"] = kwargs
+        return config
+
+    async def fake_run(generated_config, state_file, *, on_progress):
+        captured["config"] = generated_config
+        captured["state_file"] = state_file
+        captured["on_progress"] = on_progress
+        return SafeAvantGardeBatchResult(
+            completed_tasks=72,
+            generated_frames=43_200,
+            state_file=state_file.resolve(),
+        )
+
+    monkeypatch.setattr(cli, "build_config", fake_build_config)
+    monkeypatch.setattr(cli, "run_safe_avant_garde_batch", fake_run)
+
+    result = CliRunner().invoke(
+        cli.app,
+        [
+            "generate-safe-avant-garde",
+            "--runs-dir",
+            str(tmp_path / "runs"),
+            "--prompts-dir",
+            str(tmp_path / "prompts"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "72 个 run，43,200 个 Frame" in result.output
+    assert "完成 run：72/72" in result.output
+    assert "生成 Frame：43200/43200" in result.output
+    assert captured["spec"].theme_count == 100
+    assert captured["spec"].frames_per_theme == 6
+    assert captured["kwargs"]["rules_directory"] == (
+        Path("rules/batches/safe_avant_garde")
+    )
+    assert captured["state_file"] == (
+        tmp_path / "runs/safe-avant-garde-batch.json"
+    )
 
 
 def test_completed_resume_needs_no_provider_configuration(

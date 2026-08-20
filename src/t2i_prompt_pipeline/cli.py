@@ -31,6 +31,10 @@ from t2i_prompt_pipeline.pipeline import PromptStudio
 from t2i_prompt_pipeline.providers.openai_compatible import (
     OpenAICompatibleProvider,
 )
+from t2i_prompt_pipeline.safe_avant_garde_batch import (
+    build_safe_avant_garde_tasks,
+    run_safe_avant_garde_batch,
+)
 from t2i_prompt_pipeline.store import LocalRunStore
 
 app = typer.Typer(
@@ -178,6 +182,88 @@ def generate_command(
         _exit_for_error(exc, runs_dir)
 
     _print_completed(archived)
+
+
+@app.command("generate-safe-avant-garde")
+def generate_safe_avant_garde_command(
+    concurrency: int = typer.Option(
+        16,
+        "--concurrency",
+        min=1,
+        max=16,
+        help="并发模型调用数；默认 16。",
+    ),
+    theme_batch_size: int = typer.Option(
+        5,
+        "--theme-batch-size",
+        min=1,
+        max=20,
+        help="每次 Theme 调用的最大主题数；默认 5。",
+    ),
+    generation_retries: int = typer.Option(
+        2,
+        "--generation-retries",
+        min=0,
+        max=5,
+        help="每次结构补全的额外尝试次数；默认 2。",
+    ),
+    runs_dir: Path = typer.Option(
+        Path("runs"),
+        "--runs-dir",
+        file_okay=False,
+        help="增量 checkpoint 和批次状态目录。",
+    ),
+    prompts_dir: Path = typer.Option(
+        Path("prompts"),
+        "--prompts-dir",
+        file_okay=False,
+        help="最终提示词文件目录。",
+    ),
+    rules_dir: Path = typer.Option(
+        Path("rules/batches/safe_avant_garde"),
+        "--rules-dir",
+        file_okay=False,
+        help="安全先锋艺术批次规则目录。",
+    ),
+    state_file: Path | None = typer.Option(
+        None,
+        "--state-file",
+        dir_okay=False,
+        help="批次状态文件；默认位于 runs 目录。",
+    ),
+) -> None:
+    """Generate the fixed 24-artist safe, clothed portrait matrix."""
+    tasks = build_safe_avant_garde_tasks()
+    resolved_state_file = (
+        state_file
+        if state_file is not None
+        else runs_dir / "safe-avant-garde-batch.json"
+    )
+    try:
+        config = build_config(
+            tasks[0].spec,
+            runs_directory=runs_dir,
+            prompts_directory=prompts_dir,
+            rules_directory=rules_dir,
+            max_concurrency=concurrency,
+            theme_batch_size=theme_batch_size,
+            generation_retries=generation_retries,
+        )
+        typer.echo("开始安全先锋艺术批次：72 个 run，43,200 个 Frame。")
+        result = asyncio.run(
+            run_safe_avant_garde_batch(
+                config,
+                resolved_state_file,
+                on_progress=typer.echo,
+            )
+        )
+    except (ValidationError, PromptPipelineError) as exc:
+        _exit_for_error(exc, runs_dir)
+
+    typer.secho("安全先锋艺术批次完成", fg=typer.colors.GREEN)
+    typer.echo(f"完成 run：{result.completed_tasks}/72")
+    typer.echo(f"生成 Frame：{result.generated_frames}/43200")
+    typer.echo(f"批次状态：{result.state_file}")
 
 
 @app.command("resume")

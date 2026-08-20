@@ -440,8 +440,8 @@ def normalize_frame(
     frame_depth = _depth_tendency(frame.camera.shot)
     if style_depth and frame_depth and style_depth != frame_depth:
         raise GenerationContractError(
-            f"{frame.frame_id} 景深与 Theme.style 冲突："
-            f"{style_depth} / {frame_depth}"
+            f"{frame.frame_id} camera.shot 必须继承 Theme.style 的"
+            f"{style_depth}；不得使用{frame_depth}。"
         )
     expected_ids = tuple(
         character.character_id for character in theme.characters

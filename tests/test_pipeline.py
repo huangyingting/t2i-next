@@ -74,6 +74,7 @@ class FakeAuthor:
         self.mixed_invalid_frame_themes: set[str] = set()
         self.contract_invalid_theme_once = False
         self.contract_invalid_frame_themes: set[str] = set()
+        self.depth_conflict_frame_themes: set[str] = set()
         self.duplicate_scene_theme_once = False
         self.duplicate_title_theme_once = False
         self.duplicate_frame_content_themes: set[str] = set()
@@ -218,6 +219,15 @@ class FakeAuthor:
                                 update={"action": "背对镜头，全身出画不可见"}
                             )
                         ]
+                    }
+                )
+            if theme_id in self.depth_conflict_frame_themes:
+                self.depth_conflict_frame_themes.remove(theme_id)
+                frames[0] = frames[0].model_copy(
+                    update={
+                        "camera": frames[0].camera.model_copy(
+                            update={"shot": "中景，浅景深聚焦人物"}
+                        )
                     }
                 )
             value = FrameBatch(theme_id=theme_id, frames=frames)
@@ -522,6 +532,34 @@ async def test_contract_rejections_are_sent_to_targeted_retries() -> None:
     assert "action 包含不可见描述：出画" in " ".join(
         frame_requests[1]["validation_issues"]
     )
+    assert len(result.result.prompts) == 1
+
+
+@pytest.mark.asyncio
+async def test_depth_conflict_retry_names_required_theme_depth() -> None:
+    spec = make_spec()
+    author = FakeAuthor(spec)
+    author.themes["T01"] = author.themes["T01"].model_copy(
+        update={"style": f"{author.themes['T01'].style} 景深偏深。"}
+    )
+    author.depth_conflict_frame_themes = {"T01"}
+
+    result = await PromptStudio(
+        author,
+        InMemoryRunStore(),
+        make_settings(generation_retries=1),
+    ).run(spec, make_rules(spec))
+
+    frame_requests = [
+        request
+        for stage, request in author.requests
+        if stage == GenerationStage.FRAMES
+    ]
+    assert "validation_issues" not in frame_requests[0]
+    assert frame_requests[1]["validation_issues"] == [
+        "T01-F01 camera.shot 必须继承 Theme.style 的深景深；"
+        "不得使用浅景深。"
+    ]
     assert len(result.result.prompts) == 1
 
 

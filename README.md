@@ -165,6 +165,22 @@ uv run t2i-prompts generate \
 避免所有 Theme 都从相同广角槽位开始；每帧必须明确写出 brief 的视觉锚点，也不
 使用没有实际相机、笔记本或工具的“虚握”动作制造伪变化。
 
+### 安全先锋艺术固定批次
+
+以下命令按 24 位先锋艺术家逐一生成三种明确成年群像配置：一女一男、
+两女一男和三女。每种配置固定生成 100 个 Theme，每个 Theme 生成 6 个
+独立变化 Frame，共 72 个 run 和 43,200 个 Frame：
+
+```bash
+uv run t2i-prompts generate-safe-avant-garde
+```
+
+该命令固定使用 `aesthetic` 和 `variations`，并加载
+`rules/batches/safe_avant_garde/` 的隔离规则，要求所有人物 25 岁以上、
+全程穿着不透明且完整覆盖的服装，不生成裸露、性行为或性化接触。
+批次进度默认写入 `runs/safe-avant-garde-batch.json`；命令中断后执行同一
+命令，会跳过已完成任务并通过现有 run checkpoint 继续当前任务。
+
 Foundation 默认直接从 brief 解析人物。`--female-count` 和 `--male-count`
 是可选 Cast Constraint，只用于 brief 没有明确性别或人数的情况，例如 brief
 只写“三名成年人”时可传 `--female-count 2 --male-count 1`。如果 brief 已明确
