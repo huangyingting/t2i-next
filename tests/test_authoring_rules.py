@@ -51,7 +51,7 @@ def test_rules_express_stage_ownership_without_crossing_boundaries() -> None:
 def test_system_rule_corpus_stays_concise() -> None:
     rule_files = tuple(SYSTEM_RULES.rglob("*.rules"))
     assert len(rule_files) == 9
-    assert sum(len(path.read_bytes()) for path in rule_files) <= 12_000
+    assert sum(len(path.read_bytes()) for path in rule_files) <= 13_000
 
 
 def test_style_constraints_preserve_brief_without_inference() -> None:
@@ -94,18 +94,47 @@ def test_every_content_level_states_a_floor_and_ceiling() -> None:
 
     assert "美学级（aesthetic）" in aesthetic
     assert "情色级（erotic）" not in aesthetic
-    assert "不描写性行为，人物之间不得出现身体接触" in aesthetic
+    assert "尺度下限是静止画面可见的形体表达" in aesthetic
+    assert "依偎、牵手、拥抱、亲吻和抚触" in aesthetic
+    assert "接触必须双方可见地互相参与" in aesthetic
+    assert "以形体美、光影和构图为主视觉" in aesthetic
+    assert "所有角色必须外观明确成年" in aesthetic
+    assert "BDSM 题材本身不决定内容等级" in aesthetic
+    assert "不得细致描写或特写聚焦性器官" in aesthetic
 
     assert "情色级（erotic）" in erotic
     assert "当前画面直接呈现" in erotic
     assert "替代该等级的可见内容" in erotic
     assert "双方可见地互相参与" in erotic
+    assert "单人、双人或多人画面" in erotic
+    assert "所有角色必须外观明确成年" in erotic
+    assert "清醒、回应、主动配合和可退出" in erotic
+    assert "明确性行为、性器官特写" in erotic
+    assert "强度默认逼近本等级上限" in erotic
+    assert "基础服饰优先写“全裸”" in erotic
+    assert "整组一半以上 Frame" in erotic
+    assert "反射或前景遮挡合计最多占一个 Frame" in erotic
+    assert "至少一处双方主动形成的具体身体接触" in erotic
+    assert "整组至少一半 Frame 中完成为可见接触" in erotic
+    assert "近景不得以胯下、腹股沟或性器官区域为主视觉" in erotic
     assert "压制、强迫、制服或无法挣脱" in erotic
+    assert "BDSM 题材本身不决定内容等级" in erotic
+    assert "支配与臣服、主从礼仪与调教仪式" in erotic
+    assert "装饰性绳缚或快拆手铐" in erotic
+    assert "眼罩或耳罩的感官剥夺" in erotic
+    assert "羽毛冰块温蜡等感官刺激" in erotic
+    assert "手掌、软拍或软质多尾鞭" in erotic
+    assert "束缚余量或快拆结构" in erotic
+    assert "悬吊、勒颈、堵塞呼吸" in erotic
     assert "明确级（hardcore）" not in erotic
 
     assert "明确级（hardcore）" in hardcore
     assert "当前画面直接、清晰地呈现" in hardcore
     assert "替代明确行为" in hardcore
+    assert "BDSM 题材本身不决定内容等级" in hardcore
+    assert "只有在画面另行呈现明确性行为时才归入 hardcore" in hardcore
+    assert "器具、束缚或痛感强度本身不能把画面升级" in hardcore
+    assert "勒颈窒息、电击、真实武器" in hardcore
 
 
 def test_frame_modes_are_mutually_exclusive() -> None:
