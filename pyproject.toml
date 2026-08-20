@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "t2i-prompt-pipeline"
+version = "0.1.0"
+description = "基于 brief 风格约束、自适应 Theme 和当前 Frame 的文生图提示词生成器"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "httpx>=0.28,<1",
+  "pydantic>=2.10,<3",
+  "python-dotenv>=1.0,<2",
+  "typer>=0.15,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.25,<1",
+  "ruff>=0.16,<1",
+]
+
+[project.scripts]
+t2i-prompts = "t2i_prompt_pipeline.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/t2i_prompt_pipeline"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Typer builds its CLI from call expressions in argument defaults.
+"src/t2i_prompt_pipeline/cli.py" = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["t2i_prompt_pipeline", "tests"]
