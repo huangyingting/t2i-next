@@ -74,7 +74,10 @@ def test_local_store_checkpoints_and_completes_idempotently(
 
     assert first.prompt_file == second.prompt_file
     prompt_path = (
-        prompts / "aesthetic" / "quiet_cafe_conversation_0001.txt"
+        prompts
+        / created.manifest.created_at[:10]
+        / "aesthetic"
+        / "quiet_cafe_conversation_0001.txt"
     )
     assert first.prompt_file == str(prompt_path)
     lines = prompt_path.read_text().splitlines()
@@ -429,8 +432,10 @@ def test_store_allocates_sequences_independently_by_content_level(
 
         completed = store.inspect(run_id).completed
         assert completed is not None
+        prompt_date = store.inspect(run_id).manifest.created_at[:10]
         assert Path(completed.prompt_file) == (
             prompts
+            / prompt_date
             / content_level.value
             / "quiet_cafe_conversation_0001.txt"
         )

@@ -226,17 +226,19 @@ runs/<run-id>/
 └── book.json
 
 prompts/
-├── aesthetic/
-│   └── semantic_name_0001.txt
-├── erotic/
-│   └── semantic_name_0001.txt
-└── hardcore/
-    └── semantic_name_0001.txt
+└── YYYY-MM-DD/
+    ├── aesthetic/
+    │   └── semantic_name_0001.txt
+    ├── erotic/
+    │   └── semantic_name_0001.txt
+    └── hardcore/
+        └── semantic_name_0001.txt
 ```
 
-每个 run 只会在其 `content_level` 对应的目录中发布提示词。文件序号按
+每个 run 只会在其创建日期和 `content_level` 对应的目录中发布提示词。日期使用
+run 的 UTC 创建日期，因此跨日 resume 仍发布到原创建日期。文件序号按日期、
 `content_level` 和 `semantic_name` 独立分配；resume 会复用 manifest 中已冻结的
-分类路径，不会重复生成提示词文件。
+文件路径，不会重复生成提示词文件。
 
 `rules.json` 保存本次 run 已解析完成的 Foundation、Theme 和 Frame 规则；
 manifest 保存它的 SHA-256 指纹。Foundation 会生成安全的英文 `snake_case`
@@ -294,8 +296,8 @@ manifest 一致。已保存且无候选的 `theme-similarity.json` 在 resume �
 `RunIncompleteError` 表示最近一个完整补全 pass 没有新增任何 Theme 或 Frame；
 在此之前有进展的 pass 已由同一次命令自动继续。
 
-提示词文件位于 `prompts/<content-level>/`，每个 Frame 占一行，行与行之间没有
-空行，也不包含 `[T01-F01]`
+提示词文件位于 `prompts/YYYY-MM-DD/<content-level>/`，每个 Frame 占一行，
+行与行之间没有空行，也不包含 `[T01-F01]`
 之类的 Frame 标题。人物 `label` 有真实姓名时使用姓名；没有姓名时，女性
 在中文模式依次使用 `女1、女2`、男性使用 `男1、男2`；英文模式使用
 `Woman 1、Woman 2` 和 `Man 1、Man 2`。完整或简写的内部 Theme、Frame、

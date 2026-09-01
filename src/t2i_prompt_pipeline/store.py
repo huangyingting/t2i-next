@@ -512,6 +512,7 @@ class LocalRunStore:
                 result.book.semantic_name,
                 (
                     Path(manifest.prompts_directory)
+                    / manifest.created_at[:10]
                     / result.spec.content_level.value
                 ),
             )
@@ -783,7 +784,7 @@ class InMemoryRunStore:
 
     def __init__(self) -> None:
         self.runs: dict[str, _MemoryRun] = {}
-        self._name_counts: dict[tuple[str, str], int] = {}
+        self._name_counts: dict[tuple[str, str, str], int] = {}
 
     def create(
         self,
@@ -948,12 +949,13 @@ class InMemoryRunStore:
         run = self.runs[run_id]
         semantic_name = result.book.semantic_name
         if run.manifest.prompt_file is None:
+            prompt_date = run.manifest.created_at[:10]
             content_level = result.spec.content_level.value
-            name_key = (content_level, semantic_name)
+            name_key = (prompt_date, content_level, semantic_name)
             sequence = self._name_counts.get(name_key, 0) + 1
             self._name_counts[name_key] = sequence
             prompt_file = (
-                f"memory://prompts/{content_level}/"
+                f"memory://prompts/{prompt_date}/{content_level}/"
                 f"{semantic_name}_{sequence:04d}.txt"
             )
         else:

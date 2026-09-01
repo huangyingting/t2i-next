@@ -1413,7 +1413,10 @@ async def test_new_store_instance_resumes_files_after_process_loss(
     assert [stage for stage, _, _ in resumed_author.calls] == [
         GenerationStage.FRAMES
     ]
-    assert Path(result.prompt_file).parent == prompts / "aesthetic"
+    prompt_date = LocalRunStore(runs).inspect(run_id).manifest.created_at[:10]
+    assert Path(result.prompt_file).parent == (
+        prompts / prompt_date / "aesthetic"
+    )
     assert len(result.result.prompts) == 6
     assert "Theme:" in result.result.prompts[0].text
 
@@ -1437,8 +1440,10 @@ async def test_completed_resume_is_idempotent() -> None:
     ).resume(first.run_id)
 
     assert second.prompt_file == first.prompt_file
+    prompt_date = store.inspect(first.run_id).manifest.created_at[:10]
     assert first.prompt_file == (
-        "memory://prompts/aesthetic/quiet_cafe_conversation_0001.txt"
+        f"memory://prompts/{prompt_date}/aesthetic/"
+        "quiet_cafe_conversation_0001.txt"
     )
     assert second_author.calls == []
 
