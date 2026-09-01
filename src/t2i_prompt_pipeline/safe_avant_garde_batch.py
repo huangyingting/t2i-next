@@ -27,6 +27,7 @@ from t2i_prompt_pipeline.providers.openai_compatible import (
     OpenAICompatibleProvider,
 )
 from t2i_prompt_pipeline.store import LocalRunStore
+from t2i_prompt_pipeline.theme_similarity import ThemeSimilarityAnalyzer
 
 SAFE_AVANT_GARDE_BATCH_ID = "safe-avant-garde-24x3-100x6-v1"
 SAFE_AVANT_GARDE_THEME_COUNT = 100
@@ -181,10 +182,16 @@ async def run_safe_avant_garde_batch(
     )
 
     async with OpenAICompatibleProvider(config.provider) as author:
+        similarity = (
+            ThemeSimilarityAnalyzer(author, config.run_settings.theme_similarity)
+            if config.run_settings.theme_similarity is not None
+            else None
+        )
         studio = PromptStudio(
             author,
             store,
             config.run_settings,
+            theme_similarity=similarity,
             on_progress=on_progress,
         )
         for index, task in enumerate(tasks, start=1):

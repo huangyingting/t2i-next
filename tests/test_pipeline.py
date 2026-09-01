@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from t2i_prompt_pipeline.errors import (
     ConfigurationError,
     GenerationContractError,
+        ProviderResponseError,
     ProviderTruncatedOutputError,
     RunIncompleteError,
     RunStoreError,
@@ -20,12 +21,18 @@ from t2i_prompt_pipeline.models import (
     AttemptOutcome,
     FrameBatch,
     Gender,
+    GenerationAttempt,
     GenerationStage,
     OutputLanguage,
     ResolvedRuleSet,
     RunStatus,
     Theme,
     ThemeBatch,
+    ThemeSimilarityPair,
+    ThemeSimilarityRejection,
+    ThemeSimilarityReport,
+    ThemeSimilaritySettings,
+    ThemeSimilarityState,
     TokenUsage,
 )
 from t2i_prompt_pipeline.pipeline import PromptStudio
@@ -34,6 +41,10 @@ from t2i_prompt_pipeline.providers.base import (
     ModelResponse,
 )
 from t2i_prompt_pipeline.store import InMemoryRunStore, LocalRunStore
+from t2i_prompt_pipeline.theme_similarity import (
+    EmbeddingResponse,
+    ThemeSimilarityAnalyzer,
+)
 from tests.factories import (
     make_foundation,
     make_frame_batch,
@@ -254,6 +265,69 @@ class FakeAuthor:
                     ],
                 )
         return ModelResponse(value=value, usage=self.usage)
+
+
+class PipelineEmbeddingModel:
+    def __init__(self, *, fail: bool = False) -> None:
+        self.fail = fail
+        self.calls = 0
+
+    async def embed(
+        self,
+        texts,
+        *,
+        model: str,
+        dimensions: int | None,
+    ) -> EmbeddingResponse:
+        self.calls += 1
+        if self.fail:
+            raise ProviderResponseError("embedding unavailable")
+        return EmbeddingResponse(
+            vectors=tuple((1.0, 0.0) for _ in texts),
+            usage=TokenUsage(prompt_tokens=12, total_tokens=12),
+        )
+
+
+class DuplicateThenDistinctEmbeddingModel(PipelineEmbeddingModel):
+    async def embed(
+        self,
+        texts,
+        *,
+        model: str,
+        dimensions: int | None,
+    ) -> EmbeddingResponse:
+        self.calls += 1
+        if self.calls == 1:
+            vectors = tuple((1.0, 0.0) for _ in texts)
+        else:
+            vectors = ((1.0, 0.0), (0.0, 1.0)) * 2
+        return EmbeddingResponse(
+            vectors=vectors,
+            usage=TokenUsage(prompt_tokens=12, total_tokens=12),
+        )
+
+
+class DistinctEmbeddingModel(PipelineEmbeddingModel):
+    async def embed(
+        self,
+        texts,
+        *,
+        model: str,
+        dimensions: int | None,
+    ) -> EmbeddingResponse:
+        self.calls += 1
+        theme_count = len(texts) // 2
+        distinct_vectors = tuple(
+            tuple(
+                1.0 if row == column else 0.0
+                for column in range(theme_count)
+            )
+            for row in range(theme_count)
+        )
+        return EmbeddingResponse(
+            vectors=distinct_vectors * 2,
+            usage=TokenUsage(prompt_tokens=12, total_tokens=12),
+        )
 
 
 class BlockingThemeAuthor(FakeAuthor):
@@ -499,6 +573,16 @@ async def test_progressing_completion_passes_finish_without_external_resume() ->
         ("T01-F01", "T01-F02"),
         ("T01-F02",),
     ]
+    stages = [stage for stage, _, _ in author.calls]
+    assert max(
+        index
+        for index, stage in enumerate(stages)
+        if stage == GenerationStage.THEMES
+    ) < min(
+        index
+        for index, stage in enumerate(stages)
+        if stage == GenerationStage.FRAMES
+    )
 
 
 @pytest.mark.asyncio
@@ -620,6 +704,387 @@ async def test_duplicate_theme_scene_is_targeted_with_existing_theme() -> None:
         theme_requests[1]["validation_issues"]
     )
     assert len(result.result.book.themes) == 2
+
+
+@pytest.mark.asyncio
+async def test_theme_similarity_regenerates_later_duplicate_theme() -> None:
+    spec = make_spec(theme_count=2)
+    author = FakeAuthor(spec)
+    store = InMemoryRunStore()
+    model = DuplicateThenDistinctEmbeddingModel()
+    similarity_settings = ThemeSimilaritySettings(
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+    )
+    studio = PromptStudio(
+        author,
+        store,
+        make_settings(theme_similarity=similarity_settings),
+        theme_similarity=ThemeSimilarityAnalyzer(model, similarity_settings),
+    )
+
+    result = await studio.run(spec, make_rules(spec))
+    await studio.resume(result.run_id)
+
+    theme_requests = [
+        request
+        for stage, request in author.requests
+        if stage == GenerationStage.THEMES
+    ]
+    report = store.inspect(result.run_id).theme_similarity_report
+    assert model.calls == 2
+    assert [request["theme_ids"] for request in theme_requests] == [
+        ["T01", "T02"],
+        ["T02"],
+    ]
+    assert theme_requests[1]["existing_themes"][0]["theme_id"] == "T01"
+    assert "embedding 相似度判定为重复" in " ".join(
+        theme_requests[1]["validation_issues"]
+    )
+    similarity_attempt = next(
+        attempt
+        for attempt in store.attempts(result.run_id)
+        if any("embedding 相似度判定为重复" in issue for issue in attempt.issues)
+    )
+    assert similarity_attempt.usage.total_tokens == 12
+    similarity_attempts = [
+        attempt
+        for attempt in store.attempts(result.run_id)
+        if attempt.stage == GenerationStage.THEME_SIMILARITY
+    ]
+    assert len(similarity_attempts) == 2
+    assert all(attempt.max_output_tokens is None for attempt in similarity_attempts)
+    assert all(attempt.operation_id for attempt in similarity_attempts)
+    assert [attempt.outcome for attempt in similarity_attempts] == [
+        AttemptOutcome.REJECTED,
+        AttemptOutcome.ACCEPTED,
+    ]
+    assert report is not None
+    assert report.error is None
+    assert report.pairs[0].potential_duplicate is False
+    assert len(result.result.book.themes) == 2
+    assert len(result.result.prompts) == 2
+
+
+@pytest.mark.asyncio
+async def test_theme_similarity_stops_after_regeneration_limit() -> None:
+    spec = make_spec(theme_count=2)
+    author = FakeAuthor(spec)
+    store = InMemoryRunStore()
+    model = PipelineEmbeddingModel()
+    similarity_settings = ThemeSimilaritySettings(
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+    )
+
+    with pytest.raises(RunIncompleteError) as exc_info:
+        await PromptStudio(
+            author,
+            store,
+            make_settings(
+                generation_retries=1,
+                theme_similarity=similarity_settings,
+            ),
+            theme_similarity=ThemeSimilarityAnalyzer(
+                model,
+                similarity_settings,
+            ),
+        ).run(spec, make_rules(spec))
+
+    assert "相似度自动重生成已达上限 1 次" in " ".join(
+        exc_info.value.causes
+    )
+    theme_requests = [
+        request
+        for stage, request in author.requests
+        if stage == GenerationStage.THEMES
+    ]
+    snapshot = store.inspect(next(iter(store.runs)))
+    assert model.calls == 2
+    assert [request["theme_ids"] for request in theme_requests] == [
+        ["T01", "T02"],
+        ["T02"],
+    ]
+    assert snapshot.manifest.status == RunStatus.FAILED
+    assert snapshot.theme_similarity_report is not None
+    assert snapshot.theme_similarity_report.pairs[0].potential_duplicate
+
+
+@pytest.mark.asyncio
+async def test_resume_regenerates_from_persisted_similarity_candidate() -> None:
+    spec = make_spec(theme_count=2)
+    similarity_settings = ThemeSimilaritySettings(
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+    )
+    settings = make_settings(theme_similarity=similarity_settings)
+    store = InMemoryRunStore()
+    snapshot = store.create(spec, settings, make_rules(spec))
+    store.checkpoint(snapshot.run_id, make_foundation(spec))
+    for theme in make_themes(spec):
+        store.checkpoint(snapshot.run_id, theme)
+    store.record_theme_similarity(
+        snapshot.run_id,
+        ThemeSimilarityReport(
+            model="embedding-model",
+            scene_threshold=0.9,
+            style_threshold=0.9,
+            input_count=4,
+            pairs=[
+                ThemeSimilarityPair(
+                    first_theme_id="T01",
+                    second_theme_id="T02",
+                    scene_similarity=0.95,
+                    style_similarity=0.96,
+                    potential_duplicate=True,
+                )
+            ],
+        ),
+    )
+    author = FakeAuthor(spec)
+    model = DistinctEmbeddingModel()
+
+    result = await PromptStudio(
+        author,
+        store,
+        settings,
+        theme_similarity=ThemeSimilarityAnalyzer(
+            model,
+            similarity_settings,
+        ),
+    ).resume(snapshot.run_id)
+
+    theme_requests = [
+        request
+        for stage, request in author.requests
+        if stage == GenerationStage.THEMES
+    ]
+    assert [request["theme_ids"] for request in theme_requests] == [["T02"]]
+    assert model.calls == 1
+    assert len(result.result.prompts) == 2
+
+
+@pytest.mark.asyncio
+async def test_resume_applies_journaled_pending_rejection() -> None:
+    spec = make_spec(theme_count=2)
+    similarity_settings = ThemeSimilaritySettings(
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+    )
+    settings = make_settings(
+        generation_retries=1,
+        theme_similarity=similarity_settings,
+    )
+    store = InMemoryRunStore()
+    snapshot = store.create(spec, settings, make_rules(spec))
+    store.checkpoint(snapshot.run_id, make_foundation(spec))
+    for theme in make_themes(spec):
+        store.checkpoint(snapshot.run_id, theme)
+    report = ThemeSimilarityReport(
+        audit_id="audit-before-crash",
+        state=ThemeSimilarityState.REJECTION_PENDING,
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+        input_count=4,
+        pairs=[],
+        regeneration_round=1,
+        rejections=[
+            ThemeSimilarityRejection(
+                rejected_theme_id="T02",
+                kept_theme_id="T01",
+                scene_similarity=0.95,
+                style_similarity=0.96,
+            )
+        ],
+        usage=TokenUsage(prompt_tokens=12, total_tokens=12),
+    )
+    store.record_theme_similarity(snapshot.run_id, report)
+    store.record_attempt(
+        snapshot.run_id,
+        GenerationAttempt(
+            operation_id=report.audit_id,
+            occurred_at="2026-09-01T00:00:00+00:00",
+            stage=GenerationStage.THEME_SIMILARITY,
+            requested_ids=["T01", "T02"],
+            attempt=1,
+            outcome=AttemptOutcome.REJECTED,
+            issues=["journaled before checkpoint deletion"],
+            duration_ms=1,
+            usage=report.usage,
+        ),
+    )
+    author = FakeAuthor(spec)
+
+    result = await PromptStudio(
+        author,
+        store,
+        settings,
+        theme_similarity=ThemeSimilarityAnalyzer(
+            DistinctEmbeddingModel(),
+            similarity_settings,
+        ),
+    ).resume(snapshot.run_id)
+
+    theme_requests = [
+        request["theme_ids"]
+        for stage, request in author.requests
+        if stage == GenerationStage.THEMES
+    ]
+    assert theme_requests == [["T02"]]
+    assert len(result.result.prompts) == 2
+
+
+@pytest.mark.asyncio
+async def test_similarity_feedback_is_scoped_to_each_regeneration_batch() -> None:
+    spec = make_spec(theme_count=5)
+    similarity_settings = ThemeSimilaritySettings(
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+    )
+    settings = make_settings(
+        theme_batch_size=2,
+        theme_similarity=similarity_settings,
+    )
+    store = InMemoryRunStore()
+    snapshot = store.create(spec, settings, make_rules(spec))
+    store.checkpoint(snapshot.run_id, make_foundation(spec))
+    for theme in make_themes(spec):
+        store.checkpoint(snapshot.run_id, theme)
+    store.record_theme_similarity(
+        snapshot.run_id,
+        ThemeSimilarityReport(
+            model="embedding-model",
+            scene_threshold=0.9,
+            style_threshold=0.9,
+            input_count=10,
+            pairs=[
+                ThemeSimilarityPair(
+                    first_theme_id="T01",
+                    second_theme_id=f"T0{index}",
+                    scene_similarity=0.95,
+                    style_similarity=0.96,
+                    potential_duplicate=True,
+                )
+                for index in range(2, 6)
+            ],
+        ),
+    )
+    author = FakeAuthor(spec)
+
+    await PromptStudio(
+        author,
+        store,
+        settings,
+        theme_similarity=ThemeSimilarityAnalyzer(
+            DistinctEmbeddingModel(),
+            similarity_settings,
+        ),
+    ).resume(snapshot.run_id)
+
+    theme_requests = [
+        request
+        for stage, request in author.requests
+        if stage == GenerationStage.THEMES
+    ]
+    assert [request["theme_ids"] for request in theme_requests] == [
+        ["T02", "T03"],
+        ["T04", "T05"],
+    ]
+    for request in theme_requests:
+        issues = " ".join(request["validation_issues"])
+        for theme_id in request["theme_ids"]:
+            assert theme_id in issues
+        other_ids = {"T02", "T03", "T04", "T05"} - set(
+            request["theme_ids"]
+        )
+        assert all(theme_id not in issues for theme_id in other_ids)
+
+
+@pytest.mark.asyncio
+async def test_similarity_chain_rejects_only_duplicates_of_kept_themes() -> None:
+    spec = make_spec(theme_count=3)
+    similarity_settings = ThemeSimilaritySettings(
+        model="embedding-model",
+        scene_threshold=0.9,
+        style_threshold=0.9,
+    )
+    settings = make_settings(theme_similarity=similarity_settings)
+    store = InMemoryRunStore()
+    snapshot = store.create(spec, settings, make_rules(spec))
+    store.checkpoint(snapshot.run_id, make_foundation(spec))
+    for theme in make_themes(spec):
+        store.checkpoint(snapshot.run_id, theme)
+    store.record_theme_similarity(
+        snapshot.run_id,
+        ThemeSimilarityReport(
+            model="embedding-model",
+            scene_threshold=0.9,
+            style_threshold=0.9,
+            input_count=6,
+            pairs=[
+                ThemeSimilarityPair(
+                    first_theme_id="T01",
+                    second_theme_id="T02",
+                    scene_similarity=0.95,
+                    style_similarity=0.96,
+                    potential_duplicate=True,
+                ),
+                ThemeSimilarityPair(
+                    first_theme_id="T02",
+                    second_theme_id="T03",
+                    scene_similarity=0.94,
+                    style_similarity=0.95,
+                    potential_duplicate=True,
+                ),
+            ],
+        ),
+    )
+    author = FakeAuthor(spec)
+
+    await PromptStudio(
+        author,
+        store,
+        settings,
+        theme_similarity=ThemeSimilarityAnalyzer(
+            DistinctEmbeddingModel(),
+            similarity_settings,
+        ),
+    ).resume(snapshot.run_id)
+
+    theme_requests = [
+        request["theme_ids"]
+        for stage, request in author.requests
+        if stage == GenerationStage.THEMES
+    ]
+    assert theme_requests == [["T02"]]
+
+
+@pytest.mark.asyncio
+async def test_theme_similarity_failure_does_not_block_generation() -> None:
+    spec = make_spec(theme_count=2)
+    author = FakeAuthor(spec)
+    store = InMemoryRunStore()
+    model = PipelineEmbeddingModel(fail=True)
+    similarity_settings = ThemeSimilaritySettings(model="embedding-model")
+
+    result = await PromptStudio(
+        author,
+        store,
+        make_settings(theme_similarity=similarity_settings),
+        theme_similarity=ThemeSimilarityAnalyzer(model, similarity_settings),
+    ).run(spec, make_rules(spec))
+
+    report = store.inspect(result.run_id).theme_similarity_report
+    assert model.calls == 1
+    assert report is not None
+    assert report.error == "embedding unavailable"
+    assert len(result.result.prompts) == 2
 
 
 @pytest.mark.asyncio

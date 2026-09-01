@@ -10,7 +10,11 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
-from t2i_prompt_pipeline.config import build_config, load_provider_settings
+from t2i_prompt_pipeline.config import (
+    build_config,
+    load_provider_settings,
+    load_theme_similarity_settings,
+)
 from t2i_prompt_pipeline.errors import (
     PromptPipelineError,
     RunIncompleteError,
@@ -36,6 +40,7 @@ from t2i_prompt_pipeline.safe_avant_garde_batch import (
     run_safe_avant_garde_batch,
 )
 from t2i_prompt_pipeline.store import LocalRunStore
+from t2i_prompt_pipeline.theme_similarity import ThemeSimilarityAnalyzer
 
 app = typer.Typer(
     name="t2i-prompts",
@@ -290,6 +295,7 @@ def resume_command(
             update={
                 "provider_signature": provider.signature(),
                 "output_token_limit": provider.output_token_limit,
+                "theme_similarity": load_theme_similarity_settings(provider),
             }
         )
         snapshot.settings.ensure_resumable_with(live_settings)
@@ -379,10 +385,16 @@ async def _run(config: AppConfig) -> ArchivedRun:
         config.prompts_directory,
     )
     async with OpenAICompatibleProvider(config.provider) as author:
+        similarity = (
+            ThemeSimilarityAnalyzer(author, config.run_settings.theme_similarity)
+            if config.run_settings.theme_similarity is not None
+            else None
+        )
         studio = PromptStudio(
             author,
             store,
             config.run_settings,
+            theme_similarity=similarity,
             on_progress=typer.echo,
         )
         return await studio.run(config.spec, config.rules)
@@ -395,10 +407,16 @@ async def _resume(
     store: LocalRunStore,
 ) -> ArchivedRun:
     async with OpenAICompatibleProvider(provider) as author:
+        similarity = (
+            ThemeSimilarityAnalyzer(author, settings.theme_similarity)
+            if settings.theme_similarity is not None
+            else None
+        )
         studio = PromptStudio(
             author,
             store,
             settings,
+            theme_similarity=similarity,
             on_progress=typer.echo,
         )
         return await studio.resume(run_id)

@@ -15,6 +15,7 @@ from t2i_prompt_pipeline.models import (
     GenerationSpec,
     ProviderSettings,
     RunSettings,
+    ThemeSimilaritySettings,
 )
 
 _PROVIDER_ENV_FIELDS = {
@@ -29,6 +30,8 @@ _PROVIDER_ENV_FIELDS = {
     "OPENAI_OUTPUT_TOKEN_LIMIT": "output_token_limit",
     "OPENAI_TIMEOUT_SECONDS": "timeout_seconds",
     "OPENAI_TRANSPORT_RETRIES": "transport_retries",
+    "OPENAI_EMBEDDING_MODEL": "embedding_model",
+    "OPENAI_EMBEDDING_DIMENSIONS": "embedding_dimensions",
 }
 
 
@@ -68,6 +71,7 @@ def build_config(
                 max_concurrency=max_concurrency,
                 provider_signature=provider.signature(),
                 output_token_limit=provider.output_token_limit,
+                theme_similarity=load_theme_similarity_settings(provider),
             ),
         )
     except (ValueError, ValidationError) as exc:
@@ -93,3 +97,24 @@ def load_provider_settings(
         return ProviderSettings.model_validate(values)
     except ValidationError as exc:
         raise ConfigurationError(f"Provider 配置无效: {exc}") from exc
+
+
+def load_theme_similarity_settings(
+    provider: ProviderSettings,
+) -> ThemeSimilaritySettings | None:
+    if provider.embedding_model is None:
+        return None
+    values: dict[str, object] = {
+        "model": provider.embedding_model,
+        "dimensions": provider.embedding_dimensions,
+    }
+    if value := os.environ.get("THEME_SIMILARITY_SCENE_THRESHOLD"):
+        values["scene_threshold"] = value
+    if value := os.environ.get("THEME_SIMILARITY_STYLE_THRESHOLD"):
+        values["style_threshold"] = value
+    try:
+        return ThemeSimilaritySettings.model_validate(values)
+    except ValidationError as exc:
+        raise ConfigurationError(
+            f"Theme similarity 配置无效: {exc}"
+        ) from exc

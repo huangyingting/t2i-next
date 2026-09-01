@@ -36,6 +36,8 @@ from t2i_prompt_pipeline.models import (
     RunStatus,
     RunSummary,
     Theme,
+    ThemeSimilarityReport,
+    ThemeSimilarityState,
     safe_run_id,
 )
 from t2i_prompt_pipeline.renderers import render_book
@@ -53,6 +55,7 @@ class RunSnapshot:
     themes: dict[str, Theme]
     frames: dict[str, Frame]
     manifest: RunManifest
+    theme_similarity_report: ThemeSimilarityReport | None = None
     completed: ArchivedRun | None = None
 
 
@@ -87,6 +90,23 @@ class RunStore(Protocol):
     ) -> None: ...
 
     def attempts(self, run_id: str) -> tuple[GenerationAttempt, ...]: ...
+
+    def record_theme_similarity(
+        self,
+        run_id: str,
+        report: ThemeSimilarityReport,
+    ) -> None: ...
+
+    def apply_theme_rejections(
+        self,
+        run_id: str,
+        report: ThemeSimilarityReport,
+    ) -> None: ...
+
+    def clear_theme_similarity(
+        self,
+        run_id: str,
+    ) -> None: ...
 
     def fail(self, run_id: str, error: str) -> None: ...
 
@@ -181,6 +201,7 @@ class LocalRunStore:
             themes={},
             frames={},
             manifest=manifest,
+            theme_similarity_report=None,
         )
 
     def inspect(self, run_id: str) -> RunSnapshot:
@@ -209,6 +230,14 @@ class LocalRunStore:
                     foundation_path.read_text(encoding="utf-8")
                 )
                 if foundation_path.exists()
+                else None
+            )
+            similarity_path = directory / "theme-similarity.json"
+            theme_similarity_report = (
+                ThemeSimilarityReport.model_validate_json(
+                    similarity_path.read_text(encoding="utf-8")
+                )
+                if similarity_path.exists()
                 else None
             )
             completed: ArchivedRun | None = None
@@ -272,6 +301,7 @@ class LocalRunStore:
             themes=themes,
             frames=frames,
             manifest=manifest,
+            theme_similarity_report=theme_similarity_report,
             completed=completed,
         )
 
@@ -333,6 +363,7 @@ class LocalRunStore:
             themes=snapshot.themes,
             frames=snapshot.frames,
             manifest=manifest,
+            theme_similarity_report=snapshot.theme_similarity_report,
         )
 
     def checkpoint(
@@ -356,6 +387,11 @@ class LocalRunStore:
         run_id: str,
         attempt: GenerationAttempt,
     ) -> None:
+        if attempt.operation_id is not None and any(
+            recorded.operation_id == attempt.operation_id
+            for recorded in self.attempts(run_id)
+        ):
+            return
         path = self._run_directory(run_id) / "attempts.jsonl"
         self._append_line(path, attempt.model_dump_json() + "\n")
 
@@ -380,6 +416,72 @@ class LocalRunStore:
         except (OSError, ValidationError) as exc:
             raise RunStoreError(
                 f"Run {run_id} 的 attempts.jsonl 损坏：{exc}"
+            ) from exc
+
+    def record_theme_similarity(
+        self,
+        run_id: str,
+        report: ThemeSimilarityReport,
+    ) -> None:
+        path = self._run_directory(run_id) / "theme-similarity.json"
+        self._write_json(path, report.model_dump(mode="json"))
+
+    def apply_theme_rejections(
+        self,
+        run_id: str,
+        report: ThemeSimilarityReport,
+    ) -> None:
+        directory = self._run_directory(run_id)
+        if report.state != ThemeSimilarityState.REJECTION_PENDING:
+            raise RunStoreError(
+                "只能应用 pending 状态的 Theme similarity rejection"
+            )
+        try:
+            persisted = ThemeSimilarityReport.model_validate_json(
+                (directory / "theme-similarity.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            if persisted.audit_id != report.audit_id:
+                raise RunStoreError(
+                    "Theme similarity rejection 与当前 report 不一致"
+                )
+            rejected_ids = tuple(
+                rejection.rejected_theme_id
+                for rejection in report.rejections
+            )
+            frames_directory = directory / "frames"
+            themes_directory = directory / "themes"
+            for theme_id in rejected_ids:
+                for path in frames_directory.glob(
+                    f"{theme_id}-F*.json"
+                ):
+                    path.unlink()
+            self._fsync_directory(frames_directory)
+            for theme_id in rejected_ids:
+                (themes_directory / f"{theme_id}.json").unlink(
+                    missing_ok=True
+                )
+            self._fsync_directory(themes_directory)
+            self._write_json(
+                directory / "theme-similarity.json",
+                report.model_copy(
+                    update={"state": ThemeSimilarityState.REGENERATING}
+                ).model_dump(mode="json"),
+            )
+        except (OSError, ValidationError) as exc:
+            raise RunStoreError(
+                f"Run {run_id} 无法拒绝重复 Theme：{exc}"
+            ) from exc
+
+    def clear_theme_similarity(self, run_id: str) -> None:
+        directory = self._run_directory(run_id)
+        try:
+            (directory / "theme-similarity.json").unlink(missing_ok=True)
+            self._fsync_directory(directory)
+        except OSError as exc:
+            raise RunStoreError(
+                f"Run {run_id} 无法清除 Theme similarity report：{exc}"
             ) from exc
 
     def fail(self, run_id: str, error: str) -> None:
@@ -672,6 +774,7 @@ class _MemoryRun:
     themes: dict[str, Theme]
     frames: dict[str, Frame]
     attempts: list[GenerationAttempt] = field(default_factory=list)
+    theme_similarity_report: ThemeSimilarityReport | None = None
     completed: ArchivedRun | None = None
 
 
@@ -745,6 +848,7 @@ class InMemoryRunStore:
             themes=themes,
             frames=frames,
             manifest=run.manifest,
+            theme_similarity_report=run.theme_similarity_report,
             completed=run.completed,
         )
 
@@ -781,10 +885,50 @@ class InMemoryRunStore:
         run_id: str,
         attempt: GenerationAttempt,
     ) -> None:
+        if attempt.operation_id is not None and any(
+            recorded.operation_id == attempt.operation_id
+            for recorded in self.runs[run_id].attempts
+        ):
+            return
         self.runs[run_id].attempts.append(attempt)
 
     def attempts(self, run_id: str) -> tuple[GenerationAttempt, ...]:
         return tuple(self.runs[run_id].attempts)
+
+    def record_theme_similarity(
+        self,
+        run_id: str,
+        report: ThemeSimilarityReport,
+    ) -> None:
+        self.runs[run_id].theme_similarity_report = report
+
+    def apply_theme_rejections(
+        self,
+        run_id: str,
+        report: ThemeSimilarityReport,
+    ) -> None:
+        if report.state != ThemeSimilarityState.REJECTION_PENDING:
+            raise RunStoreError(
+                "只能应用 pending 状态的 Theme similarity rejection"
+            )
+        run = self.runs[run_id]
+        rejected = {
+            rejection.rejected_theme_id
+            for rejection in report.rejections
+        }
+        for theme_id in rejected:
+            run.themes.pop(theme_id, None)
+        run.frames = {
+            frame_id: frame
+            for frame_id, frame in run.frames.items()
+            if frame_id.split("-F", 1)[0] not in rejected
+        }
+        run.theme_similarity_report = report.model_copy(
+            update={"state": ThemeSimilarityState.REGENERATING}
+        )
+
+    def clear_theme_similarity(self, run_id: str) -> None:
+        self.runs[run_id].theme_similarity_report = None
 
     def fail(self, run_id: str, error: str) -> None:
         run = self.runs[run_id]

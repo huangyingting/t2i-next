@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
+from t2i_prompt_pipeline.errors import ConfigurationError
 from t2i_prompt_pipeline.models import (
     ContentLevel,
     Foundation,
@@ -10,7 +11,9 @@ from t2i_prompt_pipeline.models import (
     OutputLanguage,
     PromptBook,
     ProviderSettings,
+    RunSettings,
     ThemeBook,
+    ThemeSimilaritySettings,
     format_character_id,
     format_frame_id,
     format_theme_id,
@@ -97,6 +100,35 @@ def test_provider_signature_tracks_generation_behavior_not_token_cap() -> None:
     assert reasoning_provider.signature() == reasoning_provider.model_copy(
         update={"temperature": 1.2}
     ).signature()
+
+
+def test_resume_requires_frozen_theme_similarity_settings() -> None:
+    original = RunSettings(
+        provider_signature="provider",
+        output_token_limit=4096,
+        theme_similarity=ThemeSimilaritySettings(
+            model="embedding-model",
+            dimensions=512,
+        ),
+    )
+    changed = original.model_copy(
+        update={
+            "theme_similarity": ThemeSimilaritySettings(
+                model="embedding-model",
+                dimensions=256,
+            )
+        }
+    )
+
+    with pytest.raises(ConfigurationError, match="similarity 配置"):
+        original.ensure_resumable_with(changed)
+
+
+def test_theme_similarity_uses_calibrated_defaults() -> None:
+    settings = ThemeSimilaritySettings(model="embedding-model")
+
+    assert settings.scene_threshold == 0.86
+    assert settings.style_threshold == 0.815
 
 
 def test_foundation_semantic_name_is_safe_for_a_filename() -> None:

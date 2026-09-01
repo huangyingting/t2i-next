@@ -21,7 +21,10 @@
 
 1. 一次 `Foundation` 调用生成共享 `StyleConstraints`、`CastPlan` 和语义文件名。
 2. `Theme` 按小批次生成，默认每批 5 个，并在同一次调用中直接生成各自的完整 `style`。
-3. 每个 `Theme` 一次 Frame 调用，生成该主题当前缺失的全部 `Frame`。
+3. 所有 `Theme` 完整生成后才执行可选的全量相似度审计；未齐时不会提前生成任何
+  `Frame`。
+4. 所有 `Theme` 通过审计后，每个 `Theme` 一次 Frame 调用，生成该主题当前缺失
+  的全部 `Frame`。
 
 因此 5 个主题、每个主题 5 个镜头的基础调用数是 7 次；100 个主题、
 每个主题 6 个镜头、Theme batch size 为 5 时，基础调用数是 121 次。
@@ -39,7 +42,8 @@ pass；只有整轮零进展时才返回可 resume 的未完成错误。checkpoi
 停止并发调用，避免继续产生无法持久化的付费结果。最终提示词仍只在全部完成后发布。
 
 每次模型调用都会追加记录到 run 的 `attempts.jsonl`，包含 stage、请求与接受的
-ID、outcome、校验问题、耗时、token usage 和输出预算。该日志同时让后续 pass
+ID、outcome、校验问题、耗时、token usage 和输出预算。Theme embedding 审计也以
+独立的 `theme_similarity` stage 记录 usage，并用 operation ID 防止 resume 重复记账。该日志同时让后续 pass
 或进程重启后的 resume 继续向模型提供最近一次相关校验反馈，而不是重新从空白
 重试。
 
@@ -240,6 +244,19 @@ manifest 保存它的 SHA-256 指纹。Foundation 会生成安全的英文 `snak
 `_0002`、`_0003`，依次递增。提示词只在全部内容生成完成后发布。这个版本
 只支持当前 schema；开发阶段不会保留旧格式的迁移或 fallback。
 
+配置 `OPENAI_EMBEDDING_MODEL` 后，每次全量 Theme 被接受时会增加一次批量
+embedding 调用，分别比较 `scene` 和移除 `required_phrases` 后的 `style`。无重复
+的 run 只调用一次；每轮自动重生成后会再审计一次。只有两个字段都达到阈值的
+Theme 对才标记为候选重复，结果保存在 run 的
+`theme-similarity.json`。命中后保留 ID 较早的 Theme，拒绝并只重新生成 ID 较后
+的 Theme，然后再次执行全量相似度审计；通过后才开始生成 Frame。候选 pair 会按
+Theme ID 顺序构造保留集：只拒绝与已保留 Theme 重复的后续 Theme，被拒 Theme
+不会继续连带淘汰其他 Theme。自动重生成最多执行 `GENERATION_RETRIES` 轮，达到
+上限仍重复时 run 会停止并保留最后一份报告。embedding provider 失败仍只记录在
+报告中并继续生成；未配置 embedding 模型时不发起该调用。拒绝决定会先持久化，
+再幂等删除目标 Theme 及其 Frame checkpoint；进程在两步之间退出时，resume 会
+完成同一操作而不会额外消耗重生成轮次。重生成反馈按 Theme ID 传给对应批次。
+
 如果 CLI brief 明确写出某位导演、艺术家或流派，Foundation 会把对应原文短语
 逐字保存在 `StyleConstraints.required_phrases` 中，Theme 也必须逐字使用。系统
 不会把一组视觉线索隐式映射为 brief 没有写出的姓名，也不会把模型对创作者的
@@ -271,6 +288,9 @@ run 内冻结的 `rules.json`，所以 VM 重启后即使系统或用户规则�
 provider 配置。未完成 run 会校验当前 provider 的 endpoint、模型、
 structured-output 模式、reasoning/thinking 设置和 temperature；当前
 `OPENAI_OUTPUT_TOKEN_LIMIT` 可以更大，但不能小于 manifest 记录的硬上限。
+启用 Theme 相似度诊断的 run 还要求 embedding 模型、dimensions 和两个阈值与
+manifest 一致。已保存且无候选的 `theme-similarity.json` 在 resume 时不会重复
+调用 embedding；已保存的候选报告会继续执行定向 Theme 重生成。
 `RunIncompleteError` 表示最近一个完整补全 pass 没有新增任何 Theme 或 Frame；
 在此之前有进展的 pass 已由同一次命令自动继续。
 
@@ -296,6 +316,10 @@ Provider 配置来自 `.env`：
 | `OPENAI_OUTPUT_TOKEN_LIMIT` | `16384` |
 | `OPENAI_TIMEOUT_SECONDS` | `180` |
 | `OPENAI_TRANSPORT_RETRIES` | `2` |
+| `OPENAI_EMBEDDING_MODEL` | 未设置，关闭 Theme 相似度诊断 |
+| `OPENAI_EMBEDDING_DIMENSIONS` | provider 模型默认维度 |
+| `THEME_SIMILARITY_SCENE_THRESHOLD` | `0.86` |
+| `THEME_SIMILARITY_STYLE_THRESHOLD` | `0.815` |
 
 `OPENAI_MODEL` 没有默认值，必须设置。只配置模型支持的 reasoning 控制：`OPENAI_REASONING_EFFORT` 或 `OPENAI_THINKING_MODE`，不要同时设置。
 

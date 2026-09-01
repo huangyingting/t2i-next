@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 import random
 import re
+from collections.abc import Sequence
 from typing import Any, TypeVar
 
 import httpx
@@ -32,6 +34,7 @@ from t2i_prompt_pipeline.providers.base import (
     ChatMessage,
     ModelResponse,
 )
+from t2i_prompt_pipeline.theme_similarity import EmbeddingResponse
 
 ResponseT = TypeVar("ResponseT", bound=BaseModel)
 _SCHEMA_MAP_KEYS = frozenset(
@@ -148,7 +151,7 @@ class OpenAICompatibleProvider(AuthorModel):
         elif self._settings.structured_output_mode == StructuredOutputMode.JSON_OBJECT:
             payload["response_format"] = {"type": "json_object"}
 
-        response = await self._post_with_retry(payload)
+        response = await self._post_with_retry("chat/completions", payload)
         usage = self._parse_usage(response)
         if self._finish_reason(response) == "length":
             try:
@@ -179,6 +182,76 @@ class OpenAICompatibleProvider(AuthorModel):
             ) from exc
         return ModelResponse(value=value, usage=usage)
 
+    async def embed(
+        self,
+        texts: Sequence[str],
+        *,
+        model: str,
+        dimensions: int | None,
+    ) -> EmbeddingResponse:
+        payload: dict[str, Any] = {
+            "model": model,
+            "input": list(texts),
+            "encoding_format": "float",
+        }
+        if dimensions is not None:
+            payload["dimensions"] = dimensions
+        response = await self._post_with_retry("embeddings", payload)
+        try:
+            body = response.json()
+            data = body["data"]
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ProviderResponseError(
+                "Embedding provider 返回了不支持的响应结构"
+            ) from exc
+        if not isinstance(data, list) or len(data) != len(texts):
+            raise ProviderResponseError(
+                "Embedding provider 返回的向量数量与输入不一致"
+            )
+        indexed: dict[int, tuple[float, ...]] = {}
+        for item in data:
+            if not isinstance(item, dict):
+                raise ProviderResponseError(
+                    "Embedding provider 返回了无效的向量项"
+                )
+            index = item.get("index")
+            embedding = item.get("embedding")
+            if (
+                not isinstance(index, int)
+                or isinstance(index, bool)
+                or not isinstance(embedding, list)
+                or not embedding
+                or any(
+                    not isinstance(value, (int, float))
+                    or isinstance(value, bool)
+                    or not math.isfinite(value)
+                    for value in embedding
+                )
+            ):
+                raise ProviderResponseError(
+                    "Embedding provider 返回了无效的向量项"
+                )
+            indexed[index] = tuple(float(value) for value in embedding)
+        if set(indexed) != set(range(len(texts))):
+            raise ProviderResponseError(
+                "Embedding provider 返回了无效的向量 index"
+            )
+        vector_dimensions = {len(vector) for vector in indexed.values()}
+        if len(vector_dimensions) != 1:
+            raise ProviderResponseError(
+                "Embedding provider 返回的向量维度不一致"
+            )
+        if dimensions is not None and vector_dimensions != {dimensions}:
+            actual_dimensions = next(iter(vector_dimensions))
+            raise ProviderResponseError(
+                "Embedding provider 返回维度与配置维度 "
+                f"{dimensions} 不一致：{actual_dimensions}"
+            )
+        return EmbeddingResponse(
+            vectors=tuple(indexed[index] for index in range(len(texts))),
+            usage=self._parse_usage(response),
+        )
+
     @staticmethod
     def _finish_reason(response: httpx.Response) -> str | None:
         try:
@@ -187,8 +260,12 @@ class OpenAICompatibleProvider(AuthorModel):
             return None
         return reason if isinstance(reason, str) else None
 
-    async def _post_with_retry(self, payload: dict[str, Any]) -> httpx.Response:
-        url = f"{self._settings.base_url.rstrip('/')}/chat/completions"
+    async def _post_with_retry(
+        self,
+        path: str,
+        payload: dict[str, Any],
+    ) -> httpx.Response:
+        url = f"{self._settings.base_url.rstrip('/')}/{path}"
         attempts = self._settings.transport_retries + 1
         for attempt in range(attempts):
             try:

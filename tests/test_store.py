@@ -15,6 +15,10 @@ from t2i_prompt_pipeline.models import (
     PromptBook,
     RunStatus,
     ThemeBook,
+    ThemeSimilarityRejection,
+    ThemeSimilarityReport,
+    ThemeSimilaritySettings,
+    ThemeSimilarityState,
     TokenUsage,
 )
 from t2i_prompt_pipeline.renderers import render_book
@@ -98,11 +102,93 @@ def test_local_store_checkpoints_and_completes_idempotently(
     assert book_payload["themes"][0]["theme"]["style"] == theme.style
 
 
+def test_local_store_persists_theme_similarity_report(tmp_path) -> None:
+    spec = make_spec(theme_count=2)
+    settings = make_settings(
+        theme_similarity=ThemeSimilaritySettings(model="embedding-model")
+    )
+    runs = tmp_path / "runs"
+    store = LocalRunStore(runs, tmp_path / "prompts")
+    snapshot = store.create(spec, settings, make_rules(spec))
+    report = ThemeSimilarityReport(
+        model="embedding-model",
+        scene_threshold=0.92,
+        style_threshold=0.92,
+        input_count=4,
+        pairs=[],
+        usage=TokenUsage(prompt_tokens=10, total_tokens=10),
+    )
+
+    store.record_theme_similarity(snapshot.run_id, report)
+
+    reopened = LocalRunStore(runs).inspect(snapshot.run_id)
+    assert reopened.theme_similarity_report == report
+    assert (runs / snapshot.run_id / "theme-similarity.json").is_file()
+
+
+def test_local_store_rejects_theme_and_dependent_checkpoints(tmp_path) -> None:
+    spec = make_spec(theme_count=2)
+    settings = make_settings(
+        theme_similarity=ThemeSimilaritySettings(model="embedding-model")
+    )
+    runs = tmp_path / "runs"
+    store = LocalRunStore(runs, tmp_path / "prompts")
+    snapshot = store.create(spec, settings, make_rules(spec))
+    foundation = make_foundation(spec)
+    themes = make_themes(spec)
+    store.checkpoint(snapshot.run_id, foundation)
+    for theme in themes:
+        store.checkpoint(snapshot.run_id, theme)
+        for frame in make_frame_batch(spec, theme).frames:
+            store.checkpoint(snapshot.run_id, frame)
+    store.record_theme_similarity(
+        snapshot.run_id,
+        report := ThemeSimilarityReport(
+            state=ThemeSimilarityState.REJECTION_PENDING,
+            model="embedding-model",
+            scene_threshold=0.86,
+            style_threshold=0.815,
+            input_count=4,
+            pairs=[],
+            regeneration_round=1,
+            rejections=[
+                ThemeSimilarityRejection(
+                    rejected_theme_id="T02",
+                    kept_theme_id="T01",
+                    scene_similarity=0.9,
+                    style_similarity=0.9,
+                )
+            ],
+        ),
+    )
+
+    store.apply_theme_rejections(snapshot.run_id, report)
+    store.apply_theme_rejections(snapshot.run_id, report)
+
+    reopened = LocalRunStore(runs).inspect(snapshot.run_id)
+    assert list(reopened.themes) == ["T01"]
+    assert sorted(reopened.frames) == ["T01-F01"]
+    assert reopened.theme_similarity_report is not None
+    assert (
+        reopened.theme_similarity_report.state
+        == ThemeSimilarityState.REGENERATING
+    )
+    assert not (runs / snapshot.run_id / "themes" / "T02.json").exists()
+    assert not list((runs / snapshot.run_id / "frames").glob("T02-F*.json"))
+
+    store.clear_theme_similarity(snapshot.run_id)
+
+    assert LocalRunStore(runs).inspect(
+        snapshot.run_id
+    ).theme_similarity_report is None
+
+
 def test_local_store_appends_and_reloads_generation_attempts(tmp_path) -> None:
     runs = tmp_path / "runs"
     store = LocalRunStore(runs, tmp_path / "prompts")
     snapshot = store.create(make_spec(), make_settings(), make_rules(make_spec()))
     attempt = GenerationAttempt(
+        operation_id="frame-attempt-1",
         occurred_at="2026-08-20T00:00:00+00:00",
         stage=GenerationStage.FRAMES,
         requested_ids=["T01-F01"],
@@ -119,6 +205,7 @@ def test_local_store_appends_and_reloads_generation_attempts(tmp_path) -> None:
         ),
     )
 
+    store.record_attempt(snapshot.run_id, attempt)
     store.record_attempt(snapshot.run_id, attempt)
 
     assert (runs / snapshot.run_id / "attempts.jsonl").read_text().count("\n") == 1

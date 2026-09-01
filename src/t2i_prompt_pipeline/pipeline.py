@@ -46,6 +46,9 @@ from t2i_prompt_pipeline.models import (
     Theme,
     ThemeBatch,
     ThemeBook,
+    ThemeSimilarityRejection,
+    ThemeSimilarityReport,
+    ThemeSimilarityState,
     TokenUsage,
     frame_batch_response_model,
     theme_batch_response_model,
@@ -58,8 +61,10 @@ from t2i_prompt_pipeline.templates import (
     frame_messages,
     theme_batch_messages,
 )
+from t2i_prompt_pipeline.theme_similarity import ThemeSimilarityAnalyzer
 
 ProgressCallback = Callable[[str], None]
+_SIMILARITY_REJECTION_PREFIX = "Theme embedding 相似度判定为重复"
 
 
 class PromptStudio:
@@ -71,11 +76,13 @@ class PromptStudio:
         store: RunStore,
         settings: RunSettings,
         *,
+        theme_similarity: ThemeSimilarityAnalyzer | None = None,
         on_progress: ProgressCallback | None = None,
     ) -> None:
         self._author = author
         self._store = store
         self._settings = settings
+        self._theme_similarity = theme_similarity
         self._on_progress = on_progress
 
     async def run(
@@ -132,12 +139,24 @@ class PromptStudio:
         expected_theme_ids = theme_ids(spec)
         while True:
             snapshot = self._store.inspect(snapshot.run_id)
+            snapshot = self._restore_theme_similarity(snapshot)
             checkpoint_count = len(snapshot.themes) + len(snapshot.frames)
             missing_theme_ids = tuple(
                 theme_id
                 for theme_id in expected_theme_ids
                 if theme_id not in snapshot.themes
             )
+            if (
+                missing_theme_ids
+                and snapshot.theme_similarity_report is not None
+                and snapshot.theme_similarity_report.state
+                in {
+                    ThemeSimilarityState.CLEAN,
+                    ThemeSimilarityState.ERROR,
+                }
+            ):
+                self._store.clear_theme_similarity(snapshot.run_id)
+                snapshot = self._store.inspect(snapshot.run_id)
             attempt_history = self._store.attempts(snapshot.run_id)
             theme_tasks = [
                 partial(
@@ -149,9 +168,9 @@ class PromptStudio:
                     batch,
                     tuple(snapshot.themes.values()),
                     rules,
-                    self._recent_attempt_issues(
+                    self._theme_retry_issues(
                         attempt_history,
-                        GenerationStage.THEMES,
+                        snapshot.theme_similarity_report,
                         batch,
                     ),
                 )
@@ -167,6 +186,36 @@ class PromptStudio:
                 )
             )
 
+            snapshot = self._store.inspect(snapshot.run_id)
+            if len(snapshot.themes) != len(expected_theme_ids):
+                current_count = len(snapshot.themes) + len(snapshot.frames)
+                if current_count == checkpoint_count:
+                    self._stop_incomplete(snapshot, causes)
+                continue
+            report = snapshot.theme_similarity_report
+            if (
+                report is not None
+                and report.state == ThemeSimilarityState.REGENERATING
+            ):
+                self._store.clear_theme_similarity(snapshot.run_id)
+                snapshot = self._store.inspect(snapshot.run_id)
+                report = None
+            if report is None and self._theme_similarity is not None:
+                report = await self._audit_theme_similarity(
+                    snapshot,
+                    foundation,
+                    expected_theme_ids,
+                )
+                self._store.record_theme_similarity(snapshot.run_id, report)
+                snapshot = self._restore_theme_similarity(
+                    self._store.inspect(snapshot.run_id)
+                )
+                report = snapshot.theme_similarity_report
+                if (
+                    report is not None
+                    and report.state == ThemeSimilarityState.REGENERATING
+                ):
+                    continue
             snapshot = self._store.inspect(snapshot.run_id)
             attempt_history = self._store.attempts(snapshot.run_id)
             frame_tasks: list[Callable[[], Awaitable[None]]] = []
@@ -241,6 +290,314 @@ class PromptStudio:
         archived = self._store.complete(snapshot.run_id, result)
         self._emit("全部 checkpoint 已完成，提示词已发布")
         return archived
+
+    async def _audit_theme_similarity(
+        self,
+        snapshot: RunSnapshot,
+        foundation: Foundation,
+        expected_theme_ids: tuple[str, ...],
+    ) -> ThemeSimilarityReport:
+        assert self._theme_similarity is not None
+        started = perf_counter()
+        audit_number = 1 + sum(
+            attempt.stage == GenerationStage.THEME_SIMILARITY
+            for attempt in self._store.attempts(snapshot.run_id)
+        )
+        try:
+            report = await self._theme_similarity.analyze(
+                tuple(snapshot.themes[theme_id] for theme_id in expected_theme_ids),
+                foundation.style_constraints.required_phrases,
+            )
+        except ProviderError as exc:
+            report = self._theme_similarity.failure_report(str(exc))
+            self._emit(f"Theme 相似度审计失败，继续生成：{exc}")
+        else:
+            candidate_count = sum(
+                pair.potential_duplicate for pair in report.pairs
+            )
+            self._emit(
+                f"Theme 相似度审计已保存：{candidate_count} 对候选重复"
+            )
+        return report.model_copy(
+            update={
+                "audit_number": audit_number,
+                "duration_ms": self._elapsed_ms(started),
+            }
+        )
+
+    def _restore_theme_similarity(
+        self,
+        snapshot: RunSnapshot,
+    ) -> RunSnapshot:
+        report = snapshot.theme_similarity_report
+        if report is None:
+            return snapshot
+        self._validate_theme_similarity_report(snapshot, report)
+        if report.state == ThemeSimilarityState.ANALYZED:
+            report = self._finalize_theme_similarity(snapshot, report)
+            self._store.record_theme_similarity(snapshot.run_id, report)
+            snapshot = self._store.inspect(snapshot.run_id)
+        self._ensure_similarity_attempt(snapshot, report)
+        if report.state == ThemeSimilarityState.EXHAUSTED:
+            rejected_ids = [
+                rejection.rejected_theme_id
+                for rejection in report.rejections
+            ]
+            message = (
+                "Theme embedding 相似度自动重生成已达上限 "
+                f"{snapshot.settings.generation_retries} 次，仍有候选重复："
+                f"{rejected_ids}"
+            )
+            self._emit(message)
+            self._stop_incomplete(
+                snapshot,
+                [
+                    *(
+                        self._similarity_rejection_issue(rejection)
+                        for rejection in report.rejections
+                    ),
+                    message,
+                ],
+            )
+        if report.state == ThemeSimilarityState.REJECTION_PENDING:
+            self._store.apply_theme_rejections(snapshot.run_id, report)
+            rejected_ids = [
+                rejection.rejected_theme_id
+                for rejection in report.rejections
+            ]
+            self._emit(
+                "Theme 相似度候选已拒绝并将自动重生成："
+                f"{rejected_ids}"
+            )
+            return self._store.inspect(snapshot.run_id)
+        return snapshot
+
+    @staticmethod
+    def _validate_theme_similarity_report(
+        snapshot: RunSnapshot,
+        report: ThemeSimilarityReport,
+    ) -> None:
+        expected_ids = set(theme_ids(snapshot.spec))
+        referenced_ids = {
+            theme_id
+            for pair in report.pairs
+            for theme_id in (pair.first_theme_id, pair.second_theme_id)
+        } | {
+            theme_id
+            for rejection in report.rejections
+            for theme_id in (
+                rejection.rejected_theme_id,
+                rejection.kept_theme_id,
+            )
+        }
+        unknown_ids = sorted(referenced_ids - expected_ids)
+        if unknown_ids:
+            raise GenerationContractError(
+                "Theme similarity report 引用未知 Theme ID："
+                f"{unknown_ids}"
+            )
+        self_pairs = sorted(
+            {
+                pair.first_theme_id
+                for pair in report.pairs
+                if pair.first_theme_id == pair.second_theme_id
+            }
+            | {
+                rejection.rejected_theme_id
+                for rejection in report.rejections
+                if rejection.rejected_theme_id == rejection.kept_theme_id
+            }
+        )
+        if self_pairs:
+            raise GenerationContractError(
+                "Theme similarity report 包含自身配对："
+                f"{self_pairs}"
+            )
+        rejected_ids = [
+            rejection.rejected_theme_id
+            for rejection in report.rejections
+        ]
+        duplicate_rejections = sorted(
+            theme_id
+            for theme_id in set(rejected_ids)
+            if rejected_ids.count(theme_id) > 1
+        )
+        if duplicate_rejections:
+            raise GenerationContractError(
+                "Theme similarity report 重复拒绝 Theme ID："
+                f"{duplicate_rejections}"
+            )
+        rejection_states = {
+            ThemeSimilarityState.REJECTION_PENDING,
+            ThemeSimilarityState.REGENERATING,
+            ThemeSimilarityState.EXHAUSTED,
+        }
+        if report.state in rejection_states and (
+            not report.rejections or report.regeneration_round is None
+        ):
+            raise GenerationContractError(
+                "Theme similarity rejection 状态缺少拒绝项或轮次"
+            )
+        if report.state == ThemeSimilarityState.ERROR and report.error is None:
+            raise GenerationContractError(
+                "Theme similarity error 状态缺少错误信息"
+            )
+
+    def _finalize_theme_similarity(
+        self,
+        snapshot: RunSnapshot,
+        report: ThemeSimilarityReport,
+    ) -> ThemeSimilarityReport:
+        if report.error is not None:
+            return report.model_copy(
+                update={"state": ThemeSimilarityState.ERROR}
+            )
+        candidates = tuple(
+            pair for pair in report.pairs if pair.potential_duplicate
+        )
+        if not candidates:
+            return report.model_copy(
+                update={"state": ThemeSimilarityState.CLEAN}
+            )
+        known_theme_ids = set(snapshot.themes)
+        unknown_theme_ids = sorted(
+            {
+                theme_id
+                for pair in candidates
+                for theme_id in (
+                    pair.first_theme_id,
+                    pair.second_theme_id,
+                )
+                if theme_id not in known_theme_ids
+            }
+        )
+        if unknown_theme_ids:
+            raise GenerationContractError(
+                "Theme similarity report 引用未知 Theme ID："
+                f"{unknown_theme_ids}"
+            )
+        self_pairs = sorted(
+            {
+                pair.first_theme_id
+                for pair in candidates
+                if pair.first_theme_id == pair.second_theme_id
+            }
+        )
+        if self_pairs:
+            raise GenerationContractError(
+                "Theme similarity report 包含自身配对："
+                f"{self_pairs}"
+            )
+        candidates_by_edge = {
+            frozenset((pair.first_theme_id, pair.second_theme_id)): pair
+            for pair in candidates
+        }
+        kept_ids: list[str] = []
+        rejections: list[ThemeSimilarityRejection] = []
+        for theme_id in sorted(snapshot.themes):
+            matches = [
+                (kept_id, pair)
+                for kept_id in kept_ids
+                if (
+                    pair := candidates_by_edge.get(
+                        frozenset((kept_id, theme_id))
+                    )
+                )
+                is not None
+            ]
+            if not matches:
+                kept_ids.append(theme_id)
+                continue
+            kept_id, pair = max(
+                matches,
+                key=lambda match: min(
+                    match[1].scene_similarity,
+                    match[1].style_similarity,
+                ),
+            )
+            rejections.append(
+                ThemeSimilarityRejection(
+                    rejected_theme_id=theme_id,
+                    kept_theme_id=kept_id,
+                    scene_similarity=pair.scene_similarity,
+                    style_similarity=pair.style_similarity,
+                )
+            )
+        completed_regenerations = sum(
+            attempt.stage == GenerationStage.THEME_SIMILARITY
+            and attempt.outcome == AttemptOutcome.REJECTED
+            for attempt in self._store.attempts(snapshot.run_id)
+        )
+        state = (
+            ThemeSimilarityState.EXHAUSTED
+            if completed_regenerations
+            >= snapshot.settings.generation_retries
+            else ThemeSimilarityState.REJECTION_PENDING
+        )
+        return report.model_copy(
+            update={
+                "state": state,
+                "regeneration_round": completed_regenerations + 1,
+                "rejections": rejections,
+            }
+        )
+
+    def _ensure_similarity_attempt(
+        self,
+        snapshot: RunSnapshot,
+        report: ThemeSimilarityReport,
+    ) -> None:
+        if any(
+            attempt.operation_id == report.audit_id
+            for attempt in self._store.attempts(snapshot.run_id)
+        ):
+            return
+        if report.state == ThemeSimilarityState.ANALYZED:
+            raise GenerationContractError(
+                "Theme similarity report 尚未完成状态判定"
+            )
+        issues = tuple(
+            self._similarity_rejection_issue(rejection)
+            for rejection in report.rejections
+        )
+        if report.error is not None:
+            issues = (*issues, report.error)
+        outcome = (
+            AttemptOutcome.PROVIDER_ERROR
+            if report.state == ThemeSimilarityState.ERROR
+            else AttemptOutcome.REJECTED
+            if report.rejections
+            else AttemptOutcome.ACCEPTED
+        )
+        self._record_attempt(
+            snapshot.run_id,
+            GenerationStage.THEME_SIMILARITY,
+            tuple(sorted(snapshot.themes)),
+            report.audit_number,
+            None,
+            outcome,
+            accepted_ids=(
+                tuple(sorted(snapshot.themes))
+                if outcome == AttemptOutcome.ACCEPTED
+                else ()
+            ),
+            issues=issues,
+            duration_ms=report.duration_ms,
+            usage=report.usage,
+            operation_id=report.audit_id,
+        )
+
+    @staticmethod
+    def _similarity_rejection_issue(
+        rejection: ThemeSimilarityRejection,
+    ) -> str:
+        return (
+            f"{_SIMILARITY_REJECTION_PREFIX}："
+            f"{rejection.rejected_theme_id} 与 {rejection.kept_theme_id}"
+            f"（scene={rejection.scene_similarity:.6f}，"
+            f"style={rejection.style_similarity:.6f}）；"
+            "请为被拒 ID 生成全新的场所、核心装置与摄影方案"
+        )
 
     async def _generate_foundation(
         self,
@@ -374,7 +731,7 @@ class PromptStudio:
             len(remaining),
             foundation.cast_plan.member_count,
         )
-        issues = list(initial_issues)
+        issues: list[str] = []
         for attempt in range(settings.generation_retries + 1):
             attempt_ids = tuple(remaining)
             attempt_budget = budget
@@ -388,7 +745,10 @@ class PromptStudio:
                         foundation,
                         tuple(remaining),
                         rules,
-                        validation_issues=tuple(issues[-3:]),
+                        validation_issues=(
+                            *initial_issues,
+                            *issues[-3:],
+                        ),
                         existing_themes=(
                             *existing_themes,
                             *completed.values(),
@@ -1006,17 +1366,19 @@ class PromptStudio:
         stage: GenerationStage,
         requested_ids: tuple[str, ...],
         attempt: int,
-        max_output_tokens: int,
+        max_output_tokens: int | None,
         outcome: AttemptOutcome,
         *,
         accepted_ids: tuple[str, ...] = (),
         issues: tuple[str, ...] = (),
         duration_ms: int,
         usage: TokenUsage | None = None,
+        operation_id: str | None = None,
     ) -> None:
         self._store.record_attempt(
             run_id,
             GenerationAttempt(
+                operation_id=operation_id,
                 occurred_at=datetime.now(UTC).isoformat(),
                 stage=stage,
                 requested_ids=list(requested_ids),
@@ -1029,6 +1391,31 @@ class PromptStudio:
                 usage=usage or TokenUsage(),
             ),
         )
+
+    def _theme_retry_issues(
+        self,
+        attempts: tuple[GenerationAttempt, ...],
+        report: ThemeSimilarityReport | None,
+        requested_ids: tuple[str, ...],
+    ) -> tuple[str, ...]:
+        issues = list(
+            self._recent_attempt_issues(
+                attempts,
+                GenerationStage.THEMES,
+                requested_ids,
+            )
+        )
+        if (
+            report is not None
+            and report.state == ThemeSimilarityState.REGENERATING
+        ):
+            requested = set(requested_ids)
+            issues.extend(
+                self._similarity_rejection_issue(rejection)
+                for rejection in report.rejections
+                if rejection.rejected_theme_id in requested
+            )
+        return tuple(issues)
 
     @staticmethod
     def _recent_attempt_issues(

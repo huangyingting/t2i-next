@@ -9,6 +9,7 @@ from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal, Union
+from uuid import uuid4
 
 from pydantic import (
     AfterValidator,
@@ -78,6 +79,7 @@ class OutputLanguage(StrEnum):
 class GenerationStage(StrEnum):
     FOUNDATION = "foundation"
     THEMES = "themes"
+    THEME_SIMILARITY = "theme_similarity"
     FRAMES = "frames"
 
 
@@ -92,6 +94,15 @@ class AttemptOutcome(StrEnum):
     PARTIAL = "partial"
     REJECTED = "rejected"
     PROVIDER_ERROR = "provider_error"
+
+
+class ThemeSimilarityState(StrEnum):
+    ANALYZED = "analyzed"
+    CLEAN = "clean"
+    ERROR = "error"
+    REJECTION_PENDING = "rejection_pending"
+    REGENERATING = "regenerating"
+    EXHAUSTED = "exhausted"
 
 
 class ProviderAuthMode(StrEnum):
@@ -393,6 +404,7 @@ class RunSettings(Model):
     max_concurrency: int = Field(default=8, ge=1, le=16)
     provider_signature: Text
     output_token_limit: int = Field(ge=256, le=65536)
+    theme_similarity: ThemeSimilaritySettings | None = None
 
     def ensure_resumable_with(self, current: RunSettings) -> None:
         if self.provider_signature != current.provider_signature:
@@ -404,6 +416,17 @@ class RunSettings(Model):
                 "当前 OPENAI_OUTPUT_TOKEN_LIMIT 小于 run 所需硬上限 "
                 f"{self.output_token_limit}"
             )
+        if self.theme_similarity != current.theme_similarity:
+            raise ConfigurationError(
+                "当前 Theme similarity 配置与 run manifest 不一致"
+            )
+
+
+class ThemeSimilaritySettings(Model):
+    model: Text
+    dimensions: int | None = Field(default=None, ge=1, le=65536)
+    scene_threshold: float = Field(default=0.86, ge=-1, le=1)
+    style_threshold: float = Field(default=0.815, ge=-1, le=1)
 
 
 class RunManifest(Model):
@@ -442,12 +465,18 @@ class ProviderSettings(Model):
     output_token_limit: int = Field(default=16384, ge=256, le=65536)
     timeout_seconds: float = Field(default=180, gt=0, le=600)
     transport_retries: int = Field(default=2, ge=0, le=8)
+    embedding_model: Text | None = None
+    embedding_dimensions: int | None = Field(default=None, ge=1, le=65536)
 
     @model_validator(mode="after")
     def reasoning_controls_do_not_conflict(self) -> ProviderSettings:
         if self.thinking_mode is not None and self.reasoning_effort is not None:
             raise ValueError(
                 "thinking_mode 与 reasoning_effort 不能同时配置"
+            )
+        if self.embedding_dimensions is not None and self.embedding_model is None:
+            raise ValueError(
+                "embedding_dimensions 需要同时配置 embedding_model"
             )
         return self
 
@@ -493,12 +522,45 @@ class TokenUsage(Model):
     total_tokens: int | None = Field(default=None, ge=0)
 
 
+class ThemeSimilarityPair(Model):
+    first_theme_id: ThemeId
+    second_theme_id: ThemeId
+    scene_similarity: float = Field(ge=-1, le=1)
+    style_similarity: float = Field(ge=-1, le=1)
+    potential_duplicate: bool
+
+
+class ThemeSimilarityRejection(Model):
+    rejected_theme_id: ThemeId
+    kept_theme_id: ThemeId
+    scene_similarity: float = Field(ge=-1, le=1)
+    style_similarity: float = Field(ge=-1, le=1)
+
+
+class ThemeSimilarityReport(Model):
+    audit_id: Text = Field(default_factory=lambda: uuid4().hex)
+    audit_number: int = Field(default=1, ge=1)
+    state: ThemeSimilarityState = ThemeSimilarityState.ANALYZED
+    model: Text
+    dimensions: int | None = Field(default=None, ge=1, le=65536)
+    scene_threshold: float = Field(ge=-1, le=1)
+    style_threshold: float = Field(ge=-1, le=1)
+    input_count: int = Field(ge=0)
+    pairs: list[ThemeSimilarityPair]
+    regeneration_round: int | None = Field(default=None, ge=1)
+    rejections: list[ThemeSimilarityRejection] = Field(default_factory=list)
+    duration_ms: int = Field(default=0, ge=0)
+    usage: TokenUsage = Field(default_factory=TokenUsage)
+    error: Text | None = None
+
+
 class GenerationAttempt(Model):
+    operation_id: Text | None = None
     occurred_at: Text
     stage: GenerationStage
     requested_ids: list[Text] = Field(default_factory=list, max_length=100)
     attempt: int = Field(ge=1)
-    max_output_tokens: int = Field(ge=256, le=65536)
+    max_output_tokens: int | None = Field(default=None, ge=256, le=65536)
     outcome: AttemptOutcome
     accepted_ids: list[Text] = Field(default_factory=list, max_length=100)
     issues: list[Text] = Field(default_factory=list)

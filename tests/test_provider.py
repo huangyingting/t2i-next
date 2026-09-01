@@ -81,6 +81,132 @@ async def test_provider_sends_strict_compatible_model_schema(
     }
 
 
+@pytest.mark.asyncio
+async def test_provider_sends_one_batched_embedding_request(monkeypatch) -> None:
+    monkeypatch.setenv("TEST_API_KEY", "secret")
+    captured: dict[str, object] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured.update(json.loads(request.content))
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "data": [
+                    {"index": 1, "embedding": [0.0, 1.0, 0.0]},
+                    {"index": 0, "embedding": [1.0, 0.0, 0.0]},
+                ],
+                "usage": {"prompt_tokens": 7, "total_tokens": 7},
+            },
+        )
+
+    settings = ProviderSettings(model="test-model", api_key_env="TEST_API_KEY")
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAICompatibleProvider(settings, client=client)
+
+    response = await provider.embed(
+        ("scene", "style"),
+        model="embedding-model",
+        dimensions=3,
+    )
+    await client.aclose()
+
+    assert captured == {
+        "path": "/v1/embeddings",
+        "model": "embedding-model",
+        "input": ["scene", "style"],
+        "encoding_format": "float",
+        "dimensions": 3,
+    }
+    assert response.vectors == ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0))
+    assert response.usage.total_tokens == 7
+
+
+@pytest.mark.asyncio
+async def test_provider_rejects_invalid_embedding_indexes(monkeypatch) -> None:
+    monkeypatch.setenv("TEST_API_KEY", "secret")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "data": [
+                    {"index": 0, "embedding": [1.0, 0.0]},
+                    {"index": 0, "embedding": [0.0, 1.0]},
+                ]
+            },
+        )
+
+    settings = ProviderSettings(model="test-model", api_key_env="TEST_API_KEY")
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAICompatibleProvider(settings, client=client)
+
+    with pytest.raises(ProviderResponseError, match="向量 index"):
+        await provider.embed(
+            ("scene", "style"),
+            model="embedding-model",
+            dimensions=None,
+        )
+    await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_provider_rejects_non_finite_embedding_values(monkeypatch) -> None:
+    monkeypatch.setenv("TEST_API_KEY", "secret")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=request,
+            content=b'{"data":[{"index":0,"embedding":[1.0,NaN]}]}',
+            headers={"Content-Type": "application/json"},
+        )
+
+    settings = ProviderSettings(model="test-model", api_key_env="TEST_API_KEY")
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAICompatibleProvider(settings, client=client)
+
+    with pytest.raises(ProviderResponseError, match="无效的向量项"):
+        await provider.embed(
+            ("scene",),
+            model="embedding-model",
+            dimensions=None,
+        )
+    await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_provider_rejects_unexpected_embedding_dimensions(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("TEST_API_KEY", "secret")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "data": [
+                    {"index": 0, "embedding": [1.0, 0.0, 0.0]},
+                ]
+            },
+        )
+
+    settings = ProviderSettings(model="test-model", api_key_env="TEST_API_KEY")
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAICompatibleProvider(settings, client=client)
+
+    with pytest.raises(ProviderResponseError, match="配置维度 2"):
+        await provider.embed(
+            ("scene",),
+            model="embedding-model",
+            dimensions=2,
+        )
+    await client.aclose()
+
+
 def test_strict_schema_requires_nullable_frame_fields() -> None:
     response_model = frame_batch_response_model(
         "T01",

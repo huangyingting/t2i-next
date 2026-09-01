@@ -93,7 +93,7 @@ def test_frame_request_contains_theme_context_and_stage_rules() -> None:
     assert "同一三维空间" in instructions
     assert "完整可见因果链" in instructions
     assert "核心道具已有来源" in instructions
-    assert "本次使用 情色级（erotic）" in instructions
+    assert "本次使用 极致情色级（erotic）" in instructions
     assert "当前画面直接呈现" in instructions
 
 
