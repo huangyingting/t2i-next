@@ -10,6 +10,12 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
+from t2i_prompt_pipeline.cast_matrix_batch import (
+    CastMatrixBatchResult,
+    build_cast_matrix_tasks,
+    default_cast_matrix_state_file,
+    run_cast_matrix_batch,
+)
 from t2i_prompt_pipeline.config import (
     build_config,
     load_provider_settings,
@@ -268,6 +274,94 @@ def generate_safe_avant_garde_command(
     typer.secho("安全先锋艺术批次完成", fg=typer.colors.GREEN)
     typer.echo(f"完成 run：{result.completed_tasks}/72")
     typer.echo(f"生成 Frame：{result.generated_frames}/43200")
+    typer.echo(f"批次状态：{result.state_file}")
+
+
+@app.command("generate-cast-matrix")
+def generate_cast_matrix_command(
+    brief: str = typer.Argument(
+        ...,
+        help="五组人物配置共享的场景、时代和视觉要求；不要在此指定人数。",
+    ),
+    content_level: ContentLevel = typer.Option(
+        ...,
+        "--content-level",
+        help="五组任务共同使用的内容尺度。",
+    ),
+    rules_dir: Path | None = typer.Option(
+        None,
+        "--rules-dir",
+        file_okay=False,
+        help="可选用户规则目录；默认使用当前目录下的 rules/。",
+    ),
+    runs_dir: Path = typer.Option(
+        Path("runs"),
+        "--runs-dir",
+        file_okay=False,
+        help="增量 checkpoint 和批次状态目录。",
+    ),
+    prompts_dir: Path = typer.Option(
+        Path("prompts"),
+        "--prompts-dir",
+        file_okay=False,
+        help="最终提示词文件目录。",
+    ),
+    state_file: Path | None = typer.Option(
+        None,
+        "--state-file",
+        dir_okay=False,
+        help="批次状态文件；默认按 brief、尺度和规则生成稳定文件名。",
+    ),
+    retry_delay_seconds: float = typer.Option(
+        5,
+        "--retry-delay-seconds",
+        min=0,
+        help="可恢复失败后的等待秒数。",
+    ),
+) -> None:
+    """Generate five resumable 100-theme by 6-frame cast combinations."""
+    try:
+        tasks = build_cast_matrix_tasks(brief, content_level)
+        config = build_config(
+            tasks[0].spec,
+            runs_directory=runs_dir,
+            prompts_directory=prompts_dir,
+            rules_directory=rules_dir,
+            max_concurrency=16,
+            theme_batch_size=5,
+            generation_retries=5,
+        )
+        resolved_state_file = (
+            state_file
+            if state_file is not None
+            else default_cast_matrix_state_file(
+                runs_dir,
+                tasks,
+                config.rules.fingerprint(),
+            )
+        )
+        typer.echo("开始人物矩阵：5 个 run，500 个 Theme，3,000 个 Frame。")
+        result = asyncio.run(
+            run_cast_matrix_batch(
+                config,
+                tasks,
+                resolved_state_file,
+                retry_delay_seconds=retry_delay_seconds,
+                on_progress=typer.echo,
+            )
+        )
+    except (ValidationError, PromptPipelineError) as exc:
+        _exit_for_error(exc, runs_dir)
+
+    _print_cast_matrix_completed(result)
+
+
+def _print_cast_matrix_completed(result: CastMatrixBatchResult) -> None:
+    typer.secho("人物矩阵生成完成。", fg=typer.colors.GREEN)
+    typer.echo(f"完成 run：{result.completed_tasks}/5")
+    typer.echo(f"生成 Frame：{result.generated_frames}/3000")
+    for prompt_file in result.prompt_files:
+        typer.echo(f"Prompts：{prompt_file}")
     typer.echo(f"批次状态：{result.state_file}")
 
 

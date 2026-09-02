@@ -5,6 +5,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from t2i_prompt_pipeline import cli
+from t2i_prompt_pipeline.cast_matrix_batch import CastMatrixBatchResult
 from t2i_prompt_pipeline.models import (
     AppConfig,
     ContentLevel,
@@ -115,6 +116,7 @@ def test_cli_exposes_generation_resume_and_runs_commands() -> None:
 
     assert result.exit_code == 0
     assert "generate" in result.output
+    assert "generate-cast-matrix" in result.output
     assert "generate-safe-avant-garde" in result.output
     assert "resume" in result.output
     assert "runs" in result.output
@@ -178,6 +180,78 @@ def test_safe_avant_garde_command_wires_fixed_batch(
     assert captured["state_file"] == (
         tmp_path / "runs/safe-avant-garde-batch.json"
     )
+
+
+def test_cast_matrix_command_wires_five_resumable_tasks(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    captured = {}
+
+    def fake_build_config(spec, **kwargs):
+        captured["spec"] = spec
+        captured["kwargs"] = kwargs
+        return AppConfig(
+            spec=spec,
+            provider=ProviderSettings(model="test"),
+            runs_directory=tmp_path / "runs",
+            prompts_directory=tmp_path / "prompts",
+            run_settings=make_settings(),
+            rules=make_rules(spec),
+        )
+
+    async def fake_run(
+        config,
+        tasks,
+        state_file,
+        *,
+        retry_delay_seconds,
+        on_progress,
+    ):
+        captured["config"] = config
+        captured["tasks"] = tasks
+        captured["state_file"] = state_file
+        captured["retry_delay_seconds"] = retry_delay_seconds
+        captured["on_progress"] = on_progress
+        return CastMatrixBatchResult(
+            completed_tasks=5,
+            generated_frames=3000,
+            prompt_files=tuple(f"/prompts/{index}.txt" for index in range(5)),
+            state_file=state_file.resolve(),
+        )
+
+    monkeypatch.setattr(cli, "build_config", fake_build_config)
+    monkeypatch.setattr(cli, "run_cast_matrix_batch", fake_run)
+
+    result = CliRunner().invoke(
+        cli.app,
+        [
+            "generate-cast-matrix",
+            "共享视觉 brief",
+            "--content-level",
+            "hardcore",
+            "--rules-dir",
+            str(tmp_path / "rules"),
+            "--runs-dir",
+            str(tmp_path / "runs"),
+            "--prompts-dir",
+            str(tmp_path / "prompts"),
+            "--retry-delay-seconds",
+            "0",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "5 个 run，500 个 Theme，3,000 个 Frame" in result.output
+    assert "完成 run：5/5" in result.output
+    assert "生成 Frame：3000/3000" in result.output
+    assert len(captured["tasks"]) == 5
+    assert captured["spec"].content_level == ContentLevel.HARDCORE
+    assert captured["kwargs"]["max_concurrency"] == 16
+    assert captured["kwargs"]["theme_batch_size"] == 5
+    assert captured["kwargs"]["generation_retries"] == 5
+    assert captured["retry_delay_seconds"] == 0
+    assert captured["state_file"].parent == tmp_path / "runs"
 
 
 def test_completed_resume_needs_no_provider_configuration(
