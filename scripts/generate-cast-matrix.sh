@@ -25,15 +25,16 @@ if [[ -z "$brief" ]]; then
 fi
 
 if [[ -z "$content_level" ]]; then
-  read -r -p "Content level [aesthetic/erotic/hardcore]: " content_level
+  content_levels=(erotic hardcore)
+else
+  case "$content_level" in
+    aesthetic|erotic|hardcore) content_levels=("$content_level") ;;
+    *)
+      printf 'Invalid content level: %s\n' "$content_level" >&2
+      exit 2
+      ;;
+  esac
 fi
-case "$content_level" in
-  aesthetic|erotic|hardcore) ;;
-  *)
-    printf 'Invalid content level: %s\n' "$content_level" >&2
-    exit 2
-    ;;
-esac
 
 if [[ ! -x "$cli" ]]; then
   printf 't2i-prompts is not executable: %s\n' "$cli" >&2
@@ -45,7 +46,10 @@ if [[ ! -d "$rules_dir" ]]; then
 fi
 
 cd -- "$repo_root"
-exec "$cli" generate-cast-matrix \
-  "$brief" \
-  --content-level "$content_level" \
-  --rules-dir "$rules_dir"
+for level in "${content_levels[@]}"; do
+  printf 'Generating cast matrix with content level: %s\n' "$level"
+  "$cli" generate-cast-matrix \
+    "$brief" \
+    --content-level "$level" \
+    --rules-dir "$rules_dir"
+done

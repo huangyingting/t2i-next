@@ -171,23 +171,25 @@ uv run t2i-prompts generate \
 
 ### 五组人物矩阵
 
-交互式脚本接收一个不含人数的共享 brief 和一个 content level，然后依次生成
-一女、两女、三女、一女一男、两女一男五组提示词。每组固定为 100 个 Theme、
-每个 Theme 6 个连续 Frame，共生成 3,000 条提示词：
+交互式脚本接收一个不含人数的共享 brief，然后依次生成一女、两女、三女、
+一女一男、两女一男五组提示词。每组固定为 100 个 Theme、每个 Theme 6 个连续
+Frame。未指定 content level 时依次运行 `erotic` 和 `hardcore`，共生成 10 个
+run 和 6,000 条提示词：
 
 ```bash
 ./scripts/generate-cast-matrix.sh
 ```
 
-也可以直接传参：
+也可以直接传入 brief，并使用相同的双尺度默认值：
 
 ```bash
 ./scripts/generate-cast-matrix.sh \
-  "盛唐河西敦煌壁画启发的现实乐舞电影摄影" \
-  erotic
+  "盛唐河西敦煌壁画启发的现实乐舞电影摄影"
 ```
 
-第三个可选参数可以指定另一个规则目录；未传时使用项目根目录的 `rules/`。
+第二个参数显式指定 `aesthetic`、`erotic` 或 `hardcore` 时只运行该尺度，共生成
+5 个 run 和 3,000 条提示词。第三个可选参数可以指定另一个规则目录；未传时使用
+项目根目录的 `rules/`。
 脚本会为每组 brief 补充明确成年的人物配置，因此共享 brief 不应自行指定人数。
 批次状态按 brief、content level 和规则自动写入 `runs/cast-matrix-*.json`。
 单次生成暂时没有进展时会自动继续同一 run；Theme 相似度重生成耗尽时会自动建立
