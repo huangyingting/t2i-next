@@ -108,9 +108,10 @@ def test_every_content_level_states_a_floor_and_ceiling() -> None:
     assert "单人、双人或多人画面" in erotic
     assert "清醒、回应、主动配合和可退出" in erotic
     assert "不出现性器官特写、插入或口部性行为、自慰、体液和性暴力细节" in erotic
-    assert "此上限内的各种性暗示都可自由使用" in erotic
-    assert "基础服饰优先写“全裸”" in erotic
-    assert "整组一半以上 Frame" in erotic
+    assert "此上限内的各种性暗示可自由使用" in erotic
+    assert "自适应选择符合氛围的服饰" in erotic
+    assert "避免单一全裸" in erotic
+    assert "有机变化" in erotic
     assert "反射或前景遮挡合计最多占一个 Frame" in erotic
     assert "至少一处双方主动形成的具体身体接触" in erotic
     assert "整组至少一半 Frame 中完成为可见接触" in erotic
