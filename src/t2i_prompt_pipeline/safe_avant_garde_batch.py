@@ -1,35 +1,20 @@
-"""Resumable fixed batch for safe avant-garde group portraits."""
+"""Safe avant-garde task definitions for the shared batch executor."""
 
 from __future__ import annotations
 
-import json
-import os
-import tempfile
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import StrEnum
 from pathlib import Path
-from typing import Literal
 
-from pydantic import Field, ValidationError, model_validator
-
-from t2i_prompt_pipeline.errors import ConfigurationError, RunStoreError
+from t2i_prompt_pipeline.batch import BatchLimits, BatchResult, BatchTask, run_batch
 from t2i_prompt_pipeline.models import (
     AppConfig,
     ContentLevel,
     FrameMode,
     GenerationSpec,
-    Model,
     OutputLanguage,
 )
-from t2i_prompt_pipeline.pipeline import PromptStudio
-from t2i_prompt_pipeline.providers.openai_compatible import (
-    OpenAICompatibleProvider,
-)
-from t2i_prompt_pipeline.store import LocalRunStore
-from t2i_prompt_pipeline.theme_similarity import ThemeSimilarityAnalyzer
 
-SAFE_AVANT_GARDE_BATCH_ID = "safe-avant-garde-24x3-100x6-v1"
 SAFE_AVANT_GARDE_THEME_COUNT = 100
 SAFE_AVANT_GARDE_FRAMES_PER_THEME = 6
 
@@ -105,44 +90,6 @@ SAFE_CAST_CONFIGURATIONS = (
 )
 
 
-class BatchTaskStatus(StrEnum):
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-
-
-class BatchTaskProgress(Model):
-    status: BatchTaskStatus = BatchTaskStatus.PENDING
-    run_id: str | None = None
-    prompt_file: str | None = None
-
-    @model_validator(mode="after")
-    def fields_match_status(self) -> BatchTaskProgress:
-        if self.status == BatchTaskStatus.PENDING:
-            if self.run_id is not None or self.prompt_file is not None:
-                raise ValueError("pending 任务不能记录 run 或提示词文件")
-        elif self.status == BatchTaskStatus.RUNNING:
-            if self.run_id is None or self.prompt_file is not None:
-                raise ValueError("running 任务必须只记录 run_id")
-        elif self.run_id is None or self.prompt_file is None:
-            raise ValueError("completed 任务必须记录 run_id 和提示词文件")
-        return self
-
-
-class SafeAvantGardeBatchState(Model):
-    batch_id: Literal["safe-avant-garde-24x3-100x6-v1"] = (
-        SAFE_AVANT_GARDE_BATCH_ID
-    )
-    tasks: dict[str, BatchTaskProgress] = Field(min_length=72, max_length=72)
-
-
-@dataclass(frozen=True)
-class SafeAvantGardeBatchResult:
-    completed_tasks: int
-    generated_frames: int
-    state_file: Path
-
-
 def build_safe_avant_garde_tasks() -> tuple[SafeAvantGardeTask, ...]:
     tasks = []
     for artist in AVANT_GARDE_ARTISTS:
@@ -171,80 +118,22 @@ async def run_safe_avant_garde_batch(
     config: AppConfig,
     state_file: Path,
     *,
+    limits: BatchLimits | None = None,
     on_progress: Callable[[str], None] | None = None,
-) -> SafeAvantGardeBatchResult:
-    tasks = build_safe_avant_garde_tasks()
-    resolved_state_file = state_file.resolve()
-    state = _load_or_create_state(resolved_state_file, tasks)
-    store = LocalRunStore(
-        config.runs_directory,
-        config.prompts_directory,
-    )
-
-    async with OpenAICompatibleProvider(config.provider) as author:
-        similarity = (
-            ThemeSimilarityAnalyzer(author, config.run_settings.theme_similarity)
-            if config.run_settings.theme_similarity is not None
-            else None
-        )
-        studio = PromptStudio(
-            author,
-            store,
-            config.run_settings,
-            theme_similarity=similarity,
-            on_progress=on_progress,
-        )
-        for index, task in enumerate(tasks, start=1):
-            progress = state.tasks[task.task_id]
-            if progress.status == BatchTaskStatus.COMPLETED:
-                _verify_existing_run(store, task, progress)
-                _emit(
-                    on_progress,
-                    f"[{index}/72] 已完成，跳过：{task.artist.name} / "
-                    f"{task.cast.description}",
-                )
-                continue
-
-            if progress.run_id is None:
-                snapshot = store.create(
-                    task.spec,
-                    config.run_settings,
-                    config.rules,
-                )
-                progress = BatchTaskProgress(
-                    status=BatchTaskStatus.RUNNING,
-                    run_id=snapshot.run_id,
-                )
-                state.tasks[task.task_id] = progress
-                _write_state(resolved_state_file, state)
-            else:
-                _verify_existing_run(store, task, progress)
-
-            _emit(
-                on_progress,
-                f"[{index}/72] 生成：{task.artist.name} / "
-                f"{task.cast.description} / run {progress.run_id}",
+) -> BatchResult:
+    return await run_batch(
+        config,
+        tuple(
+            BatchTask(
+                task.task_id,
+                task.spec,
+                f"{task.artist.name} / {task.cast.description}",
             )
-            archived = await studio.resume(progress.run_id)
-            state.tasks[task.task_id] = BatchTaskProgress(
-                status=BatchTaskStatus.COMPLETED,
-                run_id=archived.run_id,
-                prompt_file=archived.prompt_file,
-            )
-            _write_state(resolved_state_file, state)
-
-    completed_tasks = sum(
-        progress.status == BatchTaskStatus.COMPLETED
-        for progress in state.tasks.values()
-    )
-    return SafeAvantGardeBatchResult(
-        completed_tasks=completed_tasks,
-        generated_frames=(
-            completed_tasks
-            * SAFE_AVANT_GARDE_THEME_COUNT
-            * SAFE_AVANT_GARDE_FRAMES_PER_THEME
+            for task in build_safe_avant_garde_tasks()
         ),
-        state_file=resolved_state_file,
+        state_file,
+        limits=limits,
+        on_progress=on_progress,
     )
 
 
@@ -261,94 +150,3 @@ def _build_brief(
         "空间关系和光影塑形构成画面；同一主题的六个画面共享人物、服饰、场景"
         "和装置，只进行互不依赖的取景、机位与构图变化。"
     )
-
-
-def _load_or_create_state(
-    path: Path,
-    tasks: tuple[SafeAvantGardeTask, ...],
-) -> SafeAvantGardeBatchState:
-    expected_ids = {task.task_id for task in tasks}
-    if not path.exists():
-        state = SafeAvantGardeBatchState(
-            tasks={
-                task.task_id: BatchTaskProgress()
-                for task in tasks
-            }
-        )
-        _write_state(path, state)
-        return state
-    if not path.is_file():
-        raise ConfigurationError(f"批次状态路径不是文件：{path}")
-    try:
-        state = SafeAvantGardeBatchState.model_validate_json(
-            path.read_text(encoding="utf-8")
-        )
-    except (OSError, UnicodeError, ValidationError) as exc:
-        raise ConfigurationError(f"批次状态文件无效：{path}：{exc}") from exc
-    if set(state.tasks) != expected_ids:
-        raise ConfigurationError(
-            f"批次状态任务集合与 {SAFE_AVANT_GARDE_BATCH_ID} 不匹配"
-        )
-    return state
-
-
-def _verify_existing_run(
-    store: LocalRunStore,
-    task: SafeAvantGardeTask,
-    progress: BatchTaskProgress,
-) -> None:
-    if progress.run_id is None:
-        raise ConfigurationError(f"任务 {task.task_id} 缺少 run_id")
-    snapshot = store.inspect(progress.run_id)
-    if snapshot.spec != task.spec:
-        raise ConfigurationError(
-            f"任务 {task.task_id} 的 run {progress.run_id} 请求不匹配"
-        )
-    if (
-        progress.status == BatchTaskStatus.COMPLETED
-        and snapshot.completed is None
-    ):
-        raise ConfigurationError(
-            f"任务 {task.task_id} 被标记完成，但 run "
-            f"{progress.run_id} 尚未完成"
-        )
-    if (
-        snapshot.completed is not None
-        and progress.prompt_file is not None
-        and snapshot.completed.prompt_file != progress.prompt_file
-    ):
-        raise ConfigurationError(
-            f"任务 {task.task_id} 的提示词文件记录不匹配"
-        )
-
-
-def _write_state(path: Path, state: SafeAvantGardeBatchState) -> None:
-    temporary_path: Path | None = None
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        descriptor, temporary_name = tempfile.mkstemp(
-            prefix=f".{path.name}-",
-            dir=path.parent,
-        )
-        temporary_path = Path(temporary_name)
-        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-            json.dump(
-                state.model_dump(mode="json"),
-                handle,
-                ensure_ascii=False,
-                indent=2,
-            )
-            handle.write("\n")
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary_path, path)
-    except OSError as exc:
-        raise RunStoreError(f"无法保存批次状态：{path}：{exc}") from exc
-    finally:
-        if temporary_path is not None and temporary_path.exists():
-            temporary_path.unlink()
-
-
-def _emit(callback: Callable[[str], None] | None, message: str) -> None:
-    if callback is not None:
-        callback(message)

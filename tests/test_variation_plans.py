@@ -32,6 +32,22 @@ def test_plan_is_stable_for_targeted_completion() -> None:
     assert targeted["T03-F06"].startswith("第 2 轮变化")
 
 
+def test_interaction_focus_uses_existing_tools_only() -> None:
+    plan = build_variation_plan("T01", ("T01-F02",))
+
+    assert "工具仅取自 brief 或 Theme" in plan["T01-F02"]
+    assert "真实记录工具" not in plan["T01-F02"]
+    assert "完整面部或仅手部入画" in plan["T01-F02"]
+
+
+def test_detail_focus_keeps_the_action_and_conditional_hand_crop() -> None:
+    plan = build_variation_plan("T02", ("T02-F02",))
+
+    assert "呈现核心动作" in plan["T02-F02"]
+    assert "brief 允许时只取手部" in plan["T02-F02"]
+    assert "手部代表可见人物，expression=null" in plan["T02-F02"]
+
+
 def test_plan_rejects_mismatched_ids() -> None:
     with pytest.raises(ValueError, match="不属于 Theme"):
         build_variation_plan("T01", ("T02-F01",))

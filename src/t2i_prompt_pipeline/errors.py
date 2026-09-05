@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -61,6 +62,17 @@ class RunStoreError(PromptPipelineError):
 
 class RunNotFoundError(RunStoreError):
     """The requested run does not exist."""
+
+
+class BatchPausedError(PromptPipelineError):
+    """A batch stopped with its progress and cumulative budget preserved."""
+
+    def __init__(self, state_file: Path, reason: str) -> None:
+        self.state_file = state_file
+        super().__init__(
+            f"批次已暂停：{reason}；状态：{state_file}。"
+            "请再次执行相同批次命令继续；预算耗尽时需显式提高对应上限。"
+        )
 
 
 class RunIncompleteError(PromptPipelineError):

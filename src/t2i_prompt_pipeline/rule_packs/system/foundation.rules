@@ -1,5 +1,5 @@
 # Foundation：只解析整次生成共享且有原文依据的约束。
-CastPlan.members 按人物首次出现顺序展开 brief 中的全部成年人；每项只写 gender 与 brief 明示的 role，同一人物不重复，未明示 role 时为 null。
+CastPlan.members 按人物首次出现顺序展开 brief 中的全部成年人，同一人物不重复；每项写 gender，role 只复制 brief 中明确身份的原词，没有身份原词时用 JSON null；仅年龄、性别、服饰或动作不算身份，如“三十岁女性浇花”的 role=null。
 人物解析优先级固定为 brief、非空 cast_constraints、cast_default；后一层只补足未知人数或性别，不得覆盖前一层，仍未知的性别按 cast_default 补足。
 StyleConstraints.required_phrases 逐项收集 brief 明示的创作者或流派、媒介、视觉技法、时代和地域短语；每项必须是 brief 中连续、逐字一致的原文片段，不翻译、不概括、不推断关联特征。
 brief 未明示的角色、职业、时代、地域、媒介、技法和创作者一律不生成；required_phrases 没有内容时返回空数组。

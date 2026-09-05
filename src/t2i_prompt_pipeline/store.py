@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import tempfile
 from dataclasses import dataclass, field
@@ -40,6 +39,7 @@ from t2i_prompt_pipeline.models import (
     ThemeSimilarityState,
     safe_run_id,
 )
+from t2i_prompt_pipeline.persistence import fsync_directory, write_json, write_text
 from t2i_prompt_pipeline.renderers import render_book
 
 type CheckpointArtifact = Foundation | Theme | Frame
@@ -158,7 +158,7 @@ class LocalRunStore:
         )
         try:
             self._runs_root.mkdir(parents=True, exist_ok=True)
-            self._fsync_directory(self._runs_root.parent)
+            fsync_directory(self._runs_root.parent)
             staging = Path(
                 tempfile.mkdtemp(
                     prefix=f".{run_id}-",
@@ -167,21 +167,21 @@ class LocalRunStore:
             )
             (staging / "themes").mkdir()
             (staging / "frames").mkdir()
-            self._write_json(
+            write_json(
                 staging / "request.json",
                 spec.model_dump(mode="json"),
             )
-            self._write_json(
+            write_json(
                 staging / "manifest.json",
                 manifest.model_dump(mode="json"),
             )
-            self._write_json(
+            write_json(
                 staging / "rules.json",
                 rules.model_dump(mode="json"),
             )
-            self._write_text(staging / "attempts.jsonl", "")
+            write_text(staging / "attempts.jsonl", "")
             os.replace(staging, final_directory)
-            self._fsync_directory(self._runs_root)
+            fsync_directory(self._runs_root)
         except (OSError, RunStoreError) as exc:
             if staging is not None:
                 try:
@@ -380,7 +380,7 @@ class LocalRunStore:
             path = directory / "frames" / f"{artifact.frame_id}.json"
         else:
             raise TypeError(f"不支持的 checkpoint：{type(artifact).__name__}")
-        self._write_json(path, artifact.model_dump(mode="json"))
+        write_json(path, artifact.model_dump(mode="json"))
 
     def record_attempt(
         self,
@@ -406,7 +406,7 @@ class LocalRunStore:
                     if last_complete_line >= 0
                     else ""
                 )
-                self._write_text(path, text)
+                write_text(path, text)
             lines = text.splitlines()
             return tuple(
                 GenerationAttempt.model_validate_json(line)
@@ -424,7 +424,7 @@ class LocalRunStore:
         report: ThemeSimilarityReport,
     ) -> None:
         path = self._run_directory(run_id) / "theme-similarity.json"
-        self._write_json(path, report.model_dump(mode="json"))
+        write_json(path, report.model_dump(mode="json"))
 
     def apply_theme_rejections(
         self,
@@ -457,13 +457,13 @@ class LocalRunStore:
                     f"{theme_id}-F*.json"
                 ):
                     path.unlink()
-            self._fsync_directory(frames_directory)
+            fsync_directory(frames_directory)
             for theme_id in rejected_ids:
                 (themes_directory / f"{theme_id}.json").unlink(
                     missing_ok=True
                 )
-            self._fsync_directory(themes_directory)
-            self._write_json(
+            fsync_directory(themes_directory)
+            write_json(
                 directory / "theme-similarity.json",
                 report.model_copy(
                     update={"state": ThemeSimilarityState.REGENERATING}
@@ -478,7 +478,7 @@ class LocalRunStore:
         directory = self._run_directory(run_id)
         try:
             (directory / "theme-similarity.json").unlink(missing_ok=True)
-            self._fsync_directory(directory)
+            fsync_directory(directory)
         except OSError as exc:
             raise RunStoreError(
                 f"Run {run_id} 无法清除 Theme similarity report：{exc}"
@@ -540,11 +540,11 @@ class LocalRunStore:
                     ) from exc
                 raise
 
-        self._write_json(
+        write_json(
             directory / "book.json",
             result.book.model_dump(mode="json"),
         )
-        self._write_text(prompt_path, self._prompt_text(result))
+        write_text(prompt_path, self._prompt_text(result))
         reservation = prompt_path.parent / f".{prompt_path.name}.reserve"
         self._remove_reservation(reservation)
         manifest = manifest.model_copy(
@@ -600,7 +600,7 @@ class LocalRunStore:
     ) -> Path:
         try:
             prompts_root.mkdir(parents=True, exist_ok=True)
-            self._fsync_directory(prompts_root.parent)
+            fsync_directory(prompts_root.parent)
         except OSError as exc:
             raise RunStoreError(
                 f"无法创建提示词目录：{exc}"
@@ -623,7 +623,7 @@ class LocalRunStore:
                 ) from exc
             try:
                 os.close(descriptor)
-                self._fsync_directory(prompts_root)
+                fsync_directory(prompts_root)
                 if final_path.exists():
                     self._remove_reservation(reservation)
                     continue
@@ -662,48 +662,10 @@ class LocalRunStore:
         directory: Path,
         manifest: RunManifest,
     ) -> None:
-        self._write_json(
+        write_json(
             directory / "manifest.json",
             manifest.model_dump(mode="json"),
         )
-
-    @classmethod
-    def _write_json(cls, path: Path, value: object) -> None:
-        cls._write_text(
-            path,
-            json.dumps(value, ensure_ascii=False, indent=2) + "\n",
-        )
-
-    @classmethod
-    def _write_text(cls, path: Path, text: str) -> None:
-        temporary: Path | None = None
-        try:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            with tempfile.NamedTemporaryFile(
-                mode="w",
-                encoding="utf-8",
-                prefix=f".{path.name}-",
-                suffix=".tmp",
-                dir=path.parent,
-                delete=False,
-            ) as handle:
-                handle.write(text)
-                handle.flush()
-                os.fsync(handle.fileno())
-                temporary = Path(handle.name)
-            os.replace(temporary, path)
-            cls._fsync_directory(path.parent)
-        except OSError as exc:
-            if temporary is not None:
-                try:
-                    temporary.unlink(missing_ok=True)
-                    cls._fsync_directory(temporary.parent)
-                except OSError as cleanup_error:
-                    raise RunStoreError(
-                        f"无法原子写入 {path}：{exc}；"
-                        f"同时无法清理临时文件：{cleanup_error}"
-                    ) from exc
-            raise RunStoreError(f"无法原子写入 {path}：{exc}") from exc
 
     @staticmethod
     def _append_line(path: Path, line: str) -> None:
@@ -721,23 +683,15 @@ class LocalRunStore:
             if descriptor is not None:
                 os.close(descriptor)
 
-    @classmethod
-    def _remove_reservation(cls, reservation: Path) -> None:
+    @staticmethod
+    def _remove_reservation(reservation: Path) -> None:
         try:
             reservation.unlink(missing_ok=True)
-            cls._fsync_directory(reservation.parent)
+            fsync_directory(reservation.parent)
         except OSError as exc:
             raise RunStoreError(
                 f"无法清理提示词文件 reservation：{exc}"
             ) from exc
-
-    @staticmethod
-    def _fsync_directory(path: Path) -> None:
-        descriptor = os.open(path, os.O_RDONLY)
-        try:
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
 
     @staticmethod
     def _remove_tree(path: Path) -> None:

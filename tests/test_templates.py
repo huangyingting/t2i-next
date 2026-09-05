@@ -116,9 +116,12 @@ def test_variation_frame_request_contains_plan_and_exclusive_rules() -> None:
 
     assert request["variation_plan"]["T01-F01"].startswith("空间关系")
     assert request["variation_plan"]["T01-F03"].startswith("锚点细节")
+    assert "工具仅取自 brief 或 Theme" in request["variation_plan"]["T01-F02"]
+    assert "brief 允许时只取手部" in request["variation_plan"]["T01-F03"]
     assert "互不依赖的完整候选画面" in instructions
     assert "request.variation_plan" in instructions
-    assert "任意两帧至少在三项上实质不同" in instructions
+    assert "三项差异是满足约束后的目标" in instructions
+    assert "一致性优先于差异数量" in instructions
     assert "完整可见因果链" not in instructions
     assert "终帧" not in instructions
 

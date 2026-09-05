@@ -10,8 +10,8 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
+from t2i_prompt_pipeline.batch import BatchLimits, BatchResult
 from t2i_prompt_pipeline.cast_matrix_batch import (
-    CastMatrixBatchResult,
     build_cast_matrix_tasks,
     default_cast_matrix_state_file,
     run_cast_matrix_batch,
@@ -242,6 +242,14 @@ def generate_safe_avant_garde_command(
         dir_okay=False,
         help="批次状态文件；默认位于 runs 目录。",
     ),
+    batch_max_attempts: int | None = typer.Option(
+        None, "--batch-max-attempts", min=1, max=1000,
+        help="每个任务累计 run 尝试上限（含首次）；新批次默认 10，恢复时保留。",
+    ),
+    batch_timeout_seconds: float | None = typer.Option(
+        None, "--batch-timeout-seconds", min=1, max=31536000,
+        help="从创建起的批次总秒数（含中断时间）；新批次默认 86400。",
+    ),
 ) -> None:
     """Generate the fixed 24-artist safe, clothed portrait matrix."""
     tasks = build_safe_avant_garde_tasks()
@@ -265,6 +273,9 @@ def generate_safe_avant_garde_command(
             run_safe_avant_garde_batch(
                 config,
                 resolved_state_file,
+                limits=_batch_limits(
+                    batch_max_attempts, None, batch_timeout_seconds
+                ),
                 on_progress=typer.echo,
             )
         )
@@ -318,6 +329,18 @@ def generate_cast_matrix_command(
         min=0,
         help="可恢复失败后的等待秒数。",
     ),
+    batch_max_attempts: int | None = typer.Option(
+        None, "--batch-max-attempts", min=1, max=1000,
+        help="每个任务累计 run 尝试上限（含首次）；新批次默认 10，恢复时保留。",
+    ),
+    batch_max_replacements: int | None = typer.Option(
+        None, "--batch-max-replacements", min=0, max=100,
+        help="每个任务的替代 run 上限；新批次默认 2，恢复时保留。",
+    ),
+    batch_timeout_seconds: float | None = typer.Option(
+        None, "--batch-timeout-seconds", min=1, max=31536000,
+        help="从创建起的批次总秒数（含中断时间）；新批次默认 86400。",
+    ),
 ) -> None:
     """Generate five resumable 100-theme by 6-frame cast combinations."""
     try:
@@ -346,6 +369,11 @@ def generate_cast_matrix_command(
                 config,
                 tasks,
                 resolved_state_file,
+                limits=_batch_limits(
+                    batch_max_attempts,
+                    batch_max_replacements,
+                    batch_timeout_seconds,
+                ),
                 retry_delay_seconds=retry_delay_seconds,
                 on_progress=typer.echo,
             )
@@ -356,7 +384,23 @@ def generate_cast_matrix_command(
     _print_cast_matrix_completed(result)
 
 
-def _print_cast_matrix_completed(result: CastMatrixBatchResult) -> None:
+def _batch_limits(
+    attempts: int | None,
+    replacements: int | None,
+    duration: float | None,
+) -> BatchLimits:
+    return BatchLimits.model_validate({
+        name: value
+        for name, value in {
+            "max_task_attempts": attempts,
+            "max_replacement_runs": replacements,
+            "max_duration_seconds": duration,
+        }.items()
+        if value is not None
+    })
+
+
+def _print_cast_matrix_completed(result: BatchResult) -> None:
     typer.secho("人物矩阵生成完成。", fg=typer.colors.GREEN)
     typer.echo(f"完成 run：{result.completed_tasks}/5")
     typer.echo(f"生成 Frame：{result.generated_frames}/3000")

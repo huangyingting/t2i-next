@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from t2i_prompt_pipeline import cli
-from t2i_prompt_pipeline.cast_matrix_batch import CastMatrixBatchResult
+from t2i_prompt_pipeline.batch import BatchResult
+from t2i_prompt_pipeline.errors import BatchPausedError
 from t2i_prompt_pipeline.models import (
     AppConfig,
     ContentLevel,
@@ -17,9 +19,6 @@ from t2i_prompt_pipeline.models import (
     ThemeBook,
 )
 from t2i_prompt_pipeline.renderers import render_book
-from t2i_prompt_pipeline.safe_avant_garde_batch import (
-    SafeAvantGardeBatchResult,
-)
 from t2i_prompt_pipeline.store import InMemoryRunStore, LocalRunStore
 from tests.factories import (
     make_foundation,
@@ -144,13 +143,15 @@ def test_safe_avant_garde_command_wires_fixed_batch(
         captured["kwargs"] = kwargs
         return config
 
-    async def fake_run(generated_config, state_file, *, on_progress):
+    async def fake_run(generated_config, state_file, *, limits, on_progress):
         captured["config"] = generated_config
         captured["state_file"] = state_file
         captured["on_progress"] = on_progress
-        return SafeAvantGardeBatchResult(
+        captured["limits"] = limits
+        return BatchResult(
             completed_tasks=72,
             generated_frames=43_200,
+            prompt_files=(),
             state_file=state_file.resolve(),
         )
 
@@ -165,6 +166,10 @@ def test_safe_avant_garde_command_wires_fixed_batch(
             str(tmp_path / "runs"),
             "--prompts-dir",
             str(tmp_path / "prompts"),
+            "--batch-max-attempts",
+            "12",
+            "--batch-timeout-seconds",
+            "7200",
         ],
     )
 
@@ -180,6 +185,10 @@ def test_safe_avant_garde_command_wires_fixed_batch(
     assert captured["state_file"] == (
         tmp_path / "runs/safe-avant-garde-batch.json"
     )
+    assert captured["limits"].model_dump(exclude_unset=True) == {
+        "max_task_attempts": 12,
+        "max_duration_seconds": 7200,
+    }
 
 
 def test_cast_matrix_command_wires_five_resumable_tasks(
@@ -205,6 +214,7 @@ def test_cast_matrix_command_wires_five_resumable_tasks(
         tasks,
         state_file,
         *,
+        limits,
         retry_delay_seconds,
         on_progress,
     ):
@@ -213,7 +223,8 @@ def test_cast_matrix_command_wires_five_resumable_tasks(
         captured["state_file"] = state_file
         captured["retry_delay_seconds"] = retry_delay_seconds
         captured["on_progress"] = on_progress
-        return CastMatrixBatchResult(
+        captured["limits"] = limits
+        return BatchResult(
             completed_tasks=5,
             generated_frames=3000,
             prompt_files=tuple(f"/prompts/{index}.txt" for index in range(5)),
@@ -238,6 +249,8 @@ def test_cast_matrix_command_wires_five_resumable_tasks(
             str(tmp_path / "prompts"),
             "--retry-delay-seconds",
             "0",
+            "--batch-max-replacements",
+            "1",
         ],
     )
 
@@ -252,6 +265,56 @@ def test_cast_matrix_command_wires_five_resumable_tasks(
     assert captured["kwargs"]["generation_retries"] == 5
     assert captured["retry_delay_seconds"] == 0
     assert captured["state_file"].parent == tmp_path / "runs"
+    assert captured["limits"].model_dump(exclude_unset=True) == {
+        "max_replacement_runs": 1,
+    }
+
+
+@pytest.mark.parametrize(
+    ("option", "value"),
+    [
+        ("--batch-max-attempts", "0"),
+        ("--batch-max-replacements", "-1"),
+        ("--batch-timeout-seconds", "0"),
+    ],
+)
+def test_batch_budget_flags_reject_invalid_values(option, value):
+    result = CliRunner().invoke(
+        cli.app,
+        ["generate-cast-matrix", "test", "--content-level", "aesthetic", option, value],
+    )
+    assert result.exit_code == 2
+    assert "Invalid value" in result.output
+
+
+def test_batch_pause_reports_state_without_suggesting_budget_bypass(
+    monkeypatch, tmp_path
+):
+    state_file = tmp_path / "batch.json"
+
+    def fake_build_config(spec, **kwargs):
+        return AppConfig(
+            spec=spec,
+            provider=ProviderSettings(model="test"),
+            runs_directory=tmp_path / "runs",
+            prompts_directory=tmp_path / "prompts",
+            run_settings=make_settings(),
+            rules=make_rules(spec),
+        )
+
+    async def pause(*args, **kwargs):
+        raise BatchPausedError(state_file, "累计 run 尝试次数已耗尽")
+
+    monkeypatch.setattr(cli, "build_config", fake_build_config)
+    monkeypatch.setattr(cli, "run_cast_matrix_batch", pause)
+    result = CliRunner().invoke(
+        cli.app,
+        ["generate-cast-matrix", "test", "--content-level", "aesthetic"],
+    )
+    assert result.exit_code == 2
+    assert str(state_file) in result.output
+    assert "显式提高" in result.output
+    assert "t2i-prompts resume" not in result.output
 
 
 def test_completed_resume_needs_no_provider_configuration(
