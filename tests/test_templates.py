@@ -46,13 +46,14 @@ def test_theme_request_contains_stable_facts_and_stage_rules() -> None:
     )
     assert request["cast_plan"] == foundation.cast_plan.model_dump(mode="json")
 
-    assert "Theme 只拥有 title、跨 Frame 稳定的 scene" in instructions
-    assert "人物位置、表情、动作、接触、遮挡和具体镜头属于 Frame" in (
-        instructions
-    )
+    assert "Theme 只拥有 title、稳定 scene/style、人物外貌和服饰" in instructions
+    assert "位置、表情、动作、接触、遮挡、镜头属于 Frame" in instructions
     assert "required_route_points" in instructions
     assert "摄影或摄像实拍方案" in instructions
-    assert "不同的完整方案" in instructions
+    assert "方案间变化发型、穿戴、配饰、固定布景和光质" in instructions
+    assert "每个 ID 恰好一项且字段齐全" in instructions
+    assert "不加未提供的路人" in instructions
+    assert "CastPlan" not in instructions
     assert "Character.label 是最终显示名" in instructions
     assert "本次使用 美学级（aesthetic）" in instructions
 

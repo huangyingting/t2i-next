@@ -40,8 +40,8 @@ def test_rules_express_stage_ownership_without_crossing_boundaries() -> None:
     assert "StyleConstraints.required_phrases" in foundation
     assert "camera.shot" not in foundation
 
-    assert "Theme 只拥有 title、跨 Frame 稳定的 scene" in themes
-    assert "人物位置、表情、动作、接触、遮挡和具体镜头属于 Frame" in themes
+    assert "Theme 只拥有 title、稳定 scene/style、人物外貌和服饰" in themes
+    assert "位置、表情、动作、接触、遮挡、镜头属于 Frame" in themes
     assert "Frame：把一个 Theme 实现" not in themes
 
     assert "Frame 只拥有 camera、当前可见人物" in frames
@@ -73,18 +73,32 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
         assert "brief 必需事实、人物、路线与因果信息完整保留" in rules
 
     themes = resolved.text_for(GenerationStage.THEMES)
-    assert "scene 用名词短语写活动位置" in themes
-    assert "brief 的全部工具与作用对象及材质" in themes
-    assert "不靠同义词或仅换时段区分" in themes
-    assert "例如“靠窗阅读”" in themes
-    assert "活动位置临窗，不是背景存在窗" in themes
-    assert "appearance 只写稳定形态，眼神、表情与朝向留给 Frame" in themes
-    assert "服饰先满足 brief 的类型、遮盖与材质要求" in themes
-    assert "单地点活动省去到达路线" in themes
+    assert "scene 用名词短语完整写活动位置" in themes
+    assert "全部工具与对象及材质" in themes
+    assert "锁定 brief 的人数、地点关系" in themes
+    assert "工具、对象、材质、活动与状态" in themes
+    assert "所有字段的未固定项取唯一具体值，不用“或”列备选" in themes
+    assert "方案间变化发型、穿戴、配饰、固定布景和光质" in themes
+    assert "末尾写已有角色的人物分布" in themes
+    assert "CastPlan" not in themes
+    assert "眼神、表情与朝向留给 Frame" in themes
+    assert "发型长度、形态、质地与颜色" in themes
+    assert "场景适合的完整穿戴" in themes
+    assert "一至两件首饰、眼镜、帽子、围巾等配饰" in themes
+    assert "不加未提供的路人" in themes
+    assert "brief 无其他人物时写“无他人”" in themes
+    assert "两三项互异固定布景" in themes
+    assert "完整写光向、软硬、色温、环境层次" in themes
+    assert "氛围由可见光色表现" in themes
+    assert "不用轴标签模板" in themes
+    assert "未固定项在方案间变化" in themes
+    assert "单地点省去路线" in themes
     assert "当前位置和持握由 Frame 描述" in themes
-    assert "request.required_route_points" in themes
+    assert "required_route_points" in themes
     assert "重生成只调整未固定项" in themes
-    assert "即使 request.validation_issues 要求新场所" in themes
+    assert "validation_issues 要求新场所" in themes
+    assert "ThemeBatch.themes 一次包含 request.theme_ids 全集" in themes
+    assert "每个 ID 恰好一项且字段齐全" in themes
 
 
 @pytest.mark.parametrize("mode", list(FrameMode))
@@ -177,7 +191,7 @@ def test_style_constraints_preserve_brief_without_inference() -> None:
     assert "没有身份原词时用 JSON null" in foundation
     assert "仅年龄、性别、服饰或动作不算身份" in foundation
     assert "摄影或摄像实拍方案" in themes
-    assert "非摄影艺术词只能作为被实拍的美术处理" in themes
+    assert "非摄影艺术词只作被实拍处理" in themes
 
 
 def test_period_rules_bind_theme_and_frame_to_the_brief() -> None:
@@ -185,7 +199,7 @@ def test_period_rules_bind_theme_and_frame_to_the_brief() -> None:
     themes = resolved.text_for(GenerationStage.THEMES)
     frames = resolved.text_for(GenerationStage.FRAMES)
 
-    assert "服饰与器物符合 brief 明示的时代、地域、天气和场合" in themes
+    assert "场景适合的完整穿戴" in themes
     assert "沿用 Theme 的时代、地域、颜色和材质逻辑" in frames
 
 
