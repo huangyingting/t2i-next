@@ -7,6 +7,14 @@ import re
 from t2i_prompt_pipeline.models import FrameMode
 
 _VARIATION_BLOCK_SIZE = 10
+_VARIATION_STORY_REQUIREMENT = (
+    "本帧必须独立落实 theme.story_plan 的同一目标、触发物和可见结果；"
+    "可改变瞬间与构图，不能改写故事或只站立、凝视、摆姿、轻触。"
+)
+_SEQUENTIAL_STORY_REQUIREMENT = (
+    "本帧必须推进 theme.story_plan 的目标，从可见触发到可见结果，"
+    "不改写故事或作静态过场。"
+)
 
 _VARIATION_FOCI = (
     "空间关系：使用全景或中全景，突出环境几何、人物与视觉锚点的空间关系。",
@@ -549,6 +557,11 @@ def build_frame_visual_plan(
         depth_mode, depth_effect = _DEPTH_STRATEGIES[depth_index]
         plan[frame_id] = {
             "focus": focus,
+            "story_requirement": (
+                _VARIATION_STORY_REQUIREMENT
+                if frame_mode == FrameMode.VARIATIONS
+                else _SEQUENTIAL_STORY_REQUIREMENT
+            ),
             "lens_profile": lens_profiles[lens_index],
             "shot_scale": _SHOT_SCALES[staging_index],
             "camera_height": _CAMERA_HEIGHTS[staging_index],

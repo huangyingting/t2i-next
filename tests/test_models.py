@@ -13,6 +13,7 @@ from t2i_prompt_pipeline.models import (
     PromptBook,
     ProviderSettings,
     RunSettings,
+    StoryPlan,
     ThemeBook,
     ThemeSimilaritySettings,
     format_character_id,
@@ -111,6 +112,29 @@ def test_output_language_defaults_to_chinese_and_accepts_english() -> None:
         ).output_language
         == OutputLanguage.ENGLISH
     )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("immediate_goal", "等待列车或决定离开"),
+        ("visible_trigger", "看挂钟或看站牌"),
+        ("visible_result", "灯熄灭或人物转身"),
+    ),
+)
+def test_story_plan_rejects_alternative_stories(
+    field: str,
+    value: str,
+) -> None:
+    payload = {
+        "immediate_goal": "确认末班车状态",
+        "visible_trigger": "站牌翻至停运状态",
+        "visible_result": "人物收起车票转身离开",
+        field: value,
+    }
+
+    with pytest.raises(ValidationError, match="必须选择一个具体故事"):
+        StoryPlan.model_validate(payload)
 
 
 def test_provider_signature_tracks_generation_behavior_not_token_cap() -> None:
@@ -293,8 +317,21 @@ def test_theme_batch_schema_uses_exact_theme_and_character_ids() -> None:
         assert set(schema["$defs"][f"ThemeFor{theme_id}"]["required"]) == {
             "theme_id",
             "setting",
+            "story_plan",
             "characters",
         }
+    assert set(schema["$defs"]["StoryPlan"]["required"]) == {
+        "immediate_goal",
+        "visible_trigger",
+        "visible_result",
+    }
+    story_properties = schema["$defs"]["StoryPlan"]["properties"]
+    assert "never give alternatives" in (
+        story_properties["immediate_goal"]["description"]
+    )
+    assert "abstract tension" in (
+        story_properties["visible_result"]["description"]
+    )
 
 
 def test_prompt_book_rejects_theme_that_does_not_match_cast_plan() -> None:

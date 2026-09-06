@@ -88,6 +88,9 @@ def _theme_natural_text(theme: Theme) -> tuple[str, ...]:
         *theme.setting.available_light_sources,
         theme.setting.background_population,
         theme.setting.atmosphere,
+        theme.story_plan.immediate_goal,
+        theme.story_plan.visible_trigger,
+        theme.story_plan.visible_result,
         *(
             value
             for character in theme.characters

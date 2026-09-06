@@ -246,9 +246,49 @@ class Setting(Model):
     atmosphere: Text
 
 
+class StoryPlan(Model):
+    immediate_goal: Text = Field(
+        description=(
+            "Exactly one coherent immediate goal shared by this Theme's "
+            "Frames; never give alternatives joined by 'or'. "
+            "Use the brief's action when present; otherwise derive a minimal "
+            "scene-grounded goal without inventing identity or backstory."
+        )
+    )
+    visible_trigger: Text = Field(
+        description=(
+            "The visible person, object, or event that initiates the goal. "
+            "Every required object must also exist in setting.fixed_elements."
+        )
+    )
+    visible_result: Text = Field(
+        description=(
+            "Name a concrete object or person and its directly imageable "
+            "changed state caused by the action. Posture, mood, atmosphere, "
+            "abstract tension, explanatory prose, and future events are not "
+            "results."
+        )
+    )
+
+    @model_validator(mode="after")
+    def fields_choose_one_story(self) -> StoryPlan:
+        alternatives = re.compile(r"或|二选一|\b(?:or|either)\b", re.IGNORECASE)
+        if any(
+            alternatives.search(value)
+            for value in (
+                self.immediate_goal,
+                self.visible_trigger,
+                self.visible_result,
+            )
+        ):
+            raise ValueError("StoryPlan 每个字段必须选择一个具体故事，不得列备选")
+        return self
+
+
 class Theme(Model):
     theme_id: ThemeId
     setting: Setting
+    story_plan: StoryPlan
     characters: list[Character] = Field(min_length=1, max_length=8)
 
 

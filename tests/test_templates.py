@@ -113,6 +113,7 @@ def test_frame_request_contains_theme_context_and_stage_rules() -> None:
     assert "variation_plan" not in request
     assert set(request["frame_visual_plan"]["T01-F02"]) == {
         "focus",
+        "story_requirement",
         "lens_profile",
         "shot_scale",
         "camera_height",
@@ -128,6 +129,10 @@ def test_frame_request_contains_theme_context_and_stage_rules() -> None:
     }
     assert request["frame_visual_plan"]["T01-F02"]["light_source"] in (
         theme.setting.available_light_sources
+    )
+    assert (
+        "推进 theme.story_plan 的目标"
+        in request["frame_visual_plan"]["T01-F02"]["story_requirement"]
     )
 
     assert (
@@ -162,6 +167,10 @@ def test_variation_frame_request_contains_plan_and_exclusive_rules() -> None:
     assert request["frame_visual_plan"]["T01-F01"]["focus"].startswith(
         "空间关系"
     )
+    assert (
+        "独立落实 theme.story_plan 的同一目标"
+        in request["frame_visual_plan"]["T01-F01"]["story_requirement"]
+    )
     assert request["frame_visual_plan"]["T01-F03"]["focus"].startswith(
         "锚点细节"
     )
@@ -174,6 +183,9 @@ def test_variation_frame_request_contains_plan_and_exclusive_rules() -> None:
         in request["frame_visual_plan"]["T01-F03"]["focus"]
     )
     assert "每个 Frame 互不依赖" in instructions
+    assert "可独立读懂的故事瞬间" in instructions
+    assert "作用于可变现场物件并显示反馈" in instructions
+    assert "不能只站立、凝视或触碰" in instructions
     assert "完整呈现 brief 全部可视事实" in instructions
     assert "工具、对象、颜色、数量和结果不得分散" in instructions
     assert "frame_visual_plan" in instructions

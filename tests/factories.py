@@ -26,6 +26,7 @@ from t2i_prompt_pipeline.models import (
     RunSettings,
     Setting,
     ShotScale,
+    StoryPlan,
     StyleConstraints,
     Theme,
     format_character_id,
@@ -105,6 +106,23 @@ def make_theme(spec: GenerationSpec, theme_index: int) -> Theme:
                 "Warm, quiet, and intimate"
                 if is_english
                 else "暖调、安静、亲密"
+            ),
+        ),
+        story_plan=StoryPlan(
+            immediate_goal=(
+                "Complete the conversation"
+                if is_english
+                else "完成当前交谈"
+            ),
+            visible_trigger=(
+                "The other participant begins speaking"
+                if is_english
+                else "另一名交谈者开口"
+            ),
+            visible_result=(
+                "Both participants visibly respond"
+                if is_english
+                else "双方作出可见回应"
             ),
         ),
         characters=[

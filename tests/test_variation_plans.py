@@ -72,6 +72,11 @@ def test_frame_plan_rotates_camera_depth_and_light_axes() -> None:
 
     assert plan["T01-F01"]["focus"].startswith("空间关系")
     assert plan["T01-F02"]["focus"].startswith("人物互动")
+    assert all(
+        "独立落实 theme.story_plan 的同一目标"
+        in value["story_requirement"]
+        for value in plan.values()
+    )
     assert len({value["lens_profile"] for value in plan.values()}) == 5
     assert len({value["shot_scale"] for value in plan.values()}) == 5
     assert len({value["camera_height"] for value in plan.values()}) == 4
@@ -188,6 +193,10 @@ def test_sequential_plan_avoids_fisheye() -> None:
 
     assert all(
         value["lens_profile"] != "fisheye" for value in plan.values()
+    )
+    assert all(
+        "推进 theme.story_plan 的目标" in value["story_requirement"]
+        for value in plan.values()
     )
 
 

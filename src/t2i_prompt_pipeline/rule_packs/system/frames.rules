@@ -1,16 +1,15 @@
 Frame 拥有 camera、lighting 和人物 framing/placement/facing/visible_appearance/lighting_effect/expression/action；Theme 设定只作来源。camera 是画面外拍摄参数，非场景器材。
-每个 Frame 的 characters 恰好包含 available_character_ids 全部 ID，并按 Theme 顺序排列。人物构图只写各自结构，不生成自由文本 composition。
-camera 的 lens_profile、shot_scale、height、direction 逐字使用 frame_visual_plan 对应值，overhead 只配 top_down；镜头只改变透视与取景，不得进入 fixed_elements、人物外观或动作。shot_scale 是整体景别，人物实际裁切以 framing 为准；medium、close_up 不配 full_body。focus_target 写对焦人物或接触点，background_effect 落实 depth_effect；不能把核心人物虚化到无法辨认。
-group_topology、depth_distribution 写入 placement，body_dynamics 写入姿态和 action。
+characters 恰好包含 available_character_ids 全部 ID，按 Theme 顺序排列；不生成自由文本 composition。
+camera 的 lens_profile、shot_scale、height、direction 逐字使用 frame_visual_plan 对应值，overhead 只配 top_down；shot_scale 是整体景别，人物实际裁切以 framing 为准；medium、close_up 不配 full_body。focus_target 写对焦人物或接触点，background_effect 落实 depth_effect；不能把核心人物虚化到无法辨认。
 lighting.source 逐字使用 frame_visual_plan.light_source；position 先写该光源在 Theme 中的实际方位，再落实 light_direction 的受光效果；color 落实 color_treatment，不发明新光源或新光色；scene_effect 写场景亮部与阴影。
 framing 只用 head_and_torso、full_body 或 head_cropped_torso，不提供局部肢体选项。placement 只写人物在前中后景与左右位置，中文不超过20字、英文不超过12词；facing 必须直接包含当前人物 ID 或“镜头”，以“朝向、面向、略朝、朝”或 facing/toward 开头写完整短语，不用“两人、另一人、pair”等泛称。
 visible_appearance 是 Theme 稳定设定在 framing 中的可见投影，只写当前可见且区分身份的发型、具体服装和身体状态；服装必须沿用 Theme 的单品名称、颜色和材质，不写“贴身剪裁上装”等抽象标签；中文不超过65字、英文不超过36词。head_and_torso 写脸、发型和上身服饰；full_body 写主要全身轮廓和鞋；head_cropped_torso 只写躯干、服饰和姿态，不写脸与发型。
 lighting_effect 只用一个短句写该人物受光结果：一处主要亮部和一处主要阴影，不写其他人物；中文不超过35字、英文不超过20词，头部裁切时不写面部受光。
 expression 与 framing 联动：head_cropped_torso 必须为 null，其他 framing 用一个短语写可见眼神或表情，中文不超过18字、英文不超过10词。
-action 用一个短句写当前时刻的接触和核心动作；核心动作的工具、对象、数量和结果修饰全部直写，不把必要信息拆到其他 Frame；中文45字或英文25词以内，每只手默认一个主要任务。
+action 用一个短句写当前故事瞬间；明确对象和可见反馈共同让事件可辨；单纯站立、凝视或摆姿不算故事动作；核心动作的工具、对象、数量和结果修饰全部直写，不把必要信息拆到其他 Frame；中文45字或英文25词以内，每只手默认一个主要任务。
 当前物体结果写入 action；容器内部仅在开口或透明结构入画时描述。
 道具沿用 Theme 名称和材质；抓握、支撑、遮挡与 depth_of_field 一致。服饰描述只沿用 Theme 原词。
 brief 明示的材质要求约束所有字段；不透明衣料的逆光只改变表面明暗。沿用 Theme 时代、地域、颜色和材质，黑白不加颜色。
-只写当前一瞬；禁止明确跨 Frame 引用，“仍、已”本身不构成错误。brief 要求互动时，至少一帧有多人互看、接触、交换或共同施力。
+禁止明确跨 Frame 引用；“仍、已”本身不构成错误。互动 brief 至少一帧有互看、接触、交换或共同施力。
 按 validation_issues 修改；示例用本次 ID、场景和动作：
-{"theme_id":"T01","frames":[{"frame_id":"T01-F01","camera":{"lens_profile":"normal","shot_scale":"medium","height":"eye_level","direction":"front","depth_of_field":{"mode":"moderate","focus_target":"T01-C01与T01-C02交握处","background_effect":"后墙轻微虚化"},"lighting":{"source":"左窗日光","position":"左侧高位","color":"中性白","scene_effect":"两人左侧亮，后墙右侧暗。"}},"characters":[{"character_id":"T01-C01","framing":"head_and_torso","placement":"左前景","facing":"朝向T01-C02","visible_appearance":"黑发、白上衣肩胸。","lighting_effect":"左脸受光，右颊留影。","expression":"注视T01-C02。","action":"右手与T01-C02交握，左臂下垂。"},{"character_id":"T01-C02","framing":"head_cropped_torso","placement":"右前景","facing":"朝向T01-C01","visible_appearance":"灰上衣肩胸和双臂。","lighting_effect":"左肩亮，躯干右侧暗。","expression":null,"action":"右手与T01-C01交握。"}]}]}
+{"theme_id":"T01","frames":[{"frame_id":"T01-F01","camera":{"lens_profile":"normal","shot_scale":"medium","height":"eye_level","direction":"front","depth_of_field":{"mode":"moderate","focus_target":"交握处","background_effect":"墙虚"},"lighting":{"source":"窗光","position":"左高","color":"白","scene_effect":"明暗"}},"characters":[{"character_id":"T01-C01","framing":"head_and_torso","placement":"左前景","facing":"朝向T01-C02","visible_appearance":"黑发、白衣。","lighting_effect":"左亮右暗。","expression":"对视","action":"双手交握。"},{"character_id":"T01-C02","framing":"head_cropped_torso","placement":"右前景","facing":"朝向T01-C01","visible_appearance":"灰衣肩胸和双臂。","lighting_effect":"左亮右暗。","expression":null,"action":"双手交握。"}]}]}

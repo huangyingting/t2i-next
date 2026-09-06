@@ -8,7 +8,7 @@
   以及 brief 明示的人物姓名，不保存外貌或服饰。只有作品名时不会猜测角色。
 - `Theme`：多个 Frame 共用的最小稳定视觉上下文，只保存结构化 `Setting`
   （明确时间、具体地点、固定元素、候选光源、背景人口与视觉氛围）、
-  人物稳定外貌和基础服饰。
+  `StoryPlan`（单一即时目标、可见触发与可见结果）、人物稳定外貌和基础服饰。
 - `Frame`：当前非入画摄影参数、结构化景深与光线，以及人物可见外观、受光、表情和动作。
 
 每个事实只有一个所有者。作品或虚构世界、导演、艺术家和风格名称由 Foundation
@@ -30,7 +30,8 @@ Theme 不再重复保存或改写风格。
 一次 run 有三类模型调用：
 
 1. 一次 `Foundation` 调用生成共享 `StyleConstraints`、`CastPlan` 和语义文件名。
-2. `Theme` 按小批次生成，默认每批 5 个，并生成各自的结构化 `setting` 与稳定人物事实。
+2. `Theme` 按小批次生成，默认每批 5 个，并生成各自的结构化 `setting`、
+  `story_plan` 与稳定人物事实。
 3. 所有 `Theme` 完整生成后才执行可选的全量相似度审计；未齐时不会提前生成任何
   `Frame`。每一行最终 Prompt 都展开 reference phrase、所属 Theme 的时间与地点。
 4. 所有 `Theme` 通过审计后，每个 `Theme` 一次 Frame 调用，生成该主题当前缺失
@@ -40,7 +41,8 @@ Theme 不再重复保存或改写风格。
 每个主题 6 个镜头、Theme batch size 为 5 时，基础调用数是 121 次。
 Theme 变化计划按 ID 稳定规划场景空间、材质、人群、氛围，以及各人物的发型、
 整体配色，以及各人物的发型、服装颜色材质、鞋履和配饰；Frame 视觉计划稳定规划
-景别、机位、人物空间编排、身体动态、景深、实际光源与光位。
+景别、机位、人物空间编排、身体动态、景深、实际光源与光位；每个 Frame 槽位
+还携带 story requirement，要求落实所属 Theme 的同一故事计划。
 各轴先覆盖十个明显不同的方向，后续轮次重新交叉组合，不会每十项原样重复；
 鱼眼等强风格镜头保持低频。
 两类计划都复用原有调用，不增加模型调用次数。Frame 请求不再重复发送全局风格
@@ -95,7 +97,8 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
 两套等级，既避免规则冲突，也减少输入 token。当前系统规则要求：
 
 - 创作先保留 brief 明示事实与 stage ownership，再满足单帧物理和可见性，之后才
-  追求差异与装饰细节。规则中的条件示例不会给其他 brief 添加地点或服饰限制；
+  满足叙事可读性，之后才追求差异与装饰细节。规则中的条件示例不会给其他 brief
+  添加地点或服饰限制；
 - 先为全部请求 ID 生成最简有效候选，再补可选细节；优先简化画面，确实无法形成
   有效候选时才省略该 ID。Theme 的 `setting` 分别保存地点、固定布景与设备、
   可用光源和背景人口约束；Frame 的 action
@@ -128,6 +131,9 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   `fixed_elements` 保存固定布景、设备与关键道具；`available_light_sources`
   只列现场存在的固定光源；`background_population` 只保存非名册背景人物约束；
   `atmosphere` 用色温、明暗或人群密度加一个情绪词表达稳定视觉氛围。
+  `story_plan` 保存所有 Frame 共用的单一即时目标、可见触发和动作造成的可见结果；
+  brief 没有动作时只推导不改变人物身份或背景事实的现场微型目标。它是 Frame 的
+  生成计划，不作为解释性 prose 直接进入最终 Prompt。
   Theme 不写人物位置、动作、持握、构图或受光，也不会在首个 Frame 前提前完成
   brief 中的寻找、发现或取得等目标；
 - 本地 contract 保护 schema、ID、人物集合与引用、framing 联动、
@@ -149,6 +155,10 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
 - Frame 是可独立渲染的当前画面，不引用 Frame ID 或前序帧元叙事；contract 会拒绝
   action 中的“不可见”“出画”“画外”和明确跨 Frame 引用，但不对一般自然语言做
   视觉质量词法评分；
+- 每个 Frame 以正在发生的动作、明确对象和可见反馈形成可辨认的故事瞬间。
+  variations 的每个候选独立落实同一 `story_plan`，只改变决定性瞬间与视觉组织；
+  sequential 则从可见触发逐帧推进到可见结果。单纯站立、凝视、摆姿或无状态变化
+  的轻触不能替代故事动作；
 - Frame 不再生成自由文本 `camera.composition` 或通用 `details`。每个人分别拥有
   `framing`、`placement`、`facing`、可见外观、受光、表情与动作；相机拥有
   结构化 `lens_profile`、`shot_scale`、`height`、`direction`、

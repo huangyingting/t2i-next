@@ -66,11 +66,15 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
         rules = resolved.text_for(stage)
         assert "示例只说明写法，不给当前 brief 增添要求" in rules
         assert (
-            "brief 明示事实与 ownership、单帧物理和可见性、画面差异、修辞细节"
+            "brief 明示事实与 ownership、单帧物理和可见性、叙事可读性、"
+            "画面差异、修辞细节"
         ) in rules
         assert "先为全部请求 ID 生成最简有效候选，再补可选细节" in rules
         assert "确实无法形成有效候选时才省略该 ID" in rules
         assert "brief 必需事实、人物、路线与因果信息完整保留" in rules
+        assert "正在发生的动作、明确对象和可见反馈" in rules
+        assert "不靠解释或新增剧情" in rules
+        assert "brief 无动作时从现场物件实例化即时目标" in rules
 
     themes = resolved.text_for(GenerationStage.THEMES)
     assert "setting.location 用短语保留 brief 地点关系" in themes
@@ -79,6 +83,8 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
         "setting.fixed_elements 只列二至四项关键布景、设备或对象"
         in themes
     )
+    assert "必须包含 brief 明示的活动对象" in themes
+    assert "未明示时实例化可发生变化的现场物件" in themes
     assert "background_population 用短语保留非名册群体" in themes
     assert "不加路人、站位、动作或括注" in themes
     assert "CastPlan" not in themes
@@ -137,6 +143,9 @@ def test_frame_rules_require_every_complete_character(
     assert "单品名称、颜色和材质" in rules
     assert "不写“贴身剪裁上装”等抽象标签" in rules
     assert "action 用一个短句" in rules
+    assert "当前故事瞬间" in rules
+    assert "明确对象和可见反馈共同让事件可辨" in rules
+    assert "单纯站立、凝视或摆姿不算故事动作" in rules
     assert "核心动作的工具、对象、数量和结果修饰全部直写" in rules
     assert "中文45字或英文25词以内" in rules
     assert "示例用本次 ID、场景和动作" in rules
@@ -288,10 +297,14 @@ def test_frame_modes_are_mutually_exclusive() -> None:
     assert "完整可见因果链" in sequential
     assert "首帧建立未完成状态" in sequential
     assert "终帧在 brief 核心动词的语义上限内" in sequential
+    assert "每帧有可见推动或状态变化" in sequential
     assert "每个 Frame 互不依赖" not in sequential
     assert "连续性允许时才落实 frame_visual_plan" in sequential
 
     assert "每个 Frame 互不依赖" in variations
+    assert "可独立读懂的故事瞬间" in variations
+    assert "作用于可变现场物件并显示反馈" in variations
+    assert "不能只站立、凝视或触碰" in variations
     assert "逐项落实 frame_visual_plan" in variations
     assert "完整呈现 brief 全部可视事实" in variations
     assert "工具、对象、颜色、数量和结果不得分散" in variations
