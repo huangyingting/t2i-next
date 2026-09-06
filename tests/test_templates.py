@@ -56,6 +56,7 @@ def test_theme_request_contains_stable_facts_and_stage_rules() -> None:
         "population_layout",
         "atmosphere_direction",
         "light_source_direction",
+        "palette_strategy",
     }
 
     assert "Theme 是多个 Frame 共用的稳定视觉上下文" in instructions
@@ -66,10 +67,10 @@ def test_theme_request_contains_stable_facts_and_stage_rules() -> None:
     )
     assert "setting.location 用短语保留 brief 地点关系" in instructions
     assert "available_light_sources 只列一至三种现场固定光源" in instructions
-    assert "setting_variation 指导空间结构、材质、背景分布、氛围和光源" in (
+    assert "setting_variation 管空间、材质、人群、氛围、光源与配色" in (
         instructions
     )
-    assert "character_variations 指导各人的发型、服装、鞋履和配饰" in (
+    assert "character_variations 管发型、服装颜色材质、鞋履和配饰" in (
         instructions
     )
     assert "每个 ID 恰好一项且字段齐全" in instructions
@@ -112,8 +113,13 @@ def test_frame_request_contains_theme_context_and_stage_rules() -> None:
     assert "variation_plan" not in request
     assert set(request["frame_visual_plan"]["T01-F02"]) == {
         "focus",
-        "shot_strategy",
-        "view_strategy",
+        "lens_profile",
+        "shot_scale",
+        "camera_height",
+        "camera_direction",
+        "group_topology",
+        "depth_distribution",
+        "body_dynamics",
         "depth_mode",
         "depth_effect",
         "light_source",

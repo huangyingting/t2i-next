@@ -5,14 +5,18 @@ from __future__ import annotations
 import re
 
 from t2i_prompt_pipeline.models import (
+    CameraDirection,
+    CameraHeight,
     CastPlan,
     CharacterFraming,
     CharacterMoment,
     Frame,
     Gender,
+    LensProfile,
     OutputLanguage,
     PromptBook,
     RenderedPrompt,
+    ShotScale,
     StyleConstraints,
     Theme,
 )
@@ -29,6 +33,69 @@ _FRAMING_TEXT = {
         CharacterFraming.HEAD_CROPPED_TORSO: (
             "head cropped out, torso in frame"
         ),
+    },
+}
+
+_CAMERA_TEXT = {
+    OutputLanguage.CHINESE: {
+        "lens": {
+            LensProfile.ULTRA_WIDE: "16mm超广角，强透视",
+            LensProfile.WIDE: "24mm广角，自然空间延伸",
+            LensProfile.NORMAL: "50mm标准镜头，自然透视",
+            LensProfile.TELEPHOTO: "85mm长焦，压缩空间层次",
+            LensProfile.FISHEYE: "鱼眼镜头，明显弧形畸变",
+        },
+        "scale": {
+            ShotScale.ESTABLISHING: "环境建立镜头",
+            ShotScale.WIDE: "远景",
+            ShotScale.FULL_BODY: "全身群像",
+            ShotScale.MEDIUM_FULL: "中全景",
+            ShotScale.MEDIUM: "半身中景",
+            ShotScale.CLOSE_UP: "近景",
+        },
+        "height": {
+            CameraHeight.EYE_LEVEL: "平视机位",
+            CameraHeight.HIGH_ANGLE: "高机位",
+            CameraHeight.LOW_ANGLE: "低机位",
+            CameraHeight.OVERHEAD: "正上方俯拍",
+        },
+        "direction": {
+            CameraDirection.FRONT: "正面",
+            CameraDirection.THREE_QUARTER: "三分之四侧视",
+            CameraDirection.SIDE: "侧面",
+            CameraDirection.TOP_DOWN: "垂直向下",
+            CameraDirection.REAR_THREE_QUARTER: "后侧三分之四",
+        },
+    },
+    OutputLanguage.ENGLISH: {
+        "lens": {
+            LensProfile.ULTRA_WIDE: "16mm ultra-wide, strong perspective",
+            LensProfile.WIDE: "24mm wide-angle, natural spatial expansion",
+            LensProfile.NORMAL: "50mm normal lens, natural perspective",
+            LensProfile.TELEPHOTO: "85mm telephoto, compressed spatial depth",
+            LensProfile.FISHEYE: "fisheye lens, pronounced curved distortion",
+        },
+        "scale": {
+            ShotScale.ESTABLISHING: "establishing shot",
+            ShotScale.WIDE: "wide shot",
+            ShotScale.FULL_BODY: "full-body group shot",
+            ShotScale.MEDIUM_FULL: "medium full shot",
+            ShotScale.MEDIUM: "medium shot",
+            ShotScale.CLOSE_UP: "close-up",
+        },
+        "height": {
+            CameraHeight.EYE_LEVEL: "eye-level",
+            CameraHeight.HIGH_ANGLE: "high angle",
+            CameraHeight.LOW_ANGLE: "low angle",
+            CameraHeight.OVERHEAD: "overhead",
+        },
+        "direction": {
+            CameraDirection.FRONT: "front",
+            CameraDirection.THREE_QUARTER: "three-quarter",
+            CameraDirection.SIDE: "side",
+            CameraDirection.TOP_DOWN: "top-down",
+            CameraDirection.REAR_THREE_QUARTER: "rear three-quarter",
+        },
     },
 }
 
@@ -179,8 +246,11 @@ def _render_prompt(
         )
         for moment in frame.characters
     )
-    camera_shot = _without_terminal_punctuation(frame.camera.shot)
-    camera_view = _without_terminal_punctuation(frame.camera.view)
+    camera_text = _CAMERA_TEXT[output_language]
+    lens = camera_text["lens"][frame.camera.lens_profile]
+    shot_scale = camera_text["scale"][frame.camera.shot_scale]
+    camera_height = camera_text["height"][frame.camera.height]
+    camera_direction = camera_text["direction"][frame.camera.direction]
     depth = frame.camera.depth_of_field
     depth_target = _without_terminal_punctuation(depth.focus_target)
     depth_background = _without_terminal_punctuation(
@@ -199,7 +269,8 @@ def _render_prompt(
             _setting_text(theme, output_language),
             f"Characters: {characters}",
             (
-                f"Shot: {camera_shot}; View: {camera_view}; "
+                f"Capture: {lens}; Shot scale: {shot_scale}; "
+                f"Camera position: {camera_height}, {camera_direction}; "
                 f"Depth of field: {depth.mode.value}, focus on {depth_target}, "
                 f"{depth_background}; Composition: {staging}; "
                 f"Lighting: {light_source} from "
@@ -219,7 +290,8 @@ def _render_prompt(
             _setting_text(theme, output_language),
             f"人物：{characters}",
             (
-                f"镜头：{camera_shot}；视角：{camera_view}；"
+                f"摄影参数：{lens}；景别：{shot_scale}；"
+                f"机位：{camera_height}；方向：{camera_direction}；"
                 f"景深：{depth.mode.value}；焦点：{depth_target}；"
                 f"背景成像：{depth_background}；构图：{staging}；"
                 f"光源：{light_source}；"

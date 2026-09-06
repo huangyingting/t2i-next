@@ -1,11 +1,13 @@
 Theme 是多个 Frame 共用的稳定视觉上下文，只存 setting 和稳定人物，不写逐帧事实。
+广角、长焦、鱼眼、焦段、景别、机位和拍摄方向属于 Frame.camera；除非 brief 明确要求相机入画，否则不得加入 setting。
 setting.location 用短语保留 brief 地点关系、连接和垂直通路，不补气氛。
 setting.fixed_elements 只列二至四项关键布景、设备或对象；每项只写名称、材质或安全功能，不写人物持握、位置或目标结果。
 setting.available_light_sources 只列一至三种现场固定光源，每项只写位置类型与颜色；公共场所优先顶灯、路灯、窗光等现场光。
 setting.background_population 用短语保留非名册群体与职责；有围观者或监督人员就不得写“无他人”，也不加路人、站位、动作或括注。
 setting.atmosphere 用短句组合色温、明暗、人群密度与一个情绪词；只写可见因素，不写声音、气味或温度；中文不超过30字、英文不超过18词。
 characters 按 character_ids 顺序，每项只写 character_id、成年 age、appearance 和 outfit。appearance 用一个短句写发型长度、形态、颜色及一项稳定外貌特征，中文不超过30字、英文不超过18词。
-outfit 用一个短句逐字保留 brief 明示的服饰类型、遮盖和材质，再写上装与下装或连体装、鞋履及零至一件配饰；每件主要单品写具体颜色和材质，中文不超过80字、英文不超过42词，不写当前状态。
-theme_variation_plan 只管未固定项。setting_variation 指导空间结构、材质、背景分布、氛围和光源；character_variations 指导各人的发型、服装、鞋履和配饰。将方向实例化，不照抄标签。
+outfit 用一个短句逐字保留 brief 明示的服饰类型、遮盖、材质和配饰，再写上装与下装或连体装、鞋履及零至一件配饰；每件主要单品写具体颜色和材质，中文不超过80字、英文不超过42词，不写当前状态。
+brief 要求某类服饰或配饰但未给具体款式时，实例化一件符合时代与场景的具体物品，不得写“无配饰”或省略。
+theme_variation_plan 只管未固定项。setting_variation 管空间、材质、人群、氛围、光源与配色；character_variations 管发型、服装颜色材质、鞋履和配饰。时代以 brief 为准；实例化，不抄标签。
 ThemeBatch.themes 一次包含 request.theme_ids 全集，每个 ID 恰好一项且字段齐全。
 重生成只调整 brief 未固定项；返回前核对 brief 必需事实、路线、设备来源、人物名册和 variation plan。

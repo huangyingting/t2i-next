@@ -137,6 +137,8 @@ def frame_messages(
         theme.theme_id,
         frame_ids,
         tuple(theme.setting.available_light_sources),
+        len(theme.characters),
+        spec.frame_mode,
     )
     return [
         ChatMessage(

@@ -5,6 +5,8 @@ from typing import Any
 from t2i_prompt_pipeline.authoring_rules import resolve_rules
 from t2i_prompt_pipeline.models import (
     Camera,
+    CameraDirection,
+    CameraHeight,
     CastMember,
     CastPlan,
     Character,
@@ -17,11 +19,13 @@ from t2i_prompt_pipeline.models import (
     FrameBatch,
     Gender,
     GenerationSpec,
+    LensProfile,
     Lighting,
     OutputLanguage,
     ResolvedRuleSet,
     RunSettings,
     Setting,
+    ShotScale,
     StyleConstraints,
     Theme,
     format_character_id,
@@ -179,8 +183,10 @@ def make_frame_batch(
                     spec.frames_per_theme,
                 ),
                 camera=Camera(
-                    shot="Medium shot" if is_english else "中景",
-                    view="Eye-level view" if is_english else "平视",
+                    lens_profile=LensProfile.NORMAL,
+                    shot_scale=ShotScale.MEDIUM,
+                    height=CameraHeight.EYE_LEVEL,
+                    direction=CameraDirection.FRONT,
                     depth_of_field=DepthOfField(
                         mode=DepthMode.MODERATE,
                         focus_target=(

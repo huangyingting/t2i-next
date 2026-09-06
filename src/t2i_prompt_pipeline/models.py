@@ -77,6 +77,38 @@ class DepthMode(StrEnum):
     DEEP = "deep"
 
 
+class LensProfile(StrEnum):
+    ULTRA_WIDE = "ultra_wide"
+    WIDE = "wide"
+    NORMAL = "normal"
+    TELEPHOTO = "telephoto"
+    FISHEYE = "fisheye"
+
+
+class ShotScale(StrEnum):
+    ESTABLISHING = "establishing"
+    WIDE = "wide"
+    FULL_BODY = "full_body"
+    MEDIUM_FULL = "medium_full"
+    MEDIUM = "medium"
+    CLOSE_UP = "close_up"
+
+
+class CameraHeight(StrEnum):
+    EYE_LEVEL = "eye_level"
+    HIGH_ANGLE = "high_angle"
+    LOW_ANGLE = "low_angle"
+    OVERHEAD = "overhead"
+
+
+class CameraDirection(StrEnum):
+    FRONT = "front"
+    THREE_QUARTER = "three_quarter"
+    SIDE = "side"
+    TOP_DOWN = "top_down"
+    REAR_THREE_QUARTER = "rear_three_quarter"
+
+
 class ContentLevel(StrEnum):
     AESTHETIC = "aesthetic"
     EROTIC = "erotic"
@@ -231,10 +263,20 @@ class DepthOfField(Model):
 
 
 class Camera(Model):
-    shot: Text
-    view: Text
+    lens_profile: LensProfile
+    shot_scale: ShotScale
+    height: CameraHeight
+    direction: CameraDirection
     depth_of_field: DepthOfField
     lighting: Lighting
+
+    @model_validator(mode="after")
+    def overhead_requires_top_down_direction(self) -> Camera:
+        overhead = self.height == CameraHeight.OVERHEAD
+        top_down = self.direction == CameraDirection.TOP_DOWN
+        if overhead != top_down:
+            raise ValueError("overhead 与 top_down 必须配对使用")
+        return self
 
 
 class CharacterMoment(Model):

@@ -134,7 +134,7 @@ def test_frame_english_rejects_chinese_text() -> None:
     spec = make_spec(output_language=OutputLanguage.ENGLISH)
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
-    frame.camera.view = "camera朝向东北"
+    frame.camera.depth_of_field.focus_target = "camera朝向东北"
 
     with pytest.raises(GenerationContractError, match="混入输出语言之外的文字"):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))

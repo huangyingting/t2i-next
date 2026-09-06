@@ -84,7 +84,6 @@ class FakeAuthor:
         self.mixed_invalid_frame_themes: set[str] = set()
         self.contract_invalid_theme_once = False
         self.contract_invalid_frame_themes: set[str] = set()
-        self.depth_conflict_frame_themes: set[str] = set()
         self.duplicate_scene_theme_once = False
         self.duplicate_title_theme_once = False
         self.duplicate_frame_content_themes: set[str] = set()
@@ -198,7 +197,7 @@ class FakeAuthor:
                         for frame_id in returned_ids
                     ],
                 }
-                payload["frames"][-1]["camera"]["shot"] = ""
+                payload["frames"][-1]["camera"]["lens_profile"] = ""
                 raise StructuredOutputError(
                     "mixed-validity frames",
                     raw_content=json.dumps(payload),
@@ -222,15 +221,6 @@ class FakeAuthor:
                                 update={"action": "背对镜头，全身出画不可见"}
                             )
                         ]
-                    }
-                )
-            if theme_id in self.depth_conflict_frame_themes:
-                self.depth_conflict_frame_themes.remove(theme_id)
-                frames[0] = frames[0].model_copy(
-                    update={
-                        "camera": frames[0].camera.model_copy(
-                            update={"shot": "中景，浅景深聚焦人物"}
-                        )
                     }
                 )
             value = FrameBatch(theme_id=theme_id, frames=frames)

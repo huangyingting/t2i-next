@@ -85,14 +85,16 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
     assert "鞋履及零至一件配饰" in themes
     assert "中文不超过30字、英文不超过18词" in themes
     assert "中文不超过80字、英文不超过42词" in themes
-    assert "逐字保留 brief 明示的服饰类型、遮盖和材质" in themes
+    assert "逐字保留 brief 明示的服饰类型、遮盖、材质和配饰" in themes
     assert "每件主要单品写具体颜色和材质" in themes
-    assert "将方向实例化，不照抄标签" in themes
+    assert "实例化，不抄标签" in themes
+    assert "不得写“无配饰”或省略" in themes
     assert "atmosphere 用短句" in themes
     assert "只写可见因素，不写声音、气味或温度" in themes
     assert "公共场所优先顶灯、路灯、窗光等现场光" in themes
     assert "theme_variation_plan 只管未固定项" in themes
-    assert "character_variations 指导各人的发型" in themes
+    assert "时代以 brief 为准" in themes
+    assert "character_variations 管发型" in themes
     assert "重生成只调整 brief 未固定项" in themes
     assert "ThemeBatch.themes 一次包含 request.theme_ids 全集" in themes
     assert "每个 ID 恰好一项且字段齐全" in themes
@@ -110,8 +112,9 @@ def test_frame_rules_require_every_complete_character(
     assert "characters 恰好包含 available_character_ids 全部 ID" in rules
     assert "不生成自由文本 composition" in rules
     assert "lighting.source 逐字使用 frame_visual_plan.light_source" in rules
-    assert "camera 按 frame_visual_plan" in rules
-    assert "position 落实 light_direction" in rules
+    assert "camera 的 lens_profile、shot_scale、height、direction" in rules
+    assert "camera 是画面外拍摄参数" in rules
+    assert "position 先写该光源在 Theme 中的实际方位" in rules
     assert "color 落实 color_treatment" in rules
     assert "scene_effect 写场景亮部与阴影" in rules
     assert "lighting_effect 只用一个短句写该人物受光结果" in rules
@@ -161,8 +164,7 @@ def test_frame_example_is_valid_short_output_with_explicit_visibility() -> None:
             len(moment.action) <= 40
             for moment in frame.characters
         )
-        assert "红" in frame.characters[0].action
-        assert "圆点" in frame.characters[0].action
+        assert "交握" in frame.characters[0].action
 
 
 @pytest.mark.parametrize("mode", list(FrameMode))
@@ -280,7 +282,7 @@ def test_frame_modes_are_mutually_exclusive() -> None:
     assert "首帧建立未完成状态" in sequential
     assert "终帧在 brief 核心动词的语义上限内" in sequential
     assert "每个 Frame 互不依赖" not in sequential
-    assert "连续性允许时落实 frame_visual_plan" in sequential
+    assert "连续性允许时才落实 frame_visual_plan" in sequential
 
     assert "每个 Frame 互不依赖" in variations
     assert "逐项落实 frame_visual_plan" in variations
@@ -305,8 +307,10 @@ def test_output_language_rule_is_selected_for_every_stage() -> None:
 
         chinese_rules = chinese.text_for(stage)
         assert "自然、流利、简练的中文" in chinese_rules
-        assert "常见摄影、服饰和材质英文术语允许保留" in chinese_rules
-        assert "能自然翻译时优先使用中文" in chinese_rules
+        assert "仅无法自然翻译的摄影、服饰和材质专有术语可保留英文" in (
+            chinese_rules
+        )
+        assert "普通动作、姿态和光效必须使用中文" in chinese_rules
 
         assert "brief 原文或规则明确允许的姓名、专有术语可原样保留" in chinese_rules
         assert "schema 规定的机器标识字段不受此限制" in chinese_rules

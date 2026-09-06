@@ -93,8 +93,6 @@ def _theme_natural_text(theme: Theme) -> tuple[str, ...]:
 
 def _frame_natural_text(frame: Frame) -> tuple[str, ...]:
     return (
-        frame.camera.shot,
-        frame.camera.view,
         frame.camera.depth_of_field.focus_target,
         frame.camera.depth_of_field.background_effect,
         frame.camera.lighting.source,

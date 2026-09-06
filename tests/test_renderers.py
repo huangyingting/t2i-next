@@ -158,6 +158,10 @@ def test_renderer_outputs_structured_depth_and_lighting() -> None:
 
     prompt = render_prompt(theme, frame, OutputLanguage.CHINESE, spec)
 
+    assert "摄影参数：50mm标准镜头，自然透视" in prompt
+    assert "景别：半身中景" in prompt
+    assert "机位：平视机位" in prompt
+    assert "方向：正面" in prompt
     assert "景深：moderate" in prompt
     assert "焦点：三人面部与中央绳结" in prompt
     assert "背景成像：后墙与围观人群逐层虚化" in prompt

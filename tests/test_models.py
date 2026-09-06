@@ -7,6 +7,7 @@ from t2i_prompt_pipeline.errors import ConfigurationError
 from t2i_prompt_pipeline.models import (
     ContentLevel,
     Foundation,
+    Frame,
     GenerationSpec,
     OutputLanguage,
     PromptBook,
@@ -20,7 +21,12 @@ from t2i_prompt_pipeline.models import (
     frame_batch_response_model,
     theme_batch_response_model,
 )
-from tests.factories import make_foundation, make_spec, make_themes
+from tests.factories import (
+    make_foundation,
+    make_frame_batch,
+    make_spec,
+    make_themes,
+)
 
 
 def test_spec_allows_only_adult_character_capacity() -> None:
@@ -30,6 +36,33 @@ def test_spec_allows_only_adult_character_capacity() -> None:
             female_count=8,
             male_count=1,
         )
+
+
+def test_camera_rejects_superseded_free_text_shot_and_view() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    payload = make_frame_batch(spec, theme).frames[0].model_dump(mode="json")
+    camera = payload["camera"]
+    for field in ("lens_profile", "shot_scale", "height", "direction"):
+        camera.pop(field)
+    camera.update({"shot": "中景", "view": "平视"})
+
+    with pytest.raises(ValidationError):
+        Frame.model_validate(payload)
+
+
+def test_camera_requires_overhead_and_top_down_to_match() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    payload = make_frame_batch(spec, theme).frames[0].model_dump(mode="json")
+    payload["camera"]["height"] = "overhead"
+    payload["camera"]["direction"] = "front"
+
+    with pytest.raises(
+        ValidationError,
+        match="overhead 与 top_down 必须配对使用",
+    ):
+        Frame.model_validate(payload)
 
 
 def test_spec_supports_optional_and_male_only_cast_constraints() -> None:
