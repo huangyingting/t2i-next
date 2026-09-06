@@ -151,9 +151,7 @@ class FakeAuthor:
             if self.contract_invalid_theme_once:
                 self.contract_invalid_theme_once = False
                 invalid = self.themes[returned_ids[0]].model_copy(
-                    update={
-                        "style": "电影摄影采用固定机位中景与暖色木纹。"
-                    }
+                    update={"theme_id": "T99"}
                 )
                 value = ThemeBatch(themes=[invalid])
             else:
@@ -206,7 +204,7 @@ class FakeAuthor:
                         for frame_id in returned_ids
                     ],
                 }
-                payload["frames"][-1]["details"] = ""
+                payload["frames"][-1]["camera"]["shot"] = ""
                 raise StructuredOutputError(
                     "mixed-validity frames",
                     raw_content=json.dumps(payload),
@@ -609,7 +607,7 @@ async def test_contract_rejections_are_sent_to_targeted_retries() -> None:
         if stage == GenerationStage.FRAMES
     ]
     assert "validation_issues" not in theme_requests[0]
-    assert "Frame 专属具体摄影参数：固定机位" in " ".join(
+    assert "Theme ID 未请求：T99" in " ".join(
         theme_requests[1]["validation_issues"]
     )
     assert "validation_issues" not in frame_requests[0]
@@ -739,9 +737,15 @@ async def test_theme_similarity_regenerates_later_duplicate_theme() -> None:
         ["T02"],
     ]
     assert theme_requests[1]["existing_themes"][0]["theme_id"] == "T01"
-    assert "embedding 相似度判定为重复" in " ".join(
-        theme_requests[1]["validation_issues"]
+    similarity_issue = " ".join(theme_requests[1]["validation_issues"])
+    assert "embedding 相似度判定为重复" in similarity_issue
+    assert "仅调整 brief 未固定的空间布置、固定构件和光质" in (
+        similarity_issue
     )
+    assert "保留 brief 的人物、场所、物体、材质与活动" in (
+        similarity_issue
+    )
+    assert "全新的场所" not in similarity_issue
     similarity_attempt = next(
         attempt
         for attempt in store.attempts(result.run_id)

@@ -8,6 +8,7 @@ from collections.abc import Collection
 from t2i_prompt_pipeline.errors import GenerationContractError
 from t2i_prompt_pipeline.models import (
     CastPlan,
+    CharacterFraming,
     Foundation,
     Frame,
     Gender,
@@ -35,29 +36,14 @@ _EMPTY_PLACEHOLDER = re.compile(
 )
 _LATIN_FRAGMENT = re.compile(r"[A-Za-z]+(?:[ '-][A-Za-z]+)*")
 _CJK_FRAGMENT = re.compile(r"[\u3400-\u9fff]+")
-_CONCRETE_CAMERA_TERM = re.compile(
-    r"相机位于|拍摄机位|固定机位|轨道横移|斯坦尼康|环绕近景|"
-    r"景别为(?:特写|近景|中景|全景|远景)|"
-    r"(?:特写|近景|中景|全景|远景)(?:镜头|取景|景别)|"
-    r"长镜头|焦距偏移|镜头运动|\d+\s*度(?:俯拍|仰拍|侧拍)|"
-    r"\d+\s*毫米(?:镜头|焦距)|\b(?:camera position|camera angle|"
-    r"focal length|aperture|camera movement|tracking shot|long take|"
-    r"steadicam|close-up|medium shot|wide shot|long shot|"
-    r"rack focus)\b",
-    re.IGNORECASE,
+_CHARACTER_ID_REFERENCE = re.compile(
+    r"(?<![A-Za-z0-9])T\d{2,4}-C\d{2}(?![A-Za-z0-9])"
 )
-_CAMERA_CAPTURED_MEDIUM = re.compile(
-    r"摄影|摄像|照片|电影静帧|实拍|\b(?:photograph(?:y|ic)?|"
-    r"cinematograph(?:y|ic)?|videograph(?:y|ic)?|"
-    r"cinematic (?:still|photo)|film still|live[- ]action|"
-    r"(?:film|video) footage)\b",
-    re.IGNORECASE,
-)
-_NON_CAMERA_CAPTURED_MEDIUM = re.compile(
-    r"水彩|油画|素描|铅笔画|炭笔画|版画|蚀刻画|插画|漫画|动画|"
-    r"像素画|三维渲染|3D\s*渲染|\b(?:watercolou?r|oil painting|"
-    r"pencil drawing|charcoal drawing|etching|illustration|anime|"
-    r"animation|pixel art|3d render)\b",
+_CAMERA_FACING_REFERENCE = re.compile(r"镜头|\bcamera\b", re.IGNORECASE)
+_INTERNAL_SCHEMA_TERM = re.compile(
+    r"\b(?:brief|required_phrases|required_route_points|validation_issues|"
+    r"available_character_ids|theme_ids|frame_ids|character_ids|"
+    r"variation_plan)\b",
     re.IGNORECASE,
 )
 _SHALLOW_DEPTH = re.compile(
@@ -68,16 +54,6 @@ _DEEP_DEPTH = re.compile(
     r"深景深|景深(?:偏|较|倾向)?深|\bdeep (?:depth of field|focus)\b",
     re.IGNORECASE,
 )
-_ORDINAL_CHARACTER_LABEL = re.compile(
-    r"^(?:[男女]\d+|(?:Woman|Man) \d+)$",
-    re.IGNORECASE,
-)
-_EXPLICIT_ERA = re.compile(
-    r"(?:[一二〇零][〇零一二三四五六七八九]{3}|(?:18|19|20)\d{2})年代|"
-    r"[一二三四五六七八九]十年代|(?:十八|十九|二十|二十一)世纪|"
-    r"\b(?:18|19|20)\d0s\b",
-    re.IGNORECASE,
-)
 _LEADING_STYLE_PHRASE = re.compile(
     r"^(?P<phrase>[^，。；;]{1,120}?导演风格)(?=的|，|。|；|;|$)"
 )
@@ -85,22 +61,8 @@ _ACTION_VISIBILITY_TERM = re.compile(
     r"不可见|出画|画外|\b(?:not visible|out of frame|off-screen)\b",
     re.IGNORECASE,
 )
-_TRANSIENT_STABLE_FACT_TERM = re.compile(
-    r"仍|已|继续|保持|维持|重新|先前|复又|再度|未变|首帧|上一帧|"
-    r"前几帧|如前|再次|终于|刚才|方才|不知何时|未复位|"
-    r"\b(?:unchanged|previous(?:ly)?|again|still|already|"
-    r"continues?|continued|remains?|remained)\b",
-    re.IGNORECASE,
-)
 _EXPLICIT_CROSS_FRAME_REFERENCE = re.compile(
     r"首帧|上一帧|前几帧|如前|\bprevious(?:ly)?\b",
-    re.IGNORECASE,
-)
-_NONVISUAL_TERM = re.compile(
-    r"声音|声响|回声|回响|雨声|脚步声|落地声|汽笛声|嗡鸣|噪音|气味|香味|臭味|"
-    r"触感|温度|微凉|发出可见|声|不可见|出画|画外|"
-    r"\b(?:sound|noise|smell|odou?r|scent|temperature|audible|"
-    r"inaudible|not visible|out of frame|off-screen)\b",
     re.IGNORECASE,
 )
 _CHINESE_ROUTE = re.compile(
@@ -141,12 +103,18 @@ def _frame_natural_text(frame: Frame) -> tuple[str, ...]:
     return (
         frame.camera.shot,
         frame.camera.view,
-        frame.camera.composition,
-        frame.details,
+        frame.camera.lighting.source,
+        frame.camera.lighting.position,
+        frame.camera.lighting.color,
+        frame.camera.lighting.scene_effect,
         *(
             value
             for moment in frame.characters
             for value in (
+                moment.placement,
+                moment.facing,
+                moment.visible_appearance,
+                moment.lighting_effect,
                 *((moment.expression,) if moment.expression else ()),
                 moment.action,
             )
@@ -159,23 +127,34 @@ def _validate_output_language(
     artifact_id: str,
     texts: tuple[str, ...],
 ) -> None:
-    pattern = (
-        _LATIN_FRAGMENT
-        if spec.output_language == OutputLanguage.CHINESE
-        else _CJK_FRAGMENT
-    )
+    if spec.output_language == OutputLanguage.CHINESE:
+        return
+    pattern = _CJK_FRAGMENT
     brief = spec.brief.casefold()
     unexpected = sorted(
         {
             match.group(0)
             for text in texts
-            for match in pattern.finditer(text)
+            for match in pattern.finditer(
+                _CHARACTER_ID_REFERENCE.sub("", text)
+            )
             if match.group(0).casefold() not in brief
         }
     )
     if unexpected:
         raise GenerationContractError(
             f"{artifact_id} 混入输出语言之外的文字：{unexpected}"
+        )
+
+
+def _validate_no_internal_schema_terms(
+    artifact_id: str,
+    texts: tuple[str, ...],
+) -> None:
+    leaked = _matched_terms(_INTERNAL_SCHEMA_TERM, texts)
+    if leaked:
+        raise GenerationContractError(
+            f"{artifact_id} 输出泄漏内部字段名：{leaked}"
         )
 
 
@@ -312,40 +291,7 @@ def normalize_theme(
             f"{theme.theme_id} style 重复 brief 原文约束："
             f"{repeated_phrases}"
         )
-    unconstrained_style = style
-    for phrase in style_constraints.required_phrases:
-        unconstrained_style = unconstrained_style.replace(phrase, "")
-    if not _CAMERA_CAPTURED_MEDIUM.search(style):
-        raise GenerationContractError(
-            f"{theme.theme_id} style 必须使用摄影或摄像媒介"
-        )
-    non_camera_captured_medium = _NON_CAMERA_CAPTURED_MEDIUM.search(
-        unconstrained_style
-    )
-    if non_camera_captured_medium:
-        raise GenerationContractError(
-            f"{theme.theme_id} style 使用非相机实拍媒介："
-            f"{non_camera_captured_medium.group(0)}"
-        )
     deterministic_issues: list[str] = []
-    camera_term = _CONCRETE_CAMERA_TERM.search(unconstrained_style)
-    if camera_term:
-        deterministic_issues.append(
-            "style 包含 Frame 专属具体摄影参数："
-            f"{camera_term.group(0)}"
-        )
-    unsupported_eras = sorted(
-        {
-            match.group(0)
-            for text in _theme_natural_text(theme)
-            for match in _EXPLICIT_ERA.finditer(text)
-            if match.group(0).casefold() not in spec.brief.casefold()
-        }
-    )
-    if unsupported_eras:
-        deterministic_issues.append(
-            f"包含 brief 未指定的时代：{unsupported_eras}"
-        )
     missing_route_points = [
         point
         for point in brief_route_points(spec.brief)
@@ -356,30 +302,16 @@ def normalize_theme(
             "Theme.scene 缺少 brief 路线地点："
             f"{missing_route_points}"
         )
-    stable_texts = (
-        theme.scene,
-        *(
-            value
-            for character in theme.characters
-            for value in (character.appearance, character.outfit)
-        ),
-    )
-    transient_terms = _matched_terms(_TRANSIENT_STABLE_FACT_TERM, stable_texts)
-    if transient_terms:
-        deterministic_issues.append(
-            f"稳定事实包含瞬时状态：{transient_terms}"
-        )
-    nonvisual_terms = _matched_terms(_NONVISUAL_TERM, stable_texts)
-    if nonvisual_terms:
-        deterministic_issues.append(
-            f"稳定事实包含非视觉信息：{nonvisual_terms}"
-        )
     if deterministic_issues:
         raise GenerationContractError(
             f"{theme.theme_id} {'; '.join(deterministic_issues)}"
         )
     _validate_output_language(
         spec,
+        theme.theme_id,
+        _theme_natural_text(theme),
+    )
+    _validate_no_internal_schema_terms(
         theme.theme_id,
         _theme_natural_text(theme),
     )
@@ -448,31 +380,35 @@ def normalize_frame(
     )
     by_id = {moment.character_id: moment for moment in frame.characters}
     if (
-        len(frame.characters) != len(by_id)
-        or not set(by_id).issubset(expected_ids)
+        len(frame.characters) != len(expected_ids)
+        or set(by_id) != set(expected_ids)
     ):
         raise GenerationContractError(
-            f"{frame.frame_id} 人物 ID 重复或不属于 Theme"
-        )
-    frame_text = "\n".join(_frame_natural_text(frame)).casefold()
-    omitted_references = [
-        character.label
-        for character in theme.characters
-        if character.character_id not in by_id
-        and _ORDINAL_CHARACTER_LABEL.fullmatch(character.label)
-        and character.label.casefold() in frame_text
-    ]
-    if omitted_references:
-        raise GenerationContractError(
-            f"{frame.frame_id} 引用了未列入 characters 的可见人物："
-            f"{omitted_references}"
+            f"{frame.frame_id} 每个 Frame 必须包含 Theme 全部人物，"
+            "人物 ID 不得缺失、重复或来自其他 Theme"
         )
     normalized_moments = []
     text_issues: list[str] = []
     for moment in frame.characters:
+        facing_character_ids = set(
+            _CHARACTER_ID_REFERENCE.findall(moment.facing)
+        )
+        unknown_facing_ids = facing_character_ids.difference(expected_ids)
+        if unknown_facing_ids:
+            text_issues.append(
+                f"{moment.character_id} facing 引用未知人物 ID："
+                f"{sorted(unknown_facing_ids)}"
+            )
+        if (
+            not facing_character_ids
+            and not _CAMERA_FACING_REFERENCE.search(moment.facing)
+        ):
+            text_issues.append(
+                f"{moment.character_id} facing 必须直接写人物 ID 或镜头"
+            )
         if _INVISIBLE_PLACEHOLDER.fullmatch(moment.action):
             text_issues.append(
-                "完全不可见的人物必须从 characters 省略"
+                "所有人物必须入画，action 不能声明人物不可见"
             )
         else:
             visibility_term = _ACTION_VISIBILITY_TERM.search(moment.action)
@@ -485,15 +421,38 @@ def normalize_frame(
             text_issues.append(
                 "action 是空值占位符而不是可见姿态"
             )
+        lighting_character_ids = set(
+            _CHARACTER_ID_REFERENCE.findall(moment.lighting_effect)
+        )
+        wrong_lighting_ids = lighting_character_ids.difference(
+            {moment.character_id}
+        )
+        if wrong_lighting_ids:
+            text_issues.append(
+                f"{moment.character_id} lighting_effect 引用其他人物："
+                f"{sorted(wrong_lighting_ids)}"
+            )
         expression = moment.expression
-        if expression and (
+        head_cropped = (
+            moment.framing == CharacterFraming.HEAD_CROPPED_TORSO
+        )
+        if head_cropped and expression is not None:
+            text_issues.append(
+                f"{moment.character_id} head_cropped_torso 的 "
+                "expression 必须为 null"
+            )
+        elif not head_cropped and expression is None:
+            text_issues.append(
+                f"{moment.character_id} 头部入画时 expression 不能为空"
+            )
+        elif expression and (
             _INVISIBLE_PLACEHOLDER.fullmatch(expression)
             or _EMPTY_PLACEHOLDER.fullmatch(expression)
         ):
-            expression = None
-        normalized_moments.append(
-            moment.model_copy(update={"expression": expression})
-        )
+            text_issues.append(
+                f"{moment.character_id} expression 与 framing 不一致"
+            )
+        normalized_moments.append(moment)
     normalized_by_id = {
         moment.character_id: moment for moment in normalized_moments
     }
@@ -516,15 +475,16 @@ def normalize_frame(
             "引用了其他 Frame："
             f"{cross_frame_references}"
         )
-    nonvisual_terms = _matched_terms(_NONVISUAL_TERM, (normalized_text,))
-    if nonvisual_terms:
-        text_issues.append(f"包含非视觉信息：{nonvisual_terms}")
     if text_issues:
         raise GenerationContractError(
             f"{frame.frame_id} {'; '.join(text_issues)}"
         )
     _validate_output_language(
         spec,
+        normalized.frame_id,
+        _frame_natural_text(normalized),
+    )
+    _validate_no_internal_schema_terms(
         normalized.frame_id,
         _frame_natural_text(normalized),
     )

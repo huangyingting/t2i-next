@@ -166,7 +166,28 @@ def test_frame_batch_schema_uses_exact_ids_for_one_theme() -> None:
             for child in value:
                 yield from properties_named(child, name)
 
+    def mappings(value):
+        if isinstance(value, dict):
+            yield value
+            for child in value.values():
+                yield from mappings(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from mappings(child)
+
     assert model.__name__.endswith("T05")
+    assert set(schema["$defs"]["Lighting"]["properties"]) == {
+        "source",
+        "position",
+        "color",
+        "scene_effect",
+    }
+    assert set(schema["$defs"]["Lighting"]["required"]) == {
+        "source",
+        "position",
+        "color",
+        "scene_effect",
+    }
     assert any(
         field.get("const") == "T05"
         for field in properties_named(schema, "theme_id")
@@ -187,8 +208,16 @@ def test_frame_batch_schema_uses_exact_ids_for_one_theme() -> None:
         for field in properties_named(schema, "character_id")
     )
     assert any(
-        field.get("minItems") == 1 and field.get("maxItems") == 2
+        field.get("minItems") == 2 and field.get("maxItems") == 2
         for field in properties_named(schema, "characters")
+    )
+    assert not list(properties_named(schema, "environment"))
+    assert not list(properties_named(schema, "composition"))
+    assert not list(properties_named(schema, "details"))
+    assert any(
+        field.get("enum")
+        == ["head_and_torso", "full_body", "head_cropped_torso"]
+        for field in mappings(schema)
     )
 
 

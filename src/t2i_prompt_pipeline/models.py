@@ -65,6 +65,12 @@ class FrameMode(StrEnum):
     VARIATIONS = "variations"
 
 
+class CharacterFraming(StrEnum):
+    HEAD_AND_TORSO = "head_and_torso"
+    FULL_BODY = "full_body"
+    HEAD_CROPPED_TORSO = "head_cropped_torso"
+
+
 class ContentLevel(StrEnum):
     AESTHETIC = "aesthetic"
     EROTIC = "erotic"
@@ -217,23 +223,48 @@ class ThemeBatch(Model):
     themes: list[Theme] = Field(min_length=1, max_length=100)
 
 
+class Lighting(Model):
+    source: Text
+    position: Text
+    color: Text
+    scene_effect: Text
+
+
 class Camera(Model):
     shot: Text
     view: Text
-    composition: Text
+    lighting: Lighting
 
 
 class CharacterMoment(Model):
     character_id: CharacterId
+    framing: CharacterFraming
+    placement: Text
+    facing: Text
+    visible_appearance: Text = Field(
+        description=(
+            "Stable appearance and clothing visible within framing. "
+            "HEAD_CROPPED_TORSO excludes face and hair."
+        )
+    )
+    lighting_effect: Text
     expression: Text | None = None
     action: Text
+
+    @model_validator(mode="after")
+    def expression_matches_framing(self) -> CharacterMoment:
+        head_cropped = self.framing == CharacterFraming.HEAD_CROPPED_TORSO
+        if head_cropped and self.expression is not None:
+            raise ValueError("head_cropped_torso 的 expression 必须为 null")
+        if not head_cropped and self.expression is None:
+            raise ValueError("头部入画时 expression 不能为空")
+        return self
 
 
 class Frame(Model):
     frame_id: FrameId
     camera: Camera
     characters: list[CharacterMoment] = Field(min_length=1, max_length=8)
-    details: Text
 
 
 class FrameBatch(Model):
@@ -300,7 +331,7 @@ def frame_batch_response_model(
     visible_moments = Annotated[
         list[response_moment],
         Field(
-            min_length=1,
+            min_length=len(character_ids),
             max_length=len(character_ids),
         ),
     ]

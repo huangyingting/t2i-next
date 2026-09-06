@@ -365,7 +365,10 @@ def test_store_requires_current_rule_snapshot_and_matching_run_id(
     store.checkpoint(invalid_graph.run_id, make_foundation())
     store.checkpoint(invalid_graph.run_id, valid_theme)
     store.checkpoint(invalid_graph.run_id, invalid_frame)
-    with pytest.raises(RunStoreError, match="人物 ID 重复或不属于 Theme"):
+    with pytest.raises(
+        RunStoreError,
+        match="人物 ID 不得缺失、重复或来自其他 Theme",
+    ):
         store.inspect(invalid_graph.run_id)
 
     missing_foundation = store.create(

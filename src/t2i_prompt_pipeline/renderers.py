@@ -5,9 +5,7 @@ from __future__ import annotations
 import re
 
 from t2i_prompt_pipeline.models import (
-    CastMember,
-    CastPlan,
-    Character,
+    CharacterFraming,
     CharacterMoment,
     Frame,
     Gender,
@@ -16,6 +14,21 @@ from t2i_prompt_pipeline.models import (
     RenderedPrompt,
     Theme,
 )
+
+_FRAMING_TEXT = {
+    OutputLanguage.CHINESE: {
+        CharacterFraming.HEAD_AND_TORSO: "头部与躯干入画",
+        CharacterFraming.FULL_BODY: "全身入画",
+        CharacterFraming.HEAD_CROPPED_TORSO: "头部被裁切、躯干入画",
+    },
+    OutputLanguage.ENGLISH: {
+        CharacterFraming.HEAD_AND_TORSO: "head and torso in frame",
+        CharacterFraming.FULL_BODY: "full body in frame",
+        CharacterFraming.HEAD_CROPPED_TORSO: (
+            "head cropped out, torso in frame"
+        ),
+    },
+}
 
 _CHARACTER_ID_PATTERN = re.compile(r"T\d{2,4}-C(?P<index>\d{2})(?!\d)")
 _FRAME_ID_PATTERN = re.compile(r"T\d{2,4}-F\d{2,3}(?!\d)")
@@ -68,86 +81,71 @@ def _display_labels(
     return labels
 
 
-def _stable_character_text(
-    character: Character,
-    cast_member: CastMember,
-    label: str,
-    output_language: OutputLanguage,
-) -> str:
-    appearance = _without_terminal_punctuation(character.appearance)
-    outfit = _without_terminal_punctuation(character.outfit)
-    role = (
-        _without_terminal_punctuation(cast_member.role)
-        if cast_member.role
-        else None
-    )
-    if output_language == OutputLanguage.ENGLISH:
-        descriptors = []
-        if role and role.casefold() != label.casefold():
-            descriptors.append(role)
-        if not re.fullmatch(r"(?:Woman|Man) \d+", label):
-            descriptors.append(
-                "female"
-                if character.gender == Gender.FEMALE
-                else "male"
-            )
-        descriptors.append(f"age {character.age}")
-        identity = f"{label} ({', '.join(descriptors)})"
-        return f"{identity}: {appearance}; outfit: {outfit}"
-    descriptors = []
-    if role and role != label:
-        descriptors.append(role)
-    if not re.fullmatch(r"[男女]\d+", label):
-        descriptors.append(character.gender.value)
-    descriptors.append(f"{character.age}岁")
-    identity = f"{label}（{'，'.join(descriptors)}）"
-    return f"{identity}：{appearance}；服饰：{outfit}"
-
-
-def _moment_text(
+def _character_text(
     moment: CharacterMoment,
     label: str,
     output_language: OutputLanguage,
 ) -> str:
+    visible_appearance = _without_terminal_punctuation(
+        moment.visible_appearance
+    )
+    lighting_effect = _without_terminal_punctuation(moment.lighting_effect)
     action = _without_terminal_punctuation(moment.action)
     if moment.expression is None:
         if output_language == OutputLanguage.ENGLISH:
-            return f"{label}: {action}"
-        return f"{label}：{action}"
+            return (
+                f"{label}: {visible_appearance}; lit by {lighting_effect}; "
+                f"{action}"
+            )
+        return (
+            f"{label}：{visible_appearance}；受光：{lighting_effect}；{action}"
+        )
     expression = _without_terminal_punctuation(moment.expression)
     if output_language == OutputLanguage.ENGLISH:
-        return f"{label}: {expression}; {action}"
-    return f"{label}：{expression}；{action}"
+        return (
+            f"{label}: {visible_appearance}; lit by {lighting_effect}; "
+            f"{expression}; {action}"
+        )
+    return (
+        f"{label}：{visible_appearance}；受光：{lighting_effect}；"
+        f"{expression}；{action}"
+    )
+
+
+def _staging_text(
+    moment: CharacterMoment,
+    label: str,
+    output_language: OutputLanguage,
+) -> str:
+    placement = _without_terminal_punctuation(moment.placement)
+    facing = _without_terminal_punctuation(moment.facing)
+    framing = _FRAMING_TEXT[output_language][moment.framing]
+    if output_language == OutputLanguage.ENGLISH:
+        return f"{label}: {placement}, {framing}, {facing}"
+    return f"{label}：{placement}，{framing}，{facing}"
 
 
 def _render_prompt(
-    cast_plan: CastPlan,
     theme: Theme,
     frame: Frame,
     output_language: OutputLanguage,
     known_theme_pattern: re.Pattern[str] | None,
     known_frame_pattern: re.Pattern[str] | None,
 ) -> str:
-    character_by_id = {
-        character.character_id: character for character in theme.characters
-    }
     display_by_id = _display_labels(theme, output_language)
     item_separator = (
         "; " if output_language == OutputLanguage.ENGLISH else "；"
     )
-    stable_characters = item_separator.join(
-        _stable_character_text(
-            character_by_id[moment.character_id],
-            cast_plan.members[
-                int(moment.character_id.rsplit("C", 1)[1]) - 1
-            ],
+    characters = item_separator.join(
+        _character_text(
+            moment,
             display_by_id[moment.character_id],
             output_language,
         )
         for moment in frame.characters
     )
-    moments = item_separator.join(
-        _moment_text(
+    staging = item_separator.join(
+        _staging_text(
             moment,
             display_by_id[moment.character_id],
             output_language,
@@ -156,21 +154,25 @@ def _render_prompt(
     )
     camera_shot = _without_terminal_punctuation(frame.camera.shot)
     camera_view = _without_terminal_punctuation(frame.camera.view)
-    camera_composition = _without_terminal_punctuation(
-        frame.camera.composition
+    lighting = frame.camera.lighting
+    light_source = _without_terminal_punctuation(lighting.source)
+    light_position = _without_terminal_punctuation(lighting.position)
+    light_color = _without_terminal_punctuation(lighting.color)
+    scene_light_effect = _without_terminal_punctuation(
+        lighting.scene_effect
     )
     if output_language == OutputLanguage.ENGLISH:
         parts = (
             theme.style,
             f"Theme: {theme.title}",
             f"Scene: {theme.scene}",
-            f"Characters: {stable_characters}",
+            f"Characters: {characters}",
             (
                 f"Shot: {camera_shot}; View: {camera_view}; "
-                f"Composition: {camera_composition}"
+                f"Composition: {staging}; Lighting: {light_source} from "
+                f"{light_position}, {light_color}; Scene light: "
+                f"{scene_light_effect}"
             ),
-            f"Current characters: {moments}",
-            f"Details: {frame.details}",
         )
         text = ". ".join(
             _without_terminal_punctuation(part) for part in parts
@@ -183,13 +185,13 @@ def _render_prompt(
             theme.style,
             f"主题：{theme.title}",
             f"场景：{theme.scene}",
-            f"人物：{stable_characters}",
+            f"人物：{characters}",
             (
                 f"镜头：{camera_shot}；视角：{camera_view}；"
-                f"构图：{camera_composition}"
+                f"构图：{staging}；光源：{light_source}；"
+                f"光位：{light_position}；光色：{light_color}；"
+                f"场景明暗：{scene_light_effect}"
             ),
-            f"当前人物：{moments}",
-            f"细节：{frame.details}",
         )
         text = "。".join(
             _without_terminal_punctuation(part) for part in parts
@@ -287,7 +289,6 @@ def render_book(
             theme_id=theme_book.theme.theme_id,
             frame_id=frame.frame_id,
             text=_render_prompt(
-                book.cast_plan,
                 theme_book.theme,
                 frame,
                 output_language,

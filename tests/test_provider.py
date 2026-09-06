@@ -207,7 +207,7 @@ async def test_provider_rejects_unexpected_embedding_dimensions(
     await client.aclose()
 
 
-def test_strict_schema_requires_nullable_frame_fields() -> None:
+def test_strict_schema_requires_all_character_moment_fields() -> None:
     response_model = frame_batch_response_model(
         "T01",
         ("T01-F01",),
@@ -218,8 +218,17 @@ def test_strict_schema_requires_nullable_frame_fields() -> None:
     moment_schema = schema["$defs"]["CharacterMomentForT01"]
 
     assert "default" not in moment_schema["properties"]["expression"]
+    assert {
+        item["type"]
+        for item in moment_schema["properties"]["expression"]["anyOf"]
+    } == {"string", "null"}
     assert set(moment_schema["required"]) == {
         "character_id",
+        "framing",
+        "placement",
+        "facing",
+        "visible_appearance",
+        "lighting_effect",
         "expression",
         "action",
     }

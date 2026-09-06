@@ -48,11 +48,11 @@ def test_theme_request_contains_stable_facts_and_stage_rules() -> None:
 
     assert "Theme 只拥有 title、稳定 scene/style、人物外貌和服饰" in instructions
     assert "位置、表情、动作、接触、遮挡、镜头属于 Frame" in instructions
-    assert "required_route_points" in instructions
-    assert "摄影或摄像实拍方案" in instructions
+    assert "请求中的路线地点原词完整保留地点和连接" in instructions
+    assert "摄影或摄像实拍媒介" in instructions
     assert "方案间变化发型、穿戴、配饰、固定布景和光质" in instructions
     assert "每个 ID 恰好一项且字段齐全" in instructions
-    assert "不加未提供的路人" in instructions
+    assert "只写非名册背景人群有无" in instructions
     assert "CastPlan" not in instructions
     assert "Character.label 是最终显示名" in instructions
     assert "本次使用 美学级（aesthetic）" in instructions
@@ -90,10 +90,13 @@ def test_frame_request_contains_theme_context_and_stage_rules() -> None:
     assert "character_ids_per_frame" not in request
     assert "variation_plan" not in request
 
-    assert "Frame 只拥有 camera、当前可见人物" in instructions
-    assert "同一三维空间" in instructions
+    assert (
+        "Frame 拥有 camera、lighting 和人物 framing/placement/facing"
+        in instructions
+    )
+    assert "抓握、支撑、遮挡与景深一致" in instructions
     assert "完整可见因果链" in instructions
-    assert "核心道具已有来源" in instructions
+    assert "道具沿用 Theme 名称和材质" in instructions
     assert "本次使用 极致情色级（erotic）" in instructions
     assert "当前画面直接呈现" in instructions
 
@@ -118,10 +121,14 @@ def test_variation_frame_request_contains_plan_and_exclusive_rules() -> None:
     assert request["variation_plan"]["T01-F01"].startswith("空间关系")
     assert request["variation_plan"]["T01-F03"].startswith("锚点细节")
     assert "工具仅取自 brief 或 Theme" in request["variation_plan"]["T01-F02"]
-    assert "brief 允许时只取手部" in request["variation_plan"]["T01-F03"]
-    assert "互不依赖的完整候选画面" in instructions
+    assert (
+        "全部人物以躯干或身体主体入画"
+        in request["variation_plan"]["T01-F03"]
+    )
+    assert "每个 Frame 互不依赖" in instructions
+    assert "完整呈现 brief 全部可视事实" in instructions
+    assert "工具、对象、颜色、图案、数量和结果不得分散" in instructions
     assert "request.variation_plan" in instructions
-    assert "三项差异是满足约束后的目标" in instructions
     assert "一致性优先于差异数量" in instructions
     assert "完整可见因果链" not in instructions
     assert "终帧" not in instructions

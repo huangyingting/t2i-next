@@ -596,7 +596,8 @@ class PromptStudio:
             f"{rejection.rejected_theme_id} 与 {rejection.kept_theme_id}"
             f"（scene={rejection.scene_similarity:.6f}，"
             f"style={rejection.style_similarity:.6f}）；"
-            "请为被拒 ID 生成全新的场所、核心装置与摄影方案"
+            "仅调整 brief 未固定的空间布置、固定构件和光质；"
+            "保留 brief 的人物、场所、物体、材质与活动"
         )
 
     async def _generate_foundation(

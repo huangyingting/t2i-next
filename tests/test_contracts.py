@@ -10,7 +10,7 @@ from t2i_prompt_pipeline.contracts import (
     theme_ids,
 )
 from t2i_prompt_pipeline.errors import GenerationContractError
-from t2i_prompt_pipeline.models import OutputLanguage
+from t2i_prompt_pipeline.models import CharacterFraming, OutputLanguage
 from tests.factories import (
     make_foundation,
     make_frame_batch,
@@ -35,8 +35,7 @@ def test_theme_style_normalizes_language_specific_ending() -> None:
     chinese_theme = make_themes(chinese_spec)[0].model_copy(
         update={
             "style": (
-                "电影摄影以暖琥珀与灰蓝配色形成柔和侧光和中等反差，"
-                "哑光木材与拉丝金属呈现细腻质感"
+                "电影摄影以暖琥珀与灰蓝配色形成中等反差"
             )
         }
     )
@@ -47,8 +46,7 @@ def test_theme_style_normalizes_language_specific_ending() -> None:
             "scene": "A quiet room with a wooden table by the window",
             "style": (
                 "Cinematic photography balances warm amber and slate blue, "
-                "soft side light, "
-                "moderate contrast, matte wood, and brushed brass textures"
+                "with moderate contrast"
             ),
             "characters": [
                 character.model_copy(
@@ -92,25 +90,6 @@ def test_theme_style_normalizes_trailing_list_separator_without_retry() -> None:
     assert normalize_test_theme(spec, theme).style == (
         "电影摄影，" + "色" * 59 + "。"
     )
-
-
-def test_theme_style_preserves_long_complete_text() -> None:
-    spec = make_spec()
-    theme = make_themes(spec)[0].model_copy(
-        update={
-            "style": (
-                "电影摄影中青绿霓虹从窗外港务灯透入，与室内昏黄钨丝灯交织成冷暖分界线；"
-                "雨幕将远景吞噬为柔焦光斑，近处金属栏杆与漆面座椅带海盐侵蚀的"
-                "哑光氧化质感；慢快门使雨滴拖成银色丝线，窗上雾气和玻璃叠化出"
-                "双重人影。"
-            )
-        }
-    )
-
-    normalized = normalize_test_theme(spec, theme)
-
-    assert normalized.style == theme.style
-    assert len(normalized.style) > 60
 
 
 def test_foundation_rejects_style_constraint_not_copied_from_brief() -> None:
@@ -186,87 +165,48 @@ def test_theme_style_must_use_brief_constraints_exactly_once() -> None:
         )
 
 
-def test_theme_rejects_unrequested_latin_text_in_chinese_output() -> None:
+def test_theme_chinese_allows_unrequested_latin_text() -> None:
     spec = make_spec()
     foundation = make_foundation(spec)
     theme = make_themes(spec)[0].model_copy(
         update={"scene": "歪斜的 singleton 竹篮搁在柱脚"}
     )
 
-    with pytest.raises(GenerationContractError, match="singleton"):
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
+    normalized = normalize_theme(
+        spec,
+        foundation.style_constraints,
+        foundation.cast_plan,
+        theme,
+        theme_ids(spec),
+    )
+
+    assert "singleton" in normalized.scene
 
 
 @pytest.mark.parametrize(
-    "camera_term",
-    [
-        "相机位于人物左侧",
-        "轨道横移长镜头",
-        "斯坦尼康环绕近景",
-        "固定机位中景",
-        "焦距偏移",
-    ],
+    ("field", "text"),
+    (
+        ("style", "摄影实拍，保留 required_phrases：柔和光线。"),
+        ("scene", "私人摄影棚，required_route_points: 摄影棚中央。"),
+    ),
 )
-def test_theme_style_rejects_frame_owned_camera_terms(
-    camera_term: str,
+def test_theme_rejects_internal_schema_term_leakage(
+    field: str,
+    text: str,
 ) -> None:
-    phrase = "韦斯安德森风格"
-    spec = make_spec(brief=f"{phrase}的有故事性的互动")
-    foundation = make_foundation(spec)
-    foundation.style_constraints.required_phrases = [phrase]
-    theme = make_themes(spec)[0].model_copy(
-        update={
-            "style": f"{phrase}，电影摄影采用{camera_term}与暖色木纹。"
-        }
-    )
-
-    with pytest.raises(GenerationContractError, match="Frame 专属具体摄影参数"):
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
-
-
-def test_theme_rejects_explicit_era_inferred_from_style_reference() -> None:
-    phrase = "王家卫风格"
-    spec = make_spec(brief=f"{phrase}的香港旧酒店重逢故事")
-    foundation = make_foundation(spec)
-    foundation.style_constraints.required_phrases = [phrase]
-    theme = make_themes(spec)[0].model_copy(
-        update={
-            "scene": "一九六零年代香港旧酒店，雨夜走廊连接电梯与客房",
-            "style": f"{phrase}，电影摄影以潮湿霓虹塑造粗颗粒质感。",
-        }
-    )
-
-    with pytest.raises(GenerationContractError, match="brief 未指定的时代"):
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
-
-
-def test_theme_style_allows_stable_slow_shutter_treatment() -> None:
     spec = make_spec()
-    theme = make_themes(spec)[0].model_copy(
-        update={"style": "电影摄影采用慢速快门拖影与粗颗粒质感。"}
-    )
+    foundation = make_foundation(spec)
+    theme = make_themes(spec)[0]
+    setattr(theme, field, text)
 
-    normalized = normalize_test_theme(spec, theme)
-
-    assert "慢速快门拖影" in normalized.style
+    with pytest.raises(GenerationContractError, match="泄漏内部字段名"):
+        normalize_theme(
+            spec,
+            foundation.style_constraints,
+            foundation.cast_plan,
+            theme,
+            theme_ids(spec),
+        )
 
 
 def test_theme_accepts_explicit_era_from_brief() -> None:
@@ -350,65 +290,6 @@ def test_theme_accepts_equivalent_hotel_route_terms() -> None:
     assert normalized.scene == theme.scene
 
 
-@pytest.mark.parametrize(
-    ("field", "text", "message"),
-    [
-        ("outfit", "旗袍侧襟已解三粒盘扣", "稳定事实包含瞬时状态.*已"),
-        ("scene", "铁皮斜顶承接雨声", "稳定事实包含非视觉信息.*雨声"),
-    ],
-)
-def test_theme_rejects_transient_or_nonvisual_stable_facts(
-    field: str,
-    text: str,
-    message: str,
-) -> None:
-    spec = make_spec()
-    foundation = make_foundation(spec)
-    theme = make_themes(spec)[0]
-    if field == "outfit":
-        theme.characters[0].outfit = text
-    else:
-        theme.scene = text
-
-    with pytest.raises(GenerationContractError, match=message):
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
-
-
-def test_theme_reports_all_deterministic_issues_together() -> None:
-    spec = make_spec(
-        brief="王家卫风格，两名成年人从电梯、走廊到房间重逢"
-    )
-    foundation = make_foundation(spec)
-    foundation.style_constraints.required_phrases = ["王家卫风格"]
-    theme = make_themes(spec)[0].model_copy(
-        update={
-            "scene": "一九六零年代旧酒店房间，铁架床靠窗",
-            "style": "王家卫风格，电影摄影采用固定机位中景与粗颗粒。",
-        }
-    )
-
-    with pytest.raises(GenerationContractError) as caught:
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
-
-    message = str(caught.value)
-    assert "固定机位" in message
-    assert "一九六零年代" in message
-    assert "电梯" in message
-    assert "走廊" in message
-
-
 def test_theme_style_allows_abstract_composition_and_perspective() -> None:
     phrase = "斯坦利·库布里克风格"
     spec = make_spec(brief=f"{phrase}的两名成年人互动")
@@ -418,7 +299,7 @@ def test_theme_style_allows_abstract_composition_and_perspective() -> None:
         update={
             "style": (
                 f"{phrase}，轴线构图与单点透视形成深景深倾向，"
-                "电影摄影以冷白光刻画抛光石材。"
+                "电影摄影以冷白色调刻画抛光石材。"
             )
         }
     )
@@ -440,7 +321,7 @@ def test_theme_style_allows_camera_constraint_copied_from_brief() -> None:
     foundation = make_foundation(spec)
     foundation.style_constraints.required_phrases = [phrase]
     theme = make_themes(spec)[0].model_copy(
-        update={"style": f"{phrase}，粗粒黑白电影摄影与硬质侧光。"}
+        update={"style": f"{phrase}，粗粒黑白电影摄影与硬反差。"}
     )
 
     normalized = normalize_theme(
@@ -454,62 +335,41 @@ def test_theme_style_allows_camera_constraint_copied_from_brief() -> None:
     assert phrase in normalized.style
 
 
-@pytest.mark.parametrize(
-    "style",
-    [
-        "水彩纸本以暖黄色晕染乡村厨房。",
-        "Graphite pencil drawing with dense cross-hatching.",
-    ],
-)
-def test_theme_style_requires_camera_captured_medium(style: str) -> None:
-    spec = make_spec()
-    foundation = make_foundation(spec)
-    theme = make_themes(spec)[0].model_copy(update={"style": style})
-
-    with pytest.raises(GenerationContractError, match="必须使用摄影或摄像"):
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
-
-
-def test_theme_style_rejects_unrequested_illustration_medium() -> None:
+def test_theme_scene_allows_background_population_fact() -> None:
     spec = make_spec()
     foundation = make_foundation(spec)
     theme = make_themes(spec)[0].model_copy(
-        update={"style": "电影摄影捕捉水彩纸本的晕染边界。"}
+        update={"scene": "私人摄影棚，背景没有其他人。"}
     )
 
-    with pytest.raises(GenerationContractError, match="使用非相机实拍媒介：水彩"):
-        normalize_theme(
-            spec,
-            foundation.style_constraints,
-            foundation.cast_plan,
-            theme,
-            theme_ids(spec),
-        )
+    normalized = normalize_theme(
+        spec,
+        foundation.style_constraints,
+        foundation.cast_plan,
+        theme,
+        theme_ids(spec),
+    )
+
+    assert normalized.scene == theme.scene
 
 
 @pytest.mark.parametrize(
     ("style", "output_language"),
     [
         (
-            "湿版火棉胶摄影呈现潮湿木材与银盐颗粒。",
+            "湿版火棉胶摄影，低饱和银盐色调。",
             OutputLanguage.CHINESE,
         ),
         (
-            "纪录片摄像以手持数字影像记录潮湿街道。",
+            "纪录片摄像，低饱和冷灰色调。",
             OutputLanguage.CHINESE,
         ),
         (
-            "Cinematic photography with restrained natural light.",
+            "Cinematic photography with restrained colors.",
             OutputLanguage.ENGLISH,
         ),
         (
-            "Observational videography with available practical light.",
+            "Observational videography in low saturation.",
             OutputLanguage.ENGLISH,
         ),
     ],
@@ -598,42 +458,74 @@ def test_theme_character_order_must_match_cast_plan_gender() -> None:
         )
 
 
-def test_frame_accepts_visible_character_subset_in_theme_order() -> None:
+def test_frame_requires_every_theme_character() -> None:
     spec = make_spec(female_count=1, male_count=1)
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
     frame.characters = [frame.characters[1]]
 
-    normalized = normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
+    with pytest.raises(
+        GenerationContractError,
+        match="每个 Frame 必须包含 Theme 全部人物",
+    ):
+        normalize_frame(
+            spec,
+            theme,
+            frame,
+            frame_ids(spec, theme.theme_id),
+        )
 
-    assert [moment.character_id for moment in normalized.characters] == [
-        theme.characters[1].character_id
-    ]
+
+@pytest.mark.parametrize(
+    ("facing", "message"),
+    (
+        ("toward pair", "必须直接写人物 ID 或镜头"),
+        ("toward T99-C01", "引用未知人物 ID"),
+    ),
+)
+def test_frame_requires_explicit_facing_target(
+    facing: str,
+    message: str,
+) -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    frame.characters[0].facing = facing
+
+    with pytest.raises(GenerationContractError, match=message):
+        normalize_frame(
+            spec,
+            theme,
+            frame,
+            frame_ids(spec, theme.theme_id),
+        )
 
 
-def test_frame_rejects_mixed_language_camera_text() -> None:
+def test_frame_chinese_allows_english_camera_term() -> None:
     spec = make_spec()
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
     frame.camera.view = ".camera朝向东北"
 
-    with pytest.raises(
-        GenerationContractError,
-        match="混入输出语言之外的文字.*camera",
-    ):
-        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
+    normalized = normalize_frame(
+        spec,
+        theme,
+        frame,
+        frame_ids(spec, theme.theme_id),
+    )
+
+    assert normalized.camera.view == ".camera朝向东北"
 
 
-def test_frame_rejects_reference_to_omitted_ordinal_character() -> None:
-    spec = make_spec(female_count=2, male_count=0)
+def test_frame_english_still_rejects_chinese_text() -> None:
+    spec = make_spec(output_language=OutputLanguage.ENGLISH)
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
-    frame.characters = [frame.characters[0]]
-    frame.characters[0].action = "女1注视画面中的女2"
+    frame.camera.view = "camera朝向东北"
 
     with pytest.raises(
         GenerationContractError,
-        match="引用了未列入 characters 的可见人物.*女2",
+        match="混入输出语言之外的文字.*朝向东北",
     ):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
@@ -704,9 +596,9 @@ def test_frame_rejects_unknown_or_duplicate_visible_characters() -> None:
     )
     unknown = frame.model_copy(update={"characters": [unknown_moment]})
 
-    with pytest.raises(GenerationContractError, match="重复或不属于 Theme"):
+    with pytest.raises(GenerationContractError, match="缺失、重复或来自其他 Theme"):
         normalize_frame(spec, theme, duplicate, frame_ids(spec, theme.theme_id))
-    with pytest.raises(GenerationContractError, match="重复或不属于 Theme"):
+    with pytest.raises(GenerationContractError, match="缺失、重复或来自其他 Theme"):
         normalize_frame(spec, theme, unknown, frame_ids(spec, theme.theme_id))
 
 
@@ -719,7 +611,10 @@ def test_frame_rejects_completely_invisible_character_placeholder() -> None:
     )
     frame.characters = [invisible]
 
-    with pytest.raises(GenerationContractError, match="必须从 characters 省略"):
+    with pytest.raises(
+        GenerationContractError,
+        match="所有人物必须入画",
+    ):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
 
@@ -736,30 +631,22 @@ def test_frame_rejects_visibility_words_inside_action(action: str) -> None:
     frame = make_frame_batch(spec, theme).frames[0]
     frame.characters[0].action = action
 
-    with pytest.raises(GenerationContractError, match="action 包含不可见描述"):
+    with pytest.raises(
+        GenerationContractError,
+        match="action 包含不可见描述",
+    ):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
 
 @pytest.mark.parametrize(
-    ("field", "text"),
-    [
-        ("action", "右手仍握住铁栅"),
-        ("details", "粗呢外套已抛落床沿"),
-        ("action", "双手保持在肩膀两侧"),
-        ("details", "皮革束带继续垂落在床沿"),
-    ],
+    "text",
+    ("右手仍握住铁栅", "双手保持在肩膀两侧"),
 )
-def test_frame_accepts_standalone_state_shorthand(
-    field: str,
-    text: str,
-) -> None:
+def test_frame_accepts_standalone_state_shorthand(text: str) -> None:
     spec = make_spec()
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
-    if field == "action":
-        frame.characters[0].action = text
-    else:
-        frame.details = text
+    frame.characters[0].action = text
 
     normalized = normalize_frame(
         spec,
@@ -768,67 +655,17 @@ def test_frame_accepts_standalone_state_shorthand(
         frame_ids(spec, theme.theme_id),
     )
 
-    if field == "action":
-        assert normalized.characters[0].action == text
-    else:
-        assert normalized.details == text
+    assert normalized.characters[0].action == text
 
 
-@pytest.mark.parametrize(
-    ("field", "text"),
-    [
-        ("action", "右手沿用上一帧的位置握住铁栅"),
-        ("details", "粗呢外套如前放在床沿"),
-    ],
-)
-def test_frame_rejects_explicit_cross_frame_reference(
-    field: str,
-    text: str,
-) -> None:
-    spec = make_spec()
-    theme = make_themes(spec)[0]
-    frame = make_frame_batch(spec, theme).frames[0]
-    if field == "action":
-        frame.characters[0].action = text
-    else:
-        frame.details = text
-
-    with pytest.raises(GenerationContractError, match="引用了其他 Frame"):
-        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
-
-
-@pytest.mark.parametrize(
-    "details",
-    [
-        "雨声从走廊尽头传来",
-        "防火门方向传来积水滴落铁管的空洞回响",
-        "升降机铁栅碰撞声不可见但栅影微晃",
-        "两人呼吸不可见但交握指节泛白",
-    ],
-)
-def test_frame_rejects_nonvisual_sound_details(details: str) -> None:
-    spec = make_spec()
-    theme = make_themes(spec)[0]
-    frame = make_frame_batch(spec, theme).frames[0]
-    frame.details = details
-
-    with pytest.raises(GenerationContractError, match="非视觉信息"):
-        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
-
-
-def test_frame_reports_all_text_issues_together() -> None:
+def test_frame_rejects_explicit_cross_frame_reference() -> None:
     spec = make_spec()
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
     frame.characters[0].action = "右手沿用上一帧的位置握住铁栅"
-    frame.details = "雨声从走廊尽头传来"
 
-    with pytest.raises(GenerationContractError) as caught:
+    with pytest.raises(GenerationContractError, match="引用了其他 Frame"):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
-
-    message = str(caught.value)
-    assert "上一帧" in message
-    assert "雨声" in message
 
 
 def test_frame_rejects_compound_english_invisible_placeholder() -> None:
@@ -838,16 +675,22 @@ def test_frame_rejects_compound_english_invisible_placeholder() -> None:
     frame.characters[0].expression = "face not visible, out of frame."
     frame.characters[0].action = "not visible, out of frame."
 
-    with pytest.raises(GenerationContractError, match="必须从 characters 省略"):
+    with pytest.raises(
+        GenerationContractError,
+        match="action 不能声明人物不可见",
+    ):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
 
-def test_frame_omits_invisible_expression_when_action_is_visible() -> None:
+def test_frame_accepts_null_expression_for_head_crop() -> None:
     spec = make_spec()
     theme = make_themes(spec)[0]
     frame = make_frame_batch(spec, theme).frames[0]
-    frame.characters[0].expression = "面部不可见。"
-
+    frame.characters[0].expression = None
+    frame.characters[0].framing = CharacterFraming.HEAD_CROPPED_TORSO
+    frame.characters[0].visible_appearance = (
+        "肩部以下躯干与基础服饰入画，头部不入画"
+    )
     normalized = normalize_frame(
         spec,
         theme,
@@ -861,7 +704,7 @@ def test_frame_omits_invisible_expression_when_action_is_visible() -> None:
     "literal",
     ["null", "NULL", "None", "nil", "undefined", "N/A", "无", "空"],
 )
-def test_frame_treats_literal_empty_placeholder_as_missing_expression(
+def test_frame_rejects_literal_empty_expression_when_head_is_visible(
     literal: str,
 ) -> None:
     spec = make_spec()
@@ -869,14 +712,16 @@ def test_frame_treats_literal_empty_placeholder_as_missing_expression(
     frame = make_frame_batch(spec, theme).frames[0]
     frame.characters[0].expression = literal
 
-    normalized = normalize_frame(
-        spec,
-        theme,
-        frame,
-        frame_ids(spec, theme.theme_id),
-    )
-
-    assert normalized.characters[0].expression is None
+    with pytest.raises(
+        GenerationContractError,
+        match="expression 与 framing 不一致",
+    ):
+        normalize_frame(
+            spec,
+            theme,
+            frame,
+            frame_ids(spec, theme.theme_id),
+        )
 
 
 def test_frame_rejects_empty_placeholder_action() -> None:

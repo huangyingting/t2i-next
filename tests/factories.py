@@ -8,12 +8,14 @@ from t2i_prompt_pipeline.models import (
     CastMember,
     CastPlan,
     Character,
+    CharacterFraming,
     CharacterMoment,
     Foundation,
     Frame,
     FrameBatch,
     Gender,
     GenerationSpec,
+    Lighting,
     OutputLanguage,
     ResolvedRuleSet,
     RunSettings,
@@ -75,18 +77,16 @@ def make_theme(spec: GenerationSpec, theme_index: int) -> Theme:
         theme_id=theme_id,
         title=f"Theme {theme_index}" if is_english else f"主题{theme_index}",
         scene=(
-            f"A quiet room {theme_index} with a wooden table by the window"
+            f"A quiet room {theme_index} with a wooden table and Window light"
             if is_english
-            else f"安静的室内{theme_index}，木桌靠窗"
+            else f"安静的室内{theme_index}，木桌靠窗，窗外自然光"
         ),
         style=(
             "Cinematic photography balances warm amber and slate blue, "
-            "soft side light, "
-            "moderate contrast, matte wood, and brushed brass textures."
+            "with moderate contrast."
             if is_english
             else (
-                "电影摄影以暖琥珀为主色、灰蓝为辅助色，柔和侧光形成中等反差，"
-                "哑光木材与拉丝黄铜呈现细腻质感。"
+                "电影摄影以暖琥珀为主色、灰蓝为辅助色，形成中等反差。"
             )
         ),
         characters=[
@@ -186,15 +186,54 @@ def make_frame_batch(
                 camera=Camera(
                     shot="Medium shot" if is_english else "中景",
                     view="Eye-level view" if is_english else "平视",
-                    composition=(
-                        f"Composition {index}"
-                        if is_english
-                        else f"构图{index}"
+                    lighting=Lighting(
+                        source=(
+                            "Window light"
+                            if is_english
+                            else "窗外自然光"
+                        ),
+                        position=(
+                            "Camera left"
+                            if is_english
+                            else "镜头左侧"
+                        ),
+                        color=(
+                            "Neutral daylight"
+                            if is_english
+                            else "中性日光色"
+                        ),
+                        scene_effect=(
+                            "The tabletop is bright and the rear wall falls dark"
+                            if is_english
+                            else "桌面明亮，后墙逐渐转暗"
+                        ),
                     ),
                 ),
                 characters=[
                     CharacterMoment(
                         character_id=character.character_id,
+                        framing=CharacterFraming.HEAD_AND_TORSO,
+                        placement=(
+                            f"position {character_index}"
+                            if is_english
+                            else f"位置{character_index}"
+                        ),
+                        facing=(
+                            "facing camera"
+                            if is_english
+                            else "朝向镜头"
+                        ),
+                        visible_appearance=(
+                            f"{character.appearance}; {character.outfit}"
+                            if is_english
+                            else f"{character.appearance}；{character.outfit}"
+                        ),
+                        lighting_effect=(
+                            "The left cheek is bright and the right side "
+                            f"is shadowed {character_index}"
+                            if is_english
+                            else f"左脸明亮，右侧留有阴影{character_index}"
+                        ),
                         expression=(
                             f"Expression {index}"
                             if is_english
@@ -206,13 +245,11 @@ def make_frame_batch(
                             else f"动作{index}"
                         ),
                     )
-                    for character in theme.characters
+                    for character_index, character in enumerate(
+                        theme.characters,
+                        start=1,
+                    )
                 ],
-                details=(
-                    f"Current detail {index}"
-                    if is_english
-                    else f"当前细节{index}"
-                ),
             )
             for index in range(1, spec.frames_per_theme + 1)
         ],

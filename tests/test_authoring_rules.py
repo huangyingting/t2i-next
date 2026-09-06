@@ -44,8 +44,8 @@ def test_rules_express_stage_ownership_without_crossing_boundaries() -> None:
     assert "位置、表情、动作、接触、遮挡、镜头属于 Frame" in themes
     assert "Frame：把一个 Theme 实现" not in themes
 
-    assert "Frame 只拥有 camera、当前可见人物" in frames
-    assert "词本身不构成错误" in frames
+    assert "Frame 拥有 camera、lighting 和人物 framing/placement/facing" in frames
+    assert "“仍、已”本身不构成错误" in frames
     assert "明确跨 Frame 引用" in frames
     assert "Theme：为每个 ID 建立" not in frames
 
@@ -53,7 +53,7 @@ def test_rules_express_stage_ownership_without_crossing_boundaries() -> None:
 def test_system_rule_corpus_stays_concise() -> None:
     rule_files = tuple(SYSTEM_RULES.rglob("*.rules"))
     assert len(rule_files) == 9
-    assert sum(len(path.read_bytes()) for path in rule_files) <= 13_000
+    assert sum(len(path.read_bytes()) for path in rule_files) <= 14_000
 
 
 def test_rule_priorities_preserve_constraints_before_decorative_variation() -> None:
@@ -73,28 +73,35 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
         assert "brief 必需事实、人物、路线与因果信息完整保留" in rules
 
     themes = resolved.text_for(GenerationStage.THEMES)
-    assert "scene 用名词短语完整写活动位置" in themes
+    assert "scene 先逐字复制 brief 的地点关系原词" in themes
     assert "全部工具与对象及材质" in themes
-    assert "锁定 brief 的人数、地点关系" in themes
-    assert "工具、对象、材质、活动与状态" in themes
-    assert "所有字段的未固定项取唯一具体值，不用“或”列备选" in themes
+    assert "Theme 各字段逐项直写 brief 的人数、否定、地点关系" in themes
+    assert "服饰类型与遮盖、工具、对象、材质、活动与状态" in themes
+    assert "不靠常识或材质暗示" in themes
+    assert "未固定项取唯一具体值，不用“或”列备选" in themes
     assert "方案间变化发型、穿戴、配饰、固定布景和光质" in themes
-    assert "末尾写已有角色的人物分布" in themes
+    assert "只写非名册背景人群有无" in themes
+    assert "不写名册人物的位置、姿态或构图" in themes
     assert "CastPlan" not in themes
     assert "眼神、表情与朝向留给 Frame" in themes
     assert "发型长度、形态、质地与颜色" in themes
-    assert "场景适合的完整穿戴" in themes
-    assert "一至两件首饰、眼镜、帽子、围巾等配饰" in themes
+    assert "场景适合的上下装或连体装" in themes
+    assert "outfit 逐字复制 brief 的服饰类型、遮盖和材质修饰原词" in themes
     assert "不加未提供的路人" in themes
     assert "brief 无其他人物时写“无他人”" in themes
     assert "两三项互异固定布景" in themes
-    assert "完整写光向、软硬、色温、环境层次" in themes
-    assert "氛围由可见光色表现" in themes
-    assert "不用轴标签模板" in themes
+    assert "公共场所先写顶灯、路灯、窗光等现场固定光源" in themes
+    assert "不能只有摄影灯具" in themes
+    assert "全局色调、饱和度、对比倾向" in themes
+    assert "不写场景、人物、材质、张力或氛围修辞" in themes
+    assert "不写光源、光位、光色或明暗影响" in themes
+    assert "不重复 scene" in themes
+    assert "不写机位、焦点、镜头运动、手持取景、镜头呼吸" in themes
     assert "未固定项在方案间变化" in themes
     assert "单地点省去路线" in themes
     assert "当前位置和持握由 Frame 描述" in themes
-    assert "required_route_points" in themes
+    assert "请求中的路线地点原词完整保留地点和连接" in themes
+    assert "不输出请求或字段名" in themes
     assert "重生成只调整未固定项" in themes
     assert "validation_issues 要求新场所" in themes
     assert "ThemeBatch.themes 一次包含 request.theme_ids 全集" in themes
@@ -103,33 +110,40 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
 
 @pytest.mark.parametrize("mode", list(FrameMode))
 @pytest.mark.parametrize("language", list(OutputLanguage))
-def test_crop_first_rules_cover_partial_faces_and_natural_actions(
+def test_frame_rules_require_every_complete_character(
     mode: FrameMode, language: OutputLanguage
 ) -> None:
     spec = make_spec(output_language=language)
     spec.frame_mode = mode
     rules = resolve_rules(spec).text_for(GenerationStage.FRAMES)
 
-    assert "先定取景边界，再定可见部位与物体" in rules
-    assert "眼部可见时写眼神或眉眼" in rules
-    assert "仅嘴部、下颌可见时写嘴角或下颌状态" in rules
-    assert "面部完全不入画时为 null" in rules
-    assert "上边界低于下颌时 expression 为 null" in rules
+    assert "characters 恰好包含 available_character_ids 全部 ID" in rules
+    assert "不生成自由文本 composition" in rules
+    assert "lighting.source 逐字复制 Theme.scene 中的实际光源" in rules
+    assert "position 写光相对场景与人物的方位" in rules
+    assert "color 写可见色温或颜色" in rules
+    assert "scene_effect 写画面整体的亮部与阴影" in rules
+    assert "lighting_effect 只写该人物受光结果" in rules
+    assert "framing 只用 head_and_torso、full_body 或 head_cropped_torso" in rules
+    assert "不提供局部肢体选项" in rules
+    assert "placement 写人物在前中后景与左右位置" in rules
+    assert "facing 必须直接包含当前人物 ID 或“镜头”" in rules
+    assert "不用“两人、另一人、pair”等泛称" in rules
+    assert "head_and_torso 写脸、发型和上身服饰" in rules
+    assert "head_cropped_torso 只写躯干、服饰和姿态" in rules
+    assert "head_cropped_torso 必须为 null" in rules
     assert "营造真实情绪张力" not in rules
     assert "每只手默认一个主要任务" in rules
-    assert "如当前帧承担浇水" in rules
-    assert "身体细节服从裁切" in rules
-    assert "容器内部仅在开口或透明结构位于取景内时描述" in rules
+    assert "当前物体结果写入 action" in rules
+    assert "容器内部仅在开口或透明结构入画时描述" in rules
     assert "brief 明示的材质要求约束所有字段" in rules
-    assert "逆光只改变衣料表面的明暗" in rules
-    assert "camera.composition 正向列出入画区域" in rules
+    assert "不透明衣料的逆光只改变表面明暗" in rules
+    assert "visible_appearance 是 Theme 稳定设定在 framing 中的可见投影" in rules
     assert "action 用一个短句" in rules
-    assert "details 默认至多两项可选细节" in rules
-    assert "只见背面时为 null" in rules
-    assert "brief 要求局部面部时才选局部" in rules
+    assert "核心动作的工具、对象、颜色、图案、数量和结果修饰全部直写" in rules
+    assert "短句不得省略" in rules
     assert "中文40字或英文25词以内" in rules
-    assert "中文共30字或英文20词以内" in rules
-    assert "短句示例仅示范写法" in rules
+    assert "示例用本次 ID、场景和动作" in rules
     assert "服饰描述只沿用 Theme 原词" in rules
 
 
@@ -139,15 +153,24 @@ def test_frame_example_is_valid_short_output_with_explicit_visibility() -> None:
     assert len(examples) == 1
     example = FrameBatch.model_validate(json.loads(examples[0]))
 
-    assert len(example.frames) == 2
-    portrait, detail = example.frames
-    assert "完整面部" in portrait.camera.composition
-    assert portrait.characters[0].expression is not None
-    assert "仅双手" in detail.camera.composition
-    assert detail.characters[0].expression is None
+    assert len(example.frames) == 1
+    portrait = example.frames[0]
+    assert len(portrait.characters) == 2
+    assert portrait.characters[0].placement == "左前景"
+    assert portrait.characters[0].facing == "朝向T01-C02"
+    assert "完整面部" in portrait.characters[0].visible_appearance
+    assert portrait.characters[0].expression
+    assert portrait.characters[1].placement == "右前景"
+    assert portrait.characters[1].facing == "朝向T01-C01"
+    assert "肩胸和双臂" in portrait.characters[1].visible_appearance
+    assert portrait.characters[1].expression is None
     for frame in example.frames:
-        assert len(frame.characters[0].action) <= 40
-        assert len(frame.details) <= 30
+        assert all(
+            len(moment.action) <= 40
+            for moment in frame.characters
+        )
+        assert "红" in frame.characters[0].action
+        assert "圆点" in frame.characters[0].action
 
 
 @pytest.mark.parametrize("mode", list(FrameMode))
@@ -190,7 +213,7 @@ def test_style_constraints_preserve_brief_without_inference() -> None:
     assert "role 只复制 brief 中明确身份的原词" in foundation
     assert "没有身份原词时用 JSON null" in foundation
     assert "仅年龄、性别、服饰或动作不算身份" in foundation
-    assert "摄影或摄像实拍方案" in themes
+    assert "摄影或摄像实拍媒介" in themes
     assert "非摄影艺术词只作被实拍处理" in themes
 
 
@@ -199,8 +222,8 @@ def test_period_rules_bind_theme_and_frame_to_the_brief() -> None:
     themes = resolved.text_for(GenerationStage.THEMES)
     frames = resolved.text_for(GenerationStage.FRAMES)
 
-    assert "场景适合的完整穿戴" in themes
-    assert "沿用 Theme 的时代、地域、颜色和材质逻辑" in frames
+    assert "场景适合的上下装或连体装" in themes
+    assert "沿用 Theme 时代、地域、颜色和材质" in frames
 
 
 def test_every_content_level_states_a_floor_and_ceiling() -> None:
@@ -265,12 +288,13 @@ def test_frame_modes_are_mutually_exclusive() -> None:
     assert "完整可见因果链" in sequential
     assert "首帧建立未完成状态" in sequential
     assert "终帧在 brief 核心动词的语义上限内" in sequential
-    assert "互不依赖的完整候选画面" not in sequential
+    assert "每个 Frame 互不依赖" not in sequential
     assert "request.variation_plan" not in sequential
 
-    assert "互不依赖的完整候选画面" in variations
+    assert "每个 Frame 互不依赖" in variations
     assert "request.variation_plan" in variations
-    assert "三项差异是满足约束后的目标" in variations
+    assert "完整呈现 brief 全部可视事实" in variations
+    assert "工具、对象、颜色、图案、数量和结果不得分散" in variations
     assert "一致性优先于差异数量" in variations
     assert "任意两帧至少在三项上实质不同" not in variations
     assert "完整可见因果链" not in variations
@@ -290,8 +314,9 @@ def test_output_language_rule_is_selected_for_every_stage() -> None:
 
         chinese_rules = chinese.text_for(stage)
         assert "自然、流利、简练的中文" in chinese_rules
-        assert "摄影、服饰和材质术语也必须译为中文" in chinese_rules
-        assert "其余只用中文、阿拉伯数字和常规标点" in chinese_rules
+        assert "常见摄影、服饰和材质英文术语允许保留" in chinese_rules
+        assert "能自然翻译时优先使用中文" in chinese_rules
+
         assert "brief 原文或规则明确允许的姓名、专有术语可原样保留" in chinese_rules
         assert "schema 规定的机器标识字段不受此限制" in chinese_rules
 
