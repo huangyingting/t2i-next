@@ -34,18 +34,13 @@ class FakeEmbeddingModel:
 
 
 @pytest.mark.asyncio
-async def test_analyzer_batches_fields_and_requires_both_thresholds() -> None:
+async def test_analyzer_batches_one_setting_per_theme() -> None:
     themes = make_themes(make_spec(theme_count=3))
-    for theme in themes:
-        theme.style = f"固定风格，{theme.style}"
     model = FakeEmbeddingModel(
         (
             (1.0, 0.0, 0.0),
             (0.99, 0.1, 0.0),
             (0.0, 1.0, 0.0),
-            (1.0, 0.0, 0.0),
-            (0.99, 0.1, 0.0),
-            (1.0, 0.0, 0.0),
         )
     )
     analyzer = ThemeSimilarityAnalyzer(
@@ -53,17 +48,17 @@ async def test_analyzer_batches_fields_and_requires_both_thresholds() -> None:
         ThemeSimilaritySettings(
             model="embedding-model",
             dimensions=3,
-            scene_threshold=0.9,
-            style_threshold=0.9,
+            setting_threshold=0.9,
         ),
     )
 
-    report = await analyzer.analyze(themes, ("固定风格",))
+    report = await analyzer.analyze(themes)
 
     assert len(model.requests) == 1
-    assert len(model.requests[0]) == 6
-    assert all("固定风格" not in text for text in model.requests[0][3:])
-    assert report.input_count == 6
+    assert len(model.requests[0]) == 3
+    assert all("location:" in text for text in model.requests[0])
+    assert all("fixed_elements:" in text for text in model.requests[0])
+    assert report.input_count == 3
     assert report.dimensions == 3
     assert report.usage.total_tokens == 42
     assert [pair.potential_duplicate for pair in report.pairs] == [
@@ -83,7 +78,7 @@ async def test_single_theme_skips_embedding_request() -> None:
         ThemeSimilaritySettings(model="embedding-model", dimensions=3),
     )
 
-    report = await analyzer.analyze(make_themes(make_spec()), ())
+    report = await analyzer.analyze(make_themes(make_spec()))
 
     assert model.requests == []
     assert report.input_count == 0
@@ -91,14 +86,10 @@ async def test_single_theme_skips_embedding_request() -> None:
 
 
 @pytest.mark.asyncio
-async def test_analyzer_uses_placeholder_when_style_is_only_required_text() -> None:
+async def test_analyzer_includes_all_setting_fields() -> None:
     themes = make_themes(make_spec(theme_count=2))
-    for theme in themes:
-        theme.style = "电影摄影，摄影"
     model = FakeEmbeddingModel(
         (
-            (1.0, 0.0, 0.0),
-            (0.0, 1.0, 0.0),
             (1.0, 0.0, 0.0),
             (0.0, 1.0, 0.0),
         )
@@ -108,6 +99,8 @@ async def test_analyzer_uses_placeholder_when_style_is_only_required_text() -> N
         ThemeSimilaritySettings(model="embedding-model", dimensions=3),
     )
 
-    await analyzer.analyze(themes, ("摄影", "电影摄影"))
+    await analyzer.analyze(themes)
 
-    assert model.requests[0][2:] == ("无额外风格", "无额外风格")
+    assert "available_light_sources: 窗外自然光" in model.requests[0][0]
+    assert "background_population: 无他人" in model.requests[0][0]
+    assert "atmosphere: 暖调、安静、亲密" in model.requests[0][0]

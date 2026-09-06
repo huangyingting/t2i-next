@@ -308,8 +308,7 @@ async def test_replacement_cap_retains_all_runs_and_counts_attempts(
             ThemeSimilarityReport(
                 state=ThemeSimilarityState.EXHAUSTED,
                 model="test-embedding",
-                scene_threshold=0.86,
-                style_threshold=0.815,
+                setting_threshold=0.86,
                 input_count=0,
                 pairs=[],
             ),

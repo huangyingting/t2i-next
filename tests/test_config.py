@@ -75,8 +75,7 @@ def test_embedding_similarity_is_opt_in_and_frozen(
     monkeypatch.setenv("OPENAI_MODEL", "model-name")
     monkeypatch.setenv("OPENAI_EMBEDDING_MODEL", "embedding-model-v1")
     monkeypatch.setenv("OPENAI_EMBEDDING_DIMENSIONS", "512")
-    monkeypatch.setenv("THEME_SIMILARITY_SCENE_THRESHOLD", "0.9")
-    monkeypatch.setenv("THEME_SIMILARITY_STYLE_THRESHOLD", "0.88")
+    monkeypatch.setenv("THEME_SIMILARITY_SETTING_THRESHOLD", "0.9")
 
     config = build_config(make_spec())
 
@@ -84,8 +83,7 @@ def test_embedding_similarity_is_opt_in_and_frozen(
     assert similarity is not None
     assert similarity.model == "embedding-model-v1"
     assert similarity.dimensions == 512
-    assert similarity.scene_threshold == 0.9
-    assert similarity.style_threshold == 0.88
+    assert similarity.setting_threshold == 0.9
 
 
 def test_embedding_similarity_is_disabled_without_model(

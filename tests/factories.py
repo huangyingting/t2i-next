@@ -10,6 +10,8 @@ from t2i_prompt_pipeline.models import (
     Character,
     CharacterFraming,
     CharacterMoment,
+    DepthMode,
+    DepthOfField,
     Foundation,
     Frame,
     FrameBatch,
@@ -19,6 +21,7 @@ from t2i_prompt_pipeline.models import (
     OutputLanguage,
     ResolvedRuleSet,
     RunSettings,
+    Setting,
     StyleConstraints,
     Theme,
     format_character_id,
@@ -69,43 +72,35 @@ def make_theme(spec: GenerationSpec, theme_index: int) -> Theme:
         spec.female_count if spec.female_count is not None else 1
     )
     male_count = spec.male_count if spec.male_count is not None else 0
-    genders = [
-        *([Gender.FEMALE] * female_count),
-        *([Gender.MALE] * male_count),
-    ]
+    member_count = female_count + male_count
     return Theme(
         theme_id=theme_id,
-        title=f"Theme {theme_index}" if is_english else f"主题{theme_index}",
-        scene=(
-            f"A quiet room {theme_index} with a wooden table and Window light"
-            if is_english
-            else f"安静的室内{theme_index}，木桌靠窗，窗外自然光"
-        ),
-        style=(
-            "Cinematic photography balances warm amber and slate blue, "
-            "with moderate contrast."
-            if is_english
-            else (
-                "电影摄影以暖琥珀为主色、灰蓝为辅助色，形成中等反差。"
-            )
+        setting=Setting(
+            location=(
+                f"A quiet room {theme_index}"
+                if is_english
+                else f"安静的室内{theme_index}"
+            ),
+            fixed_elements=(
+                ["wooden table", "window"]
+                if is_english
+                else ["木桌", "窗户"]
+            ),
+            available_light_sources=(
+                ["Window light"] if is_english else ["窗外自然光"]
+            ),
+            background_population=(
+                "No other people" if is_english else "无他人"
+            ),
+            atmosphere=(
+                "Warm, quiet, and intimate"
+                if is_english
+                else "暖调、安静、亲密"
+            ),
         ),
         characters=[
             Character(
                 character_id=format_character_id(theme_id, index),
-                label=(
-                    (
-                        f"Woman {index}"
-                        if is_english
-                        else f"女{index}"
-                    )
-                    if gender == Gender.FEMALE
-                    else (
-                        f"Man {index - female_count}"
-                        if is_english
-                        else f"男{index - female_count}"
-                    )
-                ),
-                gender=gender,
                 age=25 + index,
                 appearance=(
                     f"Character {index} stable appearance"
@@ -118,7 +113,7 @@ def make_theme(spec: GenerationSpec, theme_index: int) -> Theme:
                     else f"人物{index}的基础服饰"
                 ),
             )
-            for index, gender in enumerate(genders, start=1)
+            for index in range(1, member_count + 1)
         ],
     )
 
@@ -186,6 +181,19 @@ def make_frame_batch(
                 camera=Camera(
                     shot="Medium shot" if is_english else "中景",
                     view="Eye-level view" if is_english else "平视",
+                    depth_of_field=DepthOfField(
+                        mode=DepthMode.MODERATE,
+                        focus_target=(
+                            "All characters"
+                            if is_english
+                            else "全部人物"
+                        ),
+                        background_effect=(
+                            "The rear wall is gently softened"
+                            if is_english
+                            else "后墙轻微虚化"
+                        ),
+                    ),
                     lighting=Lighting(
                         source=(
                             "Window light"

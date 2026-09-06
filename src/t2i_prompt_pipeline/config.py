@@ -108,10 +108,8 @@ def load_theme_similarity_settings(
         "model": provider.embedding_model,
         "dimensions": provider.embedding_dimensions,
     }
-    if value := os.environ.get("THEME_SIMILARITY_SCENE_THRESHOLD"):
-        values["scene_threshold"] = value
-    if value := os.environ.get("THEME_SIMILARITY_STYLE_THRESHOLD"):
-        values["style_threshold"] = value
+    if value := os.environ.get("THEME_SIMILARITY_SETTING_THRESHOLD"):
+        values["setting_threshold"] = value
     try:
         return ThemeSimilaritySettings.model_validate(values)
     except ValidationError as exc:

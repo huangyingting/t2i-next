@@ -71,6 +71,12 @@ class CharacterFraming(StrEnum):
     HEAD_CROPPED_TORSO = "head_cropped_torso"
 
 
+class DepthMode(StrEnum):
+    SHALLOW = "shallow"
+    MODERATE = "moderate"
+    DEEP = "deep"
+
+
 class ContentLevel(StrEnum):
     AESTHETIC = "aesthetic"
     EROTIC = "erotic"
@@ -182,34 +188,22 @@ class CastPlan(Model):
 
 class Character(Model):
     character_id: CharacterId
-    label: Text = Field(
-        description=(
-            "Final display name. Use a real name when available; otherwise "
-            "follow the output-language-specific naming rule in the request."
-        )
-    )
-    gender: Gender
     age: int = Field(ge=21, le=99)
     appearance: Text
     outfit: Text
 
 
+class Setting(Model):
+    location: Text
+    fixed_elements: list[Text] = Field(min_length=1, max_length=12)
+    available_light_sources: list[Text] = Field(min_length=1, max_length=8)
+    background_population: Text
+    atmosphere: Text
+
+
 class Theme(Model):
     theme_id: ThemeId
-    title: Text
-    scene: Text = Field(
-        description=(
-            "Complete stable spatial envelope for this Theme. Include every "
-            "brief-required route location and the fixed connections between "
-            "them; do not describe transient character actions."
-        )
-    )
-    style: Text = Field(
-        description=(
-            "Complete photography, cinematography, or videography treatment "
-            "for this Theme. Illustration and rendered-art media are invalid."
-        )
-    )
+    setting: Setting
     characters: list[Character] = Field(min_length=1, max_length=8)
 
 
@@ -230,9 +224,16 @@ class Lighting(Model):
     scene_effect: Text
 
 
+class DepthOfField(Model):
+    mode: DepthMode
+    focus_target: Text
+    background_effect: Text
+
+
 class Camera(Model):
     shot: Text
     view: Text
+    depth_of_field: DepthOfField
     lighting: Lighting
 
 
@@ -360,6 +361,7 @@ class ThemeBook(Model):
 
 class PromptBook(Model):
     semantic_name: SemanticName
+    style_constraints: StyleConstraints
     cast_plan: CastPlan
     themes: list[ThemeBook]
 
@@ -371,18 +373,9 @@ class PromptBook(Model):
                 raise ValueError(
                     f"{theme.theme_id} 人物数量不符合 Cast Plan"
                 )
-            for index, (character, cast_member) in enumerate(
-                zip(
-                    theme.characters,
-                    self.cast_plan.members,
-                    strict=True,
-                ),
-                start=1,
-            ):
-                if (
-                    character.character_id
-                    != format_character_id(theme.theme_id, index)
-                    or character.gender != cast_member.gender
+            for index, character in enumerate(theme.characters, start=1):
+                if character.character_id != format_character_id(
+                    theme.theme_id, index
                 ):
                     raise ValueError(
                         f"{character.character_id} 不符合 Cast Plan 顺序"
@@ -456,8 +449,7 @@ class RunSettings(Model):
 class ThemeSimilaritySettings(Model):
     model: Text
     dimensions: int | None = Field(default=None, ge=1, le=65536)
-    scene_threshold: float = Field(default=0.86, ge=-1, le=1)
-    style_threshold: float = Field(default=0.815, ge=-1, le=1)
+    setting_threshold: float = Field(default=0.86, ge=-1, le=1)
 
 
 class RunManifest(Model):
@@ -556,16 +548,14 @@ class TokenUsage(Model):
 class ThemeSimilarityPair(Model):
     first_theme_id: ThemeId
     second_theme_id: ThemeId
-    scene_similarity: float = Field(ge=-1, le=1)
-    style_similarity: float = Field(ge=-1, le=1)
+    setting_similarity: float = Field(ge=-1, le=1)
     potential_duplicate: bool
 
 
 class ThemeSimilarityRejection(Model):
     rejected_theme_id: ThemeId
     kept_theme_id: ThemeId
-    scene_similarity: float = Field(ge=-1, le=1)
-    style_similarity: float = Field(ge=-1, le=1)
+    setting_similarity: float = Field(ge=-1, le=1)
 
 
 class ThemeSimilarityReport(Model):
@@ -574,8 +564,7 @@ class ThemeSimilarityReport(Model):
     state: ThemeSimilarityState = ThemeSimilarityState.ANALYZED
     model: Text
     dimensions: int | None = Field(default=None, ge=1, le=65536)
-    scene_threshold: float = Field(ge=-1, le=1)
-    style_threshold: float = Field(ge=-1, le=1)
+    setting_threshold: float = Field(ge=-1, le=1)
     input_count: int = Field(ge=0)
     pairs: list[ThemeSimilarityPair]
     regeneration_round: int | None = Field(default=None, ge=1)

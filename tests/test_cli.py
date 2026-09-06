@@ -39,6 +39,7 @@ def test_generate_command_reports_batched_call_count(
     themes = make_themes(spec)
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[
             ThemeBook(
@@ -330,6 +331,7 @@ def test_completed_resume_needs_no_provider_configuration(
     snapshot = store.create(spec, settings, make_rules(spec))
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[ThemeBook(theme=theme, frames=frames)],
     )
@@ -398,6 +400,7 @@ def _publish_local_run(store: LocalRunStore, spec) -> str:
     snapshot = store.create(spec, make_settings(), make_rules(spec))
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[ThemeBook(theme=theme, frames=frames)],
     )

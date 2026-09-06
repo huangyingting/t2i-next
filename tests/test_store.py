@@ -61,6 +61,7 @@ def test_local_store_checkpoints_and_completes_idempotently(
 
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[ThemeBook(theme=theme, frames=frames)],
     )
@@ -102,7 +103,12 @@ def test_local_store_checkpoints_and_completes_idempotently(
         foundation.style_constraints.model_dump(mode="json")
     )
     assert "style" not in foundation_payload
-    assert book_payload["themes"][0]["theme"]["style"] == theme.style
+    assert book_payload["style_constraints"] == (
+        foundation.style_constraints.model_dump(mode="json")
+    )
+    assert book_payload["themes"][0]["theme"]["setting"] == (
+        theme.setting.model_dump(mode="json")
+    )
 
 
 def test_local_store_persists_theme_similarity_report(tmp_path) -> None:
@@ -115,9 +121,8 @@ def test_local_store_persists_theme_similarity_report(tmp_path) -> None:
     snapshot = store.create(spec, settings, make_rules(spec))
     report = ThemeSimilarityReport(
         model="embedding-model",
-        scene_threshold=0.92,
-        style_threshold=0.92,
-        input_count=4,
+        setting_threshold=0.92,
+        input_count=2,
         pairs=[],
         usage=TokenUsage(prompt_tokens=10, total_tokens=10),
     )
@@ -149,17 +154,15 @@ def test_local_store_rejects_theme_and_dependent_checkpoints(tmp_path) -> None:
         report := ThemeSimilarityReport(
             state=ThemeSimilarityState.REJECTION_PENDING,
             model="embedding-model",
-            scene_threshold=0.86,
-            style_threshold=0.815,
-            input_count=4,
+            setting_threshold=0.86,
+            input_count=2,
             pairs=[],
             regeneration_round=1,
             rejections=[
                 ThemeSimilarityRejection(
                     rejected_theme_id="T02",
                     kept_theme_id="T01",
-                    scene_similarity=0.9,
-                    style_similarity=0.9,
+                    setting_similarity=0.9,
                 )
             ],
         ),
@@ -268,6 +271,7 @@ def test_complete_reuses_prompt_path_persisted_before_reboot(
     snapshot = store.create(spec, make_settings(), make_rules(spec))
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[ThemeBook(theme=theme, frames=frames)],
     )
@@ -407,6 +411,7 @@ def _publish_run(store: LocalRunStore, spec) -> str:
     snapshot = store.create(spec, make_settings(), make_rules(spec))
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[ThemeBook(theme=theme, frames=frames)],
     )
@@ -542,6 +547,7 @@ def test_store_without_prompts_root_refuses_to_create_but_still_completes(
     )
     book = PromptBook(
         semantic_name=foundation.semantic_name,
+        style_constraints=foundation.style_constraints,
         cast_plan=foundation.cast_plan,
         themes=[ThemeBook(theme=theme, frames=frames)],
     )

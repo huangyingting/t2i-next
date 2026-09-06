@@ -9,7 +9,6 @@ from t2i_prompt_pipeline.models import (
     CastPlan,
     Foundation,
     Frame,
-    FrameMode,
     GenerationSpec,
     GenerationStage,
     ResolvedRuleSet,
@@ -17,7 +16,10 @@ from t2i_prompt_pipeline.models import (
     format_character_id,
 )
 from t2i_prompt_pipeline.providers.base import ChatMessage
-from t2i_prompt_pipeline.variation_plans import build_variation_plan
+from t2i_prompt_pipeline.variation_plans import (
+    build_frame_visual_plan,
+    build_theme_variation_plan,
+)
 
 
 def foundation_messages(
@@ -78,6 +80,10 @@ def theme_batch_messages(
         "cast_plan": foundation.cast_plan.model_dump(mode="json"),
         "theme_ids": list(theme_ids),
         "character_ids": character_ids,
+        "theme_variation_plan": build_theme_variation_plan(
+            theme_ids,
+            character_count,
+        ),
     }
     required_route_points = brief_route_points(spec.brief)
     if required_route_points:
@@ -127,11 +133,11 @@ def frame_messages(
     }
     if validation_issues:
         request["validation_issues"] = list(validation_issues)
-    if spec.frame_mode == FrameMode.VARIATIONS:
-        request["variation_plan"] = build_variation_plan(
-            theme.theme_id,
-            frame_ids,
-        )
+    request["frame_visual_plan"] = build_frame_visual_plan(
+        theme.theme_id,
+        frame_ids,
+        tuple(theme.setting.available_light_sources),
+    )
     return [
         ChatMessage(
             role="system",

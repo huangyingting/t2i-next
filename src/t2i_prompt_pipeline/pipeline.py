@@ -270,6 +270,7 @@ class PromptStudio:
 
         book = PromptBook(
             semantic_name=foundation.semantic_name,
+            style_constraints=foundation.style_constraints,
             cast_plan=foundation.cast_plan,
             themes=[
                 ThemeBook(
@@ -306,7 +307,6 @@ class PromptStudio:
         try:
             report = await self._theme_similarity.analyze(
                 tuple(snapshot.themes[theme_id] for theme_id in expected_theme_ids),
-                foundation.style_constraints.required_phrases,
             )
         except ProviderError as exc:
             report = self._theme_similarity.failure_report(str(exc))
@@ -510,17 +510,13 @@ class PromptStudio:
                 continue
             kept_id, pair = max(
                 matches,
-                key=lambda match: min(
-                    match[1].scene_similarity,
-                    match[1].style_similarity,
-                ),
+                key=lambda match: match[1].setting_similarity,
             )
             rejections.append(
                 ThemeSimilarityRejection(
                     rejected_theme_id=theme_id,
                     kept_theme_id=kept_id,
-                    scene_similarity=pair.scene_similarity,
-                    style_similarity=pair.style_similarity,
+                    setting_similarity=pair.setting_similarity,
                 )
             )
         completed_regenerations = sum(
@@ -594,9 +590,8 @@ class PromptStudio:
         return (
             f"{_SIMILARITY_REJECTION_PREFIX}："
             f"{rejection.rejected_theme_id} 与 {rejection.kept_theme_id}"
-            f"（scene={rejection.scene_similarity:.6f}，"
-            f"style={rejection.style_similarity:.6f}）；"
-            "仅调整 brief 未固定的空间布置、固定构件和光质；"
+            f"（setting={rejection.setting_similarity:.6f}）；"
+            "仅调整 brief 未固定的场所、固定构件和可用光源；"
             "保留 brief 的人物、场所、物体、材质与活动"
         )
 
@@ -1134,12 +1129,12 @@ class PromptStudio:
         accepted: list[Theme] = []
         issues: list[str] = []
         seen: set[str] = set()
-        scene_owners = {
-            " ".join(theme.scene.split()).casefold(): theme.theme_id
-            for theme in existing_themes
-        }
-        title_owners = {
-            " ".join(theme.title.split()).casefold(): theme.theme_id
+        setting_owners = {
+            json.dumps(
+                theme.setting.model_dump(mode="json"),
+                ensure_ascii=False,
+                sort_keys=True,
+            ): theme.theme_id
             for theme in existing_themes
         }
         for theme in batch.themes:
@@ -1149,7 +1144,6 @@ class PromptStudio:
             try:
                 normalized = normalize_theme(
                     spec,
-                    foundation.style_constraints,
                     foundation.cast_plan,
                     theme,
                     requested_ids,
@@ -1157,25 +1151,20 @@ class PromptStudio:
             except GenerationContractError as exc:
                 issues.append(str(exc))
                 continue
-            scene_key = " ".join(normalized.scene.split()).casefold()
-            scene_owner = scene_owners.get(scene_key)
-            if scene_owner is not None:
+            setting_key = json.dumps(
+                normalized.setting.model_dump(mode="json"),
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+            setting_owner = setting_owners.get(setting_key)
+            if setting_owner is not None:
                 issues.append(
-                    f"{normalized.theme_id} Theme.scene 与已接受 Theme 重复："
-                    f"{scene_owner}"
-                )
-                continue
-            title_key = " ".join(normalized.title.split()).casefold()
-            title_owner = title_owners.get(title_key)
-            if title_owner is not None:
-                issues.append(
-                    f"{normalized.theme_id} Theme.title 与已接受 Theme 重复："
-                    f"{title_owner}"
+                    f"{normalized.theme_id} Theme.setting 与已接受 Theme 重复："
+                    f"{setting_owner}"
                 )
                 continue
             seen.add(theme.theme_id)
-            scene_owners[scene_key] = normalized.theme_id
-            title_owners[title_key] = normalized.theme_id
+            setting_owners[setting_key] = normalized.theme_id
             accepted.append(normalized)
         accepted.sort(key=lambda theme: requested_ids.index(theme.theme_id))
         return accepted, issues

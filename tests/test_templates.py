@@ -45,16 +45,37 @@ def test_theme_request_contains_stable_facts_and_stage_rules() -> None:
         foundation.style_constraints.model_dump(mode="json")
     )
     assert request["cast_plan"] == foundation.cast_plan.model_dump(mode="json")
+    assert set(
+        request["theme_variation_plan"]["T02"]["character_variations"]
+    ) == {"T02-C01", "T02-C02"}
+    assert set(
+        request["theme_variation_plan"]["T02"]["setting_variation"]
+    ) == {
+        "spatial_structure",
+        "material_direction",
+        "population_layout",
+        "atmosphere_direction",
+        "light_source_direction",
+    }
 
-    assert "Theme 只拥有 title、稳定 scene/style、人物外貌和服饰" in instructions
-    assert "位置、表情、动作、接触、遮挡、镜头属于 Frame" in instructions
-    assert "请求中的路线地点原词完整保留地点和连接" in instructions
-    assert "摄影或摄像实拍媒介" in instructions
-    assert "方案间变化发型、穿戴、配饰、固定布景和光质" in instructions
+    assert "Theme 是多个 Frame 共用的稳定视觉上下文" in instructions
+    assert "theme_variation_plan 只管未固定项" in instructions
+    assert (
+        "不写逐帧事实"
+        in instructions
+    )
+    assert "setting.location 用短语保留 brief 地点关系" in instructions
+    assert "available_light_sources 只列一至三种现场固定光源" in instructions
+    assert "setting_variation 指导空间结构、材质、背景分布、氛围和光源" in (
+        instructions
+    )
+    assert "character_variations 指导各人的发型、服装、鞋履和配饰" in (
+        instructions
+    )
     assert "每个 ID 恰好一项且字段齐全" in instructions
-    assert "只写非名册背景人群有无" in instructions
+    assert "保留非名册群体" in instructions
     assert "CastPlan" not in instructions
-    assert "Character.label 是最终显示名" in instructions
+    assert "不写人物持握、位置或目标结果" in instructions
     assert "本次使用 美学级（aesthetic）" in instructions
 
 
@@ -89,12 +110,26 @@ def test_frame_request_contains_theme_context_and_stage_rules() -> None:
     assert "variation_range" not in request
     assert "character_ids_per_frame" not in request
     assert "variation_plan" not in request
+    assert set(request["frame_visual_plan"]["T01-F02"]) == {
+        "focus",
+        "shot_strategy",
+        "view_strategy",
+        "depth_mode",
+        "depth_effect",
+        "light_source",
+        "light_direction",
+        "color_treatment",
+    }
+    assert request["frame_visual_plan"]["T01-F02"]["light_source"] in (
+        theme.setting.available_light_sources
+    )
 
     assert (
         "Frame 拥有 camera、lighting 和人物 framing/placement/facing"
         in instructions
     )
-    assert "抓握、支撑、遮挡与景深一致" in instructions
+    assert "抓握、支撑、遮挡与 depth_of_field 一致" in instructions
+    assert "focus_target 写对焦人物或接触点" in instructions
     assert "完整可见因果链" in instructions
     assert "道具沿用 Theme 名称和材质" in instructions
     assert "本次使用 极致情色级（erotic）" in instructions
@@ -118,18 +153,25 @@ def test_variation_frame_request_contains_plan_and_exclusive_rules() -> None:
     request = json.loads(messages[1].content)
     instructions = messages[0].content
 
-    assert request["variation_plan"]["T01-F01"].startswith("空间关系")
-    assert request["variation_plan"]["T01-F03"].startswith("锚点细节")
-    assert "工具仅取自 brief 或 Theme" in request["variation_plan"]["T01-F02"]
+    assert request["frame_visual_plan"]["T01-F01"]["focus"].startswith(
+        "空间关系"
+    )
+    assert request["frame_visual_plan"]["T01-F03"]["focus"].startswith(
+        "锚点细节"
+    )
+    assert (
+        "工具仅取自 brief 或 Theme"
+        in request["frame_visual_plan"]["T01-F02"]["focus"]
+    )
     assert (
         "全部人物以躯干或身体主体入画"
-        in request["variation_plan"]["T01-F03"]
+        in request["frame_visual_plan"]["T01-F03"]["focus"]
     )
     assert "每个 Frame 互不依赖" in instructions
     assert "完整呈现 brief 全部可视事实" in instructions
-    assert "工具、对象、颜色、图案、数量和结果不得分散" in instructions
-    assert "request.variation_plan" in instructions
-    assert "一致性优先于差异数量" in instructions
+    assert "工具、对象、颜色、数量和结果不得分散" in instructions
+    assert "frame_visual_plan" in instructions
+    assert "一致性优先" in instructions
     assert "完整可见因果链" not in instructions
     assert "终帧" not in instructions
 

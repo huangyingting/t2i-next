@@ -14,7 +14,6 @@ from t2i_prompt_pipeline.models import (
     Gender,
     GenerationSpec,
     OutputLanguage,
-    StyleConstraints,
     Theme,
     format_character_id,
     format_frame_id,
@@ -44,14 +43,6 @@ _INTERNAL_SCHEMA_TERM = re.compile(
     r"\b(?:brief|required_phrases|required_route_points|validation_issues|"
     r"available_character_ids|theme_ids|frame_ids|character_ids|"
     r"variation_plan)\b",
-    re.IGNORECASE,
-)
-_SHALLOW_DEPTH = re.compile(
-    r"浅景深|景深(?:偏|较|倾向)?浅|\bshallow (?:depth of field|focus)\b",
-    re.IGNORECASE,
-)
-_DEEP_DEPTH = re.compile(
-    r"深景深|景深(?:偏|较|倾向)?深|\bdeep (?:depth of field|focus)\b",
     re.IGNORECASE,
 )
 _LEADING_STYLE_PHRASE = re.compile(
@@ -84,14 +75,15 @@ _ROUTE_EQUIVALENT_GROUPS = (
 
 def _theme_natural_text(theme: Theme) -> tuple[str, ...]:
     return (
-        theme.title,
-        theme.scene,
-        theme.style,
+        theme.setting.location,
+        *theme.setting.fixed_elements,
+        *theme.setting.available_light_sources,
+        theme.setting.background_population,
+        theme.setting.atmosphere,
         *(
             value
             for character in theme.characters
             for value in (
-                character.label,
                 character.appearance,
                 character.outfit,
             )
@@ -103,6 +95,8 @@ def _frame_natural_text(frame: Frame) -> tuple[str, ...]:
     return (
         frame.camera.shot,
         frame.camera.view,
+        frame.camera.depth_of_field.focus_target,
+        frame.camera.depth_of_field.background_effect,
         frame.camera.lighting.source,
         frame.camera.lighting.position,
         frame.camera.lighting.color,
@@ -156,14 +150,6 @@ def _validate_no_internal_schema_terms(
         raise GenerationContractError(
             f"{artifact_id} 输出泄漏内部字段名：{leaked}"
         )
-
-
-def _depth_tendency(text: str) -> str | None:
-    is_shallow = _SHALLOW_DEPTH.search(text) is not None
-    is_deep = _DEEP_DEPTH.search(text) is not None
-    if is_shallow == is_deep:
-        return None
-    return "浅景深" if is_shallow else "深景深"
 
 
 def _matched_terms(pattern: re.Pattern[str], texts: tuple[str, ...]) -> list[str]:
@@ -261,45 +247,29 @@ def normalize_foundation(
 
 def normalize_theme(
     spec: GenerationSpec,
-    style_constraints: StyleConstraints,
     cast_plan: CastPlan,
     theme: Theme,
     allowed_theme_ids: Collection[str],
 ) -> Theme:
     if theme.theme_id not in allowed_theme_ids:
         raise GenerationContractError(f"Theme ID 未请求：{theme.theme_id}")
-    style = theme.style
-    phrase_counts = {
-        phrase: style.count(phrase)
-        for phrase in style_constraints.required_phrases
-    }
-    missing_phrases = [
-        phrase
-        for phrase, count in phrase_counts.items()
-        if count == 0
-    ]
-    if missing_phrases:
-        raise GenerationContractError(
-            f"{theme.theme_id} style 缺少 brief 原文约束："
-            f"{missing_phrases}"
-        )
-    repeated_phrases = [
-        phrase for phrase, count in phrase_counts.items() if count > 1
-    ]
-    if repeated_phrases:
-        raise GenerationContractError(
-            f"{theme.theme_id} style 重复 brief 原文约束："
-            f"{repeated_phrases}"
-        )
     deterministic_issues: list[str] = []
+    setting_text = " ".join(
+        (
+            theme.setting.location,
+            *theme.setting.fixed_elements,
+            *theme.setting.available_light_sources,
+            theme.setting.background_population,
+        )
+    )
     missing_route_points = [
         point
         for point in brief_route_points(spec.brief)
-        if not _route_point_is_present(point, theme.scene)
+        if not _route_point_is_present(point, setting_text)
     ]
     if missing_route_points:
         deterministic_issues.append(
-            "Theme.scene 缺少 brief 路线地点："
+            "Theme.setting 缺少 brief 路线地点："
             f"{missing_route_points}"
         )
     if deterministic_issues:
@@ -315,26 +285,6 @@ def normalize_theme(
         theme.theme_id,
         _theme_natural_text(theme),
     )
-    if spec.output_language == OutputLanguage.CHINESE:
-        if not style.endswith("。"):
-            if style.endswith(("，", "、", "；")):
-                style = f"{style[:-1]}。"
-            elif style.endswith("："):
-                raise GenerationContractError(
-                    f"{theme.theme_id} style 疑似在句中截断"
-                )
-            else:
-                style += "。"
-    else:
-        if not style.endswith("."):
-            if style.endswith((",", ";")):
-                style = f"{style[:-1]}."
-            elif style.endswith(":"):
-                raise GenerationContractError(
-                    f"{theme.theme_id} style 疑似在句中截断"
-                )
-            else:
-                style += "."
     expected_ids = tuple(
         format_character_id(theme.theme_id, index)
         for index in range(1, cast_plan.member_count + 1)
@@ -348,16 +298,7 @@ def normalize_theme(
     ):
         raise GenerationContractError(f"{theme.theme_id} 人物 ID 不完整或重复")
     ordered = [by_id[character_id] for character_id in expected_ids]
-    for character, cast_member in zip(
-        ordered,
-        cast_plan.members,
-        strict=True,
-    ):
-        if character.gender != cast_member.gender:
-            raise GenerationContractError(
-                f"{character.character_id} 性别不符合 Cast Plan"
-            )
-    return theme.model_copy(update={"style": style, "characters": ordered})
+    return theme.model_copy(update={"characters": ordered})
 
 
 def normalize_frame(
@@ -368,13 +309,6 @@ def normalize_frame(
 ) -> Frame:
     if frame.frame_id not in allowed_frame_ids:
         raise GenerationContractError(f"Frame ID 未请求：{frame.frame_id}")
-    style_depth = _depth_tendency(theme.style)
-    frame_depth = _depth_tendency(frame.camera.shot)
-    if style_depth and frame_depth and style_depth != frame_depth:
-        raise GenerationContractError(
-            f"{frame.frame_id} camera.shot 必须继承 Theme.style 的"
-            f"{style_depth}；不得使用{frame_depth}。"
-        )
     expected_ids = tuple(
         character.character_id for character in theme.characters
     )
@@ -513,7 +447,6 @@ def normalize_checkpoint_graph(
             )
         normalized_themes[stored_id] = normalize_theme(
             spec,
-            foundation.style_constraints,
             foundation.cast_plan,
             theme,
             allowed_theme_ids,

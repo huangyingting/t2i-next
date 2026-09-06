@@ -5,22 +5,24 @@
 - `StyleConstraints`：只保存 brief 明示且逐字复制的风格、媒介、技法、时代和地域短语。
 - `CastPlan`：从 brief 解析出的共享人物名册，只保存人物顺序、性别和明确身份，
   不保存外貌或服饰。
-- `Theme`：主题、场景、精简摄影媒介与全局色调、人物稳定外貌和基础服饰。
-- `Frame`：当前镜头、视角、构图、结构化光线、人物可见外观、受光、表情和动作。
+- `Theme`：多个 Frame 共用的最小稳定视觉上下文，只保存结构化 `Setting`
+  （地点、固定元素、候选光源、背景人口与一句视觉氛围）、
+  人物稳定外貌和基础服饰。
+- `Frame`：当前镜头、视角、结构化景深与光线、人物可见外观、受光、表情和动作。
 
-每个事实只有一个所有者。renderer 只按固定顺序展开这些事实，不推断内容，也不补写光线、接触、服饰或位置。
+每个事实只有一个所有者。renderer 只按固定顺序展开这些事实，不推断内容，也不补写光线、接触、服饰或位置。人物稳定事实用于生成 Frame，最终提示词只展开当前取景可见的投影，避免把完整穿搭与当前可见状态重复两遍；Theme 的候选光源列表也不展开，最终只写本帧实际采用的光源。
 
 `StyleConstraints.required_phrases` 不解释风格，也不补写 brief 没有提到的时代、
 地域、媒介或视觉特征。例如 brief 只有“韦斯安德森风格”时，Foundation 只保存
-这段原文。每个 `Theme.style` 必须逐字包含这些约束，并只补充摄影媒介和必要的
-全局色调；场景、材质、构图和光线由各自字段承载。
+这段原文。renderer 直接从 `PromptBook.style_constraints` 生成实拍摄影前缀；
+Theme 不再重复保存或改写风格。
 
 ## 生成流程
 
 一次 run 有三类模型调用：
 
 1. 一次 `Foundation` 调用生成共享 `StyleConstraints`、`CastPlan` 和语义文件名。
-2. `Theme` 按小批次生成，默认每批 5 个，并在同一次调用中直接生成各自的完整 `style`。
+2. `Theme` 按小批次生成，默认每批 5 个，并生成各自的结构化 `setting` 与稳定人物事实。
 3. 所有 `Theme` 完整生成后才执行可选的全量相似度审计；未齐时不会提前生成任何
   `Frame`。
 4. 所有 `Theme` 通过审计后，每个 `Theme` 一次 Frame 调用，生成该主题当前缺失
@@ -28,8 +30,9 @@
 
 因此 5 个主题、每个主题 5 个镜头的基础调用数是 7 次；100 个主题、
 每个主题 6 个镜头、Theme batch size 为 5 时，基础调用数是 121 次。
-自适应 `Theme.style` 复用原有 Theme 调用，不增加模型调用次数，也不需要预生成
-风格候选、候选 ID、额外选择调用或选择理由。Frame 请求不再重复发送全局风格
+Theme 变化计划按 ID 稳定规划场景空间、材质、人群、氛围，以及各人物的发型、
+服装、鞋履和配饰；Frame 视觉计划稳定规划景别、机位、景深、实际光源与光位。
+两类计划都复用原有调用，不增加模型调用次数。Frame 请求不再重复发送全局风格
 摘要，最终 prompt 也不再叠加全局 anchor，因此还能减少重复输入和输出 token。
 
 管线只检查人数约束、数量、ID、CastPlan 对应关系和人物引用。没有 Outline 状态链、
@@ -83,9 +86,9 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
 - 创作先保留 brief 明示事实与 stage ownership，再满足单帧物理和可见性，之后才
   追求差异与装饰细节。规则中的条件示例不会给其他 brief 添加地点或服饰限制；
 - 先为全部请求 ID 生成最简有效候选，再补可选细节；优先简化画面，确实无法形成
-  有效候选时才省略该 ID。Theme 的 scene 用名词短语列活动位置、工具与对象、
-  材质、固定布景及可用光源，style 默认一句；Frame 的 action
-  用一个短句（中文40字或英文25词）；Frame 以结构化 lighting 明确光源、
+  有效候选时才省略该 ID。Theme 的 `setting` 分别保存地点、固定布景与设备、
+  可用光源和背景人口约束；Frame 的 action
+  用一个短句（中文45字或英文25词）；Frame 以结构化 lighting 明确光源、
   光位、光色和场景明暗，并为每个人物分别描述亮部与阴影；
   这些是指令侧长度要求，不做运行时截断，brief 必需事实、人物、路线
   与因果信息仍须完整保留；
@@ -104,21 +107,18 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   明确身份原词，无身份原词时使用 JSON null，不能根据地点、任务或道具猜测职业；
   可选 CLI 人数只补足 brief
   没有明确的性别或人数，不能覆盖 brief，也不授权创造职业；
-- Theme 在逐字保留 required_phrases 的前提下生成完整 style，以自然句明确色彩、
-  对比倾向和材质呈现；具体光源、光位、光色和明暗影响由 Frame 定义；最终媒介必须
-  是摄影或摄像，不使用水彩、素描、版画、插画、动画或三维渲染；具体景别、相机
-  位置、数值角度、焦距和镜头运动由 Frame 定义。Theme 同时拥有稳定外貌和完整穿戴：
+- Theme 不保存 title 或 style；全局媒介和 brief 风格原词由 Foundation 拥有并由
+  renderer 确定性展开。Theme 拥有稳定外貌和完整穿戴：
   appearance 明确发型长度、形态、质地、颜色及一项稳定外貌特征；outfit 明确合乎
-  场景的上下装或连体装、鞋、层次、版型、材质、颜色及零至两件配饰。每个未固定项
+  场景的上下装或连体装、鞋、关键材质及零至一件配饰。每个未固定项
   选择一个具体值而不是列出备选，并在不同 Theme 间形成协调变化；brief 明示的数量、
   否定、服饰类型与遮盖、颜色和材质必须直接写出，其中服饰修饰原词复制到 outfit，
-  不能用常识或材质暗示替代。scene 确定稳定空间
-  结构、两三项固定布景和关键道具身份、材质；scene 先复制 brief 的地点关系原词，
-  再按已有角色名册明确人物分布；brief
-  指定没有其他人物时写明“无他人”，不会添加未提供的路人。可移动道具的位置与持握由 Frame 描述，
-  brief 明示的起点仍须保留。单地点活动不编造到达路线；scene 不复述 style，也不会在首个 Frame 前提前
-  完成 brief 中的寻找、发现或取得等目标；brief 要求故事性或互动时，scene 还要
-  提供能承载互动的可见信息或关键道具；
+  不能用常识或材质暗示替代。`setting.location` 保留地点关系；
+  `fixed_elements` 保存固定布景、设备与关键道具；`available_light_sources`
+  只列现场存在的固定光源；`background_population` 只保存非名册背景人物约束；
+  `atmosphere` 用色温、明暗或人群密度加一个情绪词表达稳定视觉氛围。
+  Theme 不写人物位置、动作、持握、构图或受光，也不会在首个 Frame 前提前完成
+  brief 中的寻找、发现或取得等目标；
 - 本地 contract 只保护 schema、ID、人物集合与引用、framing 联动、
   required_phrases、路线和内部字段泄漏等确定性约束；自然语言质量由生成规则负责，
   不使用词法黑名单触发重试；
@@ -127,10 +127,11 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   例如写“陶油灯”“木格窗”“麻布直裾”而不是“灯”“窗”“衣服”，避免笼统名词
   被文生图模型默认渲染成当代工业制品；时代早于当代时不得出现电灯、塑料、拉链、
   机制印刷品、机动车等该时代不存在的物件，Frame 的 environment 也沿用同一时代形制；
-- 同一批 Theme 必须形成不同的完整方案，不能复制 title、scene 和稳定事实后只
-  替换 style；差异只来自 brief 未固定的布局、布景、障碍、路线和 style，不能移动
+- 同一批 Theme 必须形成不同的完整方案，不能复制 setting 和稳定人物事实后只
+  替换颜色；差异只来自 brief 未固定的布局、布景、障碍、路线、发型、服装轮廓、
+  鞋履和配饰，不能移动
   brief 已指定的起点、核心物体、目标地点或其他不变量；涉及楼层或高度变化时，
-  scene 必须提供能承载人物和核心物体的可执行垂直路线；brief 指定多个连续地点时，
+  setting 必须提供能承载人物和核心物体的可执行垂直路线；brief 指定多个连续地点时，
   每个 Theme 都包含全部地点及连接关系，并由自己的 Frames 独立完成整条故事线，
   不能把不同 Theme 当成同一故事的连续章节；相似度反馈要求新方案时，也只调整
   brief 未固定的部分；
@@ -139,14 +140,13 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   视觉质量词法评分；
 - Frame 不再生成自由文本 `camera.composition` 或通用 `details`。每个人分别拥有
   `framing`、`placement`、`facing`、可见外观、受光、表情与动作；相机拥有
-  `shot`、`view` 和结构化 `lighting`。renderer 按人物 ID 确定性合成统一构图并替换为姓名或
+  `shot`、`view`、结构化 `depth_of_field` 和 `lighting`。renderer 按人物 ID 确定性合成统一构图并替换为
   女1、男1等显示名，因此人物身份、位置和入画范围不会由两套自由文本分别描述；
 - Frame 的现有字段需要覆盖取景与透视、景深与焦点、视觉重点、人物调度、
   前中后景、姿态与视线，以及当前环境光效和道具状态；只写与画面相关的信息，
-  不机械罗列摄影术语，并把 Theme 的抽象构图、透视和景深倾向转成具体 camera
-  选择；承担核心互动或故事推进的道具必须已经存在于 Theme.scene
-  或人物稳定服饰配件中，Frame 不临时发明新的核心道具；Theme.style 明确浅景深
-  或深景深倾向时，Frame 不得选择相反景深；
+  不机械罗列摄影术语。`depth_of_field` 明确 shallow、moderate 或 deep、对焦目标
+  和背景呈现；承担核心互动或故事推进的道具必须已经存在于
+  `Theme.setting.fixed_elements` 或人物稳定服饰配件中，Frame 不临时发明新的核心道具；
 - Frame 按 Theme 顺序包含全部人物，并选择能容纳所有人身体主体的景别。`framing`
   只允许头部与躯干、全身或裁头躯干三种值，不提供局部肢体选项；裁头时 expression
   必须为 null，其他取景必须提供表情。执行核心动作时，
@@ -157,7 +157,7 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   独立呈现 brief 的全部可视事实，核心动作的工具、对象、颜色、图案、数量和结果
   不能拆散到其他 Frame；
 - brief 的空间关系需要由实际活动位置体现，而不只是背景里出现相关物体；服饰
-  材质要求同时约束 Frame 的光照与 environment，不透明衣料不因逆光描写而变为透明。
+  材质要求同时约束 Frame 的光照与可见外观，不透明衣料不因逆光描写而变为透明。
   Theme 的 appearance 只写稳定形态，当前眼神、表情与朝向留给 Frame；
 - sequential 镜头围绕 brief 的核心行动或关键道具形成可见推进，人物与道具状态
   只能通过画面内成立的动作改变；最后一个 Frame 必须在 brief 核心动词的语义
@@ -398,7 +398,7 @@ run 内冻结的 `rules.json`，所以 VM 重启后即使系统或用户规则�
 provider 配置。未完成 run 会校验当前 provider 的 endpoint、模型、
 structured-output 模式、reasoning/thinking 设置和 temperature；当前
 `OPENAI_OUTPUT_TOKEN_LIMIT` 可以更大，但不能小于 manifest 记录的硬上限。
-启用 Theme 相似度诊断的 run 还要求 embedding 模型、dimensions 和两个阈值与
+启用 Theme 相似度诊断的 run 还要求 embedding 模型、dimensions 和 setting 阈值与
 manifest 一致。已保存且无候选的 `theme-similarity.json` 在 resume 时不会重复
 调用 embedding；已保存的候选报告会继续执行定向 Theme 重生成。
 `RunIncompleteError` 表示最近一个完整补全 pass 没有新增任何 Theme 或 Frame；
@@ -406,11 +406,12 @@ manifest 一致。已保存且无候选的 `theme-similarity.json` 在 resume �
 
 提示词文件位于 `prompts/YYYY-MM-DD/<content-level>/`，每个 Frame 占一行，
 行与行之间没有空行，也不包含 `[T01-F01]`
-之类的 Frame 标题。人物 `label` 有真实姓名时使用姓名；没有姓名时，女性
-在中文模式依次使用 `女1、女2`、男性使用 `男1、男2`；英文模式使用
+之类的 Frame 标题。人物显示名由 `CastPlan` 的性别和顺序确定：女性
+在中文模式依次使用 `女1、女2`，男性使用 `男1、男2`；英文模式使用
 `Woman 1、Woman 2` 和 `Man 1、Man 2`。完整或简写的内部 Theme、Frame、
-Character ID 都不会写入最终提示词文本。每行只展开一次所属 Theme 的完整
-`style`；Foundation 的原文约束已包含在该 style 中，不再另行重复。
+Character ID 都不会写入最终提示词文本。每行展开一次 Foundation 的实拍摄影
+与风格原词，再展开所属 Theme 的场所、必要固定布景、背景人口，以及 Frame
+当前真正可见的人物、景深、构图与光线。
 
 ## 配置
 
@@ -428,8 +429,7 @@ Provider 配置来自 `.env`：
 | `OPENAI_TRANSPORT_RETRIES` | `2` |
 | `OPENAI_EMBEDDING_MODEL` | 未设置，关闭 Theme 相似度诊断 |
 | `OPENAI_EMBEDDING_DIMENSIONS` | provider 模型默认维度 |
-| `THEME_SIMILARITY_SCENE_THRESHOLD` | `0.86` |
-| `THEME_SIMILARITY_STYLE_THRESHOLD` | `0.815` |
+| `THEME_SIMILARITY_SETTING_THRESHOLD` | `0.86` |
 
 `OPENAI_MODEL` 没有默认值，必须设置。只配置模型支持的 reasoning 控制：`OPENAI_REASONING_EFFORT` 或 `OPENAI_THINKING_MODE`，不要同时设置。
 

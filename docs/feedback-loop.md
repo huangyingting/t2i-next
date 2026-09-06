@@ -200,16 +200,12 @@ category 应保持有限且稳定，具体解释放在 evidence 和 root cause �
 - 规则指纹是否一致；
 - Theme、Frame 和 Character ID 是否泄漏到最终文本；
 - `StyleConstraints.required_phrases` 是否都是 brief 的逐字连续子串；
-- 每个 required phrase 是否在当前 `Theme.style` 中恰好出现一次；
-- 当前 `Theme.style` 是否在每个 prompt 中恰好出现一次；
-- required phrases 之外的 `Theme.style` 是否混入具体相机位置或摄影参数；
-- `Theme.style` 是否明确使用摄影或摄像，并排除非相机实拍的最终媒介；
-- Theme 是否加入 brief 未指定的明确年代；
+- 每个 required phrase 是否由 renderer 在每个 prompt 中恰好展开一次；
+- Theme 是否只包含结构化 setting 和人物稳定事实；
 - brief 指定多个连续地点时，每个 Theme 是否独立包含完整路线而不是充当一个章节；
-- Frame 明确选择的景深是否与 `Theme.style` 的明确景深倾向相反；
+- Frame 的 `depth_of_field` 是否包含合法模式、明确焦点和背景呈现；
 - Frame action 是否包含“不可见”“出画”“画外”，自然语言字段是否使用“仍”“已”
     等跨 Frame 缩写，或混入声音、气味、温度等非视觉信息；
-- 中文和英文 style 是否符合当前长度 contract；
 - Theme 自然语言字段是否混入 brief 未授权的其他语言文字；
 - prompt 是否为空、重复、异常过长或含连续重复片段；
 - 同一 Theme 的稳定人物字段是否保持一致；
@@ -230,7 +226,7 @@ category 应保持有限且稳定，具体解释放在 evidence 和 root cause �
 - brief 是否被 Foundation、Theme 和 Frame 忠实表达；
 - StyleConstraints 是否逐字保留 brief 明确指定的导演、艺术家或流派短语；
 - StyleConstraints 是否擅自总结或补写 brief 没有明示的时代、地域、媒介或风格事实；
-- Theme.style 是否与主题、场景、人物和基础服饰匹配；
+- Theme.setting 是否与 brief、人物和基础服饰匹配；
 - 不同 Theme 是否形成自然视觉差异；
 - Frame 是否只拥有当前镜头事实；
 - 相机位置、镜头朝向、取景范围、人物朝向、姿态、重心和支撑是否相容；
@@ -277,7 +273,7 @@ Prompt feedback 不能完全代替图片反馈。后续如果系统能够获得�
 - 人物数量、身份和外貌是否一致；
 - 姿态、肢体和接触是否合理；
 - 遮挡与视角是否成立；
-- Theme.style 及其 brief 原文约束是否在图片中可见；
+- Foundation 风格原词及 Theme.setting 是否在图片中可见；
 - 图片是否遗漏 prompt 中已经明确的关键事实。
 
 必须区分：
@@ -319,7 +315,7 @@ Findings 应至少按以下维度聚合：
 - 每 100 个 prompt 的 finding 数；
 - 无 error prompt 比例；
 - 各 category 的 error/warning 比例；
-- Theme.style 重复率；
+- Theme.setting 重复率；
 - prompt 长度和生成 token 分布；
 - 人工接受率；
 - 图片遵循率；
@@ -481,7 +477,7 @@ Evaluator model、rubric 和 structured schema 都必须版本化。不同 evalu
 - 实现本地确定性 analyzer；
 - 增加 `audit RUN_ID`；
 - 写入独立 evaluations 目录；
-- 测试现有结构 contract、ID 清理、Theme.style 展开和缓存。
+- 测试现有结构 contract、ID 清理、Foundation 风格原词与 Theme.setting 展开和缓存。
 
 验收标准：不调用 LLM；不修改 run；同一 run 重复 audit 得到同一结果。
 

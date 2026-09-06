@@ -127,8 +127,7 @@ def test_resume_requires_frozen_theme_similarity_settings() -> None:
 def test_theme_similarity_uses_calibrated_defaults() -> None:
     settings = ThemeSimilaritySettings(model="embedding-model")
 
-    assert settings.scene_threshold == 0.86
-    assert settings.style_threshold == 0.815
+    assert settings.setting_threshold == 0.86
 
 
 def test_foundation_semantic_name_is_safe_for_a_filename() -> None:
@@ -188,6 +187,11 @@ def test_frame_batch_schema_uses_exact_ids_for_one_theme() -> None:
         "color",
         "scene_effect",
     }
+    assert set(schema["$defs"]["DepthOfField"]["required"]) == {
+        "mode",
+        "focus_target",
+        "background_effect",
+    }
     assert any(
         field.get("const") == "T05"
         for field in properties_named(schema, "theme_id")
@@ -226,7 +230,8 @@ def test_theme_batch_schema_uses_exact_theme_and_character_ids() -> None:
         ("T006", "T007"),
         2,
     )
-    encoded = str(model.model_json_schema())
+    schema = model.model_json_schema()
+    encoded = str(schema)
 
     assert "T006" in encoded
     assert "T007" in encoded
@@ -235,6 +240,27 @@ def test_theme_batch_schema_uses_exact_theme_and_character_ids() -> None:
     assert "T001-C01" not in encoded
     assert "'minLength': 20" not in encoded
     assert "'maxLength': 60" not in encoded
+    assert set(schema["$defs"]["Setting"]["required"]) == {
+        "location",
+        "fixed_elements",
+        "available_light_sources",
+        "background_population",
+        "atmosphere",
+    }
+    for theme_id in ("T006", "T007"):
+        assert set(
+            schema["$defs"][f"CharacterFor{theme_id}"]["required"]
+        ) == {
+            "character_id",
+            "age",
+            "appearance",
+            "outfit",
+        }
+        assert set(schema["$defs"][f"ThemeFor{theme_id}"]["required"]) == {
+            "theme_id",
+            "setting",
+            "characters",
+        }
 
 
 def test_prompt_book_rejects_theme_that_does_not_match_cast_plan() -> None:
@@ -246,6 +272,7 @@ def test_prompt_book_rejects_theme_that_does_not_match_cast_plan() -> None:
     with pytest.raises(ValidationError, match="人物数量不符合 Cast Plan"):
         PromptBook(
             semantic_name=foundation.semantic_name,
+            style_constraints=foundation.style_constraints,
             cast_plan=foundation.cast_plan,
             themes=[ThemeBook(theme=theme, frames=[])],
         )

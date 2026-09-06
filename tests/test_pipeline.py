@@ -20,7 +20,6 @@ from t2i_prompt_pipeline.errors import (
 from t2i_prompt_pipeline.models import (
     AttemptOutcome,
     FrameBatch,
-    Gender,
     GenerationAttempt,
     GenerationStage,
     OutputLanguage,
@@ -163,22 +162,17 @@ class FakeAuthor:
             if self.duplicate_scene_theme_once:
                 self.duplicate_scene_theme_once = False
                 value.themes[1] = value.themes[1].model_copy(
-                    update={"scene": value.themes[0].scene}
+                    update={"setting": value.themes[0].setting}
                 )
             if self.duplicate_title_theme_once:
                 self.duplicate_title_theme_once = False
                 value.themes[1] = value.themes[1].model_copy(
-                    update={"title": value.themes[0].title}
+                    update={"setting": value.themes[0].setting}
                 )
             if self.duplicate_invalid_theme_once:
                 self.duplicate_invalid_theme_once = False
                 valid = value.themes[0]
-                invalid_characters = [
-                    character.model_copy(
-                        update={"gender": Gender.MALE}
-                    )
-                    for character in valid.characters
-                ]
+                invalid_characters = valid.characters[:-1]
                 value = ThemeBatch(
                     themes=[
                         valid.model_copy(
@@ -298,7 +292,7 @@ class DuplicateThenDistinctEmbeddingModel(PipelineEmbeddingModel):
         if self.calls == 1:
             vectors = tuple((1.0, 0.0) for _ in texts)
         else:
-            vectors = ((1.0, 0.0), (0.0, 1.0)) * 2
+            vectors = ((1.0, 0.0), (0.0, 1.0))
         return EmbeddingResponse(
             vectors=vectors,
             usage=TokenUsage(prompt_tokens=12, total_tokens=12),
@@ -314,7 +308,7 @@ class DistinctEmbeddingModel(PipelineEmbeddingModel):
         dimensions: int | None,
     ) -> EmbeddingResponse:
         self.calls += 1
-        theme_count = len(texts) // 2
+        theme_count = len(texts)
         distinct_vectors = tuple(
             tuple(
                 1.0 if row == column else 0.0
@@ -323,7 +317,7 @@ class DistinctEmbeddingModel(PipelineEmbeddingModel):
             for row in range(theme_count)
         )
         return EmbeddingResponse(
-            vectors=distinct_vectors * 2,
+            vectors=distinct_vectors,
             usage=TokenUsage(prompt_tokens=12, total_tokens=12),
         )
 
@@ -618,45 +612,11 @@ async def test_contract_rejections_are_sent_to_targeted_retries() -> None:
 
 
 @pytest.mark.asyncio
-async def test_depth_conflict_retry_names_required_theme_depth() -> None:
-    spec = make_spec()
-    author = FakeAuthor(spec)
-    author.themes["T01"] = author.themes["T01"].model_copy(
-        update={"style": f"{author.themes['T01'].style} 景深偏深。"}
-    )
-    author.depth_conflict_frame_themes = {"T01"}
-
-    result = await PromptStudio(
-        author,
-        InMemoryRunStore(),
-        make_settings(generation_retries=1),
-    ).run(spec, make_rules(spec))
-
-    frame_requests = [
-        request
-        for stage, request in author.requests
-        if stage == GenerationStage.FRAMES
-    ]
-    assert "validation_issues" not in frame_requests[0]
-    assert frame_requests[1]["validation_issues"] == [
-        "T01-F01 camera.shot 必须继承 Theme.style 的深景深；"
-        "不得使用浅景深。"
-    ]
-    assert len(result.result.prompts) == 1
-
-
-@pytest.mark.asyncio
 async def test_foundation_contract_rejection_is_sent_to_retry() -> None:
     phrase = "贝纳尔多·贝托鲁奇（Bernardo Bertolucci）导演风格"
     spec = make_spec(brief=f"{phrase}的两名成年人互动")
     author = FakeAuthor(spec)
     author.foundation.style_constraints.required_phrases = [phrase]
-    author.themes = {
-        theme_id: theme.model_copy(
-            update={"style": f"{phrase}，{theme.style}"}
-        )
-        for theme_id, theme in author.themes.items()
-    }
     author.contract_invalid_foundation_once = True
 
     await PromptStudio(
@@ -698,7 +658,7 @@ async def test_duplicate_theme_scene_is_targeted_with_existing_theme() -> None:
         ["T02"],
     ]
     assert theme_requests[1]["existing_themes"][0]["theme_id"] == "T01"
-    assert "Theme.scene 与已接受 Theme 重复" in " ".join(
+    assert "Theme.setting 与已接受 Theme 重复" in " ".join(
         theme_requests[1]["validation_issues"]
     )
     assert len(result.result.book.themes) == 2
@@ -712,8 +672,7 @@ async def test_theme_similarity_regenerates_later_duplicate_theme() -> None:
     model = DuplicateThenDistinctEmbeddingModel()
     similarity_settings = ThemeSimilaritySettings(
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
+        setting_threshold=0.9,
     )
     studio = PromptStudio(
         author,
@@ -739,7 +698,7 @@ async def test_theme_similarity_regenerates_later_duplicate_theme() -> None:
     assert theme_requests[1]["existing_themes"][0]["theme_id"] == "T01"
     similarity_issue = " ".join(theme_requests[1]["validation_issues"])
     assert "embedding 相似度判定为重复" in similarity_issue
-    assert "仅调整 brief 未固定的空间布置、固定构件和光质" in (
+    assert "仅调整 brief 未固定的场所、固定构件和可用光源" in (
         similarity_issue
     )
     assert "保留 brief 的人物、场所、物体、材质与活动" in (
@@ -779,8 +738,7 @@ async def test_theme_similarity_stops_after_regeneration_limit() -> None:
     model = PipelineEmbeddingModel()
     similarity_settings = ThemeSimilaritySettings(
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
+        setting_threshold=0.9,
     )
 
     with pytest.raises(RunIncompleteError) as exc_info:
@@ -821,8 +779,7 @@ async def test_resume_regenerates_from_persisted_similarity_candidate() -> None:
     spec = make_spec(theme_count=2)
     similarity_settings = ThemeSimilaritySettings(
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
+        setting_threshold=0.9,
     )
     settings = make_settings(theme_similarity=similarity_settings)
     store = InMemoryRunStore()
@@ -834,15 +791,13 @@ async def test_resume_regenerates_from_persisted_similarity_candidate() -> None:
         snapshot.run_id,
         ThemeSimilarityReport(
             model="embedding-model",
-            scene_threshold=0.9,
-            style_threshold=0.9,
-            input_count=4,
+            setting_threshold=0.9,
+            input_count=2,
             pairs=[
                 ThemeSimilarityPair(
                     first_theme_id="T01",
                     second_theme_id="T02",
-                    scene_similarity=0.95,
-                    style_similarity=0.96,
+                    setting_similarity=0.95,
                     potential_duplicate=True,
                 )
             ],
@@ -876,8 +831,7 @@ async def test_resume_applies_journaled_pending_rejection() -> None:
     spec = make_spec(theme_count=2)
     similarity_settings = ThemeSimilaritySettings(
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
+        setting_threshold=0.9,
     )
     settings = make_settings(
         generation_retries=1,
@@ -892,17 +846,15 @@ async def test_resume_applies_journaled_pending_rejection() -> None:
         audit_id="audit-before-crash",
         state=ThemeSimilarityState.REJECTION_PENDING,
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
-        input_count=4,
+        setting_threshold=0.9,
+        input_count=2,
         pairs=[],
         regeneration_round=1,
         rejections=[
             ThemeSimilarityRejection(
                 rejected_theme_id="T02",
                 kept_theme_id="T01",
-                scene_similarity=0.95,
-                style_similarity=0.96,
+                setting_similarity=0.95,
             )
         ],
         usage=TokenUsage(prompt_tokens=12, total_tokens=12),
@@ -948,8 +900,7 @@ async def test_similarity_feedback_is_scoped_to_each_regeneration_batch() -> Non
     spec = make_spec(theme_count=5)
     similarity_settings = ThemeSimilaritySettings(
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
+        setting_threshold=0.9,
     )
     settings = make_settings(
         theme_batch_size=2,
@@ -964,15 +915,13 @@ async def test_similarity_feedback_is_scoped_to_each_regeneration_batch() -> Non
         snapshot.run_id,
         ThemeSimilarityReport(
             model="embedding-model",
-            scene_threshold=0.9,
-            style_threshold=0.9,
+            setting_threshold=0.9,
             input_count=10,
             pairs=[
                 ThemeSimilarityPair(
                     first_theme_id="T01",
                     second_theme_id=f"T0{index}",
-                    scene_similarity=0.95,
-                    style_similarity=0.96,
+                    setting_similarity=0.95,
                     potential_duplicate=True,
                 )
                 for index in range(2, 6)
@@ -1015,8 +964,7 @@ async def test_similarity_chain_rejects_only_duplicates_of_kept_themes() -> None
     spec = make_spec(theme_count=3)
     similarity_settings = ThemeSimilaritySettings(
         model="embedding-model",
-        scene_threshold=0.9,
-        style_threshold=0.9,
+        setting_threshold=0.9,
     )
     settings = make_settings(theme_similarity=similarity_settings)
     store = InMemoryRunStore()
@@ -1028,22 +976,19 @@ async def test_similarity_chain_rejects_only_duplicates_of_kept_themes() -> None
         snapshot.run_id,
         ThemeSimilarityReport(
             model="embedding-model",
-            scene_threshold=0.9,
-            style_threshold=0.9,
+            setting_threshold=0.9,
             input_count=6,
             pairs=[
                 ThemeSimilarityPair(
                     first_theme_id="T01",
                     second_theme_id="T02",
-                    scene_similarity=0.95,
-                    style_similarity=0.96,
+                    setting_similarity=0.95,
                     potential_duplicate=True,
                 ),
                 ThemeSimilarityPair(
                     first_theme_id="T02",
                     second_theme_id="T03",
-                    scene_similarity=0.94,
-                    style_similarity=0.95,
+                    setting_similarity=0.94,
                     potential_duplicate=True,
                 ),
             ],
@@ -1112,7 +1057,7 @@ async def test_duplicate_theme_title_is_targeted_with_existing_theme() -> None:
         ["T01", "T02"],
         ["T02"],
     ]
-    assert "Theme.title 与已接受 Theme 重复" in " ".join(
+    assert "Theme.setting 与已接受 Theme 重复" in " ".join(
         theme_requests[1]["validation_issues"]
     )
     assert len(result.result.book.themes) == 2
@@ -1216,7 +1161,7 @@ async def test_pipeline_renders_selected_english_output_language() -> None:
         make_settings(),
     ).run(spec, make_rules(spec))
 
-    assert "Theme:" in result.result.prompts[0].text
+    assert "Location:" in result.result.prompts[0].text
     assert "主题：" not in result.result.prompts[0].text
 
 
@@ -1422,7 +1367,7 @@ async def test_new_store_instance_resumes_files_after_process_loss(
         prompts / prompt_date / "aesthetic"
     )
     assert len(result.result.prompts) == 6
-    assert "Theme:" in result.result.prompts[0].text
+    assert "Location:" in result.result.prompts[0].text
 
 
 @pytest.mark.asyncio
