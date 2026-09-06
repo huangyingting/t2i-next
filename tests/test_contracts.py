@@ -10,7 +10,11 @@ from t2i_prompt_pipeline.contracts import (
     theme_ids,
 )
 from t2i_prompt_pipeline.errors import GenerationContractError
-from t2i_prompt_pipeline.models import CharacterFraming, OutputLanguage
+from t2i_prompt_pipeline.models import (
+    CharacterFraming,
+    OutputLanguage,
+    ShotScale,
+)
 from tests.factories import (
     make_foundation,
     make_frame_batch,
@@ -44,6 +48,15 @@ def test_foundation_rejects_omitted_explicit_director_style() -> None:
 
     with pytest.raises(GenerationContractError, match="遗漏 brief 明示风格"):
         normalize_foundation(spec, make_foundation(spec))
+
+
+def test_foundation_rejects_display_name_not_copied_from_brief() -> None:
+    spec = make_spec(brief="令狐冲与任盈盈在客栈交谈")
+    foundation = make_foundation(spec)
+    foundation.cast_plan.members[0].display_name = "岳灵珊"
+
+    with pytest.raises(GenerationContractError, match="人物姓名不是 brief 原文"):
+        normalize_foundation(spec, foundation)
 
 
 def test_theme_accepts_complete_explicit_brief_route() -> None:
@@ -137,6 +150,63 @@ def test_frame_english_rejects_chinese_text() -> None:
     frame.camera.depth_of_field.focus_target = "camera朝向东北"
 
     with pytest.raises(GenerationContractError, match="混入输出语言之外的文字"):
+        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("position", "chest-high 前侧"),
+        ("facing", "towards镜头"),
+    ),
+)
+def test_frame_chinese_rejects_latin_text(
+    field: str,
+    value: str,
+) -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    if field == "position":
+        frame.camera.lighting.position = value
+    else:
+        frame.characters[0].facing = value
+
+    with pytest.raises(GenerationContractError, match="混入输出语言之外的文字"):
+        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
+
+
+def test_frame_rejects_structured_output_residue_in_text() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    frame.camera.depth_of_field.background_effect = "后墙渐虚'}},"
+
+    with pytest.raises(GenerationContractError, match="结构化输出残片"):
+        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
+
+
+def test_frame_rejects_incomplete_facing_phrase() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    frame.characters[0].facing = "镜头"
+
+    with pytest.raises(GenerationContractError, match="facing 格式不完整"):
+        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
+
+
+@pytest.mark.parametrize("shot_scale", (ShotScale.MEDIUM, ShotScale.CLOSE_UP))
+def test_frame_rejects_full_body_framing_in_tight_shot(
+    shot_scale: ShotScale,
+) -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    frame.camera.shot_scale = shot_scale
+    frame.characters[0].framing = CharacterFraming.FULL_BODY
+
+    with pytest.raises(GenerationContractError, match="与 full_body 不兼容"):
         normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
 

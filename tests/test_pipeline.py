@@ -721,7 +721,7 @@ async def test_theme_similarity_regenerates_later_duplicate_theme() -> None:
 
 
 @pytest.mark.asyncio
-async def test_theme_similarity_stops_after_regeneration_limit() -> None:
+async def test_theme_similarity_continues_after_regeneration_limit() -> None:
     spec = make_spec(theme_count=2)
     author = FakeAuthor(spec)
     store = InMemoryRunStore()
@@ -731,23 +731,19 @@ async def test_theme_similarity_stops_after_regeneration_limit() -> None:
         setting_threshold=0.9,
     )
 
-    with pytest.raises(RunIncompleteError) as exc_info:
-        await PromptStudio(
-            author,
-            store,
-            make_settings(
-                generation_retries=1,
-                theme_similarity=similarity_settings,
-            ),
-            theme_similarity=ThemeSimilarityAnalyzer(
-                model,
-                similarity_settings,
-            ),
-        ).run(spec, make_rules(spec))
+    result = await PromptStudio(
+        author,
+        store,
+        make_settings(
+            generation_retries=1,
+            theme_similarity=similarity_settings,
+        ),
+        theme_similarity=ThemeSimilarityAnalyzer(
+            model,
+            similarity_settings,
+        ),
+    ).run(spec, make_rules(spec))
 
-    assert "相似度自动重生成已达上限 1 次" in " ".join(
-        exc_info.value.causes
-    )
     theme_requests = [
         request
         for stage, request in author.requests
@@ -759,9 +755,10 @@ async def test_theme_similarity_stops_after_regeneration_limit() -> None:
         ["T01", "T02"],
         ["T02"],
     ]
-    assert snapshot.manifest.status == RunStatus.FAILED
+    assert snapshot.manifest.status == RunStatus.COMPLETED
     assert snapshot.theme_similarity_report is not None
     assert snapshot.theme_similarity_report.pairs[0].potential_duplicate
+    assert len(result.result.prompts) == 2
 
 
 @pytest.mark.asyncio

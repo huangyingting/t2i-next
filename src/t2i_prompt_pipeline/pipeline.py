@@ -343,21 +343,10 @@ class PromptStudio:
                 rejection.rejected_theme_id
                 for rejection in report.rejections
             ]
-            message = (
-                "Theme embedding 相似度自动重生成已达上限 "
-                f"{snapshot.settings.generation_retries} 次，仍有候选重复："
+            self._emit(
+                "Theme embedding 相似度自动重生成已达上限，"
+                "保留当前 Theme 并继续生成："
                 f"{rejected_ids}"
-            )
-            self._emit(message)
-            self._stop_incomplete(
-                snapshot,
-                [
-                    *(
-                        self._similarity_rejection_issue(rejection)
-                        for rejection in report.rejections
-                    ),
-                    message,
-                ],
             )
         if report.state == ThemeSimilarityState.REJECTION_PENDING:
             self._store.apply_theme_rejections(snapshot.run_id, report)

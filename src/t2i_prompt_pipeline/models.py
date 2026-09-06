@@ -203,6 +203,7 @@ class StyleConstraints(Model):
 
 
 class CastMember(Model):
+    display_name: Text | None
     role: Text | None = None
     gender: Gender
 
@@ -226,7 +227,19 @@ class Character(Model):
 
 
 class Setting(Model):
-    location: Text
+    time_context: Text = Field(
+        description=(
+            "Explicit visual period and immediate time. Preserve the brief; "
+            "when unspecified, infer only a broad era and plausible season "
+            "or time of day without inventing an exact historical date."
+        )
+    )
+    location: Text = Field(
+        description=(
+            "Concrete geographic and physical place visible in the image, "
+            "not only a fictional world, work title, or generic genre."
+        )
+    )
     fixed_elements: list[Text] = Field(min_length=1, max_length=12)
     available_light_sources: list[Text] = Field(min_length=1, max_length=8)
     background_population: Text

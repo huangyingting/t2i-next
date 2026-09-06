@@ -92,6 +92,7 @@ class ThemeSimilarityAnalyzer:
     def _setting_text(theme: Theme) -> str:
         return "\n".join(
             (
+                f"time_context: {theme.setting.time_context}",
                 f"location: {theme.setting.location}",
                 "fixed_elements: "
                 + "；".join(theme.setting.fixed_elements),

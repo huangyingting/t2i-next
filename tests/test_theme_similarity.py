@@ -101,6 +101,7 @@ async def test_analyzer_includes_all_setting_fields() -> None:
 
     await analyzer.analyze(themes)
 
+    assert "time_context: 当代，秋季傍晚" in model.requests[0][0]
     assert "available_light_sources: 窗外自然光" in model.requests[0][0]
     assert "background_population: 无他人" in model.requests[0][0]
     assert "atmosphere: 暖调、安静、亲密" in model.requests[0][0]

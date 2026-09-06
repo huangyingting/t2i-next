@@ -10,6 +10,7 @@ from t2i_prompt_pipeline.models import (
     CastPlan,
     CharacterFraming,
     CharacterMoment,
+    DepthMode,
     Frame,
     Gender,
     LensProfile,
@@ -60,11 +61,16 @@ _CAMERA_TEXT = {
             CameraHeight.OVERHEAD: "正上方俯拍",
         },
         "direction": {
-            CameraDirection.FRONT: "正面",
-            CameraDirection.THREE_QUARTER: "三分之四侧视",
-            CameraDirection.SIDE: "侧面",
-            CameraDirection.TOP_DOWN: "垂直向下",
-            CameraDirection.REAR_THREE_QUARTER: "后侧三分之四",
+            CameraDirection.FRONT: "正面拍摄",
+            CameraDirection.THREE_QUARTER: "三分之四侧面拍摄",
+            CameraDirection.SIDE: "侧面拍摄",
+            CameraDirection.TOP_DOWN: "垂直俯拍",
+            CameraDirection.REAR_THREE_QUARTER: "后侧三分之四拍摄",
+        },
+        "depth": {
+            DepthMode.SHALLOW: "较浅",
+            DepthMode.MODERATE: "中等",
+            DepthMode.DEEP: "较深",
         },
     },
     OutputLanguage.ENGLISH: {
@@ -96,6 +102,11 @@ _CAMERA_TEXT = {
             CameraDirection.TOP_DOWN: "top-down",
             CameraDirection.REAR_THREE_QUARTER: "rear three-quarter",
         },
+        "depth": {
+            DepthMode.SHALLOW: "shallow",
+            DepthMode.MODERATE: "moderate",
+            DepthMode.DEEP: "deep",
+        },
     },
 }
 
@@ -123,7 +134,9 @@ def _display_labels(
     ):
         gender = cast_member.gender
         counters[gender] += 1
-        if output_language == OutputLanguage.ENGLISH:
+        if cast_member.display_name is not None:
+            label = cast_member.display_name
+        elif output_language == OutputLanguage.ENGLISH:
             label = (
                 f"Woman {counters[gender]}"
                 if gender == Gender.FEMALE
@@ -153,18 +166,37 @@ def _capture_text(
 
 def _setting_text(
     theme: Theme,
+    style_constraints: StyleConstraints,
     output_language: OutputLanguage,
 ) -> str:
     setting = theme.setting
+    separator = ", " if output_language == OutputLanguage.ENGLISH else "，"
+    reference_phrases = {
+        phrase.strip(" ，,；;：:")
+        for phrase in style_constraints.required_phrases
+    }
+    location_segments = [
+        segment.strip()
+        for segment in re.split(r"[，,；;]", setting.location)
+    ]
+    location = separator.join(
+        segment
+        for segment in location_segments
+        if segment and segment.strip(" ：:") not in reference_phrases
+    )
+    if not location:
+        location = setting.location
     fixed_elements = "、".join(setting.fixed_elements)
     if output_language == OutputLanguage.ENGLISH:
         return (
-            f"Location: {setting.location}; fixed elements: {fixed_elements}; "
+            f"Time: {setting.time_context}; Location: {location}; "
+            f"fixed elements: {fixed_elements}; "
             f"background population: {setting.background_population}; "
             f"atmosphere: {setting.atmosphere}"
         )
     return (
-        f"场所：{setting.location}；固定布景：{fixed_elements}；"
+        f"时间：{setting.time_context}；场所：{location}；"
+        f"固定布景：{fixed_elements}；"
         f"背景人物：{setting.background_population}；"
         f"氛围：{setting.atmosphere}"
     )
@@ -190,7 +222,7 @@ def _character_text(
                 f"{label}: {description}; lit by {lighting_effect}; {action}"
             )
         return (
-            f"{label}：{description}；受光：{lighting_effect}；{action}"
+            f"{label}——{description}；受光：{lighting_effect}；{action}"
         )
     expression = _without_terminal_punctuation(moment.expression)
     if output_language == OutputLanguage.ENGLISH:
@@ -199,7 +231,7 @@ def _character_text(
             f"{expression}; {action}"
         )
     return (
-        f"{label}：{description}；受光：{lighting_effect}；"
+        f"{label}——{description}；受光：{lighting_effect}；"
         f"{expression}；{action}"
     )
 
@@ -213,8 +245,8 @@ def _staging_text(
     facing = _without_terminal_punctuation(moment.facing)
     framing = _FRAMING_TEXT[output_language][moment.framing]
     if output_language == OutputLanguage.ENGLISH:
-        return f"{label}: {placement}, {framing}, {facing}"
-    return f"{label}：{placement}，{framing}，{facing}"
+        return f"{label} at {placement}, {framing}, {facing}"
+    return f"{label}位于{placement}，{framing}，{facing}"
 
 
 def _render_prompt(
@@ -249,9 +281,16 @@ def _render_prompt(
     camera_text = _CAMERA_TEXT[output_language]
     lens = camera_text["lens"][frame.camera.lens_profile]
     shot_scale = camera_text["scale"][frame.camera.shot_scale]
+    if frame.camera.shot_scale == ShotScale.FULL_BODY and len(frame.characters) == 1:
+        shot_scale = (
+            "full-body shot"
+            if output_language == OutputLanguage.ENGLISH
+            else "全身画面"
+        )
     camera_height = camera_text["height"][frame.camera.height]
     camera_direction = camera_text["direction"][frame.camera.direction]
     depth = frame.camera.depth_of_field
+    depth_mode = camera_text["depth"][depth.mode]
     depth_target = _without_terminal_punctuation(depth.focus_target)
     depth_background = _without_terminal_punctuation(
         depth.background_effect
@@ -266,15 +305,17 @@ def _render_prompt(
     if output_language == OutputLanguage.ENGLISH:
         parts = (
             _capture_text(style_constraints, output_language),
-            _setting_text(theme, output_language),
+            _setting_text(theme, style_constraints, output_language),
             f"Characters: {characters}",
             (
-                f"Capture: {lens}; Shot scale: {shot_scale}; "
-                f"Camera position: {camera_height}, {camera_direction}; "
-                f"Depth of field: {depth.mode.value}, focus on {depth_target}, "
-                f"{depth_background}; Composition: {staging}; "
+                f"Camera: {lens}, {shot_scale}, {camera_height}, "
+                f"{camera_direction}; Depth: {depth_mode}, "
+                f"focus on {depth_target}, "
+                f"{depth_background}; Composition: {staging}"
+            ),
+            (
                 f"Lighting: {light_source} from "
-                f"{light_position}, {light_color}; Scene light: "
+                f"{light_position}, {light_color}; Light distribution: "
                 f"{scene_light_effect}"
             ),
         )
@@ -287,16 +328,17 @@ def _render_prompt(
     else:
         parts = (
             _capture_text(style_constraints, output_language),
-            _setting_text(theme, output_language),
+            _setting_text(theme, style_constraints, output_language),
             f"人物：{characters}",
             (
-                f"摄影参数：{lens}；景别：{shot_scale}；"
-                f"机位：{camera_height}；方向：{camera_direction}；"
-                f"景深：{depth.mode.value}；焦点：{depth_target}；"
-                f"背景成像：{depth_background}；构图：{staging}；"
-                f"光源：{light_source}；"
-                f"光位：{light_position}；光色：{light_color}；"
-                f"场景明暗：{scene_light_effect}"
+                f"摄影：{lens}，{shot_scale}，{camera_height}，"
+                f"{camera_direction}；景深：{depth_mode}，"
+                f"焦点落在{depth_target}，{depth_background}；"
+                f"构图：{staging}"
+            ),
+            (
+                f"光线：{light_source}，来自{light_position}，"
+                f"呈{light_color}；明暗关系：{scene_light_effect}"
             ),
         )
         text = "。".join(

@@ -1,9 +1,9 @@
 Frame 拥有 camera、lighting 和人物 framing/placement/facing/visible_appearance/lighting_effect/expression/action；Theme 设定只作来源。camera 是画面外拍摄参数，非场景器材。
 每个 Frame 的 characters 恰好包含 available_character_ids 全部 ID，并按 Theme 顺序排列。人物构图只写各自结构，不生成自由文本 composition。
-camera 的 lens_profile、shot_scale、height、direction 逐字使用 frame_visual_plan 对应值，overhead 只配 top_down；镜头只改变透视与取景，不得进入 fixed_elements、人物外观或动作。shot_scale 是整体景别，人物实际裁切以 framing 为准。focus_target 写对焦人物或接触点，background_effect 落实 depth_effect；不能把核心人物虚化到无法辨认。
-group_topology、depth_distribution 写入 placement，body_dynamics 写入姿态和 action；服从 brief、核心动作、安全、全员入画与连续性。
+camera 的 lens_profile、shot_scale、height、direction 逐字使用 frame_visual_plan 对应值，overhead 只配 top_down；镜头只改变透视与取景，不得进入 fixed_elements、人物外观或动作。shot_scale 是整体景别，人物实际裁切以 framing 为准；medium、close_up 不配 full_body。focus_target 写对焦人物或接触点，background_effect 落实 depth_effect；不能把核心人物虚化到无法辨认。
+group_topology、depth_distribution 写入 placement，body_dynamics 写入姿态和 action。
 lighting.source 逐字使用 frame_visual_plan.light_source；position 先写该光源在 Theme 中的实际方位，再落实 light_direction 的受光效果；color 落实 color_treatment，不发明新光源或新光色；scene_effect 写场景亮部与阴影。
-framing 只用 head_and_torso、full_body 或 head_cropped_torso，不提供局部肢体选项。placement 只写人物在前中后景与左右位置，中文不超过20字、英文不超过12词；facing 必须直接包含当前人物 ID 或“镜头”，不用“两人、另一人、pair”等泛称。每个人都以躯干或身体主体入画。
+framing 只用 head_and_torso、full_body 或 head_cropped_torso，不提供局部肢体选项。placement 只写人物在前中后景与左右位置，中文不超过20字、英文不超过12词；facing 必须直接包含当前人物 ID 或“镜头”，以“朝向、面向、略朝、朝”或 facing/toward 开头写完整短语，不用“两人、另一人、pair”等泛称。
 visible_appearance 是 Theme 稳定设定在 framing 中的可见投影，只写当前可见且区分身份的发型、具体服装和身体状态；服装必须沿用 Theme 的单品名称、颜色和材质，不写“贴身剪裁上装”等抽象标签；中文不超过65字、英文不超过36词。head_and_torso 写脸、发型和上身服饰；full_body 写主要全身轮廓和鞋；head_cropped_torso 只写躯干、服饰和姿态，不写脸与发型。
 lighting_effect 只用一个短句写该人物受光结果：一处主要亮部和一处主要阴影，不写其他人物；中文不超过35字、英文不超过20词，头部裁切时不写面部受光。
 expression 与 framing 联动：head_cropped_torso 必须为 null，其他 framing 用一个短语写可见眼神或表情，中文不超过18字、英文不超过10词。

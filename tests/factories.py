@@ -80,6 +80,11 @@ def make_theme(spec: GenerationSpec, theme_index: int) -> Theme:
     return Theme(
         theme_id=theme_id,
         setting=Setting(
+            time_context=(
+                "A contemporary autumn evening"
+                if is_english
+                else "当代，秋季傍晚"
+            ),
             location=(
                 f"A quiet room {theme_index}"
                 if is_english
@@ -144,6 +149,7 @@ def make_foundation(spec: GenerationSpec | None = None) -> Foundation:
             members=[
                 *[
                     CastMember(
+                        display_name=None,
                         role=("Conversation participant" if is_english else "交谈者"),
                         gender=Gender.FEMALE,
                     )
@@ -151,6 +157,7 @@ def make_foundation(spec: GenerationSpec | None = None) -> Foundation:
                 ],
                 *[
                     CastMember(
+                        display_name=None,
                         role=("Conversation participant" if is_english else "交谈者"),
                         gender=Gender.MALE,
                     )

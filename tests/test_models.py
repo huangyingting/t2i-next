@@ -274,6 +274,7 @@ def test_theme_batch_schema_uses_exact_theme_and_character_ids() -> None:
     assert "'minLength': 20" not in encoded
     assert "'maxLength': 60" not in encoded
     assert set(schema["$defs"]["Setting"]["required"]) == {
+        "time_context",
         "location",
         "fixed_elements",
         "available_light_sources",

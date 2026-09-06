@@ -74,6 +74,7 @@ def test_rule_priorities_preserve_constraints_before_decorative_variation() -> N
 
     themes = resolved.text_for(GenerationStage.THEMES)
     assert "setting.location 用短语保留 brief 地点关系" in themes
+    assert "不写或重复作品、虚构世界、style_constraints" in themes
     assert (
         "setting.fixed_elements 只列二至四项关键布景、设备或对象"
         in themes
@@ -196,12 +197,18 @@ def test_style_constraints_preserve_brief_without_inference() -> None:
     )
     themes = resolve_rules(make_spec()).text_for(GenerationStage.THEMES)
 
-    assert "brief 明示的创作者或流派、媒介、视觉技法、时代和地域" in (
+    assert (
+        "brief 明示的作品或虚构世界、导演、艺术家、流派与风格、"
+        "媒介、视觉技法、时代和地域"
+    ) in (
         foundation
     )
     assert "brief 中连续、逐字一致的原文片段" in foundation
     assert "不翻译、不概括、不推断关联特征" in foundation
-    assert "brief 未明示的角色、职业、时代、地域、媒介、技法和创作者" in (
+    assert (
+        "brief 未明示的作品、世界、角色、职业、时代、地域、媒介、"
+        "技法、风格和创作者"
+    ) in (
         foundation
     )
     assert "role 只复制 brief 中明确身份的原词" in foundation
@@ -307,12 +314,10 @@ def test_output_language_rule_is_selected_for_every_stage() -> None:
 
         chinese_rules = chinese.text_for(stage)
         assert "自然、流利、简练的中文" in chinese_rules
-        assert "仅无法自然翻译的摄影、服饰和材质专有术语可保留英文" in (
-            chinese_rules
-        )
+        assert "brief 原文中的姓名和专有术语可原样保留" in chinese_rules
+        assert "其余自然语言不得夹杂英文" in chinese_rules
         assert "普通动作、姿态和光效必须使用中文" in chinese_rules
 
-        assert "brief 原文或规则明确允许的姓名、专有术语可原样保留" in chinese_rules
         assert "schema 规定的机器标识字段不受此限制" in chinese_rules
 
 

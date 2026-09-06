@@ -90,8 +90,34 @@ def test_renderer_derives_labels_from_cast_plan(
     prompt = render_prompt(theme, frame, OutputLanguage.CHINESE, spec)
 
     for label in labels:
-        assert f"{label}：" in prompt
+        assert f"{label}——" in prompt
     assert "T01-C" not in prompt
+
+
+def test_renderer_prefers_explicit_character_names() -> None:
+    spec = make_spec(
+        brief="令狐冲与任盈盈在客栈交谈",
+        female_count=1,
+        male_count=1,
+    )
+    foundation = make_foundation(spec)
+    foundation.cast_plan.members[0].display_name = "任盈盈"
+    foundation.cast_plan.members[1].display_name = "令狐冲"
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    book = PromptBook(
+        semantic_name="named_characters",
+        style_constraints=foundation.style_constraints,
+        cast_plan=foundation.cast_plan,
+        themes=[ThemeBook(theme=theme, frames=[frame])],
+    )
+
+    prompt = render_book(book, OutputLanguage.CHINESE)[0].text
+
+    assert "任盈盈——" in prompt
+    assert "令狐冲——" in prompt
+    assert "女1——" not in prompt
+    assert "男1——" not in prompt
 
 
 def test_renderer_uses_frame_projection_without_repeating_stable_facts() -> None:
@@ -145,6 +171,52 @@ def test_renderer_includes_concise_visual_atmosphere() -> None:
     assert "氛围：暖黄低照度下安静而亲密" in prompt
 
 
+def test_renderer_includes_explicit_time_location_and_reference_phrase() -> None:
+    spec = make_spec()
+    foundation = make_foundation(spec)
+    foundation.style_constraints.required_phrases = ["笑傲江湖的武侠世界"]
+    theme = make_themes(spec)[0]
+    theme.setting.time_context = "架空中国古代江湖时期，深秋黄昏"
+    theme.setting.location = "笑傲江湖的武侠世界，林间古道旁的驿站前庭"
+    frame = make_frame_batch(spec, theme).frames[0]
+    book = PromptBook(
+        semantic_name="renderer_test",
+        style_constraints=foundation.style_constraints,
+        cast_plan=foundation.cast_plan,
+        themes=[ThemeBook(theme=theme, frames=[frame])],
+    )
+
+    prompt = render_book(book, OutputLanguage.CHINESE)[0].text
+
+    assert "实拍摄影，笑傲江湖的武侠世界" in prompt
+    assert prompt.count("笑傲江湖的武侠世界") == 1
+    assert "时间：架空中国古代江湖时期，深秋黄昏" in prompt
+    assert "场所：林间古道旁的驿站前庭" in prompt
+    assert "世界背景：" not in prompt
+
+
+def test_renderer_does_not_remove_reference_inside_location_phrase() -> None:
+    spec = make_spec()
+    foundation = make_foundation(spec)
+    foundation.style_constraints.required_phrases = ["广寒宫", "月桂树"]
+    theme = make_themes(spec)[0]
+    theme.setting.location = (
+        "广寒宫月台，月桂树下，周边展开宫宇廊檐"
+    )
+    frame = make_frame_batch(spec, theme).frames[0]
+    book = PromptBook(
+        semantic_name="renderer_test",
+        style_constraints=foundation.style_constraints,
+        cast_plan=foundation.cast_plan,
+        themes=[ThemeBook(theme=theme, frames=[frame])],
+    )
+
+    prompt = render_book(book, OutputLanguage.CHINESE)[0].text
+
+    assert "场所：广寒宫月台，月桂树下，周边展开宫宇廊檐" in prompt
+    assert "场所：月台，下" not in prompt
+
+
 def test_renderer_outputs_structured_depth_and_lighting() -> None:
     spec = make_spec(female_count=2, male_count=1)
     theme = make_themes(spec)[0]
@@ -158,17 +230,33 @@ def test_renderer_outputs_structured_depth_and_lighting() -> None:
 
     prompt = render_prompt(theme, frame, OutputLanguage.CHINESE, spec)
 
-    assert "摄影参数：50mm标准镜头，自然透视" in prompt
-    assert "景别：半身中景" in prompt
-    assert "机位：平视机位" in prompt
-    assert "方向：正面" in prompt
-    assert "景深：moderate" in prompt
-    assert "焦点：三人面部与中央绳结" in prompt
-    assert "背景成像：后墙与围观人群逐层虚化" in prompt
-    assert "光源：顶部冷白荧光灯" in prompt
-    assert "光位：人物正上方" in prompt
-    assert "光色：冷白色" in prompt
-    assert "场景明暗：地面明亮，车库深处落入暗部" in prompt
+    assert (
+        "摄影：50mm标准镜头，自然透视，半身中景，平视机位，"
+        "正面拍摄"
+        in prompt
+    )
+    assert (
+        "景深：中等，焦点落在三人面部与中央绳结，"
+        "后墙与围观人群逐层虚化"
+    ) in prompt
+    assert "背景成像：" not in prompt
+    assert (
+        "光线：顶部冷白荧光灯，来自人物正上方，呈冷白色"
+        in prompt
+    )
+    assert "明暗关系：地面明亮，车库深处落入暗部" in prompt
+
+
+def test_renderer_uses_singular_full_body_scale_for_one_character() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    frame.camera.shot_scale = "full_body"
+
+    prompt = render_prompt(theme, frame, OutputLanguage.CHINESE, spec)
+
+    assert "全身画面" in prompt
+    assert "全身群像" not in prompt
 
 
 def test_renderer_derives_head_cropped_staging() -> None:
@@ -215,6 +303,7 @@ def test_renderer_produces_english_prompt() -> None:
 
     assert prompt.startswith("Live-action photography")
     assert "Location:" in prompt
-    assert "Depth of field:" in prompt
+    assert "Depth:" in prompt
+    assert "Camera:" in prompt
     assert "Woman 1:" in prompt
     assert "Man 1:" in prompt

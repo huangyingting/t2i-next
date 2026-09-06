@@ -14,6 +14,7 @@ from t2i_prompt_pipeline.models import (
     Gender,
     GenerationSpec,
     OutputLanguage,
+    ShotScale,
     Theme,
     format_character_id,
     format_frame_id,
@@ -43,6 +44,12 @@ _INTERNAL_SCHEMA_TERM = re.compile(
     r"\b(?:brief|required_phrases|required_route_points|validation_issues|"
     r"available_character_ids|theme_ids|frame_ids|character_ids|"
     r"variation_plan)\b",
+    re.IGNORECASE,
+)
+_STRUCTURED_OUTPUT_RESIDUE = re.compile(r"[{}\[\]]")
+_CHINESE_FACING_PREFIX = re.compile(r"^(?:朝向|面向|略朝|朝).+")
+_ENGLISH_FACING_PREFIX = re.compile(
+    r"^(?:facing|towards?)\s+.+",
     re.IGNORECASE,
 )
 _LEADING_STYLE_PHRASE = re.compile(
@@ -75,6 +82,7 @@ _ROUTE_EQUIVALENT_GROUPS = (
 
 def _theme_natural_text(theme: Theme) -> tuple[str, ...]:
     return (
+        theme.setting.time_context,
         theme.setting.location,
         *theme.setting.fixed_elements,
         *theme.setting.available_light_sources,
@@ -120,8 +128,9 @@ def _validate_output_language(
     texts: tuple[str, ...],
 ) -> None:
     if spec.output_language == OutputLanguage.CHINESE:
-        return
-    pattern = _CJK_FRAGMENT
+        pattern = _LATIN_FRAGMENT
+    else:
+        pattern = _CJK_FRAGMENT
     brief = spec.brief.casefold()
     unexpected = sorted(
         {
@@ -136,6 +145,23 @@ def _validate_output_language(
     if unexpected:
         raise GenerationContractError(
             f"{artifact_id} 混入输出语言之外的文字：{unexpected}"
+        )
+
+
+def _validate_no_structured_output_residue(
+    artifact_id: str,
+    texts: tuple[str, ...],
+) -> None:
+    residues = sorted(
+        {
+            match.group(0)
+            for text in texts
+            for match in _STRUCTURED_OUTPUT_RESIDUE.finditer(text)
+        }
+    )
+    if residues:
+        raise GenerationContractError(
+            f"{artifact_id} 自然文本混入结构化输出残片：{residues}"
         )
 
 
@@ -209,6 +235,18 @@ def normalize_foundation(
     spec: GenerationSpec,
     foundation: Foundation,
 ) -> Foundation:
+    display_names = [
+        member.display_name
+        for member in foundation.cast_plan.members
+        if member.display_name is not None
+    ]
+    if len(display_names) != len(set(display_names)):
+        raise GenerationContractError("人物姓名重复")
+    for display_name in display_names:
+        if display_name not in spec.brief:
+            raise GenerationContractError(
+                f"人物姓名不是 brief 原文：{display_name}"
+            )
     required_phrases = foundation.style_constraints.required_phrases
     if len(required_phrases) != len(set(required_phrases)):
         raise GenerationContractError("风格约束包含重复原文")
@@ -254,6 +292,7 @@ def normalize_theme(
     deterministic_issues: list[str] = []
     setting_text = " ".join(
         (
+            theme.setting.time_context,
             theme.setting.location,
             *theme.setting.fixed_elements,
             *theme.setting.available_light_sources,
@@ -274,12 +313,16 @@ def normalize_theme(
         raise GenerationContractError(
             f"{theme.theme_id} {'; '.join(deterministic_issues)}"
         )
-    _validate_output_language(
-        spec,
+    _validate_no_internal_schema_terms(
         theme.theme_id,
         _theme_natural_text(theme),
     )
-    _validate_no_internal_schema_terms(
+    _validate_no_structured_output_residue(
+        theme.theme_id,
+        _theme_natural_text(theme),
+    )
+    _validate_output_language(
+        spec,
         theme.theme_id,
         _theme_natural_text(theme),
     )
@@ -337,6 +380,33 @@ def normalize_frame(
         ):
             text_issues.append(
                 f"{moment.character_id} facing 必须直接写人物 ID 或镜头"
+            )
+        facing_without_ids = _CHARACTER_ID_REFERENCE.sub("", moment.facing)
+        facing_has_foreign_text = (
+            _LATIN_FRAGMENT.search(facing_without_ids)
+            if spec.output_language == OutputLanguage.CHINESE
+            else _CJK_FRAGMENT.search(facing_without_ids)
+        )
+        facing_prefix = (
+            _CHINESE_FACING_PREFIX
+            if spec.output_language == OutputLanguage.CHINESE
+            else _ENGLISH_FACING_PREFIX
+        )
+        if (
+            not facing_has_foreign_text
+            and not facing_prefix.fullmatch(moment.facing)
+        ):
+            text_issues.append(
+                f"{moment.character_id} facing 格式不完整，必须写完整朝向短语"
+            )
+        if (
+            frame.camera.shot_scale
+            in {ShotScale.MEDIUM, ShotScale.CLOSE_UP}
+            and moment.framing == CharacterFraming.FULL_BODY
+        ):
+            text_issues.append(
+                f"{moment.character_id} {frame.camera.shot_scale.value} "
+                "与 full_body 不兼容"
             )
         if _INVISIBLE_PLACEHOLDER.fullmatch(moment.action):
             text_issues.append(
@@ -411,12 +481,16 @@ def normalize_frame(
         raise GenerationContractError(
             f"{frame.frame_id} {'; '.join(text_issues)}"
         )
-    _validate_output_language(
-        spec,
+    _validate_no_structured_output_residue(
         normalized.frame_id,
         _frame_natural_text(normalized),
     )
     _validate_no_internal_schema_terms(
+        normalized.frame_id,
+        _frame_natural_text(normalized),
+    )
+    _validate_output_language(
+        spec,
         normalized.frame_id,
         _frame_natural_text(normalized),
     )

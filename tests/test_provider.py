@@ -76,6 +76,7 @@ async def test_provider_sends_strict_compatible_model_schema(
     assert "title" not in schema["$defs"]["StyleConstraints"]
     assert "default" not in schema["$defs"]["CastMember"]["properties"]["role"]
     assert set(schema["$defs"]["CastMember"]["required"]) == {
+        "display_name",
         "role",
         "gender",
     }
