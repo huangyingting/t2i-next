@@ -6,7 +6,7 @@ setting.fixed_elements 只列二至四项关键布景、设备或对象；必须
 setting.available_light_sources 只列一至三种现场固定光源；公共场所优先顶灯、路灯、窗光等现场光。
 setting.background_population 用短语保留非名册群体与职责；有围观者不得写“无他人”，不加路人、站位、动作或括注。
 setting.atmosphere 用短句组合色温、明暗、人群密度与情绪词；只写可见因素，不写声音、气味或温度；中文不超过30字、英文不超过18词。
-characters 按 character_ids 顺序，只写 ID、成年 age、appearance、outfit；appearance 写发型长度、形态、颜色及一项稳定外貌。
+characters 按 character_ids 顺序，只写 ID、age、appearance、outfit；appearance 写发型长度、形态、颜色、脸型及至少两项眉眼、鼻唇、肤色、颧骨或下颌特征。
 outfit 逐字保留 brief 明示的服饰类型、遮盖、材质和配饰，补齐上装与下装或连体装、鞋履及零至一件配饰；每件主要单品写具体颜色和材质；中文不超过80字、英文不超过42词；不写当前状态。
 brief 要求某类服饰或配饰但未给具体款式时，实例化一件符合时代与场景的具体物品，不得写“无配饰”或省略。
 theme_variation_plan 只管未固定项；setting_variation 管空间、材质、人群、氛围、光源与配色；character_variations 管发型、服装颜色材质、鞋履和配饰；时代以 brief 为准；实例化，不抄标签。

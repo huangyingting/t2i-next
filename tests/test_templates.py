@@ -210,7 +210,8 @@ def test_foundation_request_contains_only_foundation_inputs() -> None:
     assert "CastPlan.members 按人物首次出现顺序展开" in instructions
     assert "CastPlan.members" in instructions
     assert "StyleConstraints.required_phrases" in instructions
-    assert "brief 中连续、逐字一致的原文片段" in instructions
+    assert "创作者与紧邻《作品名》合并" in instructions
+    assert "其余逐字保留" in instructions
     assert "camera.shot" not in instructions
 
 

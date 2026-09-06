@@ -130,7 +130,7 @@ def test_frame_rules_require_every_complete_character(
     assert "placement 只写人物在前中后景与左右位置" in rules
     assert "facing 必须直接包含当前人物 ID 或“镜头”" in rules
     assert "不用“两人、另一人、pair”等泛称" in rules
-    assert "head_and_torso 写脸、发型和上身服饰" in rules
+    assert "head_and_torso 与 full_body 必须沿用脸型" in rules
     assert "head_cropped_torso 只写躯干、服饰和姿态" in rules
     assert "head_cropped_torso 必须为 null" in rules
     assert "营造真实情绪张力" not in rules
@@ -200,20 +200,21 @@ def test_aesthetic_floor_preserves_fixed_clothing_and_activity(
         assert "尺度上限为不得细致描写或特写聚焦性器官" in rules
 
 
-def test_style_constraints_preserve_brief_without_inference() -> None:
+def test_style_constraints_preserve_brief_with_typed_work_relation() -> None:
     foundation = resolve_rules(make_spec()).text_for(
         GenerationStage.FOUNDATION
     )
     themes = resolve_rules(make_spec()).text_for(GenerationStage.THEMES)
 
     assert (
-        "brief 明示的作品或虚构世界、导演、艺术家、流派与风格、"
-        "媒介、视觉技法、时代和地域"
+        "brief 明示的作品、世界、创作者、风格、媒介、技法、时代和地域"
     ) in (
         foundation
     )
-    assert "brief 中连续、逐字一致的原文片段" in foundation
-    assert "不翻译、不概括、不推断关联特征" in foundation
+    assert "创作者与紧邻《作品名》合并" in foundation
+    assert "张爱玲小说《沉香屑·第一炉香》" in foundation
+    assert "其余逐字保留" in foundation
+    assert "不推断风格" in foundation
     assert (
         "brief 未明示的作品、世界、角色、职业、时代、地域、媒介、"
         "技法、风格和创作者"

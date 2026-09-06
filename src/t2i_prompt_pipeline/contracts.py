@@ -47,6 +47,16 @@ _INTERNAL_SCHEMA_TERM = re.compile(
     re.IGNORECASE,
 )
 _STRUCTURED_OUTPUT_RESIDUE = re.compile(r"[{}\[\]]")
+_CHINESE_FACE_SHAPE = re.compile(r"脸|面庞|面容|面型|颧骨|下颌|颌线")
+_CHINESE_FACE_FEATURE = re.compile(r"眉|眼|鼻|唇|嘴|肤色|皮肤")
+_ENGLISH_FACE_SHAPE = re.compile(
+    r"\b(?:face|facial|cheekbones?|jaw(?:line)?)\b",
+    re.IGNORECASE,
+)
+_ENGLISH_FACE_FEATURE = re.compile(
+    r"\b(?:brows?|eyes?|nose|lips?|mouth|complexion|skin)\b",
+    re.IGNORECASE,
+)
 _CHINESE_FACING_PREFIX = re.compile(r"^(?:朝向|面向|略朝|朝).+")
 _ENGLISH_FACING_PREFIX = re.compile(
     r"^(?:facing|towards?)\s+.+",
@@ -54,6 +64,12 @@ _ENGLISH_FACING_PREFIX = re.compile(
 )
 _LEADING_STYLE_PHRASE = re.compile(
     r"^(?P<phrase>[^，。；;]{1,120}?导演风格)(?=的|，|。|；|;|$)"
+)
+_REFERENCE_RELATION_LABEL = re.compile(
+    r"小说|电影|电视剧|戏剧|诗集|散文集|漫画|动画|绘画|摄影作品|"
+    r"\b(?:novel|film|movie|television series|TV series|play|poetry "
+    r"collection|essay collection|comic|animation|painting|photograph)\b",
+    re.IGNORECASE,
 )
 _ACTION_VISIBILITY_TERM = re.compile(
     r"不可见|出画|画外|\b(?:not visible|out of frame|off-screen)\b",
@@ -123,6 +139,16 @@ def _frame_natural_text(frame: Frame) -> tuple[str, ...]:
             )
         ),
     )
+
+
+def _has_facial_identity(text: str, language: OutputLanguage) -> bool:
+    if language == OutputLanguage.CHINESE:
+        shape = _CHINESE_FACE_SHAPE
+        feature = _CHINESE_FACE_FEATURE
+    else:
+        shape = _ENGLISH_FACE_SHAPE
+        feature = _ENGLISH_FACE_FEATURE
+    return shape.search(text) is not None and len(feature.findall(text)) >= 2
 
 
 def _validate_output_language(
@@ -254,9 +280,19 @@ def normalize_foundation(
     if len(required_phrases) != len(set(required_phrases)):
         raise GenerationContractError("风格约束包含重复原文")
     for phrase in required_phrases:
-        if phrase not in spec.brief:
+        source_phrase = _REFERENCE_RELATION_LABEL.sub("", phrase, count=1)
+        if phrase not in spec.brief and source_phrase not in spec.brief:
             raise GenerationContractError(
-                f"风格约束不是 brief 原文：{phrase}"
+                f"reference phrase 没有 brief 原文依据：{phrase}"
+            )
+    for left, right in zip(
+        required_phrases,
+        required_phrases[1:],
+        strict=False,
+    ):
+        if right.startswith(("《", "“", '"')) and left + right in spec.brief:
+            raise GenerationContractError(
+                "相邻创作者与作品名必须合成含作品类型的单一 reference phrase"
             )
     explicit_style = _LEADING_STYLE_PHRASE.match(spec.brief)
     if (
@@ -312,6 +348,12 @@ def normalize_theme(
             "Theme.setting 缺少 brief 路线地点："
             f"{missing_route_points}"
         )
+    for character in theme.characters:
+        if not _has_facial_identity(character.appearance, spec.output_language):
+            deterministic_issues.append(
+                f"{character.character_id} appearance 必须包含脸型和至少"
+                "两项面部特征"
+            )
     if deterministic_issues:
         raise GenerationContractError(
             f"{theme.theme_id} {'; '.join(deterministic_issues)}"
@@ -368,6 +410,17 @@ def normalize_frame(
     normalized_moments = []
     text_issues: list[str] = []
     for moment in frame.characters:
+        if (
+            moment.framing != CharacterFraming.HEAD_CROPPED_TORSO
+            and not _has_facial_identity(
+                moment.visible_appearance,
+                spec.output_language,
+            )
+        ):
+            text_issues.append(
+                f"{moment.character_id} 头部入画时 visible_appearance "
+                "必须包含脸型和至少两项面部特征"
+            )
         facing_character_ids = set(
             _CHARACTER_ID_REFERENCE.findall(moment.facing)
         )

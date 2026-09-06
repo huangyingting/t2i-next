@@ -21,9 +21,10 @@
 Frame 内部仍以稳定 Character ID 关联人物。
 
 `StyleConstraints.required_phrases` 不解释风格，也不补写 brief 没有提到的时代、
-地域、媒介或视觉特征。例如 brief 只有“韦斯安德森风格”时，Foundation 只保存
-这段原文。renderer 直接从 `PromptBook.style_constraints` 生成实拍摄影前缀；
-Theme 不再重复保存或改写风格。
+地域、媒介或视觉特征。创作者与紧邻的作品名保存为一个自然 reference，并可插入
+准确的作品类型关系词，例如“张爱玲小说《沉香屑·第一炉香》”；其他内容保持原文。
+renderer 直接展开 `PromptBook.style_constraints` 中的 reference，
+不额外添加“实拍摄影”等媒介或风格前缀；Theme 不再重复保存或改写风格。
 
 ## 生成流程
 
@@ -123,7 +124,7 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   没有明确的性别或人数，不能覆盖 brief，也不授权创造职业；
 - Theme 不保存 title 或 style；全局媒介和 brief 风格原词由 Foundation 拥有并由
   renderer 确定性展开。Theme 拥有稳定外貌和完整穿戴：
-  appearance 明确发型长度、形态、质地、颜色及一项稳定外貌特征；outfit 明确合乎
+  appearance 明确发型、脸型及至少两项眉眼、鼻唇、肤色、颧骨或下颌特征；outfit 明确合乎
   场景的上下装或连体装、鞋、关键材质及零至一件配饰。每个未固定项
   选择一个具体值而不是列出备选，并在不同 Theme 间形成协调变化；brief 明示的数量、
   否定、服饰类型与遮盖、颜色和材质必须直接写出，其中服饰修饰原词复制到 outfit，
@@ -136,7 +137,8 @@ priority、replace、disable、模板变量或条件 DSL，行顺序就是规则
   生成计划，不作为解释性 prose 直接进入最终 Prompt。
   Theme 不写人物位置、动作、持握、构图或受光，也不会在首个 Frame 前提前完成
   brief 中的寻找、发现或取得等目标；
-- 本地 contract 保护 schema、ID、人物集合与引用、framing 联动、
+- 本地 contract 保护 schema、ID、人物集合与引用、framing 联动，以及头部入画时
+  对脸型和至少两项面部特征的覆盖，
   required_phrases、路线、输出语言、结构化残片和内部字段泄漏等确定性约束；
   开放式自然语言质量仍由生成规则负责，不使用宽泛质量词表打分；
 - 基础服饰必须同时符合 brief 明示的时代地域和 scene 的地点、场合、季节与天气；
@@ -436,8 +438,9 @@ manifest 一致。已保存且无候选的 `theme-similarity.json` 在 resume �
 之类的 Frame 标题。人物显示名由 `CastPlan` 的性别和顺序确定：女性
 在中文模式依次使用 `女1、女2`，男性使用 `男1、男2`；英文模式使用
 `Woman 1、Woman 2` 和 `Man 1、Man 2`。完整或简写的内部 Theme、Frame、
-Character ID 都不会写入最终提示词文本。每行展开一次 Foundation 的实拍摄影
-与风格原词，再展开所属 Theme 的场所、必要固定布景、背景人口，以及 Frame
+Character ID 都不会写入最终提示词文本。每行先展开 Foundation 保存的 brief
+reference 原词；没有 reference 时直接从 Theme 开始，不添加媒介前缀。随后展开
+所属 Theme 的场所、必要固定布景、背景人口，以及 Frame
 当前真正可见的人物、景深、构图与光线。
 
 ## 配置

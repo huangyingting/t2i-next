@@ -38,7 +38,29 @@ def test_foundation_rejects_style_constraint_not_copied_from_brief() -> None:
     foundation = make_foundation(spec)
     foundation.style_constraints.required_phrases = ["一九六零年代"]
 
-    with pytest.raises(GenerationContractError, match="不是 brief 原文"):
+    with pytest.raises(GenerationContractError, match="没有 brief 原文依据"):
+        normalize_foundation(spec, foundation)
+
+
+def test_foundation_accepts_work_type_between_adjacent_creator_and_title() -> None:
+    spec = make_spec(brief="张爱玲《沉香屑·第一炉香》中的葛薇龙")
+    foundation = make_foundation(spec)
+    foundation.style_constraints.required_phrases = [
+        "张爱玲小说《沉香屑·第一炉香》"
+    ]
+
+    assert normalize_foundation(spec, foundation) == foundation
+
+
+def test_foundation_rejects_split_adjacent_creator_and_title() -> None:
+    spec = make_spec(brief="张爱玲《沉香屑·第一炉香》中的葛薇龙")
+    foundation = make_foundation(spec)
+    foundation.style_constraints.required_phrases = [
+        "张爱玲",
+        "《沉香屑·第一炉香》",
+    ]
+
+    with pytest.raises(GenerationContractError, match="必须合成"):
         normalize_foundation(spec, foundation)
 
 
@@ -88,6 +110,18 @@ def test_theme_rejects_internal_schema_term_leakage() -> None:
         normalize_test_theme(spec, theme)
 
 
+def test_theme_rejects_hair_without_facial_identity_anchors() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    theme.characters[0].appearance = "乌黑波浪中长发垂肩"
+
+    with pytest.raises(
+        GenerationContractError,
+        match="appearance 必须包含脸型和至少两项面部特征",
+    ):
+        normalize_test_theme(spec, theme)
+
+
 def test_theme_reorders_characters_by_id() -> None:
     spec = make_spec(female_count=1, male_count=1)
     theme = make_themes(spec)[0]
@@ -99,6 +133,19 @@ def test_theme_reorders_characters_by_id() -> None:
         "T01-C01",
         "T01-C02",
     ]
+
+
+def test_frame_rejects_visible_head_without_facial_identity_anchors() -> None:
+    spec = make_spec()
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    frame.characters[0].visible_appearance = "乌黑波浪中长发与白色衬衫"
+
+    with pytest.raises(
+        GenerationContractError,
+        match="头部入画时 visible_appearance 必须包含脸型",
+    ):
+        normalize_frame(spec, theme, frame, frame_ids(spec, theme.theme_id))
 
 
 def test_theme_rejects_missing_character() -> None:

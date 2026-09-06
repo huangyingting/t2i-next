@@ -152,16 +152,12 @@ def _display_labels(
     return labels
 
 
-def _capture_text(
+def _reference_text(
     style_constraints: StyleConstraints,
     output_language: OutputLanguage,
 ) -> str:
-    phrases = "，".join(style_constraints.required_phrases)
-    if output_language == OutputLanguage.ENGLISH:
-        return f"Live-action photography, {phrases}" if phrases else (
-            "Live-action photography"
-        )
-    return f"实拍摄影，{phrases}" if phrases else "实拍摄影"
+    separator = ", " if output_language == OutputLanguage.ENGLISH else "，"
+    return separator.join(style_constraints.required_phrases)
 
 
 def _setting_text(
@@ -304,7 +300,7 @@ def _render_prompt(
     )
     if output_language == OutputLanguage.ENGLISH:
         parts = (
-            _capture_text(style_constraints, output_language),
+            _reference_text(style_constraints, output_language),
             _setting_text(theme, style_constraints, output_language),
             f"Characters: {characters}",
             (
@@ -320,14 +316,14 @@ def _render_prompt(
             ),
         )
         text = ". ".join(
-            _without_terminal_punctuation(part) for part in parts
+            _without_terminal_punctuation(part) for part in parts if part
         ) + "."
         unknown_character = "character"
         current_frame = "current shot"
         current_theme = "current theme"
     else:
         parts = (
-            _capture_text(style_constraints, output_language),
+            _reference_text(style_constraints, output_language),
             _setting_text(theme, style_constraints, output_language),
             f"人物：{characters}",
             (
@@ -342,7 +338,7 @@ def _render_prompt(
             ),
         )
         text = "。".join(
-            _without_terminal_punctuation(part) for part in parts
+            _without_terminal_punctuation(part) for part in parts if part
         ) + "。"
         unknown_character = "人物"
         current_frame = "当前镜头"

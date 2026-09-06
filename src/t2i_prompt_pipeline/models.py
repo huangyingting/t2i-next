@@ -199,7 +199,15 @@ class GenerationSpec(Model):
 
 
 class StyleConstraints(Model):
-    required_phrases: list[Text] = Field(default_factory=list, max_length=16)
+    required_phrases: list[Text] = Field(
+        default_factory=list,
+        max_length=16,
+        description=(
+            "Brief-grounded reference expressions. Keep adjacent creator "
+            "and titled work in one expression and insert only an accurate "
+            "work-type relation label when needed for natural grammar."
+        ),
+    )
 
 
 class CastMember(Model):
@@ -222,7 +230,13 @@ class CastPlan(Model):
 class Character(Model):
     character_id: CharacterId
     age: int = Field(ge=21, le=99)
-    appearance: Text
+    appearance: Text = Field(
+        description=(
+            "Stable identity anchors: specific hair, face shape, and at "
+            "least two facial features such as brows, eyes, nose, lips, "
+            "complexion, cheekbones, or jawline."
+        )
+    )
     outfit: Text
 
 
@@ -339,8 +353,9 @@ class CharacterMoment(Model):
     facing: Text
     visible_appearance: Text = Field(
         description=(
-            "Stable appearance and clothing visible within framing. "
-            "HEAD_CROPPED_TORSO excludes face and hair."
+            "Stable identity anchors and clothing visible within framing. "
+            "When the head is visible, include face shape and at least two "
+            "facial features. HEAD_CROPPED_TORSO excludes face and hair."
         )
     )
     lighting_effect: Text

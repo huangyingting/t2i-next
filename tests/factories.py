@@ -130,9 +130,10 @@ def make_theme(spec: GenerationSpec, theme_index: int) -> Theme:
                 character_id=format_character_id(theme_id, index),
                 age=25 + index,
                 appearance=(
-                    f"Character {index} stable appearance"
+                    f"Character {index} has an oval face, arched brows, "
+                    "dark eyes, and a straight nose"
                     if is_english
-                    else f"人物{index}的稳定外貌"
+                    else f"人物{index}椭圆脸、弯眉、深色眼睛与直鼻"
                 ),
                 outfit=(
                     f"Character {index} base outfit"

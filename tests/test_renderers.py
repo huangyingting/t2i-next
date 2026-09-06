@@ -46,7 +46,8 @@ def test_renderer_only_projects_frame_visible_character_facts() -> None:
 
     prompt = render_prompt(theme, frame, OutputLanguage.CHINESE, spec)
 
-    assert prompt.startswith("实拍摄影")
+    assert prompt.startswith("时间：")
+    assert "实拍摄影" not in prompt
     for phrase in foundation.style_constraints.required_phrases:
         assert prompt.count(phrase) == 1
     assert prompt.count(theme.setting.location) == 1
@@ -188,11 +189,33 @@ def test_renderer_includes_explicit_time_location_and_reference_phrase() -> None
 
     prompt = render_book(book, OutputLanguage.CHINESE)[0].text
 
-    assert "实拍摄影，笑傲江湖的武侠世界" in prompt
+    assert prompt.startswith("笑傲江湖的武侠世界。时间：")
+    assert "实拍摄影" not in prompt
     assert prompt.count("笑傲江湖的武侠世界") == 1
     assert "时间：架空中国古代江湖时期，深秋黄昏" in prompt
     assert "场所：林间古道旁的驿站前庭" in prompt
     assert "世界背景：" not in prompt
+
+
+def test_renderer_keeps_creator_work_relation_unambiguous() -> None:
+    spec = make_spec()
+    foundation = make_foundation(spec)
+    foundation.style_constraints.required_phrases = [
+        "张爱玲小说《沉香屑·第一炉香》"
+    ]
+    theme = make_themes(spec)[0]
+    frame = make_frame_batch(spec, theme).frames[0]
+    book = PromptBook(
+        semantic_name="renderer_test",
+        style_constraints=foundation.style_constraints,
+        cast_plan=foundation.cast_plan,
+        themes=[ThemeBook(theme=theme, frames=[frame])],
+    )
+
+    prompt = render_book(book, OutputLanguage.CHINESE)[0].text
+
+    assert prompt.startswith("张爱玲小说《沉香屑·第一炉香》。时间：")
+    assert "张爱玲，《沉香屑·第一炉香》" not in prompt
 
 
 def test_renderer_does_not_remove_reference_inside_location_phrase() -> None:
@@ -301,7 +324,8 @@ def test_renderer_produces_english_prompt() -> None:
 
     prompt = render_prompt(theme, frame, OutputLanguage.ENGLISH, spec)
 
-    assert prompt.startswith("Live-action photography")
+    assert prompt.startswith("Time:")
+    assert "Live-action photography" not in prompt
     assert "Location:" in prompt
     assert "Depth:" in prompt
     assert "Camera:" in prompt
