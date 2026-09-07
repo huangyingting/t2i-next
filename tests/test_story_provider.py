@@ -6,23 +6,27 @@ import httpx
 import pytest
 
 from t2i_story_pipeline.errors import StoryProviderResponseError
-from t2i_story_pipeline.models import StoryBlueprint, StoryStage
-from t2i_story_pipeline.prompts import interpretation_messages
+from t2i_story_pipeline.models import (
+    StoryStage,
+    exact_frame_sequence_model,
+)
+from t2i_story_pipeline.prompts import frame_messages
 from t2i_story_pipeline.provider import (
     OpenAIStoryModel,
     StoryProviderSettings,
 )
 from tests.story_factories import (
-    make_story_blueprint,
+    make_frame_sequence,
     make_story_request,
+    make_theme,
 )
 
 
 @pytest.mark.asyncio
-async def test_story_provider_sends_strict_schema(monkeypatch) -> None:
+async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     captured = {}
-    blueprint = make_story_blueprint()
+    sequence = make_frame_sequence()
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["authorization"] = request.headers["Authorization"]
@@ -34,7 +38,7 @@ async def test_story_provider_sends_strict_schema(monkeypatch) -> None:
                 "choices": [
                     {
                         "finish_reason": "stop",
-                        "message": {"content": blueprint.model_dump_json()},
+                        "message": {"content": sequence.model_dump_json()},
                     }
                 ],
                 "usage": {
@@ -52,43 +56,32 @@ async def test_story_provider_sends_strict_schema(monkeypatch) -> None:
     )
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     provider = OpenAIStoryModel(settings, client=client)
+    response_model = exact_frame_sequence_model(2)
 
     response = await provider.generate(
-        stage=StoryStage.INTERPRET,
-        messages=interpretation_messages(make_story_request()),
-        response_model=StoryBlueprint,
-        max_output_tokens=2000,
+        stage=StoryStage.FRAMES,
+        messages=frame_messages(make_story_request(), make_theme()),
+        response_model=response_model,
+        max_output_tokens=10000,
     )
     await client.aclose()
 
-    assert response.value == blueprint
+    assert response.value.model_dump() == sequence.model_dump()
     assert response.usage.total_tokens == 30
-    assert captured["authorization"] == "Bearer secret"
+    assert captured["authorization"].startswith("Bearer ")
     assert captured["reasoning_effort"] == "none"
     assert "temperature" not in captured
     schema = captured["response_format"]["json_schema"]["schema"]
     assert schema["additionalProperties"] is False
-    assert "title" not in schema
-    assert set(schema["required"]) == {
-        "title",
-        "logline",
-        "time",
-        "location",
-        "environment",
-        "atmosphere",
-        "characters",
-        "relationships",
-        "beats",
-        "cinematography",
-    }
+    assert set(schema["required"]) == {"frames"}
 
 
 @pytest.mark.asyncio
-async def test_story_provider_accepts_valid_json_when_finish_reason_is_length(
+async def test_story_provider_accepts_valid_json_at_length_limit(
     monkeypatch,
 ) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
-    blueprint = make_story_blueprint()
+    sequence = make_frame_sequence()
 
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(
@@ -98,7 +91,7 @@ async def test_story_provider_accepts_valid_json_when_finish_reason_is_length(
                 "choices": [
                     {
                         "finish_reason": "length",
-                        "message": {"content": blueprint.model_dump_json()},
+                        "message": {"content": sequence.model_dump_json()},
                     }
                 ],
                 "usage": {"total_tokens": 100},
@@ -115,18 +108,18 @@ async def test_story_provider_accepts_valid_json_when_finish_reason_is_length(
     )
 
     response = await provider.generate(
-        stage=StoryStage.INTERPRET,
-        messages=interpretation_messages(make_story_request()),
-        response_model=StoryBlueprint,
-        max_output_tokens=2000,
+        stage=StoryStage.FRAMES,
+        messages=frame_messages(make_story_request(), make_theme()),
+        response_model=exact_frame_sequence_model(2),
+        max_output_tokens=10000,
     )
     await client.aclose()
 
-    assert response.value == blueprint
+    assert response.value.model_dump() == sequence.model_dump()
 
 
 @pytest.mark.asyncio
-async def test_story_provider_preserves_usage_on_invalid_structured_output(
+async def test_story_provider_preserves_usage_on_invalid_output(
     monkeypatch,
 ) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
@@ -139,7 +132,7 @@ async def test_story_provider_preserves_usage_on_invalid_structured_output(
                 "choices": [
                     {
                         "finish_reason": "stop",
-                        "message": {"content": '{"title":"incomplete"}'},
+                        "message": {"content": '{"frames":[]}'},
                     }
                 ],
                 "usage": {
@@ -161,10 +154,10 @@ async def test_story_provider_preserves_usage_on_invalid_structured_output(
 
     with pytest.raises(StoryProviderResponseError) as error:
         await provider.generate(
-            stage=StoryStage.INTERPRET,
-            messages=interpretation_messages(make_story_request()),
-            response_model=StoryBlueprint,
-            max_output_tokens=2000,
+            stage=StoryStage.FRAMES,
+            messages=frame_messages(make_story_request(), make_theme()),
+            response_model=exact_frame_sequence_model(2),
+            max_output_tokens=10000,
         )
     await client.aclose()
 

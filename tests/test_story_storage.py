@@ -1,93 +1,57 @@
 from __future__ import annotations
 
-from t2i_story_pipeline.models import (
-    NarrativeThemeResult,
-    StoryResult,
-    TokenUsage,
-)
-from t2i_story_pipeline.render import render_narratives
+import json
+
+from t2i_story_pipeline.models import QualityFeedback, StoryStage
 from t2i_story_pipeline.storage import publish_story
-from tests.story_factories import (
-    make_narrative_review,
-    make_narrative_sequence,
-    make_narrative_theme,
-    make_story_blueprint,
-    make_story_request,
-)
+from tests.story_factories import make_story_result
 
 
-def test_publish_story_writes_json_prose_and_prompt_files(tmp_path) -> None:
-    request = make_story_request()
-    blueprint = make_story_blueprint()
-    sequence = make_narrative_sequence()
-    theme = make_narrative_theme()
-    result = StoryResult(
-        run_id="abcdef123456",
-        request=request,
-        blueprint=blueprint,
-        themes=[
-            NarrativeThemeResult(
-                theme=theme,
-                sequence=sequence,
-                narratives=render_narratives(blueprint, theme, sequence),
-                reviews=[make_narrative_review(passing=True)],
-                revision_count=0,
-            )
-        ],
-        usage=TokenUsage(total_tokens=30),
-    )
+def test_publish_story_writes_json_and_one_prompt_file(tmp_path) -> None:
+    result = make_story_result()
+    result.quality_feedback = [
+        QualityFeedback(
+            stage=StoryStage.FRAMES,
+            item_id="T001/F01",
+            issues=["镜头句缺少拍摄角度"],
+        )
+    ]
 
     published = publish_story(result, tmp_path)
 
     assert published.json_file.exists()
     assert published.prompt_file.exists()
-    assert published.prose_file.exists()
     assert len(published.prompt_file.read_text().splitlines()) == 2
-    prose_lines = published.prose_file.read_text().splitlines()
-    assert len(prose_lines) == 2
-    assert prose_lines[0].startswith("1930年代秋夜")
-    assert "时间与地点：" not in prose_lines[0]
-    assert '"run_id": "abcdef123456"' in (
-        published.json_file.read_text(encoding="utf-8")
+    assert published.prompt_file.read_text().splitlines()[0].startswith(
+        "1930年代北平电影风格"
     )
+    assert '"run_id": "abcdef123456"' in published.json_file.read_text(
+        encoding="utf-8"
+    )
+    payload = json.loads(published.json_file.read_text(encoding="utf-8"))
+    assert payload["request"]["content_level"] == "aesthetic"
+    assert payload["quality_feedback"] == [
+        {
+            "stage": "frames",
+            "item_id": "T001/F01",
+            "issues": ["镜头句缺少拍摄角度"],
+        }
+    ]
+    assert "镜头句缺少拍摄角度" not in published.prompt_file.read_text(
+        encoding="utf-8"
+    )
+    assert list(tmp_path.glob("*")) == [
+        published.json_file,
+        published.prompt_file,
+    ]
 
 
 def test_publish_story_writes_six_hundred_ordered_prompts(tmp_path) -> None:
-    request = make_story_request(theme_count=100, frames_per_theme=6)
-    blueprint = make_story_blueprint()
-    themes = []
-    for index in range(1, 101):
-        theme = make_narrative_theme(index)
-        sequence = make_narrative_sequence(
-            frame_count=6,
-            theme=theme,
-        )
-        themes.append(
-            NarrativeThemeResult(
-                theme=theme,
-                sequence=sequence,
-                narratives=render_narratives(blueprint, theme, sequence),
-                reviews=[
-                    make_narrative_review(
-                        passing=True,
-                        frame_count=6,
-                    )
-                ],
-                revision_count=0,
-            )
-        )
-    result = StoryResult(
-        run_id="abcdef123456",
-        request=request,
-        blueprint=blueprint,
-        themes=themes,
-        usage=TokenUsage(total_tokens=3165),
-    )
+    result = make_story_result(theme_count=100, frames_per_theme=6)
 
     published = publish_story(result, tmp_path)
 
-    assert len(published.prose_file.read_text().splitlines()) == 600
-    assert len(published.prompt_file.read_text().splitlines()) == 600
-    payload = published.json_file.read_text(encoding="utf-8")
-    assert '"theme_id": "T001"' in payload
-    assert '"theme_id": "T100"' in payload
+    lines = published.prompt_file.read_text().splitlines()
+    assert len(lines) == 600
+    assert "第1站台" in lines[0]
+    assert "第100站台" in lines[-1]

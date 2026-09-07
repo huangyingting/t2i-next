@@ -1,814 +1,555 @@
-"""Story interpretation, creative theming, generation, and quality review."""
+"""Generate final narrative paragraphs behind one small interface."""
 
 from __future__ import annotations
 
-import json
+import asyncio
 import re
+from collections.abc import Callable
+from difflib import SequenceMatcher
 from uuid import uuid4
+
+from pydantic import BaseModel
 
 from t2i_story_pipeline.errors import (
     StoryContractError,
     StoryProviderResponseError,
+    UnsafeStoryError,
 )
 from t2i_story_pipeline.models import (
-    NarrativeReview,
-    NarrativeSequence,
+    ContentLevel,
+    NarrativeFrame,
+    NarrativeFrameSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
     NarrativeThemeResult,
-    OutputLanguage,
-    RenderedNarrative,
-    StoryBlueprint,
+    QualityFeedback,
     StoryRequest,
     StoryResult,
     StoryStage,
     TokenUsage,
-    exact_narrative_review_model,
-    exact_narrative_sequence_model,
+    exact_frame_sequence_model,
     exact_theme_batch_model,
 )
 from t2i_story_pipeline.prompts import (
-    interpretation_messages,
-    narrative_messages,
-    review_messages,
-    revision_messages,
+    ACTION_CHAIN_MARKERS,
+    EROTIC_VISIBLE_MARKERS,
+    EROTIC_VISIBLE_MARKERS_EN,
+    FRAME_TRANSITION_MARKERS,
+    HARDCORE_VISIBLE_MARKERS,
+    HARDCORE_VISIBLE_MARKERS_EN,
+    PORTRAIT_ACTION_MARKERS,
+    SHOT_ANGLES,
+    SHOT_SCALES,
+    SOURCE_SENSITIVE_MARKERS,
+    STATIC_TRANSITION_MARKERS,
+    anachronism_markers_for_story,
+    frame_messages,
     theme_messages,
 )
 from t2i_story_pipeline.provider import ChatMessage, StoryModel
-from t2i_story_pipeline.render import render_narratives
 from t2i_story_pipeline.safety import (
     validate_generated_story,
     validate_source_story,
 )
 
+_CHINESE_SENTENCE_SPLIT = re.compile(r"(?<=[。！？])")
+_ASCII_WORD = re.compile(r"[A-Za-z]+")
+_PROGRESSIVE_ACTION = re.compile(
+    r"^此刻，.{0,40}(?:正在|正)[\u4e00-\u9fff]"
+)
+_ACTION_SIMILARITY_LIMIT = 0.82
+
 
 class StoryStudio:
-    """Generate a complete storyboard through one prose-first interface."""
+    """Turn one story request directly into final prose image prompts."""
 
     def __init__(
         self,
         model: StoryModel,
         *,
-        max_revisions: int = 2,
+        concurrency: int = 10,
         generation_retries: int = 2,
     ) -> None:
-        if not 0 <= max_revisions <= 5:
-            raise ValueError("max_revisions 必须介于 0 和 5")
+        if not 1 <= concurrency <= 32:
+            raise ValueError("concurrency 必须介于 1 和 32")
         if not 0 <= generation_retries <= 5:
             raise ValueError("generation_retries 必须介于 0 和 5")
         self._model = model
-        self._max_revisions = max_revisions
+        self._concurrency = concurrency
         self._generation_retries = generation_retries
 
     async def generate(self, request: StoryRequest) -> StoryResult:
-        validate_source_story(request.story)
-        blueprint, blueprint_usage = await self._interpret(request)
-        themes, theme_usage = await self._generate_themes(
-            request,
-            blueprint,
+        validate_source_story(
+            request.story,
+            require_intimate_consent=(
+                request.content_level
+                in {ContentLevel.EROTIC, ContentLevel.HARDCORE}
+            ),
         )
-        usage = blueprint_usage + theme_usage
-        theme_results: list[NarrativeThemeResult] = []
-        for theme in themes:
-            theme_result, theme_result_usage = await self._generate_theme(
-                request,
-                blueprint,
-                theme,
-            )
-            theme_results.append(theme_result)
-            usage += theme_result_usage
-        self._validate_portfolio(theme_results)
+        themes, theme_usage, feedback = await self._generate_themes(request)
+        semaphore = asyncio.Semaphore(self._concurrency)
+
+        async def generate_theme(
+            theme: NarrativeTheme,
+        ) -> tuple[NarrativeThemeResult, TokenUsage, list[QualityFeedback]]:
+            async with semaphore:
+                return await self._generate_frames(request, theme)
+
+        generated = await asyncio.gather(
+            *(generate_theme(theme) for theme in themes)
+        )
+        usage = theme_usage
+        results: list[NarrativeThemeResult] = []
+        for result, frame_usage, frame_feedback in generated:
+            results.append(result)
+            usage += frame_usage
+            feedback.extend(frame_feedback)
         return StoryResult(
             run_id=uuid4().hex[:12],
             request=request,
-            blueprint=blueprint,
-            themes=theme_results,
+            themes=results,
+            quality_feedback=feedback,
             usage=usage,
         )
-
-    async def _interpret(
-        self,
-        request: StoryRequest,
-    ) -> tuple[StoryBlueprint, TokenUsage]:
-        messages = interpretation_messages(request)
-        usage = TokenUsage()
-        for attempt in range(self._generation_retries + 1):
-            try:
-                response = await self._model.generate(
-                    stage=StoryStage.INTERPRET,
-                    messages=messages,
-                    response_model=StoryBlueprint,
-                    max_output_tokens=6000,
-                )
-            except StoryProviderResponseError as exc:
-                usage += exc.usage
-                if attempt >= self._generation_retries:
-                    raise
-                messages = self._contract_retry_messages(
-                    interpretation_messages(request),
-                    exc,
-                )
-                continue
-            usage += response.usage
-            blueprint = response.value
-            if not isinstance(blueprint, StoryBlueprint):
-                raise StoryContractError(
-                    "故事模型在 interpret 阶段返回了错误类型"
-                )
-            try:
-                self._normalize_display_names(request, blueprint)
-                self._validate_blueprint_fidelity(request, blueprint)
-                self._validate_output_language(
-                    request,
-                    blueprint,
-                    stage="故事结构",
-                )
-                validate_generated_story(
-                    blueprint.model_dump_json(ensure_ascii=False)
-                )
-            except StoryContractError as exc:
-                if attempt >= self._generation_retries:
-                    raise
-                messages = self._contract_retry_messages(
-                    interpretation_messages(request),
-                    exc,
-                )
-                continue
-            return blueprint, usage
-        raise AssertionError("unreachable")
 
     async def _generate_themes(
         self,
         request: StoryRequest,
-        blueprint: StoryBlueprint,
-    ) -> tuple[list[NarrativeTheme], TokenUsage]:
+    ) -> tuple[list[NarrativeTheme], TokenUsage, list[QualityFeedback]]:
         themes: list[NarrativeTheme] = []
         usage = TokenUsage()
+        feedback: list[QualityFeedback] = []
         while len(themes) < request.theme_count:
             start_index = len(themes) + 1
             count = min(10, request.theme_count - len(themes))
-            base_messages = theme_messages(
+            messages = theme_messages(
                 request,
-                blueprint,
                 start_index=start_index,
                 count=count,
                 existing_themes=themes,
             )
-            messages = base_messages
-            for attempt in range(self._generation_retries + 1):
-                try:
-                    response = await self._model.generate(
-                        stage=StoryStage.THEMES,
-                        messages=messages,
-                        response_model=exact_theme_batch_model(count),
-                        max_output_tokens=6000,
+
+            def validate(
+                value: BaseModel,
+                expected_start: int = start_index,
+                expected_count: int = count,
+            ) -> None:
+                if not isinstance(value, NarrativeThemeBatch):
+                    raise StoryContractError("provider 返回了错误的主题类型")
+                expected = [
+                    f"T{index:03d}"
+                    for index in range(
+                        expected_start,
+                        expected_start + expected_count,
                     )
-                except StoryProviderResponseError as exc:
-                    usage += exc.usage
-                    if attempt >= self._generation_retries:
-                        raise
-                    messages = self._contract_retry_messages(
-                        base_messages,
-                        exc,
-                    )
-                    continue
-                usage += response.usage
-                batch = response.value
-                if not isinstance(batch, NarrativeThemeBatch):
+                ]
+                actual = [theme.theme_id for theme in value.themes]
+                if actual != expected:
                     raise StoryContractError(
-                        "故事模型在 themes 阶段返回了错误类型"
+                        "主题数量或顺序不符合请求："
+                        f"expected={expected}, actual={actual}"
                     )
-                try:
-                    self._validate_theme_batch(
-                        request,
-                        themes,
-                        batch,
-                        expected_start=start_index,
-                        expected_count=count,
-                    )
-                    self._validate_output_language(
-                        request,
-                        batch,
-                        stage="叙事主题",
-                    )
-                    validate_generated_story(
-                        batch.model_dump_json(ensure_ascii=False)
-                    )
-                except StoryContractError as exc:
-                    if attempt >= self._generation_retries:
-                        raise
-                    messages = self._contract_retry_messages(
-                        base_messages,
-                        exc,
-                    )
-                    continue
-                break
-            themes.extend(batch.themes)
-        return themes, usage
-
-    async def _generate_theme(
-        self,
-        request: StoryRequest,
-        blueprint: StoryBlueprint,
-        theme: NarrativeTheme,
-    ) -> tuple[NarrativeThemeResult, TokenUsage]:
-        sequence, narratives, usage = await self._generate_sequence(
-            request,
-            blueprint,
-            theme,
-        )
-        reviews: list[NarrativeReview] = []
-        revision_count = 0
-        review_scope = sequence
-        previous_full_review: NarrativeReview | None = None
-        while True:
-            review_response = await self._model.generate(
-                stage=StoryStage.REVIEW,
-                messages=review_messages(
-                    request,
-                    blueprint,
-                    theme,
-                    review_scope,
-                ),
-                response_model=exact_narrative_review_model(
-                    len(review_scope.scenes)
-                ),
-                max_output_tokens=16000,
-            )
-            scoped_review = review_response.value
-            if not isinstance(scoped_review, NarrativeReview):
-                raise StoryContractError("故事模型在 review 阶段返回了错误类型")
-            self._validate_review(review_scope, scoped_review)
-            full_review = (
-                scoped_review
-                if previous_full_review is None
-                else self._merge_review(
-                    sequence,
-                    previous_full_review,
-                    scoped_review,
-                )
-            )
-            reviews.append(full_review)
-            usage += review_response.usage
-            if full_review.meets_threshold():
-                break
-            if revision_count >= self._max_revisions:
-                raise StoryContractError(
-                    f"{theme.theme_id} 叙事评审未达到发布标准，且修订次数已耗尽"
-                )
-            failed_scene_ids = self._failed_scene_ids(full_review)
-            revision_scope = self._select_sequence(
-                sequence,
-                failed_scene_ids,
-            )
-            revision_review = self._select_review(
-                full_review,
-                failed_scene_ids,
-            )
-            revision_response = await self._model.generate(
-                stage=StoryStage.REVISE,
-                messages=revision_messages(
-                    request,
-                    blueprint,
-                    theme,
-                    revision_scope,
-                    revision_review,
-                ),
-                response_model=exact_narrative_sequence_model(
-                    len(revision_scope.scenes)
-                ),
-                max_output_tokens=10000,
-            )
-            revised = revision_response.value
-            if not isinstance(revised, NarrativeSequence):
-                raise StoryContractError("故事模型在 revise 阶段返回了错误类型")
-            self._restore_revision_identity(revision_scope, revised)
-            sequence = self._merge_sequence(sequence, revised)
-            self._validate_sequence(request, blueprint, sequence)
-            self._validate_output_language(request, sequence, stage="修订场景")
-            validate_generated_story(sequence.model_dump_json(ensure_ascii=False))
-            narratives = render_narratives(
-                blueprint,
-                theme,
-                sequence,
-                request.output_language,
-            )
-            previous_full_review = full_review
-            review_scope = self._select_sequence(
-                sequence,
-                failed_scene_ids,
-            )
-            revision_count += 1
-            usage += revision_response.usage
-        return (
-            NarrativeThemeResult(
-                theme=theme,
-                sequence=sequence,
-                narratives=narratives,
-                reviews=reviews,
-                revision_count=revision_count,
-            ),
-            usage,
-        )
-
-    async def _generate_sequence(
-        self,
-        request: StoryRequest,
-        blueprint: StoryBlueprint,
-        theme: NarrativeTheme,
-    ) -> tuple[NarrativeSequence, list[RenderedNarrative], TokenUsage]:
-        base_messages = narrative_messages(request, blueprint, theme)
-        messages = base_messages
-        usage = TokenUsage()
-        for attempt in range(self._generation_retries + 1):
-            try:
-                sequence_response = await self._model.generate(
-                    stage=StoryStage.SCENES,
-                    messages=messages,
-                    response_model=exact_narrative_sequence_model(
-                        request.frames_per_theme
-                    ),
-                    max_output_tokens=10000,
-                )
-            except StoryProviderResponseError as exc:
-                usage += exc.usage
-                if attempt >= self._generation_retries:
-                    raise
-                messages = self._contract_retry_messages(
-                    base_messages,
-                    exc,
-                )
-                continue
-            usage += sequence_response.usage
-            sequence = sequence_response.value
-            if not isinstance(sequence, NarrativeSequence):
-                raise StoryContractError(
-                    "故事模型在 scenes 阶段返回了错误类型"
-                )
-            try:
-                self._validate_sequence(request, blueprint, sequence)
-                self._validate_output_language(
-                    request,
-                    sequence,
-                    stage="叙事场景",
-                )
                 validate_generated_story(
-                    sequence.model_dump_json(ensure_ascii=False)
+                    value.model_dump_json(ensure_ascii=False)
                 )
-            except StoryContractError as exc:
-                if attempt >= self._generation_retries:
-                    raise
-                messages = self._contract_retry_messages(
-                    base_messages,
-                    exc,
-                )
-                continue
-            break
 
-        narratives = render_narratives(
-            blueprint,
-            theme,
-            sequence,
-            request.output_language,
-        )
-        return sequence, narratives, usage
+            value, batch_usage = await self._generate_validated(
+                stage=StoryStage.THEMES,
+                messages=messages,
+                response_model=exact_theme_batch_model(count),
+                max_output_tokens=6000,
+                validate=validate,
+            )
+            if not isinstance(value, NarrativeThemeBatch):
+                raise AssertionError("validated theme response changed type")
+            themes.extend(value.themes)
+            feedback.extend(self._theme_feedback(request, value.themes))
+            usage += batch_usage
+        return themes, usage, feedback
 
-    @staticmethod
-    def _validate_theme_batch(
+    async def _generate_frames(
+        self,
         request: StoryRequest,
-        existing: list[NarrativeTheme],
-        batch: NarrativeThemeBatch,
-        *,
-        expected_start: int,
-        expected_count: int,
-    ) -> None:
-        expected_ids = [
-            f"T{index:03d}"
-            for index in range(
-                expected_start,
-                expected_start + expected_count,
-            )
+        theme: NarrativeTheme,
+    ) -> tuple[NarrativeThemeResult, TokenUsage, list[QualityFeedback]]:
+        expected = [
+            f"F{index:02d}"
+            for index in range(1, request.frames_per_theme + 1)
         ]
-        actual_ids = [theme.theme_id for theme in batch.themes]
-        if actual_ids != expected_ids:
-            raise StoryContractError(
-                "主题数量或顺序不符合请求："
-                f"expected={expected_ids}, actual={actual_ids}"
-            )
-        if expected_start + expected_count - 1 > request.theme_count:
-            raise StoryContractError("主题批次超出请求数量")
-        all_themes = [*existing, *batch.themes]
-        titles = [StoryStudio._semantic_key(theme.title) for theme in all_themes]
-        if len(titles) != len(set(titles)):
-            raise StoryContractError("主题标题必须实质不同")
-        creative_keys = [
-            (
-                StoryStudio._semantic_key(theme.creative_intent.decisive_moment),
-                StoryStudio._semantic_key(theme.creative_intent.visual_motif),
-            )
-            for theme in all_themes
-        ]
-        if len(creative_keys) != len(set(creative_keys)):
-            raise StoryContractError("主题的决定性瞬间与视觉母题组合必须实质不同")
-        source_material = request.story
-        generated_themes = batch.model_dump_json(ensure_ascii=False)
-        for unsupported_identity_mark in (
-            "疤",
-            "胎记",
-            "纹身",
-            "戒痕",
-        ):
-            if (
-                unsupported_identity_mark in generated_themes
-                and unsupported_identity_mark not in source_material
-            ):
+
+        def validate_ids(
+            value: BaseModel,
+            expected_ids: list[str] = expected,
+        ) -> None:
+            if not isinstance(value, NarrativeFrameSequence):
+                raise StoryContractError("provider 返回了错误的画面类型")
+            actual = [frame.frame_id for frame in value.frames]
+            if actual != expected_ids:
                 raise StoryContractError(
-                    "主题新增了故事未提供的身份标记："
-                    f"{unsupported_identity_mark}"
+                    "画面数量或顺序不符合请求："
+                    f"expected={expected_ids}, actual={actual}"
                 )
+            for frame in value.frames:
+                validate_generated_story(frame.prose)
 
-    @staticmethod
-    def _semantic_key(value: str) -> str:
-        return re.sub(r"[\W\d_]+", "", value.casefold())
-
-    @staticmethod
-    def _contract_retry_messages(
-        base_messages: list[ChatMessage],
-        error: StoryContractError | StoryProviderResponseError,
-    ) -> list[ChatMessage]:
-        return [
-            *base_messages,
-            ChatMessage(
-                role="user",
-                content=(
-                    "上一份输出违反硬性契约，必须从头重新生成。"
-                    f"具体问题：{error}。"
-                    "只修正该问题并继续遵守 system 中的全部规则；"
-                    "不要解释或输出 schema 之外的内容。"
-                ),
+        value, usage = await self._generate_validated(
+            stage=StoryStage.FRAMES,
+            messages=frame_messages(request, theme),
+            response_model=exact_frame_sequence_model(
+                request.frames_per_theme
             ),
+            max_output_tokens=16000,
+            validate=validate_ids,
+        )
+        if not isinstance(value, NarrativeFrameSequence):
+            raise AssertionError("validated frame response changed type")
+        issues = self._frame_issues(request, theme, value.frames)
+        feedback = [
+            QualityFeedback(
+                stage=StoryStage.FRAMES,
+                item_id=f"{theme.theme_id}/{frame_id}",
+                issues=frame_issues,
+            )
+            for frame_id, frame_issues in issues.items()
         ]
+        return NarrativeThemeResult(theme=theme, frames=value.frames), usage, feedback
 
-    @staticmethod
-    def _normalize_display_names(
+    def _theme_feedback(
+        self,
         request: StoryRequest,
-        blueprint: StoryBlueprint,
-    ) -> None:
-        chinese_ordinals = "一二三四五六七八"
-        normalized_story = re.sub(r"\s+", "", request.story)
-        for index, character in enumerate(blueprint.characters, start=1):
-            normalized_name = re.sub(r"\s+", "", character.display_name)
-            if normalized_name not in normalized_story:
-                character.display_name = (
-                    f"人物{chinese_ordinals[index - 1]}"
-                    if request.output_language == OutputLanguage.CHINESE
-                    else f"Character {index}"
+        themes: list[NarrativeTheme],
+    ) -> list[QualityFeedback]:
+        allowed_ascii = set(_ASCII_WORD.findall(request.story))
+        feedback: list[QualityFeedback] = []
+        for theme in themes:
+            issues: list[str] = []
+            if request.output_language.value == "chinese":
+                unexpected = sorted(
+                    set(
+                        _ASCII_WORD.findall(
+                            f"{theme.title} {theme.premise} {theme.style}"
+                        )
+                    )
+                    - allowed_ascii
                 )
-
-    @staticmethod
-    def _validate_blueprint_fidelity(
-        request: StoryRequest,
-        blueprint: StoryBlueprint,
-    ) -> None:
-        normalized_story = re.sub(r"\s+", "", request.story)
-        story_has_gender = bool(
-            re.search(
-                r"男性|女性|男人|女人|男子|女子|男士|女士|丈夫|妻子|"
-                r"男孩|女孩|少女|少年|父亲|母亲",
+                if unexpected:
+                    issues.append(
+                        "含有 story 原文之外的英文词："
+                        + ",".join(unexpected)
+                    )
+            source_issues = self._source_fidelity_issues(
+                theme.model_dump_json(ensure_ascii=False),
                 request.story,
             )
-        )
-        if not story_has_gender:
-            for character in blueprint.characters:
-                identity_text = (
-                    f"{character.display_name}{character.role}"
-                    f"{character.appearance}{character.outfit}"
+            if source_issues:
+                issues.append(
+                    "含有 story 未提供的来源敏感事实："
+                    + ",".join(source_issues)
                 )
-                if re.search(r"男性|女性|男人|女人|男子|女子|旗袍|裙装", identity_text):
-                    raise StoryContractError(
-                        f"{character.character_id} 新增了原文未提供的性别"
-                    )
-        for relationship in blueprint.relationships:
-            normalized_relationship = re.sub(
-                r"\s+",
-                "",
-                relationship.source_relationship,
+            issues.extend(self._content_level_issues(request, theme.premise))
+            issues.extend(
+                self._era_consistency_issues(request, theme.premise)
             )
-            if normalized_relationship not in normalized_story:
-                raise StoryContractError(
-                    "人物关系没有故事原文依据："
-                    f"{relationship.source_relationship}"
-                )
-            for unsupported_history in (
-                "多年",
-                "十年前",
-                "曾经",
-                "旧日",
-                "约定",
-                "秘密",
-            ):
-                if (
-                    unsupported_history in relationship.relationship
-                    and unsupported_history not in request.story
-                ):
-                    raise StoryContractError(
-                        "人物关系新增了原文未提供的经历："
-                        f"{unsupported_history}"
+            if issues:
+                feedback.append(
+                    QualityFeedback(
+                        stage=StoryStage.THEMES,
+                        item_id=theme.theme_id,
+                        issues=issues,
                     )
-        for beat in blueprint.beats:
-            normalized_source_action = re.sub(r"\s+", "", beat.source_action)
-            if normalized_source_action not in normalized_story:
-                raise StoryContractError(
-                    f"{beat.beat_id} 动作没有故事原文依据："
-                    f"{beat.source_action}"
                 )
-            if re.search(
-                r"彼此|他们|两人|一起|双方",
-                beat.source_action,
-            ) and len(
-                beat.participant_ids
-            ) < 2:
-                raise StoryContractError(
-                    f"{beat.beat_id} 多人动作缺少参与人物"
+        return feedback
+
+    def _frame_issues(
+        self,
+        request: StoryRequest,
+        theme: NarrativeTheme,
+        frames: list[NarrativeFrame],
+    ) -> dict[str, list[str]]:
+        allowed_ascii = set(
+            _ASCII_WORD.findall(
+                f"{request.story} {theme.title} "
+                f"{theme.premise} {theme.style}"
+            )
+        )
+        issues: dict[str, list[str]] = {}
+        for frame in frames:
+            frame_issues: list[str] = []
+            if not frame.prose.startswith(theme.style):
+                frame_issues.append(f"必须以主题风格开头：{theme.style}")
+            source_issues = self._source_fidelity_issues(
+                frame.prose,
+                request.story,
+            )
+            if source_issues:
+                frame_issues.append(
+                    "含有 story 未提供的来源敏感事实："
+                    + ",".join(source_issues)
                 )
+            if request.output_language.value == "chinese":
+                frame_issues.extend(
+                    self._chinese_frame_shape_issues(
+                        frame.prose,
+                        allowed_ascii=allowed_ascii,
+                    )
+                )
+            frame_issues.extend(
+                self._content_level_issues(request, frame.prose)
+            )
+            frame_issues.extend(
+                self._era_consistency_issues(request, frame.prose)
+            )
+            if frame_issues:
+                issues[frame.frame_id] = frame_issues
+        action_sentences: list[tuple[str, str]] = []
+        for frame in frames:
+            action = self._action_sentence(frame.prose)
+            if action is not None:
+                action_sentences.append((frame.frame_id, action))
+        for index, (frame_id, action) in enumerate(action_sentences):
+            for earlier_id, earlier_action in action_sentences[:index]:
+                similarity = SequenceMatcher(
+                    None,
+                    earlier_action,
+                    action,
+                ).ratio()
+                if similarity >= _ACTION_SIMILARITY_LIMIT:
+                    issues.setdefault(frame_id, []).append(
+                        f"动作句与 {earlier_id} 相似度 "
+                        f"{similarity:.0%}，不得复写"
+                    )
+        return issues
 
     @staticmethod
-    def _validate_output_language(
+    def _content_level_issues(
         request: StoryRequest,
-        value: object,
-        *,
-        stage: str,
-    ) -> None:
-        if request.output_language != OutputLanguage.CHINESE:
-            return
-        allowed_words = {
-            word.casefold()
-            for word in re.findall(r"[A-Za-z]{2,}", request.story)
-        }
-
-        def text_values(item: object) -> list[str]:
-            if isinstance(item, str):
-                return [item]
-            if isinstance(item, list):
-                return [
-                    text
-                    for child in item
-                    for text in text_values(child)
+        text: str,
+    ) -> list[str]:
+        if request.output_language.value == "chinese":
+            erotic_markers = EROTIC_VISIBLE_MARKERS
+            hardcore_markers = HARDCORE_VISIBLE_MARKERS
+            compared_text = text
+        else:
+            erotic_markers = EROTIC_VISIBLE_MARKERS_EN
+            hardcore_markers = HARDCORE_VISIBLE_MARKERS_EN
+            compared_text = text.casefold()
+        if request.content_level == ContentLevel.AESTHETIC:
+            explicit = [
+                marker for marker in hardcore_markers if marker in compared_text
+            ]
+            return (
+                [
+                    "aesthetic 不得呈现明确性行为："
+                    + ",".join(explicit)
                 ]
-            if isinstance(item, dict):
+                if explicit
+                else []
+            )
+        if request.content_level == ContentLevel.EROTIC:
+            explicit = [
+                marker for marker in hardcore_markers if marker in compared_text
+            ]
+            if explicit:
                 return [
-                    text
-                    for key, child in item.items()
-                    if not key.endswith("_id")
-                    and key
-                    not in {"mode", "participant_ids", "visible_character_ids"}
-                    for text in text_values(child)
+                    "erotic 不得升级为明确性行为："
+                    + ",".join(explicit)
                 ]
-            if hasattr(item, "model_dump"):
-                return text_values(item.model_dump(mode="json"))
+            if not any(marker in compared_text for marker in erotic_markers):
+                return ["erotic 缺少直接可见的成人情色事实"]
             return []
-
-        unexpected = sorted(
-            {
-                word
-                for text in text_values(value)
-                for word in re.findall(r"[A-Za-z]{2,}", text)
-                if word.casefold() not in allowed_words
-            }
-        )
-        if unexpected:
-            raise StoryContractError(
-                f"{stage}混入原文未提供的英文：{unexpected}"
-            )
+        if not any(marker in compared_text for marker in hardcore_markers):
+            return ["hardcore 缺少直接明确的成人性行为"]
+        return []
 
     @staticmethod
-    def _validate_portfolio(
-        themes: list[NarrativeThemeResult],
-    ) -> None:
-        sequence_keys = [
-            StoryStudio._semantic_key(
-                "\n".join(narrative.prose for narrative in theme.narratives)
-            )
-            for theme in themes
-        ]
-        if len(sequence_keys) != len(set(sequence_keys)):
-            raise StoryContractError("不同主题的画面序列必须实质不同")
-
-    @staticmethod
-    def _validate_sequence(
+    def _era_consistency_issues(
         request: StoryRequest,
-        blueprint: StoryBlueprint,
-        sequence: NarrativeSequence,
-    ) -> None:
-        expected_scene_ids = [
-            f"S{index:02d}" for index in range(1, request.frames_per_theme + 1)
-        ]
-        actual_scene_ids = [scene.scene_id for scene in sequence.scenes]
-        if actual_scene_ids != expected_scene_ids:
-            raise StoryContractError(
-                "场景数量或顺序不符合请求："
-                f"expected={expected_scene_ids}, actual={actual_scene_ids}"
-            )
-        semantic_frames = [
-            StoryStudio._semantic_key(
-                json.dumps(
-                    scene.model_dump(
-                        mode="json",
-                        exclude={"scene_id"},
-                    ),
-                    ensure_ascii=False,
-                    sort_keys=True,
-                )
-            )
-            for scene in sequence.scenes
-        ]
-        if len(semantic_frames) != len(set(semantic_frames)):
-            raise StoryContractError("同一主题中的每个画面必须实质不同")
-
-        known_beats = {beat.beat_id for beat in blueprint.beats}
-        known_characters = {
-            character.character_id for character in blueprint.characters
-        }
-        for scene in sequence.scenes:
-            if scene.beat_id not in known_beats:
-                raise StoryContractError(
-                    f"{scene.scene_id} 引用未知故事节拍：{scene.beat_id}"
-                )
-            unknown_characters = set(scene.visible_character_ids) - known_characters
-            if unknown_characters:
-                raise StoryContractError(
-                    f"{scene.scene_id} 引用未知人物：{sorted(unknown_characters)}"
-                )
-            expected_order = [
-                character.character_id
-                for character in blueprint.characters
-                if character.character_id in scene.visible_character_ids
+        text: str,
+    ) -> list[str]:
+        compared_text = text.casefold()
+        matches = sorted(
+            (
+                marker
+                for marker in anachronism_markers_for_story(request)
+                if marker.casefold() in compared_text
+            ),
+            key=len,
+            reverse=True,
+        )
+        incompatible: list[str] = []
+        for marker in matches:
+            if not any(marker.casefold() in kept.casefold() for kept in incompatible):
+                incompatible.append(marker)
+        return (
+            [
+                "出现与 story 时代或季节背景不符的事物："
+                + ",".join(incompatible)
             ]
-            if scene.visible_character_ids != expected_order:
-                raise StoryContractError(
-                    f"{scene.scene_id} 人物必须按 StoryBlueprint 顺序排列"
-                )
-            normalized_story = re.sub(r"\s+", "", request.story)
-            for source_text in scene.source_context:
-                if re.sub(r"\s+", "", source_text) not in normalized_story:
-                    raise StoryContractError(
-                        f"{scene.scene_id} 来源片段没有故事原文依据："
-                        f"{source_text}"
-                    )
-            for action in scene.present_actions:
-                unknown_action_characters = set(action.participant_ids) - set(
-                    scene.visible_character_ids
-                )
-                if unknown_action_characters:
-                    raise StoryContractError(
-                        f"{scene.scene_id} 动作引用未入画人物："
-                        f"{sorted(unknown_action_characters)}"
-                    )
+            if incompatible
+            else []
+        )
 
     @staticmethod
-    def _validate_review(
-        sequence: NarrativeSequence,
-        review: NarrativeReview,
-    ) -> None:
-        expected_ids = [scene.scene_id for scene in sequence.scenes]
-        actual_ids = [scene_review.scene_id for scene_review in review.scene_reviews]
-        if actual_ids != expected_ids:
-            raise StoryContractError(
-                "叙事评审没有按顺序覆盖全部场景："
-                f"expected={expected_ids}, actual={actual_ids}"
-            )
-        for scene_review in review.scene_reviews:
-            wrong_issue_ids = {
-                issue.scene_id
-                for issue in scene_review.issues
-                if issue.scene_id != scene_review.scene_id
-            }
-            if wrong_issue_ids:
-                raise StoryContractError(
-                    f"{scene_review.scene_id} 的评审问题引用其他场景："
-                    f"{sorted(wrong_issue_ids)}"
-                )
-            low_dimensions = {
-                dimension
-                for dimension, score in (scene_review.scores.model_dump().items())
-                if score < 4
-            }
-            issue_dimensions = {issue.dimension.value for issue in scene_review.issues}
-            if low_dimensions != issue_dimensions:
-                raise StoryContractError(
-                    f"{scene_review.scene_id} 的低分维度与 issues 不一致"
-                )
-
-    @staticmethod
-    def _failed_scene_ids(review: NarrativeReview) -> list[str]:
+    def _source_fidelity_issues(text: str, source: str) -> list[str]:
         return [
-            scene_review.scene_id
-            for scene_review in review.scene_reviews
-            if not scene_review.scores.meets_threshold()
-            or scene_review.issues
+            marker
+            for marker in SOURCE_SENSITIVE_MARKERS
+            if marker in text and marker not in source
         ]
 
     @staticmethod
-    def _select_sequence(
-        sequence: NarrativeSequence,
-        scene_ids: list[str],
-    ) -> NarrativeSequence:
-        selected = set(scene_ids)
-        return NarrativeSequence(
-            scenes=[
-                scene
-                for scene in sequence.scenes
-                if scene.scene_id in selected
+    def _action_sentence(prose: str) -> str | None:
+        return next(
+            (
+                sentence.strip()
+                for sentence in _CHINESE_SENTENCE_SPLIT.split(prose)
+                if sentence.strip().startswith("此刻")
+            ),
+            None,
+        )
+
+    @staticmethod
+    def _chinese_frame_shape_issues(
+        prose: str,
+        *,
+        allowed_ascii: set[str],
+    ) -> list[str]:
+        issues: list[str] = []
+        unexpected_ascii = sorted(
+            set(_ASCII_WORD.findall(prose)) - allowed_ascii
+        )
+        if unexpected_ascii:
+            issues.append(
+                "不得混入原文之外的英文词："
+                + ",".join(unexpected_ascii)
+            )
+        found_markers = [
+            marker for marker in FRAME_TRANSITION_MARKERS if marker in prose
+        ]
+        if found_markers:
+            issues.append(f"不得出现推进词：{','.join(found_markers)}")
+
+        sentences = [
+            sentence.strip()
+            for sentence in _CHINESE_SENTENCE_SPLIT.split(prose)
+            if sentence.strip()
+        ]
+        action_indexes = [
+            index
+            for index, sentence in enumerate(sentences)
+            if sentence.startswith("此刻")
+        ]
+        if len(action_indexes) != 1:
+            issues.append("必须恰好有一句以“此刻”开头的动作句")
+        else:
+            action = sentences[action_indexes[0]]
+            if not action.startswith("此刻，"):
+                issues.append("唯一动作句必须精确以“此刻，”开头")
+            elif not _PROGRESSIVE_ACTION.search(action):
+                issues.append("唯一动作句必须在施动者后使用“正”或“正在”")
+            if action_indexes[0] != len(sentences) - 3:
+                issues.append("动作句之后必须恰好只有镜头句和光线句")
+
+        if len(sentences) < 3 or not sentences[-2].startswith("镜头采用"):
+            issues.append("倒数第二句必须以“镜头采用”开头")
+        else:
+            camera = sentences[-2]
+            if not any(scale in camera for scale in SHOT_SCALES):
+                issues.append("镜头句缺少景别")
+            if not any(angle in camera for angle in SHOT_ANGLES):
+                issues.append("镜头句缺少拍摄角度")
+        if len(sentences) < 2 or not sentences[-1].startswith("光线"):
+            issues.append("最后一句必须以“光线”开头")
+
+        if len(action_indexes) == 1:
+            action = sentences[action_indexes[0]]
+            action_markers = [
+                marker
+                for marker in ACTION_CHAIN_MARKERS
+                if marker in action
             ]
-        )
-
-    @staticmethod
-    def _select_review(
-        review: NarrativeReview,
-        scene_ids: list[str],
-    ) -> NarrativeReview:
-        selected = set(scene_ids)
-        return NarrativeReview(
-            scene_reviews=[
-                scene_review
-                for scene_review in review.scene_reviews
-                if scene_review.scene_id in selected
-            ],
-            overall_summary=review.overall_summary,
-        )
-
-    @staticmethod
-    def _merge_sequence(
-        sequence: NarrativeSequence,
-        revised: NarrativeSequence,
-    ) -> NarrativeSequence:
-        replacements = {
-            scene.scene_id: scene
-            for scene in revised.scenes
-        }
-        return NarrativeSequence(
-            scenes=[
-                replacements.get(scene.scene_id, scene)
-                for scene in sequence.scenes
+            if "又" in action and "再" in action:
+                action_markers.append("又...再")
+            if action_markers:
+                issues.append(
+                    "唯一动作句不得串联动作："
+                    + ",".join(action_markers)
+                )
+            static_section = sentences[action_indexes[0] - 1]
+            static_markers = [
+                marker
+                for marker in STATIC_TRANSITION_MARKERS
+                if marker in static_section
             ]
-        )
+            if static_markers:
+                issues.append(
+                    "人物静态段不得出现姿态变化："
+                    + ",".join(static_markers)
+                )
+            portrait_actions = [
+                marker
+                for marker in PORTRAIT_ACTION_MARKERS
+                if marker in static_section
+            ]
+            if portrait_actions:
+                issues.append(
+                    "人物静态段不得执行次动作："
+                    + ",".join(portrait_actions)
+                )
 
-    @staticmethod
-    def _merge_review(
-        sequence: NarrativeSequence,
-        previous: NarrativeReview,
-        updated: NarrativeReview,
-    ) -> NarrativeReview:
-        replacements = {
-            scene_review.scene_id: scene_review
-            for scene_review in updated.scene_reviews
-        }
-        previous_by_id = {
-            scene_review.scene_id: scene_review
-            for scene_review in previous.scene_reviews
-        }
-        return NarrativeReview(
-            scene_reviews=[
-                replacements.get(
-                    scene.scene_id,
-                    previous_by_id[scene.scene_id],
-                )
-                for scene in sequence.scenes
-            ],
-            overall_summary=updated.overall_summary,
-        )
+        return issues
 
-    @staticmethod
-    def _restore_revision_identity(
-        previous: NarrativeSequence,
-        revised: NarrativeSequence,
-    ) -> None:
-        for old_scene, new_scene in zip(
-            previous.scenes,
-            revised.scenes,
-            strict=True,
-        ):
-            if len(old_scene.present_actions) != len(new_scene.present_actions):
-                raise StoryContractError(
-                    f"{old_scene.scene_id} 修订不得改变动作条目数量"
+    async def _generate_validated(
+        self,
+        *,
+        stage: StoryStage,
+        messages: list[ChatMessage],
+        response_model: type[BaseModel],
+        max_output_tokens: int,
+        validate: Callable[[BaseModel], None],
+    ) -> tuple[BaseModel, TokenUsage]:
+        base_messages = messages
+        usage = TokenUsage()
+        for attempt in range(self._generation_retries + 1):
+            rejected_value: BaseModel | None = None
+            try:
+                response = await self._model.generate(
+                    stage=stage,
+                    messages=messages,
+                    response_model=response_model,
+                    max_output_tokens=max_output_tokens,
                 )
-            if len(old_scene.visible_text) != len(new_scene.visible_text):
-                raise StoryContractError(
-                    f"{old_scene.scene_id} 修订不得改变画面文字条目数量"
+                usage += response.usage
+                rejected_value = response.value
+                validate(response.value)
+            except StoryProviderResponseError as exc:
+                usage += exc.usage
+                error: Exception = exc
+            except (StoryContractError, UnsafeStoryError) as exc:
+                error = exc
+            else:
+                return response.value, usage
+
+            if attempt >= self._generation_retries:
+                raise error
+            messages = list(base_messages)
+            if rejected_value is not None:
+                messages.append(
+                    ChatMessage(
+                        role="assistant",
+                        content=rejected_value.model_dump_json(
+                            ensure_ascii=False
+                        ),
+                    )
                 )
-            new_scene.scene_id = old_scene.scene_id
-            new_scene.beat_id = old_scene.beat_id
-            new_scene.mode = old_scene.mode
-            new_scene.visible_character_ids = old_scene.visible_character_ids.copy()
-            for old_action, new_action in zip(
-                old_scene.present_actions,
-                new_scene.present_actions,
-                strict=True,
-            ):
-                new_action.participant_ids = old_action.participant_ids.copy()
-            for old_text, new_text in zip(
-                old_scene.visible_text,
-                new_scene.visible_text,
-                strict=True,
-            ):
-                new_text.content = old_text.content
+            messages.append(
+                ChatMessage(
+                    role="user",
+                    content=(
+                        "上一份输出未满足基本契约。保留所有合格内容，"
+                        "只修正列出的问题。"
+                        f"问题：{error}。不要解释，只返回完整 schema 数据。"
+                    ),
+                )
+            )
+        raise AssertionError("unreachable")

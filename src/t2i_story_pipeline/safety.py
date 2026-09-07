@@ -49,13 +49,19 @@ _CONSENT = re.compile(
 )
 
 
-def validate_source_story(text: str) -> None:
+def validate_source_story(
+    text: str,
+    *,
+    require_intimate_consent: bool = False,
+) -> None:
     if match := _current_minor_match(text):
         raise UnsafeStoryError(
             f"故事人物必须明确成年，检测到未成年或年龄模糊表达：{match.group(0)}"
         )
     _validate_no_coercive_sexual_content(text)
-    if _INTIMACY.search(text) and not _CONSENT.search(text):
+    if (
+        require_intimate_consent or _INTIMACY.search(text)
+    ) and not _CONSENT.search(text):
         raise UnsafeStoryError("亲密互动必须在故事中明确表达双方合意、回应或可随时停止")
 
 

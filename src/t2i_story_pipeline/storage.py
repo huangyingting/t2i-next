@@ -1,4 +1,4 @@
-"""Publish completed story prompts without partial file contents."""
+"""Publish completed narrative prompts without partial file contents."""
 
 from __future__ import annotations
 
@@ -15,7 +15,6 @@ from t2i_story_pipeline.models import StoryResult
 @dataclass(frozen=True, slots=True)
 class PublishedStory:
     json_file: Path
-    prose_file: Path
     prompt_file: Path
 
 
@@ -25,19 +24,12 @@ def publish_story(
 ) -> PublishedStory:
     output_directory = output_directory.resolve()
     json_file = output_directory / f"story-{result.run_id}.json"
-    prose_file = output_directory / f"story-{result.run_id}.prose.txt"
-    prompt_file = output_directory / f"story-{result.run_id}.prompt.txt"
-    prose_text = (
-        "\n".join(
-            narrative.prose for theme in result.themes for narrative in theme.narratives
-        )
-        + "\n"
-    )
+    prompt_file = output_directory / f"story-{result.run_id}.txt"
     prompt_text = (
         "\n".join(
-            narrative.prompt
+            frame.prose
             for theme in result.themes
-            for narrative in theme.narratives
+            for frame in theme.frames
         )
         + "\n"
     )
@@ -52,15 +44,10 @@ def publish_story(
             )
             + "\n",
         )
-        _atomic_write(prose_file, prose_text)
         _atomic_write(prompt_file, prompt_text)
     except OSError as exc:
         raise StoryStorageError(f"无法发布故事提示词：{exc}") from exc
-    return PublishedStory(
-        json_file=json_file,
-        prose_file=prose_file,
-        prompt_file=prompt_file,
-    )
+    return PublishedStory(json_file=json_file, prompt_file=prompt_file)
 
 
 def _atomic_write(path: Path, text: str) -> None:

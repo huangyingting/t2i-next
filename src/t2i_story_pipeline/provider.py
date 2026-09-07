@@ -34,7 +34,7 @@ from t2i_story_pipeline.models import (
 class ChatMessage(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    role: Literal["system", "user"]
+    role: Literal["system", "user", "assistant"]
     content: str
 
 

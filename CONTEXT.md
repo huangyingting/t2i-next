@@ -54,52 +54,48 @@ The user's prose account of time, place, adult characters, relationships,
 interaction, action, emotion, environment, camera intent, and lighting intent.
 _Avoid_: Brief, configuration
 
-**Story Blueprint**:
-The run-wide interpretation of one Story Description. It owns the cast,
-relationships, ordered Story Beats, setting, atmosphere, and cinematography.
-_Avoid_: Foundation, Theme
+**Story Content Level**:
+The requested visible-content floor for every Narrative Frame: `aesthetic`,
+`erotic`, or `hardcore`. It changes authoring instructions, never the adult
+consent safety contract. Only the selected level is compiled into provider
+prompts.
+_Avoid_: Legacy Content Level, safety mode
 
-**Story Beat**:
-One causal unit containing a current action, visible response, emotional turn,
-and visible result.
-_Avoid_: Story Shot, Frame
-
-**Creative Intent**:
-The thematic soul of one Narrative Theme. It owns one emotional core,
-narrative tension, decisive moment, story-derived visual motif, visible motif
-progression, and explicit restraint. It decides what details matter and what
-attractive but irrelevant details must be omitted.
-_Avoid_: Style preset, mood list, detail expansion
+**Era Consistency**:
+The requirement that every visible object, material, technology, garment,
+title, and expression agree with the Story Description's time, place, and
+social setting. Explicit time travel, alternate history, or intentional
+anachronism in the Story Description overrides ordinary historical fidelity.
+_Avoid_: Exact-date invention, silent modernization
 
 **Narrative Theme**:
-One materially distinct creative interpretation of the shared Story Blueprint.
-It owns one Creative Intent and exactly the requested ordered Narrative Scenes.
-Narrative Themes may not differ only by numbering, adjectives, color, or camera
-terminology.
+One micro-story concept derived from the Story Description. It owns a short
+title, premise, and concise style phrase that identifies the event, character
+tension, decisive moment, and visual mode. Differences between Narrative
+Themes come from story events rather than prop, color, or camera substitutions.
+The premise is a bounded story seed, not a scene-by-scene action list.
 _Avoid_: Legacy Theme, variant label
 
-**Narrative Scene**:
-One ordered cinematic account and independently renderable projection of a
-Story Beat. It owns a narrative mode, temporal-spatial opening, environmental
-evidence, character entry, verbatim source context, one current action and its
-visible response, material feedback, one static camera composition, visible
-sensory evidence, and thematic closure. Scene length follows narrative need;
-the contract limits structural repetition rather than prose length.
-_Avoid_: Story Shot, Frame, Theme
+**Narrative Frame**:
+One final, independently renderable prose paragraph. It naturally integrates
+time and place, event-bearing environment, a complete restatement of every
+visible adult character, one static pose and one decisive action with visible
+response and physical result, then an explicit camera sentence and light
+sentence. It has no intermediate visual-specification fields and needs no
+renderer.
+Its setup states identity, goal, deadline, and consequence as static causal
+facts; new evidence and relationship changes occur only in the decisive action.
+_Avoid_: Narrative Scene, Story Shot, structured prompt
 
-**Visible Text**:
-Literal text that must appear in one Narrative Scene, together with its
-physical carrier, placement, and visual appearance. Its content is immutable
-through revision and is rendered inside English double quotes.
-_Avoid_: Caption, prose quotation
+**Narrative Sequence**:
+The ordered one-to-six Narrative Frames belonging to one Narrative Theme.
+Together they form a micro-story while each frame remains independently
+understandable.
+_Avoid_: Review cycle, storyboard schema
 
-**Narrative Review**:
-The typed quality assessment of every Narrative Scene across temporal-spatial
-grounding, environmental storytelling, causal action, physical feedback,
-cinematography integration, sensory visualization, thematic closure, and
-language coherence, plus creative unity and story specificity. Any score below
-four requires an actionable issue and a revision before publication. Review
-receives the authoritative Narrative Sequence rather than duplicate rendered
-projections; revision and re-review operate only on failed scenes before Studio
-merges them into the complete sequence.
-_Avoid_: General feedback, critic prose
+**Quality Feedback**:
+Non-blocking diagnostics for a Narrative Theme or Narrative Frame. It records
+prompt-quality deviations in the Story Result for evaluation and future prompt
+improvement, but never rejects or revises generated prose. Schema, identity,
+count, and safety failures remain hard contract errors instead.
+_Avoid_: Quality gate, review stage, revision request

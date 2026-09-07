@@ -60,6 +60,19 @@ def test_story_accepts_consensual_adult_intimacy() -> None:
     )
 
 
+def test_explicit_content_level_requires_consent_in_source_story() -> None:
+    with pytest.raises(UnsafeStoryError, match="必须在故事中明确"):
+        validate_source_story(
+            "两名三十岁的成年人站在卧室内。",
+            require_intimate_consent=True,
+        )
+
+    validate_source_story(
+        "两名三十岁的成年人自愿互动、彼此回应且随时可以停止。",
+        require_intimate_consent=True,
+    )
+
+
 def test_generated_story_allows_adult_memory_of_youth() -> None:
     validate_generated_story("两名三十多岁的成年人回忆少年时代的旧车站。")
 

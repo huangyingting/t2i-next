@@ -2,30 +2,44 @@
 
 ## 独立故事生成器
 
-`story` 分支新增完全独立的 `t2i_story_pipeline`。它不复用下文旧管线的
+`t2i_story_pipeline` 是完全独立的极简叙事生成器。它不复用下文旧管线的
 Foundation、Theme、Frame、规则、checkpoint 或 renderer，而是从一段故事描述
-直接生成共享 Story Blueprint、彼此不同的 Narrative Themes，以及每个主题
-六个连续 Narrative Scenes：
+直接生成彼此不同的微型故事主题，以及每个主题一至六段最终叙事提示词：
 
 ```bash
 uv run t2i-story generate \
   "秋夜，两名三十多岁的成年人在旧车站重逢。他们确认彼此身份后一起寻找遗失的行李，气氛由警惕转为释然。湿润月台反射暖色站灯，使用平视中景和侧后方灯光。" \
   --themes 100 \
-  --frames 6
+  --frames 6 \
+  --content-level erotic \
+  --concurrency 10
 ```
 
 输出写入 `story-prompts/`：
 
-- `story-<run-id>.json`：Story Blueprint、Creative Intents、Narrative Scenes、十维评审、
-  修订次数和 token usage；
-- `story-<run-id>.prose.txt`：每行一段连续电影化场景叙事；
-- `story-<run-id>.prompt.txt`：每行一条可独立渲染的结构化提示词。
+- `story-<run-id>.json`：请求、主题、最终 frames、非阻断质量反馈和 token usage；
+- `story-<run-id>.txt`：每行一段可独立渲染的最终故事画面。
 
-每个 Narrative Theme 都定义情感核心、叙事张力、决定性瞬间、视觉母题、
-母题演进和主动取舍。每个画面经过十维叙事评审；除时空、环境、因果、
-物理、摄影、感官、主题和语言外，还检查创意统一性与故事独有性。
-低于发布标准时，系统把 typed feedback 交回修订阶段并再次评审。
-主题只有编号不同、主题间画面重复或同一主题内画面重复时会直接拒绝发布。
+每个 Narrative Frame 只有 `frame_id` 和一段无换行的 `prose`。每帧以主题选择的
+简短风格开头，重新完整描写所有人物，只保留一个静态瞬间和一个决定性动作，并以
+明确的镜头句、光线句收束。每帧用一句静态因果交代人物身份与关系、当前目标、
+期限和失败后果；真正的新线索或关系转折只发生在唯一动作句。年代地点、环境证据、
+人物与前因、动作回应、物理结果、摄影和氛围自然融为一个段落，不输出字段标签。
+本地仅以数量、ID、typed schema 和安全规则阻断生成。静态画面形状、来源忠实度、
+镜头、光线、动作链与重复度检查只写入 JSON 的 `quality_feedback`，用于评估输出并
+继续改进初始 prompt；它们不阻止发布，也不产生额外 provider 调用。
+每帧必须重新交代年代、地点与当前时刻；建筑、陈设、器物、材料、服装、发型、
+交通、通信、照明、社会称谓和人物用语必须符合该时代与地域。不确定时采用保守的
+时代通用描述。历史故事出现高置信度现代事物时会写入非阻断反馈；Story Description
+明确要求穿越、架空或时代错置时允许有意混搭。服装冷暖、植物与取暖方式还必须
+符合季节，光源必须符合时辰，官职、礼仪和称谓必须属于正确朝代。
+
+独立故事分支支持 `--content-level aesthetic|erotic|hardcore`。默认
+`aesthetic` 以故事和构图为主，不主动增加性内容；`erotic` 要求可见但非露骨的
+成人裸露与双方主动亲密接触；`hardcore` 要求直接呈现明确的成人性行为。后两级
+必须在 Story Description 中明确清醒、自愿、持续回应和可随时停止。三个等级都
+严格限制为二十一岁以上成年人，并禁止胁迫、伤害与无法退出的互动。生成结果未达到
+所选等级或越级时会写入非阻断 `quality_feedback`，不会额外调用 provider。
 
 Provider 使用独立的 `STORY_OPENAI_*` 环境变量；完整说明见
 [独立故事生成器](docs/story-pipeline.md)。
