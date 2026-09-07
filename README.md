@@ -1,5 +1,35 @@
 # t2i-prompt-pipeline
 
+## 独立故事生成器
+
+`story` 分支新增完全独立的 `t2i_story_pipeline`。它不复用下文旧管线的
+Foundation、Theme、Frame、规则、checkpoint 或 renderer，而是从一段故事描述
+直接生成共享 Story Blueprint、彼此不同的 Narrative Themes，以及每个主题
+六个连续 Narrative Scenes：
+
+```bash
+uv run t2i-story generate \
+  "秋夜，两名三十多岁的成年人在旧车站重逢。他们确认彼此身份后一起寻找遗失的行李，气氛由警惕转为释然。湿润月台反射暖色站灯，使用平视中景和侧后方灯光。" \
+  --themes 100 \
+  --frames 6
+```
+
+输出写入 `story-prompts/`：
+
+- `story-<run-id>.json`：Story Blueprint、Creative Intents、Narrative Scenes、十维评审、
+  修订次数和 token usage；
+- `story-<run-id>.prose.txt`：每行一段连续电影化场景叙事；
+- `story-<run-id>.prompt.txt`：每行一条可独立渲染的结构化提示词。
+
+每个 Narrative Theme 都定义情感核心、叙事张力、决定性瞬间、视觉母题、
+母题演进和主动取舍。每个画面经过十维叙事评审；除时空、环境、因果、
+物理、摄影、感官、主题和语言外，还检查创意统一性与故事独有性。
+低于发布标准时，系统把 typed feedback 交回修订阶段并再次评审。
+主题只有编号不同、主题间画面重复或同一主题内画面重复时会直接拒绝发布。
+
+Provider 使用独立的 `STORY_OPENAI_*` 环境变量；完整说明见
+[独立故事生成器](docs/story-pipeline.md)。
+
 这个工具把文生图内容分成共享 Foundation 和两层具体画面事实：
 
 - `StyleConstraints`：保存 brief 明示且逐字复制的作品或虚构世界、导演、艺术家、

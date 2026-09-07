@@ -24,9 +24,10 @@ dev = [
 
 [project.scripts]
 t2i-prompts = "t2i_prompt_pipeline.cli:app"
+t2i-story = "t2i_story_pipeline.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/t2i_prompt_pipeline"]
+packages = ["src/t2i_prompt_pipeline", "src/t2i_story_pipeline"]
 
 [tool.pytest.ini_options]
 addopts = "-q"
@@ -42,6 +43,7 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.per-file-ignores]
 # Typer builds its CLI from call expressions in argument defaults.
 "src/t2i_prompt_pipeline/cli.py" = ["B008"]
+"src/t2i_story_pipeline/cli.py" = ["B008"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["t2i_prompt_pipeline", "tests"]
