@@ -67,14 +67,18 @@ Story Blueprint 只保存所有主题共享的故事事实。每个 Narrative Th
 
 `interpret`、`themes` 和 `scenes` 若违反来源、语言、静态画面或可成像契约，
 Studio 会把具体问题反馈给 provider 并执行有界重试；连续违规才会失败关闭。
+失败响应携带的 provider usage 也计入最终 token 总量。
 
 十个评审维度是时空落地、环境叙事、因果动作、物理反馈、摄影叙事整合、
 感官视觉化、主题收束、语言连贯、创意统一性和故事独有性。
 每项满分 5 分，4 分为发布标准。
 任何低于 4 分的维度必须产生包含 `problem` 和 `required_change` 的 typed issue。
 
-系统把当前 Narrative Sequence 和 issues 发送给 `revise`，要求只修正低分部分，
-然后重新执行 `review`。默认最多修订两次；仍未达标则失败，不发布低质量结果。
+`review` 只接收 authoritative Narrative Sequence，不重复上传由本地 renderer
+确定性生成的 prose 与 prompt。系统只把低分 scenes 及其 issues 发送给
+`revise`，并且只重新评审这些 scenes；通过的 scenes 保留在 Studio 内部，
+最终重新合并为完整 Narrative Sequence。默认最多修订两次；仍未达标则失败，
+不发布低质量结果。
 
 本地 renderer 按固定顺序生成两种输出：
 
@@ -82,6 +86,9 @@ Studio 会把具体问题反馈给 provider 并执行有界重试；连续违规
   材质物理 → 摄影光线 → 感官证据 → 主题收束；
 - 结构化 prompt：创意主线、时间地点、人物、调度、互动动作、情绪主题、
   环境、摄影和光线。
+
+每帧 prompt 保留当前场景需要的完整细节，但不会重复整组六帧
+`motif_progression`。系统不设置统一的 prose 短篇幅目标；复杂场景可以按需展开。
 
 画面中的招牌、信件、屏幕或海报文字使用结构化 `visible_text` 保存。
 `content` 必须逐字保留，renderer 会用英文双引号括起文字，并同时输出其

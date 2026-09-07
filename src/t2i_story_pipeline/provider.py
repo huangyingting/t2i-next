@@ -215,23 +215,29 @@ class OpenAIStoryModel(StoryModel):
             content = choice["message"]["content"]
         except (ValueError, KeyError, IndexError, TypeError) as exc:
             raise StoryProviderResponseError(
-                f"{stage.value} 返回了不支持的响应结构"
+                f"{stage.value} 返回了不支持的响应结构",
+                usage=usage,
             ) from exc
         if not isinstance(content, str) or not content.strip():
-            raise StoryProviderResponseError(f"{stage.value} 返回了空内容")
+            raise StoryProviderResponseError(
+                f"{stage.value} 返回了空内容",
+                usage=usage,
+            )
         try:
             value = response_model.model_validate_json(content)
         except ValidationError as exc:
             if finish_reason == "length":
                 raise StoryProviderResponseError(
-                    f"{stage.value} 输出达到 token 上限"
+                    f"{stage.value} 输出达到 token 上限",
+                    usage=usage,
                 ) from exc
             issues = "; ".join(
                 f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}"
                 for error in exc.errors()
             )
             raise StoryProviderResponseError(
-                f"{stage.value} 返回内容不符合 {response_model.__name__}: {issues}"
+                f"{stage.value} 返回内容不符合 {response_model.__name__}: {issues}",
+                usage=usage,
             ) from exc
         return ModelResponse(value=value, usage=usage)
 

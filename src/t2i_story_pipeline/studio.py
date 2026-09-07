@@ -101,6 +101,7 @@ class StoryStudio:
                     max_output_tokens=6000,
                 )
             except StoryProviderResponseError as exc:
+                usage += exc.usage
                 if attempt >= self._generation_retries:
                     raise
                 messages = self._contract_retry_messages(
@@ -163,6 +164,7 @@ class StoryStudio:
                         max_output_tokens=6000,
                     )
                 except StoryProviderResponseError as exc:
+                    usage += exc.usage
                     if attempt >= self._generation_retries:
                         raise
                     messages = self._contract_retry_messages(
@@ -217,6 +219,8 @@ class StoryStudio:
         )
         reviews: list[NarrativeReview] = []
         revision_count = 0
+        review_scope = sequence
+        previous_full_review: NarrativeReview | None = None
         while True:
             review_response = await self._model.generate(
                 stage=StoryStage.REVIEW,
@@ -224,49 +228,75 @@ class StoryStudio:
                     request,
                     blueprint,
                     theme,
-                    sequence,
-                    narratives,
+                    review_scope,
                 ),
-                response_model=exact_narrative_review_model(request.frames_per_theme),
+                response_model=exact_narrative_review_model(
+                    len(review_scope.scenes)
+                ),
                 max_output_tokens=16000,
             )
-            review = review_response.value
-            if not isinstance(review, NarrativeReview):
+            scoped_review = review_response.value
+            if not isinstance(scoped_review, NarrativeReview):
                 raise StoryContractError("故事模型在 review 阶段返回了错误类型")
-            self._validate_review(sequence, review)
-            reviews.append(review)
+            self._validate_review(review_scope, scoped_review)
+            full_review = (
+                scoped_review
+                if previous_full_review is None
+                else self._merge_review(
+                    sequence,
+                    previous_full_review,
+                    scoped_review,
+                )
+            )
+            reviews.append(full_review)
             usage += review_response.usage
-            if review.meets_threshold():
+            if full_review.meets_threshold():
                 break
             if revision_count >= self._max_revisions:
                 raise StoryContractError(
                     f"{theme.theme_id} 叙事评审未达到发布标准，且修订次数已耗尽"
                 )
+            failed_scene_ids = self._failed_scene_ids(full_review)
+            revision_scope = self._select_sequence(
+                sequence,
+                failed_scene_ids,
+            )
+            revision_review = self._select_review(
+                full_review,
+                failed_scene_ids,
+            )
             revision_response = await self._model.generate(
                 stage=StoryStage.REVISE,
                 messages=revision_messages(
                     request,
                     blueprint,
                     theme,
-                    sequence,
-                    review,
+                    revision_scope,
+                    revision_review,
                 ),
-                response_model=exact_narrative_sequence_model(request.frames_per_theme),
+                response_model=exact_narrative_sequence_model(
+                    len(revision_scope.scenes)
+                ),
                 max_output_tokens=10000,
             )
             revised = revision_response.value
             if not isinstance(revised, NarrativeSequence):
                 raise StoryContractError("故事模型在 revise 阶段返回了错误类型")
-            self._restore_revision_identity(sequence, revised)
-            self._validate_sequence(request, blueprint, revised)
-            self._validate_output_language(request, revised, stage="修订场景")
-            validate_generated_story(revised.model_dump_json(ensure_ascii=False))
-            sequence = revised
+            self._restore_revision_identity(revision_scope, revised)
+            sequence = self._merge_sequence(sequence, revised)
+            self._validate_sequence(request, blueprint, sequence)
+            self._validate_output_language(request, sequence, stage="修订场景")
+            validate_generated_story(sequence.model_dump_json(ensure_ascii=False))
             narratives = render_narratives(
                 blueprint,
                 theme,
                 sequence,
                 request.output_language,
+            )
+            previous_full_review = full_review
+            review_scope = self._select_sequence(
+                sequence,
+                failed_scene_ids,
             )
             revision_count += 1
             usage += revision_response.usage
@@ -301,6 +331,7 @@ class StoryStudio:
                     max_output_tokens=10000,
                 )
             except StoryProviderResponseError as exc:
+                usage += exc.usage
                 if attempt >= self._generation_retries:
                     raise
                 messages = self._contract_retry_messages(
@@ -667,6 +698,85 @@ class StoryStudio:
                 raise StoryContractError(
                     f"{scene_review.scene_id} 的低分维度与 issues 不一致"
                 )
+
+    @staticmethod
+    def _failed_scene_ids(review: NarrativeReview) -> list[str]:
+        return [
+            scene_review.scene_id
+            for scene_review in review.scene_reviews
+            if not scene_review.scores.meets_threshold()
+            or scene_review.issues
+        ]
+
+    @staticmethod
+    def _select_sequence(
+        sequence: NarrativeSequence,
+        scene_ids: list[str],
+    ) -> NarrativeSequence:
+        selected = set(scene_ids)
+        return NarrativeSequence(
+            scenes=[
+                scene
+                for scene in sequence.scenes
+                if scene.scene_id in selected
+            ]
+        )
+
+    @staticmethod
+    def _select_review(
+        review: NarrativeReview,
+        scene_ids: list[str],
+    ) -> NarrativeReview:
+        selected = set(scene_ids)
+        return NarrativeReview(
+            scene_reviews=[
+                scene_review
+                for scene_review in review.scene_reviews
+                if scene_review.scene_id in selected
+            ],
+            overall_summary=review.overall_summary,
+        )
+
+    @staticmethod
+    def _merge_sequence(
+        sequence: NarrativeSequence,
+        revised: NarrativeSequence,
+    ) -> NarrativeSequence:
+        replacements = {
+            scene.scene_id: scene
+            for scene in revised.scenes
+        }
+        return NarrativeSequence(
+            scenes=[
+                replacements.get(scene.scene_id, scene)
+                for scene in sequence.scenes
+            ]
+        )
+
+    @staticmethod
+    def _merge_review(
+        sequence: NarrativeSequence,
+        previous: NarrativeReview,
+        updated: NarrativeReview,
+    ) -> NarrativeReview:
+        replacements = {
+            scene_review.scene_id: scene_review
+            for scene_review in updated.scene_reviews
+        }
+        previous_by_id = {
+            scene_review.scene_id: scene_review
+            for scene_review in previous.scene_reviews
+        }
+        return NarrativeReview(
+            scene_reviews=[
+                replacements.get(
+                    scene.scene_id,
+                    previous_by_id[scene.scene_id],
+                )
+                for scene in sequence.scenes
+            ],
+            overall_summary=updated.overall_summary,
+        )
 
     @staticmethod
     def _restore_revision_identity(

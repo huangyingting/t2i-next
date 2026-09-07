@@ -1,5 +1,7 @@
 """Expected failures for the standalone story pipeline."""
 
+from t2i_story_pipeline.models import TokenUsage
+
 
 class StoryPipelineError(Exception):
     """Base class for failures that callers may present to users."""
@@ -27,6 +29,15 @@ class StoryProviderAuthenticationError(StoryProviderError):
 
 class StoryProviderResponseError(StoryProviderError):
     """The story model returned an unsupported response."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        usage: TokenUsage | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.usage = usage or TokenUsage()
 
 
 class StoryStorageError(StoryPipelineError):

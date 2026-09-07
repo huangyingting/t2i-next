@@ -5,6 +5,7 @@ import json
 import httpx
 import pytest
 
+from t2i_story_pipeline.errors import StoryProviderResponseError
 from t2i_story_pipeline.models import StoryBlueprint, StoryStage
 from t2i_story_pipeline.prompts import interpretation_messages
 from t2i_story_pipeline.provider import (
@@ -122,3 +123,49 @@ async def test_story_provider_accepts_valid_json_when_finish_reason_is_length(
     await client.aclose()
 
     assert response.value == blueprint
+
+
+@pytest.mark.asyncio
+async def test_story_provider_preserves_usage_on_invalid_structured_output(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {"content": '{"title":"incomplete"}'},
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 20,
+                    "completion_tokens": 10,
+                    "total_tokens": 30,
+                },
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+        ),
+        client=client,
+    )
+
+    with pytest.raises(StoryProviderResponseError) as error:
+        await provider.generate(
+            stage=StoryStage.INTERPRET,
+            messages=interpretation_messages(make_story_request()),
+            response_model=StoryBlueprint,
+            max_output_tokens=2000,
+        )
+    await client.aclose()
+
+    assert error.value.usage.total_tokens == 30

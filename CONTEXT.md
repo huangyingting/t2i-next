@@ -81,9 +81,10 @@ _Avoid_: Legacy Theme, variant label
 **Narrative Scene**:
 One ordered cinematic account and independently renderable projection of a
 Story Beat. It owns a narrative mode, temporal-spatial opening, environmental
-evidence, character entry, optional causal context, current actions and
-visible responses, material feedback, one static camera composition, visible
-sensory evidence, and thematic closure.
+evidence, character entry, verbatim source context, one current action and its
+visible response, material feedback, one static camera composition, visible
+sensory evidence, and thematic closure. Scene length follows narrative need;
+the contract limits structural repetition rather than prose length.
 _Avoid_: Story Shot, Frame, Theme
 
 **Visible Text**:
@@ -97,5 +98,8 @@ The typed quality assessment of every Narrative Scene across temporal-spatial
 grounding, environmental storytelling, causal action, physical feedback,
 cinematography integration, sensory visualization, thematic closure, and
 language coherence, plus creative unity and story specificity. Any score below
-four requires an actionable issue and a revision before publication.
+four requires an actionable issue and a revision before publication. Review
+receives the authoritative Narrative Sequence rather than duplicate rendered
+projections; revision and re-review operate only on failed scenes before Studio
+merges them into the complete sequence.
 _Avoid_: General feedback, critic prose

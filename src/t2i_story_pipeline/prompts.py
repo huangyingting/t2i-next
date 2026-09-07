@@ -10,7 +10,6 @@ from t2i_story_pipeline.models import (
     NarrativeSequence,
     NarrativeTheme,
     OutputLanguage,
-    RenderedNarrative,
     StoryBlueprint,
     StoryRequest,
 )
@@ -272,7 +271,6 @@ def review_messages(
     blueprint: StoryBlueprint,
     theme: NarrativeTheme,
     sequence: NarrativeSequence,
-    narratives: list[RenderedNarrative],
 ) -> list[ChatMessage]:
     system = "\n".join(
         (
@@ -288,7 +286,7 @@ def review_messages(
             "issue 必须指出具体问题和可直接执行的 required_change。",
             "problem 不超过 120 个汉字，required_change 不超过 160 个汉字；"
             "只写一个最关键且可在当前 schema 内完成的修正。",
-            "检查 prose 是否遵循：时空、环境证据、人物进入与前因、"
+            "检查每个 scene 是否遵循：时空、环境证据、人物进入与前因、"
             "动作反馈、材质物理、摄影光线、感官证据、主题收束。",
             "抽象情绪、声音、气味或温度若没有可成像证据，"
             "sensory_visualization 不得超过 3 分。",
@@ -300,10 +298,10 @@ def review_messages(
             "漂亮话，story_specificity 不得超过 3 分。",
             "若画面违反 restraint，或母题没有按 motif_progression 演进，"
             "creative_unity 不得超过 3 分。",
-            "若 prose 直接复述 emotional_core、visual_motif 或"
+            "若 scene 直接复述 emotional_core、visual_motif 或"
             "motif_progression，而不是以可见事实体现，creative_unity 和"
             "language_coherence 均不得超过 3 分。",
-            "若 prose 或 prompt 泄漏 C01、B01、S01 等机器 ID，"
+            "若自然语言字段泄漏 C01、B01、S01 等机器 ID，"
             "或中文请求混入非专有名词的英文摄影术语，"
             "language_coherence 不得超过 3 分。",
             "若生成内容新增用户未提供的姓名、职业、明确年份、旧日约定"
@@ -327,9 +325,6 @@ def review_messages(
                     "story_blueprint": blueprint.model_dump(mode="json"),
                     "narrative_theme": theme.model_dump(mode="json"),
                     "narrative_sequence": sequence.model_dump(mode="json"),
-                    "rendered_narratives": [
-                        item.model_dump(mode="json") for item in narratives
-                    ],
                 },
                 ensure_ascii=False,
             ),
@@ -347,10 +342,11 @@ def revision_messages(
     system = "\n".join(
         (
             "你是电影场景叙事修订导演。根据 typed review "
-            "返回完整修订后的 NarrativeSequence。",
+            "只返回输入 current_sequence 中需要修订的 scenes。",
             _SAFETY_RULES,
             "逐项落实每条 issue.required_change；不得删除、合并、"
-            "重排或新增 scene_id、beat_id、人物与核心故事事实。",
+            "重排或新增输入范围内的 scene_id、beat_id、人物与核心故事事实。",
+            "不要补写 current_sequence 未包含的其他 scenes，Studio 会保留并合并它们。",
             "不得修改任何 visible_text.content，只可修正其承载物、位置或外观描述。",
             "没有 issue 的场景和维度保持不变，避免无关改写。",
             "所有修改必须继续服务 NarrativeTheme 的创意核心、决定性瞬间、"

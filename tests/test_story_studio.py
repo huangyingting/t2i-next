@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Iterable
 
 import pytest
@@ -10,6 +11,7 @@ from t2i_story_pipeline.errors import (
 )
 from t2i_story_pipeline.models import (
     CreativeIntent,
+    NarrativeSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
     OutputLanguage,
@@ -115,6 +117,25 @@ async def test_studio_allocates_full_budget_to_ten_dimension_review() -> None:
 
     review_index = model.stages.index(StoryStage.REVIEW)
     assert model.output_budgets[review_index] == 16000
+
+
+@pytest.mark.asyncio
+async def test_studio_reviews_sequence_without_render_duplicates() -> None:
+    model = FakeStoryModel(
+        [
+            make_story_blueprint(),
+            make_narrative_theme_batch(),
+            make_narrative_sequence(),
+            make_narrative_review(passing=True),
+        ]
+    )
+
+    await StoryStudio(model).generate(make_story_request())
+
+    review_index = model.stages.index(StoryStage.REVIEW)
+    review_payload = json.loads(model.messages[review_index][1].content)
+    assert "narrative_sequence" in review_payload
+    assert "rendered_narratives" not in review_payload
 
 
 @pytest.mark.asyncio
@@ -383,7 +404,14 @@ async def test_studio_retries_provider_schema_failure_for_scenes() -> None:
         [
             make_story_blueprint(),
             make_narrative_theme_batch(),
-            StoryProviderResponseError("场景内容必须能够直接成像"),
+            StoryProviderResponseError(
+                "场景内容必须能够直接成像",
+                usage=TokenUsage(
+                    prompt_tokens=20,
+                    completion_tokens=10,
+                    total_tokens=30,
+                ),
+            ),
             make_narrative_sequence(),
             make_narrative_review(passing=True),
         ]
@@ -395,6 +423,7 @@ async def test_studio_retries_provider_schema_failure_for_scenes() -> None:
     assert model.stages.count(StoryStage.SCENES) == 2
     second_scene_call = model.stages.index(StoryStage.SCENES) + 1
     assert "必须能够直接成像" in model.messages[second_scene_call][-1].content
+    assert result.usage.total_tokens == 90
 
 
 @pytest.mark.asyncio
@@ -405,6 +434,9 @@ async def test_studio_revises_narrative_from_typed_review_feedback() -> None:
     revised.scenes[0].present_actions[
         0
     ].visible_response = "车轮轻晃，积水沿铁轨荡开细小波纹。"
+    revised = NarrativeSequence(scenes=[revised.scenes[0]])
+    passing_rereview = make_narrative_review(passing=True)
+    passing_rereview.scene_reviews = passing_rereview.scene_reviews[:1]
     model = FakeStoryModel(
         [
             make_story_blueprint(),
@@ -412,7 +444,7 @@ async def test_studio_revises_narrative_from_typed_review_feedback() -> None:
             initial,
             make_narrative_review(passing=False),
             revised,
-            make_narrative_review(passing=True),
+            passing_rereview,
         ]
     )
 
@@ -435,12 +467,49 @@ async def test_studio_revises_narrative_from_typed_review_feedback() -> None:
 
 
 @pytest.mark.asyncio
+async def test_studio_revises_and_rereviews_only_failed_scenes() -> None:
+    initial = make_narrative_sequence()
+    initial.scenes[0].present_actions[0].visible_response = "皮箱没有立即移动。"
+    revised_scene = initial.scenes[0].model_copy(deep=True)
+    revised_scene.present_actions[
+        0
+    ].visible_response = "车轮轻晃，积水沿铁轨荡开细小波纹。"
+    revised = NarrativeSequence(scenes=[revised_scene])
+    passing_rereview = make_narrative_review(passing=True)
+    passing_rereview.scene_reviews = passing_rereview.scene_reviews[:1]
+    model = FakeStoryModel(
+        [
+            make_story_blueprint(),
+            make_narrative_theme_batch(),
+            initial,
+            make_narrative_review(passing=False),
+            revised,
+            passing_rereview,
+        ]
+    )
+
+    result = await StoryStudio(model).generate(make_story_request())
+
+    final = result.themes[0]
+    assert len(final.sequence.scenes) == 2
+    assert final.sequence.scenes[1] == initial.scenes[1]
+    assert len(final.reviews[1].scene_reviews) == 2
+    revise_index = model.stages.index(StoryStage.REVISE)
+    revise_payload = json.loads(model.messages[revise_index][1].content)
+    assert len(revise_payload["current_sequence"]["scenes"]) == 1
+    second_review_index = len(model.stages) - 1
+    rereview_payload = json.loads(model.messages[second_review_index][1].content)
+    assert len(rereview_payload["narrative_sequence"]["scenes"]) == 1
+
+
+@pytest.mark.asyncio
 async def test_studio_revises_frames_from_creative_unity_feedback() -> None:
     initial = make_narrative_sequence()
     revised = initial.model_copy(deep=True)
     revised.scenes[
         0
     ].lighting_and_color = "站灯沿铁轨形成两条分离光带，在共同握住的提手处汇合。"
+    revised = NarrativeSequence(scenes=[revised.scenes[0]])
     failing_review = make_narrative_review(passing=True)
     failing_review.scene_reviews[0].scores.creative_unity = 2
     failing_review.scene_reviews[0].issues = [
@@ -451,6 +520,8 @@ async def test_studio_revises_frames_from_creative_unity_feedback() -> None:
             required_change="让两条分离光带在共同握住的提手处汇合。",
         )
     ]
+    passing_rereview = make_narrative_review(passing=True)
+    passing_rereview.scene_reviews = passing_rereview.scene_reviews[:1]
     model = FakeStoryModel(
         [
             make_story_blueprint(),
@@ -458,7 +529,7 @@ async def test_studio_revises_frames_from_creative_unity_feedback() -> None:
             initial,
             failing_review,
             revised,
-            make_narrative_review(passing=True),
+            passing_rereview,
         ]
     )
 
@@ -478,6 +549,9 @@ async def test_studio_restores_identity_changed_by_revision_model() -> None:
     revised.scenes[0].beat_id = "B02"
     revised.scenes[0].visible_character_ids = ["C02"]
     revised.scenes[0].present_actions[0].participant_ids = ["C02"]
+    revised = NarrativeSequence(scenes=[revised.scenes[0]])
+    passing_rereview = make_narrative_review(passing=True)
+    passing_rereview.scene_reviews = passing_rereview.scene_reviews[:1]
     model = FakeStoryModel(
         [
             make_story_blueprint(),
@@ -485,7 +559,7 @@ async def test_studio_restores_identity_changed_by_revision_model() -> None:
             initial,
             make_narrative_review(passing=False),
             revised,
-            make_narrative_review(passing=True),
+            passing_rereview,
         ]
     )
 
@@ -501,14 +575,17 @@ async def test_studio_restores_identity_changed_by_revision_model() -> None:
 @pytest.mark.asyncio
 async def test_studio_fails_closed_when_revision_budget_is_exhausted() -> None:
     sequence = make_narrative_sequence()
+    revision = NarrativeSequence(scenes=[sequence.scenes[0]])
+    failing_rereview = make_narrative_review(passing=False)
+    failing_rereview.scene_reviews = failing_rereview.scene_reviews[:1]
     model = FakeStoryModel(
         [
             make_story_blueprint(),
             make_narrative_theme_batch(),
             sequence,
             make_narrative_review(passing=False),
-            sequence,
-            make_narrative_review(passing=False),
+            revision,
+            failing_rereview,
         ]
     )
 

@@ -126,7 +126,6 @@ def _render_narrative_prompt(
                 theme.creative_intent.narrative_tension,
                 theme.creative_intent.decisive_moment,
                 theme.creative_intent.visual_motif,
-                theme.creative_intent.motif_progression,
                 theme.creative_intent.restraint,
             )
         )
@@ -192,7 +191,6 @@ def _render_narrative_prompt(
             theme.creative_intent.narrative_tension,
             theme.creative_intent.decisive_moment,
             theme.creative_intent.visual_motif,
-            theme.creative_intent.motif_progression,
             theme.creative_intent.restraint,
         )
     )

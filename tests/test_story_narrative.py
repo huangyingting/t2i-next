@@ -142,3 +142,15 @@ def test_renderer_replaces_internal_ids_and_avoids_double_restraint() -> None:
     assert "B01" not in rendered.prose
     assert "B03" not in rendered.prose
     assert "舍弃舍弃" not in rendered.prompt
+
+
+def test_renderer_does_not_repeat_full_sequence_progression_in_each_prompt() -> None:
+    theme = make_narrative_theme()
+    rendered = render_narratives(
+        make_story_blueprint(),
+        theme,
+        make_narrative_sequence(frame_count=1),
+    )[0]
+
+    assert theme.creative_intent.visual_motif in rendered.prompt
+    assert theme.creative_intent.motif_progression not in rendered.prompt
