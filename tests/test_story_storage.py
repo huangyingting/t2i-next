@@ -4,6 +4,7 @@ import json
 
 import pytest
 
+from t2i_story_pipeline import persistence
 from t2i_story_pipeline.errors import StoryStorageError
 from t2i_story_pipeline.models import StoryStage, TokenUsage
 from t2i_story_pipeline.provider import StoryProviderSettings
@@ -21,6 +22,28 @@ from tests.story_factories import (
     make_story_result,
     make_theme_batch,
 )
+
+
+def test_durable_mkdir_fsyncs_every_created_directory_parent(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    synced = []
+    monkeypatch.setattr(
+        persistence,
+        "fsync_directory",
+        synced.append,
+    )
+    target = tmp_path / "first" / "second" / "third"
+
+    persistence.durable_mkdir(target)
+
+    assert target.is_dir()
+    assert synced == [
+        tmp_path,
+        tmp_path / "first",
+        tmp_path / "first" / "second",
+    ]
 
 
 def test_publish_story_writes_json_and_one_prompt_file(tmp_path) -> None:

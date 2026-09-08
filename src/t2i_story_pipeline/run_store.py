@@ -31,6 +31,7 @@ from t2i_story_pipeline.models import (
     TokenUsage,
     exact_frame_sequence_model,
 )
+from t2i_story_pipeline.persistence import durable_mkdir, fsync_directory
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.storage import PublishedStory, publish_story
 
@@ -156,21 +157,20 @@ class LocalStoryRunStore:
             output_directory=str(self._output_root),
         )
         try:
-            self._runs_root.mkdir(parents=True, exist_ok=True)
-            _fsync_directory(self._runs_root.parent)
+            durable_mkdir(self._runs_root)
             staging = Path(
                 tempfile.mkdtemp(prefix=f".{run_id}-", dir=self._runs_root)
             )
-            (staging / "themes").mkdir()
-            (staging / "frames").mkdir()
-            (staging / "attempts").mkdir()
+            durable_mkdir(staging / "themes")
+            durable_mkdir(staging / "frames")
+            durable_mkdir(staging / "attempts")
             _write_json(staging / "request.json", request.model_dump(mode="json"))
             _write_json(
                 staging / "manifest.json",
                 manifest.model_dump(mode="json"),
             )
             os.replace(staging, final_directory)
-            _fsync_directory(self._runs_root)
+            fsync_directory(self._runs_root)
         except (OSError, StoryStorageError) as exc:
             if staging is not None and staging.exists():
                 try:
@@ -244,6 +244,10 @@ class LocalStoryRunStore:
                 continue
             try:
                 manifest = self._read_manifest(directory)
+                if manifest.run_id != directory.name:
+                    raise StoryStorageError(
+                        "manifest run_id 与目录名称不匹配"
+                    )
                 request = StoryRequest.model_validate_json(
                     (directory / "request.json").read_text(encoding="utf-8")
                 )
@@ -650,7 +654,7 @@ def _write_json(path: Path, value: object) -> None:
 def _write_text(path: Path, text: str) -> None:
     temporary: Path | None = None
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
+        durable_mkdir(path.parent)
         with tempfile.NamedTemporaryFile(
             mode="w",
             encoding="utf-8",
@@ -664,7 +668,7 @@ def _write_text(path: Path, text: str) -> None:
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary, path)
-        _fsync_directory(path.parent)
+        fsync_directory(path.parent)
     except OSError as exc:
         if temporary is not None:
             try:
@@ -675,14 +679,3 @@ def _write_text(path: Path, text: str) -> None:
                     f"{cleanup_error}"
                 ) from exc
         raise StoryStorageError(f"无法原子写入 {path}：{exc}") from exc
-
-
-def _fsync_directory(path: Path) -> None:
-    try:
-        descriptor = os.open(path, os.O_RDONLY)
-        try:
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
-    except OSError as exc:
-        raise StoryStorageError(f"无法同步目录 {path}：{exc}") from exc

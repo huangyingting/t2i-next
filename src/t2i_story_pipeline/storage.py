@@ -10,6 +10,7 @@ from pathlib import Path
 
 from t2i_story_pipeline.errors import StoryStorageError
 from t2i_story_pipeline.models import StoryResult
+from t2i_story_pipeline.persistence import durable_mkdir, fsync_directory
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,7 +35,7 @@ def publish_story(
         + "\n"
     )
     try:
-        output_directory.mkdir(parents=True, exist_ok=True)
+        durable_mkdir(output_directory)
         _atomic_write(
             json_file,
             json.dumps(
@@ -53,6 +54,7 @@ def publish_story(
 def _atomic_write(path: Path, text: str) -> None:
     temporary: Path | None = None
     try:
+        durable_mkdir(path.parent)
         with tempfile.NamedTemporaryFile(
             mode="w",
             encoding="utf-8",
@@ -66,16 +68,8 @@ def _atomic_write(path: Path, text: str) -> None:
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary, path)
-        _fsync_directory(path.parent)
+        fsync_directory(path.parent)
     except OSError:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
         raise
-
-
-def _fsync_directory(path: Path) -> None:
-    descriptor = os.open(path, os.O_RDONLY)
-    try:
-        os.fsync(descriptor)
-    finally:
-        os.close(descriptor)
