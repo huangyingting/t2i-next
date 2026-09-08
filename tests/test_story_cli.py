@@ -6,6 +6,12 @@ from typer.testing import CliRunner
 
 import t2i_story_pipeline.cli as story_cli
 from t2i_story_pipeline.cli import app
+from t2i_story_pipeline.provider import StoryProviderSettings
+from t2i_story_pipeline.run_store import (
+    LocalStoryRunStore,
+    StoryRunSettings,
+)
+from tests.story_factories import make_story_request
 
 
 def test_story_cli_exposes_generate_command() -> None:
@@ -13,6 +19,8 @@ def test_story_cli_exposes_generate_command() -> None:
 
     assert result.exit_code == 0
     assert "generate" in result.stdout
+    assert "resume" in result.stdout
+    assert "runs" in result.stdout
     assert "从一段故事描述" in result.stdout
 
 
@@ -47,10 +55,25 @@ def test_story_generate_reads_story_description_from_prompt_file(
     )
     captured = {}
 
-    async def fake_generate(request, settings, *, concurrency):
+    async def fake_generate(
+        request,
+        settings,
+        *,
+        concurrency,
+        runs_directory,
+        output_directory,
+    ):
         captured["request"] = request
         captured["concurrency"] = concurrency
-        return object()
+        captured["runs_directory"] = runs_directory
+        captured["output_directory"] = output_directory
+        return SimpleNamespace(
+            run_id="test-run",
+            published=SimpleNamespace(
+                json_file=output_directory / "story.json",
+                prompt_file=output_directory / "story.txt",
+            ),
+        )
 
     monkeypatch.setattr(
         story_cli,
@@ -58,14 +81,6 @@ def test_story_generate_reads_story_description_from_prompt_file(
         lambda: object(),
     )
     monkeypatch.setattr(story_cli, "_generate", fake_generate)
-    monkeypatch.setattr(
-        story_cli,
-        "publish_story",
-        lambda result, output_dir: SimpleNamespace(
-            json_file=output_dir / "story.json",
-            prompt_file=output_dir / "story.txt",
-        ),
-    )
 
     result = CliRunner().invoke(
         app,
@@ -77,6 +92,10 @@ def test_story_generate_reads_story_description_from_prompt_file(
             "2",
             "--male-count",
             "1",
+            "--runs-dir",
+            str(tmp_path / "runs"),
+            "--output-dir",
+            str(tmp_path / "prompts"),
         ],
     )
 
@@ -88,6 +107,9 @@ def test_story_generate_reads_story_description_from_prompt_file(
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
     assert captured["concurrency"] == 8
+    assert captured["runs_directory"] == tmp_path / "runs"
+    assert captured["output_directory"] == tmp_path / "prompts"
+    assert "Run：test-run" in result.output
 
 
 def test_story_generate_rejects_missing_story_input() -> None:
@@ -146,3 +168,74 @@ def test_story_generate_rejects_non_utf8_prompt_file(tmp_path) -> None:
 
     assert result.exit_code != 0
     assert "UTF-8" in result.output
+
+
+def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
+    provider = StoryProviderSettings(model="test-model")
+    store = LocalStoryRunStore(
+        tmp_path / "runs",
+        tmp_path / "prompts",
+    )
+    snapshot = store.create(
+        make_story_request(),
+        StoryRunSettings(provider=provider, concurrency=3),
+    )
+    captured = {}
+
+    async def fake_resume(run_id, current_provider, settings, current_store):
+        captured["run_id"] = run_id
+        captured["provider"] = current_provider
+        captured["settings"] = settings
+        captured["store"] = current_store
+        return SimpleNamespace(
+            run_id=run_id,
+            published=SimpleNamespace(
+                json_file=tmp_path / "prompts" / "story.json",
+                prompt_file=tmp_path / "prompts" / "story.txt",
+            ),
+        )
+
+    monkeypatch.setattr(
+        story_cli,
+        "load_story_provider_settings",
+        lambda: provider,
+    )
+    monkeypatch.setattr(story_cli, "_resume", fake_resume)
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "resume",
+            snapshot.run_id,
+            "--runs-dir",
+            str(tmp_path / "runs"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["run_id"] == snapshot.run_id
+    assert captured["settings"].concurrency == 3
+    assert captured["provider"] == provider
+    assert isinstance(captured["store"], LocalStoryRunStore)
+
+
+def test_story_runs_lists_resumable_command(tmp_path) -> None:
+    store = LocalStoryRunStore(
+        tmp_path / "runs",
+        tmp_path / "prompts",
+    )
+    snapshot = store.create(
+        make_story_request(),
+        StoryRunSettings(
+            provider=StoryProviderSettings(model="test-model")
+        ),
+    )
+
+    result = CliRunner().invoke(
+        app,
+        ["runs", "--runs-dir", str(tmp_path / "runs")],
+    )
+
+    assert result.exit_code == 0
+    assert snapshot.run_id in result.output
+    assert f"t2i-story resume {snapshot.run_id}" in result.output

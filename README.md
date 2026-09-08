@@ -3,8 +3,9 @@
 ## 独立故事生成器
 
 `t2i_story_pipeline` 是完全独立的极简叙事生成器。它不复用下文旧管线的
-Foundation、Theme、Frame、规则、checkpoint 或 renderer，而是从一段故事描述
-直接生成彼此不同的微型故事主题，以及每个主题一至六段最终叙事提示词：
+Foundation、字段化 Theme/Frame、规则或 renderer，而是从一段故事描述直接生成
+彼此不同的微型故事主题，以及每个主题一至六段最终叙事提示词。它使用独立的
+`story-runs/` 保存增量 checkpoint 和运行记录：
 
 ```bash
 uv run t2i-story generate \
@@ -30,6 +31,17 @@ uv run t2i-story generate \
 故事位置参数与 `--prompt-file` 必须且只能提供一个。文件首尾空白会被移除，
 内部换行会原样保留。`--female-count` 和 `--male-count` 可以分别约束每个主题
 及每帧中的成年女性和成年男性人数；省略时遵循 Story Description 明示的人物。
+
+每个 run 在首次 provider 调用前创建。每批 Theme 和每个 Theme 的完整 Frame
+Sequence 都会原子保存；失败或进程退出后，只重新生成缺失部分：
+
+```bash
+uv run t2i-story runs --runs-dir story-runs
+uv run t2i-story resume RUN_ID --runs-dir story-runs
+```
+
+`request.json`、provider/并发/retry/token 配置、generation attempts 和 token
+usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
 
 输出写入 `story-prompts/`：
 

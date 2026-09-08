@@ -38,3 +38,28 @@ class StoryProviderResponseError(StoryProviderError):
 
 class StoryStorageError(StoryPipelineError):
     """A completed story result could not be published."""
+
+
+class StoryRunNotFoundError(StoryStorageError):
+    """The requested story run does not exist."""
+
+
+class StoryRunIncompleteError(StoryPipelineError):
+    """A resumable story run stopped before all checkpoints completed."""
+
+    def __init__(
+        self,
+        run_id: str,
+        *,
+        missing_themes: int,
+        missing_frames: int,
+        causes: tuple[str, ...],
+    ) -> None:
+        self.run_id = run_id
+        self.missing_themes = missing_themes
+        self.missing_frames = missing_frames
+        self.causes = causes
+        super().__init__(
+            f"Run {run_id} 尚未完成：缺少 {missing_themes} 个 Theme、"
+            f"{missing_frames} 个 Frame Sequence；请执行 resume {run_id}"
+        )

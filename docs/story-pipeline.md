@@ -6,10 +6,15 @@ renderer、provider review 或 revision 阶段。
 
 ## Interface
 
-调用者只需要一个 seam：
+调用者只需要一个可恢复的 seam：
 
 ```python
-result = await StoryStudio(model).generate(
+store = LocalStoryRunStore(
+    Path("story-runs"),
+    Path("story-prompts"),
+)
+settings = StoryRunSettings(provider=provider_settings)
+completed = await StoryStudio(model, store, settings).run(
     StoryRequest(
         story="故事要求",
         theme_count=100,
@@ -19,6 +24,17 @@ result = await StoryStudio(model).generate(
         content_level=ContentLevel.EROTIC,
     )
 )
+```
+
+恢复时使用同一个 runs 目录和 manifest 中冻结的 settings：
+
+```python
+snapshot = LocalStoryRunStore(Path("story-runs")).inspect(run_id)
+completed = await StoryStudio(
+    model,
+    LocalStoryRunStore(Path("story-runs")),
+    snapshot.manifest.settings,
+).resume(run_id)
 ```
 
 结果按 Narrative Theme 分组；每个 Narrative Frame 只有：
@@ -34,7 +50,8 @@ result = await StoryStudio(model).generate(
    不存在本地拼接或二次 renderer。
 
 100 themes × 6 frames 的基础调用量是十次 theme batch 加一百次 frame sequence，
-共 110 次 provider 调用。`StoryStudio` 默认最多并发生成十个 frame sequences。
+共 110 次 provider 调用。`StoryStudio` 默认最多并发生成八个 frame sequences。
+resume 只调用缺失的 Theme batch 和 Frame Sequence。
 
 ## Content Level
 
@@ -79,6 +96,34 @@ result = await StoryStudio(model).generate(
 第一次看到的就是完整创作方向；输出只经过结构契约，不因文风或词语触发额外
 生成调用。
 
+## 运行记录与恢复
+
+每个 run 在首次 provider 调用前分配 ID，并写入独立目录：
+
+```text
+story-runs/<run-id>/
+├── request.json
+├── manifest.json
+├── attempts/
+│   └── <operation>-<attempt>.json
+├── themes/
+│   └── T001.json
+├── frames/
+│   └── T001.json
+└── result.json
+```
+
+`manifest.json` 冻结 provider、并发数、generation retry、theme batch size、
+theme/frame token 上限和发布目录。每个成功 Theme 和每个 Theme 的完整 Frame
+Sequence 都独立原子写入并 fsync；attempt 文件保存结果、错误和 token usage。
+checkpoint 文件名、内容 ID、顺序、数量或 schema 不一致时会明确报告损坏，不会
+静默跳过。
+
+同一 run 执行期间持有非阻塞文件锁，避免两个进程同时恢复。失败会保留全部成功
+checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 operation 的错误
+反馈给模型。全部 checkpoint 完成后才写入 `result.json` 并发布 JSON/TXT。
+已完成 run 的 `resume` 直接返回已发布结果，不调用 provider。
+
 ## 时间、地点与时代一致性
 
 Narrative Theme 必须建立“谁、何时何地”的故事种子；每个 Narrative Frame
@@ -115,7 +160,8 @@ uv run t2i-story generate \
   --female-count 1 \
   --male-count 1 \
   --content-level erotic \
-  --concurrency 8
+  --concurrency 8 \
+  --runs-dir story-runs
 ```
 
 或者从 UTF-8 文本文件读取完整 Story Description：
@@ -145,6 +191,14 @@ uv run t2i-story generate \
 --content-level TEXT   aesthetic、erotic 或 hardcore
 --language TEXT        chinese 或 english
 --output-dir DIRECTORY 输出目录
+--runs-dir DIRECTORY   增量 checkpoint 和运行记录目录
+```
+
+查看和恢复 run：
+
+```bash
+uv run t2i-story runs --runs-dir story-runs
+uv run t2i-story resume RUN_ID --runs-dir story-runs
 ```
 
 ## 输出
