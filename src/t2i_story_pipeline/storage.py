@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import tempfile
 from dataclasses import dataclass
@@ -15,17 +14,14 @@ from t2i_story_pipeline.persistence import durable_mkdir, fsync_directory
 
 @dataclass(frozen=True, slots=True)
 class PublishedStory:
-    json_file: Path
     prompt_file: Path
 
 
 def publish_story(
     result: StoryResult,
-    output_directory: Path,
+    prompt_file: Path,
 ) -> PublishedStory:
-    output_directory = output_directory.resolve()
-    json_file = output_directory / f"story-{result.run_id}.json"
-    prompt_file = output_directory / f"story-{result.run_id}.txt"
+    prompt_file = prompt_file.resolve()
     prompt_text = (
         "\n".join(
             frame.prose
@@ -35,20 +31,10 @@ def publish_story(
         + "\n"
     )
     try:
-        durable_mkdir(output_directory)
-        _atomic_write(
-            json_file,
-            json.dumps(
-                result.model_dump(mode="json"),
-                ensure_ascii=False,
-                indent=2,
-            )
-            + "\n",
-        )
         _atomic_write(prompt_file, prompt_text)
     except OSError as exc:
         raise StoryStorageError(f"无法发布故事提示词：{exc}") from exc
-    return PublishedStory(json_file=json_file, prompt_file=prompt_file)
+    return PublishedStory(prompt_file=prompt_file)
 
 
 def _atomic_write(path: Path, text: str) -> None:

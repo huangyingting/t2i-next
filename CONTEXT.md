@@ -61,6 +61,28 @@ consent safety contract. Only the selected level is compiled into provider
 prompts.
 _Avoid_: Legacy Content Level, safety mode
 
+**Nationality Default**:
+Chinese nationality assigned independently to each person whose nationality
+is not explicit in the Story Description. Setting, name, language, and
+appearance are not nationality declarations.
+_Avoid_: Ethnicity inference, setting inference
+
+**Setting Default**:
+China as the country containing the story setting when the Story Description
+does not state a country or a place that identifies one. An unspecified
+studio, room, or landscape is not permission to invent a foreign setting.
+_Avoid_: Foreign setting invention, location inference
+
+**Story Semantic Name**:
+A short lowercase English snake_case name summarizing the whole Story
+Description. It identifies published prompt files independently of run IDs.
+_Avoid_: Run name, Theme title, input filename
+
+**Cast Slug**:
+A deterministic lowercase English snake_case rendering of the requested
+female and male totals. It is part of every published story prompt filename.
+_Avoid_: Model-generated cast name, inferred cast
+
 **Era Consistency**:
 The requirement that every visible object, material, technology, garment,
 title, and expression agree with the Story Description's time, place, and

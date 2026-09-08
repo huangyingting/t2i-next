@@ -6,7 +6,11 @@ import pytest
 
 from t2i_story_pipeline.models import ContentLevel
 from t2i_story_pipeline.prompts import frame_messages, theme_messages
-from tests.story_factories import make_story_request, make_theme
+from tests.story_factories import (
+    make_story_request,
+    make_theme,
+    make_theme_batch,
+)
 
 
 def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
@@ -23,10 +27,29 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     assert payload["story"] == request.story
     assert payload["batch_count"] == 10
     assert payload["content_level"] == "aesthetic"
+    assert payload["semantic_name"] is None
+    assert "semantic_name 使用简短的小写英文 snake_case 概括整个 story" in prompt
     assert "premise 最多两句" in prompt
     assert "不写具体姿态、绳路、器具" in prompt
     assert "把这些留给各个 frame 独立发挥" in prompt
     assert "人物关系、场景用途、决定或冲突上真正不同" in prompt
+
+
+def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
+    request = make_story_request(theme_count=20)
+
+    messages = theme_messages(
+        request,
+        start_index=11,
+        count=10,
+        existing_themes=make_theme_batch(count=10).themes,
+        semantic_name="lost_luggage_reunion",
+    )
+
+    prompt = messages[0].content
+    payload = json.loads(messages[1].content)
+    assert payload["semantic_name"] == "lost_luggage_reunion"
+    assert "semantic_name 必须逐字返回 lost_luggage_reunion" in prompt
 
 
 def test_prompts_compile_exact_cast_constraints() -> None:
@@ -70,6 +93,31 @@ def test_prompts_preserve_unspecified_cast_from_story() -> None:
         }
         assert "人物人数和性别必须忠实遵循 story 明示事实" in (
             messages[0].content
+        )
+
+
+def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
+    request = make_story_request()
+
+    for messages in (
+        theme_messages(
+            request,
+            start_index=1,
+            count=1,
+            existing_themes=[],
+        ),
+        frame_messages(request, make_theme()),
+    ):
+        prompt = messages[0].content
+
+        assert "未明确说明某个人物的国籍时，该人物缺省为中国人" in prompt
+        assert "地点、姓名、语言、肤色或其他外貌特征不能作为国籍依据" in prompt
+        assert "theme premise 和每个 frame prose 都必须逐人明确写出国籍" in prompt
+        assert "输出英文时明确使用 Chinese" in prompt
+        assert "未明确故事发生国家或可确定国家的地点时，场景缺省位于中国" in prompt
+        assert "不得自行改到其他国家" in prompt
+        assert "每个 theme premise 和每个 frame prose 都必须明确写出故事发生国家" in (
+            prompt
         )
 
 

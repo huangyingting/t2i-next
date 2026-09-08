@@ -531,6 +531,21 @@ def test_list_runs_ignores_absent_root_and_staging_directories(
     assert listing.unreadable == ()
 
 
+def test_prompt_run_listing_ignores_story_pipeline_runs(tmp_path) -> None:
+    runs = tmp_path / "runs"
+    foreign = runs / "20260909T000000Z-abcdef01"
+    foreign.mkdir(parents=True)
+    (foreign / "request.json").write_text(
+        '{"story": "story pipeline request"}',
+        encoding="utf-8",
+    )
+
+    listing = LocalRunStore(runs).list_runs()
+
+    assert listing.runs == ()
+    assert listing.unreadable == ()
+
+
 def test_store_without_prompts_root_refuses_to_create_but_still_completes(
     tmp_path,
 ) -> None:

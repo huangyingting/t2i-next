@@ -7,6 +7,7 @@ from t2i_story_pipeline.models import (
     ContentLevel,
     NarrativeFrame,
     NarrativeTheme,
+    NarrativeThemeBatch,
     StoryRequest,
     exact_frame_sequence_model,
     exact_theme_batch_model,
@@ -19,6 +20,14 @@ def test_exact_theme_batch_schema_requires_requested_count() -> None:
 
     with pytest.raises(ValidationError):
         response_model.model_validate(make_theme_batch(count=1).model_dump())
+
+
+def test_theme_batch_requires_lowercase_snake_case_semantic_name() -> None:
+    with pytest.raises(ValidationError):
+        NarrativeThemeBatch(
+            semantic_name="Lost Luggage",
+            themes=make_theme_batch().themes,
+        )
 
 
 def test_exact_frame_schema_requires_requested_count() -> None:

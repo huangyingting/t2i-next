@@ -10,8 +10,8 @@ renderer、provider review 或 revision 阶段。
 
 ```python
 store = LocalStoryRunStore(
-    Path("story-runs"),
-    Path("story-prompts"),
+    Path("runs"),
+    Path("prompts"),
 )
 settings = StoryRunSettings(provider=provider_settings)
 completed = await StoryStudio(model, store, settings).run(
@@ -29,10 +29,10 @@ completed = await StoryStudio(model, store, settings).run(
 恢复时使用同一个 runs 目录和 manifest 中冻结的 settings：
 
 ```python
-snapshot = LocalStoryRunStore(Path("story-runs")).inspect(run_id)
+snapshot = LocalStoryRunStore(Path("runs")).inspect(run_id)
 completed = await StoryStudio(
     model,
-    LocalStoryRunStore(Path("story-runs")),
+    LocalStoryRunStore(Path("runs")),
     snapshot.manifest.settings,
 ).resume(run_id)
 ```
@@ -78,6 +78,17 @@ resume 只调用缺失的 Theme batch 和 Frame Sequence。
 约束会同时编译进 theme 和 frame 的 system prompt，并以 `cast_constraints`
 写入两个阶段的 provider request。
 
+## 人物国籍与地点缺省值
+
+Story Description 明确说明某个人物国籍时，Theme 和 Frame 忠实沿用。未明确
+说明时，该人物缺省为中国籍。故事地点、姓名、语言、肤色和外貌不作为其他国籍
+的推断依据。
+
+Story Description 明确说明故事发生国家，或给出可确定国家的地点时，Theme 和
+Frame 忠实沿用；两者都没有时，场景缺省位于中国，不得自行改到其他国家。每个
+Theme premise 和每个最终 Frame 都必须逐人明确写出国籍，并明确写出故事发生
+国家；英文输出用 `Chinese` 明示默认人物国籍。
+
 ## 叙事方式
 
 每帧是一段自然流动的故事画面，而不是视觉规格表。整体通顺、画面成立和人物关系
@@ -101,7 +112,7 @@ resume 只调用缺失的 Theme batch 和 Frame Sequence。
 每个 run 在首次 provider 调用前分配 ID，并写入独立目录：
 
 ```text
-story-runs/<run-id>/
+runs/<run-id>/
 ├── request.json
 ├── manifest.json
 ├── attempts/
@@ -186,7 +197,7 @@ uv run t2i-story generate \
   --male-count 1 \
   --content-level erotic \
   --concurrency 8 \
-  --runs-dir story-runs
+  --runs-dir runs
 ```
 
 或者从 UTF-8 文本文件读取完整 Story Description：
@@ -215,26 +226,39 @@ uv run t2i-story generate \
 --concurrency INTEGER  frame sequence 并发数，1 至 32
 --content-level TEXT   aesthetic、erotic 或 hardcore
 --language TEXT        chinese 或 english
---output-dir DIRECTORY 输出目录
+--prompts-dir DIRECTORY 按日期保存最终 TXT 的根目录
 --runs-dir DIRECTORY   增量 checkpoint 和运行记录目录
 ```
 
 查看和恢复 run：
 
 ```bash
-uv run t2i-story runs --runs-dir story-runs
-uv run t2i-story resume RUN_ID --runs-dir story-runs
+uv run t2i-story runs --runs-dir runs
+uv run t2i-story resume RUN_ID --runs-dir runs
 ```
 
 ## 输出
 
 ```text
-story-prompts/
-├── story-<run-id>.json
-└── story-<run-id>.txt
+prompts/
+└── YYYY-MM-DD/
+    ├── aesthetic/
+    │   └── <semantic-name>_<cast-slug>_0001.txt
+    ├── erotic/
+    │   └── <semantic-name>_<cast-slug>_0001.txt
+    └── hardcore/
+        └── <semantic-name>_<cast-slug>_0001.txt
 ```
 
 TXT 每帧一行，内容就是最终 prose，不含主题标题或 frame ID。
+`prompts/` 中只发布最终 TXT。用于恢复的 request、manifest、Theme、Frame、
+attempt 和完整 result JSON 只保存在 `runs/`，不会复制到 `prompts/`。
+`semantic-name` 由模型用简短的小写英文 snake_case 概括整个 Story Description；
+`cast-slug` 根据请求中的女性和男性人数确定，例如 `one_woman_one_man`、
+`two_women`、`three_women`、`two_women_one_man` 或
+`one_woman_two_men`。同一天、同一 content level 下完整名称重名时，序号按
+`_0001`、`_0002` 递增分配。只约束一侧或未约束人数时，slug 使用
+`unspecified` 明示未知部分，不根据模型正文猜测。
 每条 prose 最多 32,768 个字符；frame sequence 请求和 provider 缺省输出上限
 也都是 32,768 tokens。该 token 上限由同一次调用中的全部 frames 和 JSON
 结构共同使用，不是每帧单独分配。

@@ -5,7 +5,7 @@
 `t2i_story_pipeline` 是完全独立的极简叙事生成器。它不复用下文旧管线的
 Foundation、字段化 Theme/Frame、规则或 renderer，而是从一段故事描述直接生成
 彼此不同的微型故事主题，以及每个主题一至六段最终叙事提示词。它使用独立的
-`story-runs/` 保存增量 checkpoint 和运行记录：
+`runs/` 保存增量 checkpoint 和运行记录：
 
 ```bash
 uv run t2i-story generate \
@@ -36,8 +36,8 @@ uv run t2i-story generate \
 Sequence 都会原子保存；失败或进程退出后，只重新生成缺失部分：
 
 ```bash
-uv run t2i-story runs --runs-dir story-runs
-uv run t2i-story resume RUN_ID --runs-dir story-runs
+uv run t2i-story runs --runs-dir runs
+uv run t2i-story resume RUN_ID --runs-dir runs
 ```
 
 `request.json`、provider/并发/retry/token 配置、generation attempts 和 token
@@ -49,10 +49,24 @@ resume 后保持该预算。attempt
 记录保存请求/接受 ID、具体 issues、耗时和 usage；resume 会把最近三条相关
 issues 继续反馈给模型。认证错误不会盲目重试。
 
-输出写入 `story-prompts/`：
+批量针对一个 Story Description 文件生成固定的 hardcore English 人物组合
+（1男1女、2女、3女、1男2女、2男1女），每组 100 themes × 6 frames：
 
-- `story-<run-id>.json`：请求、主题、最终 frames 和 token usage；
-- `story-<run-id>.txt`：每行一段可独立渲染的最终故事画面。
+```bash
+./scripts/generate-story-cast-matrix.sh story-inputs/example.txt
+```
+
+最终 TXT 默认统一写入 `prompts/YYYY-MM-DD/hardcore/`，所有可恢复 run 记录在
+`runs/`。也可以把第二、第三个位置参数分别用于覆盖
+prompts root 和 runs directory。
+
+输出按 `prompts/YYYY-MM-DD/aesthetic|erotic|hardcore/` 分类：
+
+- `<semantic-name>_<cast-slug>_NNNN.txt`：小写英文 snake_case 语义名称、确定性
+  人数组合（如 `one_woman_two_men`）和四位冲突序号；每行一段可独立渲染的
+  最终故事画面。
+
+`prompts/` 中只保存最终 TXT；恢复所需的结构化 JSON 只保存在 `runs/`。
 
 每个 Narrative Frame 只有 `frame_id` 和一段无换行的 `prose`。每帧自然点明风格、
 年代、地点和当前时刻，重新完整描写所有可见人物，并将当前静态关系、环境证据、
@@ -73,6 +87,9 @@ issues 继续反馈给模型。认证错误不会盲目重试。
 
 Provider 使用独立的 `STORY_OPENAI_*` 环境变量；完整说明见
 [独立故事生成器](docs/story-pipeline.md)。
+Story Description 未明确人物国籍时，该人物缺省为中国籍；未明确故事发生国家
+或可确定国家的地点时，场景缺省位于中国。Theme premise 和每个最终 Frame 都会
+明确写出人物国籍与故事发生国家。
 
 这个工具把文生图内容分成共享 Foundation 和两层具体画面事实：
 

@@ -104,8 +104,11 @@ class StoryStudio:
             snapshot.run_id,
             request,
             list(snapshot.themes),
+            snapshot.manifest.semantic_name,
         )
         snapshot = self._store.inspect(snapshot.run_id)
+        if snapshot.manifest.semantic_name is None:
+            raise StoryStorageError("Story run 缺少 semantic_name")
         semaphore = asyncio.Semaphore(self._settings.concurrency)
 
         async def generate_theme(
@@ -146,6 +149,7 @@ class StoryStudio:
             raise self._incomplete(snapshot, causes)
         result = StoryResult(
             run_id=snapshot.run_id,
+            semantic_name=snapshot.manifest.semantic_name,
             request=request,
             themes=[
                 NarrativeThemeResult(
@@ -165,6 +169,7 @@ class StoryStudio:
         run_id: str,
         request: StoryRequest,
         themes: list[NarrativeTheme],
+        semantic_name: str | None,
     ) -> list[NarrativeTheme]:
         while len(themes) < request.theme_count:
             start_index = len(themes) + 1
@@ -177,12 +182,14 @@ class StoryStudio:
                 start_index=start_index,
                 count=count,
                 existing_themes=themes,
+                semantic_name=semantic_name,
             )
 
             def validate(
                 value: BaseModel,
                 expected_start: int = start_index,
                 expected_count: int = count,
+                expected_semantic_name: str | None = semantic_name,
             ) -> None:
                 if not isinstance(value, NarrativeThemeBatch):
                     raise StoryContractError("provider 返回了错误的主题类型")
@@ -197,6 +204,15 @@ class StoryStudio:
                     raise StoryContractError(
                         "主题数量不符合请求："
                         f"expected={len(expected)}, actual={len(value.themes)}"
+                    )
+                if (
+                    expected_semantic_name is not None
+                    and value.semantic_name != expected_semantic_name
+                ):
+                    raise StoryContractError(
+                        "semantic_name 与 run 不一致："
+                        f"expected={expected_semantic_name}, "
+                        f"actual={value.semantic_name}"
                     )
                 for theme, theme_id in zip(
                     value.themes,
@@ -225,7 +241,12 @@ class StoryStudio:
             )
             if not isinstance(value, NarrativeThemeBatch):
                 raise AssertionError("validated theme response changed type")
-            self._store.checkpoint_themes(run_id, value.themes)
+            self._store.checkpoint_themes(
+                run_id,
+                value.themes,
+                value.semantic_name,
+            )
+            semantic_name = value.semantic_name
             themes.extend(value.themes)
             self._emit(
                 f"{value.themes[0].theme_id}–{value.themes[-1].theme_id} "

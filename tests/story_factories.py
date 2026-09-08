@@ -48,8 +48,10 @@ def make_theme_batch(
     *,
     start: int = 1,
     count: int = 1,
+    semantic_name: str = "lost_luggage_reunion",
 ) -> NarrativeThemeBatch:
     return NarrativeThemeBatch(
+        semantic_name=semantic_name,
         themes=[make_theme(index) for index in range(start, start + count)]
     )
 
@@ -98,12 +100,17 @@ def make_story_result(
     *,
     theme_count: int = 1,
     frames_per_theme: int = 2,
+    female_count: int | None = None,
+    male_count: int | None = None,
 ) -> StoryResult:
     return StoryResult(
         run_id="abcdef123456",
+        semantic_name="lost_luggage_reunion",
         request=make_story_request(
             theme_count=theme_count,
             frames_per_theme=frames_per_theme,
+            female_count=female_count,
+            male_count=male_count,
         ),
         themes=[
             NarrativeThemeResult(

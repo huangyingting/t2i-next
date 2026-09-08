@@ -105,14 +105,14 @@ def generate_command(
         "--language",
         help="叙事正文语言。",
     ),
-    output_dir: Path = typer.Option(
-        Path("story-prompts"),
-        "--output-dir",
+    prompts_dir: Path = typer.Option(
+        Path("prompts"),
+        "--prompts-dir",
         file_okay=False,
-        help="JSON 与提示词输出目录。",
+        help="按运行日期保存最终 TXT 提示词的根目录。",
     ),
     runs_dir: Path = typer.Option(
-        Path("story-runs"),
+        Path("runs"),
         "--runs-dir",
         file_okay=False,
         help="增量 checkpoint 和运行记录目录。",
@@ -136,7 +136,7 @@ def generate_command(
                 settings,
                 concurrency=concurrency,
                 runs_directory=runs_dir,
-                output_directory=output_dir,
+                prompts_directory=prompts_dir,
             )
         )
     except (ValidationError, StoryPipelineError) as exc:
@@ -149,7 +149,7 @@ def generate_command(
 def resume_command(
     run_id: str = typer.Argument(..., help="需要继续的 story run ID。"),
     runs_dir: Path = typer.Option(
-        Path("story-runs"),
+        Path("runs"),
         "--runs-dir",
         file_okay=False,
         help="增量 checkpoint 和运行记录目录。",
@@ -184,7 +184,7 @@ def resume_command(
 @app.command("runs")
 def runs_command(
     runs_dir: Path = typer.Option(
-        Path("story-runs"),
+        Path("runs"),
         "--runs-dir",
         file_okay=False,
         help="增量 checkpoint 和运行记录目录。",
@@ -255,14 +255,14 @@ async def _generate(
     settings: StoryProviderSettings,
     *,
     concurrency: int,
-    runs_directory: Path = Path("story-runs"),
-    output_directory: Path = Path("story-prompts"),
+    runs_directory: Path = Path("runs"),
+    prompts_directory: Path = Path("prompts"),
 ) -> CompletedStoryRun:
     run_settings = StoryRunSettings(
         provider=settings,
         concurrency=concurrency,
     )
-    store = LocalStoryRunStore(runs_directory, output_directory)
+    store = LocalStoryRunStore(runs_directory, prompts_directory)
     async with OpenAIStoryModel(settings) as model:
         return await StoryStudio(
             model,
@@ -290,7 +290,6 @@ async def _resume(
 def _print_completed(completed: CompletedStoryRun) -> None:
     typer.secho("生成完成。", fg=typer.colors.GREEN)
     typer.echo(f"Run：{completed.run_id}")
-    typer.echo(f"结构化结果：{completed.published.json_file}")
     typer.echo(f"叙事提示词：{completed.published.prompt_file}")
 
 

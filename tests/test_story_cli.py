@@ -34,6 +34,8 @@ def test_story_generate_exposes_only_generation_controls() -> None:
     assert "--male-count" in result.stdout
     assert "--concurrency" in result.stdout
     assert "--prompt-file" in result.stdout
+    assert "--prompts-dir" in result.stdout
+    assert "--output-dir" not in result.stdout
     assert "[default: 8]" in result.stdout
     assert "--content-level" in result.stdout
     assert "内容尺度" in result.stdout
@@ -61,17 +63,16 @@ def test_story_generate_reads_story_description_from_prompt_file(
         *,
         concurrency,
         runs_directory,
-        output_directory,
+        prompts_directory,
     ):
         captured["request"] = request
         captured["concurrency"] = concurrency
         captured["runs_directory"] = runs_directory
-        captured["output_directory"] = output_directory
+        captured["prompts_directory"] = prompts_directory
         return SimpleNamespace(
             run_id="test-run",
             published=SimpleNamespace(
-                json_file=output_directory / "story.json",
-                prompt_file=output_directory / "story.txt",
+                prompt_file=prompts_directory / "story.txt",
             ),
         )
 
@@ -94,7 +95,7 @@ def test_story_generate_reads_story_description_from_prompt_file(
             "1",
             "--runs-dir",
             str(tmp_path / "runs"),
-            "--output-dir",
+            "--prompts-dir",
             str(tmp_path / "prompts"),
         ],
     )
@@ -108,7 +109,7 @@ def test_story_generate_reads_story_description_from_prompt_file(
     assert captured["request"].male_count == 1
     assert captured["concurrency"] == 8
     assert captured["runs_directory"] == tmp_path / "runs"
-    assert captured["output_directory"] == tmp_path / "prompts"
+    assert captured["prompts_directory"] == tmp_path / "prompts"
     assert "Run：test-run" in result.output
 
 
@@ -190,7 +191,6 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
         return SimpleNamespace(
             run_id=run_id,
             published=SimpleNamespace(
-                json_file=tmp_path / "prompts" / "story.json",
                 prompt_file=tmp_path / "prompts" / "story.txt",
             ),
         )

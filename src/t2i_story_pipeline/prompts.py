@@ -66,6 +66,19 @@ def _cast_instruction(request: StoryRequest) -> str:
     )
 
 
+def _people_and_setting_defaults_instruction() -> str:
+    return (
+        "story 明确说明某个人物的国籍时必须忠实沿用；未明确说明某个人物的国籍时，"
+        "该人物缺省为中国人。地点、姓名、语言、肤色或其他外貌特征不能作为国籍"
+        "依据。theme premise 和每个 frame prose 都必须逐人明确写出国籍，不得只"
+        "依靠场景或姓名暗示；输出英文时明确使用 Chinese，输出中文时明确使用"
+        "“中国人”或“中国籍”。story 明确说明故事发生国家或给出可确定国家的地点"
+        "时必须忠实沿用；未明确故事发生国家或可确定国家的地点时，场景缺省位于"
+        "中国，不得自行改到其他国家。每个 theme premise 和每个 frame prose 都"
+        "必须明确写出故事发生国家，不能只靠城市、建筑或环境暗示。"
+    )
+
+
 def _era_consistency_instruction() -> str:
     return (
         "时间和地点是整体世界的一部分。建筑、陈设、器物、材料、服装、发型、"
@@ -83,6 +96,7 @@ def theme_messages(
     start_index: int,
     count: int,
     existing_themes: list[NarrativeTheme],
+    semantic_name: str | None = None,
 ) -> list[ChatMessage]:
     end_index = start_index + count - 1
     language = (
@@ -93,6 +107,11 @@ def theme_messages(
             "“slight” rather than the age-ambiguous English adjective for low "
             "importance."
         )
+    )
+    semantic_name_instruction = (
+        f"semantic_name 必须逐字返回 {semantic_name}。"
+        if semantic_name is not None
+        else "semantic_name 使用简短的小写英文 snake_case 概括整个 story。"
     )
     system = "\n".join(
         (
@@ -110,10 +129,12 @@ def theme_messages(
             "构思可信的新事件。不要为了戏剧性虚构姓名、精确年号地点、秘密身世、"
             "物件来历、身份等级、伤痕或关系史。",
             _cast_instruction(request),
+            _people_and_setting_defaults_instruction(),
             _era_consistency_instruction(),
             "style 是一句完整、简洁的视觉风格描述，不罗列不同景别或多个构图方案。",
             "不同主题要从人物关系、场景用途、决定或冲突上真正不同。已有主题只用于"
             "避开重复，不要改写后再次输出。",
+            semantic_name_instruction,
             _content_level_instruction(request),
             language,
             "不要输出解释或 schema 之外的字段。",
@@ -128,6 +149,7 @@ def theme_messages(
                     "story": request.story,
                     "cast_constraints": _cast_constraints(request),
                     "content_level": request.content_level.value,
+                    "semantic_name": semantic_name,
                     "batch_start": start_index,
                     "batch_count": count,
                     "frames_per_theme": request.frames_per_theme,
@@ -178,6 +200,7 @@ def frame_messages(
             "人的发色、发长、脸型或身形。不同人物要有能够彼此回应的情绪和空间"
             "关系。",
             _cast_instruction(request),
+            _people_and_setting_defaults_instruction(),
             "画面定格在一个清晰瞬间。可以有一个最重要的动作、接触或受力关系，"
             "但只写当前可见状态和直接物理结果，不叙述先后步骤，不让人物在同一帧"
             "连续改变姿态。不要为了符合句式而使用“此刻”或其他固定开头。",

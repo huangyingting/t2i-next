@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import json
-
 import pytest
 
-from t2i_story_pipeline import persistence
+from t2i_story_pipeline import persistence, run_store
 from t2i_story_pipeline.errors import StoryStorageError
 from t2i_story_pipeline.models import StoryStage, TokenUsage
 from t2i_story_pipeline.provider import StoryProviderSettings
@@ -22,6 +20,29 @@ from tests.story_factories import (
     make_story_result,
     make_theme_batch,
 )
+
+
+@pytest.mark.parametrize(
+    ("female_count", "male_count", "expected"),
+    (
+        (1, 1, "one_woman_one_man"),
+        (2, 0, "two_women"),
+        (3, 0, "three_women"),
+        (2, 1, "two_women_one_man"),
+        (1, 2, "one_woman_two_men"),
+    ),
+)
+def test_story_prompt_cast_slug_uses_existing_naming_convention(
+    female_count,
+    male_count,
+    expected,
+) -> None:
+    request = make_story_request(
+        female_count=female_count,
+        male_count=male_count,
+    )
+
+    assert run_store._cast_slug(request) == expected
 
 
 def test_durable_mkdir_fsyncs_every_created_directory_parent(
@@ -46,33 +67,27 @@ def test_durable_mkdir_fsyncs_every_created_directory_parent(
     ]
 
 
-def test_publish_story_writes_json_and_one_prompt_file(tmp_path) -> None:
+def test_publish_story_writes_only_one_prompt_file(tmp_path) -> None:
     result = make_story_result()
+    prompt_file = tmp_path / "lost_luggage_reunion_0001.txt"
 
-    published = publish_story(result, tmp_path)
+    published = publish_story(result, prompt_file)
 
-    assert published.json_file.exists()
     assert published.prompt_file.exists()
     assert len(published.prompt_file.read_text().splitlines()) == 2
     assert published.prompt_file.read_text().splitlines()[0].startswith(
         "1930年代北平电影风格"
     )
-    assert '"run_id": "abcdef123456"' in published.json_file.read_text(
-        encoding="utf-8"
-    )
-    payload = json.loads(published.json_file.read_text(encoding="utf-8"))
-    assert payload["request"]["content_level"] == "aesthetic"
-    assert "quality_feedback" not in payload
-    assert list(tmp_path.glob("*")) == [
-        published.json_file,
-        published.prompt_file,
-    ]
+    assert list(tmp_path.glob("*")) == [published.prompt_file]
 
 
 def test_publish_story_writes_six_hundred_ordered_prompts(tmp_path) -> None:
     result = make_story_result(theme_count=100, frames_per_theme=6)
 
-    published = publish_story(result, tmp_path)
+    published = publish_story(
+        result,
+        tmp_path / "lost_luggage_reunion_0001.txt",
+    )
 
     lines = published.prompt_file.read_text().splitlines()
     assert len(lines) == 600
@@ -83,7 +98,7 @@ def test_publish_story_writes_six_hundred_ordered_prompts(tmp_path) -> None:
 def test_story_run_store_persists_checkpoints_attempts_and_completion(
     tmp_path,
 ) -> None:
-    request = make_story_request()
+    request = make_story_request(female_count=1, male_count=1)
     settings = StoryRunSettings(
         provider=StoryProviderSettings(model="test-model"),
         concurrency=1,
@@ -96,7 +111,11 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
     themes = make_theme_batch().themes
     frames = make_frame_sequence()
 
-    store.checkpoint_themes(snapshot.run_id, themes)
+    store.checkpoint_themes(
+        snapshot.run_id,
+        themes,
+        "lost_luggage_reunion",
+    )
     store.checkpoint_frames(snapshot.run_id, "T001", frames)
     store.record_attempt(
         snapshot.run_id,
@@ -130,7 +149,7 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
             usage=TokenUsage(total_tokens=20),
         ),
     )
-    result = make_story_result().model_copy(
+    result = make_story_result(female_count=1, male_count=1).model_copy(
         update={
             "run_id": snapshot.run_id,
             "request": request,
@@ -146,6 +165,19 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
     assert restored.manifest.status == StoryRunStatus.COMPLETED
     assert completed.result_file.is_file()
     assert completed.published.prompt_file.is_file()
+    assert completed.published.prompt_file.parent == (
+        tmp_path
+        / "prompts"
+        / snapshot.manifest.created_at[:10]
+        / "aesthetic"
+    )
+    assert completed.published.prompt_file.name == (
+        "lost_luggage_reunion_one_woman_one_man_0001.txt"
+    )
+    assert list((tmp_path / "prompts").rglob("*.json")) == []
+    assert '"json_file"' not in (
+        tmp_path / "runs" / snapshot.run_id / "manifest.json"
+    ).read_text(encoding="utf-8")
     assert len(tuple((tmp_path / "runs" / snapshot.run_id / "attempts").iterdir())) == 2
     assert [item.run_id for item in listing.runs] == [snapshot.run_id]
     assert listing.runs[0].status == StoryRunStatus.COMPLETED
@@ -185,3 +217,18 @@ def test_story_run_store_rejects_corrupt_checkpoint(tmp_path) -> None:
 
     with pytest.raises(StoryStorageError, match="文件名与内容不匹配"):
         store.inspect(snapshot.run_id)
+
+
+def test_story_run_listing_ignores_prompt_pipeline_runs(tmp_path) -> None:
+    runs = tmp_path / "runs"
+    foreign = runs / "20260909T000000Z-abcdef01"
+    foreign.mkdir(parents=True)
+    (foreign / "request.json").write_text(
+        '{"brief": "prompt pipeline request"}',
+        encoding="utf-8",
+    )
+
+    listing = LocalStoryRunStore(runs).list_runs()
+
+    assert listing.runs == ()
+    assert listing.unreadable == ()

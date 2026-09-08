@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
+from itertools import count
 from pathlib import Path
 from uuid import uuid4
 
@@ -25,6 +26,7 @@ from t2i_story_pipeline.errors import (
 from t2i_story_pipeline.models import (
     NarrativeFrameSequence,
     NarrativeTheme,
+    SemanticName,
     StoryRequest,
     StoryResult,
     StoryStage,
@@ -36,6 +38,54 @@ from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.storage import PublishedStory, publish_story
 
 _RUN_ID = re.compile(r"\d{8}T\d{6}Z-[a-f0-9]{8}")
+_COUNT_NAMES = (
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+)
+
+
+def _cast_slug(request: StoryRequest) -> str:
+    female_count = request.female_count
+    male_count = request.male_count
+    if female_count is None and male_count is None:
+        return "unspecified_cast"
+    if female_count is not None and male_count is not None:
+        parts = []
+        if female_count:
+            parts.append(
+                f"{_COUNT_NAMES[female_count]}_"
+                f"{'woman' if female_count == 1 else 'women'}"
+            )
+        if male_count:
+            parts.append(
+                f"{_COUNT_NAMES[male_count]}_"
+                f"{'man' if male_count == 1 else 'men'}"
+            )
+        return "_".join(parts)
+
+    parts = []
+    if female_count is None:
+        parts.append("unspecified_women")
+    else:
+        parts.append(
+            f"{_COUNT_NAMES[female_count]}_"
+            f"{'woman' if female_count == 1 else 'women'}"
+        )
+    if male_count is None:
+        parts.append("unspecified_men")
+    else:
+        parts.append(
+            f"{_COUNT_NAMES[male_count]}_"
+            f"{'man' if male_count == 1 else 'men'}"
+        )
+    return "_".join(parts)
 
 
 class _Model(BaseModel):
@@ -70,8 +120,8 @@ class StoryRunManifest(_Model):
     created_at: str
     updated_at: str
     settings: StoryRunSettings
-    output_directory: str
-    json_file: str | None = None
+    prompts_directory: str
+    semantic_name: SemanticName | None = None
     prompt_file: str | None = None
     error: str | None = None
 
@@ -135,11 +185,11 @@ class LocalStoryRunStore:
     def __init__(
         self,
         runs_root: Path,
-        output_root: Path | None = None,
+        prompts_root: Path | None = None,
     ) -> None:
         self._runs_root = runs_root.resolve()
-        self._output_root = (
-            output_root.resolve() if output_root is not None else None
+        self._prompts_root = (
+            prompts_root.resolve() if prompts_root is not None else None
         )
 
     def create(
@@ -147,8 +197,8 @@ class LocalStoryRunStore:
         request: StoryRequest,
         settings: StoryRunSettings,
     ) -> StoryRunSnapshot:
-        if self._output_root is None:
-            raise StoryStorageError("创建 story run 需要输出目录")
+        if self._prompts_root is None:
+            raise StoryStorageError("创建 story run 需要 prompts 目录")
         run_id = self._new_run_id()
         final_directory = self._runs_root / run_id
         staging: Path | None = None
@@ -159,7 +209,7 @@ class LocalStoryRunStore:
             created_at=now,
             updated_at=now,
             settings=settings,
-            output_directory=str(self._output_root),
+            prompts_directory=str(self._prompts_root),
         )
         try:
             durable_mkdir(self._runs_root)
@@ -248,14 +298,26 @@ class LocalStoryRunStore:
             if not directory.is_dir() or _RUN_ID.fullmatch(directory.name) is None:
                 continue
             try:
+                request_text = (directory / "request.json").read_text(
+                    encoding="utf-8"
+                )
+                request_payload = json.loads(request_text)
+            except (OSError, json.JSONDecodeError):
+                unreadable.append(directory.name)
+                continue
+            if (
+                isinstance(request_payload, dict)
+                and "brief" in request_payload
+                and "story" not in request_payload
+            ):
+                continue
+            try:
                 manifest = self._read_manifest(directory)
                 if manifest.run_id != directory.name:
                     raise StoryStorageError(
                         "manifest run_id 与目录名称不匹配"
                     )
-                request = StoryRequest.model_validate_json(
-                    (directory / "request.json").read_text(encoding="utf-8")
-                )
+                request = StoryRequest.model_validate_json(request_text)
             except (OSError, ValidationError, StoryStorageError):
                 unreadable.append(directory.name)
                 continue
@@ -298,6 +360,7 @@ class LocalStoryRunStore:
         self,
         run_id: str,
         themes: list[NarrativeTheme],
+        semantic_name: str,
     ) -> None:
         snapshot = self.inspect(run_id)
         if snapshot.completed is not None:
@@ -314,6 +377,23 @@ class LocalStoryRunStore:
                 f"actual={actual_ids}"
             )
         directory = self._run_directory(run_id)
+        if (
+            snapshot.manifest.semantic_name is not None
+            and snapshot.manifest.semantic_name != semantic_name
+        ):
+            raise StoryStorageError(
+                "Theme checkpoint semantic_name 与 run 不一致"
+            )
+        if snapshot.manifest.semantic_name is None:
+            self._write_manifest(
+                directory,
+                snapshot.manifest.model_copy(
+                    update={
+                        "semantic_name": semantic_name,
+                        "updated_at": self._now(),
+                    }
+                ),
+            )
         for theme in themes:
             _write_json(
                 directory / "themes" / f"{theme.theme_id}.json",
@@ -432,6 +512,11 @@ class LocalStoryRunStore:
             return snapshot.completed
         if result.run_id != run_id or result.request != snapshot.request:
             raise StoryStorageError("完成结果与 story run 不匹配")
+        if (
+            snapshot.manifest.semantic_name is None
+            or result.semantic_name != snapshot.manifest.semantic_name
+        ):
+            raise StoryStorageError("完成结果的 semantic_name 与 story run 不匹配")
         if len(snapshot.themes) != snapshot.request.theme_count:
             raise StoryStorageError("Theme checkpoint 尚未完整")
         if len(snapshot.frames) != snapshot.request.theme_count:
@@ -453,16 +538,42 @@ class LocalStoryRunStore:
             raise StoryStorageError("完成结果的 token usage 与运行记录不匹配")
         directory = self._run_directory(run_id)
         result_file = directory / "result.json"
-        _write_json(result_file, result.model_dump(mode="json"))
-        published = publish_story(
-            result,
-            Path(snapshot.manifest.output_directory),
+        completion_manifest = snapshot.manifest
+        prompt_path = (
+            Path(completion_manifest.prompt_file)
+            if completion_manifest.prompt_file is not None
+            else self._allocate_prompt_path(
+                f"{result.semantic_name}_{_cast_slug(result.request)}",
+                (
+                    Path(completion_manifest.prompts_directory)
+                    / completion_manifest.created_at[:10]
+                    / result.request.content_level.value
+                ),
+            )
         )
-        manifest = snapshot.manifest.model_copy(
+        if completion_manifest.prompt_file is None:
+            completion_manifest = completion_manifest.model_copy(
+                update={
+                    "prompt_file": str(prompt_path),
+                    "updated_at": self._now(),
+                }
+            )
+            try:
+                self._write_manifest(directory, completion_manifest)
+            except StoryStorageError:
+                self._remove_reservation(
+                    prompt_path.parent / f".{prompt_path.name}.reserve"
+                )
+                raise
+        _write_json(result_file, result.model_dump(mode="json"))
+        published = publish_story(result, prompt_path)
+        self._remove_reservation(
+            prompt_path.parent / f".{prompt_path.name}.reserve"
+        )
+        manifest = completion_manifest.model_copy(
             update={
                 "status": StoryRunStatus.COMPLETED,
                 "updated_at": self._now(),
-                "json_file": str(published.json_file),
                 "prompt_file": str(published.prompt_file),
                 "error": None,
             }
@@ -560,7 +671,7 @@ class LocalStoryRunStore:
         themes: tuple[NarrativeTheme, ...],
         frames: dict[str, NarrativeFrameSequence],
     ) -> CompletedStoryRun:
-        if manifest.json_file is None or manifest.prompt_file is None:
+        if manifest.prompt_file is None:
             raise StoryStorageError("已完成 run 缺少发布文件路径")
         result_file = directory / "result.json"
         try:
@@ -571,6 +682,13 @@ class LocalStoryRunStore:
             raise StoryStorageError(f"已完成 run 无法读取 result.json：{exc}") from exc
         if result.run_id != manifest.run_id or result.request != request:
             raise StoryStorageError("已完成 run 的 result 与 manifest 不匹配")
+        if (
+            manifest.semantic_name is None
+            or result.semantic_name != manifest.semantic_name
+        ):
+            raise StoryStorageError(
+                "已完成 run 的 semantic_name 与 manifest 不匹配"
+            )
         if len(themes) != request.theme_count or len(frames) != request.theme_count:
             raise StoryStorageError("已完成 run 的 checkpoint 不完整")
         expected_themes = [
@@ -587,20 +705,66 @@ class LocalStoryRunStore:
             raise StoryStorageError(
                 "已完成 run 的 result token usage 与 attempt 记录不匹配"
             )
-        json_file = Path(manifest.json_file)
         prompt_file = Path(manifest.prompt_file)
-        if not json_file.is_file() or not prompt_file.is_file():
+        if not prompt_file.is_file():
             raise StoryStorageError("已完成 run 的发布文件不存在")
         return CompletedStoryRun(
             run_id=manifest.run_id,
             request_file=directory / "request.json",
             result_file=result_file,
             published=PublishedStory(
-                json_file=json_file,
                 prompt_file=prompt_file,
             ),
             result=result,
         )
+
+    def _allocate_prompt_path(
+        self,
+        filename_stem: str,
+        prompts_directory: Path,
+    ) -> Path:
+        try:
+            durable_mkdir(prompts_directory)
+        except OSError as exc:
+            raise StoryStorageError(f"无法创建提示词目录：{exc}") from exc
+        for sequence in count(1):
+            filename = f"{filename_stem}_{sequence:04d}.txt"
+            final_path = prompts_directory / filename
+            reservation = prompts_directory / f".{filename}.reserve"
+            try:
+                descriptor = os.open(
+                    reservation,
+                    os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+                    0o600,
+                )
+            except FileExistsError:
+                continue
+            except OSError as exc:
+                raise StoryStorageError(
+                    f"无法分配提示词文件序号：{exc}"
+                ) from exc
+            try:
+                os.close(descriptor)
+                fsync_directory(prompts_directory)
+                if final_path.exists():
+                    self._remove_reservation(reservation)
+                    continue
+                return final_path
+            except OSError as exc:
+                raise StoryStorageError(
+                    f"无法分配提示词文件序号：{exc}"
+                ) from exc
+        raise StoryStorageError("无法分配提示词文件序号")
+
+    @staticmethod
+    def _remove_reservation(path: Path) -> None:
+        try:
+            path.unlink(missing_ok=True)
+            fsync_directory(path.parent)
+        except OSError as exc:
+            raise StoryStorageError(
+                f"无法清理提示词文件 reservation：{exc}"
+            ) from exc
 
     def _run_directory(self, run_id: str) -> Path:
         if _RUN_ID.fullmatch(run_id) is None:

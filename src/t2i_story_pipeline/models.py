@@ -54,6 +54,14 @@ NarrativeProse = Annotated[
 ]
 ThemeId = Annotated[str, StringConstraints(pattern=r"^T\d{3}$")]
 FrameId = Annotated[str, StringConstraints(pattern=r"^F\d{2}$")]
+SemanticName = Annotated[
+    str,
+    StringConstraints(
+        min_length=1,
+        max_length=80,
+        pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$",
+    ),
+]
 
 
 class OutputLanguage(StrEnum):
@@ -107,6 +115,7 @@ class NarrativeTheme(Model):
 
 
 class NarrativeThemeBatch(Model):
+    semantic_name: SemanticName
     themes: list[NarrativeTheme] = Field(min_length=1, max_length=10)
 
 
@@ -141,6 +150,7 @@ class TokenUsage(Model):
 
 class StoryResult(Model):
     run_id: Text
+    semantic_name: SemanticName
     request: StoryRequest
     themes: list[NarrativeThemeResult] = Field(min_length=1, max_length=100)
     usage: TokenUsage

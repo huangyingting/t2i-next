@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 from dataclasses import dataclass, field
@@ -319,10 +320,22 @@ class LocalRunStore:
             if not directory.is_dir() or not safe_run_id(directory.name):
                 continue
             try:
-                manifest = self._read_manifest(directory)
-                spec = GenerationSpec.model_validate_json(
-                    (directory / "request.json").read_text(encoding="utf-8")
+                request_text = (directory / "request.json").read_text(
+                    encoding="utf-8"
                 )
+                request_payload = json.loads(request_text)
+            except (OSError, json.JSONDecodeError):
+                unreadable.append(directory.name)
+                continue
+            if (
+                isinstance(request_payload, dict)
+                and "story" in request_payload
+                and "brief" not in request_payload
+            ):
+                continue
+            try:
+                manifest = self._read_manifest(directory)
+                spec = GenerationSpec.model_validate_json(request_text)
             except (RunStoreError, OSError, ValidationError):
                 unreadable.append(directory.name)
                 continue
