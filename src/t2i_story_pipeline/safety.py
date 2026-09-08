@@ -15,6 +15,12 @@ _PAST_AGE_REFERENCE = re.compile(
     r"(?:少年|少女)(?:时代|时期|时光|岁月|记忆|往事|旧梦)",
     re.IGNORECASE,
 )
+_CURRENT_AMBIGUOUS_WOMAN = re.compile(
+    r"少女(?!时代|时期|时光|岁月|记忆|往事|旧梦)"
+)
+_CURRENT_AMBIGUOUS_MAN = re.compile(
+    r"少年(?!时代|时期|时光|岁月|记忆|往事|旧梦)"
+)
 _SEXUAL_VIOLENCE = re.compile(
     r"强奸|性侵|性暴力|猥亵|非自愿性行为|"
     r"\b(?:rape|sexual assault|sexual violence|non-consensual sex)\b",
@@ -68,7 +74,13 @@ def validate_source_story(
 def validate_generated_story(text: str) -> None:
     if match := _current_minor_match(text):
         raise UnsafeStoryError(f"生成内容出现未成年或年龄模糊表达：{match.group(0)}")
-    _validate_no_coercive_sexual_content(text)
+    if match := _SEXUAL_VIOLENCE.search(text):
+        raise UnsafeStoryError(f"不支持性胁迫或性暴力内容：{match.group(0)}")
+
+
+def normalize_generated_adult_language(text: str) -> str:
+    text = _CURRENT_AMBIGUOUS_WOMAN.sub("成年女性", text)
+    return _CURRENT_AMBIGUOUS_MAN.sub("成年男性", text)
 
 
 def _validate_no_coercive_sexual_content(text: str) -> None:

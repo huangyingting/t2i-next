@@ -4,6 +4,7 @@ import pytest
 
 from t2i_story_pipeline.errors import UnsafeStoryError
 from t2i_story_pipeline.safety import (
+    normalize_generated_adult_language,
     validate_generated_story,
     validate_source_story,
 )
@@ -75,6 +76,21 @@ def test_explicit_content_level_requires_consent_in_source_story() -> None:
 
 def test_generated_story_allows_adult_memory_of_youth() -> None:
     validate_generated_story("两名三十多岁的成年人回忆少年时代的旧车站。")
+
+
+def test_generated_story_does_not_reject_consensual_bondage_vocabulary() -> None:
+    validate_generated_story(
+        "两名三十岁的成年人自愿参与情色绳艺，绳索压制衣料褶皱，彼此持续回应。"
+    )
+
+
+def test_generated_story_normalizes_ambiguous_adult_terms() -> None:
+    assert normalize_generated_adult_language(
+        "二十八岁的少女与三十岁的少年互相回应。"
+    ) == "二十八岁的成年女性与三十岁的成年男性互相回应。"
+    assert normalize_generated_adult_language(
+        "两名成年人回忆少女时代与少年时期。"
+    ) == "两名成年人回忆少女时代与少年时期。"
 
 
 def test_generated_story_still_rejects_current_minor_character() -> None:

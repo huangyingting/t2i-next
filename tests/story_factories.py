@@ -111,6 +111,5 @@ def make_story_result(
             )
             for index in range(1, theme_count + 1)
         ],
-        quality_feedback=[],
         usage=TokenUsage(total_tokens=30),
     )

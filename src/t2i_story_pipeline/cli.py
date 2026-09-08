@@ -99,10 +99,6 @@ def generate_command(
 
     typer.echo(f"结构化结果：{published.json_file}")
     typer.echo(f"叙事提示词：{published.prompt_file}")
-    typer.echo(
-        f"非阻断质量反馈：{len(result.quality_feedback)} 项"
-        "（详见结构化结果）"
-    )
 
 
 async def _generate(

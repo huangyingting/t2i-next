@@ -2,20 +2,12 @@ from __future__ import annotations
 
 import json
 
-from t2i_story_pipeline.models import QualityFeedback, StoryStage
 from t2i_story_pipeline.storage import publish_story
 from tests.story_factories import make_story_result
 
 
 def test_publish_story_writes_json_and_one_prompt_file(tmp_path) -> None:
     result = make_story_result()
-    result.quality_feedback = [
-        QualityFeedback(
-            stage=StoryStage.FRAMES,
-            item_id="T001/F01",
-            issues=["镜头句缺少拍摄角度"],
-        )
-    ]
 
     published = publish_story(result, tmp_path)
 
@@ -30,16 +22,7 @@ def test_publish_story_writes_json_and_one_prompt_file(tmp_path) -> None:
     )
     payload = json.loads(published.json_file.read_text(encoding="utf-8"))
     assert payload["request"]["content_level"] == "aesthetic"
-    assert payload["quality_feedback"] == [
-        {
-            "stage": "frames",
-            "item_id": "T001/F01",
-            "issues": ["镜头句缺少拍摄角度"],
-        }
-    ]
-    assert "镜头句缺少拍摄角度" not in published.prompt_file.read_text(
-        encoding="utf-8"
-    )
+    assert "quality_feedback" not in payload
     assert list(tmp_path.glob("*")) == [
         published.json_file,
         published.prompt_file,

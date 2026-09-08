@@ -34,12 +34,12 @@ Text = Annotated[
 ]
 StyleText = Annotated[
     str,
-    StringConstraints(min_length=2, max_length=40, strip_whitespace=True),
+    StringConstraints(min_length=1, strip_whitespace=True),
     AfterValidator(_single_line),
 ]
 PremiseText = Annotated[
     str,
-    StringConstraints(min_length=1, max_length=300, strip_whitespace=True),
+    StringConstraints(min_length=1, strip_whitespace=True),
     AfterValidator(_single_line),
 ]
 StoryText = Annotated[
@@ -81,9 +81,13 @@ class StoryRequest(Model):
 
 class NarrativeTheme(Model):
     theme_id: ThemeId
-    title: Text
-    premise: PremiseText
-    style: StyleText
+    title: Text = Field(description="简洁自然的中文主题标题")
+    premise: PremiseText = Field(
+        description="至多两句的完整人物故事前提，不包含写作指令"
+    )
+    style: StyleText = Field(
+        description="一句完整简洁的视觉风格描述，不包含写作指令或内部字段"
+    )
 
 
 class NarrativeThemeBatch(Model):
@@ -92,7 +96,9 @@ class NarrativeThemeBatch(Model):
 
 class NarrativeFrame(Model):
     frame_id: FrameId
-    prose: NarrativeProse
+    prose: NarrativeProse = Field(
+        description="只含最终画面正文的单段自然语言，不包含内部编号或写作指令"
+    )
 
 
 class NarrativeFrameSequence(Model):
@@ -102,12 +108,6 @@ class NarrativeFrameSequence(Model):
 class NarrativeThemeResult(Model):
     theme: NarrativeTheme
     frames: list[NarrativeFrame] = Field(min_length=1, max_length=6)
-
-
-class QualityFeedback(Model):
-    stage: StoryStage
-    item_id: Text
-    issues: list[Text] = Field(min_length=1)
 
 
 class TokenUsage(Model):
@@ -127,7 +127,6 @@ class StoryResult(Model):
     run_id: Text
     request: StoryRequest
     themes: list[NarrativeThemeResult] = Field(min_length=1, max_length=100)
-    quality_feedback: list[QualityFeedback] = Field(default_factory=list)
     usage: TokenUsage
 
 

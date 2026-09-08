@@ -44,24 +44,30 @@ def test_narrative_theme_requires_one_style_anchor() -> None:
         )
 
 
-def test_narrative_theme_rejects_style_essay() -> None:
-    with pytest.raises(ValidationError):
-        NarrativeTheme(
-            theme_id="T001",
-            title="遗失的行李",
-            premise="两名成年人共同寻找行李。",
-            style="清代内廷暗调电影风格" * 10,
-        )
+def test_narrative_theme_does_not_truncate_long_style_description() -> None:
+    style = "清代内廷暗调电影风格" * 10
+
+    theme = NarrativeTheme(
+        theme_id="T001",
+        title="遗失的行李",
+        premise="两名成年人共同寻找行李。",
+        style=style,
+    )
+
+    assert theme.style == style
 
 
-def test_narrative_theme_rejects_overlong_premise() -> None:
-    with pytest.raises(ValidationError):
-        NarrativeTheme(
-            theme_id="T001",
-            title="遗失的行李",
-            premise="人物寻找遗失行李。" * 40,
-            style="旧城雨夜电影风格",
-        )
+def test_narrative_theme_does_not_truncate_long_premise() -> None:
+    premise = "人物寻找遗失行李。" * 40
+
+    theme = NarrativeTheme(
+        theme_id="T001",
+        title="遗失的行李",
+        premise=premise,
+        style="旧城雨夜电影风格",
+    )
+
+    assert theme.premise == premise
 
 
 def test_story_request_defaults_to_aesthetic_content() -> None:

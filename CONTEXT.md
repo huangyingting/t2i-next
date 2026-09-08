@@ -79,12 +79,10 @@ _Avoid_: Legacy Theme, variant label
 **Narrative Frame**:
 One final, independently renderable prose paragraph. It naturally integrates
 time and place, event-bearing environment, a complete restatement of every
-visible adult character, one static pose and one decisive action with visible
-response and physical result, then an explicit camera sentence and light
-sentence. It has no intermediate visual-specification fields and needs no
-renderer.
-Its setup states identity, goal, deadline, and consequence as static causal
-facts; new evidence and relationship changes occur only in the decisive action.
+visible adult character, a legible static relationship, physical state,
+camera, and light in the order that reads most naturally. It has no fixed
+sentence openings, mandatory causal formula, intermediate visual-specification
+fields, evaluator, or renderer.
 _Avoid_: Narrative Scene, Story Shot, structured prompt
 
 **Narrative Sequence**:
@@ -92,10 +90,3 @@ The ordered one-to-six Narrative Frames belonging to one Narrative Theme.
 Together they form a micro-story while each frame remains independently
 understandable.
 _Avoid_: Review cycle, storyboard schema
-
-**Quality Feedback**:
-Non-blocking diagnostics for a Narrative Theme or Narrative Frame. It records
-prompt-quality deviations in the Story Result for evaluation and future prompt
-improvement, but never rejects or revises generated prose. Schema, identity,
-count, and safety failures remain hard contract errors instead.
-_Avoid_: Quality gate, review stage, revision request
