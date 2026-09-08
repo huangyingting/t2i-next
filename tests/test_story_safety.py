@@ -15,6 +15,8 @@ from t2i_story_pipeline.safety import (
     (
         "一名少女在雨夜车站等车。",
         "A teenage traveler waits at a station.",
+        "A ten-year-old person waits at a station.",
+        "A girl waits at a station.",
     ),
 )
 def test_story_rejects_minor_or_age_ambiguous_characters(story: str) -> None:
@@ -76,6 +78,29 @@ def test_explicit_content_level_requires_consent_in_source_story() -> None:
 
 def test_generated_story_allows_adult_memory_of_youth() -> None:
     validate_generated_story("两名三十多岁的成年人回忆少年时代的旧车站。")
+
+
+def test_story_allows_minor_as_an_english_adjective() -> None:
+    validate_source_story(
+        "A twenty-eight-year-old adult notices a minor lighting variation."
+    )
+    validate_generated_story(
+        "A twenty-eight-year-old adult notices a minor lighting variation."
+    )
+
+
+@pytest.mark.parametrize(
+    "story",
+    (
+        "A minor woman stands by the window.",
+        "The model is a minor.",
+        "A minor, who is waiting by the window, looks at the camera.",
+        "Two minors stand by the window.",
+    ),
+)
+def test_story_rejects_minor_in_an_english_person_context(story: str) -> None:
+    with pytest.raises(UnsafeStoryError, match="未成年|必须明确成年"):
+        validate_generated_story(story)
 
 
 def test_generated_story_does_not_reject_consensual_bondage_vocabulary() -> None:

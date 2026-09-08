@@ -67,7 +67,11 @@ def theme_messages(
     language = (
         "title、premise 和 style 使用自然中文"
         if request.output_language == OutputLanguage.CHINESE
-        else "Write title, premise, and style in natural English"
+        else (
+            "Write title, premise, and style in natural English. Use “small” or "
+            "“slight” rather than the age-ambiguous English adjective for low "
+            "importance."
+        )
     )
     system = "\n".join(
         (
@@ -123,7 +127,11 @@ def frame_messages(
     language = (
         "prose 使用自然、准确、流畅的中文"
         if request.output_language == OutputLanguage.CHINESE
-        else "Write prose in natural, precise, fluent English"
+        else (
+            "Write prose in natural, precise, fluent English. Use “small” or "
+            "“slight” rather than the age-ambiguous English adjective for low "
+            "importance."
+        )
     )
     frame_ids = [
         f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)

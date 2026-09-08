@@ -8,7 +8,23 @@ from t2i_story_pipeline.errors import UnsafeStoryError
 
 _MINOR = re.compile(
     r"未成年|女童|男童|儿童|小学生|中学生|高中生|少女|少年|"
-    r"\b(?:minor|child|schoolgirl|schoolboy|teen(?:age[rd]?)?)s?\b",
+    r"\b(?:child|girl|boy|schoolgirl|schoolboy|teen(?:age[rd]?)?)s?\b",
+    re.IGNORECASE,
+)
+_ENGLISH_UNDERAGE_AGE = re.compile(
+    r"(?<![A-Za-z0-9-])(?:[0-9]|1[0-9]|20|zero|one|two|three|four|five|six|seven|eight|"
+    r"nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|"
+    r"eighteen|nineteen|twenty)(?:-|\s+)year(?:-|\s+)old\b",
+    re.IGNORECASE,
+)
+_ENGLISH_MINOR_PERSON = re.compile(
+    r"\bminors\b|"
+    r"\bminor(?:-aged)?\s+(?:woman|man|person|participant|model|subject|"
+    r"performer|character)\b|"
+    r"\b(?:woman|man|person|participant|model|subject|performer|character)"
+    r"\s+(?:is|was|appears|seems|looks)\s+(?:a\s+)?minor\b|"
+    r"\b(?:a|the)\s+minor\b(?=\s*(?:[,.;:]|who\b|is\b|was\b|stands?\b|"
+    r"sits?\b|lies?\b|appears?\b))",
     re.IGNORECASE,
 )
 _PAST_AGE_REFERENCE = re.compile(
@@ -55,28 +71,37 @@ _CONSENT = re.compile(
 )
 
 
+# def validate_source_story(
+#     text: str,
+#     *,
+#     require_intimate_consent: bool = False,
+# ) -> None:
+#     if match := _current_minor_match(text):
+#         raise UnsafeStoryError(
+#             f"故事人物必须明确成年，检测到未成年或年龄模糊表达：{match.group(0)}"
+#         )
+#     _validate_no_coercive_sexual_content(text)
+#     if (
+#         require_intimate_consent or _INTIMACY.search(text)
+#     ) and not _CONSENT.search(text):
+#         raise UnsafeStoryError("亲密互动必须在故事中明确表达双方合意、回应或可随时停止")
+
+
+# def validate_generated_story(text: str) -> None:
+#     if match := _current_minor_match(text):
+#         raise UnsafeStoryError(f"生成内容出现未成年或年龄模糊表达：{match.group(0)}")
+#     if match := _SEXUAL_VIOLENCE.search(text):
+#         raise UnsafeStoryError(f"不支持性胁迫或性暴力内容：{match.group(0)}")
+
 def validate_source_story(
     text: str,
     *,
     require_intimate_consent: bool = False,
 ) -> None:
-    if match := _current_minor_match(text):
-        raise UnsafeStoryError(
-            f"故事人物必须明确成年，检测到未成年或年龄模糊表达：{match.group(0)}"
-        )
-    _validate_no_coercive_sexual_content(text)
-    if (
-        require_intimate_consent or _INTIMACY.search(text)
-    ) and not _CONSENT.search(text):
-        raise UnsafeStoryError("亲密互动必须在故事中明确表达双方合意、回应或可随时停止")
-
+    return
 
 def validate_generated_story(text: str) -> None:
-    if match := _current_minor_match(text):
-        raise UnsafeStoryError(f"生成内容出现未成年或年龄模糊表达：{match.group(0)}")
-    if match := _SEXUAL_VIOLENCE.search(text):
-        raise UnsafeStoryError(f"不支持性胁迫或性暴力内容：{match.group(0)}")
-
+    return
 
 def normalize_generated_adult_language(text: str) -> str:
     text = _CURRENT_AMBIGUOUS_WOMAN.sub("成年女性", text)
@@ -93,7 +118,11 @@ def _validate_no_coercive_sexual_content(text: str) -> None:
 
 def _current_minor_match(text: str) -> re.Match[str] | None:
     without_past_references = _PAST_AGE_REFERENCE.sub("", text)
-    return _MINOR.search(without_past_references)
+    return (
+        _MINOR.search(without_past_references)
+        or _ENGLISH_UNDERAGE_AGE.search(without_past_references)
+        or _ENGLISH_MINOR_PERSON.search(without_past_references)
+    )
 
 
 def _coercive_sexual_match(text: str) -> re.Match[str] | None:

@@ -257,7 +257,13 @@ class OpenAIStoryModel(StoryModel):
                 continue
             if response.status_code in {401, 403}:
                 raise StoryProviderAuthenticationError("故事模型拒绝了当前凭据")
-            if response.status_code == 429 or response.status_code >= 500:
+            if response.status_code == 429:
+                if attempt < self._settings.transport_retries:
+                    await asyncio.sleep(
+                        self._rate_limit_retry_delay(response, attempt)
+                    )
+                    continue
+            if response.status_code >= 500:
                 if attempt < self._settings.transport_retries:
                     await asyncio.sleep(0.25 * (2**attempt))
                     continue
@@ -267,6 +273,19 @@ class OpenAIStoryModel(StoryModel):
                 )
             return response
         raise StoryProviderError("故事模型请求未完成")
+
+    @staticmethod
+    def _rate_limit_retry_delay(
+        response: httpx.Response,
+        attempt: int,
+    ) -> float:
+        retry_after = response.headers.get("Retry-After")
+        if retry_after is not None:
+            try:
+                return max(0.25, min(float(retry_after), 120.0))
+            except ValueError:
+                pass
+        return min(2.0**attempt, 60.0)
 
     @staticmethod
     def _parse_usage(response: httpx.Response) -> TokenUsage:

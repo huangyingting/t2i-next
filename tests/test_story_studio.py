@@ -5,7 +5,6 @@ from collections.abc import Iterable
 import pytest
 
 from t2i_story_pipeline.errors import (
-    StoryContractError,
     StoryProviderResponseError,
     UnsafeStoryError,
 )
@@ -131,6 +130,67 @@ async def test_studio_generates_one_hundred_themes_and_six_hundred_frames() -> N
 
 
 @pytest.mark.asyncio
+async def test_studio_supports_smaller_theme_batches() -> None:
+    model = FakeStoryModel(
+        [
+            make_theme_batch(start=1, count=3),
+            make_theme_batch(start=4, count=3),
+            *[
+                make_frame_sequence(theme_index=index)
+                for index in range(1, 7)
+            ],
+        ]
+    )
+
+    result = await StoryStudio(
+        model,
+        concurrency=1,
+        theme_batch_size=3,
+    ).generate(make_story_request(theme_count=6))
+
+    assert len(result.themes) == 6
+    assert model.stages.count(StoryStage.THEMES) == 2
+
+
+@pytest.mark.asyncio
+async def test_studio_normalizes_theme_ids_by_response_order() -> None:
+    duplicate_batch = make_theme_batch(start=6, count=5)
+    for theme in duplicate_batch.themes:
+        theme.theme_id = "T006"
+    model = FakeStoryModel(
+        [
+            make_theme_batch(count=5),
+            duplicate_batch,
+            *[
+                make_frame_sequence(theme_index=index)
+                for index in range(1, 11)
+            ],
+        ]
+    )
+
+    result = await StoryStudio(
+        model,
+        concurrency=1,
+        generation_retries=0,
+        theme_batch_size=5,
+    ).generate(make_story_request(theme_count=10))
+
+    assert [item.theme.theme_id for item in result.themes] == [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+    ]
+    assert model.stages.count(StoryStage.THEMES) == 2
+
+
+@pytest.mark.asyncio
 async def test_studio_retries_provider_shape_failure_and_counts_usage() -> None:
     model = FakeStoryModel(
         [
@@ -153,17 +213,21 @@ async def test_studio_retries_provider_shape_failure_and_counts_usage() -> None:
 
 
 @pytest.mark.asyncio
-async def test_studio_rejects_wrong_frame_ids() -> None:
+async def test_studio_normalizes_frame_ids_by_response_order() -> None:
     sequence = make_frame_sequence()
     sequence.frames[1].frame_id = "F03"
     model = FakeStoryModel([make_theme_batch(), sequence])
 
-    with pytest.raises(StoryContractError, match="画面数量或顺序"):
-        await StoryStudio(
-            model,
-            concurrency=1,
-            generation_retries=0,
-        ).generate(make_story_request())
+    result = await StoryStudio(
+        model,
+        concurrency=1,
+        generation_retries=0,
+    ).generate(make_story_request())
+
+    assert [frame.frame_id for frame in result.themes[0].frames] == [
+        "F01",
+        "F02",
+    ]
 
 
 @pytest.mark.asyncio

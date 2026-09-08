@@ -44,14 +44,18 @@ class StoryStudio:
         *,
         concurrency: int = 10,
         generation_retries: int = 2,
+        theme_batch_size: int = 10,
     ) -> None:
         if not 1 <= concurrency <= 32:
             raise ValueError("concurrency 必须介于 1 和 32")
         if not 0 <= generation_retries <= 5:
             raise ValueError("generation_retries 必须介于 0 和 5")
+        if not 1 <= theme_batch_size <= 10:
+            raise ValueError("theme_batch_size 必须介于 1 和 10")
         self._model = model
         self._concurrency = concurrency
         self._generation_retries = generation_retries
+        self._theme_batch_size = theme_batch_size
 
     async def generate(self, request: StoryRequest) -> StoryResult:
         validate_source_story(
@@ -93,7 +97,10 @@ class StoryStudio:
         usage = TokenUsage()
         while len(themes) < request.theme_count:
             start_index = len(themes) + 1
-            count = min(10, request.theme_count - len(themes))
+            count = min(
+                self._theme_batch_size,
+                request.theme_count - len(themes),
+            )
             messages = theme_messages(
                 request,
                 start_index=start_index,
@@ -125,12 +132,17 @@ class StoryStudio:
                         expected_start + expected_count,
                     )
                 ]
-                actual = [theme.theme_id for theme in value.themes]
-                if actual != expected:
+                if len(value.themes) != len(expected):
                     raise StoryContractError(
-                        "主题数量或顺序不符合请求："
-                        f"expected={expected}, actual={actual}"
+                        "主题数量不符合请求："
+                        f"expected={len(expected)}, actual={len(value.themes)}"
                     )
+                for theme, theme_id in zip(
+                    value.themes,
+                    expected,
+                    strict=True,
+                ):
+                    theme.theme_id = theme_id
                 validate_generated_story(
                     value.model_dump_json(ensure_ascii=False)
                 )
@@ -164,14 +176,19 @@ class StoryStudio:
         ) -> None:
             if not isinstance(value, NarrativeFrameSequence):
                 raise StoryContractError("provider 返回了错误的画面类型")
-            for frame in value.frames:
-                frame.prose = normalize_generated_adult_language(frame.prose)
-            actual = [frame.frame_id for frame in value.frames]
-            if actual != expected_ids:
+            if len(value.frames) != len(expected_ids):
                 raise StoryContractError(
-                    "画面数量或顺序不符合请求："
-                    f"expected={expected_ids}, actual={actual}"
+                    "画面数量不符合请求："
+                    f"expected={len(expected_ids)}, "
+                    f"actual={len(value.frames)}"
                 )
+            for frame, frame_id in zip(
+                value.frames,
+                expected_ids,
+                strict=True,
+            ):
+                frame.frame_id = frame_id
+                frame.prose = normalize_generated_adult_language(frame.prose)
             for frame in value.frames:
                 validate_generated_story(frame.prose)
 

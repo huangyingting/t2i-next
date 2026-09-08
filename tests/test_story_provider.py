@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from unittest.mock import AsyncMock
 
 import httpx
 import pytest
@@ -116,6 +117,62 @@ async def test_story_provider_accepts_valid_json_at_length_limit(
     await client.aclose()
 
     assert response.value.model_dump() == sequence.model_dump()
+
+
+@pytest.mark.asyncio
+async def test_story_provider_retries_rate_limit_with_retry_after(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+    sleep = AsyncMock()
+    monkeypatch.setattr("t2i_story_pipeline.provider.asyncio.sleep", sleep)
+    sequence = make_frame_sequence()
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return httpx.Response(
+                429,
+                request=request,
+                headers={"Retry-After": "3"},
+                json={"error": {"message": "rate limited"}},
+            )
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {"content": sequence.model_dump_json()},
+                    }
+                ]
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+            transport_retries=1,
+        ),
+        client=client,
+    )
+
+    response = await provider.generate(
+        stage=StoryStage.FRAMES,
+        messages=frame_messages(make_story_request(), make_theme()),
+        response_model=exact_frame_sequence_model(2),
+        max_output_tokens=10000,
+    )
+    await client.aclose()
+
+    assert response.value.model_dump() == sequence.model_dump()
+    assert calls == 2
+    sleep.assert_awaited_once_with(3.0)
 
 
 @pytest.mark.asyncio
