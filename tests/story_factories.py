@@ -17,6 +17,8 @@ def make_story_request(
     *,
     theme_count: int = 1,
     frames_per_theme: int = 2,
+    female_count: int | None = None,
+    male_count: int | None = None,
     content_level: ContentLevel = ContentLevel.AESTHETIC,
 ) -> StoryRequest:
     return StoryRequest(
@@ -27,6 +29,8 @@ def make_story_request(
         ),
         theme_count=theme_count,
         frames_per_theme=frames_per_theme,
+        female_count=female_count,
+        male_count=male_count,
         content_level=content_level,
     )
 

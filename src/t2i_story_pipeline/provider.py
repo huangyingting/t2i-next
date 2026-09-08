@@ -67,7 +67,7 @@ class StoryProviderSettings(BaseModel):
     thinking_mode: ThinkingMode | None = None
     reasoning_effort: ReasoningEffort | None = None
     temperature: float = Field(default=0.5, ge=0, le=2)
-    output_token_limit: int = Field(default=12000, ge=512, le=65536)
+    output_token_limit: int = Field(default=32768, ge=512, le=65536)
     timeout_seconds: float = Field(default=180, gt=0, le=600)
     transport_retries: int = Field(default=2, ge=0, le=8)
 

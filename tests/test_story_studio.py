@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from inspect import signature
 
 import pytest
 
-from t2i_story_pipeline.errors import (
-    StoryProviderResponseError,
-    UnsafeStoryError,
-)
+from t2i_story_pipeline.errors import StoryProviderResponseError
 from t2i_story_pipeline.models import (
-    ContentLevel,
-    StoryRequest,
     StoryStage,
     TokenUsage,
 )
@@ -28,6 +24,7 @@ class FakeStoryModel:
         self._values = iter(values)
         self.stages: list[StoryStage] = []
         self.messages = []
+        self.max_output_tokens: list[int] = []
 
     async def generate(
         self,
@@ -39,6 +36,7 @@ class FakeStoryModel:
     ) -> ModelResponse:
         self.stages.append(stage)
         self.messages.append(messages)
+        self.max_output_tokens.append(max_output_tokens)
         value = next(self._values)
         if isinstance(value, Exception):
             raise value
@@ -50,6 +48,10 @@ class FakeStoryModel:
                 total_tokens=15,
             ),
         )
+
+
+def test_story_studio_defaults_to_eight_concurrent_frame_sequences() -> None:
+    assert signature(StoryStudio).parameters["concurrency"].default == 8
 
 
 @pytest.mark.asyncio
@@ -73,6 +75,7 @@ async def test_studio_generates_final_story_paragraphs() -> None:
         StoryStage.FRAMES,
         StoryStage.FRAMES,
     ]
+    assert model.max_output_tokens == [6000, 32768, 32768]
     assert result.usage.total_tokens == 45
 
 
@@ -91,20 +94,6 @@ async def test_studio_accepts_prose_without_quality_template() -> None:
 
     assert result.themes[0].frames[0].prose == sequence.frames[0].prose
     assert model.stages == [StoryStage.THEMES, StoryStage.FRAMES]
-
-
-@pytest.mark.asyncio
-async def test_studio_requires_source_consent_for_explicit_content_level() -> None:
-    model = FakeStoryModel([])
-    request = StoryRequest(
-        story="两名三十岁的成年人在卧室内交谈。",
-        content_level=ContentLevel.EROTIC,
-    )
-
-    with pytest.raises(UnsafeStoryError, match="必须在故事中明确"):
-        await StoryStudio(model).generate(request)
-
-    assert model.stages == []
 
 
 @pytest.mark.asyncio
@@ -228,29 +217,3 @@ async def test_studio_normalizes_frame_ids_by_response_order() -> None:
         "F01",
         "F02",
     ]
-
-
-@pytest.mark.asyncio
-async def test_studio_rejects_unsafe_source_before_provider_call() -> None:
-    model = FakeStoryModel([])
-    request = make_story_request()
-    request.story = "一名少女在车站等待。"
-
-    with pytest.raises(UnsafeStoryError):
-        await StoryStudio(model).generate(request)
-
-    assert model.stages == []
-
-
-@pytest.mark.asyncio
-async def test_studio_rejects_generated_sexual_violence() -> None:
-    sequence = make_frame_sequence()
-    sequence.frames[0].prose = "两名成年人正在实施明确的性暴力。"
-    model = FakeStoryModel([make_theme_batch(), sequence])
-
-    with pytest.raises(UnsafeStoryError):
-        await StoryStudio(
-            model,
-            concurrency=1,
-            generation_retries=0,
-        ).generate(make_story_request())

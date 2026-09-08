@@ -11,9 +11,25 @@ uv run t2i-story generate \
   "秋夜，两名三十多岁的成年人在旧车站重逢。他们确认彼此身份后一起寻找遗失的行李，气氛由警惕转为释然。湿润月台反射暖色站灯，使用平视中景和侧后方灯光。" \
   --themes 100 \
   --frames 6 \
+  --female-count 1 \
+  --male-count 1 \
   --content-level erotic \
-  --concurrency 10
+  --concurrency 8
 ```
+
+也可以把完整 Story Description 保存为 UTF-8 文本文件，用文件代替位置参数：
+
+```bash
+uv run t2i-story generate \
+  --prompt-file story.txt \
+  --themes 100 \
+  --frames 6 \
+  --content-level erotic
+```
+
+故事位置参数与 `--prompt-file` 必须且只能提供一个。文件首尾空白会被移除，
+内部换行会原样保留。`--female-count` 和 `--male-count` 可以分别约束每个主题
+及每帧中的成年女性和成年男性人数；省略时遵循 Story Description 明示的人物。
 
 输出写入 `story-prompts/`：
 

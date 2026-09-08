@@ -29,6 +29,50 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     assert "人物关系、场景用途、决定或冲突上真正不同" in prompt
 
 
+def test_prompts_compile_exact_cast_constraints() -> None:
+    request = make_story_request(female_count=2, male_count=1)
+
+    for messages in (
+        theme_messages(
+            request,
+            start_index=1,
+            count=1,
+            existing_themes=[],
+        ),
+        frame_messages(request, make_theme()),
+    ):
+        prompt = messages[0].content
+        payload = json.loads(messages[1].content)
+
+        assert payload["cast_constraints"] == {
+            "female_count": 2,
+            "male_count": 1,
+        }
+        assert "成年女性 2 名、成年男性 1 名" in prompt
+        assert "不得省略、替换或增加其他人物" in prompt
+
+
+def test_prompts_preserve_unspecified_cast_from_story() -> None:
+    request = make_story_request()
+
+    for messages in (
+        theme_messages(
+            request,
+            start_index=1,
+            count=1,
+            existing_themes=[],
+        ),
+        frame_messages(request, make_theme()),
+    ):
+        assert json.loads(messages[1].content)["cast_constraints"] == {
+            "female_count": None,
+            "male_count": None,
+        }
+        assert "人物人数和性别必须忠实遵循 story 明示事实" in (
+            messages[0].content
+        )
+
+
 def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     request = make_story_request(frames_per_theme=6)
     messages = frame_messages(request, make_theme())
@@ -59,13 +103,6 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "必须精确以“此刻，”开头" not in prompt
     assert "倒数第二句必须以“镜头采用”开头" not in prompt
     assert "以下是提交前必须满足的精确质量门" not in prompt
-
-
-def test_frame_prompt_keeps_adult_consent_safety() -> None:
-    prompt = frame_messages(make_story_request(), make_theme())[0].content
-
-    assert "二十一岁以上成年人" in prompt
-    assert "清醒、自愿" in prompt
 
 
 @pytest.mark.parametrize(

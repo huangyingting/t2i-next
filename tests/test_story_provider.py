@@ -23,6 +23,12 @@ from tests.story_factories import (
 )
 
 
+def test_story_provider_defaults_to_32768_output_tokens() -> None:
+    settings = StoryProviderSettings(model="story-model")
+
+    assert settings.output_token_limit == 32768
+
+
 @pytest.mark.asyncio
 async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")

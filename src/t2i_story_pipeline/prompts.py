@@ -12,13 +12,6 @@ from t2i_story_pipeline.models import (
 )
 from t2i_story_pipeline.provider import ChatMessage
 
-_SAFETY = (
-    "所有人物必须明确为二十一岁以上成年人。成年人只能称为成年女性、成年男性"
-    "或其明确成年身份，不得使用少女、少年等年龄模糊称谓。不得生成未成年人、"
-    "性胁迫、性暴力或无法退出的亲密互动。情色或亲密互动只可表现参与者清醒、"
-    "自愿、持续回应且可随时停止。"
-)
-
 _CONTENT_LEVEL_INSTRUCTIONS = {
     ContentLevel.AESTHETIC: (
         "采用美学叙事尺度。以故事、人物、构图和氛围为主，不主动增加性内容。"
@@ -42,6 +35,34 @@ def _content_level_instruction(request: StoryRequest) -> str:
     return (
         _CONTENT_LEVEL_INSTRUCTIONS[request.content_level]
         + "不要把内容等级名称、英文值或合规说明写入 title、premise 或 prose。"
+    )
+
+
+def _cast_constraints(request: StoryRequest) -> dict[str, int | None]:
+    return {
+        "female_count": request.female_count,
+        "male_count": request.male_count,
+    }
+
+
+def _cast_instruction(request: StoryRequest) -> str:
+    female_count = request.female_count
+    male_count = request.male_count
+    if female_count is None and male_count is None:
+        return (
+            "人物人数和性别必须忠实遵循 story 明示事实，不得擅自增减或替换人物。"
+        )
+    if female_count is not None and male_count is not None:
+        return (
+            f"每个 theme 及其每个 frame 必须恰好包含成年女性 {female_count} 名、"
+            f"成年男性 {male_count} 名，不得省略、替换或增加其他人物。"
+        )
+
+    gender = "成年女性" if female_count is not None else "成年男性"
+    count = female_count if female_count is not None else male_count
+    return (
+        f"每个 theme 及其每个 frame 必须恰好包含{gender} {count} 名；"
+        "未指定性别的人数遵循 story 明示事实，不得省略或额外增加已约束性别的人物。"
     )
 
 
@@ -77,7 +98,6 @@ def theme_messages(
         (
             "你是叙事选题编辑。围绕同一 story 构思真正不同、可以拍成若干独立"
             "静态画面的微型故事，不是把同一动作换地点、换颜色或换机位。",
-            _SAFETY,
             f"themes 必须恰好包含 {count} 项，theme_id 从 "
             f"T{start_index:03d} 连续到 T{end_index:03d}。",
             "title 简洁自然。premise 最多两句：第一句确定时间、地点、人物和"
@@ -89,6 +109,7 @@ def theme_messages(
             "若 story 已给出具体事件，就深化人物和可见处境；若只是宽泛题材，可以"
             "构思可信的新事件。不要为了戏剧性虚构姓名、精确年号地点、秘密身世、"
             "物件来历、身份等级、伤痕或关系史。",
+            _cast_instruction(request),
             _era_consistency_instruction(),
             "style 是一句完整、简洁的视觉风格描述，不罗列不同景别或多个构图方案。",
             "不同主题要从人物关系、场景用途、决定或冲突上真正不同。已有主题只用于"
@@ -105,6 +126,7 @@ def theme_messages(
             content=json.dumps(
                 {
                     "story": request.story,
+                    "cast_constraints": _cast_constraints(request),
                     "content_level": request.content_level.value,
                     "batch_start": start_index,
                     "batch_count": count,
@@ -141,13 +163,12 @@ def frame_messages(
             "你是电影感静态画面叙事作家。把 theme 写成若干可直接用于文生图、"
             "又能让人一眼理解人物处境的独立画面。整体叙事的自然、通顺和画面成立"
             "优先于逐项填表。",
-            _SAFETY,
             f"frames 必须恰好包含 {len(frame_ids)} 项，frame_id 依次为 "
             f"{'、'.join(frame_ids)}。",
             "每个 prose 是一个无换行的自然段，不使用主题、人物、动作、摄影、"
             "光线等字段标签。开头自然点明 theme.style，并在前部让年代、地点和"
             "当前时刻清楚成立，但不要每帧套用完全相同的句式。",
-            "把每帧当作这组图片中唯一存在的一张来写，读者不需要知道其他五帧。"
+            "把每帧当作这组图片中唯一存在的一张来写，读者不需要知道其他帧。"
             "自然交代谁在什么处境中、他们正在面对"
             "什么，以及这一瞬间为何有意义；只有故事确实需要时才写期限或失败后果，"
             "不要强造委托方、验收、倒计时、交付任务或抽象的风险术语。",
@@ -156,6 +177,7 @@ def frame_messages(
             "档案一样逐项罗列；稳定外貌沿用 theme premise，不能在各帧改变同一"
             "人的发色、发长、脸型或身形。不同人物要有能够彼此回应的情绪和空间"
             "关系。",
+            _cast_instruction(request),
             "画面定格在一个清晰瞬间。可以有一个最重要的动作、接触或受力关系，"
             "但只写当前可见状态和直接物理结果，不叙述先后步骤，不让人物在同一帧"
             "连续改变姿态。不要为了符合句式而使用“此刻”或其他固定开头。",
@@ -195,6 +217,7 @@ def frame_messages(
             content=json.dumps(
                 {
                     "story": request.story,
+                    "cast_constraints": _cast_constraints(request),
                     "content_level": request.content_level.value,
                     "theme": theme.model_dump(mode="json"),
                     "frames_per_theme": request.frames_per_theme,

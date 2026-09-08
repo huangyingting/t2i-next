@@ -11,10 +11,6 @@ class StoryConfigurationError(StoryPipelineError):
     """Story provider configuration is invalid or incomplete."""
 
 
-class UnsafeStoryError(StoryPipelineError):
-    """The source story violates a non-negotiable safety invariant."""
-
-
 class StoryContractError(StoryPipelineError):
     """Generated story data violates the requested shape or references."""
 

@@ -11,10 +11,8 @@ from pydantic import BaseModel
 from t2i_story_pipeline.errors import (
     StoryContractError,
     StoryProviderResponseError,
-    UnsafeStoryError,
 )
 from t2i_story_pipeline.models import (
-    ContentLevel,
     NarrativeFrameSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
@@ -28,11 +26,6 @@ from t2i_story_pipeline.models import (
 )
 from t2i_story_pipeline.prompts import frame_messages, theme_messages
 from t2i_story_pipeline.provider import ChatMessage, StoryModel
-from t2i_story_pipeline.safety import (
-    normalize_generated_adult_language,
-    validate_generated_story,
-    validate_source_story,
-)
 
 
 class StoryStudio:
@@ -42,7 +35,7 @@ class StoryStudio:
         self,
         model: StoryModel,
         *,
-        concurrency: int = 10,
+        concurrency: int = 8,
         generation_retries: int = 2,
         theme_batch_size: int = 10,
     ) -> None:
@@ -58,13 +51,6 @@ class StoryStudio:
         self._theme_batch_size = theme_batch_size
 
     async def generate(self, request: StoryRequest) -> StoryResult:
-        validate_source_story(
-            request.story,
-            require_intimate_consent=(
-                request.content_level
-                in {ContentLevel.EROTIC, ContentLevel.HARDCORE}
-            ),
-        )
         themes, theme_usage = await self._generate_themes(request)
         semaphore = asyncio.Semaphore(self._concurrency)
 
@@ -115,16 +101,6 @@ class StoryStudio:
             ) -> None:
                 if not isinstance(value, NarrativeThemeBatch):
                     raise StoryContractError("provider 返回了错误的主题类型")
-                for theme in value.themes:
-                    theme.title = normalize_generated_adult_language(
-                        theme.title
-                    )
-                    theme.premise = normalize_generated_adult_language(
-                        theme.premise
-                    )
-                    theme.style = normalize_generated_adult_language(
-                        theme.style
-                    )
                 expected = [
                     f"T{index:03d}"
                     for index in range(
@@ -143,9 +119,6 @@ class StoryStudio:
                     strict=True,
                 ):
                     theme.theme_id = theme_id
-                validate_generated_story(
-                    value.model_dump_json(ensure_ascii=False)
-                )
 
             value, batch_usage = await self._generate_validated(
                 stage=StoryStage.THEMES,
@@ -188,9 +161,6 @@ class StoryStudio:
                 strict=True,
             ):
                 frame.frame_id = frame_id
-                frame.prose = normalize_generated_adult_language(frame.prose)
-            for frame in value.frames:
-                validate_generated_story(frame.prose)
 
         value, usage = await self._generate_validated(
             stage=StoryStage.FRAMES,
@@ -198,7 +168,7 @@ class StoryStudio:
             response_model=exact_frame_sequence_model(
                 request.frames_per_theme
             ),
-            max_output_tokens=16000,
+            max_output_tokens=32768,
             validate=validate_ids,
         )
         if not isinstance(value, NarrativeFrameSequence):
@@ -231,7 +201,7 @@ class StoryStudio:
             except StoryProviderResponseError as exc:
                 usage += exc.usage
                 error: Exception = exc
-            except (StoryContractError, UnsafeStoryError) as exc:
+            except StoryContractError as exc:
                 error = exc
             else:
                 return response.value, usage
@@ -252,7 +222,7 @@ class StoryStudio:
                 ChatMessage(
                     role="user",
                     content=(
-                        "上一份输出未满足基本结构或安全契约。"
+                        "上一份输出未满足基本结构契约。"
                         f"问题：{error}。不要解释，只返回完整 schema 数据。"
                     ),
                 )

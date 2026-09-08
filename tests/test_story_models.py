@@ -35,6 +35,14 @@ def test_narrative_frame_is_one_final_prose_paragraph() -> None:
         NarrativeFrame(frame_id="F01", prose="第一段。\n第二段。")
 
 
+def test_narrative_frame_allows_up_to_32768_characters() -> None:
+    frame = NarrativeFrame(frame_id="F01", prose="a" * 32768)
+
+    assert len(frame.prose) == 32768
+    with pytest.raises(ValidationError):
+        NarrativeFrame(frame_id="F01", prose="a" * 32769)
+
+
 def test_narrative_theme_requires_one_style_anchor() -> None:
     with pytest.raises(ValidationError):
         NarrativeTheme(
@@ -74,6 +82,28 @@ def test_story_request_defaults_to_aesthetic_content() -> None:
     request = StoryRequest(story="两名三十岁的成年人站在旧车站。")
 
     assert request.content_level is ContentLevel.AESTHETIC
+
+
+def test_story_request_supports_optional_and_male_only_cast_constraints() -> None:
+    unconstrained = StoryRequest(story="测试故事。")
+    request = StoryRequest(
+        story="测试故事。",
+        female_count=0,
+        male_count=2,
+    )
+
+    assert unconstrained.female_count is None
+    assert unconstrained.male_count is None
+    assert request.female_count == 0
+    assert request.male_count == 2
+
+
+def test_story_request_rejects_invalid_cast_constraints() -> None:
+    with pytest.raises(ValidationError, match="人物约束不能同时为零"):
+        StoryRequest(story="测试故事。", female_count=0, male_count=0)
+
+    with pytest.raises(ValidationError, match="每个主题最多包含八名角色"):
+        StoryRequest(story="测试故事。", female_count=5, male_count=4)
 
 
 def test_story_request_accepts_all_content_levels() -> None:

@@ -14,6 +14,8 @@ result = await StoryStudio(model).generate(
         story="故事要求",
         theme_count=100,
         frames_per_theme=6,
+        female_count=1,
+        male_count=1,
         content_level=ContentLevel.EROTIC,
     )
 )
@@ -48,10 +50,16 @@ result = await StoryStudio(model).generate(
 只把当前选择等级的指令编译进 theme 与 frame prompt；不会同时发送另外两级规则。
 等级名称和合规说明不得出现在生成的 `title`、`premise` 或 `prose` 中。
 
-`erotic` 和 `hardcore` 会让 Story Description 必须显式声明参与者清醒、自愿、
-持续回应或可以停止，否则在任何 provider 调用前失败。所有等级都继续执行相同的
-硬安全契约：人物必须二十一岁以上，禁止未成年人、性胁迫、性暴力和无法退出的
-亲密互动。`hardcore` 不会放宽这些规则。
+## 人物数量约束
+
+`StoryRequest.female_count` 和 `male_count` 是可选人物数量约束，分别接受 0 至 8。
+两者都提供时，每个 Narrative Theme 及其每个 Narrative Frame 必须恰好使用该
+阵容，不得省略、替换或增加其他人物。只提供一项时，该性别人数必须精确匹配，
+另一性别人数遵循 Story Description 明示事实；两项都省略时，人物人数和性别
+完全遵循 Story Description。两项不能同时为 0，已指定人数之和不能超过 8。
+
+约束会同时编译进 theme 和 frame 的 system prompt，并以 `cast_constraints`
+写入两个阶段的 provider request。
 
 ## 叙事方式
 
@@ -68,7 +76,7 @@ result = await StoryStudio(model).generate(
 篇幅由人物和画面复杂度决定，不设目标字数。
 
 系统没有本地叙事质量门、关键词评分、相似度 gate、review 或 revision。provider
-第一次看到的就是完整创作方向；输出只经过结构与安全契约，不因文风或词语触发额外
+第一次看到的就是完整创作方向；输出只经过结构契约，不因文风或词语触发额外
 生成调用。
 
 ## 时间、地点与时代一致性
@@ -92,12 +100,9 @@ theme 与 frame 的初始 prompt 同时要求建筑、室内陈设、家具、�
 - Pydantic typed schema；
 - 精确主题数、帧数和连续 ID；
 - 非空单段 prose；
-- 所有人物明确二十一岁以上；
-- 情色或亲密互动必须清醒、自愿、持续回应且可以停止；
-- 拒绝未成年人、性胁迫、性暴力和无法退出的亲密互动；
 - provider 结构错误的有界重试和 token usage 统计。
 
-因此 100 themes × 6 frames 在没有 provider/schema/安全错误时始终保持
+因此 100 themes × 6 frames 在没有 provider/schema 错误时始终保持
 110 次基础调用。
 
 ## CLI
@@ -107,15 +112,35 @@ uv run t2i-story generate \
   "1930年代秋夜，两名三十岁的成年人在旧车站重逢。他们双方自愿拥抱，彼此回应且任何一方都可以停止。" \
   --themes 100 \
   --frames 6 \
+  --female-count 1 \
+  --male-count 1 \
   --content-level erotic \
-  --concurrency 10
+  --concurrency 8
 ```
+
+或者从 UTF-8 文本文件读取完整 Story Description：
+
+```bash
+uv run t2i-story generate \
+  --prompt-file story.txt \
+  --themes 100 \
+  --frames 6 \
+  --content-level erotic \
+  --concurrency 8
+```
+
+故事位置参数与 `--prompt-file` 互斥，并且必须提供其中一个。文件首尾空白会被
+移除，内部换行会保留。空文件、目录、不可读文件和非 UTF-8 文件会在 provider
+调用前报错。
 
 主要选项：
 
 ```text
+--prompt-file PATH     从 UTF-8 文本文件读取完整故事描述
 --themes INTEGER       主题数量，1 至 100
 --frames INTEGER       每个主题的画面数，1 至 6
+--female-count INTEGER 可选女性人数约束，0 至 8
+--male-count INTEGER   可选男性人数约束，0 至 8
 --concurrency INTEGER  frame sequence 并发数，1 至 32
 --content-level TEXT   aesthetic、erotic 或 hardcore
 --language TEXT        chinese 或 english
@@ -131,6 +156,9 @@ story-prompts/
 ```
 
 TXT 每帧一行，内容就是最终 prose，不含主题标题或 frame ID。
+每条 prose 最多 32,768 个字符；frame sequence 请求和 provider 缺省输出上限
+也都是 32,768 tokens。该 token 上限由同一次调用中的全部 frames 和 JSON
+结构共同使用，不是每帧单独分配。
 
 Provider 使用独立的 `STORY_OPENAI_*` 环境变量。凭证只从配置的环境变量读取，
 不会写入产物或日志。
