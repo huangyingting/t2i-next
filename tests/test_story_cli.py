@@ -107,6 +107,7 @@ def test_story_generate_reads_story_description_from_prompt_file(
     )
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
+    assert captured["request"].source_prompt_stem == "story"
     assert captured["concurrency"] == 8
     assert captured["runs_directory"] == tmp_path / "runs"
     assert captured["prompts_directory"] == tmp_path / "prompts"
@@ -118,6 +119,40 @@ def test_story_generate_rejects_missing_story_input() -> None:
 
     assert result.exit_code != 0
     assert "故事描述或 --prompt-file" in result.output
+
+
+def test_story_generate_direct_input_has_no_source_prompt_stem(
+    monkeypatch,
+) -> None:
+    captured = {}
+
+    async def fake_generate(
+        request,
+        settings,
+        *,
+        concurrency,
+        runs_directory,
+        prompts_directory,
+    ):
+        captured["request"] = request
+        return SimpleNamespace(
+            run_id="test-run",
+            published=SimpleNamespace(
+                prompt_file=prompts_directory / "story.txt",
+            ),
+        )
+
+    monkeypatch.setattr(
+        story_cli,
+        "load_story_provider_settings",
+        lambda: object(),
+    )
+    monkeypatch.setattr(story_cli, "_generate", fake_generate)
+
+    result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
+
+    assert result.exit_code == 0
+    assert captured["request"].source_prompt_stem is None
 
 
 def test_story_generate_rejects_story_and_prompt_file_together(

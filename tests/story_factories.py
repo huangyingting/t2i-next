@@ -20,6 +20,7 @@ def make_story_request(
     female_count: int | None = None,
     male_count: int | None = None,
     content_level: ContentLevel = ContentLevel.AESTHETIC,
+    source_prompt_stem: str | None = None,
 ) -> StoryRequest:
     return StoryRequest(
         story=(
@@ -32,6 +33,7 @@ def make_story_request(
         female_count=female_count,
         male_count=male_count,
         content_level=content_level,
+        source_prompt_stem=source_prompt_stem,
     )
 
 
@@ -102,6 +104,8 @@ def make_story_result(
     frames_per_theme: int = 2,
     female_count: int | None = None,
     male_count: int | None = None,
+    content_level: ContentLevel = ContentLevel.AESTHETIC,
+    source_prompt_stem: str | None = None,
 ) -> StoryResult:
     return StoryResult(
         run_id="abcdef123456",
@@ -111,6 +115,8 @@ def make_story_result(
             frames_per_theme=frames_per_theme,
             female_count=female_count,
             male_count=male_count,
+            content_level=content_level,
+            source_prompt_stem=source_prompt_stem,
         ),
         themes=[
             NarrativeThemeResult(

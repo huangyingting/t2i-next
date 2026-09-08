@@ -122,6 +122,9 @@ def generate_command(
     try:
         request = StoryRequest(
             story=_resolve_story_input(story, prompt_file),
+            source_prompt_stem=(
+                prompt_file.stem if prompt_file is not None else None
+            ),
             theme_count=themes,
             frames_per_theme=frames,
             female_count=female_count,

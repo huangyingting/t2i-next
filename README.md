@@ -62,9 +62,14 @@ prompts root 和 runs directory。
 
 输出按 `prompts/YYYY-MM-DD/aesthetic|erotic|hardcore/` 分类：
 
-- `<semantic-name>_<cast-slug>_NNNN.txt`：小写英文 snake_case 语义名称、确定性
-  人数组合（如 `one_woman_two_men`）和四位冲突序号；每行一段可独立渲染的
-  最终故事画面。
+- 使用 `--prompt-file` 时：
+  `<prompt-stem>_<content-level>_<female-count>_<male-count>_NNNN.txt`，例如
+  `3-view_hardcore_1_woman_0_men_0001.txt`。文件 stem 会转为小写，空格和不适合
+  文件名的标点归一化为下划线；女性、男性人数和四位冲突序号始终明确写出。
+- 直接传入 Story Description 时：
+  `<semantic-name>_<cast-slug>_NNNN.txt`，继续使用模型生成的小写英文 snake_case
+  语义名称和现有 cast slug。
+- 每行是一段可独立渲染的最终故事画面。
 
 `prompts/` 中只保存最终 TXT；恢复所需的结构化 JSON 只保存在 `runs/`。
 

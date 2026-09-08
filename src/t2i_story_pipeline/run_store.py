@@ -88,6 +88,50 @@ def _cast_slug(request: StoryRequest) -> str:
     return "_".join(parts)
 
 
+def _numeric_cast_slug(request: StoryRequest) -> str:
+    def count_slug(
+        value: int | None,
+        singular: str,
+        plural: str,
+    ) -> str:
+        if value is None:
+            return f"unspecified_{plural}"
+        noun = singular if value == 1 else plural
+        return f"{value}_{noun}"
+
+    return "_".join(
+        (
+            count_slug(request.female_count, "woman", "women"),
+            count_slug(request.male_count, "man", "men"),
+        )
+    )
+
+
+def _normalize_source_prompt_stem(value: str) -> str:
+    normalized = re.sub(r"[^\w-]+", "_", value.lower())
+    normalized = re.sub(r"_+", "_", normalized).strip("_-")
+    if not normalized:
+        raise StoryStorageError(
+            "提示词文件名必须至少包含一个可用于输出文件名的字符"
+        )
+    return normalized
+
+
+def _prompt_filename_stem(
+    request: StoryRequest,
+    semantic_name: str,
+) -> str:
+    if request.source_prompt_stem is None:
+        return f"{semantic_name}_{_cast_slug(request)}"
+    return "_".join(
+        (
+            _normalize_source_prompt_stem(request.source_prompt_stem),
+            request.content_level.value,
+            _numeric_cast_slug(request),
+        )
+    )
+
+
 class _Model(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -543,7 +587,10 @@ class LocalStoryRunStore:
             Path(completion_manifest.prompt_file)
             if completion_manifest.prompt_file is not None
             else self._allocate_prompt_path(
-                f"{result.semantic_name}_{_cast_slug(result.request)}",
+                _prompt_filename_stem(
+                    result.request,
+                    result.semantic_name,
+                ),
                 (
                     Path(completion_manifest.prompts_directory)
                     / completion_manifest.created_at[:10]

@@ -17,6 +17,7 @@ settings = StoryRunSettings(provider=provider_settings)
 completed = await StoryStudio(model, store, settings).run(
     StoryRequest(
         story="故事要求",
+        source_prompt_stem=None,
         theme_count=100,
         frames_per_theme=6,
         female_count=1,
@@ -213,7 +214,8 @@ uv run t2i-story generate \
 
 故事位置参数与 `--prompt-file` 互斥，并且必须提供其中一个。文件首尾空白会被
 移除，内部换行会保留。空文件、目录、不可读文件和非 UTF-8 文件会在 provider
-调用前报错。
+调用前报错。使用文件时，其不含扩展名的文件名会作为 `source_prompt_stem`
+冻结到 `request.json`，供完成或 resume 时确定最终文件名。
 
 主要选项：
 
@@ -243,22 +245,29 @@ uv run t2i-story resume RUN_ID --runs-dir runs
 prompts/
 └── YYYY-MM-DD/
     ├── aesthetic/
-    │   └── <semantic-name>_<cast-slug>_0001.txt
+    │   └── <prompt-stem>_aesthetic_<female-count>_<male-count>_0001.txt
     ├── erotic/
-    │   └── <semantic-name>_<cast-slug>_0001.txt
+    │   └── <prompt-stem>_erotic_<female-count>_<male-count>_0001.txt
     └── hardcore/
-        └── <semantic-name>_<cast-slug>_0001.txt
+        └── <prompt-stem>_hardcore_<female-count>_<male-count>_0001.txt
 ```
 
 TXT 每帧一行，内容就是最终 prose，不含主题标题或 frame ID。
 `prompts/` 中只发布最终 TXT。用于恢复的 request、manifest、Theme、Frame、
 attempt 和完整 result JSON 只保存在 `runs/`，不会复制到 `prompts/`。
-`semantic-name` 由模型用简短的小写英文 snake_case 概括整个 Story Description；
-`cast-slug` 根据请求中的女性和男性人数确定，例如 `one_woman_one_man`、
-`two_women`、`three_women`、`two_women_one_man` 或
-`one_woman_two_men`。同一天、同一 content level 下完整名称重名时，序号按
-`_0001`、`_0002` 递增分配。只约束一侧或未约束人数时，slug 使用
-`unspecified` 明示未知部分，不根据模型正文猜测。
+使用 `--prompt-file` 时，`prompt-stem` 来自输入文件去掉扩展名后的名称，并归一化
+为安全的小写文件名；随后依次写入 content level、数字女性人数、数字男性人数和
+序号，例如 `3-view_hardcore_1_woman_0_men_0001.txt`。只约束一侧或未约束
+人数时，未知部分使用 `unspecified_women` 或 `unspecified_men`，不根据模型正文
+猜测。
+
+直接传入 Story Description 时没有 `prompt-stem`，继续使用
+`<semantic-name>_<cast-slug>_NNNN.txt`。`semantic-name` 由模型用简短的小写
+英文 snake_case 概括整个 Story Description；现有 `cast-slug` 使用
+`one_woman_one_man` 等英文数量形式。
+
+同一天、同一 content level 下完整名称重名时，序号按 `_0001`、`_0002` 递增
+分配。
 每条 prose 最多 32,768 个字符；frame sequence 请求和 provider 缺省输出上限
 也都是 32,768 tokens。该 token 上限由同一次调用中的全部 frames 和 JSON
 结构共同使用，不是每帧单独分配。

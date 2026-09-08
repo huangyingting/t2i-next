@@ -4,7 +4,7 @@ import pytest
 
 from t2i_story_pipeline import persistence, run_store
 from t2i_story_pipeline.errors import StoryStorageError
-from t2i_story_pipeline.models import StoryStage, TokenUsage
+from t2i_story_pipeline.models import ContentLevel, StoryStage, TokenUsage
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
     LocalStoryRunStore,
@@ -43,6 +43,56 @@ def test_story_prompt_cast_slug_uses_existing_naming_convention(
     )
 
     assert run_store._cast_slug(request) == expected
+
+
+@pytest.mark.parametrize(
+    ("female_count", "male_count", "expected"),
+    (
+        (1, 0, "3-view_hardcore_1_woman_0_men"),
+        (1, 1, "3-view_hardcore_1_woman_1_man"),
+        (2, 1, "3-view_hardcore_2_women_1_man"),
+        (None, None, "3-view_hardcore_unspecified_women_unspecified_men"),
+    ),
+)
+def test_prompt_file_output_stem_uses_source_level_and_numeric_cast(
+    female_count,
+    male_count,
+    expected,
+) -> None:
+    request = make_story_request(
+        female_count=female_count,
+        male_count=male_count,
+        content_level=ContentLevel.HARDCORE,
+        source_prompt_stem="3-view",
+    )
+
+    assert run_store._prompt_filename_stem(
+        request,
+        semantic_name="ignored_for_prompt_files",
+    ) == expected
+
+
+def test_direct_story_output_stem_keeps_semantic_name_and_cast_slug() -> None:
+    request = make_story_request(female_count=1, male_count=1)
+
+    assert run_store._prompt_filename_stem(
+        request,
+        semantic_name="lost_luggage_reunion",
+    ) == "lost_luggage_reunion_one_woman_one_man"
+
+
+def test_prompt_file_output_stem_normalizes_filename_characters() -> None:
+    request = make_story_request(
+        female_count=1,
+        male_count=1,
+        content_level=ContentLevel.EROTIC,
+        source_prompt_stem="My Story.v1",
+    )
+
+    assert run_store._prompt_filename_stem(
+        request,
+        semantic_name="ignored_for_prompt_files",
+    ) == "my_story_v1_erotic_1_woman_1_man"
 
 
 def test_durable_mkdir_fsyncs_every_created_directory_parent(
@@ -98,7 +148,12 @@ def test_publish_story_writes_six_hundred_ordered_prompts(tmp_path) -> None:
 def test_story_run_store_persists_checkpoints_attempts_and_completion(
     tmp_path,
 ) -> None:
-    request = make_story_request(female_count=1, male_count=1)
+    request = make_story_request(
+        female_count=1,
+        male_count=1,
+        content_level=ContentLevel.HARDCORE,
+        source_prompt_stem="3-view",
+    )
     settings = StoryRunSettings(
         provider=StoryProviderSettings(model="test-model"),
         concurrency=1,
@@ -149,7 +204,12 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
             usage=TokenUsage(total_tokens=20),
         ),
     )
-    result = make_story_result(female_count=1, male_count=1).model_copy(
+    result = make_story_result(
+        female_count=1,
+        male_count=1,
+        content_level=ContentLevel.HARDCORE,
+        source_prompt_stem="3-view",
+    ).model_copy(
         update={
             "run_id": snapshot.run_id,
             "request": request,
@@ -169,10 +229,10 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
         tmp_path
         / "prompts"
         / snapshot.manifest.created_at[:10]
-        / "aesthetic"
+        / "hardcore"
     )
     assert completed.published.prompt_file.name == (
-        "lost_luggage_reunion_one_woman_one_man_0001.txt"
+        "3-view_hardcore_1_woman_1_man_0001.txt"
     )
     assert list((tmp_path / "prompts").rglob("*.json")) == []
     assert '"json_file"' not in (

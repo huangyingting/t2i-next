@@ -24,6 +24,12 @@ def _single_line(value: str) -> str:
     return value.strip()
 
 
+def _usable_source_prompt_stem(value: str) -> str:
+    if not any(character.isalnum() for character in value):
+        raise ValueError("提示词文件名必须包含字母或数字")
+    return value
+
+
 class Model(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -62,6 +68,16 @@ SemanticName = Annotated[
         pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$",
     ),
 ]
+SourcePromptStem = Annotated[
+    str,
+    StringConstraints(
+        min_length=1,
+        max_length=120,
+        strip_whitespace=True,
+        pattern=r"^[^/\\\r\n]+$",
+    ),
+    AfterValidator(_usable_source_prompt_stem),
+]
 
 
 class OutputLanguage(StrEnum):
@@ -82,6 +98,7 @@ class StoryStage(StrEnum):
 
 class StoryRequest(Model):
     story: StoryText
+    source_prompt_stem: SourcePromptStem | None = None
     theme_count: int = Field(default=1, ge=1, le=100)
     frames_per_theme: int = Field(default=6, ge=1, le=6)
     female_count: int | None = Field(default=None, ge=0, le=8)

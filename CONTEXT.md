@@ -75,12 +75,21 @@ _Avoid_: Foreign setting invention, location inference
 
 **Story Semantic Name**:
 A short lowercase English snake_case name summarizing the whole Story
-Description. It identifies published prompt files independently of run IDs.
-_Avoid_: Run name, Theme title, input filename
+Description. It identifies published prompt files for direct Story Description
+input; prompt-file runs retain it as generation metadata but name output from
+the Source Prompt Stem.
+_Avoid_: Run name, Theme title, source prompt stem
+
+**Source Prompt Stem**:
+The input prompt filename without its extension, frozen in the Story Request.
+For prompt-file runs it is the first part of the published filename, before
+content level and numeric female and male counts.
+_Avoid_: Full prompt path, Story Semantic Name
 
 **Cast Slug**:
 A deterministic lowercase English snake_case rendering of the requested
-female and male totals. It is part of every published story prompt filename.
+female and male totals for direct Story Description input. Prompt-file outputs
+instead include explicit numeric female and male count segments.
 _Avoid_: Model-generated cast name, inferred cast
 
 **Era Consistency**:

@@ -93,6 +93,20 @@ def test_story_request_defaults_to_aesthetic_content() -> None:
     assert request.content_level is ContentLevel.AESTHETIC
 
 
+def test_story_request_rejects_source_prompt_path_instead_of_stem() -> None:
+    with pytest.raises(ValidationError):
+        StoryRequest(
+            story="测试故事。",
+            source_prompt_stem="../story",
+        )
+
+    with pytest.raises(ValidationError, match="必须包含字母或数字"):
+        StoryRequest(
+            story="测试故事。",
+            source_prompt_stem="---",
+        )
+
+
 def test_story_request_supports_optional_and_male_only_cast_constraints() -> None:
     unconstrained = StoryRequest(story="测试故事。")
     request = StoryRequest(
