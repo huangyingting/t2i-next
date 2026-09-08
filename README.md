@@ -42,6 +42,12 @@ uv run t2i-story resume RUN_ID --runs-dir story-runs
 
 `request.json`、provider/并发/retry/token 配置、generation attempts 和 token
 usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
+网络 timeout、transport error、429 和 5xx 默认在 provider 层额外重试两次；
+空响应、schema 错误和截断输出在 generation 层分类记录并进行有界重试。截断
+Theme 输出会把下一次请求预算提升到 run 冻结的 provider token 上限，并在
+resume 后保持该预算。attempt
+记录保存请求/接受 ID、具体 issues、耗时和 usage；resume 会把最近三条相关
+issues 继续反馈给模型。认证错误不会盲目重试。
 
 输出写入 `story-prompts/`：
 

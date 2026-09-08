@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from unittest.mock import AsyncMock
 
 import httpx
 import pytest
 
-from t2i_story_pipeline.errors import StoryProviderResponseError
+from t2i_story_pipeline.errors import (
+    StoryProviderHTTPError,
+    StoryProviderTruncatedOutputError,
+    StoryStructuredOutputError,
+)
 from t2i_story_pipeline.models import (
     StoryStage,
     exact_frame_sequence_model,
@@ -182,6 +188,104 @@ async def test_story_provider_retries_rate_limit_with_retry_after(
 
 
 @pytest.mark.asyncio
+async def test_story_provider_supports_http_date_retry_after(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+    sleep = AsyncMock()
+    monkeypatch.setattr("t2i_story_pipeline.provider.asyncio.sleep", sleep)
+    sequence = make_frame_sequence()
+    calls = 0
+    retry_at = format_datetime(
+        datetime.now(UTC) + timedelta(seconds=30),
+        usegmt=True,
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return httpx.Response(
+                429,
+                request=request,
+                headers={"Retry-After": retry_at},
+                json={"error": {"message": "rate limited"}},
+            )
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {"content": sequence.model_dump_json()},
+                    }
+                ]
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+            transport_retries=1,
+        ),
+        client=client,
+    )
+
+    await provider.generate(
+        stage=StoryStage.FRAMES,
+        messages=frame_messages(make_story_request(), make_theme()),
+        response_model=exact_frame_sequence_model(2),
+        max_output_tokens=10000,
+    )
+    await client.aclose()
+
+    delay = sleep.await_args.args[0]
+    assert 28 <= delay <= 30
+
+
+@pytest.mark.asyncio
+async def test_story_provider_does_not_restart_exhausted_http_retries(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(
+            503,
+            request=request,
+            json={"error": {"message": "unavailable"}},
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+            transport_retries=2,
+        ),
+        client=client,
+    )
+
+    with pytest.raises(StoryProviderHTTPError) as error:
+        await provider.generate(
+            stage=StoryStage.FRAMES,
+            messages=frame_messages(make_story_request(), make_theme()),
+            response_model=exact_frame_sequence_model(2),
+            max_output_tokens=10000,
+        )
+    await client.aclose()
+
+    assert error.value.status_code == 503
+    assert calls == 3
+
+
+@pytest.mark.asyncio
 async def test_story_provider_preserves_usage_on_invalid_output(
     monkeypatch,
 ) -> None:
@@ -215,7 +319,7 @@ async def test_story_provider_preserves_usage_on_invalid_output(
         client=client,
     )
 
-    with pytest.raises(StoryProviderResponseError) as error:
+    with pytest.raises(StoryStructuredOutputError) as error:
         await provider.generate(
             stage=StoryStage.FRAMES,
             messages=frame_messages(make_story_request(), make_theme()),
@@ -225,3 +329,49 @@ async def test_story_provider_preserves_usage_on_invalid_output(
     await client.aclose()
 
     assert error.value.usage.total_tokens == 30
+    assert error.value.raw_content == '{"frames":[]}'
+    assert error.value.validation_issues
+
+
+@pytest.mark.asyncio
+async def test_story_provider_classifies_invalid_truncated_output(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "length",
+                        "message": {"content": '{"frames":['},
+                    }
+                ],
+                "usage": {"total_tokens": 40},
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+        ),
+        client=client,
+    )
+
+    with pytest.raises(StoryProviderTruncatedOutputError) as error:
+        await provider.generate(
+            stage=StoryStage.FRAMES,
+            messages=frame_messages(make_story_request(), make_theme()),
+            response_model=exact_frame_sequence_model(2),
+            max_output_tokens=10000,
+        )
+    await client.aclose()
+
+    assert error.value.usage.total_tokens == 40
+    assert error.value.raw_content == '{"frames":['
+    assert error.value.validation_issues

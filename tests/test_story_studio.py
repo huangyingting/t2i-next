@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -7,7 +8,9 @@ import pytest
 
 from t2i_story_pipeline.errors import (
     StoryProviderResponseError,
+    StoryProviderTruncatedOutputError,
     StoryRunIncompleteError,
+    StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
     StoryStage,
@@ -19,7 +22,9 @@ from t2i_story_pipeline.provider import (
 )
 from t2i_story_pipeline.run_store import (
     LocalStoryRunStore,
+    StoryAttemptOutcome,
     StoryRunSettings,
+    StoryRunStatus,
 )
 from t2i_story_pipeline.studio import StoryStudio
 from tests.story_factories import (
@@ -227,9 +232,11 @@ async def test_studio_retries_provider_shape_failure_and_counts_usage(
 ) -> None:
     model = FakeStoryModel(
         [
-            StoryProviderResponseError(
+            StoryStructuredOutputError(
                 "invalid themes",
+                raw_content='{"themes":[]}',
                 usage=TokenUsage(total_tokens=30),
+                validation_issues=("themes: List should have at least 1 item",),
             ),
             make_theme_batch(),
             make_frame_sequence(),
@@ -244,6 +251,121 @@ async def test_studio_retries_provider_shape_failure_and_counts_usage(
     assert model.stages.count(StoryStage.THEMES) == 2
     assert "invalid themes" in model.messages[1][-1].content
     assert result.usage.total_tokens == 60
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(
+        completed.run_id
+    )
+    assert attempts[0].requested_ids == ["T001"]
+    assert attempts[0].accepted_ids == []
+    assert attempts[0].outcome == StoryAttemptOutcome.REJECTED
+    assert attempts[0].issues[-1].startswith("themes:")
+    assert attempts[1].accepted_ids == ["T001"]
+
+
+@pytest.mark.asyncio
+async def test_studio_expands_budget_after_truncated_output(tmp_path) -> None:
+    model = FakeStoryModel(
+        [
+            StoryProviderTruncatedOutputError(
+                "themes output truncated",
+                raw_content='{"themes":[',
+                usage=TokenUsage(total_tokens=20),
+                validation_issues=("invalid JSON",),
+            ),
+            make_theme_batch(),
+            make_frame_sequence(),
+        ]
+    )
+
+    completed = await make_studio(model, tmp_path, concurrency=1).run(
+        make_story_request()
+    )
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(
+        completed.run_id
+    )
+
+    assert model.max_output_tokens == [6000, 32768, 32768]
+    assert attempts[0].max_output_tokens == 6000
+    assert attempts[0].outcome == StoryAttemptOutcome.TRUNCATED
+    assert attempts[1].max_output_tokens == 32768
+
+
+@pytest.mark.asyncio
+async def test_studio_preserves_truncation_budget_across_resume(
+    tmp_path,
+) -> None:
+    first_model = FakeStoryModel(
+        [
+            StoryProviderTruncatedOutputError(
+                "themes output truncated",
+                raw_content='{"themes":[',
+                usage=TokenUsage(total_tokens=20),
+                validation_issues=("invalid JSON",),
+            ),
+            StoryStructuredOutputError(
+                "themes still invalid",
+                raw_content='{"themes":[]}',
+                usage=TokenUsage(total_tokens=30),
+                validation_issues=("themes: List should have at least 1 item",),
+            ),
+        ]
+    )
+    studio = make_studio(
+        first_model,
+        tmp_path,
+        concurrency=1,
+        generation_retries=1,
+    )
+
+    with pytest.raises(StoryRunIncompleteError) as failure:
+        await studio.run(make_story_request())
+
+    snapshot = LocalStoryRunStore(tmp_path / "runs").inspect(
+        failure.value.run_id
+    )
+    resumed_model = FakeStoryModel(
+        [make_theme_batch(), make_frame_sequence()]
+    )
+    completed = await StoryStudio(
+        resumed_model,
+        LocalStoryRunStore(tmp_path / "runs"),
+        snapshot.manifest.settings,
+    ).resume(snapshot.run_id)
+
+    assert completed.result.usage.total_tokens == 80
+    assert resumed_model.max_output_tokens == [32768, 32768]
+    assert "List should have at least 1 item" in (
+        resumed_model.messages[0][-1].content
+    )
+
+
+@pytest.mark.asyncio
+async def test_studio_records_all_structured_output_issues(tmp_path) -> None:
+    validation_issues = tuple(
+        f"themes.{index}: Field required"
+        for index in range(40)
+    )
+    model = FakeStoryModel(
+        [
+            StoryStructuredOutputError(
+                "invalid theme batch",
+                raw_content='{"themes":[]}',
+                usage=TokenUsage(total_tokens=25),
+                validation_issues=validation_issues,
+            ),
+            make_theme_batch(),
+            make_frame_sequence(),
+        ]
+    )
+
+    completed = await make_studio(model, tmp_path, concurrency=1).run(
+        make_story_request()
+    )
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(
+        completed.run_id
+    )
+
+    assert len(attempts[0].issues) == 41
+    assert attempts[0].issues[-1] == validation_issues[-1]
 
 
 @pytest.mark.asyncio
@@ -322,3 +444,66 @@ async def test_studio_completed_resume_is_idempotent(tmp_path) -> None:
 
     assert resumed == completed
     assert resumed_model.stages == []
+
+
+class CancellableStoryModel:
+    def __init__(self) -> None:
+        self.started_frames = 0
+        self.cancelled_frames = 0
+        self.all_frames_started = asyncio.Event()
+        self.release_frames = asyncio.Event()
+
+    async def generate(
+        self,
+        *,
+        stage,
+        messages,
+        response_model,
+        max_output_tokens,
+    ) -> ModelResponse:
+        if stage == StoryStage.THEMES:
+            return ModelResponse(
+                value=make_theme_batch(count=2),
+                usage=TokenUsage(total_tokens=10),
+            )
+        self.started_frames += 1
+        if self.started_frames == 2:
+            self.all_frames_started.set()
+        try:
+            await self.release_frames.wait()
+        except asyncio.CancelledError:
+            self.cancelled_frames += 1
+            raise
+        raise AssertionError("frame generation should be cancelled")
+
+
+@pytest.mark.asyncio
+async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
+    model = CancellableStoryModel()
+    store = LocalStoryRunStore(
+        tmp_path / "runs",
+        tmp_path / "prompts",
+    )
+    settings = StoryRunSettings(
+        provider=StoryProviderSettings(model="test-model"),
+        concurrency=2,
+    )
+    task = asyncio.create_task(
+        StoryStudio(model, store, settings).run(
+            make_story_request(theme_count=2)
+        )
+    )
+    await asyncio.wait_for(model.all_frames_started.wait(), timeout=1)
+
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    summary = store.list_runs().runs[0]
+    snapshot = store.inspect(summary.run_id)
+    assert model.cancelled_frames == 2
+    assert snapshot.manifest.status == StoryRunStatus.RUNNING
+    assert len(snapshot.themes) == 2
+    assert snapshot.frames == {}
+    with store.lock(snapshot.run_id):
+        pass

@@ -124,6 +124,31 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
 反馈给模型。全部 checkpoint 完成后才写入 `result.json` 并发布 JSON/TXT。
 已完成 run 的 `resume` 直接返回已发布结果，不调用 provider。
 
+## 错误分类与重试
+
+错误恢复分为两层：
+
+1. provider transport 层默认额外重试两次。timeout、transport error、HTTP 429
+   和 5xx 使用有界退避；429 优先遵循 `Retry-After`。401/403 立即报告认证错误。
+2. generation 层对每个 Theme batch 或 Frame Sequence 默认额外重试两次。
+   空响应和不支持的 provider 响应记录为 provider error；JSON/schema 错误记录
+   为 structured-output rejection；无效且 `finish_reason=length` 的响应单独记录
+   为 truncated output。截断 Theme 响应后，下一次 attempt 从初始 6,000-token
+   预算提升到 manifest 冻结的 provider 上限；Frame Sequence 当前初始上限已经是
+   32,768。truncated outcome 会持久化，因此进程重启后的第一次 resume attempt
+   也直接使用提升后的预算。
+
+每个 attempt 保存 stage、operation、requested IDs、accepted IDs、具体 issues、
+实际请求 token 上限、耗时和 token usage。当前进程内的下一次 attempt，以及进程
+重启后的 resume，都会读取最近一次与当前 requested IDs 相交的 attempt，并把最多
+三条 issues 反馈给模型。认证失败和 transport 层耗尽后的不可恢复 provider error
+不会在 generation 层盲目循环。
+
+Theme batch 和 Frame Sequence 的 schema 都要求完整返回，因此 story pipeline 不
+引入旧管线面向 partial-ID batch 的 salvage/no-progress 循环；每个 operation 的
+flat retry 次数本身严格有界。取消运行时 `asyncio` 会取消所有在途 Frame task，
+已落盘 checkpoint 保留，run 锁释放，manifest 保持可 resume。
+
 ## 时间、地点与时代一致性
 
 Narrative Theme 必须建立“谁、何时何地”的故事种子；每个 Narrative Frame

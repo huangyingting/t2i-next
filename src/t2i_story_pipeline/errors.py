@@ -23,6 +23,16 @@ class StoryProviderAuthenticationError(StoryProviderError):
     """The story model rejected the configured credentials."""
 
 
+class StoryProviderHTTPError(StoryProviderError):
+    """The story model returned a terminal HTTP error response."""
+
+    def __init__(self, status_code: int, response_text: str) -> None:
+        self.status_code = status_code
+        super().__init__(
+            f"故事模型返回 HTTP {status_code}: {response_text[:500]}"
+        )
+
+
 class StoryProviderResponseError(StoryProviderError):
     """The story model returned an unsupported response."""
 
@@ -34,6 +44,26 @@ class StoryProviderResponseError(StoryProviderError):
     ) -> None:
         super().__init__(message)
         self.usage = usage or TokenUsage()
+
+
+class StoryStructuredOutputError(StoryProviderResponseError):
+    """The story model response did not match the requested schema."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        raw_content: str,
+        usage: TokenUsage | None = None,
+        validation_issues: tuple[str, ...] = (),
+    ) -> None:
+        super().__init__(message, usage=usage)
+        self.raw_content = raw_content
+        self.validation_issues = validation_issues
+
+
+class StoryProviderTruncatedOutputError(StoryStructuredOutputError):
+    """The story model stopped before producing a valid complete response."""
 
 
 class StoryStorageError(StoryPipelineError):

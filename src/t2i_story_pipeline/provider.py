@@ -6,6 +6,8 @@ import asyncio
 import json
 import os
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from enum import StrEnum
 from typing import Any, Literal, Protocol, TypeVar
 
@@ -22,7 +24,10 @@ from t2i_story_pipeline.errors import (
     StoryConfigurationError,
     StoryProviderAuthenticationError,
     StoryProviderError,
+    StoryProviderHTTPError,
     StoryProviderResponseError,
+    StoryProviderTruncatedOutputError,
+    StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
     StoryStage,
@@ -226,18 +231,24 @@ class OpenAIStoryModel(StoryModel):
         try:
             value = response_model.model_validate_json(content)
         except ValidationError as exc:
-            if finish_reason == "length":
-                raise StoryProviderResponseError(
-                    f"{stage.value} 输出达到 token 上限",
-                    usage=usage,
-                ) from exc
-            issues = "; ".join(
-                f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}"
+            validation_issues = tuple(
+                f"{'.'.join(str(part) for part in error['loc'])}: "
+                f"{error['msg']}"
                 for error in exc.errors()
             )
-            raise StoryProviderResponseError(
-                f"{stage.value} 返回内容不符合 {response_model.__name__}: {issues}",
+            if finish_reason == "length":
+                raise StoryProviderTruncatedOutputError(
+                    f"{stage.value} 输出达到 token 上限",
+                    raw_content=content,
+                    usage=usage,
+                    validation_issues=validation_issues,
+                ) from exc
+            raise StoryStructuredOutputError(
+                f"{stage.value} 返回内容不符合 {response_model.__name__}: "
+                f"{'; '.join(validation_issues)}",
+                raw_content=content,
                 usage=usage,
+                validation_issues=validation_issues,
             ) from exc
         return ModelResponse(value=value, usage=usage)
 
@@ -268,8 +279,9 @@ class OpenAIStoryModel(StoryModel):
                     await asyncio.sleep(0.25 * (2**attempt))
                     continue
             if response.is_error:
-                raise StoryProviderResponseError(
-                    f"故事模型返回 HTTP {response.status_code}: {response.text[:500]}"
+                raise StoryProviderHTTPError(
+                    response.status_code,
+                    response.text,
                 )
             return response
         raise StoryProviderError("故事模型请求未完成")
@@ -284,7 +296,16 @@ class OpenAIStoryModel(StoryModel):
             try:
                 return max(0.25, min(float(retry_after), 120.0))
             except ValueError:
-                pass
+                try:
+                    retry_at = parsedate_to_datetime(retry_after)
+                    if retry_at.tzinfo is None:
+                        retry_at = retry_at.replace(tzinfo=UTC)
+                    delay = (
+                        retry_at.astimezone(UTC) - datetime.now(UTC)
+                    ).total_seconds()
+                    return max(0.25, min(delay, 120.0))
+                except (TypeError, ValueError, OverflowError):
+                    pass
         return min(2.0**attempt, 60.0)
 
     @staticmethod

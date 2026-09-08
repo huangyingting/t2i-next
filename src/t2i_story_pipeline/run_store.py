@@ -52,6 +52,7 @@ class StoryAttemptOutcome(StrEnum):
     ACCEPTED = "accepted"
     REJECTED = "rejected"
     PROVIDER_ERROR = "provider_error"
+    TRUNCATED = "truncated"
 
 
 class StoryRunSettings(_Model):
@@ -79,9 +80,13 @@ class StoryAttempt(_Model):
     occurred_at: str
     stage: StoryStage
     operation_id: str
+    requested_ids: list[str] = Field(max_length=100)
     attempt: int = Field(ge=1)
     max_output_tokens: int = Field(ge=512, le=65536)
     outcome: StoryAttemptOutcome
+    accepted_ids: list[str] = Field(max_length=100)
+    issues: list[str]
+    duration_ms: int = Field(ge=0)
     error: str | None = None
     usage: TokenUsage = Field(default_factory=TokenUsage)
 

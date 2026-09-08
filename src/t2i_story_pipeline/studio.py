@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+from time import perf_counter
 
 from pydantic import BaseModel
 
@@ -12,8 +13,10 @@ from t2i_story_pipeline.errors import (
     StoryPipelineError,
     StoryProviderError,
     StoryProviderResponseError,
+    StoryProviderTruncatedOutputError,
     StoryRunIncompleteError,
     StoryStorageError,
+    StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
     NarrativeFrameSequence,
@@ -206,9 +209,14 @@ class StoryStudio:
                 f"themes-T{start_index:03d}-"
                 f"T{start_index + count - 1:03d}"
             )
+            requested_ids = tuple(
+                f"T{index:03d}"
+                for index in range(start_index, start_index + count)
+            )
             value, _ = await self._generate_validated(
                 run_id=run_id,
                 operation_id=operation_id,
+                requested_ids=requested_ids,
                 stage=StoryStage.THEMES,
                 messages=messages,
                 response_model=exact_theme_batch_model(count),
@@ -258,6 +266,10 @@ class StoryStudio:
         value, _ = await self._generate_validated(
             run_id=run_id,
             operation_id=f"frames-{theme.theme_id}",
+            requested_ids=tuple(
+                f"{theme.theme_id}-{frame_id}"
+                for frame_id in expected
+            ),
             stage=StoryStage.FRAMES,
             messages=frame_messages(request, theme),
             response_model=exact_frame_sequence_model(
@@ -275,6 +287,7 @@ class StoryStudio:
         *,
         run_id: str,
         operation_id: str,
+        requested_ids: tuple[str, ...],
         stage: StoryStage,
         messages: list[ChatMessage],
         response_model: type[BaseModel],
@@ -286,44 +299,98 @@ class StoryStudio:
         prior_attempts = tuple(
             attempt
             for attempt in self._store.attempts(run_id)
-            if attempt.operation_id == operation_id
         )
-        if prior_attempts and prior_attempts[-1].error:
+        feedback_issues = list(
+            self._recent_attempt_issues(
+                prior_attempts,
+                stage,
+                requested_ids,
+            )
+        )
+        if feedback_issues:
             messages = self._retry_messages(
                 base_messages,
-                prior_attempts[-1].error,
+                tuple(feedback_issues[-3:]),
             )
-        attempt_offset = len(prior_attempts)
+        attempt_offset = sum(
+            attempt.operation_id == operation_id
+            for attempt in prior_attempts
+        )
+        relevant_attempts = tuple(
+            attempt
+            for attempt in prior_attempts
+            if (
+                attempt.stage == stage
+                and set(requested_ids).intersection(attempt.requested_ids)
+            )
+        )
+        budget = (
+            self._settings.provider.output_token_limit
+            if any(
+                attempt.outcome == StoryAttemptOutcome.TRUNCATED
+                for attempt in relevant_attempts
+            )
+            else min(
+                max_output_tokens,
+                self._settings.provider.output_token_limit,
+            )
+        )
         for attempt in range(self._settings.generation_retries + 1):
             rejected_value: BaseModel | None = None
             attempt_usage = TokenUsage()
+            attempt_issues: tuple[str, ...]
+            started = perf_counter()
             try:
                 response = await self._model.generate(
                     stage=stage,
                     messages=messages,
                     response_model=response_model,
-                    max_output_tokens=max_output_tokens,
+                    max_output_tokens=budget,
                 )
                 attempt_usage = response.usage
                 usage += attempt_usage
                 rejected_value = response.value
                 validate(response.value)
-            except StoryProviderResponseError as exc:
+            except StoryProviderTruncatedOutputError as exc:
                 attempt_usage = exc.usage
                 usage += attempt_usage
                 error: Exception = exc
+                outcome = StoryAttemptOutcome.TRUNCATED
+                attempt_issues = (
+                    str(exc),
+                    *exc.validation_issues,
+                )
+            except StoryStructuredOutputError as exc:
+                attempt_usage = exc.usage
+                usage += attempt_usage
+                error = exc
+                outcome = StoryAttemptOutcome.REJECTED
+                attempt_issues = (
+                    str(exc),
+                    *exc.validation_issues,
+                )
+            except StoryProviderResponseError as exc:
+                attempt_usage = exc.usage
+                usage += attempt_usage
+                error = exc
                 outcome = StoryAttemptOutcome.PROVIDER_ERROR
+                attempt_issues = (str(exc),)
             except StoryContractError as exc:
                 error = exc
                 outcome = StoryAttemptOutcome.REJECTED
+                attempt_issues = (str(exc),)
             except StoryProviderError as exc:
                 self._record_attempt(
                     run_id=run_id,
                     operation_id=operation_id,
+                    requested_ids=requested_ids,
                     stage=stage,
                     attempt=attempt_offset + attempt + 1,
-                    max_output_tokens=max_output_tokens,
+                    max_output_tokens=budget,
                     outcome=StoryAttemptOutcome.PROVIDER_ERROR,
+                    accepted_ids=(),
+                    issues=(str(exc),),
+                    duration_ms=self._elapsed_ms(started),
                     usage=attempt_usage,
                     error=str(exc),
                 )
@@ -332,10 +399,14 @@ class StoryStudio:
                 self._record_attempt(
                     run_id=run_id,
                     operation_id=operation_id,
+                    requested_ids=requested_ids,
                     stage=stage,
                     attempt=attempt_offset + attempt + 1,
-                    max_output_tokens=max_output_tokens,
+                    max_output_tokens=budget,
                     outcome=StoryAttemptOutcome.ACCEPTED,
+                    accepted_ids=requested_ids,
+                    issues=(),
+                    duration_ms=self._elapsed_ms(started),
                     usage=attempt_usage,
                     error=None,
                 )
@@ -344,18 +415,25 @@ class StoryStudio:
             self._record_attempt(
                 run_id=run_id,
                 operation_id=operation_id,
+                requested_ids=requested_ids,
                 stage=stage,
                 attempt=attempt_offset + attempt + 1,
-                max_output_tokens=max_output_tokens,
+                max_output_tokens=budget,
                 outcome=outcome,
+                accepted_ids=(),
+                issues=attempt_issues,
+                duration_ms=self._elapsed_ms(started),
                 usage=attempt_usage,
                 error=str(error),
             )
+            feedback_issues.extend(attempt_issues)
             if attempt >= self._settings.generation_retries:
                 raise error
+            if isinstance(error, StoryProviderTruncatedOutputError):
+                budget = self._settings.provider.output_token_limit
             messages = self._retry_messages(
                 base_messages,
-                str(error),
+                tuple(feedback_issues[-3:]),
                 rejected_value,
             )
         raise AssertionError("unreachable")
@@ -365,10 +443,14 @@ class StoryStudio:
         *,
         run_id: str,
         operation_id: str,
+        requested_ids: tuple[str, ...],
         stage: StoryStage,
         attempt: int,
         max_output_tokens: int,
         outcome: StoryAttemptOutcome,
+        accepted_ids: tuple[str, ...],
+        issues: tuple[str, ...],
+        duration_ms: int,
         usage: TokenUsage,
         error: str | None,
     ) -> None:
@@ -378,9 +460,13 @@ class StoryStudio:
                 occurred_at=self._store.now(),
                 stage=stage,
                 operation_id=operation_id,
+                requested_ids=list(requested_ids),
                 attempt=attempt,
                 max_output_tokens=max_output_tokens,
                 outcome=outcome,
+                accepted_ids=list(accepted_ids),
+                issues=list(issues),
+                duration_ms=duration_ms,
                 error=error,
                 usage=usage,
             ),
@@ -389,7 +475,7 @@ class StoryStudio:
     @staticmethod
     def _retry_messages(
         base_messages: list[ChatMessage],
-        error: str,
+        issues: tuple[str, ...],
         rejected_value: BaseModel | None = None,
     ) -> list[ChatMessage]:
         messages = list(base_messages)
@@ -407,11 +493,32 @@ class StoryStudio:
                 role="user",
                 content=(
                     "上一份输出未满足基本结构契约。"
-                    f"问题：{error}。不要解释，只返回完整 schema 数据。"
+                    f"问题：{'; '.join(issues)}。"
+                    "不要解释，只返回完整 schema 数据。"
                 ),
             )
         )
         return messages
+
+    @staticmethod
+    def _recent_attempt_issues(
+        attempts: tuple[StoryAttempt, ...],
+        stage: StoryStage,
+        requested_ids: tuple[str, ...],
+    ) -> tuple[str, ...]:
+        requested = set(requested_ids)
+        for attempt in reversed(attempts):
+            if (
+                attempt.stage == stage
+                and requested.intersection(attempt.requested_ids)
+                and attempt.issues
+            ):
+                return tuple(attempt.issues[-3:])
+        return ()
+
+    @staticmethod
+    def _elapsed_ms(started: float) -> int:
+        return max(0, round((perf_counter() - started) * 1000))
 
     @staticmethod
     def _incomplete(
