@@ -7,6 +7,7 @@ from t2i_story_pipeline.models import (
     NarrativeTheme,
     NarrativeThemeBatch,
     NarrativeThemeResult,
+    OutputLanguage,
     StoryRequest,
     StoryResult,
     TokenUsage,
@@ -20,6 +21,7 @@ def make_story_request(
     female_count: int | None = None,
     male_count: int | None = None,
     content_level: ContentLevel = ContentLevel.AESTHETIC,
+    output_language: OutputLanguage = OutputLanguage.CHINESE,
     source_prompt_stem: str | None = None,
 ) -> StoryRequest:
     return StoryRequest(
@@ -33,6 +35,7 @@ def make_story_request(
         female_count=female_count,
         male_count=male_count,
         content_level=content_level,
+        output_language=output_language,
         source_prompt_stem=source_prompt_stem,
     )
 

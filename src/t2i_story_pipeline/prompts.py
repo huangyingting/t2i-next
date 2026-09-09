@@ -131,7 +131,8 @@ def theme_messages(
             _cast_instruction(request),
             _people_and_setting_defaults_instruction(),
             _era_consistency_instruction(),
-            "style 是一句完整、简洁的视觉风格描述，不罗列不同景别或多个构图方案。",
+            "style 是一句完整、简洁的视觉风格描述，不罗列不同景别或多个构图方案。"
+            "style 必须概括并沿用 story 的明确表现要求，不得与其冲突或将其弱化。",
             "不同主题要从人物关系、场景用途、决定或冲突上真正不同。已有主题只用于"
             "避开重复，不要改写后再次输出。",
             semantic_name_instruction,
@@ -169,12 +170,14 @@ def frame_messages(
     theme: NarrativeTheme,
 ) -> list[ChatMessage]:
     language = (
-        "prose 使用自然、准确、流畅的中文"
+        "prose 使用自然、准确、流畅的中文。把 story 中的外语概念自然翻译成"
+        "中文，整段不得夹入英文代词、服装、摄影、姿态或动作短语。"
         if request.output_language == OutputLanguage.CHINESE
         else (
-            "Write prose in natural, precise, fluent English. Use “small” or "
-            "“slight” rather than the age-ambiguous English adjective for low "
-            "importance."
+            "Write every prose paragraph entirely in natural, precise, fluent "
+            "English. Do not include Chinese characters or switch to another "
+            "language. Use “small” or “slight” rather than the age-ambiguous "
+            "English adjective for low importance."
         )
     )
     frame_ids = [
@@ -204,10 +207,13 @@ def frame_messages(
             "画面定格在一个清晰瞬间。可以有一个最重要的动作、接触或受力关系，"
             "但只写当前可见状态和直接物理结果，不叙述先后步骤，不让人物在同一帧"
             "连续改变姿态。不要为了符合句式而使用“此刻”或其他固定开头。",
-            "story 若围绕绳艺、口塞、服装展示或其他明确视觉主题，每一帧都直接"
-            "呈现已经完成、可被拍摄的核心造型，而不是准备、逐步增加、调整或解除"
-            "过程；从 story 提供的造型中选择适合当前画面的一种，不把全部术语"
-            "同时堆入一帧。",
+            "story 明确要求的最终状态必须在每一帧直接呈现，不写成准备、逐步改变"
+            "或解除过程，也不以堆砌术语代替可见画面。",
+            "story 若按 theme_id 分配了差异化要求，必须先读取 payload 中当前 "
+            "theme.theme_id，只执行与该 ID 匹配的要求，不得任选、错用或借用"
+            "其他 ID 的方案。",
+            "story 的明确约束优先于通用写作建议和 theme.style；theme.style 只能"
+            "具体化这些约束，不能替换、冲突或弱化它们。",
             "环境应提供与人物处境有关的物件、材质、距离和空间证据，不堆砌无关"
             "陈设。身体重心、四肢方向、遮挡、接触点、衣物和道具受力必须可信。",
             "镜头与光线必须明确而专业，包括合适的景别、机位或角度、构图焦点、"
@@ -225,12 +231,10 @@ def frame_messages(
             _era_consistency_instruction(),
             _content_level_instruction(request),
             language,
-            "输出中文时，把 story 中的外语概念自然翻译成中文，整段不得夹入英文"
-            "代词、服装、摄影、姿态或动作短语。",
-            "提交前只做一次整体通读：把正文中残留的外语碎片改写成自然中文，并"
-            "确认人物和空间成立、画面能被直接看见。正文不得提及 theme、frame、"
-            "编号、提示词、字段或其他内部生成过程，也不要输出评语、合规说明或"
-            "schema 之外的字段。",
+            "提交前只做一次整体通读：把正文中不属于请求输出语言的碎片改写为"
+            "请求语言，并确认人物和空间成立、画面能被直接看见。正文不得提及 "
+            "theme、frame、编号、提示词、字段或其他内部生成过程，也不要输出"
+            "评语、合规说明或 schema 之外的字段。",
         )
     )
     return [

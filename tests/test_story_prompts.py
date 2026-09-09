@@ -142,8 +142,13 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "每帧重新完整描写所有可见人物" in prompt
     assert "只写当前可见状态和直接物理结果" in prompt
     assert "镜头与光线必须明确而专业" in prompt
-    assert "每一帧都直接呈现已经完成、可被拍摄的核心造型" in prompt
+    assert "story 明确要求的最终状态必须在每一帧直接呈现" in prompt
+    assert "必须先读取 payload 中当前 theme.theme_id" in prompt
+    assert "只执行与该 ID 匹配的要求" in prompt
+    assert "story 的明确约束优先于通用写作建议和 theme.style" in prompt
+    assert "绳艺、口塞、服装展示" not in prompt
     assert "整段不得夹入英文" in prompt
+    assert "不属于请求输出语言的碎片" in prompt
     assert "平行画面方案，不是一件事按时间先后展开的镜头序列" in prompt
     assert "篇幅由人物数量和画面复杂度决定" in prompt
     assert "严格依次写六部分" not in prompt
@@ -151,6 +156,16 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "必须精确以“此刻，”开头" not in prompt
     assert "倒数第二句必须以“镜头采用”开头" not in prompt
     assert "以下是提交前必须满足的精确质量门" not in prompt
+
+
+def test_english_frame_prompt_requires_english_only_output() -> None:
+    request = make_story_request(output_language="english")
+
+    prompt = frame_messages(request, make_theme())[0].content
+
+    assert "Write every prose paragraph entirely" in prompt
+    assert "Do not include Chinese characters" in prompt
+    assert "or switch to another language" in prompt
 
 
 @pytest.mark.parametrize(
