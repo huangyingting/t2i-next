@@ -51,7 +51,7 @@ PremiseText = Annotated[
 ]
 StoryText = Annotated[
     str,
-    StringConstraints(min_length=1, max_length=20000, strip_whitespace=True),
+    StringConstraints(min_length=1, max_length=50000, strip_whitespace=True),
 ]
 NarrativeProse = Annotated[
     str,

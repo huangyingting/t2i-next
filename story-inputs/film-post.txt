@@ -1,0 +1,168 @@
+BRIEF
+
+Create original theatrical movie-poster Themes for fictional feature films. For each Theme, first invent one compelling story concept and English title, then generate exactly the CLI-requested number of independent poster designs, each free to develop its own tagline and campaign emphasis. Every result must be a finished, high-impact one-sheet with integrated typography, not a film still, storyboard, technical grading demonstration, title card, or plain photograph with text added afterward.
+
+Every readable word inside the poster and every final prompt must be grammatical English. This includes props, documents, signs, maps, stamps, seals, screens, clothing, architecture, and environmental graphics. Use only English Latin letters, Arabic numerals, and standard punctuation; never show another writing system, gibberish, pseudo-letters, or placeholder copy.
+
+EXAMPLES ARE OPEN-ENDED
+
+Every list below is open-ended inspiration, not a menu, enum, preset library, quota, sequence, or multiple-choice instruction. Select, combine, transform, or invent approaches as the story demands. Only statements using "must," "every," "exact," or "do not" are mandatory.
+
+CAST, ADULTHOOD, AND CONTENT
+
+Treat the CLI-requested cast as a creative seed, not a fixed visible headcount. A story or poster may foreground a subset, introduce additional story-relevant adults, or represent someone through absence, objects, text, shadow, or off-screen implication. Every depicted person must be an unmistakably mature Chinese adult aged 25 or older, alert, willing, responsive, and able to stop. Follow the CLI content level and its safety rules. When a person recurs, preserve identity, age, face, hair, body proportions, scars, garments, and other defining anchors.
+
+Both the fictional-film content and the poster's central creative concept must be generated specifically for the current CLI content level. The level must shape the premise, conflict, action, symbolism, composition, typography, visual emphasis, and emotional tone; do not reuse a concept from another level with only a label, pose, clothing, or isolated detail changed.
+
+STORY CONCEPT FIRST
+
+Generate exactly the Theme and Frames-per-Theme counts requested by the CLI. Each Theme must define the mature Chinese cast its story needs; a specific Chinese place, period, season, and social world; one immediate conflict or impossible choice with emotional and practical stakes; one memorable relationship, secret, object, location, or motif; a distinct genre and tone; and an invented English title of one to five words.
+
+Make the concept instantly understandable yet specific enough to inspire symbolism. Transform generic premises through an unusual setting, contradiction, profession, ritual, object, or consequence. Derive the title from the story and keep it exact across the Theme. Let each poster invent a distinct English tagline of three to twelve words that suits its particular creative direction. Do not use existing movie titles, franchises, copyrighted characters, real studios, or recognizable fictional worlds.
+
+POSTERS ARE PARALLEL DESIGNS
+
+Treat every Frame as a self-contained, parallel poster proposal for the same film, never a chronological scene or storyboard beat. Nothing carries between posters, and no poster may refer to another Frame or imply before-and-after progression. Each must restate the story anchors needed to render it alone while preserving the title, core conflict, and motif; visible cast, protagonist emphasis, tagline, and campaign voice may vary when that produces a stronger concept.
+
+Radically vary the central graphic idea, composition, scale, palette, image-text relationship, and emotional emphasis. Changing only camera angle, color grade, wardrobe, or background does not count.
+
+CREATIVE POSTER DIRECTIONS
+
+Build every poster around one dominant creative device and only the supporting elements needed to make it unmistakable. Possible directions include, but are not limited to:
+
+- iconic-object metaphor: one story object becomes a charged symbol, landscape, doorway, wound, clock, cage, map, or impossible container for the protagonist;
+- negative-space revelation: empty space forms a second image, hidden face, body contour, location, threat, or relationship only visible after the first read;
+- character-led prestige portrait: a psychologically precise face or body silhouette carries the campaign, with one disruptive prop, shadow, reflection, color field, or typographic intervention;
+- environmental narrative tableau: the protagonist is small but decisive inside a vast location whose architecture, weather, crowd absence, or practical light reveals the conflict;
+- impossible scale: a realistic person confronts an enlarged object, compressed city, endless room, monumental garment, or architecture derived from the story motif;
+- surreal transformation: hair becomes smoke, fabric becomes terrain, rain becomes thread, a room folds into an object, or another original transition expresses the story while the human body remains singular and anatomically clear;
+- split-world tension: one coherent image holds two incompatible spaces, seasons, social roles, or emotional realities divided by a meaningful physical boundary rather than a generic diagonal split;
+- evidence and archive: receipts, letters, maps, contact prints, redactions, diagrams, stamps, or case-file material form a controlled editorial composition tied directly to the plot;
+- tactile print object: screen print, letterpress, torn paper, embossed foil, ink bleed, newsprint, risograph, painted one-sheet, woodblock-like carving, or distressed theatrical lithography gives the poster a physical identity;
+- typography as image: title letters become architecture, cast shadows, pass behind and in front of the protagonist, cut windows into the setting, follow perspective, emerge from smoke, or behave as a real material within the scene;
+- color-field minimalism: a radical limited palette, a single silhouette or object, and exact spatial proportion create tension without decorative emptiness;
+- layered conceptual photomontage: precisely masked photographic elements combine into one impossible but legible metaphor without duplicating or deforming the cast;
+- genre subversion: romance presented through forensic order, thriller through domestic softness, historical drama through severe modernist geometry, or another deliberate contradiction rooted in the story.
+- visual substitution: a crucial object, opening, shadow, garment, or architectural feature replaces another expected form and creates a precise visual pun tied to the plot;
+- nested world: a room, landscape, memory, or conflict appears inside a story object, letterform, pupil, window, vessel, wound-shaped void, or other meaningful boundary;
+- silhouette as container: one singular human or object silhouette contains the film's setting, threat, memory, or opposing emotional reality without duplicating the cast;
+- absence and imprint: an empty chair, compressed bedding, missing tile, erased portrait, body-shaped dust gap, wet footprint, or faded rectangle makes the absent force more powerful than a literal depiction;
+- pattern disruption: a field of repeated nonhuman objects, windows, files, tiles, threads, seats, tools, or lights is broken by one meaningful anomaly that encodes the protagonist's choice;
+- object constellation: several plot objects form a face, location, character relationship, Chinese character-like geometry, or larger symbolic image only at poster-viewing distance;
+- visual equation: two or three carefully chosen images are arranged like a proposition, contradiction, cause, price, or impossible choice rather than a decorative collage;
+- visual palindrome: the composition reads differently from top to bottom, left to right, or at a second glance while remaining one coherent poster;
+- reversible figure-ground: foreground and background exchange meaning, allowing the viewer to discover a second story image without rotating the poster or duplicating a person;
+- mask and aperture: doors, torn paper, keyholes, curtains, screens, machinery, windows, title counters, or organic shapes reveal only the story-critical portion of the protagonist or setting;
+- threshold composition: the entire campaign is organized around one boundary the protagonist must cross, refuse, guard, hide behind, or transform;
+- impossible interior: a realistic room secretly follows the geometry of an object, body contour, letter, clock, map, instrument, or emotional condition from the story;
+- architectural metaphor: corridors, stairs, bridges, courtyards, scaffolds, shelves, tunnels, apartment blocks, or factory structures embody pressure, division, repetition, escape, or social hierarchy;
+- cartographic narrative: streets, transit lines, river systems, contour lines, property plans, star charts, or hand-drawn routes merge with the protagonist's decision and title design;
+- cutaway or cross-section: a building, object, vehicle, room, garment, or symbolic container opens into a precise sectional view of the story world;
+- forensic diagram: measurements, numbered evidence, trajectories, timelines, redactions, or technical annotation create suspense while remaining visually elegant and plot-specific;
+- censorship and erasure: black bars, scraped emulsion, removed names, covered windows, missing lines, burned paper, or painted-over areas conceal exactly what the story makes dangerous;
+- reflection contradiction: glass, water, polished metal, lacquer, mirrors, screens, or wet pavement reveal a different emotional truth without creating an unexplained duplicate body;
+- refraction and lensing: prisms, bottles, rain, textured glass, ice, heat haze, water, or optical instruments bend only story-relevant portions of the image;
+- shadow narrative: a physically plausible cast shadow reveals the threat, desire, secret, title shape, alternative role, or consequence that the visible figure cannot directly show;
+- projected-image conflict: film, slides, surveillance, maps, handwriting, architectural plans, or natural patterns fall across the protagonist and environment as active story evidence;
+- forced-perspective metaphor: camera position aligns distant and near elements into one impossible relationship that resolves clearly from the poster viewpoint;
+- macro-to-epic scale: an extreme close detail of skin, fabric, paper, food, machinery, craft, or weather becomes a landscape for the story without losing material realism;
+- miniature-world tension: a tactile scale model, diorama, dollhouse-like architecture, tabletop reconstruction, or model city embodies control, memory, surveillance, or vulnerability;
+- monumental mundane object: an ordinary plot object gains overwhelming scale and forces the protagonist into a visually dramatic relationship with it;
+- cosmic-domestic collision: stars, eclipse geometry, weather systems, geological forms, or vast darkness meet an intimate household object or gesture for a story-specific reason;
+- time compression: seasonal traces, aging materials, repeated nonhuman objects, clock geometry, exposure layers, or decayed surfaces condense duration into one nonsequential image;
+- suspended consequence: fragments, rain, ash, paper, glass, dust, thread, petals, or practical debris freeze around one stable human state at the decisive emotional pressure point;
+- extreme crop: a radical but anatomically clear fragment of face, hand, back, garment, or object becomes monumental while typography completes the missing visual information;
+- peripheral protagonist: the protagonist occupies an unexpected edge or corner while the central void, architecture, object, or text carries the conflict;
+- bottom-weighted monumentality: image mass and protagonist sit low beneath a vast field of atmosphere or type, creating scale, dread, reverence, or release;
+- top-weighted pressure: title, architecture, weather, machinery, or symbolic mass bears down from above while preserving intentional breathing room;
+- one-point-perspective trap: corridors, roads, shelves, tunnels, cables, beds, windows, or text lines converge on a story-critical figure or void;
+- circular or orbital system: objects, type, light, architecture, or environmental traces orbit a central absence, face, object, or decision;
+- spiral descent or ascent: composition and typography guide the eye through one tightening or opening spatial movement without depicting chronological scenes;
+- asymmetric editorial grid: disciplined columns, rules, cropping, white space, and image modules create tension between institutional order and human disorder;
+- modular evidence field: several nonchronological fragments of the same story world form one designed information system, with one dominant image and no repeated cast bodies;
+- frame within frame: windows, screens, packaging, photographs, documents, doorways, curtains, shelving, or title letterforms create nested attention and controlled revelation;
+- border invasion: image, object, shadow, weather, or typography deliberately breaks the poster's implied edge to express escape, contamination, memory, or pressure;
+- radical verticality: tall architecture, falling fabric, rain, smoke, title columns, suspended objects, or body line makes the one-sheet format essential to the idea;
+- radical horizontality within vertical format: one narrow cinematic band, horizon, table, bed, bridge, or text rule cuts across a large vertical field for controlled tension;
+- diagonal force system: stairs, light, body line, weather, typography, or architecture creates one dominant directional thrust rather than arbitrary tilted composition;
+- typographic monolith: the title occupies most of the poster as a monumental object, with the protagonist, setting, or story evidence physically embedded in or moving through its letters;
+- typographic void: the title is formed by missing material, erased architecture, negative space, light gaps, peeled paint, absent tiles, or unprinted paper;
+- typographic shadow: unseen title letters become legible only through cast shadows, projected light, reflection, embossing, or surface deformation;
+- typographic perspective: title and tagline follow the real perspective of floors, walls, roads, shelves, windows, water, fabric, or architecture;
+- typographic obstruction: carefully chosen image elements obscure small parts of large letters while preserving instant legibility and creating depth;
+- typographic transformation: one title letter becomes a plot object, room, doorway, body-safe silhouette, tool, route, horizon, or symbolic wound;
+- typographic rhythm: repeated spacing, staggered baselines, vertical stacking, compression, expansion, or controlled misregistration expresses the film's emotional pressure;
+- handwritten evidence: one character's invented handwriting, annotation, correction, signature, or crossed-out sentence becomes a limited counterpoint to professionally set title type;
+- English-only environmental typography: signs, labels, seals, maps, forms, handwriting, packaging, screens, and architectural lettering may support place and plot authenticity, but every readable word must remain grammatical English;
+- photographic cut-paper collage: sharply cut photographic planes overlap with visible paper edges and controlled shadows, creating depth without random scrapbook clutter;
+- torn-layer archaeology: peeled paper, wallpaper, posters, fabric, paint, emulsion, or printed layers reveal older visual information tied to the story;
+- translucent overlay: vellum, tracing paper, frosted plastic, silk, glass, x-ray film, projection acetate, or wet fabric carries type and image across different depth planes;
+- die-cut illusion: apparent holes, slits, perforations, folds, tabs, or punched letterforms reveal a second image layer while remaining a printable poster concept;
+- embossed or debossed minimalism: light grazing a physically raised or recessed title, motif, map, scar-like line, or object contour supplies the central visual event;
+- foil and reflective interruption: restrained metallic, pearlescent, mirrored, or holographic material marks only the story's unstable or precious element;
+- screen-printed reduction: two to five flat inks, bold trapping, overprint, and deliberate shape economy reduce the story to an iconic theatrical image;
+- risograph misregistration: limited fluorescent or muted inks, visible dot texture, overprint, and controlled offset create an energetic independent-release identity;
+- letterpress pressure: deep impression, ink spread, rough cotton paper, and tactile title hierarchy make language feel physically consequential;
+- distressed lithographic one-sheet: painted realism, hand-separated color, weathered paper, brush texture, and dramatic type evoke a fictional release history without copying an existing poster;
+- newsprint urgency: coarse halftone, narrow columns, redaction, torn headlines, and limited ink coverage create immediacy around a plot rooted in public information;
+- cyanotype or blueprint logic: white lines and photographic silhouettes on deep blue turn architecture, evidence, planning, memory, or hidden structure into the campaign system;
+- infrared, thermal, ultraviolet, or x-ray metaphor: a scientifically grounded alternate imaging mode reveals only the story's hidden heat, structure, trace, or material difference;
+- contact-sheet discipline: one dominant frame is surrounded by sparse technical marks or rejected nonhuman details, using photographic process as plot evidence rather than displaying repeated people;
+- film-strip or projector logic: sprocket holes, frame burns, cue marks, light cones, or optical timing marks become structural graphic elements tied to memory, surveillance, performance, or missing footage;
+- ink-rubbing materiality: stone, wood, metal, textile, carved text, architectural relief, or found surface transfers into a stark tactile image specific to the setting;
+- paper-cut silhouette: layered cut-paper depth, crisp positive-negative shapes, and controlled color turn story objects and architecture into a bold symbolic system;
+- shadow-puppet geometry: articulated object silhouettes, translucent screen light, and visible support logic inspire composition without turning people into malformed puppets;
+- embroidery and thread mapping: stitches, loose threads, knots, seams, and woven grids form routes, wounds, borders, architecture, weather, or title strokes connected to the story;
+- seal-carved massing: blocky positive-negative red and off-white forms inspire title and image structure without copying historical seals or existing calligraphy;
+- lacquer and gold interruption: deep reflective black, cinnabar-like red, restrained gold leaf, cracks, and layered polish create luxurious tension around a relevant object or ritual;
+- ink-wash atmosphere against hard type: fluid monochrome space, bleeding edges, dry-brush texture, and one precise modern typographic system hold tradition and present conflict in deliberate opposition;
+- ceramic crackle network: glaze color, crazing lines, repaired seams, and fired texture organize fragmentation, inheritance, pressure, or repair;
+- textile-grid composition: loom structure, pleats, checks, nets, mosquito screens, woven mats, or industrial fabric create a graphic matrix interrupted by the story;
+- botanical specimen order: pressed plants, roots, seeds, labels, seasonal traces, or medicinal preparation form a rigorous symbolic archive tied to place and consequence;
+- food and domestic-material metaphor: steam, oil, flour, tea stains, rice grains, fruit peel, porcelain, chopping marks, or preserved ingredients become an emotionally exact graphic language;
+- industrial-material metaphor: rust, grease, welding light, warning paint, cable, concrete dust, machine diagrams, punched steel, or factory numbering carries the social world into the poster;
+- water-system composition: tides, canal grids, condensation, flooded rooms, reflected signage, ripples, drainage, or rain paths structure the image and typography;
+- weather as typography: snow gaps, rain trails, smoke breaks, cloud edges, frost, dust, ash, or sunlight physically forms or erases title elements;
+- light-only image: controlled beams, practical pools, projected rectangles, reflections, shadow edges, or illuminated dust imply characters and setting with minimal literal depiction;
+- monochrome plus one narrative color: one exact accent color belongs only to the decisive object, body-safe detail, title element, or consequence;
+- duotone or tritone conflict: two or three inks encode opposing roles, times, spaces, institutions, temperatures, or emotional forces;
+- near-black chromatic poster: extremely dark differentiated hues, selective gloss, one readable highlight, and precise typography reward close viewing without losing thumbnail recognition;
+- overexposed white-field poster: blown atmosphere, pale material detail, faint silhouette, and one controlled dark typographic anchor create unease or transcendence;
+- chromatic silhouette: a strongly colored but anatomically coherent profile or body shape becomes the primary field for internal image, type, or environmental evidence;
+- anti-portrait: the protagonist is represented through posture, hands, clothing, tools, room trace, shadow, or occupied space rather than a conventional face-forward image;
+- direct-gaze confrontation: one mature face meets the viewer with psychologically specific intent while typography and a single motif destabilize the apparent simplicity;
+- obstructed portrait: glass, fabric, condensation, object, shadow, text, or architecture conceals only a story-relevant portion of the face while identity remains clear;
+- environmental portrait at epic scale: a very small protagonist anchors monumental weather, architecture, landscape, machinery, or institutional space whose shape tells the conflict;
+- intimate-object portrait: hands and one plot object carry identity, profession, relationship, and stakes without reducing the poster to a product photograph;
+- social-role collision: wardrobe, tool, location, posture, and type deliberately combine two incompatible public identities or duties from the premise;
+- ceremonial symmetry: frontal balance, repeated objects, controlled gesture, and formal type imply ritual, power, judgment, or inevitability;
+- broken symmetry: one displaced object, tilted gaze, missing letter, altered light, or asymmetric body position destabilizes an otherwise strict ceremonial system;
+- comic deadpan: rigid composition, mundane detail, emotionally neutral expression, and precisely timed title placement create dark or absurd humor without cartoonish clutter;
+- romantic restraint: distance, parallel lines, withheld touch, shared negative space, paired objects, or interrupted typography conveys desire without generic soft-focus imagery;
+- horror through normality: calm daylight, domestic order, clean typography, and one impossible detail create dread without gore, screaming faces, or conventional darkness;
+- thriller through information: maps, schedules, evidence, spatial systems, surveillance traces, and missing data generate tension rather than weapons or explosions;
+- historical-modern collision: period-accurate people and setting meet a deliberately modern graphic system that clarifies the story tension without inserting anachronistic objects into the scene;
+- premium reissue interpretation: spare archival confidence, restored photographic depth, exact typography, and one newly discovered symbolic reading present the fictional film as culturally enduring;
+- underground campaign: rough physical production, photocopy layers, hand-applied marks, paste-up seams, limited ink, and urgent hierarchy suggest clandestine circulation while remaining designed;
+- luxury restraint: exceptional material detail, precise spacing, refined type, and one controlled image create value without generic black-and-gold decoration;
+- maximalist controlled density: many story-specific objects, textures, and type fragments form an intentional hierarchy with a dominant focal image rather than undirected visual noise.
+
+If the requested Frame count exceeds these examples, invent additional story-specific directions rather than repeating a layout. Do not default to floating heads, a centered full-body figure over a landscape, generic double exposure, random collage, a face montage, a glowing horizon, teal-orange grading, explosive debris, or a conventional streaming thumbnail.
+
+ENGLISH TYPOGRAPHY AND POSTER COPY
+
+Every poster must visibly include the Theme's exact English title, one original English tagline written for that design, either "COMING SOON" or one short English release line, and a compact fictional English billing block. Invent all billing names and companies; never use real actors, directors, studios, festivals, awards, critics, brands, logos, ratings, laurels, reviews, URLs, or social handles.
+
+Make the title dominant and the tagline secondary. Specify type category, exact position, scale, alignment, spacing, hierarchy, color, material or printing behavior, image interaction, and sufficient contrast. Typography must participate in the concept rather than float in unused space. Keep copy restrained and fully legible.
+
+COMPOSITION, PHOTOGRAPHY, AND PHYSICS
+
+Use a vertical theatrical one-sheet unless requested otherwise. Create a clear first read, second read, and text path at thumbnail and full size. Let story-specific perspective, light, architecture, weather, material, wardrobe, props, and finishing support one dominant idea. Scale may come from restraint, symbolism, negative space, typography, or spatial metaphor rather than spectacle.
+
+Keep photographic skin, hair, fabric, and materials believable. Treat each poster as one physical state: one location, orientation, gaze, stable pose, and compatible task per visible limb, with natural reach and visible support. Transform environment, type, shadow, negative space, clothing edges, objects, or nonfigurative material, never anatomy. Do not create extra limbs, duplicate faces, ghost bodies, mirror clones, malformed text, or conflicting states.
+
+VARIETY AND FINAL OUTPUT
+
+Across Themes, vary genre, conflict, place, period, season, profession, relationship, motif, palette, typography, print language, composition, protagonist scale, and emotional promise. Genre must control the visual logic, not appear only as a label.
+
+Write each final prompt as one concise English paragraph. Begin with the story hook, then describe one poster concept, cast, composition, symbolic device, setting, lighting, palette, exact English typography and placement, release line, fictional billing block, and visible print or finishing character. Prioritize one unforgettable central idea. The result must unmistakably be a professionally designed theatrical poster, not a still with added text.

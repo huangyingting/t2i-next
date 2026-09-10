@@ -1,0 +1,79 @@
+BRIEF
+
+Create varied, hyper-realistic cinematic adult photography Themes with the scale, visual authority, and meticulous craft of stills from a major theatrical feature. Every Theme must have a bold, original aesthetic identity that is recognizable before its finishing process is named. Film post-production and finishing remain a major visual idea: within one Theme, every requested Frame is an independent finished alternative from the same coherent premise, but each Frame must use a clearly different film-processing, print, scan, restoration, optical, or digital-intermediate style. This is authored feature-film imagery, not a technical grading demo, movie poster, advertisement, title card, or graphic-layout design.
+
+EXAMPLES ARE OPEN-ENDED
+
+Every list below is inspiration, not a menu, enum, fixed preset library, or multiple-choice instruction. Combine compatible examples, transform them, or invent equivalent treatments. Only statements using "must," "every," "exact," or "do not" are mandatory.
+
+CAST, ADULTHOOD, AND CONTENT
+
+Use the exact CLI-requested human cast and no additional people. Every person must be an unmistakably mature Chinese adult aged 25 or older, alert, actively willing, mutually responsive, and able to stop. Preserve each person's identity, age, face, hair, body proportions, scars, garments, and other anchors throughout a Theme.
+
+Follow the CLI content level in every Frame. At hardcore level, begin after a directly visible explicit interaction is established. Qualifying contact includes visible genital, anal, oral, or toy penetration, or active direct genital stimulation; name the involved anatomy and current contact. Mere nudity, breast touching, alignment, pressing at an entrance, preparation, imminent contact, or aftermath does not qualify. Every participant must have a clear active role.
+
+THEME AND FRAME RELATION
+
+Generate exactly the Theme count and Frames-per-Theme count requested by the CLI; never assume or state a fixed total. Give each Theme one shared premise, private Chinese location, cast identity, wardrobe logic, production design, source-lighting setup, and visual thesis.
+
+Define each Theme's style DNA with exactly five elements: one spatial principle, light principle, palette relationship, lens behavior, and material motif. Bind them to one original cinematic mode—such as restrained observation, architectural formalism, tactile chamber drama, nocturnal expressionism, clinical realism, dreamlike materialism, theatrical tableau, weather-driven naturalism, or an invented equivalent—and one deliberate refusal of a familiar device. The mode must shape blocking, camera distance, environmental detail, and emotional restraint; the refusal may exclude devices such as visible practicals, warm-skin/cool-background separation, shallow-focus close-ups, symmetry, or saturated accents.
+
+Treat the requested Frames as parallel finishing explorations, not chronological story beats. No Frame occurs before or after another, and no garment, prop, fluid, or pose state carries forward. Each Frame must introduce one dominant finishing difference and one secondary cinematic difference chosen from composition, lens behavior, blocking, spatial depth, source-light geometry, atmosphere, or material emphasis. The finishing difference must remain unmistakable, but it does not need to be the sole or strongest source of variation.
+
+Each Frame must preserve at least three style-DNA elements while looking unmistakably different from its peers. Outside the finishing treatment, substantially transform no more than two non-action dimensions. Do not disguise one repeated grade with new adjectives.
+
+FEATURE-FILM SCALE AND AESTHETIC IDENTITY
+
+Make every Frame feel extracted from a fully realized feature rather than staged against a decorated room. Build scale through decisive blocking, architectural layers, controlled depth, motivated atmosphere, shaped contrast, and selective detail; even a close-up must imply a world beyond the crop.
+
+Give every Theme one memorable visual rule or tension and develop it through composition, production design, lighting, wardrobe, and finish. Favor a confident aesthetic proposition and meaningful omissions over accumulated colors, props, haze, reflections, or effects. Do not rely on generic teal-orange grading, indiscriminate anamorphic flares, shallow depth alone, luxury decor, or unrelated spectacle. Do not imitate a named filmmaker, cinematographer, photographer, living artist, or existing movie.
+
+CROSS-THEME CONTRAST
+
+Compare all Themes as a set. No two may share the same combination of spatial principle, dominant light source, palette structure, lens family, material motif, and cinematic mode; adjacent Themes must differ strongly on at least four of these six axes. If two premises feel interchangeable without their finishing labels, redesign one.
+
+POST-PRODUCTION STYLE DESIGN
+
+Build each Frame around one dominant finishing concept and a restrained set of supporting traits. The finish must intensify the Theme rather than replace it. State the visible result, not merely a process name or unspecified "cinematic LUT."
+
+Photochemical inspirations include fine-grain release printing, pushed small-gauge negative, pulled low-contrast negative, silver retention, cross-processed reversal, expired stock, dye-transfer-like separation, faded prints, contact-print softness, optical-printer contrast, pre-exposed shadows, and restored wet-gate clarity.
+
+Black-and-white inspirations include panchromatic or orthochromatic rendering, high-silver contrast, soft portrait stock, charcoal blacks, milky prints, cool or warm archival toning, split tones, and distressed duplicate negatives.
+
+Digital-intermediate inspirations include soft highlight shoulders, dense or lifted blacks, muted pastels, restrained complementary separation, near-monochrome isolation, reversal-like saturation, desaturated silver texture, selective density shaping, localized bloom, day-for-night, and character-preserving restoration.
+
+Physical and scan character may include gauge-appropriate grain, highlight halation, optical bloom, gate weave, edge fog, restrained leaks, scratches, dust, uneven development, printer-light drift, slight channel misregistration, scan noise, flicker, vignette, or softened corners.
+
+Use only compatible effects. Grain must agree with the source medium; halation belongs around strong highlights; scratches, dust, weave, and leaks must occupy a plausible film or scan layer rather than skin anatomy. Do not stack every artifact into one Frame.
+
+Finishing diversity may also come from clean image-making: restrained printer lights, plausible color-density relationships, selective chroma compression, luminous low saturation, hard tonal partition, neutral highlights, deep color without heavy contrast, or immaculate source texture. Do not equate originality with dirt, damage, extreme grain, color casts, or visible artifacts.
+
+VISUAL LEGIBILITY AND DIFFERENTIATION
+
+Make the Theme's identity and each Frame's finish readable at a glance. Change several coherent dimensions—tone curve, color separation, grain, highlights, shadow density, print texture, scan character, or artifact pattern—so the emotional and material character changes, not just white balance. Keep a strong silhouette, deliberate color hierarchy, and one memorable visual relationship.
+
+Preserve believable skin despite stylization. Retain pores, fine hair, sweat, pressure marks, fabric texture, and material response. Avoid waxy skin, excessive smoothing, plastic highlights, clipped channels, featureless crushed blacks, muddy midtones, uniformly orange skin, or arbitrary color painted over anatomy.
+
+Post effects must not duplicate or deform people. Do not place human figures inside double exposure, frame echo, motion interpolation, mirror repetition, RGB displacement, kaleidoscopic repetition, or ghost trails. Optical overlays may affect abstract light, grain, dust, texture, architecture, or nonfigurative background elements while every human body remains singular and anatomically clear.
+
+CAMERA, LIGHT, AND PRODUCTION DESIGN
+
+Choose capture format, lens, exposure, and lighting that support the finish. Vary close, medium, and environmental views; front, profile, rear three-quarter, gentle high, and moderate low angles; and normal, portrait, restrained wide, or coherent anamorphic lens language. Compose purposeful foreground, action plane, and background with negative space, leading architecture, controlled occlusion, and selective focus. Avoid extreme perspective, severe foreshortening, joint-cutting crops, empty wides, arbitrary Dutch angles, and clutter that obscures faces, anatomy, support, or decisive contact.
+
+Use motivated practical or shaped light with clear direction, sculpted falloff, plane separation, and restrained atmosphere. Specify which highlights bloom or halate, which colors separate, how shadows reproduce, and where texture is most visible.
+
+Build tactile, inhabited settings whose architecture, use, period, climate response, circulation, wear, surfaces, weather traces, and practical sources imply a larger world. Make Chinese locations specific without touristic symbols, generalized exoticism, or decorative clichés. Let a few strong material motifs support the finish, and keep props physically useful rather than ornamental lists.
+
+PHYSICS, ANATOMY, AND SINGLE-STATE ACTION
+
+Treat every Frame as one exposure and describe one current physical state. Give each person one location, orientation, gaze target, and stable pose; give every visible hand, foot, mouth, and weight-bearing limb one compatible task. Keep contact within natural reach, pelvis and penetration axes aligned, garments clear of decisive contact, and body weight supported by a broad fixed floor, bed, bench, sofa, or wall.
+
+Keep limbs traceable from shoulder or hip to their visible endpoint and minimize ambiguous overlap. Do not narrate preparation, transition, withdrawal and reinsertion, repeated motion phases, self-correction, or alternate versions inside one Frame. Film artifacts may imply material history, but they must never create a second body state.
+
+VARIETY, NOVELTY, AND OUTPUT QUALITY
+
+Across Themes, vary location, period, season, time, cast appearance, wardrobe, relationship dynamic, interaction, pose family, lens language, source format, lighting, production design, and finishing philosophy. Within a Theme, distribute styles without a fixed sequence or quota; invent coherent treatments when the examples run out.
+
+Silently reject repeated combinations of camera distance and angle, light and color relationship, spatial arrangement, material motif, emotional temperature, or finishing signature. Do not print this comparison.
+
+Keep final prose concise and directly imageable: name the scene, current action, camera and lighting, then the post pipeline and visible result. Prioritize one dominant treatment, few supporting traits, and one memorable material detail. Never include drafting notes, correction branches, alternatives, copyrighted characters, named living artists, movie titles, logos, captions, credits, borders, or poster typography.
