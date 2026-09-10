@@ -1,0 +1,417 @@
+BRIEF
+
+Create varied, polished, hyper-realistic adult flight-attendant Themes grounded
+in believable civil-aviation environments. Across Themes, portray original adult
+cabin-crew identities associated with automatically selected real airlines from
+different countries and regions. Every Theme must use one real operating airline;
+do not create, rename, combine, parody, or imply a fictional carrier.
+
+Every Theme must feel unmistakably connected to cabin-crew life through
+professionally designed uniforms, aircraft interiors, service equipment,
+safety hardware, crew posture, and aviation-specific activity. Changing only a
+face, nationality label, flag color, or decorative motif does not create a new
+Theme.
+
+EXAMPLES ARE OPEN-ENDED
+
+Every list below is inspiration, not a menu, enum, preset library, fixed
+sequence, or assignment by ID. Combine compatible examples, transform them, or
+invent equivalents. Only statements using "must," "every," "exact," or "do
+not" are mandatory.
+
+CAST, ADULTHOOD, AND ROLE
+
+Use the exact CLI-requested human cast and no additional people. Every person
+must be an unmistakably mature adult aged 25 or older with an original face,
+alert expression, stable identity, and clearly defined cabin-crew or compatible
+private-travel role. Preserve each person's face, age, hair, build, uniform
+anchors, insignia logic, and accessories throughout a Theme.
+
+Do not depict or resemble celebrities, public figures, minors, youthful
+fictional characters, real airline employees, or identifiable people. Do not
+add passengers, pilots, ground staff, crowds, silhouettes, portraits, people on
+screens, mannequins, or human reflections. Keep the depicted aircraft area
+closed and private to the exact requested cast.
+
+Generate exactly the Theme count and Frames-per-Theme count requested by the
+CLI; never assume, state, or encode a fixed total. Do not assign a country,
+region, uniform, activity, camera angle, or intensity by Theme ID, Frame ID, or
+ordinal position.
+
+CONTENT-LEVEL COMPLIANCE
+
+Honor the exact CLI-requested content level at both Theme and Frame stages. Do
+not silently raise, lower, relabel, postpone, or average the level.
+
+At aesthetic level, every person must remain fully and professionally dressed
+in a coherent cabin-crew uniform. Center poised service craft, safety
+demonstration, crew coordination, aircraft architecture, destination atmosphere,
+and editorial portraiture. The image must read as premium aviation photography,
+not eroticized employment.
+
+At erotic level, the scene may use partial or full artistic adult nudity,
+sensual body presentation, intimate eye contact, or close consensual interaction
+in a clearly private, off-duty, editorial, fantasy, or closed-set context.
+Retain enough aviation-specific uniform anchors and equipment to make the
+flight-attendant concept unmistakable: examples include a neck scarf,
+airline-appropriate wing brooch, pillbox hat, tailored jacket worn open or draped
+nearby, low-profile nameplate without readable identity, service gloves,
+stockings, cabin shoes, crew watch, or secured service cart. A generic nude
+person inside an aircraft does not satisfy this brief.
+
+Every erotic Theme must establish its sensual adult state directly in the Theme
+premise through body coverage, current pose, gaze, uniform state, and
+aviation-specific surroundings. A fully dressed service pose, ordinary smile,
+distant silhouette, or vague romantic mood alone does not satisfy erotic level.
+Keep all intimate contact non-graphic; do not use explicit sexual acts or
+pornographic anatomical close-ups.
+
+This non-graphic brief is incompatible with hardcore output. If the CLI requests
+hardcore, fail clearly rather than weakening, relabeling, or silently
+downgrading the requested level.
+
+CONTENT-LEVEL GATE FOR THEMES AND FRAMES
+
+Every Theme premise must visibly encode the requested content level, exact adult
+cast, current body-coverage and uniform state, cabin-crew activity or private
+aviation context, and relationship dynamic. Do not defer these decisions to the
+Frame stage. Every Theme style must reinforce the requested level through
+camera distance, composition, light, material rendering, and visual emphasis.
+
+Every Frame must preserve that same level and begin with its defining state
+already visible. Do not substitute preparation, undressing in progress,
+anticipated escalation, aftermath, obscured evidence, a distant establishing
+view, or a milder interaction. Reject and rewrite any Theme or Frame whose
+visible content reads below or above the CLI-requested level.
+
+PROFESSIONAL AND CONSENT BOUNDARIES
+
+Do not eroticize mandatory labor, customer service, employment hierarchy,
+discipline, evaluation, financial pressure, immigration status, or inability to
+leave an aircraft. Do not use a passenger exploiting a worker, a supervisor
+coercing junior crew, hidden cameras, public exposure, intoxication, sleep,
+panic, turbulence danger, emergency vulnerability, restraint, or blocked exits.
+
+At erotic level, establish that every adult is off duty or participating in a
+consensual closed-set editorial fantasy inside a parked training cabin, private
+charter set, grounded aircraft studio, crew lounge, or other controlled private
+environment. Uniform pieces function as visual identity, not authority or
+coercion. Every participant must be alert, actively willing, mutually
+responsive, and able to stop.
+
+COUNTRY AND CULTURAL RANGE
+
+Across requested Themes, vary national or regional design inspiration with
+care. Ground the distinction in climate, tailoring history, textile craft,
+aviation era, architecture, palette, service-object design, route atmosphere,
+and contemporary fashion rather than caricature.
+
+Use a natural-language cultural or geographic description only when it helps
+the image. Do not place flags on intimate anatomy. Do not turn sacred,
+ceremonial, Indigenous, military, or religious garments into fetish costumes.
+Do not use exaggerated accents, submissive-nationality tropes, racial hierarchy,
+skin-tone hierarchy, exoticizing language, or claims that one national group
+has a fixed personality or body type.
+
+Country and region inspirations may include:
+contemporary Chinese tailoring with restrained red and warm ivory accents
+Japanese precision minimalism with indigo, pearl gray, and origami-like seams
+Korean modern tailoring with clean pastel geometry and polished accessories
+Thai silk-inspired color harmony translated into a modern non-ceremonial uniform
+Singaporean tropical-modern palette with batik-inspired abstract textile rhythm
+Indian contemporary tailoring with jewel-tone piping and non-ceremonial woven detail
+Emirati luxury aviation minimalism with sand, pearl, burgundy, and sculptural hats
+Turkish geometric textile accents with deep teal and warm copper
+French couture restraint with navy, cream, and one sharp scarf accent
+Italian modernist tailoring with espresso, ivory, and architectural lines
+British heritage-inspired tailoring modernized without military insignia
+Spanish warm modernism with saffron, black, and fluid scarf movement
+Scandinavian functional minimalism with ice blue, charcoal, and natural texture
+Dutch graphic modernism with cobalt and restrained orange accents
+German precision workwear translated into elegant cabin tailoring
+Swiss clean geometry with red accents and brushed-metal accessories
+Greek island palette with white, Aegean blue, and lightweight summer tailoring
+Moroccan contemporary textile geometry used without ceremonial costume
+Kenyan modern design with earth tones and abstract bead-inspired color placement
+South African contemporary tailoring with bold geometric lining
+Brazilian modernist color and flowing warm-climate uniform construction
+Mexican contemporary textile color translated into restrained aviation graphics
+American mid-century jet-age tailoring reinterpreted for contemporary cabin service
+Canadian practical elegance with winter textures and maple-red used abstractly
+Australian coastal modernism with eucalyptus green and sand tones
+New Zealand functional tailoring with fern-like abstract seam geometry
+
+REAL AIRLINE SELECTION
+
+Privately and automatically select one real, currently operating passenger
+airline for every Theme. The selected airline must be headquartered in or
+strongly associated with the Theme's chosen country or region. Prefer
+well-documented carriers whose current name, home region, uniform identity, and
+cabin design can be represented confidently. If uncertain whether a carrier is
+real or still operating, choose another carrier rather than inventing details.
+
+Name the selected real airline naturally in every Theme premise and fully
+re-establish it in every Frame. Preserve its identity consistently throughout
+the Theme. Use its recognizable current uniform silhouette, signature palette,
+accessory logic, cabin class, seat materials, service-object design, and brand
+details where visually appropriate. Do not combine one airline's uniform with
+another airline's cabin, colors, logo, route identity, or accessories.
+
+Do not invent airline names, altered spellings, substitute logos, hybrid
+carriers, fictional subsidiaries, fake route maps, or imaginary liveries. Do
+not present the image as an official advertisement, endorsement, or documentary
+record of a real employee. The cast must remain original fictional adults and
+must not resemble identifiable airline staff.
+
+Across requested Themes, select different real airlines before repeating one.
+Themes must also differ substantially in country or region, uniform silhouette,
+palette, materials, cabin class, lighting, route atmosphere, activity, and
+camera strategy, not merely airline name or scarf color.
+
+REAL AIRLINE EXAMPLES:
+Air China for contemporary Chinese flag-carrier tailoring and red accents
+All Nippon Airways for Japanese precision and blue cabin geometry
+Japan Airlines for Japanese red-and-white restraint and polished service design
+Korean Air for Korean sky-blue identity and contemporary cabin styling
+Singapore Airlines for Singaporean batik uniform heritage and warm premium cabins
+Thai Airways for Thai silk color and purple-gold cabin identity
+Air India for Indian contemporary motifs and deep red accents
+Emirates for Emirati cream tailoring, red hats, and premium wide-body cabins
+Qatar Airways for Qatari burgundy accents and sculptural long-haul interiors
+Turkish Airlines for Turkish red identity and modern international cabins
+Air France for French navy tailoring and restrained red accents
+British Airways for British structured tailoring and deep blue cabin identity
+KLM for Dutch blue uniforms and graphic contemporary interiors
+Lufthansa for German navy-and-yellow precision and functional cabin design
+SWISS for Swiss red accents and clean geometric tailoring
+Iberia for Spanish red-and-yellow warmth and modern cabin materials
+ITA Airways for Italian blue tailoring and contemporary design
+Aegean Airlines for Greek blue-and-white restraint and bright Mediterranean light
+Royal Air Maroc for Moroccan red-green accents and contemporary textile detail
+Kenya Airways for Kenyan red identity and warm modern tailoring
+South African Airways for South African color accents and long-haul cabin design
+LATAM Airlines for South American magenta-blue identity and modern wide-body cabins
+Aeromexico for Mexican navy tailoring and silver aviation accents
+Delta Air Lines for American plum-red tailoring and contemporary cabin geometry
+Air Canada for Canadian black-red tailoring and cool modern interiors
+Qantas for Australian red identity and polished long-haul styling
+Air New Zealand for New Zealand black tailoring and fern-inspired visual identity
+
+THEME AND FRAME CONTRACT
+
+Every Theme must define:
+- one country or region-inspired contemporary design language;
+- one automatically selected real operating airline from that country or region;
+- one private aviation setting and physically current activity;
+- one exact adult cast with stable uniform anchors;
+- one content-level-appropriate body-coverage and interaction state;
+- one source-lighting logic and palette;
+- one visual rule that links uniform, cabin, and service equipment; and
+- one emotional dynamic such as composure, camaraderie, playful confidence,
+  private tenderness, theatrical glamour, or quiet authority.
+
+Give each Theme one concise original title. Its premise must describe the exact
+adult cast, present aviation situation, body-coverage and uniform logic, visible
+activity, relationship, and one concrete visual tension in no more than two
+sentences. Its style must be one complete flowing sentence defining
+composition, lens behavior, light, palette, cabin materials, uniform rendering,
+and finish.
+
+Frames within one Theme are parallel visual alternatives of the same broad
+situation, not chronological chapters. No pose, garment state, service stage,
+prop position, or lighting event carries from another Frame. Every Frame must
+stand alone, fully redescribe the exact cast, uniform state, cabin zone, current
+action, and source light, while using a distinct camera relationship and visual
+center.
+
+Write every final Frame as one unbroken natural-language paragraph in the
+CLI-requested language. Do not output a screenplay, shot list, tag list,
+explanation, visible title, caption, airline advertisement copy, watermark, or
+interface element. Authentic airline branding may appear only as a natural part
+of the uniform or aircraft environment.
+
+AVIATION AUTHENTICITY GATE
+
+Every Frame must contain at least three unmistakable cabin-crew or aircraft
+details that matter to the composition rather than serving as random decor.
+Keep doors, jumpseats, galleys, bins, carts, latches, restraints, call panels,
+interphones, lighting strips, seat rows, and safety equipment physically
+credible.
+
+Service carts must be locked or visibly braked when stationary. Hot liquids,
+glassware, sharp utensils, loose luggage, and unsecured equipment must remain
+outside body paths. Keep aisles, exits, hatches, and emergency equipment clear.
+Do not show active flight with unsafe posture, open doors, loose heavy objects,
+or ignored turbulence restraints.
+
+Use believable crew movement: balanced aisle stance during stable conditions,
+one hand lightly near a seatback or cart handle when appropriate, compact
+reaches in the galley, practiced door-side posture, controlled demonstration
+gestures, and precise service handling. At erotic level in a grounded private
+set, poses may be more editorial, but aircraft fixtures must not become unsafe
+restraints or load-bearing erotic apparatus.
+
+UNIFORM DESIGN GATE
+
+Every uniform must be recognizably designed for cabin service. Include a
+compatible combination of tailored jacket, blouse or knit shell, knee-length or
+midi skirt, tailored trousers, practical dress, waistcoat, scarf, hat, hosiery,
+flat or low stable cabin shoes, service gloves, crew watch, airline-appropriate
+brooch, and low-profile nameplate.
+
+Uniforms must permit reaching, bending, lifting, aisle movement, and prolonged
+wear. Use secured scarves, low-snag closures, opaque professional fabrics,
+practical hems, stable footwear, and pockets that close. Do not use military
+ranks, police insignia, hazardous stilettos during active service, loose chains,
+trailing fabric, oversized wings, or costume pieces that could snag cabin
+hardware.
+
+At erotic level, uniform styling may include an open tailored jacket, loosened
+but secured scarf, unfastened blouse, skirt or dress draped nearby, stockings,
+garters styled as editorial wardrobe, hat, gloves, shoes, or jewelry retained
+with partial or full artistic nudity. Keep removed pieces neatly folded,
+draped over a fixed jumpseat, or secured inside an open wardrobe compartment;
+do not scatter garments across aisles or exits.
+
+ADULT CABIN-CREW PRESENTATION:
+poised senior cabin attendant with immaculate tailored posture
+warmly confident crew member checking a secured service cart
+two adult attendants coordinating a synchronized safety gesture
+adult purser framed by galley geometry and a coherent cabin palette
+off-duty adult crew portrait with jacket draped over a fixed jumpseat
+closed-set editorial pose retaining scarf, hat, gloves, and crew watch
+private charter attendant arranging destination-inspired service objects
+adult crew companions sharing composed eye contact in an empty premium cabin
+confident solo portrait beside a parked aircraft's closed boarding door
+small adult crew group arranged through repeating seat and aisle geometry
+
+
+AVIATION SETTING:
+parked wide-body first-class cabin with sculptural privacy shells
+grounded narrow-body training cabin with visible safety hardware
+private charter interior with restrained wood, leather, and brushed metal
+empty premium-economy cabin with repeating headrest geometry
+aircraft galley with latched compartments and a braked service cart
+crew rest lounge with bunks closed and personal items secured
+door training mock-up inside a controlled aviation studio
+airline uniform atelier built around authentic cabin fixtures
+airport crew lounge overlooking aircraft through soundproof glass
+parked retro jet-age cabin reconstructed as a polished studio set
+long-haul business cabin during quiet blue-hour ground operations
+bright tropical-route cabin filled with diffused apron daylight
+
+
+CURRENT ACTIVITY:
+performing a precise non-emergency safety-demonstration gesture
+checking sealed compartments before a staged cabin portrait
+presenting a carefully designed tray in a stable empty cabin
+coordinating scarf and jacket details before a cabin-crew lookbook
+standing at a closed aircraft door with one hand near the arming panel
+reviewing a route-inspired service setting without readable documents
+arranging secured amenities inside a premium seat shell
+sharing a composed off-duty pause beside the crew jumpseats
+holding an interphone handset during a staged communications portrait
+walking the empty aisle with compact practiced posture
+posing around a locked service cart as an architectural centerpiece
+resting in a private crew lounge after all uniform pieces are secured
+
+
+EROTIC CLOSED-SET ACTIVITY:
+full artistic nude portrait retaining a neck scarf, hat, and crew watch
+open jacket framing bare skin while the adult remains confidently posed
+partially undressed editorial stance beside a fixed closed jumpseat
+two off-duty adult crew members in close consensual skin-to-skin contact
+nude adult seated safely inside a broad private-suite shell with scarf retained
+bare adult torso framed by tailored lapels and airline-appropriate wing brooch
+stockings, low cabin shoes, gloves, and hat retained with artistic nudity
+intimate adult eye contact across a latched service cart in a grounded set
+adult partners embracing privately beneath dimmed cabin lighting
+sculptural nude group pose aligned with repeating seat geometry
+
+
+UNIFORM SILHOUETTE:
+single-breasted cropped jacket with curved seam lines
+longline tailored jacket over straight-leg cabin trousers
+structured midi dress with flexible side panels
+soft blouse and practical A-line skirt with a secured scarf
+collarless jacket with contrast piping and hidden closures
+waistcoat layered over a breathable knit shell
+wrap-inspired dress engineered with secure internal fastenings
+minimal tunic and tapered trousers for warm-climate routes
+winter-weight jacket with a removable short collar
+jet-age fitted dress modernized with functional stretch and pockets
+
+
+SIGNATURE ACCESSORIES:
+short secured neck scarf with abstract route-inspired pattern
+small sculptural pillbox hat fixed with discreet pins
+airline-appropriate wing brooch using the selected carrier's visual language
+brushed-metal crew watch with a clean readable dial
+low-profile blank nameplate with no personal information
+soft service gloves matching the carrier accent color
+compact communication earpiece used only in a staged portrait
+structured cabin handbag stored clear of the aisle
+practical low stable shoes designed for long service
+subtle earrings coordinated with the uniform's metal accents
+
+
+CAMERA LANGUAGE:
+medium-full aisle portrait preserving uniform silhouette and cabin depth
+low eye-level view using seatbacks as converging lines
+symmetrical frontal composition centered on a closed aircraft door
+side-on galley portrait framed by repeating latches and compartments
+overhead view turning seats, scarves, and limbs into controlled geometry
+long-lens portrait compressing an empty aisle behind the cast
+close editorial portrait with uniform anchors and aircraft context both visible
+wide environmental frame showing the complete empty cabin and exact cast
+three-quarter view through a premium-suite doorway
+rear follow view emphasizing jacket construction and aisle rhythm
+reflection-free window-side portrait against apron or sky light
+ground-level camera using a braked cart wheel as foreground scale
+
+
+LIGHTING AND ROUTE ATMOSPHERE:
+cool dawn apron light entering through one side of the cabin
+warm sunset light banding across seats and tailored uniforms
+soft overcast daylight producing clean professional skin tones
+dim blue long-haul cabin light with warm personal-lamp accents
+bright tropical daylight softened by layered window shades
+golden desert-airport light against burgundy and pearl materials
+rainy-night terminal reflections filtered through aircraft windows
+crisp alpine daylight with silver, red, and charcoal accents
+warm galley practicals shaping polished metal and textile surfaces
+controlled aviation-studio beauty light motivated by cabin fixtures
+
+
+VISUAL STORY DYNAMICS:
+professional composure interrupted by a private shared smile
+precise teamwork expressed through mirrored hands and eyelines
+quiet senior confidence within complex aircraft geometry
+playful off-duty glamour after the cabin has been secured
+private tenderness contrasted with formal uniform structure
+destination anticipation expressed through color and service objects
+calm authority framed by the closed door and safety hardware
+editorial sensuality balanced by unmistakable aviation identity
+cross-cultural crew camaraderie without national caricature
+solitary poise amplified by an empty long-haul cabin
+
+
+VARIATION AND REJECTION RULES
+
+- Every Theme must combine a real airline, regional design logic, uniform
+  silhouette, cabin function, activity, palette, and camera strategy.
+- Prioritize unused combinations before repeating any country or region.
+- Do not reduce national difference to flags, skin tone, facial stereotype,
+  exotic costume, or one scarf pattern.
+- Do not use an unnamed, unbranded, invented, altered, parody, or hybrid airline.
+- Do not let nudity erase the cabin-crew identity or replace a concrete visual
+  concept.
+- Reject any Theme or Frame with an unclear adult age, ambiguous consent,
+  employment coercion, public exposure, unsafe aviation behavior, blocked exit,
+  unsecured heavy object, or extra person.
+- Reject any Theme or Frame whose uniform cannot plausibly function in an
+  aircraft cabin.
+- Reject any Theme or Frame whose visible intensity does not match the exact
+  CLI-requested content level.
+- Preserve cultural respect, aviation credibility, stable cast identity, and a
+  polished original editorial finish in every output.
