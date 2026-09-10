@@ -8,17 +8,21 @@ Every list below is inspiration, not a menu or fixed preset. Combine compatible 
 
 CAST, ADULTHOOD, AND CONTINUITY
 
-Use the exact CLI-requested human cast and no additional people. Every person must be an unmistakably mature, consenting Chinese adult aged 25 or older: alert, actively participating, mutually responsive, and able to stop.
+Use the exact CLI-requested human cast and no additional people. Every person must be an unmistakably mature, consenting Chinese adult aged 25 or older: alert, actively participating, mutually responsive, and able to stop. Keep every background empty of other people. Do not add bystanders, crowds, silhouettes, portraits, human images on screens, mannequins, mirrors, or human reflections; use matte surfaces near bodies.
 
-The primary model is a 25-year-old Chinese woman, 170 cm tall, with a narrow waist, slender body, naturally large pendulous breasts, fair skin, no visible makeup, long wispy dark hair, side-parted bangs, and no pubic hair. Give every additional adult a distinct stable appearance. Preserve identity, mature age, face, hair, body proportions, and other anchors across all views and Frames.
+The primary model is a 21-year-old Chinese woman, 170 cm tall, with a narrow waist, slender body, naturally large pendulous breasts, fair skin, no visible makeup, long wispy dark hair, side-parted bangs, and no pubic hair. Give every requested adult a distinct stable appearance. Preserve identity, mature age, face, hair, body proportions, and other anchors across all views and Frames.
 
-At least one view in every Frame must make the complete cast count and body relationships unmistakable. Other views may intentionally crop people for close-ups.
+At least one view in every Frame must make the complete cast and body relationships unmistakable. Other views may intentionally crop people for close-ups.
+
+FRAME CONTENT PRIORITY
+
+At hardcore content level, every Frame must already contain a directly visible ongoing explicit act in its primary interaction view; preparation, undressing, imminent contact, ordinary nudity, or passive aftermath cannot substitute for it. Directly name the involved anatomy and current contact, begin after that contact is established, and keep every participant active and consenting.
 
 STORY AND FRAME CONTINUITY
 
-For each Theme, create a concise premise grounded in a Chinese location, period, relationship, and situation. Give the primary woman a clear objective, every additional adult a compatible dramatic role, and one visually understandable nonviolent obstacle, choice, interruption, secret, ritual, wager, deadline, or power shift. Communicate through action, reaction, eyelines, space, and recurring props, not captions, speech bubbles, or written exposition.
+For each Theme, create a concise premise grounded in a Chinese location, period, relationship, and situation. Give the primary woman a clear objective, every additional adult a compatible dramatic role, and one visually understandable nonviolent obstacle, choice, secret, ritual, wager, deadline, environmental interruption, or power shift that introduces no other person or human image. Communicate through action, reaction, eyelines, space, and recurring props, not captions, speech bubbles, or written exposition.
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the CLI; never assume a fixed total. Adapt the arc to the available length: establish the situation, develop it without filler, place the turning point where it works best, and resolve the immediate objective. These are flexible functions, not numbered beats or a mandatory pose sequence.
+Generate exactly the Theme count and Frames-per-Theme count requested by the CLI; never assume a fixed total. Adapt the arc to the available length without ordinary setup or aftermath Frames. At hardcore level, the explicit interaction is already underway in the first Frame and remains directly visible in every Frame, including the final one; advance the story through expression, agency, power balance, gaze, grounded position, props, environment, and current interaction rather than through clothed introduction, imminent contact, or recovery.
 
 Every Frame must work alone as a clear story beat and advance the complete sequence. Preserve cast, architecture, furniture, major props, and visual language while allowing motivated changes in pose, expression, garments, prop placement, light, weather, and elapsed time. A later Frame may show a new state caused by an earlier beat, but describe only its current result. Do not reset continuity, repeat the same action in consecutive Frames, introduce unexplained people or props, or leave the central question unresolved.
 
@@ -26,30 +30,30 @@ Views within one Frame are separate storyboard shots and may cover complementary
 
 FULL-BLEED MULTI-VIEW LAYOUT
 
-State the exact view count and use a deliberate rectangular tiling that covers 100 percent of the canvas. Two-view inspirations include horizontal, vertical, and unequal splits; three-view inspirations include T-shaped, one-large-plus-two-stacked, or one-wide-plus-two layouts; four-view inspirations include two-by-two, one-wide-plus-three, or one-large-plus-three-stacked layouts. Vary region size, alignment, and portrait, landscape, or square crop geometry instead of defaulting to equal columns.
+State the exact view count and use that exact number of non-overlapping rectangular regions covering 100 percent of the canvas; all row and column proportions must sum to the full width and height. Two-view inspirations include horizontal, vertical, and unequal splits; three-view inspirations include T-shaped, one-large-plus-two-stacked, or one-wide-plus-two layouts; four-view inspirations include two-by-two, one-wide-plus-three, or one-large-plus-three-stacked layouts. Vary region size, alignment, and portrait, landscape, or square crop geometry instead of defaulting to equal columns.
 
 Every view must fill its region to the crop edge and directly abut neighboring views at a hard cut. Use no gutter, border, margin, padding, divider, frame, mat, shadow, blank area, or uncovered canvas. Call each region a view, never a collage, panel, filmstrip, contact sheet, album, floating tile, overlapping layout, or picture-in-picture.
 
-Final prose must begin with this sentence, replacing the bracketed word with the selected count: “A full-bleed seamless [two/three/four]-view tiled composition covers the entire canvas; every view fills its assigned region and directly abuts neighboring views edge-to-edge, with no visible separators.”
+Final prose must begin with the following exact English sentence, replacing only the bracketed word with the selected count. Copy it before any premise or style text; do not translate or paraphrase it: “A full-bleed [two/three/four]-view hard-cut tiled composition covers the entire canvas; every view fills its assigned region and directly abuts neighboring views edge-to-edge, with no gaps and no cross-view continuation.”
 
-Seamless describes only the layout assembly. Each view is an independent storyboard shot, not part of one continuous panorama. Bodies, limbs, furniture, architecture, reflections, and backgrounds must never merge, stretch, or continue across a hard cut.
+Each view is an independent storyboard shot, not part of one continuous panorama. Bodies, limbs, furniture, architecture, and backgrounds must never merge, stretch, or continue across a hard cut.
 
 PER-VIEW PHYSICS AND ANATOMY
 
-Treat each view as one exposure. Within it, describe exactly one current pose, interaction, contact graph, and support graph. Lock each person to one location, orientation, gaze target, and action; do not combine preparation, movement, contact, and aftermath or place one body part in successive positions.
+Treat each view as one exposure. Within it, describe exactly one current pose, interaction, contact graph, and support graph. Lock each person to one location, orientation, gaze target, and action. Describe the final human state once; do not narrate transitions, withdrawal and reinsertion, pose changes, self-corrections, or successive positions of one body part.
 
-Show no more than one sharp instance of each requested person inside a view. Use ordinary anatomy, natural digits, reachable contact, plausible pelvis alignment, and broad support from a fixed floor, bed, seat, or wall. Give every visible hand, foot, mouth, and weight-bearing limb one compatible task. In full and medium views, keep limbs traceable from shoulder or hip to their endpoints and minimize ambiguous overlap.
+Show no more than one sharp instance of each requested person inside a view. Use ordinary anatomy, natural digits, reachable contact, and directly aligned pelvises and penetration axis. Keep genitals and the complete contact path visibly clear of garments. Bodies may bear weight only on a broad fixed floor, bed, bench, sofa, or wall; props do not support, suspend, trap, or separate limbs. Give every visible hand, foot, mouth, and weight-bearing limb one compatible task. Keep limbs traceable from shoulder or hip to their endpoints and minimize ambiguous overlap. Keep every scar, mark, garment, and physical trait attached to its original owner. Keep harnesses, belts, ropes, machinery, sharp structures, stairs, narrow ledges, and moving props outside body paths; avoid wedged, twisted, crossed-limb, or acrobatic support. Do not bend a penis against the abdomen during penetration or describe internal anatomy as externally visible.
 
 Close-ups may focus on a face, breasts, nipples, buttocks, vulva, penis, scrotum, anus, mouth, hands, tactile detail, or direct sexual contact. They may crop beyond the tile edge, but every visible part must belong clearly to one established person and connect naturally to the source body. Do not create detached, source-less, repeated, or extra anatomy through mirrors, screens, posters, shadows, ghosting, double exposure, motion trails, or cross-boundary imagery.
 
-VIEW ROLES
+SHOT MIX
 
-Every image must include Role B. Use B plus one of A, C, or D for two views; B plus two different remaining roles for three; and all four roles for four. Assign roles to any tile position or size and do not duplicate a role merely to reach the count.
+Every image must include one primary interaction view and at least one supporting view. Select the remaining shots according to the chosen view count, vary their tile positions and sizes, and identify them only by shot purpose or tile position; never assign alphabetic character labels.
 
-- Role A — Establishing: a medium or medium-full view showing location, relationships, complete cast, support, and the visual clue driving the current beat.
-- Role B — Primary intimate detail: a close or medium-close view that clearly shows the requested adult content level and decisive contact in one stable, anatomically coherent pose. For solo casts, show active consensual self-stimulation; for multi-person casts, give every adult a clear active role.
-- Role C — Body and space: a complementary medium or full-body view revealing body geometry, limb paths, contact, fixed support, spatial relationships, and a relevant recurring prop.
-- Role D — Alternate or close-up: a distinct angle or intentional close-up emphasizing expression, reaction, guiding hands, skin or fabric texture, breasts, nipples, buttocks, genitals, anus, decisive contact, or another story clue while preserving source-body context.
+- Primary interaction: a medium-close or medium view showing the complete cast, decisive explicit contact, each participant's response, and stable support.
+- Context: a medium or medium-full view establishing location, cast relationships, body geometry, support, and the current story clue.
+- Optional spatial detail: a complementary view clarifying limb paths, pelvis alignment, contact, furniture, and a recurring prop.
+- Optional close-up: an anchored facial, reaction, hand, breast, buttock, genital, anal, oral, tactile, contact, or story detail.
 
 CAMERA AND VARIETY
 
@@ -57,4 +61,6 @@ Make views meaningfully different in direction, height, distance, crop, or optic
 
 Crop deliberately at clean torso or mid-limb locations, never through a face, neck, joint, hand, foot, or decisive contact, and never so tightly that anatomy loses its source. Avoid extreme wide angle, fisheye, severe foreshortening, steep overhead compression, worm's-eye distortion, body-crossing foregrounds, or clutter that obscures faces, support, contact, or story clues.
 
-Across Themes, vary premise, objective, obstacle, resolution, Chinese setting, furnishings, styling, emotional dynamic, interaction, camera language, palette, and lighting. Across Frames of one Theme, preserve continuity while varying story action, view count, tiling, role placement, crop, and emphasis. Every Frame must remain a complete multi-view image whose current story beat and primary adult interaction are clear.
+Keep final prose under about 800 Chinese characters or 400 English words: write the required opening, one concise sentence for each view, and one brief shared style sentence. Complete every promised view before adding atmosphere; omit biographies, backstory, sound, smell, and decorative prose that do not clarify the image.
+
+Across Themes, vary premise, objective, obstacle, resolution, Chinese setting, furnishings, styling, emotional dynamic, interaction, camera language, palette, and lighting. Across Frames of one Theme, preserve continuity while varying story action, view count, tiling, shot mix, crop, and emphasis. Every Frame must remain a complete multi-view image whose current story beat and primary adult interaction are clear.
