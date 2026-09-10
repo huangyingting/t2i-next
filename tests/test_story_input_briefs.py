@@ -44,9 +44,135 @@ def test_dress_board_region_names_are_layout_only() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "dress.txt").read_text(
         encoding="utf-8"
     )
+    normalized = " ".join(brief.split())
 
     assert "Do not render the Theme title or region names as visible text." in brief
     assert "Use region names only as internal layout references" in brief
+    assert "Begin the scale at visibly sensual" in normalized
+    assert (
+        "compatible only with CLI cast settings of one woman and zero men"
+        in normalized
+    )
+    assert "zero or one visually restrained body-safe adult product" in normalized
+    assert "adult product-and-wearable fashion system" in normalized
+    assert (
+        "Include one to three clearly designed body-safe adult products"
+        in normalized
+    )
+    assert "BDSM equipment-and-wardrobe design board" in normalized
+    assert "Include three to six BDSM-specific designed elements" in normalized
+    assert "BDSM EQUIPMENT SPECIFICATION" in normalized
+    assert "at least two externally wearable pieces" in normalized
+    assert "non-load-bearing, low-pressure, and visibly releasable" in normalized
+    assert "HARDCORE VISUAL IMPACT GATE" in normalized
+    assert "remains powerful at thumbnail scale" in normalized
+    assert "Use at least three of these contrast axes" in normalized
+    assert "one dominant statement, two secondary structures" in normalized
+    assert "CURATED HARDCORE WARDROBE ARCHETYPES" in normalized
+    assert "CURATED HARDCORE EQUIPMENT SYSTEMS" in normalized
+    assert "CURATED EXPLICIT BDSM PRODUCT CATEGORIES" in normalized
+    assert "SEX TOY PRODUCT SPECIFICATION" in normalized
+    assert "CURATED SEX TOY PRODUCT CATEGORIES" in normalized
+    assert "CURATED HARDCORE MATERIAL AND COLOR SYSTEMS" in normalized
+    assert "nipple clamps" in normalized
+    assert "ball gag" in normalized
+    assert "bit gag" in normalized
+    assert "open-center mouth gag" in normalized
+    assert "Any selected hardcore product may appear worn" in normalized
+    assert "visible low-tension limiter" in normalized
+    assert "visible breathing path" in normalized
+    assert "relaxed jaw" in normalized
+    assert "chastity-inspired waist belt" in normalized
+    assert "ventilated leather half-mask" in normalized
+    assert "wide posture collar" in normalized
+    assert "bondage mitts" in normalized
+    assert "breast-framing leather harness" in normalized
+    assert "lightweight padded spreader bar" in normalized
+    assert "soft suede flogger" in normalized
+    assert "broad padded leather paddle" in normalized
+    assert "limited body area necessary" in normalized
+    assert "External wearable sex toys may appear fitted" in normalized
+    assert "Insertive product categories may be named and shown" in normalized
+    assert "must remain completely outside the body" in normalized
+    assert "full-size wand massager" in normalized
+    assert "strap-on harness carrying a removable silicone dildo" in normalized
+    assert "classic silicone dildo" in normalized
+    assert "rabbit vibrator" in normalized
+    assert "jeweled silicone butt plug" in normalized
+    assert "graduated anal-bead set" in normalized
+    assert "textured masturbation sleeve" in normalized
+    assert "one to three sex toys in addition to its BDSM" in normalized
+    assert "PRODUCT AUTHENTICITY GATE" in normalized
+    assert "attach to the nipples" in normalized
+    assert "attached to lace" in normalized
+    assert "must not be called a nipple clamp" in normalized
+    assert "CONSTRUCTION AND CONNECTION INTEGRITY" in normalized
+    assert "collar seamlessly extends into gloves" in normalized
+    assert "material flat lay must show two shoes, two gloves" in normalized
+    assert "genuinely different presentation" in normalized
+    assert "Change at least four of these" in normalized
+    assert "Do not write the internal level names" in normalized
+    assert "BDSM may appear at most once" in normalized
+    assert "Do not leak English workflow words" in normalized
+    assert "Do not pad final prose with compliance-shaped negations" in normalized
+    assert "does not satisfy hardcore product emphasis" in normalized
+    assert "Do not use the words futuristic" in normalized
+    assert "generic mid-gray walls" in normalized
+    assert "flat, shadowless catalog lighting" in normalized
+    assert "Every named product has its real shape and intended fit" in normalized
+    assert "Every Frame differs from other Frames" in normalized
+    assert "Final prose never states an internal content level" in normalized
+    assert "cybernetic body parts" in normalized
+    assert "technology-shaped costume components" in normalized
+    assert "utilitarian futurism" not in normalized
+    assert "Aesthetic is sensual lingerie-led fashion" in normalized
+    assert "hardcore is a BDSM wardrobe-and-equipment system" in normalized
+    assert "Present one complete, opaque, non-erotic outfit." not in brief
+    assert "At aesthetic level, include none." not in brief
+
+    wardrobe_pool = brief.split(
+        "\nCURATED HARDCORE WARDROBE ARCHETYPES\n", maxsplit=1
+    )[1].split("\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1)[0]
+    equipment_pool = brief.split(
+        "\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1
+    )[1].split("\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1)[0]
+    product_pool = brief.split(
+        "\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1
+    )[1].split("\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1)[0]
+    sex_toy_pool = brief.split(
+        "\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1
+    )[1].split("\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1)[0]
+    material_pool = brief.split(
+        "\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1
+    )[1].split("\nSIX-VIEW BOARD CONTRACT\n", maxsplit=1)[0]
+    for pool in (
+        wardrobe_pool,
+        equipment_pool,
+        product_pool,
+        sex_toy_pool,
+        material_pool,
+    ):
+        entries = [
+            line.removeprefix("- ").strip()
+            for line in pool.splitlines()
+            if line.startswith("- ")
+        ]
+        assert len(entries) >= 12
+        assert len(entries) == len(set(entries))
+
+    explicit_product_entries = [
+        line.removeprefix("- ").strip()
+        for line in product_pool.splitlines()
+        if line.startswith("- ")
+    ]
+    assert len(explicit_product_entries) >= 24
+    sex_toy_entries = [
+        line.removeprefix("- ").strip()
+        for line in sex_toy_pool.splitlines()
+        if line.startswith("- ")
+    ]
+    assert len(sex_toy_entries) >= 20
+
     assert (
         "The Theme title appears exactly once and the six region labels "
         "each appear once"
