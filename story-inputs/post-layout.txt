@@ -1,0 +1,87 @@
+BRIEF
+
+Create varied, copy-ready image prompts for finished single-image designs. Each result may center a product, person, space, interface, event, service, or information topic, but it must read as one resolved composition rather than a moodboard, storyboard, process sheet, or collection of alternatives.
+
+Keep the original seven-part structure in this exact order: Subject, Scene, Composition, Style, Text, Details, Output. A Frame missing any label is invalid. Make every field compact, directly imageable, and useful; do not add unlabeled prose, planning notes, explanations, or optional branches.
+
+Every readable word inside the generated image must be grammatical English. This includes the headline, subtitle, labels, buttons, annotations, packaging, signs, screens, documents, clothing, and environmental graphics. The descriptive prompt follows the CLI output language, but all quoted image copy remains English.
+
+EXAMPLES ARE OPEN-ENDED
+
+Examples below are inspiration, not presets, quotas, or a fixed sequence. Combine compatible ideas or invent an equivalent. Only statements using "must," "every," "exact," or "do not" are mandatory.
+
+CAST, ADULTHOOD, AND CONTENT
+
+When people are requested, use the exact CLI-requested human cast and no additional people. Every depicted person must be an unmistakably mature Chinese adult aged 25 or older, alert, willing, responsive, and able to stop. Preserve identity, age, face, hair, body proportions, garments, and other anchors throughout a Theme.
+
+Follow the CLI content level in every Frame. The level must shape the subject, interaction, crop, hierarchy, text tone, and visual emphasis rather than appearing as an isolated detail. At hardcore level, show a direct visible explicit interaction already occurring, name the involved anatomy and current contact, keep every participant active, and do not substitute nudity, preparation, alignment, or implication.
+
+THEMES AND FRAMES
+
+Generate exactly the Theme count and Frames-per-Theme count requested by the CLI. Each Theme establishes one design problem: a specific subject, purpose, context, exact headline, palette family, and visual identity.
+
+Use the Theme schema deliberately: `title` is an original grammatical English headline of one to six words that every Frame must reproduce exactly; `premise` defines the shared subject and context within the schema's story limits; `style` locks the palette family, material language, and visual identity in one concise sentence. Do not translate the title.
+
+Across Themes, vary subject category, location, audience, emotional temperature, era, material language, palette, and layout potential. Before returning a Theme batch, compare every pair and rewrite any pair that shares the same premise family, setting function, era, or style system. Do not produce several campaigns for one fictional story.
+
+Frames are parallel finished design proposals for the same Theme, never chronological stages. Preserve the Theme's exact subject, headline, palette family, and identity anchors, while giving each Frame a substantially different composition, aspect ratio, focal hierarchy, image-text relationship, and supporting detail. Changing only color, camera angle, or decoration does not count as a new layout. Restate each Frame independently; do not use "same," "still," "again," or another continuity shortcut.
+
+During Theme generation, return only the shared design concept and one concise style sentence. Do not include Frame drafts, field templates, count values, alternate layouts, or instructions for later stages.
+
+SEVEN-PART PROMPT CONTRACT
+
+Every Frame's `prose` must begin with the exact ASCII substring `Subject:` and contain each of the following English labels exactly once in this exact order. Draft all seven labels before filling their content. Copy the labels and ASCII colons literally even when the field content uses another language; do not translate, punctuate, decorate, or prefix them:
+
+Subject:
+Scene:
+Composition:
+Style:
+Text:
+Details:
+Output:
+
+After each label, provide:
+
+- Subject: the primary subject, defining appearance, current action or function, and the one feature that must dominate recognition.
+- Scene: the concrete context, intended audience, use case, and narrative or informational setting.
+- Composition: one exact aspect ratio, crop or camera distance, grid, focal hierarchy, placement, reading path, and protected negative space.
+- Style: one coherent visual language through material, lighting, color, era, texture, and brand or editorial tone.
+- Text: the exact English Theme title in quotation marks plus only essential grammatical English supporting copy, with hierarchy and location. If no supporting copy is needed, include only the title.
+- Details: only the few supporting objects, callouts, interface layers, or decorative elements that strengthen the main idea.
+- Output: resolution matching this Frame's Composition aspect ratio, finish quality, edge treatment, text fidelity, and the final readability requirement.
+
+Write one compact sentence or clause per field. Fields may follow one another in a single paragraph, but each literal label must remain visible. Do not write prose before `Subject:` or after the `Output:` field. Do not merge, rename, reorder, or repeat fields, and do not leave brackets, placeholders, implementation notes, or multiple-choice wording in the final prompt. Apart from the seven labels and quoted English image copy, field descriptions must remain entirely in the requested output language.
+
+LAYOUT AND FOCAL HIERARCHY
+
+Build each Frame around one dominant layout system. Possibilities include a centered hero, asymmetric editorial grid, typographic monolith, large negative-space field, split-world boundary, modular information grid, frame within frame, extreme crop, peripheral subject, top- or bottom-weighted composition, diagonal force, or an original equivalent.
+
+Use one primary focal point, one secondary information zone, and a clear reading path. Make the title hierarchy and primary visual legible at thumbnail size. Keep subject edges, faces, hands, essential product features, and decisive interactions clear of accidental crops, text collisions, and decorative clutter.
+
+Do not default every Frame to a centered subject with a headline above it. Do not combine several unrelated layout devices, duplicate the main subject, scatter floating elements, or turn one finished design into a collage of proposals.
+
+TEXT AND GRAPHIC DISCIPLINE
+
+Treat text as part of the composition, not as a caption added afterward. Lock the exact English headline across a Theme. Keep supporting copy minimal, purposeful, fully specified, and English-only; never invite the model to invent filler copy. Use only English Latin letters, Arabic numerals, and standard punctuation inside the image. Prohibit Chinese or other writing systems, gibberish, pseudo-letters, fake logos, watermarks, and unreadable microtext.
+
+Specify type scale, weight, alignment, spacing, contrast, and relation to the image without naming a copyrighted brand identity. Keep the headline immediately readable and use no more than two additional text levels unless the subject genuinely requires an information-dense interface.
+
+STYLE AND MATERIAL COHERENCE
+
+Derive style from the subject, audience, and purpose. Choose a restrained palette, one dominant material relationship, one motivated light system, and one period or design attitude. Avoid generic terms such as "premium," "cinematic," "modern," or "luxury" unless visible choices define them.
+
+Style may use clean commercial realism, tactile print, severe modernism, playful color blocking, archival editorial design, technical information graphics, restrained futurism, domestic warmth, nocturnal spectacle, or an original coherent direction. Do not imitate named living artists, existing campaigns, copyrighted characters, or recognizable brands.
+
+Keep textures and effects physically located: paper grain belongs to paper, bloom to bright light, embossing to a surface, reflections to reflective material, and interface glow to emissive screens. Do not stack unrelated artifacts merely to create novelty.
+
+PHYSICS AND RENDERABILITY
+
+Treat every Frame as one exposure and one final layout. Give each person or object one location, scale, orientation, support, and compatible function. Keep anatomy natural, contact reachable, weight supported, product geometry intact, interface layers aligned, and cast shadows consistent with the stated light.
+
+Protect all required text with adequate contrast and uncluttered space. Do not place important copy across complex faces, hands, anatomy, reflective highlights, deep folds, or perspective surfaces unless the Composition field explicitly makes that integration legible.
+
+OUTPUT
+
+Write one compact line per field. Target 350–550 Chinese characters and never exceed 700; target 180–280 English words and never exceed 350. Every phrase must control visible content, layout, text, material, or finish.
+
+Before returning, verify that all seven literal labels occur once in order; the exact English Theme title, subject, and palette are unchanged; the Composition and Output fields use the same aspect ratio; all in-image writing is grammatical English; the primary visual and title hierarchy survive thumbnail viewing; every promised word is readable; and the result describes one finished image only. Rewrite any Frame that fails this check. Remove repeated adjectives, backstory, symbolism explanations, audience reactions, and decorative details that do not improve hierarchy or renderability.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 
 import pytest
 
@@ -28,11 +29,13 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     assert payload["batch_count"] == 10
     assert payload["content_level"] == "aesthetic"
     assert payload["semantic_name"] is None
-    assert "semantic_name 使用简短的小写英文 snake_case 概括整个 story" in prompt
-    assert "premise 最多两句" in prompt
-    assert "不写具体姿态、绳路、器具" in prompt
-    assert "把这些留给各个 frame 独立发挥" in prompt
-    assert "人物关系、场景用途、决定或冲突上真正不同" in prompt
+    assert "concise lowercase English snake_case name" in prompt
+    assert "Premise must contain no more than two sentences" in prompt
+    assert "Do not put concrete poses, rope paths, equipment" in prompt
+    assert "Leave those details to each frame" in prompt
+    assert "unless the story explicitly requires them during Theme generation" in prompt
+    assert "material state or operating rule instead" in prompt
+    assert "relationship, setting function, decision, or conflict" in prompt
 
 
 def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
@@ -49,7 +52,7 @@ def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
     prompt = messages[0].content
     payload = json.loads(messages[1].content)
     assert payload["semantic_name"] == "lost_luggage_reunion"
-    assert "semantic_name 必须逐字返回 lost_luggage_reunion" in prompt
+    assert "Return semantic_name exactly as lost_luggage_reunion" in prompt
 
 
 def test_prompts_compile_exact_cast_constraints() -> None:
@@ -71,8 +74,11 @@ def test_prompts_compile_exact_cast_constraints() -> None:
             "female_count": 2,
             "male_count": 1,
         }
-        assert "成年女性 2 名、成年男性 1 名" in prompt
-        assert "不得省略、替换或增加其他人物" in prompt
+        assert (
+            "exactly 2 adult female participant(s) and 1 adult male participant(s)"
+            in prompt
+        )
+        assert "Do not omit, replace, or add anyone" in prompt
 
 
 def test_prompts_preserve_unspecified_cast_from_story() -> None:
@@ -91,9 +97,7 @@ def test_prompts_preserve_unspecified_cast_from_story() -> None:
             "female_count": None,
             "male_count": None,
         }
-        assert "人物人数和性别必须忠实遵循 story 明示事实" in (
-            messages[0].content
-        )
+        assert "must follow the explicit facts in the story" in messages[0].content
 
 
 def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
@@ -110,14 +114,18 @@ def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
     ):
         prompt = messages[0].content
 
-        assert "未明确说明某个人物的国籍时，该人物缺省为中国人" in prompt
-        assert "地点、姓名、语言、肤色或其他外貌特征不能作为国籍依据" in prompt
-        assert "theme premise 和每个 frame prose 都必须逐人明确写出国籍" in prompt
-        assert "输出英文时明确使用 Chinese" in prompt
-        assert "未明确故事发生国家或可确定国家的地点时，场景缺省位于中国" in prompt
-        assert "不得自行改到其他国家" in prompt
-        assert "每个 theme premise 和每个 frame prose 都必须明确写出故事发生国家" in (
-            prompt
+        assert "otherwise that person defaults to Chinese" in prompt
+        assert "Do not infer nationality from location, name, language" in prompt
+        assert (
+            "Every theme premise and frame prose must state each person's "
+            "nationality explicitly"
+        ) in prompt
+        assert 'Use "Chinese" in English output' in prompt
+        assert "otherwise the setting defaults to China" in prompt
+        assert "Do not move it to another country" in prompt
+        assert (
+            "Every theme premise and frame prose must state the country explicitly"
+            in prompt
         )
 
 
@@ -137,25 +145,29 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
         "F05",
         "F06",
     ]
-    assert "整体叙事的自然、通顺和画面成立优先于逐项填表" in prompt
-    assert "把每帧当作这组图片中唯一存在的一张来写" in prompt
-    assert "每帧重新完整描写所有可见人物" in prompt
-    assert "只写当前可见状态和直接物理结果" in prompt
-    assert "镜头与光线必须明确而专业" in prompt
-    assert "story 明确要求的最终状态必须在每一帧直接呈现" in prompt
-    assert "必须先读取 payload 中当前 theme.theme_id" in prompt
-    assert "只执行与该 ID 匹配的要求" in prompt
-    assert "story 的明确约束优先于通用写作建议和 theme.style" in prompt
-    assert "绳艺、口塞、服装展示" not in prompt
-    assert "整段不得夹入英文" in prompt
-    assert "不属于请求输出语言的碎片" in prompt
-    assert "平行画面方案，不是一件事按时间先后展开的镜头序列" in prompt
-    assert "篇幅由人物数量和画面复杂度决定" in prompt
-    assert "严格依次写六部分" not in prompt
-    assert "因玉扣遗失" not in prompt
-    assert "必须精确以“此刻，”开头" not in prompt
-    assert "倒数第二句必须以“镜头采用”开头" not in prompt
-    assert "以下是提交前必须满足的精确质量门" not in prompt
+    assert "Narrative coherence, fluency, and visual plausibility" in prompt
+    assert "Treat each frame as the only image in the set" in prompt
+    assert (
+        "Fully redescribe every visible person's unmistakable adult identity"
+        in prompt
+    )
+    assert "currently visible state and direct physical result" in prompt
+    assert "one physically possible held pose" in prompt
+    assert "must not travel between positions" in prompt
+    assert "Camera and lighting must be explicit and professional" in prompt
+    assert "final state explicitly required by the story must appear directly" in prompt
+    assert "read theme.theme_id from the current payload first" in prompt
+    assert "apply only requirements matching that ID" in prompt
+    assert "Explicit story constraints take priority" in prompt
+    assert "rope art" not in prompt
+    assert "do not mix in English pronouns" in prompt
+    assert "not in the requested output language" in prompt
+    assert "parallel visual alternatives" in prompt
+    assert "Length should be driven by cast size and visual complexity" in prompt
+    assert "follow exactly six sections" not in prompt
+    assert "must begin exactly with" not in prompt
+    assert "penultimate sentence" not in prompt
+    assert "exact quality gate" not in prompt
 
 
 def test_english_frame_prompt_requires_english_only_output() -> None:
@@ -168,23 +180,71 @@ def test_english_frame_prompt_requires_english_only_output() -> None:
     assert "or switch to another language" in prompt
 
 
+def test_chinese_prompts_allow_story_required_english_labels_and_copy() -> None:
+    request = make_story_request(output_language="chinese")
+
+    theme_prompt = theme_messages(
+        request,
+        start_index=1,
+        count=1,
+        existing_themes=[],
+    )[0].content
+    frame_prompt = frame_messages(request, make_theme())[0].content
+
+    assert "explicitly requires a foreign-language title verbatim" in theme_prompt
+    assert "requires a fixed field structure" in frame_prompt
+    assert "English labels or visible image text explicitly required" in frame_prompt
+    assert (
+        "fixed field labels explicitly required by the story are allowed"
+        in frame_prompt
+    )
+
+
+@pytest.mark.parametrize("output_language", ("chinese", "english"))
+def test_system_instructions_are_written_entirely_in_english(
+    output_language: str,
+) -> None:
+    request = make_story_request(output_language=output_language)
+
+    prompts = (
+        theme_messages(
+            request,
+            start_index=1,
+            count=1,
+            existing_themes=[],
+        )[0].content,
+        frame_messages(request, make_theme())[0].content,
+    )
+
+    assert all(re.search(r"[\u4e00-\u9fff]", prompt) is None for prompt in prompts)
+
+
 @pytest.mark.parametrize(
     ("level", "required", "excluded"),
     (
         (
             ContentLevel.AESTHETIC,
-            "采用美学叙事尺度",
-            ("采用成人情色尺度", "采用仅限二十一岁以上成年人的露骨情色尺度"),
+            "Use the aesthetic narrative level",
+            (
+                "Use the adult erotic narrative level",
+                "Use the explicit erotic narrative level",
+            ),
         ),
         (
             ContentLevel.EROTIC,
-            "采用成人情色尺度",
-            ("采用美学叙事尺度", "采用仅限二十一岁以上成年人的露骨情色尺度"),
+            "Use the adult erotic narrative level",
+            (
+                "Use the aesthetic narrative level",
+                "Use the explicit erotic narrative level",
+            ),
         ),
         (
             ContentLevel.HARDCORE,
-            "采用仅限二十一岁以上成年人的露骨情色尺度",
-            ("采用美学叙事尺度", "采用成人情色尺度"),
+            "Use the explicit erotic narrative level",
+            (
+                "Use the aesthetic narrative level",
+                "Use the adult erotic narrative level",
+            ),
         ),
     ),
 )
@@ -207,6 +267,10 @@ def test_prompts_compile_only_selected_content_level(
         prompt = messages[0].content
         assert required in prompt
         assert all(item not in prompt for item in excluded)
+        assert (
+            "If the story sets stricter visible requirements for this selected "
+            "level, every one of them is mandatory"
+        ) in prompt
 
 
 def test_prompts_express_era_consistency_holistically() -> None:
@@ -222,7 +286,7 @@ def test_prompts_express_era_consistency_holistically() -> None:
         frame_messages(request, make_theme()),
     ):
         prompt = messages[0].content
-        assert "建筑、陈设、器物、材料、服装、发型" in prompt
-        assert "时代、地域、季节、时辰和社会环境" in prompt
-        assert "不确定史实时使用可信的通用描述" in prompt
-        assert "穿越、架空或时代错置" in prompt
+        assert "Architecture, furnishings, objects, materials, clothing, hair" in prompt
+        assert "era, region, season, time of day, and social setting" in prompt
+        assert "When historical facts are uncertain" in prompt
+        assert "time travel, alternate history, or temporal dislocation" in prompt

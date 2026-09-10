@@ -14,19 +14,25 @@ from t2i_story_pipeline.provider import ChatMessage
 
 _CONTENT_LEVEL_INSTRUCTIONS = {
     ContentLevel.AESTHETIC: (
-        "采用美学叙事尺度。以故事、人物、构图和氛围为主，不主动增加性内容。"
-        "story 已经要求成人裸露或亲密互动时可以自然呈现，但不描写明确性行为。"
+        "Use the aesthetic narrative level. Prioritize story, character, "
+        "composition, and atmosphere, and do not add sexual content. If the "
+        "story already requests adult nudity or intimacy, it may appear "
+        "naturally, but do not describe explicit sexual activity."
     ),
     ContentLevel.EROTIC: (
-        "采用成人情色尺度。画面应当一眼可见成人裸露、亲密接触或鲜明的身体张力，"
-        "不能退化为普通服装肖像、准备过程或纯气氛暗示；这些情色内容要自然服务于"
-        "人物关系，保持非露骨，不描写明确性行为。多人互动要让自愿、回应和可停止"
-        "从视线、姿态或主动接触中看得出来。"
+        "Use the adult erotic narrative level. Adult nudity, intimate contact, "
+        "or unmistakable bodily tension must be immediately visible rather "
+        "than reduced to an ordinary clothed portrait, preparation, or "
+        "atmosphere alone. Keep it non-explicit and make the erotic content "
+        "serve the relationship. With multiple participants, show willingness, "
+        "response, and ability to stop through gaze, posture, or active contact."
     ),
     ContentLevel.HARDCORE: (
-        "采用仅限二十一岁以上成年人的露骨情色尺度。明确性行为必须真实发生并"
-        "服务于人物关系和当前故事，而不是孤立的器官说明；参与者的清醒、自愿、"
-        "持续回应和停止权必须在画面中成立。"
+        "Use the explicit erotic narrative level for adults aged twenty-one or "
+        "older only. Explicit sexual activity must actually be occurring and "
+        "serve the relationship and current story rather than becoming an "
+        "isolated anatomical description. Every participant must visibly "
+        "remain alert, willing, responsive, and able to stop."
     ),
 }
 
@@ -34,7 +40,14 @@ _CONTENT_LEVEL_INSTRUCTIONS = {
 def _content_level_instruction(request: StoryRequest) -> str:
     return (
         _CONTENT_LEVEL_INSTRUCTIONS[request.content_level]
-        + "不要把内容等级名称、英文值或合规说明写入 title、premise 或 prose。"
+        + " If the story sets stricter visible requirements for this selected "
+        "level, every one of them is mandatory; do not substitute the broader "
+        "alternatives above. If the story requires this content-level "
+        "interaction to enact a concept, causal rule, or visual contradiction, "
+        "use that same interaction as the sole human action rather than placing "
+        "compliant content beside a separate task."
+        + " Do not write the content-level name, CLI value, or compliance "
+        "explanation in title, premise, or prose."
     )
 
 
@@ -50,43 +63,58 @@ def _cast_instruction(request: StoryRequest) -> str:
     male_count = request.male_count
     if female_count is None and male_count is None:
         return (
-            "人物人数和性别必须忠实遵循 story 明示事实，不得擅自增减或替换人物。"
+            "The number and genders of people must follow the explicit facts in "
+            "the story. Do not add, omit, or replace people."
         )
     if female_count is not None and male_count is not None:
         return (
-            f"每个 theme 及其每个 frame 必须恰好包含成年女性 {female_count} 名、"
-            f"成年男性 {male_count} 名，不得省略、替换或增加其他人物。"
+            f"Every theme and every frame must contain exactly {female_count} "
+            f"adult female participant(s) and {male_count} adult male "
+            "participant(s). Do not omit, replace, or add anyone."
         )
 
-    gender = "成年女性" if female_count is not None else "成年男性"
+    gender = (
+        "adult female participant(s)"
+        if female_count is not None
+        else "adult male participant(s)"
+    )
     count = female_count if female_count is not None else male_count
     return (
-        f"每个 theme 及其每个 frame 必须恰好包含{gender} {count} 名；"
-        "未指定性别的人数遵循 story 明示事实，不得省略或额外增加已约束性别的人物。"
+        f"Every theme and every frame must contain exactly {count} {gender}. "
+        "For unconstrained genders, follow the explicit facts in the story. "
+        "Do not omit or add people of the constrained gender."
     )
 
 
 def _people_and_setting_defaults_instruction() -> str:
     return (
-        "story 明确说明某个人物的国籍时必须忠实沿用；未明确说明某个人物的国籍时，"
-        "该人物缺省为中国人。地点、姓名、语言、肤色或其他外貌特征不能作为国籍"
-        "依据。theme premise 和每个 frame prose 都必须逐人明确写出国籍，不得只"
-        "依靠场景或姓名暗示；输出英文时明确使用 Chinese，输出中文时明确使用"
-        "“中国人”或“中国籍”。story 明确说明故事发生国家或给出可确定国家的地点"
-        "时必须忠实沿用；未明确故事发生国家或可确定国家的地点时，场景缺省位于"
-        "中国，不得自行改到其他国家。每个 theme premise 和每个 frame prose 都"
-        "必须明确写出故事发生国家，不能只靠城市、建筑或环境暗示。"
+        "Preserve any nationality that the story explicitly assigns to a "
+        "person; otherwise that person defaults to Chinese. Do not infer "
+        "nationality from location, name, language, skin tone, or appearance. "
+        "Every theme premise and frame prose must state each person's "
+        "nationality explicitly rather than implying it through setting or "
+        'name. Use "Chinese" in English output and the natural equivalent in '
+        "Chinese output. Preserve an explicitly stated country or a location "
+        "whose country is unambiguous; otherwise the setting defaults to China. "
+        "Do not move it to another country. Every theme premise and frame prose "
+        "must state the country explicitly rather than relying on a city, "
+        "building, or environment to imply it."
     )
 
 
 def _era_consistency_instruction() -> str:
     return (
-        "时间和地点是整体世界的一部分。建筑、陈设、器物、材料、服装、发型、"
-        "交通、武器、通信、照明、社会称谓和人物用语应当彼此协调，并符合 story "
-        "给出的时代、地域、季节、时辰和社会环境；服装冷暖、植物状态、光源、"
-        "礼仪与制度也要自然成立。不确定史实时使用可信的通用描述，不为显得具体"
-        "而猜测品牌、型号、精确年代或专名。story 明确要求穿越、架空或时代错置"
-        "时，才把违时代元素作为有意设计。"
+        "Treat time and place as one coherent world. Architecture, furnishings, "
+        "objects, materials, clothing, hair, transport, weapons, communication, "
+        "lighting, social titles, and character language must agree with one "
+        "another and with the era, region, season, time of day, and social "
+        "setting given by the story. Clothing warmth, plant condition, light "
+        "sources, etiquette, and institutions must also fit. When historical "
+        "facts are uncertain, use credible generic descriptions rather than "
+        "guessing brands, models, exact dates, or proper names merely to sound "
+        "specific. Use anachronistic elements deliberately only when the story "
+        "explicitly requests time travel, alternate history, or temporal "
+        "dislocation."
     )
 
 
@@ -100,7 +128,9 @@ def theme_messages(
 ) -> list[ChatMessage]:
     end_index = start_index + count - 1
     language = (
-        "title、premise 和 style 使用自然中文"
+        "Write title, premise, and style in natural Chinese. If the story "
+        "explicitly requires a foreign-language title verbatim, preserve that "
+        "title and keep all other content in natural Chinese."
         if request.output_language == OutputLanguage.CHINESE
         else (
             "Write title, premise, and style in natural English. Use “small” or "
@@ -109,36 +139,58 @@ def theme_messages(
         )
     )
     semantic_name_instruction = (
-        f"semantic_name 必须逐字返回 {semantic_name}。"
+        f"Return semantic_name exactly as {semantic_name}."
         if semantic_name is not None
-        else "semantic_name 使用简短的小写英文 snake_case 概括整个 story。"
+        else (
+            "Set semantic_name to a concise lowercase English snake_case name "
+            "for the whole story."
+        )
     )
     system = "\n".join(
         (
-            "你是叙事选题编辑。围绕同一 story 构思真正不同、可以拍成若干独立"
-            "静态画面的微型故事，不是把同一动作换地点、换颜色或换机位。",
-            f"themes 必须恰好包含 {count} 项，theme_id 从 "
-            f"T{start_index:03d} 连续到 T{end_index:03d}。",
-            "title 简洁自然。premise 最多两句：第一句确定时间、地点、人物和"
-            "他们共同进入的情境，并为每个人给出可在所有 frame 保持一致的成年"
-            "年龄、面部特征、身形与发型；第二句只写人物关系中最重要的情绪张力"
-            "或选择。"
-            "premise 不写具体姿态、绳路、器具、镜头、光线、操作过程、倒计时、"
-            "外部职业危机或结局，把这些留给各个 frame 独立发挥。",
-            "若 story 已给出具体事件，就深化人物和可见处境；若只是宽泛题材，可以"
-            "构思可信的新事件。不要为了戏剧性虚构姓名、精确年号地点、秘密身世、"
-            "物件来历、身份等级、伤痕或关系史。",
+            "You are a narrative concept editor. From one story, devise truly "
+            "different miniature stories that can each support several "
+            "independent still images. Do not merely move the same action to a "
+            "new location, color palette, or camera angle.",
+            f"Themes must contain exactly {count} items with consecutive "
+            f"theme_id values from T{start_index:03d} through T{end_index:03d}.",
+            "Keep title concise and natural. Premise must contain no more than "
+            "two sentences. The first establishes time, place, people, and "
+            "their shared situation, giving every person an adult age, facial "
+            "features, build, and hairstyle that remain stable across all "
+            "frames. The second states only the most important emotional "
+            "tension or choice in their relationship unless the story "
+            "explicitly requires a visible material state or operating rule "
+            "instead. Do not put concrete "
+            "poses, rope paths, equipment, camera, lighting, operational steps, "
+            "countdowns, external workplace crises, or outcomes in a premise "
+            "unless the story explicitly requires them during Theme generation. "
+            "Leave those details to each frame by default; when the story does "
+            "require them, include only the minimum current material state or "
+            "operating rule instead of a sequence.",
+            "If the story provides a concrete event, deepen its characters and "
+            "visible situation. If it provides only a broad subject, invent a "
+            "credible event. If the story explicitly defines static, "
+            "nonchronological tableaux, treat the currently visible condition "
+            "itself as the event; do not add a deadline, repeated cycle, "
+            "before-and-after change, intended next step, or future consequence. "
+            "Do not fabricate names, exact dates or places, "
+            "secret histories, object provenance, ranks, scars, or relationship "
+            "backstory merely to add drama.",
             _cast_instruction(request),
             _people_and_setting_defaults_instruction(),
             _era_consistency_instruction(),
-            "style 是一句完整、简洁的视觉风格描述，不罗列不同景别或多个构图方案。"
-            "style 必须概括并沿用 story 的明确表现要求，不得与其冲突或将其弱化。",
-            "不同主题要从人物关系、场景用途、决定或冲突上真正不同。已有主题只用于"
-            "避开重复，不要改写后再次输出。",
+            "Style must be one complete, concise visual-style sentence, not a "
+            "list of shot scales or composition alternatives. It must summarize "
+            "and preserve the story's explicit presentation requirements "
+            "without conflicting with or weakening them.",
+            "Themes must differ genuinely in relationship, setting function, "
+            "decision, or conflict. Use existing themes only to avoid repetition; "
+            "do not rewrite and return them again.",
             semantic_name_instruction,
             _content_level_instruction(request),
             language,
-            "不要输出解释或 schema 之外的字段。",
+            "Do not output explanations or fields outside the schema.",
         )
     )
     return [
@@ -170,8 +222,11 @@ def frame_messages(
     theme: NarrativeTheme,
 ) -> list[ChatMessage]:
     language = (
-        "prose 使用自然、准确、流畅的中文。把 story 中的外语概念自然翻译成"
-        "中文，整段不得夹入英文代词、服装、摄影、姿态或动作短语。"
+        "Write prose in natural, precise, fluent Chinese. Preserve verbatim any "
+        "English labels or visible image text explicitly required by the story. "
+        "Translate all other foreign concepts naturally into Chinese, and do "
+        "not mix in English pronouns, clothing, photography, pose, or action "
+        "phrases."
         if request.output_language == OutputLanguage.CHINESE
         else (
             "Write every prose paragraph entirely in natural, precise, fluent "
@@ -185,56 +240,98 @@ def frame_messages(
     ]
     system = "\n".join(
         (
-            "你是电影感静态画面叙事作家。把 theme 写成若干可直接用于文生图、"
-            "又能让人一眼理解人物处境的独立画面。整体叙事的自然、通顺和画面成立"
-            "优先于逐项填表。",
-            f"frames 必须恰好包含 {len(frame_ids)} 项，frame_id 依次为 "
-            f"{'、'.join(frame_ids)}。",
-            "每个 prose 是一个无换行的自然段，不使用主题、人物、动作、摄影、"
-            "光线等字段标签。开头自然点明 theme.style，并在前部让年代、地点和"
-            "当前时刻清楚成立，但不要每帧套用完全相同的句式。",
-            "把每帧当作这组图片中唯一存在的一张来写，读者不需要知道其他帧。"
-            "自然交代谁在什么处境中、他们正在面对"
-            "什么，以及这一瞬间为何有意义；只有故事确实需要时才写期限或失败后果，"
-            "不要强造委托方、验收、倒计时、交付任务或抽象的风险术语。",
-            "每帧重新完整描写所有可见人物的明确成年身份、年龄、性别、稳定外貌、"
-            "发型、服装、表情、视线和当前姿态。把这些信息融入观察顺序，不要像"
-            "档案一样逐项罗列；稳定外貌沿用 theme premise，不能在各帧改变同一"
-            "人的发色、发长、脸型或身形。不同人物要有能够彼此回应的情绪和空间"
-            "关系。",
+            "You are a cinematic still-image narrative writer. Turn the theme "
+            "into independent images that are directly usable for text-to-image "
+            "generation and make the characters' situation immediately legible. "
+            "Narrative coherence, fluency, and visual plausibility take priority "
+            "over filling fields, but never override the story's explicit "
+            "output format. When the story requires a fixed field structure, "
+            "use its labels and order verbatim and prioritize structural "
+            "completeness.",
+            f"Frames must contain exactly {len(frame_ids)} items with frame_id "
+            f"values in this order: {', '.join(frame_ids)}.",
+            "Follow the output form required by the story. When the story "
+            "requires a fixed field structure, use its labels and order verbatim. "
+            "Otherwise, each prose value must be one unbroken natural-language "
+            "paragraph without field labels such as theme, character, action, "
+            "camera, or lighting. Without a fixed structure, open by naturally "
+            "establishing theme.style and make the era, place, and current moment "
+            "clear near the beginning without repeating one sentence template "
+            "across frames.",
+            "Treat each frame as the only image in the set. The reader must not "
+            "need another frame. Naturally establish who is in the situation, "
+            "what they currently face, and why this instant matters. Mention a "
+            "deadline or consequence only when the story truly needs it. Do not "
+            "invent clients, acceptance checks, countdowns, delivery tasks, or "
+            "abstract risk terminology.",
+            "Fully redescribe every visible person's unmistakable adult identity, "
+            "age, gender, stable appearance, hairstyle, clothing, expression, "
+            "gaze, and current pose in every frame. Integrate these facts into "
+            "the visual reading order rather than listing a dossier. Preserve "
+            "stable appearance from theme premise; do not change the same "
+            "person's hair color, hair length, face shape, or build between "
+            "frames. Give different people emotionally and spatially responsive "
+            "relationships.",
             _cast_instruction(request),
             _people_and_setting_defaults_instruction(),
-            "画面定格在一个清晰瞬间。可以有一个最重要的动作、接触或受力关系，"
-            "但只写当前可见状态和直接物理结果，不叙述先后步骤，不让人物在同一帧"
-            "连续改变姿态。不要为了符合句式而使用“此刻”或其他固定开头。",
-            "story 明确要求的最终状态必须在每一帧直接呈现，不写成准备、逐步改变"
-            "或解除过程，也不以堆砌术语代替可见画面。",
-            "story 若按 theme_id 分配了差异化要求，必须先读取 payload 中当前 "
-            "theme.theme_id，只执行与该 ID 匹配的要求，不得任选、错用或借用"
-            "其他 ID 的方案。",
-            "story 的明确约束优先于通用写作建议和 theme.style；theme.style 只能"
-            "具体化这些约束，不能替换、冲突或弱化它们。",
-            "环境应提供与人物处境有关的物件、材质、距离和空间证据，不堆砌无关"
-            "陈设。身体重心、四肢方向、遮挡、接触点、衣物和道具受力必须可信。",
-            "镜头与光线必须明确而专业，包括合适的景别、机位或角度、构图焦点、"
-            "景深、光源方向和色调；把它们写进段落的自然节奏，不要求固定句首、"
-            "固定位置或固定数量的摄影术语。",
-            "同一主题的多帧是同一人物、场所和情绪前提的平行画面方案，不是一件事"
-            "按时间先后展开的镜头序列。每帧都从头建立完整现场，并拥有不同的造型、"
-            "视觉中心和情绪重点；不能把一帧写成另一帧的前置、后续、升级或解除"
-            "状态，也不能借助“同一、仍然、已经、再次、换成、终于”等前文状态"
-            "来省略本帧信息。",
-            "篇幅由人物数量和画面复杂度决定。细节足够支撑文生图即可，不要用同义"
-            "情绪、伪精确时间、技术说明、抽象评论或重复前因填充长度。",
-            "只沿用 story 与 theme 已有的事实精度。story 指定的画面文字必须逐字"
-            "保留并用双引号括起；没有指定就不要主动添加文字。",
+            "Freeze the image at one clear instant. It may contain one dominant "
+            "action, contact, or force relationship, but describe only the "
+            "currently visible state and direct physical result. Do not narrate "
+            "sequential steps or make a person change pose within one frame. Do "
+            "not use a fixed opening such as 'at this moment' merely to satisfy "
+            "a template.",
+            "When the story explicitly requires static body mechanics, each "
+            "person must remain in one physically possible held pose on a broad "
+            "stable support. Assign each visible limb one consistent contact or "
+            "force role. Use stative bodily predicates for held pose, fixed "
+            "contact, sustained pressure, support, and gaze. A body or handled "
+            "object must not travel between positions, and no body part may "
+            "become an impossible structural component of the scene.",
+            "The final state explicitly required by the story must appear "
+            "directly in every frame, not as preparation, gradual change, or "
+            "removal. Do not replace visible evidence with terminology.",
+            "If the story assigns differentiated requirements by theme_id, read "
+            "theme.theme_id from the current payload first and apply only "
+            "requirements matching that ID. Do not choose freely, use the wrong "
+            "assignment, or borrow another ID's design.",
+            "Explicit story constraints take priority over general writing "
+            "guidance and theme.style. Theme.style may only make those constraints "
+            "concrete; it must not replace, conflict with, or weaken them.",
+            "Use setting objects, materials, distance, and spatial evidence that "
+            "matter to the characters' situation rather than unrelated decor. "
+            "Body balance, limb direction, occlusion, contact points, clothing, "
+            "and prop forces must be physically credible.",
+            "Camera and lighting must be explicit and professional, including an "
+            "appropriate shot scale, camera height or angle, composition focus, "
+            "depth of field, light direction, and color treatment. Integrate "
+            "them into the paragraph's natural rhythm without imposing a fixed "
+            "sentence opening, position, or number of technical terms.",
+            "Multiple frames for one theme are parallel visual alternatives with "
+            "the same people, place, and emotional premise, not a chronological "
+            "shot sequence. Re-establish the complete scene from scratch in "
+            "every frame and give each a different styling, visual center, and "
+            "emotional emphasis. Never make one frame a setup, sequel, escalation, "
+            "or release of another, and do not use continuity shortcuts such as "
+            "'the same,' 'still,' 'already,' 'again,' 'changed to,' or 'finally' "
+            "to omit information.",
+            "Length should be driven by cast size and visual complexity. Include "
+            "enough detail for text-to-image generation without padding with "
+            "synonymous emotions, false-precision timestamps, technical "
+            "explanations, abstract criticism, or repeated causes.",
+            "Preserve only the level of factual precision already present in the "
+            "story and theme. Any visible image text specified by the story must "
+            "be preserved verbatim inside double quotation marks. Do not invent "
+            "visible text when none is specified.",
             _era_consistency_instruction(),
             _content_level_instruction(request),
             language,
-            "提交前只做一次整体通读：把正文中不属于请求输出语言的碎片改写为"
-            "请求语言，并确认人物和空间成立、画面能被直接看见。正文不得提及 "
-            "theme、frame、编号、提示词、字段或其他内部生成过程，也不要输出"
-            "评语、合规说明或 schema 之外的字段。",
+            "Before submission, read the whole result once. Rewrite any fragment "
+            "that is not in the requested output language, except literal text "
+            "that the story requires, and confirm that people, space, and the "
+            "visible image are coherent. Do not mention themes, frames, IDs, "
+            "prompts, or internal generation steps in prose; fixed field labels "
+            "explicitly required by the story are allowed. Do not output reviews, "
+            "compliance explanations, or fields outside the schema.",
         )
     )
     return [
