@@ -168,7 +168,14 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "Realize all six stunt seeds recorded in the Theme premise" in prompt
     assert "Explicitly describe Region 1 through Region 6" in prompt
     assert "general board synopsis" in prompt
-    assert "that one Narrative Frame is the entire multi-region board" in prompt
+    assert (
+        "every Narrative Frame must independently contain one complete board"
+        in prompt
+    )
+    assert "regardless of frames_per_theme" in prompt
+    assert "Never distribute one board across multiple Frames" in prompt
+    assert "use one Frame per region" in prompt
+    assert "When frames_per_theme is 1" not in prompt
     assert "roughly 450 to 650 words" in prompt
     assert "flexible panel dramaturgy" in prompt
     assert "do not impose a fixed climax position" in prompt

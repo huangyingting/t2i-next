@@ -270,7 +270,20 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
         "general board synopsis without six expanded region descriptions"
         in normalized
     )
-    assert "single Narrative Frame is the entire six-region board" in normalized
+    assert (
+        "Every Narrative Frame is one complete 2-column by 3-row grid"
+        in normalized
+    )
+    assert "regardless of frames_per_theme" in normalized
+    assert "Never distribute one board across multiple Frames" in normalized
+    assert "never use one Frame per region" in normalized
+    assert "one familiar everyday object enlarged to colossal scale" in normalized
+    assert "Every person remains physically outside the colossal object" in normalized
+    assert (
+        "Never place a person inside the object, inside one of its cavities"
+        in normalized
+    )
+    assert "When frames_per_theme is 1" not in normalized
     assert "roughly 450 to 650 words" in normalized
     assert (
         "four or more stunts can be summarized with passive bodily verbs"
