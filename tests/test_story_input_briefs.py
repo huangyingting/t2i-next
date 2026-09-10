@@ -2,6 +2,43 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
+WOMAN_CENTERED_STORY_INPUTS = (
+    "anamorphic-room.txt",
+    "archival-reconstruction.txt",
+    "botanical-time-slice.txt",
+    "choreographic-score.txt",
+    "cinematic-cutaway.txt",
+    "color-relay.txt",
+    "environmental-portrait.txt",
+    "evidence-table.txt",
+    "forced-perspective.txt",
+    "light-echo.txt",
+    "living-map.txt",
+    "material-alchemy.txt",
+    "miniature-civic-system.txt",
+    "negative-space.txt",
+    "object-biography.txt",
+    "optical-layering.txt",
+    "practical-weather.txt",
+    "shadow-narrative.txt",
+    "spatial-rhythm.txt",
+    "threshold-worlds.txt",
+    "topographic-body.txt",
+)
+
+
+def test_new_story_inputs_require_a_visible_active_adult_woman() -> None:
+    for filename in WOMAN_CENTERED_STORY_INPUTS:
+        brief = (
+            REPOSITORY_ROOT / "story-inputs" / filename
+        ).read_text(encoding="utf-8")
+        normalized = " ".join(brief.split())
+
+        assert "WOMAN CAST GATE" in brief
+        assert "Every Theme and every Frame must include at least one" in normalized
+        assert "unmistakably adult woman" in normalized
+        assert "This brief is incompatible with a zero-woman cast." in normalized
+
 
 def test_dress_board_region_names_are_layout_only() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "dress.txt").read_text(

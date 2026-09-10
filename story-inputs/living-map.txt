@@ -1,0 +1,47 @@
+BRIEF
+
+Create ambitious living-map Themes in which a real landscape or interior is
+organized to resemble a map while remaining fully usable at human scale. The
+requested adult cast navigates one current decision through paths, boundaries,
+landmarks, and terrain made from actual site materials.
+
+WOMAN CAST GATE
+
+Every Theme and every Frame must include at least one unmistakably adult woman
+physically navigating the mapped world. Give her a specific adult age, stable
+appearance, clearly visible body, exact map position, gaze, and current route
+choice. A tiny anonymous marker, silhouette, portrait, reflection, or off-camera
+traveler does not count. Additional CLI-requested adults may navigate with her,
+but she must remain essential to the decision. This brief is incompatible with
+a zero-woman cast.
+
+MAP-WORLD RULE
+
+Choose a different map purpose for every Theme: water distribution, memory,
+harvest, evacuation, migration of animals, neighborhood exchange, weather, or
+another nonviolent system. Roads, contours, borders, and landmarks must be
+formed by credible features such as paths, hedges, channels, rugs, shelving,
+tables, light, crops, or stone. Do not simply print a map on the floor.
+
+THEME CONTRACT
+
+The premise names country, exact site, adult cast, mapped system, orientation
+logic, one blocked route or competing destination, and the cast's current
+decision. The style sentence defines elevated photography, scale cues, palette,
+weather, and surface detail.
+
+FRAME CONTRACT
+
+Each Frame is one oblique or high view that reads both as a functional place and
+as a map. Establish north or another orientation through a natural environmental
+cue rather than a letter. Describe at least two routes, one boundary, three
+landmarks, the cast's exact position, and a visible choice between paths.
+
+Keep routes continuous, slopes traversable, water downhill, doors connected,
+and scale consistent. Do not add labels, pins, legends, arrows, UI, floating
+terrain, tiny anonymous crowds, or satellite imagery. The cast must physically
+use the mapped world rather than point at it from outside.
+
+Reject decorative labyrinths, landscapes that only resemble maps by coincidence,
+and map concepts whose human decision cannot be understood from position and
+direction alone.

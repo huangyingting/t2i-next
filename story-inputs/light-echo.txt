@@ -1,0 +1,52 @@
+BRIEF
+
+Create atmospheric light-echo Themes where one practical light source produces
+a sequence of secondary illuminations across a real environment. The requested
+adult cast occupies the final illuminated zone and responds to the source's
+physical behavior.
+
+WOMAN CAST GATE
+
+Every Theme and every Frame must include at least one unmistakably adult woman
+inside the final illuminated zone. Give her a specific adult age, stable
+appearance, clearly visible face and body, position, gaze, and necessary action.
+A shadow, reflection, portrait, or implied off-camera recipient does not count.
+Additional CLI-requested adults may appear, but she must remain the human payoff
+of the light path. This brief is incompatible with a zero-woman cast.
+
+LIGHT CHAIN
+
+Build the path as exactly five named positions: original source -> solid or
+liquid link 1 -> solid or liquid link 2 -> solid or liquid link 3 -> final cast
+zone. Volumetric dust, smoke, or mist may reveal an existing segment but never
+counts as one of the three links. Use credible combinations of water, glass,
+polished metal, pale fabric, prisms, perforated screens, glossy tile, or
+architectural reflectors. Every link must have line of sight to the previous one
+and must send a clearly directed, weaker outgoing beam toward the next.
+
+THEME CONTRACT
+
+The premise names country, time, exact location, adult cast, practical source,
+link 1, link 2, link 3, final light pattern, and the choice or discovery it
+reveals, in that order. The style sentence defines exposure, contrast, color
+separation, atmosphere, and medium.
+
+FRAME CONTRACT
+
+Each Frame shows all five named positions in one coherent view. For link 1,
+link 2, and link 3, explicitly describe incident direction, receiving surface,
+outgoing direction, color or shape change, and decreasing relative intensity.
+The cast
+has one clear action in the final zone; faces, hands, and body edges remain
+readable without unrelated fill light.
+
+Maintain plausible inverse-square falloff, reflection angles, refraction,
+shadow direction, volumetric visibility, and material roughness. Do not turn
+every surface into a mirror, duplicate people in reflections, or use impossible
+light beams visible in clean air.
+
+VARIETY AND REJECTION
+
+Vary source, optical chain, architecture, palette, camera axis, and human stakes.
+Reject generic colored lighting, arbitrary glowing objects, a chain with missing
+line of sight, or prose that lists effects without tracing the light path.

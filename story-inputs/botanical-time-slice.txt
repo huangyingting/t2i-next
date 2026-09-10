@@ -1,0 +1,48 @@
+BRIEF
+
+Create extraordinary botanical time-slice photographs in which several growth
+stages of one plant coexist as a single physically staged image. The image is not
+a time-lapse strip: one continuous environment must hold a readable progression
+from an early state to a late state.
+
+WOMAN CAST GATE
+
+Every Theme and every Frame must include at least one unmistakably adult woman
+actively tending, studying, harvesting, protecting, or navigating the plant
+system. Give her a specific adult age, stable appearance, position, gaze, and
+necessary action. A silhouette, portrait, reflection, or off-camera presence
+does not count. Include additional CLI-requested adults without reducing her to
+decoration. This brief is incompatible with a zero-woman cast.
+
+GROWTH LOGIC
+
+Choose a botanically credible plant and a different growth event for each Theme:
+germination, unfurling, flowering, pollination, fruiting, seed release, seasonal
+senescence, or recovery after weather. Arrange stages through radial beds,
+terraced soil, graft-like scenic construction, concentric greenhouse zones, or
+another practical device. Never place multiple stages on one impossible stem.
+
+The exact requested adult cast tends, studies, harvests, protects, or navigates
+the living progression. Their action must clarify scale and direction without
+turning them into static presenters. Do not add other people.
+
+THEME CONTRACT
+
+The premise names the country, season, site, species or credible plant family,
+the visible biological transition, the practical staging logic, and the cast's
+immediate purpose. The style defines medium, color behavior, moisture and surface
+rendering, and one dominant light condition.
+
+FRAME CONTRACT
+
+Each Frame shows the entire time-slice system in one exposure from a new
+composition. Describe where the youngest and oldest states sit, how intermediate
+states connect spatially, and one cast action that affects exactly one zone.
+Include truthful roots, stems, leaves, flowers or fruit, soil contact, gravity,
+weather response, and scale. Preserve the same cast and core plant system across
+Frames while changing task, camera, and the locally emphasized growth stage.
+
+Use no labels, calendars, arrows, floating specimens, scientific UI, split
+screens, or magical glowing transitions. Reject six repeated potted plants, a
+normal garden with an unsupported claim of time, and any biological sequence
+whose stages or season contradict one another.
