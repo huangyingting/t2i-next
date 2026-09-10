@@ -1,0 +1,273 @@
+BRIEF
+
+Create varied, polished, hyper-realistic adult group-portrait Themes built around
+tightly organized geometric body arrangements. The recurring visual language is
+playful, sculptural, intimate, and immediately legible: adults form radial rings,
+tiered silhouettes, nested arcs, living chandeliers, flower-like clusters,
+supported pyramids, spirals, and other precise collective shapes while the camera
+uses bold low, high, rear, or central viewpoints.
+
+Abstract the visual principles into new concepts rather than repeating one
+finished image. Every Theme must invent a distinct group geometry, support
+system, camera relationship, crop rhythm, palette, and emotional charge.
+
+EXAMPLES ARE OPEN-ENDED
+
+Every list below is inspiration, not a menu, enum, preset library, or fixed
+sequence. Combine compatible examples, transform them, or invent equivalents.
+Only statements using "must," "every," "exact," or "do not" are mandatory.
+
+CAST, ADULTHOOD, AND IDENTITY
+
+Use the exact CLI-requested human cast and no additional people. Every person
+must be an unmistakably mature Chinese adult aged 25 or older, alert, actively
+willing, mutually responsive, and able to leave the arrangement. Give each
+adult a distinct original face, hairstyle, build, and stable visual anchor.
+
+Do not depict, name, or resemble celebrities, public figures, minors, youthful
+fictional characters, or identifiable real people. Do not add bystanders,
+assistants, crowds, mannequins, portraits, human images on screens, mirrors, or
+reflections that could create an ambiguous extra person.
+
+Generate exactly the Theme count and Frames-per-Theme count requested by the
+CLI; never assume, state, or encode a fixed total. Do not assign concepts,
+positions, camera angles, or intensities by Theme ID, Frame ID, or ordinal
+position.
+
+CONTENT-LEVEL COMPLIANCE
+
+Honor the exact CLI-requested content level at both Theme and Frame stages. Do
+not silently raise, lower, relabel, or postpone the level.
+
+At aesthetic level, use coherent sculptural fashion, fitted studio garments,
+opaque bodysuits, coordinated dancewear, or architectural costume. Physical
+closeness may be warm and playful, but the image must read first as a formal
+group portrait and body-geometry study.
+
+At erotic level, partial or full artistic adult nudity is permitted. Every
+erotic Theme must visibly establish sensual adult intent through body coverage,
+close skin-to-skin proximity, deliberate presentation, expressive gaze, tactile
+compression, or another non-graphic erotic signal. Ordinary clothed posing,
+casual friendship, distant silhouettes, or neutral dance geometry alone does
+not satisfy erotic level. Keep all intimate contact non-graphic; do not use
+explicit sexual acts or pornographic anatomical close-ups.
+
+At hardcore level, explicit sexual acts and pornographic anatomical close-ups are permitted, and the imagery must clearly convey intense sexual activity among consenting adults. Every hardcore Theme must establish the context, body coverage, and interaction in a way that leaves no ambiguity about the sexual nature of the scene.
+
+Every Theme premise must state the current body-coverage logic, collective
+arrangement, physical support system, and content-level-defining interaction.
+Every Theme style must reinforce that level through crop, camera distance,
+lighting, skin or fabric rendering, and composition. Every Frame must begin with
+the defining state already visible and must not replace it with preparation,
+anticipated escalation, aftermath, or a milder substitute.
+
+THEME AND FRAME CONTRACT
+
+Every Theme must define one complete portrait system:
+- one original collective geometric proposition;
+- one private closed studio, stage, or constructed interior;
+- one coherent wardrobe or artistic-nudity logic;
+- one safe support method;
+- one dominant camera relationship;
+- one palette and motivated lighting system; and
+- one playful, tender, theatrical, or commanding group dynamic.
+
+Give each Theme one concise title. Its premise must describe the whole cast,
+current geometric arrangement, visible support logic, and why the arrangement
+is visually surprising in no more than two sentences. Its style must be one
+flowing sentence defining composition, lens behavior, crop, palette, light,
+surface rendering, and finish.
+
+Frames within a Theme are parallel alternatives of the same broad visual
+proposition, not chronological steps. No pose, garment state, crop, prop
+position, or support state carries between Frames. Every Frame must stand alone,
+fully redescribe the exact cast and arrangement, and use a different compatible
+camera strategy, silhouette rhythm, or expression pattern.
+
+Write each final Frame as one unbroken natural-language paragraph in the
+CLI-requested language. Do not output a screenplay, shot list, tag list,
+instructional explanation, visible title, caption, label, logo, watermark, or
+interface element.
+
+SAFE STRUCTURAL ILLUSION GATE
+
+The cast may appear stacked, tiered, suspended, or interlocked, but no adult may
+bear another adult's weight on the head, neck, spine, ribs, abdomen, pelvis,
+lower back, or unsupported joints. Do not place knees, feet, elbows, or hard
+props on another person's back or torso. Do not use human bodies as steps,
+platforms, bridges, stools, or load-bearing architecture.
+
+Build elevated or impossible-looking arrangements with visible safe engineering:
+transparent acrylic tiers, hidden-height padded plinths, broad upholstered
+platforms, floor-mounted posing blocks, overhead body-safe harnesses, individual
+waist supports, rigid scenic armatures kept outside body paths, or compositing
+that gives every adult independent support. Support hardware must have soft
+edges, broad contact, quick releases, and no pressure on the neck or chest.
+
+Every adult must support only their own body or be independently supported.
+Hands may touch shoulders, arms, waists, outer hips, or nearby safe structures
+for expressive connection, but must not pull hair, compress airways, pin joints,
+or create painful leverage. Reject and rewrite any arrangement that depends on
+unexplained balance, dangerous compression, hidden crushing force, or impossible
+human strength.
+
+CAST COUNT AND ANATOMY GATE
+
+Every requested adult must be visibly present exactly once in the image. Make
+the full cast count auditable through separate heads, hairstyles, faces or
+clearly traceable profiles, torsos, and limb paths. Cropping may hide part of a
+person, but it must not make cast count or ownership ambiguous.
+
+Show ordinary anatomy, natural joints, and correct digits. Give every visible
+hand, foot, and limb one compatible task. Keep each limb traceable from shoulder
+or hip to its endpoint. Do not create detached anatomy, merged torsos, shared
+limbs, extra hands, repeated heads, duplicated bodies, impossible bends, or
+cross-person skin continuity.
+
+When bodies overlap, separate them with distinct hair, skin tone variation,
+garment color, edge light, focus, pose direction, or a visible gap. Keep every
+recognizable body fragment attached unambiguously to its owner.
+
+COLLECTIVE GEOMETRY:
+inward-facing radial ring around an empty center
+flower-rosette cluster with heads and shoulders forming layered petals
+supported champagne-tower silhouette on transparent independent tiers
+vertical living chandelier with each adult in a separate harness loop
+nested crescent arcs arranged from low foreground to high background
+spiral helix of bodies around a central scenic column
+fan-shaped formation opening toward the camera
+symmetrical diamond built from individually supported reclining diagonals
+concentric circles of faces, shoulders, and linked forearms
+stair-step silhouette on broad hidden-height padded plinths
+inverted teardrop composition suspended from separate waist harnesses
+wave formation with alternating torso angles and synchronized arm curves
+compact bouquet composition with distinct heads radiating outward
+architectural arch illusion built around a non-load-bearing scenic frame
+stacked portrait medallions separated by clear acrylic shelves
+zigzag chain of seated and standing silhouettes on individual platforms
+two opposing body clusters creating a narrow negative-space corridor
+human kaleidoscope pattern without mirrors or duplicated people
+
+
+GROUP CONNECTION:
+forearms linked into a continuous circular chain
+hands resting lightly on neighboring shoulders
+palms meeting at the center of a radial composition
+heads tilted inward while bodies angle outward
+backs aligned close together without carrying weight
+shoulders touching in a dense but breathable cluster
+hands placed on one's own ribs, waist, shoulders, or outer hips
+paired adults facing each other across a geometric gap
+alternating gazes toward the camera and toward neighboring adults
+coordinated smiles traveling around a circular arrangement
+calm direct eye contact creating a commanding collective portrait
+playful asymmetrical expressions within a strict formation
+soft skin-to-skin side contact with clear independent support
+intertwined forearms with every hand and wrist fully visible
+
+
+POSE RHYTHM:
+alternating upright and diagonal torsos
+repeated arches with different heights and directions
+compact curled silhouettes opening into long extensions
+mirrored arm curves framing distinct faces
+offset shoulders creating a descending visual rhythm
+heads arranged as a precise arc across the frame
+hips and shoulders counter-rotated to clarify separate bodies
+legs forming parallel diagonals on individual supports
+outward-pointing feet surrounding an empty central space
+inward-folded knees separated by visible platform edges
+long spine lines balanced by compact arm shapes
+asymmetrical body levels resolving into one stable outer silhouette
+
+
+CAMERA RELATIONSHIP:
+extreme low-angle central view aimed upward through a radial ring
+low rear three-quarter view revealing the complete tiered silhouette
+straight-down overhead view flattening the cast into graphic geometry
+eye-level frontal view emphasizing exact symmetry and cast count
+wide corner view showing support engineering and formation depth
+compressed long-lens view aligning separately supported body tiers
+close central portrait with peripheral adults cropped into deliberate fragments
+medium-wide view preserving every adult's complete silhouette
+ground-level side view making transparent platforms nearly disappear
+slightly canted view turning a stable formation into a dynamic diagonal
+deep-focus view through foreground limbs toward the visual lead
+shallow-focus central face with distinct peripheral hair and profile anchors
+
+
+CROP AND VISUAL HIERARCHY:
+one central adult dominates while every peripheral adult remains countable
+the full group silhouette dominates with faces arranged as secondary rhythm
+hands and linked forearms create the first readable geometric pattern
+distinct hairstyles form a colorful halo around the center
+foreground shoulders frame a sharp central face
+repeated torso curves lead toward one expressive gaze
+negative space between bodies becomes the central symbol
+platform edges and body diagonals form one architectural grid
+the arrangement reads clearly at thumbnail scale before fine detail appears
+the closest body remains natural in perspective without extreme distortion
+
+
+SETTING:
+plain pastel cyclorama with no visible horizon line
+soft white studio with transparent acrylic posing tiers
+powder-blue soundstage with upholstered geometric plinths
+warm peach portrait room with seamless curved walls
+black-box theater with isolated circular pools of light
+silver reflective stage using matte panels near every body
+candy-colored sculptural set with oversized rounded forms
+minimal ivory gallery with one non-load-bearing scenic armature
+soft lavender studio with suspended fabric clouds
+deep red stage with broad padded platforms and controlled shadows
+mint-green chamber with translucent steps and diffused backlight
+dark indigo volume with glowing floor lines tracing the group geometry
+
+
+LIGHTING:
+large overhead diffusion with soft sculptural shadow transitions
+symmetrical side lights defining every overlapping body edge
+pastel frontal fill with a narrow halo backlight
+high softbox producing clean skin texture and gentle contact shadows
+low ring of diffused lights illuminating an upward-facing composition
+top light broken by a geometric scrim pattern
+warm key light against cool edge separation
+pearl-white beauty light with restrained dewy highlights
+colored side gradients moving from rose to cyan
+soft theatrical spotlights isolating each independently supported tier
+bright seamless illumination with fine pores and natural tonal variation
+deep background falloff with luminous faces and clear silhouettes
+
+
+FINISH AND MATERIAL DETAIL:
+polished editorial realism with fine pores and natural radiance
+soft pastel color separation with clean neutral highlights
+dewy satin skin rendering without plastic smoothing
+tactile opaque fabric with visible seams and compression
+transparent acrylic edges catching thin white highlights
+subtle pressure marks only where safe broad supports touch skin
+gentle tonal rolloff preserving detail in highlights and shadows
+precise edge separation across overlapping bodies
+restrained grain adding texture without obscuring anatomy
+clean studio finish with no text, border, or graphic overlay
+
+
+VARIATION AND REJECTION RULES
+
+- Every Theme must use a genuinely different collective geometry and support logic.
+- Prioritize unused camera, crop, palette, and group-dynamic combinations before
+  repeating one.
+- Do not repeatedly default to a pyramid, inward-facing circle, low angle, pastel
+  background, or one dominant central adult.
+- Do not copy a sample's fixed cast count, row count, hairstyle assignment, pose,
+  lens, palette, or body-part focal point.
+- Do not let nudity substitute for a strong geometric concept.
+- Do not focus the entire composition on breasts, buttocks, genitals, or another
+  isolated anatomical feature.
+- Reject any Frame whose arrangement would collapse without unsafe human
+  load-bearing.
+- Reject any Frame with an ambiguous cast count, merged anatomy, extra limbs,
+  duplicated people, unexplained supports, or a content level below the CLI
+  request.
+- Preserve a playful, sculptural, polished group-portrait identity while making
+  every final image an original visual invention.

@@ -1,0 +1,369 @@
+BRIEF
+
+Create varied, polished, hyper-realistic cinematic adult-romance Themes set
+inside spacecraft in zero gravity. Every Theme must center the exact
+CLI-requested cast sharing consensual, content-level-appropriate weightless
+intimacy. Make the spacecraft, floating objects, changing body orientation,
+inertia, handholds, light, facial expression, body coverage, skin contact,
+clothing or wearable-device movement, and celestial view concrete enough for
+direct text-to-image generation.
+
+Keep every person unmistakably mature, alert, actively willing, mutually
+responsive, and able to stop. Do not include coercion, humiliation, injury,
+panic, intoxication, helplessness, or unsafe behavior.
+
+EXAMPLES ARE OPEN-ENDED
+
+Every list below is inspiration, not a menu, enum, preset library, or
+multiple-choice instruction. Combine compatible examples, transform them, or
+invent new equivalents. Only statements using "must," "every," "exact," or
+"do not" are mandatory.
+
+CONTENT LEVEL, BODY COVERAGE, AND WEAR
+
+Honor the exact CLI-requested content level; do not silently replace it with
+another level. Body coverage, pose intensity, physical contact, camera distance,
+and visual emphasis must all agree with that setting.
+
+At aesthetic level, keep the cast fully or substantially clothed in coherent
+spaceflight garments. Center tenderness, coordinated drift, expressive faces,
+hands, silhouettes, and the spacecraft environment rather than nudity.
+
+At erotic level, partial or full artistic nudity is permitted when requested or
+visually coherent. A nude adult may retain spacecraft-specific wearable devices
+such as biosensor patches, a telemetry belt, a soft quick-release tether harness,
+wrist displays, communication earpieces, medical monitoring leads, or a compact
+environmental-control collar. Every erotic Theme must establish an unmistakably
+adult sensual state through partial or full nudity, sustained skin-to-skin body
+contact, a strongly intimate weightless configuration, or a compatible
+combination. A fully clothed embrace, ordinary kiss, distant silhouette, or
+romantic mood alone does not satisfy erotic level. Keep intimate contact
+non-graphic; do not use pornographic anatomical close-ups or explicit sexual
+acts.
+
+This non-graphic brief is incompatible with hardcore output. If the CLI requests
+hardcore, fail clearly instead of weakening, relabeling, or silently downgrading
+the requested content level.
+
+CONTENT-LEVEL COMPLIANCE GATE
+
+The Theme stage must honor the CLI content level directly; do not defer content
+intensity to later Frame generation. Every Theme premise must state a current
+interaction, body-coverage state, and spacecraft-wearable logic that visibly
+meet the requested level. Every Theme style must reinforce that level through
+camera distance, composition, light, silhouette, and material detail without
+contradicting the premise.
+
+The Frame stage must preserve the same content level in every generated prompt.
+Every Frame must begin with the content-level-defining state already visible and
+must not replace it with preparation, implication, anticipated escalation,
+aftermath, distant atmosphere, or a milder interaction. Reject and rewrite any
+Theme or Frame whose visible result reads below the CLI-requested level.
+
+Every garment and wearable must belong to the spacecraft setting. Use
+close-fitting, low-snag construction; secured closures; short cable runs; soft
+edges; and visible quick-release points. Nothing may trail into a hatch, obscure
+a handhold, restrict breathing, create an entanglement hazard, or repurpose
+life-critical equipment as restraint. Loose removed garments must be secured in
+a storage net rather than floating through the cabin.
+
+THEME AND FRAME CONTRACT
+
+Generate exactly the Theme count and Frames-per-Theme count requested by the
+CLI; never assume or state a fixed total. Every Theme must use a distinct
+spacecraft zone, celestial background, floating-object system, relationship
+dynamic, emotional charge, lighting logic, and zero-gravity movement pattern.
+Themes must not differ only by camera angle.
+
+Give each Theme one concise cinematic title. Its premise must establish the
+adult cast, private spacecraft location, shared emotional situation, and one
+physically legible weightless interaction. Its style must be one flowing
+sentence defining composition, palette, source light, material rendering, lens
+behavior, and the visual rule that makes the Theme recognizable.
+
+Frames within one Theme are parallel visual alternatives of the same broad
+moment, not chronological chapters. No action, prop position, garment state, or
+body orientation carries from one Frame to another. Every Frame must stand
+alone, fully redescribe the complete cast and spacecraft context, preserve
+stable identity and wardrobe anchors, and show a different current
+configuration, camera strategy, and emotional emphasis.
+
+Do not assign camera strategies, body configurations, locations, or emotional
+beats by Frame ID or ordinal position. Across the CLI-requested Frames, maximize
+contrast by drawing non-sequentially from the camera-language pool below.
+Prioritize unused strategies before repeating one, including medium-long
+establishing views, top-down views, low-angle views, rolling side views, deep
+views through circular hatches, and celestial-window silhouettes. Select only
+the requested number of alternatives and do not imply that additional Frames
+must exist.
+
+ZERO-GRAVITY PHYSICS
+
+Every Frame must obey believable weightless mechanics:
+- there is no natural up or down;
+- every push creates an opposite drift;
+- unanchored bodies continue moving until contact changes their motion;
+- hair, fabric, droplets, paper, and loose objects float independently;
+- handrails, straps, padded walls, and cabin handles provide anchor points;
+- movements remain slow and controlled unless a deliberate push creates rotation;
+- contact between partners changes both trajectories; and
+- nobody stands, lies, falls, kneels, or bears weight as if ordinary gravity exists.
+
+FLOATING BODY GATE
+
+Every requested person must be visibly floating in every Frame. Show the torso,
+pelvis, legs, and feet fully suspended with a clear readable gap from every
+floor-like plane, wall, ceiling, bed, seat, platform, sleep bag, or broad cabin
+surface. No person may stand, sit, kneel, crouch, lie, recline, lean, brace, or
+rest body weight on the spacecraft interior.
+
+Hands or fingertips may lightly grip a dedicated handrail, cabin handle, or
+another adult's hand for steering, and a soft tether may connect to a waist
+harness, but these controls must leave the body visibly afloat rather than
+pinned to a surface. Feet, knees, hips, buttocks, back, shoulders, and head must
+not become support contacts. Use intervening floating objects, cast shadows,
+parallax, and visible empty space around the entire silhouette to prove
+suspension. Reject and rewrite the complete Frame if any person could be read as
+touching down, standing on a surface, lying on a surface, or supported by
+furniture.
+
+Every Frame must show at least three clearly visible floating objects from at
+least two object families. Every Frame must also include one exterior celestial
+view through a porthole, observation window, reflection, or aligned hatch.
+Describe one current pose and one current movement state per person. Do not
+narrate a sequence of poses inside one image.
+
+VISUAL PROSE CONTRACT
+
+Write final Frame prose in the CLI-requested language. Each Frame must be one
+unbroken natural-language paragraph, not a screenplay, shot list, tag list, or
+multi-beat story. Integrate the exact shot scale, camera height or angle,
+composition, depth, light direction, color, complete adult cast, facial
+responses, reachable contacts, control grips, garment state, floating props,
+and visible cause-and-effect into a coherent still image.
+
+Keep all limbs traceable and every touch within natural reach. Use surrounding
+handrails, hatches, windows, straps, and floating objects to make each body's
+orientation immediately understandable. End each paragraph on a strong visible
+image rather than an explanation, moral, or future action.
+
+
+SPACECRAFT LOCATION:
+circular observation module with a panoramic Earth-facing window
+narrow transfer tunnel lined with handrails and padded panels
+quiet sleeping compartment with two wall-mounted sleep bags
+compact laboratory filled with sealed instruments and sample containers
+command cabin illuminated by navigation displays
+maintenance bay with exposed pipes, storage nets, and service lights
+greenhouse module with floating leaves and tethered plants
+cupola window surrounded by dark structural frames
+airlock preparation area with neatly secured equipment
+long cylindrical habitat module with repeating circular hatches
+emergency-lit corridor washed in dim red light
+minimal private cabin with warm adjustable lighting
+
+
+CELESTIAL BACKGROUND:
+blue Earth curve moving slowly beneath the spacecraft
+sunrise breaking over Earth with a thin golden atmosphere
+night-side Earth covered in scattered city lights
+bright Moon suspended beyond the observation window
+dense star field visible against absolute black
+aurora glowing along the planet's polar edge
+distant storm systems spiraling across the ocean
+sunlight flashing across solar panels outside the window
+the spacecraft passing from daylight into orbital night
+soft reflected Earthlight filling the cabin with blue
+
+
+FLOATING OBJECTS:
+round water droplets reflecting miniature distorted faces
+loose paper sheets turning slowly through the cabin
+silver pen drifting end over end
+thin safety strap forming a soft curve in the air
+small photograph rotating near the observation window
+fabric ribbon tracing the direction of weak air currents
+sealed drink pouch with a flexible straw
+tiny checklist card escaping from a storage pocket
+lightweight headset floating between the partners
+transparent sample sphere catching colored display light
+folded cloth drifting open like a slow flower
+small artificial plant leaf detached from its tether
+pair of soft gloves rotating in opposite directions
+metal ring glinting as it crosses a beam of light
+
+
+SPACEFLIGHT WARDROBE AND WEARABLE DEVICES:
+fitted blue cabin uniforms with flat seams and secured pockets
+soft gray thermal base layers with integrated biometric patches
+lightweight white flight suits with low-profile mission hardware
+dark minimalist spacecraft garments with flexible joint panels
+orange flight suits with embroidered mission patches and wrist displays
+navy utility garments with magnetic closures and compact telemetry belts
+comfortable long-sleeved cabin wear with soft quick-release waist tethers
+pale silver zero-gravity garments with reflective safety piping
+partial artistic nudity with a soft chest telemetry band and wrist display
+full artistic nudity with discreet biosensor patches and a waist tether
+bare skin crossed by a non-load-bearing quick-release monitoring harness
+nude body with a compact environmental-control collar and communication earpiece
+minimal sensor mesh following the torso without obscuring natural body contours
+open flight suit secured at the hips over spacecraft-specific monitoring wear
+thermal garment folded into a nearby storage net while biosensors remain attached
+soft thigh and upper-arm telemetry bands with short body-hugging cable runs
+
+
+HAIR BEHAVIOR:
+long hair spreading outward in a weightless halo
+short hair lifting slightly away from the scalp
+braided hair floating in a slow curved line
+loose curls drifting around the face
+ponytail swinging behind each turn
+soft strands crossing the eyes during rotation
+hair illuminated from behind by blue Earthlight
+closely cropped hair emphasizing changing facial orientation
+
+
+CONTENT-LEVEL-APPROPRIATE INTIMATE INTERACTION:
+hands reaching across open space before the bodies meet
+fingers interlocking to stop an uncontrolled drift
+foreheads touching while both partners rotate slowly
+gentle face-to-face embrace near the observation window
+brief tender kiss while anchored to a handrail
+one partner guiding the other through a circular hatch
+back-to-chest embrace stabilized by a safety strap
+cheek resting against a shoulder during orbital night
+palms pressed together while the bodies drift apart
+arms linked as both partners circle a shared center of mass
+one partner catching the other's wrist and drawing them closer
+quiet eye contact reflected in a floating water droplet
+protective embrace after an unexpected gentle spin
+slow reunion after drifting from opposite ends of a module
+full-body skin-to-skin embrace while both adults float free of every surface
+nude chest-to-chest contact with hips offset and soft waist tethers trailing behind
+long kiss with one nude adult inverted relative to the other
+bare thighs intertwined around a shared center without anatomical emphasis
+one adult's legs wrapped around the other's waist during a slow mutual rotation
+close back-to-chest nude embrace with both bodies following the same orbital arc
+hands spread across shoulder blades, waist, and outer hips to control shared drift
+flushed faces and parted lips held close while biosensor lights pulse on bare skin
+
+
+ZERO-GRAVITY BODY CONFIGURATION:
+face-to-face with both bodies angled diagonally across the cabin
+one partner upright relative to the camera while the other appears inverted
+both partners horizontal to the corridor and parallel to each other
+partners facing opposite directions while connected by both hands
+side-by-side drift with shoulders lightly touching
+back-to-chest alignment floating clear of a padded wall
+feet pointing toward opposite walls with faces at the same level
+bodies forming a wide V shape around a shared handhold
+one partner centered by a waist tether while the other traces a slow circular orbit
+both partners curled gently around a common center of mass
+mirrored poses on opposite sides of a circular hatch
+intertwined arms creating a stable rotating pair
+nude bodies aligned chest-to-chest while their hips remain visibly offset
+bare legs loosely intertwined as both adults curl around a shared center
+one nude adult inverted above the other with faces and torsos held close
+legs wrapped around a partner's waist while both bodies remain fully suspended
+close spoon-like alignment rotated vertically in open cabin space
+asymmetrical full-body embrace with one torso arched through weightless momentum
+
+
+MOVEMENT PATTERN:
+slow mutual rotation continuing after both partners release a handrail
+gentle lateral drift across the full width of the module
+controlled half-turn around a fixed handrail
+gradual approach from opposite ends of a narrow corridor
+shared tumble arrested by paired waist tethers before either body reaches a surface
+one partner centered by a loose tether while the other arcs closer
+slow separation followed by reunion using an extended hand
+synchronized passage through multiple circular hatches
+continuous roll that exchanges the apparent ceiling and floor
+small corrective pulls on hand tethers that gradually align both bodies
+rotation becoming still when both partners grasp the same strap
+quiet drift toward the window as the cabin enters darkness
+
+
+CAMERA LANGUAGE:
+medium-long shot showing both partners and the surrounding cabin
+wide establishing shot through two aligned circular hatches
+top-down view from the ceiling toward the center of the module
+low-angle view from the floor with floating objects in the foreground
+side-on tracking shot matching the partners' slow drift
+over-the-shoulder view toward the observation window
+symmetrical frontal composition centered on a circular hatch
+slow camera roll that removes any stable sense of up and down
+deep-focus shot with foreground droplets and distant figures
+silhouette shot against the bright curve of Earth
+long-lens view compressing a narrow tunnel
+gentle orbiting camera around the partners' shared center
+static wide shot while the characters rotate through the frame
+reverse angle revealing the celestial view behind them
+
+
+LIGHTING:
+cool white cabin light mixed with reflected blue Earthlight
+warm private-cabin lamps against a dark window
+thin golden sunrise light crossing the partners' faces
+dim red emergency light creating long soft shadows
+navigation displays painting cyan and amber highlights
+hard sunlight broken into bands by window frames
+near darkness illuminated only by Earth and instrument panels
+soft moonlight creating pale outlines around floating hair
+alternating light and shadow during orbital sunrise
+gentle backlight turning the partners into silhouettes
+
+
+SOUND AND ATMOSPHERE:
+low continuous ventilation hum
+distant mechanical click from the spacecraft structure
+soft fabric rustle amplified by the quiet cabin
+calm breathing heard inside the enclosed module
+faint radio chatter fading into silence
+small tap as a floating object touches the wall
+quiet warning tone ending before the intimate moment
+subtle vibration from an attitude-control maneuver
+complete emotional stillness despite constant orbital motion
+muted equipment noise contrasted with private conversation
+
+
+EMOTIONAL ARC:
+playful curiosity becoming quiet tenderness
+initial awkwardness becoming coordinated trust
+brief separation followed by a reassuring reunion
+wonder at Earth deepening into affection
+gentle laughter settling into reflective silence
+nervousness transformed by a steady guiding hand
+professional restraint giving way to an honest embrace
+shared loneliness softened by physical closeness
+an unexpected spin becoming a moment of mutual care
+the vastness outside making the connection inside feel precious
+
+
+FINAL IMAGE:
+the partners become small silhouettes against the blue Earth
+their joined hands remain centered as the camera retreats through a hatch
+a floating photograph settles between them without touching either person
+two water droplets merge while the partners drift out of focus behind them
+the cabin rotates slowly around their motionless embrace
+sunrise outlines their faces before the image fades to white
+their reflections remain in the dark window after the camera turns away
+the safety strap forms a loose circle around the distant pair
+the last visible object is a silver pen still turning in the quiet cabin
+the spacecraft window fills the frame as their silhouettes leave its edge
+
+
+VARIATION AND REJECTION RULES
+
+- Never reuse the same combination of location, movement, camera angle, and ending.
+- Avoid treating zero gravity as ordinary walking, falling, lying down, or standing.
+- Keep every body entirely clear of every broad support surface in every Frame.
+- Ensure every body orientation can be understood from the surrounding handrails,
+  hatches, windows, straps, and floating objects.
+- Alternate expansive observation-window Themes with confined interior Themes.
+- Vary emotional tone while keeping every relationship consensual and caring.
+- Keep intimate actions non-graphic and suitable for cinematic adult romance.
+- Do not write category names or selected examples as a list in final prose.
+- Reject and rewrite any Frame with impossible support, contradictory momentum,
+  duplicate anatomy, obscured cast count, an unsafe collision, or no visible
+  evidence of weightlessness.

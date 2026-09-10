@@ -1,0 +1,370 @@
+BRIEF
+
+Create varied, award-caliber, hyper-realistic adult campaign stills in an
+original theatrical pop-surreal visual language. Each Theme invents a complete
+human-scale staged tableau in which a familiar consumer object, service,
+ceremony, or social ritual becomes an extravagant practical set with an
+immediately legible visual contradiction.
+
+The result should feel like an extravagant editorial production photographed
+on a real soundstage: saturated color, sculptural bodies, elaborate practical
+sets, glossy commercial surfaces, irreverent symbolic collisions, and one
+decisive frozen action. Do not name, quote, recreate, or imitate any living
+artist or any identifiable existing artwork, campaign, photograph, costume,
+set, or composition. Build a new visual identity from the concrete principles
+in this brief.
+
+CORE CAMPAIGN EQUATION
+
+Build every Theme from this equation:
+
+    ordinary desire or social ritual
+    + monumental consumer ecology
+    + one morally or physically ironic reversal
+    = one original pop-surreal campaign proposition
+
+The consumer ecology is more than one enlarged object. Use its recognizable
+packaging, mechanisms, ingredients, waste, tools, byproducts, service roles,
+and material states as parts of one coherent tableau. The cast must actively
+operate, resist, celebrate, perform, or transform that system.
+
+Scale alone is not a concept. A giant object with people standing beside it is
+invalid. The object must acquire a new social function, and the cast's action
+must visibly expose the reversal. Favor propositions that can be understood
+without captions, logos, or prior knowledge.
+
+TABLEAU FIRST, NOT MINIATURE ENGINEERING
+
+The cast remains ordinary human scale unless the Story Description explicitly
+requires another scale. Build a full-scale theatrical set around them. Do not
+default to tiny people living inside packaging, machines, appliances, ducts,
+containers, food, cosmetics, or anatomical cavities.
+
+The set is a symbolic stage, not a miniature survival simulation. Reject
+shelters, civic utilities, maintenance societies, valve-control jobs, cable
+transport, improvised workshops, pressure systems, domestic infrastructure,
+and people operating giant mechanisms when those logistics become the main
+idea. Machinery may appear only as one visually subordinate part of a larger
+human ritual.
+
+Every image needs a tableau readable first as one bold icon: a human desire,
+public ritual, glamorous catastrophe, artificial paradise, or moral collision.
+Small mechanisms and world-building details support that icon; they never
+replace it.
+
+Examples of productive reversals include luxury becoming public labor,
+cleanliness producing visible excess, convenience requiring an absurd ritual,
+devotion functioning as customer service, celebration becoming maintenance,
+beauty manufacturing its own weather, abundance creating a precise shortage,
+or private desire becoming civic infrastructure. These are mechanisms, not a
+fixed subject list; invent unrelated propositions rather than paraphrasing the
+examples.
+
+ANTHOLOGY DIVERSITY
+
+This is an anthology, not one continuous universe. Generate exactly the Theme
+count and Frames-per-Theme count requested by the CLI.
+
+Every Theme must differ from all others in:
+
+- hero ecology and its ordinary real-world function;
+- human objective and social ritual;
+- ironic reversal;
+- location type and architectural silhouette;
+- dominant palette and secondary accent;
+- material behavior;
+- lighting design;
+- emotional temperature; and
+- camera grammar.
+
+Do not let several Themes collapse into the same nightclub, chapel, beauty
+salon, supermarket, swimming pool, banquet, factory, bedroom, or ruin. Do not
+repeatedly rely on giant food, giant flowers, liquid baths, fabric mazes,
+religious poses, miniature civilizations, mechanical interiors, or people
+merely climbing an object.
+
+Before returning a Theme, silently compare it with the other Themes in the
+current batch. Replace it if the same proposition would survive after swapping
+only the hero object, palette, or wardrobe.
+
+THEME-STAGE CONTRACT
+
+Each Theme must establish one campaign proposition capable of producing the
+requested number of visually distinct Frames.
+
+The title is concise, vivid, and original. It contains no artist name, content
+level, camera term, workflow term, or explanation.
+
+The premise contains no more than two sentences:
+
+1. Sentence one establishes the explicit country, precise location, era or
+   year, recurring adult cast, monumental hero ecology, and the cast's shared
+   objective.
+2. Sentence two states the single ironic operating law, the decisive physical
+   mechanism that makes it visible, and the cost, desire, or contradiction that
+   binds the cast to it.
+
+The premise must give every recurring person a stable compact identity:
+nationality, unmistakably adult age of twenty-five or older, complexion,
+build, face structure, and hair. Use exactly the cast requested by the CLI.
+Repeated views of the same cast do not add people.
+
+The style field must describe an original production language using concrete
+photographic properties rather than an artist reference. Include:
+
+- a candy-saturated dominant palette with at least one deliberately abrasive
+  complementary collision rather than tasteful analogous color;
+- a dense contrast between polished advertising surfaces and tactile ruin,
+  residue, nature, bodily presence, or weather;
+- broad frontal illumination or crisp hard flash reinforced by colored side
+  light, luminous practicals, and precisely separated skin tones;
+- a full-scale soundstage or constructed-location logic with foreground,
+  middle-ground, and background events;
+- a wide or normal lens with deep tableau legibility, or a tightly controlled
+  portrait lens when the face and body carry the entire symbolic collision;
+- sculptural group blocking influenced by baroque diagonals, altar-like
+  symmetry, fashion-editorial precision, and music-video immediacy without
+  reproducing a known composition; and
+- a visual rhythm that balances ecstatic commercial polish with apocalypse,
+  absurdity, spiritual yearning, environmental unease, or comic rupture.
+
+Do not put a list of Frame poses in the premise. The Theme defines a deep
+visual system; each Frame discovers a different decisive image inside it.
+
+FRAME-STAGE CONTRACT
+
+Each Narrative Frame is one standalone full-frame photograph, not a storyboard,
+contact sheet, collage, split screen, or multi-panel layout. It must be directly
+usable as a text-to-image prompt and understandable without another Frame.
+
+Every Frame must naturally restate:
+
+- the country, precise location, era or year, and current moment;
+- the complete recurring cast with stable adult identities;
+- each person's exact pose, gaze, action, leverage, support, and response;
+- the hero ecology's scale, components, working function, and physical state;
+- the Theme's ironic law as a visible present-tense cause and effect;
+- foreground, middle ground, background, and negative-space organization;
+- camera distance, height, angle, lens character, focus hierarchy, and depth;
+- key, fill, rim, practical sources, reflections, shadows, and color spill; and
+- truthful material response at every important contact point.
+
+Open with the visual situation rather than a style label. Write one fluid prose
+paragraph without headings, bullets, field names, captions, or compliance
+language. Do not mention Theme, Frame, prompt, content level, CLI settings, or
+the instructions.
+
+Every Frame freezes one decisive instant. Use active present-tense contact and
+visible consequences: compression, tension, drag, recoil, displacement, spray,
+foam, fracture, condensation, reflection, residue, wrinkles, fingerprints,
+powder, droplets, or another material response appropriate to the selected
+hero. Do not depend on invisible automation, off-frame causes, future events,
+written explanations, or a sequence of actions.
+
+FRAME VARIATION
+
+Frames within one Theme share cast identity, hero ecology, operating law,
+location logic, and overall production language. They must nevertheless be
+genuinely different campaign key visuals.
+
+Change at least four of these between any two Frames:
+
+- hero component or material state;
+- cast action and division of labor;
+- visible consequence of the ironic law;
+- set zone or architectural scale;
+- foreground obstruction or framing device;
+- camera distance or angle;
+- lens character or focus strategy;
+- dominant light direction;
+- palette balance; and
+- emotional temperature.
+
+Across a six-Frame Theme, seek a flexible rhythm such as monumental, intimate,
+kinetic, ceremonious, comic, and uncanny. These are not fixed positions. Do not
+force a chronological beginning-middle-ending sequence, and do not reserve a
+specific narrative role for any Frame number.
+
+At least one Frame must contain a category-breaking event grounded in the hero
+ecology: practical material weather, a full-scale ceremonial service, an
+outside-stage intervention, a packaging component with a social role, a mass
+ritual built from product logistics, or an equally strong invention.
+
+Most cast actions must be consequential. Reject a Frame if its main action can
+be summarized only as standing, gazing, touching, leaning, lying, posing,
+walking, bathing, or climbing.
+
+VISUAL LANGUAGE
+
+Favor:
+
+- aggressively saturated cyan, magenta, scarlet, cobalt, acid yellow, emerald,
+  ultraviolet, porcelain white, metallic gold, and luminous flesh-tone
+  collisions, while preserving believable skin color;
+- full-scale practical sets that combine artificial paradise with visible
+  decay: tropical plants against molded plastic, flowers against wreckage,
+  chrome against mud, luxury upholstery against flood residue, or immaculate
+  packaging against bodily mess;
+- glossy commercial perfection interrupted by sweat, residue, dents, runoff,
+  fingerprints, crumbs, torn foil, smoke, crushed petals, or another truthful
+  imperfection;
+- altar-like frontal symmetry or a pyramidal group silhouette ruptured by one
+  forceful baroque diagonal, falling element, reaching limb, or material surge;
+- crowded but hierarchical tableaux in which the decisive bodies remain
+  readable at thumbnail scale and every background object reinforces the same
+  symbolic conflict;
+- low heroic angles, direct eye-level confrontation, formal medium-wide
+  tableaux, controlled overhead views, and selective beauty close-ups rather
+  than generic cinematic coverage;
+- broad luminous frontal exposure, crisp hard flash, glossy specular highlights,
+  saturated colored edge light, theatrical shafts, and practical sources that
+  remain physically motivated inside the set;
+- posed theatricality combined with a genuinely unstable present instant:
+  water crossing a polished floor, flowers collapsing, packaging splitting,
+  cosmetic pigment erupting, artificial weather entering the set, or a staged
+  paradise visibly failing;
+- sculptural silhouettes, readable hands, expressive faces, purposeful
+  eye-lines, and fashion-editorial control even during catastrophe;
+- extravagant camp, visual irony, artificial paradise, consumer excess,
+  spiritual seriousness, environmental unease, celebrity-scale glamour, and
+  emotional sincerity without cynical detachment; and
+- one dominant iconic statement, two secondary symbolic structures, and a
+  richly dressed but non-random background.
+
+Avoid generic neon haze, empty nightclub lighting, random religious symbols,
+decorative clutter, weightless fantasy particles, plastic skin, generic luxury,
+gray industrial interiors, dark mechanical tunnels, improvised survival gear,
+steampunk valve networks, miniature infrastructure, fashion poses without
+consequence, and six variations of the same camera view.
+
+HUMAN DRAMA DOMINATES THE FRAME
+
+The cast occupies the visual and emotional center. In medium-wide Frames, their
+faces, hands, torsos, contact, and gaze remain immediately readable rather than
+being dwarfed by machinery or architecture. At least two thirds of Frames in a
+Theme must place the principal bodies within the central two thirds of the
+image and render them large enough to carry the symbolic event.
+
+Give the cast heightened but specific emotional states: ecstatic conviction,
+solemn devotion, glamorous defiance, comic self-importance, exhausted rapture,
+public vulnerability, or calm acceptance amid excess. Avoid generic smiling,
+relaxation, passive wonder, routine teamwork, and neutral concentration.
+
+The tableau should look intentionally staged, but the photographed material
+event must feel real. Direct gazes into the lens when confrontation strengthens
+the proposition; otherwise create a closed circuit of purposeful eye-lines
+among the cast and the decisive object.
+
+SYMBOLIC AND CULTURAL INTEGRITY
+
+Symbolic material must arise from the Theme's social ritual and hero ecology.
+Do not paste sacred objects, ethnic costume, disability, poverty, disaster,
+war, or political suffering into a scene as decorative shock. Do not recreate
+recognizable scripture scenes, famous paintings, celebrity portraits, music
+videos, advertisements, or fashion campaigns.
+
+When a Theme uses ceremony, devotion, coronation, procession, confession,
+pilgrimage, sacrifice, baptism, or an icon-like pose, invent a fictional secular
+ritual with original objects and gestures. Make its practical function visible
+inside the consumer ecology.
+
+CAST, AGENCY, AND CONTINUITY
+
+Use exactly the requested number of adult women and adult men. All people are
+clearly at least twenty-five years old, alert, willing, mutually responsive,
+and visibly able to stop or leave. The same cast recurs across all Frames of a
+Theme; repeated reflections, screens, statues, packaging portraits, shadows,
+or body fragments must not imply additional people.
+
+Preserve identity, body details, hair, body marks, and styling logic across a
+Theme. Wardrobe may transform only when the Theme's proposition visibly causes
+that transformation. Give every person an indispensable action; no participant
+may exist as decorative background furniture.
+
+Show complete, anatomically coherent bodies unless the composition intentionally
+uses a close crop. Keep hands readable, joints natural, centers of mass
+supported, and bodies in distinct physical space. Reflections and mirrors must
+match the cast, pose, set geometry, and camera.
+
+CONTENT LEVEL
+
+Interpret the proposition through exactly the content level selected by the
+CLI. The selected level changes exposure and intimacy, not the ambition of the
+concept, the sophistication of the production, or the agency of the cast.
+
+At aesthetic level, use publication-safe body awareness, fashion tension, and
+non-explicit interaction. Do not add sexual activity.
+
+At erotic level, use clearly adult nudity or concealment, non-explicit intimate
+contact, mutual gaze, active response, and strong bodily tension when useful to
+the proposition. Do not introduce explicit sexual activity.
+
+At hardcore level, explicit consensual adult sexual activity may be central,
+and every Frame generated at this level must visibly contain an explicit
+consensual adult sexual act already in progress. Mere nudity, erotic posing,
+pressure through a barrier, near-contact, preparation, concealment, bathing,
+body display, or a sexual act implied outside the frozen instant is invalid.
+The same explicit interaction must perform the Theme's social function or
+ironic law rather than sit beside an unrelated spectacle. Keep the decisive
+contact in the central half of the image and make every participant actively
+support, perform, or respond to the same interaction; no participant operates
+a separate machine or watches from a detached station. Keep anatomy, contact,
+support, agency, and physical plausibility unambiguous. Every participant must
+remain alert, responsive, and able to stop. Do not use injury, coercion,
+intoxication, restricted breathing, dangerous suspension, uncontrolled
+machinery, sharp objects near bodies, or anatomy-defying contact.
+
+Do not sanitize erotic or hardcore requests into neutral wellness imagery, and
+do not increase sexual intensity beyond the selected level. Never write the
+level name or explain compliance in the final title, premise, style, or prose.
+
+PHOTOGRAPHIC REALISM
+
+Render the impossible proposition as premium practical photography. Gravity,
+optics, scale, load paths, reflections, skin texture, hair, fabric, liquids,
+foam, glass, chrome, latex, powder, and packaging must behave truthfully.
+
+Every body and heavy set element needs visible support. Every hose, cable,
+platform, vessel, suspended piece, and moving component needs believable
+attachment, clearance, and force direction. Human bodies must not serve as
+hinges, tracks, structural columns, pulleys, or impossible load-bearing parts.
+
+Describe contact deformation where skin, clothing, tools, or set materials meet.
+Keep fluids out of eyes and airways. Avoid broken glass, exposed live
+electricity, uncontrolled pressure, fire near bodies, unstable heights,
+crushing forces, or toxic substances. Replace dangerous spectacle with
+body-safe theatrical materials that preserve the intended appearance.
+
+NO-TEXT IMAGE CONTRACT
+
+The rendered image contains no title, caption, label, logo, brand mark,
+watermark, interface, subtitle, border text, packaging copy, readable meter,
+poster, sign, or typography. Use shape, color, material, gesture, and spatial
+cause-and-effect to communicate the proposition.
+
+FINAL SILENT CHECK
+
+Before returning any output, verify:
+
+- the Theme is original and does not name or reproduce a living artist's work;
+- the exact requested Theme and Frame counts are present;
+- the exact requested adult cast appears in every Theme and Frame;
+- nationality and country are explicit;
+- the premise follows the two-sentence contract;
+- the style field uses concrete photographic properties;
+- every Frame is one standalone photograph in one prose paragraph;
+- the hero is a working ecology rather than one enlarged object;
+- the cast remains human scale in a full-scale symbolic tableau rather than a
+  miniature mechanical society;
+- the ironic reversal is visible without text;
+- cast actions are active, necessary, and materially consequential;
+- human drama dominates architecture, machinery, and logistical explanation;
+- Frames within a Theme differ on at least four required axes;
+- the selected content intensity is exact;
+- every hardcore Frame contains one explicit consensual adult interaction
+  already in progress at the central frozen instant;
+- agency, anatomy, support, materials, optics, and reflections are coherent;
+- no dangerous setup is presented as body-safe; and
+- the final image contains no rendered text.
+
+If any check fails, revise the output before returning it.
