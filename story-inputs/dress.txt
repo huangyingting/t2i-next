@@ -1,0 +1,223 @@
+BRIEF
+
+Create varied, polished, hyper-realistic female fashion character boards. Each Frame is one finished six-view board presenting the same adult Chinese woman, one coherent outfit, its accessories, adult props when permitted, construction, materials, and content-level styling intensity.
+
+This is fashion, accessory, and product design, not a narrative scene, storyboard, transformation sequence, anatomical study, or sexual interaction. The CLI-selected content level controls garment coverage, sensual intensity, wearable adult accessories, adult-toy presence, and product-detail emphasis. No level requires sexual anatomy to be named or described.
+
+Generate exactly the Theme count and Frames-per-Theme count requested by the CLI. Every Theme defines a different woman, wardrobe concept, accessory language, material system, palette, setting influence, and fashion attitude.
+
+CAST
+
+Use exactly one unmistakably mature Chinese woman aged 25 or older and no other people. She is alert, self-possessed, and physically safe. Do not add men, companions, crowds, assistants, silhouettes, portraits, mannequins, dolls, or human reflections.
+
+Give each Theme one stable woman with a specific age, facial structure, skin tone, body proportions, hair length, hair texture, and hairstyle. Preserve her exact identity and physical traits in every view and every Frame belonging to that Theme.
+
+Do not idealize her into a generic fashion model. Vary adult age, face shape, height, build, proportions, and presence across Themes while keeping anatomy realistic and internally consistent.
+
+CONTENT LEVEL CONTROLS THE WARDROBE
+
+The selected content level is a wardrobe-and-coverage contract and an accessory-and-prop intensity scale for this non-narrative character board. Do not invent sexual anatomy, a partner, sexual act, story event, or unrelated action to satisfy it.
+
+AESTHETIC
+
+- Present one complete, opaque, non-erotic outfit.
+- Maintain conventional full coverage with correctly fitted garment layers.
+- Use ordinary fashion posture and neutral confidence rather than erotic posing.
+- Emphasize silhouette, tailoring, layer structure, fabric, color, footwear, jewelry, and functional accessories.
+- Do not use lingerie as the primary outfit, transparent coverage, strategic nudity, fetish hardware, adult toys, or explicitly sexual accessories.
+
+EROTIC
+
+- Present one visibly sensual but non-explicit fashion look built around lingerie, a bodysuit, an open robe, sheer layering, cutouts, a slip, corsetry, hosiery, or an original equivalent.
+- Show substantial exposed adult skin while strategic garment coverage remains coherent from every view.
+- Make sensuality legible through silhouette, layer openness, transparency, texture, fit, and accessory placement without naming or describing sexual anatomy.
+- Keep clothing and accessories central: exposure must reveal the outfit's construction rather than replace the outfit.
+- Permit restrained adult-coded wearables such as a collar, soft cuffs, garter structures, body chains, or harness elements when they belong to the fashion system.
+- Permit at most one body-safe adult toy as an unused product object in ACCESSORIES or MATERIALS; it is never worn internally, activated, or used in a sexual action.
+- Use confident editorial posture without intimate touching, insertion, stimulation, toy use, or implied participation by another person.
+- Every view must preserve the same strategic coverage boundaries without accidental exposure caused by a changed angle.
+
+HARDCORE
+
+- Treat hardcore as the maximum adult-product and wearable-design intensity for this non-narrative board, not as a request for anatomical description or a sexual act.
+- Present one unmistakably adult accessory-led look using a coherent selection of open garments, harness structures, body jewelry, gloves, stockings, footwear, headwear, belts, collars, cuffs, straps, or original equivalents.
+- Include one to three clearly designed body-safe adult toys or props as central product elements. Name them with explicit but anatomy-neutral product categories rather than vague phrases such as “adult object,” “form prop,” or “device.” Describe their silhouette, relative scale, material, color, surface, controls, fastening or storage method, and visual relationship to the outfit.
+- Wearable pieces may attach only at clearly named non-anatomical regions such as the neck, shoulders, wrists, torso, waist, thighs, ankles, or garment hardware.
+- Adult toys may be carried in a purpose-built holster, attached to garment hardware, or displayed in ACCESSORIES and MATERIALS. Describe only their visible display, attachment, and storage state.
+- Keep strategic garment coverage in every human view and express the level through explicit product language, bolder hardware, and stronger wearable styling rather than exposed anatomy.
+- The outfit, wearables, and toys form one designed system; do not reduce the board to an undressed body study or a disconnected product catalog.
+- Show no sexual anatomy, intimate contact, insertion, stimulation, bodily fluid, partner, sexual action, or narrative event.
+
+If a Theme or Frame mixes intensity rules from different levels, rewrite it. Do not make aesthetic secretly erotic, erotic an adult-toy catalog, or hardcore merely lingerie without explicit adult-product design.
+
+THEME DESIGN
+
+Each Theme defines one complete fashion identity:
+
+1. one original English look name of one to four words;
+2. one mature female identity with stable physical anchors;
+3. one wardrobe archetype and silhouette;
+4. one exact layer order from body outward;
+5. one dominant material and one contrasting material;
+6. one restrained palette of two to four named colors;
+7. one closure and construction logic;
+8. two to five coordinated accessories with fixed body locations plus only the adult props permitted by the selected level;
+9. one hairstyle that exposes important garment and accessory details; and
+10. one studio or environmental design influence that supports the look without becoming a story.
+
+Across Themes, vary silhouette family, body coverage, neckline, shoulder treatment, waist construction, sleeve logic, hem geometry, footwear category, accessory scale, material behavior, palette temperature, era influence, and social attitude.
+
+Do not create several recolors of the same gown, repeat the same corset-and-stockings formula, default every Theme to bridal couture, or change only hairstyle and jewelry.
+
+WARDROBE SPECIFICATION
+
+Describe the outfit as a buildable object. State:
+
+- garment category and silhouette;
+- exact layer order;
+- neckline, shoulders, sleeves, waist, hips, hem, and back construction;
+- closure position and hardware;
+- fabric weight, drape, opacity, surface, and finish;
+- color placement;
+- seams, panels, boning, pleats, gathers, cutouts, trim, and edge treatment only where visible;
+- footwear shape, material, heel or sole, and fastening; and
+- content-level coverage and product-intensity boundaries.
+
+Every garment must fit the same body in every view. Front, back, and profile construction must agree. A closure, seam, strap, cutout, opening, or ornament visible in one view must occupy the corresponding physical location in all other views.
+
+Use physically credible fabric behavior. Heavy material keeps structure, soft material drapes, stretch material follows tension, sheer material remains transparent, reflective material reflects its environment, and fasteners carry plausible load.
+
+Do not use impossible fabric, unsupported rigid shapes, random floating cloth, unexplained garment morphing, contradictory closures, fused layers, or decorative complexity that cannot be understood from the board.
+
+ACCESSORY SPECIFICATION
+
+Choose two to five accessories that belong to one design language. Assign each accessory one fixed body location, scale, orientation, material, color, fastening, and relationship to the garment.
+
+Possible categories include headwear, hair ornaments, earrings, eyewear, neck pieces, collars, shoulder pieces, gloves, cuffs, rings, belts, waist chains, body jewelry, hosiery, leg pieces, footwear, and one handheld fashion object. Erotic and hardcore levels may also use the adult wearables and props allowed by their level. These are open categories, not required items.
+
+Do not overload every body zone. Keep the face, silhouette, garment construction, and content-level coverage readable.
+
+An accessory must not change sides, multiply, disappear, migrate, intersect anatomy, float, pierce an unintended body part, or become a different design across views. Paired accessories must remain a pair.
+
+ADULT PROP SPECIFICATION
+
+Adult props are fashion-product elements, never performers or substitutes for anatomy. Use clear anatomy-neutral categories based on product form and control language, such as a wand massager, remote vibrator, silicone plug, paired adjustable clamps, restraint cuffs, or an original equally legible category. Do not name a product after a body area.
+
+At aesthetic level, include none. At erotic level, include zero or one unused, visually restrained adult toy. At hardcore level, include one to three visibly explicit adult toys or props designed as part of the same wardrobe system.
+
+For each permitted adult prop, lock:
+
+- product category and silhouette;
+- relative scale and orientation;
+- body-safe material, hardness, surface, and finish;
+- color and hardware language;
+- visible controls, seams, joints, or charging features;
+- garment attachment, holster, case, stand, or storage position; and
+- exact presence in HERO, ACCESSORIES, and MATERIALS.
+
+Describe adult props externally through form, material, finish, controls, attachment, holster, case, stand, and storage. Do not name sexual organs, body openings, internal placement, insertion, stimulation, fluid, use, non-use, or prohibited actions. Keep every product clean, intact, and physically supported.
+
+The same prop must retain its count, dimensions, color, material, controls, and attachment across views. Do not turn a wearable into a different object or add an unexplained duplicate.
+
+SIX-VIEW BOARD CONTRACT
+
+Every Frame is one landscape character board containing exactly six non-overlapping view regions:
+
+1. HERO — a dominant head-to-foot full-body fashion portrait at a three-quarter viewing angle, never a three-quarter-length crop, occupying about forty percent of the canvas;
+2. FRONT — a full-body orthographic front view;
+3. BACK — a full-body orthographic rear view;
+4. PROFILE — a full-body side view;
+5. ACCESSORIES — one anchored close-up showing face, hair, jewelry, closure, and accessory attachment;
+6. MATERIALS — one organized flat-lay study of garment layers, fabric swatches, hardware, footwear, removable accessories, and the exact adult props permitted by the selected level.
+
+All five human views depict the same single woman in the same outfit state during one design session. Repeated views are references to the same person, not additional cast members.
+
+Use a clear editorial grid with the HERO region dominant and the five supporting regions smaller. Regions may vary in proportion across Frames, but none may overlap, merge bodies, crop required anatomy, or continue one body across a region boundary.
+
+Use restrained gutters, aligned baselines, and protected negative space. Do not turn the board into a comic page, filmstrip, contact sheet, scrapbook, moodboard, or collection of alternate outfits.
+
+FRAMING AND POSE
+
+Show the entire body from head to footwear in HERO, FRONT, BACK, and PROFILE. Keep the camera near waist height with normal perspective so proportions remain comparable.
+
+Use neutral, stable, fashion-reference poses. FRONT and BACK use balanced weight and relaxed arms that do not cover garment construction or required anatomy. PROFILE preserves a true side silhouette. HERO may use a restrained editorial contrapposto without twisting the outfit into a different design.
+
+The woman has one anatomically possible pose per view. Keep limbs traceable, joints natural, hands complete, feet grounded, and weight visibly supported. Do not use motion, walking, spinning, wind-driven action, acrobatics, extreme foreshortening, or pose transitions.
+
+The ACCESSORIES close-up may crop at the upper torso but must keep every visible body part connected to the same woman. It may include externally worn adult accessories or a holstered product without showing intimate anatomy or use. The MATERIALS region contains no body parts or mannequin, shows both members of every paired garment, shoe, or accessory set, and contains no spare, backup, alternate, or replacement item absent from the worn look.
+
+IDENTITY AND OUTFIT CONTINUITY
+
+Preserve exactly across all human views:
+
+- face shape and facial features;
+- age and skin tone;
+- body build and proportions;
+- hair length, texture, part, and styling;
+- makeup and nail treatment;
+- garment count, layer order, fit, color, material, seams, openings, and closures;
+- accessory count, side, fastening, and placement; and
+- content-level coverage, wearable intensity, and adult-prop inventory.
+
+Do not duplicate the woman within one region, invent extra limbs or anatomy, mirror asymmetric details onto the wrong side, or show front and rear construction that cannot belong to the same garment.
+
+STYLE, LIGHT, AND MATERIALS
+
+Use hyper-realistic fashion photography and product-design clarity. Select one coherent visual system per Theme: studio precision, tactile atelier documentation, restrained cinematic world-building, archival couture presentation, technical luxury, ceremonial minimalism, utilitarian futurism, or an original equivalent.
+
+Use one motivated shared light setup across the board. Keep skin tone, garment colors, material response, and accessory finish consistent in every region. Supporting close-ups may increase detail but must not change light direction or color temperature.
+
+The background must support silhouette separation and material readability. Avoid scenery that competes with the outfit, decorative dust, fog, sparks, particles, dramatic weather, or atmospheric effects that obscure construction.
+
+Do not imitate a named living designer, photographer, fashion house, campaign, copyrighted character, or existing costume.
+
+TEXT-FREE BOARD
+
+Do not render the Theme title or region names as visible text. Use region names only as internal layout references while planning the board.
+
+In final Frame prose, identify regions through spatial position and visual function: the dominant full-body three-quarter portrait, full-body front view, full-body rear view, full-body side view, anchored accessory close-up, and organized material flat lay. Do not include the literal uppercase region-name tokens or describe the board as titled.
+
+The finished image contains no typography, letters, numbers, measurements, brand names, logos, slogans, captions, pseudo-letters, watermarks, signatures, or other visible text.
+
+THEMES AND FRAMES
+
+Themes are different women and fashion concepts, not scenes in one story.
+
+Frames within one Theme are parallel board-layout alternatives for the same woman and the same complete look. Preserve identity, outfit, accessories, adult props, coverage, palette, and material system. Vary only grid proportions, dominant portrait pose, crop emphasis inside the detail views, background treatment, and graphic hierarchy.
+
+No Frame occurs before or after another. Do not describe dressing, undressing, opening, removing, adding, changing, adjusting, or transforming garments between views or Frames.
+
+THEME-STAGE OUTPUT
+
+Use the Theme schema as follows:
+
+- `title`: an internal original English look name that guides the design but is not rendered on the board;
+- `premise`: the woman, selected content-level styling intensity, complete outfit, layer order, fixed accessories, and permitted adult props;
+- `style`: the shared board layout language, palette, materials, background, graphic hierarchy, and lighting.
+
+Return only Theme fields. Do not include Frame drafts, view-by-view prose, count values, schema explanations, or later-stage instructions.
+
+FRAME-STAGE OUTPUT
+
+Write one directly imageable paragraph with no fixed character or word count. Write all descriptive prose in the CLI-requested output language. Do not mention theme.title or insert English label tokens to identify regions.
+
+Begin by stating, in the requested output language, that one polished text-free six-view female character board fills a landscape canvas. Then state the selected content-level wardrobe state, woman's stable identity, complete outfit construction, fixed accessories, permitted adult props, six-region grid, each region's spatial position and visual function, per-view pose and crop, material details, background, and shared lighting.
+
+Describe the final visible board only. Do not include alternatives, optional wording, design rationale, backstory, symbolism, sequence, dressing actions, internal instructions, or statements explaining that a product is unused or that a prohibited act is absent.
+
+FINAL VALIDATION
+
+Silently rewrite any Theme or Frame that fails one check:
+
+1. Exactly one adult Chinese woman aged 25 or older is depicted; all human views are the same person.
+2. The selected content level controls outfit coverage, wearable intensity, and adult-prop presence in every view.
+3. Aesthetic is fully clothed with no adult products; erotic is visibly sensual with at most one restrained adult product in display or storage position; hardcore uses one to three unmistakably adult products as designed fashion elements.
+4. The same single outfit, layer order, construction, colors, and coverage appear in the dominant portrait, front view, rear view, side view, and accessory close-up.
+5. Every accessory preserves its count, side, position, material, scale, and fastening; the material flat lay shows complete pairs rather than one item from a pair.
+6. All poses are static, anatomically possible, grounded, unobstructed, and useful for reading the design.
+7. The dominant portrait, front view, rear view, side view, accessory close-up, and material flat lay each occupy exactly one non-overlapping region.
+8. The dominant portrait, front view, rear view, and side view all show the complete body from head through footwear without cropping; “three-quarter” may describe viewing angle only. Every coverage statement agrees with the visible garment layers. Scan every garment, accessory, and product name and replace any term naming sexual anatomy or a body opening with an anatomy-neutral form, material, or control term.
+9. The material flat lay contains only the exact garments, fabrics, hardware, footwear, removable accessories, and permitted adult props used by the design, with no spare or alternate pieces; every adult product has a clear non-vague anatomy-neutral category and only visible form, control, attachment, or storage details.
+10. The finished board contains no visible title, region labels, typography, letters, numbers, logos, captions, or pseudo-text.
+11. Lighting, skin, hair, outfit, materials, adult props, and background remain coherent across the entire board.
+12. All descriptive prose uses the requested output language, identifies the six-view board at the beginning, and ends with complete sentence punctuation.

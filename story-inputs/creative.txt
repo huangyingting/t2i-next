@@ -1,0 +1,211 @@
+BRIEF
+
+Create varied, award-caliber, hyper-realistic six-panel campaign concept boards.
+Each Theme must be a fresh visual invention, not a variation on a prescribed
+subject. The board contains one recurring miniature adult cast and one colossal
+hero ecology whose real properties make six impossible but instantly legible
+images possible.
+
+This is explicitly a non-narrative high-concept campaign board. Conceptual
+invention replaces conventional plot, relationship conflict, or a person merely
+exploring a setting.
+
+OPEN SUBJECT SELECTION
+
+Choose subjects freely and unpredictably. A subject may come from any domain,
+including domains not suggested here. Do not assign categories, moods, objects,
+materials, or intensities by theme_id. Theme IDs identify outputs only.
+
+Across requested Themes, maximize distance in subject, world logic, material
+behavior, human activity, palette, and visual rhythm. Do not choose several
+subjects that all become caves, forests, mazes, baths, beds, shelters, or
+landscapes.
+
+THE CONCEPT EQUATION
+
+Build each concept with this equation:
+
+    familiar hero + distant system or ritual + truthful material mechanism
+    = one surprising campaign proposition
+
+The distant system or ritual must change what the hero does and what the cast
+can do with it. Scale by itself is not an idea.
+
+The hero is an ecology, not just one enlarged object. Use several of its real
+components, stages, states, byproducts, tools, packaging forms, or effects. They
+must remain recognizable while acquiring useful new roles inside one coherent
+world.
+
+A strong proposition completes this sentence with concrete, visible nouns and
+verbs:
+
+    This is not merely a giant [hero]. Its [real property or component] becomes
+    [unexpected function], so the miniature cast can [specific desire, ritual,
+    service, game, contradiction, or transformation].
+
+Reject the proposition if the final clause is only "explore it," "feel it,"
+"connect with it," "be immersed in it," or another vague sensory treatment.
+
+SECOND-ORDER LEAP
+
+Before writing, generate multiple unrelated candidates and select the one with
+the clearest second-order leap. The final idea must combine at least three
+compatible creative operations, chosen for the selected subject rather than by
+quota:
+
+- function transfer: a real component becomes transport, fashion, furniture,
+  architecture, machinery, service infrastructure, stagecraft, sport, or
+  another unexpected working role;
+- state drama: different physical states create different actions and images;
+- miniature logistics: the cast builds a working tool, route, vehicle, rig,
+  workshop, delivery system, or civic system from the hero;
+- scale crossing: a hand, tool, flow, mechanism, shadow, or force from another
+  scale intervenes and changes the micro-world;
+- character shift: a component acts as host, companion, rival, audience,
+  performer, guide, or creature without turning cartoonish;
+- material weather: a truthful byproduct becomes climate, light, atmosphere,
+  precipitation, or environmental force;
+- ritual or game: an ordinary use becomes a ceremony, courtship rule, sport,
+  feast, performance, challenge, or elegant practical joke;
+- hero reveal: dispersed components resolve into an iconic finished form,
+  service moment, presentation, or other visual payoff.
+
+These are open creative operations, not Theme assignments or fixed panel roles.
+Invent other operations when they serve the proposition better.
+
+THE SIX-STUNT TEST
+
+Invent more than six visual stunts, then retain the six strongest. Every retained
+stunt must:
+
+- work as a standalone campaign key visual;
+- use a different role, state, process, component, scale, or physical force;
+- show the adult cast doing something necessary to the proposition;
+- contain clear contact, force, response, and material consequence when bodies
+  or tools interact with the hero;
+- remain understandable without a caption; and
+- belong unmistakably to the same hero ecology.
+
+Most stunts must change function or state, not merely change camera angle or
+body pose. At least one stunt must contain a category-breaking event such as a
+working miniature system, an outside-scale intervention, material weather, a
+component with a social role, or an equally strong invention arising naturally
+from the hero.
+
+HARD REJECTION GATE
+
+Discard and replace the entire Theme when four or more stunts can be summarized
+with passive bodily verbs such as walk through, stand beside, gaze at, touch,
+stroke, lean on, lie on, bathe in, embrace, or climb.
+
+The following are beginnings, not finished concepts:
+
+- repeated long things becoming a forest;
+- lines or fabric becoming a maze;
+- liquid becoming a bath;
+- a hollow object becoming a cave or room;
+- a curved surface becoming a bed or slide;
+- a mushroom, shell, leaf, or cloth becoming shelter;
+- a large device merely being operated at scale.
+
+One of these forms may appear only if another idea overturns it through changed
+function, ritual, law, social meaning, logistics, or scale. Sensual photography
+cannot compensate for a weak proposition.
+
+THEME-STAGE OUTPUT CONTRACT
+
+Use the Theme schema normally, but make the two-sentence premise carry an
+auditable creative plan:
+
+1. Sentence one states the hero, the distant system or ritual, and the physical
+   mechanism that creates the second-order conceptual leap.
+2. Sentence two contains exactly six concise visual-stunt seeds separated by
+   semicolons. Each seed names the transformed hero component or state, its new
+   function, and a concrete cast action.
+
+Do not spend the premise on generic mood, intimacy, exploration, or backstory.
+The style field carries medium, palette, light, material rendering, and visual
+rhythm. The six seeds may use any order; no panel position has a permanently
+assigned narrative function.
+
+FRAME-STAGE OUTPUT CONTRACT
+
+Produce one portrait 2-column by 3-row grid per Theme. It is one image with six
+cleanly separated regions and no visible title, caption, label, typography,
+logo, watermark, border text, or interface element.
+
+Realize all six stunt seeds from the Theme premise, one per region. Do not
+replace, merge, or dilute them. Explicitly describe Region 1 through Region 6;
+a general board synopsis without six expanded region descriptions is invalid.
+When frames_per_theme is 1, the single Narrative Frame is the entire six-region
+board, not one region or a summary. Use roughly 450 to 650 words, or equivalent
+detail in the requested language. Expand each seed into a photographic scene
+with:
+
+- the recurring cast's exact action and leverage;
+- the hero component's scale, role, and physical state;
+- visible cause and effect;
+- tactile deformation, displacement, spray, tension, fracture, compression,
+  flow, reflection, residue, or another truthful material response;
+- composition, camera distance and angle, lens character, focus, lighting, and
+  color; and
+- enough surrounding context to make both scale and concept immediately clear.
+
+The six regions form a flexible visual rhythm, not six equal poses and not a
+mandatory beginning-middle-climax sequence. Any region may be quiet, comic,
+intimate, kinetic, monumental, or revelatory when the chosen concept calls for
+it.
+
+CAST AND CONTINUITY
+
+Use exactly the requested number of adult women and adult men. All depicted
+people are clearly adults. The same cast recurs across the six regions; repeated
+views do not add people. Give each person a stable compact identity: apparent
+age, ancestry or complexion, body build, face structure, and hair.
+
+Preserve identity, body details, styling logic, and any transformed wardrobe or
+body marks across all regions unless the proposition visibly changes them.
+Supporting tools must be built from or materially linked to the hero ecology,
+not added as arbitrary spectacle.
+
+CONTENT LEVEL
+
+Interpret the chosen concept specifically through the requested content_level.
+Do not let content intensity choose or limit the subject.
+
+- aesthetic: elegant, non-explicit, publication-safe body awareness and
+  interaction;
+- erotic: clearly adult sensual charge, intentional exposure or concealment,
+  intimate self-touch where conceptually useful, and strong physical tension
+  without explicit sexual acts;
+- hardcore: clearly adult explicit sexual action may be central when requested,
+  while anatomy, contact, agency, physical plausibility, and the high-concept
+  campaign proposition remain precise.
+
+Do not sanitize erotic or hardcore into neutral wellness imagery. Do not add
+sexual content beyond the selected level.
+
+PHOTOGRAPHIC STANDARD
+
+Render the impossible as premium practical photography: believable gravity,
+scale, optics, material microtexture, skin texture, moisture, fibers, particles,
+reflections, shadows, and contact deformation. Favor one controlled visual
+language with enough contrast between regions to keep the grid alive. Avoid
+generic fantasy haze, decorative clutter, cartoon physics, empty spectacle, and
+six near-identical camera views.
+
+FINAL SILENT CHECK
+
+Before returning output, verify:
+
+- the subject was freely invented and not inferred from theme_id;
+- the premise follows the exact two-sentence contract;
+- sentence two contains six semicolon-separated, visibly different stunts;
+- at least three creative operations combine into one coherent proposition;
+- the hero appears through multiple truthful components, states, or effects;
+- most cast actions are active and consequential rather than passive contact;
+- all six stunt seeds are realized in the Frame;
+- the requested cast count and content level are exact; and
+- the final grid contains no rendered text.
+
+If any check fails, revise before returning.

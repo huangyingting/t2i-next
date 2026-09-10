@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
 
 import pytest
 
@@ -12,6 +13,8 @@ from tests.story_factories import (
     make_theme,
     make_theme_batch,
 )
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
@@ -35,6 +38,12 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     assert "Leave those details to each frame" in prompt
     assert "unless the story explicitly requires them during Theme generation" in prompt
     assert "material state or operating rule instead" in prompt
+    assert "non-narrative character or design board" in prompt
+    assert "campaign, editorial concept board" in prompt
+    assert "visual proposition, hero system, and conceptual leap" in prompt
+    assert "six distinct visual-stunt seeds separated by semicolons" in prompt
+    assert "even though shot-level detail is otherwise deferred" in prompt
+    assert "generic tactile exploration" in prompt
     assert "relationship, setting function, decision, or conflict" in prompt
 
 
@@ -154,6 +163,15 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "currently visible state and direct physical result" in prompt
     assert "one physically possible held pose" in prompt
     assert "must not travel between positions" in prompt
+    assert "repeated views of the same person" in prompt
+    assert "every region must deliver a distinct visual stunt" in prompt
+    assert "Realize all six stunt seeds recorded in the Theme premise" in prompt
+    assert "Explicitly describe Region 1 through Region 6" in prompt
+    assert "general board synopsis" in prompt
+    assert "that one Narrative Frame is the entire multi-region board" in prompt
+    assert "roughly 450 to 650 words" in prompt
+    assert "flexible panel dramaturgy" in prompt
+    assert "do not impose a fixed climax position" in prompt
     assert "Camera and lighting must be explicit and professional" in prompt
     assert "final state explicitly required by the story must appear directly" in prompt
     assert "read theme.theme_id from the current payload first" in prompt
@@ -271,6 +289,63 @@ def test_prompts_compile_only_selected_content_level(
             "If the story sets stricter visible requirements for this selected "
             "level, every one of them is mandatory"
         ) in prompt
+        assert "presentation contract" in prompt
+        assert "non-narrative design or pose board" in prompt
+        assert "wardrobe, coverage, and pose-intensity rules" in prompt
+        assert "do not invent a sexual act or missing partner" in prompt
+
+
+@pytest.mark.parametrize(
+    ("level", "required_contract"),
+    (
+        (
+            ContentLevel.AESTHETIC,
+            (
+                "At aesthetic level, the dominant hero photograph must remain "
+                "unmistakably non-explicit"
+            ),
+        ),
+        (
+            ContentLevel.EROTIC,
+            (
+                "At erotic level, every Frame must make non-explicit adult "
+                "intimacy unmistakably visible in the dominant hero photograph"
+            ),
+        ),
+        (
+            ContentLevel.HARDCORE,
+            (
+                "At hardcore level, every Frame must place the direct explicit "
+                "adult interaction in the dominant hero photograph"
+            ),
+        ),
+    ),
+)
+def test_post_layout_prompt_compiles_dominant_hero_content_contract(
+    level: ContentLevel,
+    required_contract: str,
+) -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "post-layout.txt").read_text(
+        encoding="utf-8"
+    )
+    request = make_story_request(
+        content_level=level,
+        frames_per_theme=1,
+        female_count=1,
+        male_count=1,
+    ).model_copy(update={"story": brief})
+
+    messages = frame_messages(request, make_theme())
+    compiled = " ".join(
+        "\n".join(message.content for message in messages).replace("\\n", " ").split()
+    )
+    payload = json.loads(messages[1].content)
+
+    assert payload["content_level"] == level.value
+    assert "Apply only the branch matching the CLI-selected content level" in compiled
+    assert required_contract in compiled
+    assert "content-level visibility anchor" in compiled
+    assert "cannot satisfy the selected content level" in compiled
 
 
 def test_prompts_express_era_consistency_holistically() -> None:

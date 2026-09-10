@@ -1,0 +1,726 @@
+BRIEF
+
+Create varied, polished, hyper-realistic six-pose adult female reference
+boards. Every Frame is one finished landscape board presenting the same
+unmistakably mature Chinese woman in exactly six distinct, anatomically
+credible static poses selected from the curated pool at the end of this brief.
+Each pose is paired with a distinct camera-angle blueprint selected from the
+separate curated camera pool.
+
+This is a non-narrative study of adult sexual-position geometry and strongly
+sexually suggestive posing. Every selected pose must either reproduce the
+single-body endpoint of a recognizable consensual adult sexual position or
+create unmistakable sexual implication through pelvic presentation, open-leg
+geometry, a pronounced receptive or dominant body angle, intimate self-touch,
+or a comparably strong combination. Neutral dance, yoga, fitness, wellness,
+fashion, portrait, and ordinary reclining poses are invalid.
+
+Use exactly one adult Chinese woman aged 25 or older and no other people. This
+brief is designed for CLI cast settings of one woman and zero men. Repeated
+depictions show one woman six times for design reference and count as one cast
+member. Do not add a partner, imply an invisible body, shape hands around
+absent anatomy, or include companions, assistants, crowds, silhouettes,
+mannequins, dolls, reflections of another person, or disembodied body parts.
+
+SEXUAL-INTENT GATE
+
+Before accepting a pose, verify that its visible endpoint passes at least two
+of these tests:
+
+- the pelvis is clearly presented, elevated, opened, pressed forward, or
+  directed toward the viewer;
+- the thighs are spread, asymmetrically opened, lifted, wrapped around a real
+  support, or arranged in recognizable adult sexual-position geometry;
+- the spine, torso, and support pattern form an unmistakably receptive,
+  presenting, straddling, mounting, or dominant silhouette;
+- a non-load-bearing hand makes content-level-appropriate intimate contact; or
+- the pose remains strongly sexually suggestive even with the face, outfit,
+  title, and surrounding context hidden.
+
+Passing through nudity, lingerie, facial expression, or camera emphasis alone
+is not enough. The body mechanics themselves must carry the sexual intent. Do
+not neutralize a pool entry into ordinary stretching, exercise, dance,
+editorial fashion, sleep, or casual lounging.
+
+RANDOM POSE-GROUP SELECTION
+
+For every Theme, privately make an independent varied selection of exactly six
+pose blueprints from the CURATED POSE POOL. Treat model sampling as the source
+of variation; do not claim that a deterministic random-number generator was
+used and do not print selection indices.
+
+Do not take six adjacent entries, the first six entries, or one fixed preset.
+Select the six poses non-sequentially from at least four different pose-family
+headings. Do not preserve pool order when assigning board regions.
+
+The six selected poses must differ in all of these dimensions:
+
+- support base and number of weight-bearing contacts;
+- standing, seated, kneeling, crouched, supine, side-lying, prone, or
+  hands-and-knees body level;
+- front-, side-, rear-, upward-, or downward-oriented torso;
+- pelvis height, tilt, presentation, and facing direction;
+- straight, bent, spread, wrapped, stacked, or lifted leg geometry;
+- compact, diagonal, vertical, horizontal, arched, twisted, or extended outer
+  silhouette; and
+- hand placement, gaze direction, and receptive, presenting, or dominant
+  emphasis.
+
+Reject near-duplicates even when their wording differs. Never fill a board
+with minor variations of one rear-presenting bend, one open-knee recline, one
+wide kneel, one pelvic bridge, or one hands-and-knees position.
+
+Across Themes, inspect existing Theme premises and avoid reusing the same
+six-pose group, dominant pose, family distribution, pose order, or silhouette
+rhythm. Exhaust unused combinations before revisiting individual poses.
+Frames belonging to one Theme preserve its six pose blueprints but may permute
+region placement and vary expression, camera emphasis, lighting, and
+background treatment.
+
+OCCASION AND SETTING SELECTION
+
+Select one concrete adult occasion and one physically coherent location for
+every Frame. All six regions inside that Frame must share that same occasion,
+location, architectural logic, floor treatment, support vocabulary, palette,
+and motivated lighting; a single board must never mix six unrelated places.
+
+Different Frames and different Themes should use clearly different occasions
+and locations. Draw non-sequentially from the broad occasion families below or
+invent an equally specific equivalent. When a run contains enough Frames, use
+different families before taking a second occasion from one family. Do not
+repeatedly default to a generic gray studio, hotel bedroom, empty apartment,
+or seamless backdrop. Exhaust unused setting families before repeating one,
+and vary time of day, architecture, surfaces, palette, support objects, and
+lighting motivation with the occasion.
+
+The occasion provides visible context, not a narrative sequence. Show only a
+safe, static adult pose-reference session with no audience, unsuspecting
+bystanders, public exposure, hidden-camera premise, workplace coercion, or
+interaction with an absent person. Theme-level support descriptions define
+required support geometry and body contacts, not one permanent room. Each
+Frame may realize that geometry through different setting-appropriate real
+objects, but must preserve the pose's support height, width, stability, body
+contacts, center of mass, and silhouette.
+
+CURATED OCCASION AND LOCATION FAMILIES
+
+PROFESSIONAL IMAGE-MAKING
+
+- A closed daylight-cyclorama pose session with painted flats, padded cubes, and north-window diffusion.
+- A locked black-box soundstage camera test with modular platforms, dark curtains, and controlled spotlights.
+- A private analog portrait sitting with hand-painted muslin, timber posing furniture, and warm tungsten lamps.
+- A fashion lookbook fitting in a loft studio with garment racks kept outside the board and broad skylight.
+- A sculptural lighting study in a white volume stage with plinths, movable walls, and crisp bounced light.
+
+PRIVATE RESIDENTIAL
+
+- A blue-hour editorial sitting in a penthouse salon with low furniture, glass walls, and city glow.
+- A quiet morning pose study in a walled courtyard residence with stone floors, timber screens, and soft daylight.
+- A private dressing ritual in a walk-in wardrobe suite with upholstered benches, mirrors, and concealed lighting.
+- An evening portrait session in a book-lined home library with a reading chaise, ladder rail, and shaded lamps.
+- A weekend art study in a modernist sunken living room with broad steps, wool carpet, and clerestory light.
+
+HOSPITALITY AND RETREAT
+
+- A private wardrobe fitting in a heritage hotel dressing suite with carved screens, a chaise, and amber lamps.
+- A secluded editorial retreat in a coastal villa salon with linen curtains, limestone floors, and sea-reflected light.
+- A closed poolside-cabana session with dry decking, padded loungers, canvas curtains, and reflected turquoise light.
+- A winter portrait retreat in a mountain-lodge suite with a stone hearth, timber bench, and cool window light.
+- A dawn styling session in a garden guesthouse with woven screens, a platform bed, and mist-filtered light.
+
+ART, DESIGN, AND PERFORMANCE
+
+- A closed-gallery installation study among blank sculptural partitions, low plinths, and track lighting.
+- A private sculpture-atelier sitting with clay stands, broad worktables, canvas screens, and high side light.
+- An after-hours costume fitting in an opera dressing salon with velvet seating, mirrors, and warm globe lights.
+- A closed contemporary-dance rehearsal camera test with sprung flooring, wall rails, and even overhead diffusion.
+- A projection-stage art session with translucent scrims, stepped rostra, and abstract color fields without text.
+
+PRIVATE WELLNESS AND LEISURE
+
+- A reserved spa-suite portrait session with dry stone flooring, padded benches, steam-softened background light, and no treatment staff.
+- A private bathhouse antechamber study with dry timber platforms, folded towels outside the body area, and diffuse skylight.
+- A closed sauna-lounge editorial on cool dry decking with broad benches and low amber illumination.
+- A private conservatory tea-retreat portrait with rattan seating, tiled flooring, tropical leaves, and filtered sun.
+- A secluded music-listening salon session with a low daybed, acoustic panels, and warm indirect lighting.
+
+ARCHITECTURAL SHOWCASES
+
+- A brutalist-house architecture shoot in a double-height concrete hall with broad stairs and sharp roof light.
+- An Art Deco interior study in a lacquered salon with curved banquettes, geometric screens, and pearl-toned sconces.
+- An industrial-loft editorial among brick piers, steel platforms, timber floors, and large factory windows.
+- A glasshouse architecture session with stone plinths, condensation-free glazing, greenery, and patterned daylight.
+- A rooftop winter-garden portrait inside a private glazed pavilion with benches, planters, and dusk reflections.
+
+SECLUDED OUTDOOR SETTINGS
+
+- A private bamboo-courtyard session on dry stone paving with a timber bench and leaf-filtered morning light.
+- A closed beach-pavilion editorial on stable decking with canvas daybeds, wind screens, and late-afternoon sun.
+- A lakeside private-pavilion study with polished floorboards, broad railings, and silver dawn light.
+- A forest-lodge deck portrait on dry timber with built-in seating, sheltered walls, and green reflected light.
+- A desert-villa terrace session on level stone with shaded platforms, plaster walls, and low golden sunlight.
+
+SEASONAL AND ATMOSPHERIC OCCASIONS
+
+- A rain-lit portrait session on an enclosed veranda with a dry tiled floor, padded bench, and window reflections.
+- A snowbound private-chalet conservatory study with heated stone flooring, timber seating, and blue ambient light.
+- A lantern-lit walled-courtyard editorial with dry paving, low platforms, silk screens, and warm pools of light.
+- A dawn glass-pavilion sitting with pale fog outside, terrazzo flooring, sculptural benches, and cool gradients.
+- A moonlit private-terrace camera test beneath a covered pergola with level decking and restrained blue fill.
+
+CAMERA-ANGLE SELECTION
+
+After selecting the six poses, independently assign exactly six distinct
+camera-angle blueprints from the CURATED CAMERA-ANGLE POOL. Treat pose and
+camera selection as separate decisions: do not bind one pose family
+permanently to one viewpoint, and do not use a camera angle as a substitute for
+sexual body mechanics.
+
+Across the six regions:
+
+- use at least four different azimuth families among frontal, front
+  three-quarter, true side, rear three-quarter, and direct rear;
+- include at least one front-biased view, one true or near-true side view, and
+  one rear-biased view;
+- use at least three camera-height or elevation bands among low, body-level,
+  and modestly elevated;
+- do not assign the same azimuth, camera height, and elevation combination
+  twice, even as a left-right mirror;
+- vary which side of the woman is nearer to camera when the pose remains
+  anatomically clear; and
+- match the angle to the pose so the pelvis direction, thigh separation,
+  spinal curve, face, and real support contacts remain simultaneously legible.
+
+Use restrained normal or short-telephoto perspective equivalent to roughly
+50-85 mm on full frame. Low means approximately knee-to-hip height with only a
+modest upward pitch; elevated means approximately head height with only a
+modest downward pitch. Never use floor-level genital framing, ceiling
+overheads, hidden-camera placement, fisheye distortion, extreme Dutch angles,
+or a view that turns a full-body pose study into an isolated body-part crop.
+
+SELF-TOUCH SELECTION
+
+After selecting the six base poses, independently choose content-level-
+appropriate gestures from the CURATED SELF-TOUCH POOL. Self-touch intensifies
+sexual intent but does not substitute for qualifying body mechanics. Preserve
+the base pose's support contacts, center of mass, pelvis direction, and
+silhouette when adding it.
+
+Do not apply the same self-touch gesture to more than one region in a board.
+Vary touched body area, left or right hand, pressure, finger shape, gaze, and
+emotional emphasis. Never detach a load-bearing hand from its support merely
+to add intimacy.
+
+Use no intimate self-touch at aesthetic level. At erotic level, apply two to
+four different non-explicit intimate self-touch gestures across the six poses.
+At hardcore level, apply three to six different gestures, including direct
+adult self-touch when compatible with the selected pose.
+
+POSE NORMALIZATION
+
+Every pool entry describes one static solo endpoint. The generated blueprint
+must make its mechanics explicit:
+
+- State the real floor, wall, platform, cube, chair, bench, bed, or mat
+  supporting the body. Never invent an invisible support or absent partner.
+- State why the final body geometry remains sexually unmistakable after
+  content-level coverage is applied.
+- Replace mood shorthand with a precise facial expression, gaze direction,
+  shoulder set, breath state, and hand placement appropriate to the selected
+  content level.
+- Reduce joint extremes, unsupported backbends, neck compression, unstable
+  balances, or contortion to a credible adult range.
+- Preserve one captured instant. Do not add thrusting, grinding, riding,
+  bouncing, rubbing, sliding, rocking, crawling, penetration, or another
+  motion sequence.
+
+Do not describe how the woman enters or exits a pose. Never combine successive
+positions, motion trails, ghosted bodies, before-and-after states, or contact
+with an absent participant inside one region.
+
+POSE BLUEPRINT CONTRACT
+
+Each of the six Theme-level pose blueprints must state:
+
+1. support base and exact weight-bearing contacts;
+2. pelvis height, tilt, presentation, and facing direction;
+3. spine curve, torso rotation, and shoulder relationship;
+4. left and right leg positions separately, including knee and foot placement;
+5. left and right arm positions separately, including elbows and hand contacts;
+6. head angle, chin position, gaze direction, and specific expression;
+7. the resulting sexually suggestive outer silhouette and garment or anatomy
+   areas it reveals; and
+8. one short anatomy or balance check proving the pose can be held;
+9. camera azimuth, nearest visible side, camera height, upward or downward
+   pitch, and normal or short-telephoto perspective; and
+10. which support contacts, pelvic cue, thigh opening, spinal curve, and facial
+    cue remain visible from that exact viewpoint.
+
+Every limb receives one unambiguous role. Hands must have five coherent
+fingers and either contact a named surface or remain visibly free. Feet must
+contact a support unless a supported reclining pose clearly lifts them. Do not
+fuse hands into hair, clothing, thighs, floor, or props; hide a load-bearing
+joint; cross limbs impossibly; rotate knees and feet in conflicting
+directions; or place the center of mass outside the support base without
+counter-support.
+
+CONTENT LEVEL CONTROLS PRESENTATION
+
+The CLI-selected content level controls wardrobe, coverage, self-touch,
+expression, crop, and explicitness, but it never removes the sexual intent of
+the selected pose. This remains one static solo reference board rather than a
+story event or an interaction with an absent person.
+
+Selecting a concrete wearable look is mandatory at every content level. Do
+not leave wardrobe implicit, describe it only as content-appropriate, or use
+generic phrases such as revealing clothes, sexy outfit, lingerie, accessories,
+or nude. Name the exact garment and accessory pieces, layer order, materials,
+colors, fit, openings, closures, footwear, and coverage state. The chosen look
+must satisfy the active level below and remain physically wearable in every
+selected pose.
+
+WARDROBE EXPOSURE LADDER
+
+Treat garment scale and body coverage as a strict three-step progression. Each
+higher level must use visibly less garment area, more open construction, and
+more exposed skin than the level below it. Aesthetic uses full-size clothing,
+erotic uses lingerie-size clothing, and hardcore uses minimal or micro-scale
+wearable elements. Do not reuse one bodysuit, robe, corset, or harness design
+at all three levels by merely changing adjectives. Silently reject a look if
+its coverage could be mistaken for the neighboring level.
+
+AESTHETIC
+
+- Use one fitted, opaque outfit with conventional full coverage and a clearly
+  readable body line. Select and name a complete look such as a fitted unitard,
+  opaque bodysuit with leggings, or comparably practical pose-study clothing;
+  do not use lingerie, transparent fabric, strategically tiny pieces, or an
+  open garment over bare anatomy.
+- Garment scale is full-size: opaque fabric continuously covers the chest,
+  nipples, abdomen, pelvis, genitals, anus, buttock cleft, and upper buttocks,
+  with conventional leg openings and enough material to remain securely in
+  place through all six poses.
+- Preserve the selected sexual-position-derived geometry and strong pelvic,
+  thigh, spine, and support cues without nudity or intimate self-touch.
+- Keep breasts, nipples, genitals, anus, and buttock cleft covered.
+- Use controlled confidence rather than an explicit orgasmic expression.
+- Do not sanitize the result into neutral wellness, dance, fitness, or ordinary
+  fashion posing.
+
+EROTIC
+
+- Use one coherent sensual but non-explicit lingerie, bodysuit, slip, open
+  robe, corsetry, hosiery, or sheer-layered fashion look. Select exact pieces
+  and state which stable opaque pieces provide the required coverage; do not
+  substitute a vague reference to lingerie or sensual clothing.
+- Garment scale is reduced to lingerie size: shoulders, back, waist, abdomen,
+  hips, outer buttocks, and most legs may be bare, while opaque cups or panels
+  cover nipples and a secure opaque brief or bodysuit panel covers genitals,
+  anus, and buttock cleft in every pose. It must be visibly more revealing than
+  aesthetic clothing but must not shrink to hardcore micro coverage.
+- Show substantial adult skin while keeping genitals and anus covered by
+  stable opaque garment pieces in all six poses.
+- Intensify the selected sexual geometry through pelvic presentation, open
+  thighs, arched spine, receptive or dominant gaze, and varied non-explicit
+  intimate self-touch.
+- Allow visible pressure on hair, face, neck, collarbone, covered chest, ribs,
+  waist, lower abdomen, outer hip, clothed buttock, or inner thigh above the
+  garment boundary.
+- Do not depict genital touching, nipple stimulation, masturbation,
+  penetration, an adult product in use, or participation by another person.
+
+HARDCORE
+
+- Treat hardcore as maximum-exposure, unmistakably explicit adult
+  sexual-position posing while preserving one static solo endpoint.
+- Use one specifically named minimal wearable styling system whose exact state
+  remains fixed in all six regions. Include at least one real garment or
+  wearable accessory with a stated material, color, attachment point, and
+  coverage state; do not leave the woman completely unstyled or describe her
+  only as nude.
+- Garment scale is minimal or micro: use narrow straps, an open garment,
+  body-chain construction, tiny decorative panels, or comparably small
+  wearable elements that occupy little body surface and do not reduce the
+  result to erotic lingerie coverage. The wearable look may leave breasts,
+  nipples, vulva, buttocks, and buttock cleft directly visible where the pose
+  and camera reveal them.
+- Adult breasts, nipples, vulva, and buttocks may be directly visible where the
+  selected geometry reveals them; do not hide decisive anatomy through
+  accidental hand, hair, prop, shadow, or garment drift.
+- Allow direct static self-touch of adult breasts, nipples, external vulva,
+  pubic mound, inner thighs, or buttocks when the selected hand is not
+  load-bearing.
+- Show no insertion, penetration, repetitive stimulation, masturbation
+  sequence, adult product in use, bodily fluid, partner, or narrative event.
+
+For every level, the woman is alert, physically safe, self-possessed, and able
+to leave every pose. Do not depict coercion, injury, pain, fear, intoxication,
+sleep, restraint, choking, dangerous flexibility, pressure on the neck, or
+inability to stop. Do not write the content-level name or compliance language
+into the final image prose.
+
+IDENTITY, WARDROBE, AND CONTINUITY
+
+Each Theme defines one stable woman with a specific adult age, facial
+structure, skin tone, height, build, body proportions, hair length, hair
+texture, hairstyle, makeup, and nail treatment. Vary those attributes across
+Themes without idealizing every woman into the same generic model.
+
+Use one simple, coherent outfit whose silhouette allows all six poses to remain
+readable. Preserve exact garment count, layer order, material, color, fit,
+coverage, seams, openings, closures, footwear, and accessories across all six
+regions and every Frame in the Theme. Clothing must respond credibly to
+gravity, compression, stretch, folds, and contact without changing design or
+coverage.
+
+The Theme premise must name the complete selected look rather than referring
+to content-level clothing in the abstract. Every Frame must fully restate that
+look in visible image language before describing the regions; do not rely on
+the Theme premise as omitted context. Within each region, state any visible
+fold, tension, displacement, or coverage relevant to that pose without
+inventing, removing, opening, or rearranging a piece.
+
+Keep accessories minimal and fixed. Do not let jewelry, loose fabric, props,
+or hair obscure hands, feet, load-bearing joints, torso direction, pelvic
+orientation, or required coverage. Use bare feet or one consistent secure
+footwear design appropriate to all six poses.
+
+SIX-REGION GRID CONTRACT
+
+Every Frame is one polished, text-free landscape board containing exactly six
+non-overlapping pose regions with restrained gutters, aligned edges, protected
+negative space, and one coherent outer composition.
+
+Use one dominant region and five supporting regions:
+
+1. the dominant region occupies about thirty-five to forty percent of the
+   canvas and contains the strongest full-body pose;
+2. each of the five smaller regions contains one other selected full-body pose
+   at a clearly readable scale.
+
+All six regions show the woman from head through feet without cropping. Give
+each region its assigned camera-angle blueprint; do not collapse the six
+angles into one repeated eye-level three-quarter view. Preserve the selected
+azimuth family, nearest visible side, camera height, pitch, and perspective
+while allowing only small framing adjustments needed to keep the whole body
+and support inside the region.
+
+The six viewpoints must feel intentionally different while remaining one
+coherent editorial board. Avoid voyeuristic hidden-camera framing, extreme
+wide-angle distortion, overhead flattening, low-angle limb enlargement,
+excessive foreshortening, shallow focus that erases joints, or a crop that
+hides support contacts.
+
+Each region contains exactly one complete depiction of the same woman. Bodies
+must not overlap gutters, continue across region boundaries, merge together,
+or be mistaken for six different women. Do not turn the board into a comic
+page, filmstrip, animation sheet, collage of moments, moodboard, or outfit
+catalog.
+
+TEXT-FREE BOARD
+
+Do not render a title, pose names, region labels, numbers, letters,
+measurements, arrows, diagrams, logos, captions, pseudo-text, watermarks, or
+signatures. Use pose-family names and region positions only as internal
+authoring references.
+
+STYLE, BACKGROUND, AND LIGHT
+
+Use hyper-realistic adult editorial pose photography with clean anatomy,
+credible support, and material clarity. Choose one restrained visual system:
+studio precision, warm private-suite editorial, sculptural monochrome, soft
+daylight boudoir, minimal theatrical staging, or an original equivalent.
+
+Use one shared background and one motivated lighting setup across the board.
+Keep skin tone, outfit color, material response, shadow direction, and exposure
+consistent in all six regions. Furniture must physically support a selected
+pose rather than serve as decorative clutter.
+
+Shared background means shared within one Frame only. It does not require
+different Frames or Themes to reuse the same occasion, room, background,
+furniture design, time of day, or lighting setup. Every new Frame must
+re-establish its own single coherent setting before describing the six regions.
+
+Light must reveal joints, limb separation, support contacts, pelvic
+orientation, muscle tension, fabric compression, and silhouette. Avoid crushed
+shadows over hands or feet, blown highlights on skin, retouching that erases
+anatomy, plastic skin, or dramatic effects that make a pose ambiguous.
+
+THEME-STAGE OUTPUT
+
+Use the Theme schema as follows:
+
+- `title`: an internal concise English name for the six-pose group; it is not
+  visible on the board.
+- `premise`: no more than two sentences. The first defines the stable adult
+  woman, outfit, content-level presentation, and the support geometry available
+  to all Frames without fixing one permanent occasion or room.
+  The second contains exactly six semicolon-separated pose-and-camera
+  blueprints satisfying the POSE BLUEPRINT CONTRACT, in intended board order.
+- `style`: one concise sentence defining grid hierarchy, background, palette,
+  camera discipline, and the range of distinct occasion treatments that Frames
+  may use; do not lock every Frame to one background.
+
+Return only Theme fields. Do not include Frame drafts, pool indices, selection
+explanations, randomness claims, schema commentary, or later-stage
+instructions.
+
+FRAME-STAGE OUTPUT
+
+Write one directly imageable paragraph with no fixed character or word count.
+Use only the CLI-requested output language. Do not mention theme.title, pose
+names as labels, pool entries, random selection, internal regions, content
+level, or generation instructions.
+
+Each Frame is one self-contained output record and becomes exactly one
+physical line in the published prompt file. Put the board overview and the
+complete descriptions of all six regions inside that Frame's single
+uninterrupted prose paragraph, with no line breaks. When multiple Frames are
+requested, every Frame must independently redescribe one complete six-region
+board. Never distribute one board across multiple Frames, use one Frame per
+region, or continue a board or region in the next Frame.
+
+Begin by naturally stating that one polished text-free six-pose female
+reference board fills a landscape canvas. Then establish the woman's stable
+identity, the exact content-level-compliant garment and accessory pieces with
+their materials, colors, fit, closures, footwear, and coverage, the shared
+occasion, location, background, grid hierarchy, and motivated lighting. Make
+the occasion visually specific rather than calling it only a studio, room, or
+interior. Do not omit the wearable look merely because it appears in the Theme
+premise. Describe the dominant region first and the five supporting regions in
+clear spatial order. For every region, state the complete held pose, support
+contacts, separate limb geometry, torso and pelvis mechanics, head and gaze,
+expression, garment response, exact camera azimuth, nearest visible side,
+camera height, pitch, perspective, and full-body framing. Use concrete phrases
+such as front three-quarter from left hip height with a modest upward pitch
+rather than vague labels such as dynamic angle or cinematic view.
+
+Describe only the final visible board. Do not narrate transitions, compare one
+pose with another, explain pose selection, offer alternatives, or include
+negative-prompt fields.
+
+FINAL VALIDATION
+
+Silently rewrite any Theme or Frame that fails one check:
+
+1. Exactly one Chinese woman aged 25 or older is depicted repeatedly; all six
+   bodies are references to her and no other person is present or implied.
+2. Exactly six distinct static pose blueprints were selected non-sequentially
+   from at least four pose families.
+3. Exactly six distinct camera-angle blueprints were assigned, using at least
+   four azimuth families, at least three height or elevation bands, and no
+   repeated or mirrored-equivalent angle combination.
+4. The board includes front-biased, true or near-true side, and rear-biased
+   views, and every region states its azimuth, nearest side, camera height,
+   pitch, and perspective explicitly.
+5. Every pose independently passes the SEXUAL-INTENT GATE through body
+   mechanics, not merely nudity, lingerie, expression, or camera angle.
+6. No pose has drifted into neutral dance, yoga, fitness, wellness, fashion,
+   portrait, sleep, or casual reclining.
+7. No two poses are near-duplicates in silhouette, body level, torso direction,
+   pelvis orientation, limb geometry, or support pattern.
+8. Every pose has a broad visible support, credible center of mass, traceable
+   spine and joints, separate left/right limb assignments, complete hands and
+   feet, and one physically possible held state.
+9. Every assigned camera angle keeps the defining pelvic cue, thigh geometry,
+   spinal curve, face, and all load-bearing contacts readable without an
+   isolated body-part crop or extreme perspective distortion.
+10. The selected content level controls wardrobe, coverage, self-touch,
+   expression, crop, and explicitness without removing sexual implication or
+   creating a partner or multi-step sexual sequence.
+11. The Theme and every Frame name a concrete wearable look whose exact
+   garments, accessories, materials, colors, fit, closures, footwear, and
+   coverage satisfy the selected content level; wardrobe is never implicit,
+   generic, or replaced by the single word nude.
+12. Garment scale follows the strict exposure ladder: full-size conventional
+   coverage for aesthetic, reduced lingerie-size coverage for erotic, and
+   minimal or micro-scale wearable elements for hardcore; adjacent levels
+   cannot be visually mistaken for one another.
+13. Identity, hair, outfit, coverage, footwear, accessories, makeup, and body
+   proportions remain identical in all six regions.
+14. One dominant region and five supporting regions form a clean,
+   non-overlapping landscape grid; every region shows one complete head-to-foot
+   body at a useful scale.
+15. No body crosses a gutter, merges with another view, gains extra anatomy, or
+   loses a load-bearing contact through crop, hair, clothing, or shadow.
+16. The entire board uses one coherent background, camera logic, palette, and
+   lighting setup.
+17. Each Frame names one concrete occasion and location shared by all six
+   regions, while different Frames and Themes use clearly different setting
+   families rather than repeating one generic studio, hotel, or apartment.
+18. Setting-specific support objects preserve every Theme-level support
+   geometry, body contact, center of mass, and silhouette without mixing
+   unrelated locations inside one board.
+19. The finished board contains no visible title, pose names, region labels,
+   numbers, letters, diagrams, captions, logos, or pseudo-text.
+20. Every Frame independently contains the board overview and all six expanded
+   region descriptions; no Frame is one region, a board fragment, or a
+   continuation of another Frame.
+21. The final output is one fluent paragraph on one physical line in the
+   requested language and contains only the finished image description.
+
+CURATED CAMERA-ANGLE POOL
+
+Each entry is a full-body viewpoint blueprint. Adapt the exact distance to the
+region size without changing its azimuth family, nearest visible side, height,
+pitch, or perspective class.
+
+- Direct frontal view from waist height with a level optical axis and restrained 65 mm perspective.
+- Direct frontal view from knee-to-hip height with a modest upward pitch and restrained 70 mm perspective.
+- Direct frontal view from head height with a modest downward pitch and restrained 70 mm perspective.
+- Left-front three-quarter view from hip height with a level optical axis and restrained 65 mm perspective.
+- Right-front three-quarter view from upper-torso height with a modest downward pitch and restrained 75 mm perspective.
+- Left-front three-quarter view from knee height with a modest upward pitch and restrained 75 mm perspective.
+- True left-side profile from waist height with a level optical axis and restrained 70 mm perspective.
+- True right-side profile from shoulder height with a modest downward pitch and restrained 85 mm perspective.
+- Near-side profile from hip height with a slight upward pitch and restrained 65 mm perspective.
+- Left-rear three-quarter view from hip height with a level optical axis and restrained 70 mm perspective.
+- Right-rear three-quarter view from knee-to-hip height with a modest upward pitch and restrained 75 mm perspective.
+- Left-rear three-quarter view from head height with a modest downward pitch and restrained 85 mm perspective.
+- Direct rear view from waist height with a level optical axis and restrained 70 mm perspective.
+- Direct rear view from knee-to-hip height with a modest upward pitch and restrained 75 mm perspective.
+- Direct rear view from head height with a modest downward pitch and restrained 85 mm perspective.
+
+CURATED POSE POOL
+
+Every entry below already passes the SEXUAL-INTENT GATE. Preserve its defining
+pelvic, thigh, spine, and support geometry when adapting exact angles,
+expression, wardrobe, and content-level coverage.
+
+FRONT-PRESENTING STANDING
+
+- Wall-backed open stance with shoulders and sacrum supported, feet wide, knees softly opened, pelvis pressed forward, and both forearms raised beside the head.
+- Wide frontal stance with feet grounded, knees bent outward, both hands pressing the inner thighs, chest lifted, and pelvis tipped toward the viewer.
+- One-foot platform stance with the raised knee opened sideways, same-side hand on the inner thigh, opposite hand at the waist, and pelvis square to camera.
+- Doorframe straddle with both hands gripping overhead sides, feet planted wide, lower back arched, and pelvis advanced between the legs.
+- Supported standing butterfly with back against a wall, soles close together on a low platform, knees opened, hands at the outer thighs, and pelvis fully supported.
+- Frontal heel-raised stance with feet wide on stable blocks, knees open, hands clasped overhead, and pelvis held forward beneath a long arched torso.
+- Standing thigh-draw with one foot grounded, opposite knee pulled outward and upward by both hands, pelvis facing front, and spine braced against a wall.
+- Corner-supported open stance with one forearm on each wall, feet staggered wide, knees flexed, chest forward, and pelvis visibly presented.
+- High side-leg support with one heel on a waist-high padded rail, standing foot grounded, hips opened toward camera, and both hands framing the raised thigh.
+
+REAR-PRESENTING STANDING AND HINGED
+
+- Standing forward hinge with feet wide, both palms on a low bench, spine long, knees soft, and pelvis shifted high and directly toward the rear-biased camera.
+- Wall-braced rear presentation with forearms high on the wall, feet stepped back and apart, lower back arched, and pelvis angled away from the wall.
+- Bench-supported asymmetrical hinge with one knee on the bench, opposite foot grounded, both hands braced forward, and lifted pelvis rotated three-quarters rearward.
+- Hands-on-thighs rear hinge with feet wide, knees bent, torso low, elbows straight, and pelvis elevated above the shoulders.
+- Doorframe rear arch with both hands gripping the frame at shoulder height, feet apart behind, chest drawn forward, and pelvis pressed backward into a deep supported curve.
+- One-foot-raised rear stance with toes on a low platform, supporting knee soft, hands on the wall, and pelvis tipped upward toward the camera.
+- Side-facing counter hinge with forearms on a padded counter, outside leg straight, inside knee bent and opened, and pelvis presented in a rear three-quarter view.
+- Wide wall squat hinge with back initially supported at the sacrum, torso folded forward between open knees, hands on the thighs, and pelvis kept high.
+- Standing crossed-support hinge with one ankle crossed behind the other, both palms on a bench, torso diagonal, and pelvis twisted into a clear rear presentation.
+
+SEATED AND STRADDLING
+
+- Bench-edge open seat with pelvis fully supported, feet wide and flat, knees opened, palms gripping the edge beside the hips, and torso arched toward the viewer.
+- Reverse chair straddle with thighs opened around the backrest, pelvis on the seat, forearms folded across the top rail, and chest pressing forward above the support.
+- Forward chair straddle with pelvis facing the backrest, feet grounded wide, hands gripping the upper rail, spine arched, and hips drawn back on the seat.
+- Low-cube spread seat with feet planted beyond shoulder width, knees open, one hand between the thighs on the cube, opposite hand behind the head, and pelvis frontal.
+- Floor V-seat with legs spread diagonally, palms planted behind the pelvis, chest lifted, and hips tipped forward between the thighs.
+- Edge-seated thigh lift with one foot grounded, opposite knee drawn high and outward by the same-side hand, free palm behind the pelvis, and lower torso exposed frontally.
+- Side-saddle open seat with one thigh across a padded chair, opposite leg opened away with foot grounded, rear hand on the backrest, and pelvis rotated toward camera.
+- Reclined bench straddle with upper back supported on a broad cushion, pelvis on the bench edge, feet grounded wide, knees open, and arms extended overhead.
+- High-stool open suspension with pelvis securely supported, legs hanging wide with toes on separate foot bars, hands holding the seat edges, and chest arched upward.
+
+KNEELING AND HEEL-SUPPORTED
+
+- Wide tall kneel with knees separated on a padded mat, pelvis pushed forward, hands pressing the rear waist, chest arched, and thighs forming an open frontal frame.
+- Wide heel seat with hips supported between the heels, knees opened, hands on the inner thighs, spine upright, and pelvis facing the viewer.
+- Kneeling rear presentation with knees apart, forearms on a low bench, chest lowered, lower back arched, and pelvis held high above the knees.
+- Half-kneeling open lunge with one foot flat, opposite knee grounded, front knee opened outward, same-side hand on the inner thigh, and pelvis rotated toward camera.
+- One-knee platform mount with grounded knee on a cushion, opposite foot on a low cube, both hands on the raised thigh, and pelvis advanced into the open angle.
+- Upright kneeling back arc with shins grounded, one hand on a heel, opposite hand on the upper thigh, pelvis forward, and chest opened diagonally.
+- Asymmetric wide kneel with one forearm grounded, opposite knee opened sideways, free hand at the rear waist, and pelvis twisted into a rear three-quarter presentation.
+- Bed-edge kneel with knees wide on the mattress, hands gripping the headboard, torso vertical, and pelvis tipped forward between the thighs.
+- Folded kneel with chest and forearms supported on a cushion, knees spread, hips remaining above the knees, and spine curved into a clear receptive silhouette.
+
+CROUCHED AND SQUATTING
+
+- Deep wide squat with feet flat, knees opened, elbows inside the thighs, hands on the upper legs, spine tall, and pelvis low but frontal.
+- Wall-supported open squat with sacrum against the wall, feet wide, thighs near horizontal, palms on the inner knees, and pelvis tipped toward camera.
+- Low rear-facing squat with feet wide, heels grounded, hands on a low platform behind, chest lifted, and pelvis suspended visibly between the thighs.
+- Three-point presenting crouch with both feet grounded, one palm on the floor, opposite hand on the inner thigh, knees spread, and pelvis angled rearward.
+- Narrow heel-raised crouch with knees opened around the torso, one hand braced on a cube, opposite hand at the lower abdomen, and pelvis facing front.
+- Side-lunge crouch with one knee deeply bent, opposite leg extended, supporting palm inside the bent foot, free hand on the open thigh, and pelvis in three-quarter view.
+- Bench-facing low straddle with hands on the bench, feet wide, knees bent outward, torso inclined forward, and pelvis held back at seat height.
+- Supported frog squat with forearms on a padded cube, feet and knees wide, spine arched, and pelvis directed toward a rear-biased camera.
+- Split-level crouch with one foot on a low platform, opposite foot on the floor, both knees open, hands behind the head, and pelvis centered between unequal supports.
+
+SUPINE AND PELVIS-LIFTED
+
+- Supine open-knee presentation with shoulders and pelvis grounded, feet flat and wide, knees dropped outward, one hand on the lower abdomen, and one arm overhead.
+- Supported pelvic bridge with shoulders and feet grounded, knees open, pelvis lifted, hands holding the outer hips, and torso forming a controlled arch.
+- Supine raised V with spine grounded, both legs lifted and spread, hands supporting separate outer thighs, knees soft, and pelvis square to the viewer.
+- Bed-edge butterfly recline with back supported on the mattress, pelvis near the edge, soles together, knees opened, hands on the inner thighs, and head turned toward camera.
+- Wall-supported open legs with sacrum close to the wall, heels planted high and wide, knees soft, arms extended overhead, and pelvis facing front.
+- Supine asymmetrical leg lift with one foot flat, opposite leg raised and opened sideways, same-side hand behind the thigh, free hand at the waist, and pelvis level.
+- Shoulder-supported hip lift with shoulders and upper arms grounded, pelvis elevated, knees bent and separated, feet planted on a broad padded block.
+- Reclined chair-edge arch with upper back across a broad seat, feet wide and grounded, pelvis lifted below seat height, and both hands gripping the chair sides.
+- Supine compact opening with knees drawn toward the torso then held wide by hands behind the thighs, sacrum grounded, feet separated, and pelvis fully front-facing.
+
+SIDE-LYING AND TWISTED
+
+- Side-lying open-knee pose with bottom leg straight, top knee bent high and planted behind, bottom forearm supporting the torso, and pelvis rolled toward camera.
+- Supported side straddle with bottom thigh grounded, top leg opened upward onto a padded rail, one hand on the inner thigh, and pelvis facing three-quarters front.
+- Side-lying hip lift with bottom forearm and knee grounded, pelvis raised, top knee opened, top hand on the outer hip, and torso arched laterally.
+- Twisted side recline with shoulders partly supine, hips stacked, top knee drawn across the body, one hand behind the head, and pelvis exposed in an open spiral.
+- Bed-edge side lounge with torso supported on one elbow, bottom leg hanging to the floor, top knee opened on the mattress, and free hand at the inner thigh.
+- Side-lying scissor with bottom leg extended forward, top leg extended backward, torso supported on both forearms, and pelvis twisted into a rear presentation.
+- Curled side opening with knees initially stacked but the top knee lifted by the same-side hand, bottom arm under the head, and pelvis directed toward camera.
+- Side plank straddle with bottom forearm and foot grounded, pelvis raised, top knee bent and opened forward, and top hand holding the upper thigh.
+- Side-facing cushion mount with one knee and shin on a broad cushion, opposite foot grounded behind, both hands on the cushion, and pelvis angled downward and rearward.
+
+PRONE AND CHEST-SUPPORTED
+
+- Prone frog with chest and abdomen supported on a thick mat, knees bent wide, lower legs angled outward, forearms forward, and pelvis pressed visibly into the support.
+- Chest-down rear presentation with chest on a broad cushion, knees wide beneath the hips, forearms forward, and pelvis elevated above the shoulders.
+- Prone single-knee opening with one leg straight, opposite knee drawn high beside the torso, both forearms supporting the chest, and pelvis rotated toward camera.
+- Bed-edge prone hinge with torso supported from chest to abdomen, feet grounded wide behind the edge, hands gripping the mattress, and pelvis projecting rearward.
+- Prone bent-knee display with pelvis grounded, knees spread, feet lifted and separated, forearms stacked under the chin, and lower back softly arched.
+- Cushion-supported prone arch with a firm bolster beneath the pelvis, legs spread behind, palms under the shoulders, and chest lifted while the hips remain supported.
+- Prone diagonal opening with one forearm under the chest, opposite arm overhead, one knee opened sideways, other leg straight, and pelvis twisted three-quarters front.
+- Low forearm rear pose with forearms and thighs grounded, chest lifted, knees opened, lower back concave, and pelvis visibly tilted upward.
+- Mattress-corner prone straddle with abdomen supported at the corner, one leg extended along each edge, elbows beneath the shoulders, and pelvis centered over the support.
+
+HANDS-AND-KNEES AND FOREARM-SUPPORTED
+
+- Arched four-point support with palms below shoulders, knees wide below hips, spine concave, chest forward, and pelvis tipped upward toward a rear-biased camera.
+- Forearm-and-knee rear presentation with forearms parallel, knees spread, chest low, hips high, and head turned into a direct side glance.
+- Three-point open-knee support with both palms and one knee grounded, opposite knee lifted and opened sideways, shoulders level, and pelvis rotated rearward.
+- Wide-knee tabletop with palms forward of the shoulders, knees beyond hip width, lower back arched, and pelvis held directly above the open thighs.
+- Bed-edge all-fours with hands on the mattress and feet on the floor, knees softly bent, torso horizontal, and pelvis projected backward at mattress height.
+- One-knee platform support with both hands and one knee on a broad cube, opposite foot grounded wide, spine arched, and pelvis twisted toward the open side.
+- Forearm puppy presentation with knees wide under the hips, forearms extended, chest lowered, pelvis remaining high, and gaze turned sideways without neck compression.
+- Side-rotated all-fours with one palm and both knees grounded, free arm behind the head, chest opened laterally, and pelvis kept raised and rear-facing.
+- Supported tabletop straddle with both palms on a low bench, feet wide on the floor, knees bent, torso near horizontal, and pelvis held high behind the support.
+
+CURATED SELF-TOUCH POOL
+
+These gestures may be layered onto compatible base poses under the SELF-TOUCH
+SELECTION and content-level rules. A gesture must never replace a required
+support contact.
+
+NON-EXPLICIT INTIMATE TOUCH
+
+- Fingertips resting along one collarbone while the opposite hand preserves the base pose's support.
+- One palm cupping the nape while the opposite hand rests at the rear waist.
+- One hand spread over the covered upper chest while the other rests on the inner thigh.
+- Both forearms crossed beneath the covered chest with gentle upward support and relaxed shoulders.
+- One palm centered on the lower abdomen above the garment boundary while the opposite arm opens away.
+- One hand spread over the side waist while the opposite fingertips contact the lower ribs.
+- One palm resting on the outer hip with fingers following the pelvic crest.
+- Fingertips resting on the inner thigh above the knee and below every opaque garment boundary.
+- Both hands resting separately on the inner thighs without approaching covered genitals.
+- One hand cupping a buttock over opaque clothing while the other remains free or load-bearing.
+
+DIRECT STATIC ADULT SELF-TOUCH - HARDCORE ONLY
+
+- One palm holding the underside of one bare breast with fingers spread and no squeezing motion.
+- Both hands cupping separate bare breasts in a fixed symmetrical hold without rhythmic stimulation.
+- Thumb and forefinger holding one nipple in a single static contact without pulling or repeated movement.
+- One open palm resting over the pubic mound and external vulva without insertion or repetitive rubbing.
+- Two fingertips resting externally along the closed vulvar cleft without insertion, spreading, or motion.
+- One hand resting between the upper inner thighs while the other opens the torso, with contact outside every body opening.
+- One palm pressing gently against one bare buttock while the opposite hand rests at the waist.
+- Both hands holding the outer buttocks in a fixed pose without spreading, impact, or repetitive movement.
