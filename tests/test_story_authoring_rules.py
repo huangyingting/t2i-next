@@ -19,9 +19,33 @@ def test_story_rules_compile_only_the_selected_content_level() -> None:
 
     for stage in StoryStage:
         text = rules.text_for(stage)
-        assert "Use the adult erotic narrative level" in text
-        assert "Use the aesthetic narrative level" not in text
-        assert "Use the explicit erotic narrative level" not in text
+        assert "本次使用 极致情色级（erotic）" in text
+        assert "本次使用 美学级（aesthetic）" not in text
+        assert "本次使用 赤裸裸的性描写（hardcore）" not in text
+
+
+def test_story_content_level_rules_match_prompt_pipeline() -> None:
+    prompt_rules = (
+        REPOSITORY_ROOT
+        / "src"
+        / "t2i_prompt_pipeline"
+        / "rule_packs"
+        / "system"
+        / "content_levels"
+    )
+    story_rules = (
+        REPOSITORY_ROOT
+        / "src"
+        / "t2i_story_pipeline"
+        / "rule_packs"
+        / "system"
+        / "content_levels"
+    )
+
+    for filename in ("aesthetic.rules", "erotic.rules", "hardcore.rules"):
+        assert (story_rules / filename).read_text(encoding="utf-8") == (
+            prompt_rules / filename
+        ).read_text(encoding="utf-8")
 
 
 def test_story_rules_append_optional_user_files_in_stage_order(tmp_path) -> None:

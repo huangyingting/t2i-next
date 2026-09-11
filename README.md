@@ -32,8 +32,9 @@ uv run t2i-story generate \
 内部换行会原样保留。`--female-count` 和 `--male-count` 可以分别约束每个主题
 及每帧中的成年女性和成年男性人数；省略时遵循 Story Description 明示的人物。
 
-story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不复用
-`t2i_prompt_pipeline` 的规则。内置规则位于
+story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在运行时加载
+`t2i_prompt_pipeline` 的规则。两个流水线的三个 content-level 文件采用相同契约
+并由测试保证逐字一致，其他阶段规则保持独立。story 内置规则位于
 `src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
 schema、人物一致性和内容等级。媒介、版式、区域、视图、比例关系及其他特定视觉
 行为由 Story Description 自己定义，Python 不识别具体 `story-inputs/*.txt`

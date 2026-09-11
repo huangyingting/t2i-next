@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
 from pathlib import Path
 
 import pytest
@@ -246,7 +245,7 @@ def test_chinese_prompts_allow_story_required_english_labels_and_copy() -> None:
 
 
 @pytest.mark.parametrize("output_language", ("chinese", "english"))
-def test_system_instructions_are_written_entirely_in_english(
+def test_system_instructions_keep_shared_rule_language_across_output_languages(
     output_language: str,
 ) -> None:
     request = make_story_request(output_language=output_language)
@@ -261,7 +260,9 @@ def test_system_instructions_are_written_entirely_in_english(
         frame_messages(request, make_theme())[0].content,
     )
 
-    assert all(re.search(r"[\u4e00-\u9fff]", prompt) is None for prompt in prompts)
+    for prompt in prompts:
+        assert "The Story Description is authoritative" in prompt
+        assert "本次使用 美学级（aesthetic）" in prompt
 
 
 @pytest.mark.parametrize(
@@ -269,26 +270,26 @@ def test_system_instructions_are_written_entirely_in_english(
     (
         (
             ContentLevel.AESTHETIC,
-            "Use the aesthetic narrative level",
+            "本次使用 美学级（aesthetic）",
             (
-                "Use the adult erotic narrative level",
-                "Use the explicit erotic narrative level",
+                "本次使用 极致情色级（erotic）",
+                "本次使用 赤裸裸的性描写（hardcore）",
             ),
         ),
         (
             ContentLevel.EROTIC,
-            "Use the adult erotic narrative level",
+            "本次使用 极致情色级（erotic）",
             (
-                "Use the aesthetic narrative level",
-                "Use the explicit erotic narrative level",
+                "本次使用 美学级（aesthetic）",
+                "本次使用 赤裸裸的性描写（hardcore）",
             ),
         ),
         (
             ContentLevel.HARDCORE,
-            "Use the explicit erotic narrative level",
+            "本次使用 赤裸裸的性描写（hardcore）",
             (
-                "Use the aesthetic narrative level",
-                "Use the adult erotic narrative level",
+                "本次使用 美学级（aesthetic）",
+                "本次使用 极致情色级（erotic）",
             ),
         ),
     ),
@@ -312,8 +313,7 @@ def test_prompts_compile_only_selected_content_level(
         prompt = messages[0].content
         assert required in prompt
         assert all(item not in prompt for item in excluded)
-        assert "more specific" in prompt
-        assert "without importing requirements from another content level" in prompt
+        assert "不要把内容等级名称、英文名或合规说明写进生成内容" in prompt
 
 
 @pytest.mark.parametrize(
