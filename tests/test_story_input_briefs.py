@@ -353,11 +353,26 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "CARICATURE AND CONTROLLED DISTORTION" in normalized
     assert "Exaggerate decisively" in normalized
     assert "SATIRICAL CARICATURE HARD GATE" in normalized
-    assert "roughly two to four times its ordinary visual scale" in normalized
-    assert "One monumental metaphor structure occupies roughly one third" in (
+    assert "one controlled caricatural exaggeration" in normalized
+    assert "thirty to forty percent of the image" in normalized
+    assert "Exactly one supporting symbol" in normalized
+    assert "CONTROLLED WHOLE-BODY EXAGGERATION" in normalized
+    assert "Every adult appears as one intact photographic person" in normalized
+    assert "Use no more than one anatomical or silhouette exaggeration" in normalized
+    assert "Never cut, paste, duplicate, float, detach, fold, splice" in normalized
+    assert "Do not exaggerate breasts, buttocks, genitals, tongue" in normalized
+    assert "Do not use exact body-part canvas percentages" in normalized
+    assert "The second sentence must name each adult" in normalized
+    assert "complete head-to-foot outfit" in normalized
+    assert "including top, bottom or one-piece garment, and footwear" in normalized
+    assert "Do not describe any body change before all complete outfits are locked" in (
         normalized
     )
-    assert "A single long arm, a mildly large hand" in normalized
+    assert "Exaggerate decisively, but select exactly one item" in normalized
+    assert "Never assign a second item from the list to the same person" in normalized
+    assert "scaled between seventy and one hundred thirty percent" in normalized
+    assert "without changing the size or shape of any facial organ" in normalized
+    assert "Never resize or paste a face or isolated organ" in normalized
     assert "All faces must remain unmistakably mature" in normalized
     assert "Reject smooth doll faces, huge sparkling eyes" in normalized
     assert "DRAW FIRST, DESCRIBE SECOND" in normalized
@@ -382,6 +397,8 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "Every symbol must have one clear referent" in normalized
     assert "CONTENT-LEVEL INTEGRATION" in normalized
     assert "At aesthetic level" in normalized
+    assert "name one complete opaque outfit for each adult" in normalized
+    assert "Show no bare torso, transparent garment, lingerie" in normalized
     assert "At erotic level" in normalized
     assert "At hardcore level" in normalized
     assert "NON-NEGOTIABLE PRIORITY" in normalized
