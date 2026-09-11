@@ -128,8 +128,14 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
         ),
         "edo-warai-e.txt": (
             "SPATIAL AND CONTACT GEOMETRY",
-            "PHOTOGRAPHIC REALISM",
+            "PERFORMED UKIYO-E TRANSLATION",
+            "DISTANCE-READ FLATNESS GATE",
             "MALE BODY VOCABULARY GATE",
+        ),
+        "ming-gongbi-mixi-tu.txt": (
+            "GONGBI LINE DISCIPLINE",
+            "LAYERED GONGBI COLOR",
+            "AGED SILK AND PIGMENT PATINA",
         ),
     }
 

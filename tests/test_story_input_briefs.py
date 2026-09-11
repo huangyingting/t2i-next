@@ -378,6 +378,178 @@ def test_edo_warai_e_brief_respects_all_content_levels() -> None:
     assert "Reject any Frame that depends on nudity" not in normalized
 
 
+def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "PERFORMED UKIYO-E TRANSLATION" in brief
+    assert "UKIYO-E COLOR GATE" in brief
+    assert "DISTANCE-READ FLATNESS GATE" in brief
+    assert "EDO MATERIAL PATINA" in brief
+    assert "Flat, borderless nishiki-e theatrical picture plane" in normalized
+    assert "enacted by real adult performers" in normalized
+    assert "not a literal woodblock print" in normalized
+    assert "keyblock-like contour separation" in normalized
+    assert "nishiki-e palette" in normalized
+    assert "flat separated color blocks" in normalized
+    assert "one bokashi-style gradient" in normalized
+    assert (
+        "At thumbnail size and viewing distance, every Frame must read as a flat "
+        "nishiki-e composition" in normalized
+    )
+    assert "exactly three shallow stacked bands" in normalized
+    assert "dominant flat silhouettes" in normalized
+    assert "no volumetric light-and-shadow modeling" in normalized
+    assert "Bokashi belongs to one background plane" in normalized
+    assert "Close inspection may reveal live performers" in normalized
+    assert "must never overturn the flat distance read" in normalized
+    assert (
+        '"Flat, borderless nishiki-e theatrical picture plane in a '
+        "[chūban-like or ōban-like] [vertical or horizontal] proportion, enacted "
+        "by real adult performers. Exactly three shallow stacked picture bands: "
+        "a lower prop strip, a central adult tableau, and an upper architectural "
+        "strip, all parallel to the image surface. Adult faces, limbs, garments, "
+        "and furniture read as contour-enclosed matte color shapes with crisp "
+        "overlaps and two-step values; contour and flat shadow shapes carry all "
+        "form. "
+        "Edo-period material patina appears only as bounded wear on physical "
+        'costumes, props, and set surfaces."' in normalized
+    )
+    assert "all adults remain in the central picture band" in normalized
+    assert "No near-far scale change or projecting foreshortened limbs" in normalized
+    assert "Repeat this exact flat-medium lock immediately after" in normalized
+    assert (
+        "All visible bodies, garments, props, and room planes return immediately "
+        "to contour-enclosed matte color shapes on the same flat three-band "
+        "nishiki-e surface." in normalized
+    )
+    assert (
+        "combine exactly two close-read performer cues chosen only from" in normalized
+    )
+    assert "Target 700 to 900 English words" in normalized
+    assert "never exceed 1000 English words" in normalized
+    assert "one solvable three-dimensional arrangement" not in normalized
+    assert "foreground, middle ground, and background" not in normalized
+    assert "live-action image of real adult performers" not in normalized
+    assert "individual hairs" not in normalized
+    assert "subtle skin variation" not in normalized
+    assert "three to five specific signs of ordinary age and handling" in normalized
+    assert "protected seams remain richer" in normalized
+    assert "Distribute wear according to touch, friction, smoke, moisture" in normalized
+    assert "must not turn the whole image brown, beige, gray, or desaturated" in (
+        normalized
+    )
+    assert "Keep adult skin as a warm, bounded matte field" in normalized
+    assert "global sepia or yellow cast" in normalized
+    assert "photographic grain" in normalized
+    assert "scanned-print damage" in normalized
+    assert "Return only positive prose describing the depicted scene" in normalized
+    assert "Enforce every rule silently" in normalized
+    assert "Every word must belong to the image-generation description" in normalized
+    assert '"The current fully clothed non-erotic interaction is"' in normalized
+    assert '"The current erotic but non-explicit interaction is"' in normalized
+    assert '"The current explicit consensual adult sexual act is"' in normalized
+    assert "name the occurring act directly" in normalized
+    assert "Prussian blue is permitted only for settings from the 1820s onward" in (
+        normalized
+    )
+    assert "full-frame or medium-format camera" not in normalized
+    assert "mm equivalent" not in normalized
+    assert "aperture behavior" not in normalized
+    assert "depth of field" not in normalized
+
+
+def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "ming-gongbi-mixi-tu.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "LATE-MING JIANGNAN WORLD" in brief
+    assert "GONGBI LINE DISCIPLINE" in brief
+    assert "LAYERED GONGBI COLOR" in brief
+    assert "CHINESE PAINTING SPACE" in brief
+    assert "FLAT GONGBI PICTURE-PLANE GATE" in brief
+    assert "ARCHIVAL FACSIMILE MEDIUM LOCK" in brief
+    assert "HUMANIZED GONGBI FIGURE DETAIL" in brief
+    assert "BORDERLESS FULL-BLEED SILK GATE" in brief
+    assert "AGED SILK AND PIGMENT PATINA" in brief
+    assert "anonymous late-Ming Jiangnan workshop album leaf" in normalized
+    assert "between 1573 and 1644" in normalized
+    assert "prepared silk or sized xuan paper" in normalized
+    assert "gossamer-line delicacy" in normalized
+    assert "iron-wire steadiness" in normalized
+    assert "ruled-line jiehua discipline" in normalized
+    assert "visual logic of sanfan jiuran" in normalized
+    assert "five to seven principal color families" in normalized
+    assert "scattered perspective" in normalized
+    assert "flat picture plane must dominate the first read" in normalized
+    assert "minimal tonal modeling" in normalized
+    assert "no volumetric light-and-shadow modeling" in normalized
+    assert "Age must be visible at first glance and thumbnail size" in normalized
+    assert "roughly two-thirds of the impression" in normalized
+    assert "one-third from visible material age" in normalized
+    assert "Full-canvas continuous-silk flat archival facsimile" in normalized
+    assert "two to four shallow, stacked, overlapping bands" in normalized
+    assert "contour-enclosed color fields" in normalized
+    assert "darker tea-brown edge oxidation" in normalized
+    assert "one shallow age crease" in normalized
+    assert "aged prepared-silk painting extends continuously to every canvas edge" in (
+        normalized
+    )
+    assert (
+        "no visible mounting margin, mat, frame, border, or rectangular edge band"
+        in normalized
+    )
+    assert "Edge patina must break, vary, and dissolve inward irregularly" in normalized
+    assert "Human specificity comes from line drawing and bounded washes" in normalized
+    assert "subtle facial asymmetry" in normalized
+    assert "exactly three restrained skin tones" in normalized
+    assert "convincingly human but unmistakably painted" in normalized
+    assert "flat archival facsimile of a hand-painted antique silk album leaf" in (
+        normalized
+    )
+    assert "borderless full-bleed composition" in normalized
+    assert (
+        "Every person, garment, object, and architectural plane exists only as ink "
+        "contour and pigment on silk" in normalized
+    )
+    assert "Repeat this compact medium lock immediately after" in normalized
+    assert "use exactly four descriptive sentences" in normalized
+    assert "No sentence after the fixed five-sentence opening may exceed 60" in (
+        normalized
+    )
+    assert 'literal phrase "three shallow stacked bands"' in normalized
+    assert "between 350 and 750 English words" in normalized
+    assert "Count before returning" in normalized
+    assert (
+        "The entire image remains a visibly aged, flat, hand-painted gongbi silk "
+        "album leaf made from ink contours and mineral pigment" in normalized
+    )
+    assert "three to five localized, physically plausible age cues" in normalized
+    assert "Japanese ukiyo-e" in normalized
+    assert "modern guochao illustration" in normalized
+    assert "Do not generate readable Chinese" in normalized
+    assert '"The current explicit consensual adult sexual act is"' in normalized
+    assert "directly naming or describing male reproductive anatomy" in normalized
+    assert "Every human mentioned in the Theme or Frame must belong" in normalized
+    assert "Do not introduce an absent spouse" in normalized
+
+    frame_contract = brief.split("\nFRAME CONTRACT\n", maxsplit=1)[1]
+    for photography_trigger in (
+        "observed-from-life",
+        "lifelike",
+        "living adult sitters",
+        "subtle flesh variation",
+        "credible weight",
+        "painted from observation",
+    ):
+        assert photography_trigger not in frame_contract
+
+
 def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "pose.txt").read_text(encoding="utf-8")
     normalized = " ".join(brief.split())

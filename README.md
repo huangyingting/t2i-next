@@ -48,6 +48,7 @@ schema、人物一致性和内容等级。媒介、版式、区域、视图、�
 story-inputs/
 ├── creative.txt
 ├── edo-warai-e.txt
+├── ming-gongbi-mixi-tu.txt
 ├── ...
 └── rules/
     ├── common.rules
