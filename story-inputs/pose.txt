@@ -16,7 +16,7 @@ or a comparably strong combination. Neutral dance, yoga, fitness, wellness,
 fashion, portrait, and ordinary reclining poses are invalid.
 
 Use exactly one adult Chinese woman aged 25 or older and no other people. This
-brief is designed for CLI cast settings of one woman and zero men. Repeated
+brief requires a cast of one woman and zero men. Repeated
 depictions show one woman six times for design reference and count as one cast
 member. Do not add a partner, imply an invisible body, shape hands around
 absent anatomy, or include companions, assistants, crowds, silhouettes,
@@ -266,7 +266,7 @@ counter-support.
 
 CONTENT LEVEL CONTROLS PRESENTATION
 
-The CLI-selected content level controls wardrobe, coverage, self-touch,
+The requested content level controls wardrobe, coverage, self-touch,
 expression, crop, and explicitness, but it never removes the sexual intent of
 the selected pose. This remains one static solo reference board rather than a
 story event or an interaction with an absent person.
@@ -468,7 +468,7 @@ instructions.
 FRAME-STAGE OUTPUT
 
 Write one directly imageable paragraph with no fixed character or word count.
-Use only the CLI-requested output language. Do not mention theme.title, pose
+Use only the requested output language. Do not mention theme.title, pose
 names as labels, pool entries, random selection, internal regions, content
 level, or generation instructions.
 

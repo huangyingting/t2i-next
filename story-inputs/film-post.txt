@@ -1,6 +1,6 @@
 BRIEF
 
-Create original theatrical movie-poster Themes for fictional feature films. For each Theme, first invent one compelling story concept and English title, then generate exactly the CLI-requested number of independent poster designs, each free to develop its own tagline and campaign emphasis. Every result must be a finished, high-impact one-sheet with integrated typography, not a film still, storyboard, technical grading demonstration, title card, or plain photograph with text added afterward.
+Create original theatrical movie-poster Themes for fictional feature films. For each Theme, first invent one compelling story concept and English title, then create independent parallel poster designs, each free to develop its own tagline and campaign emphasis. Every result must be a finished, high-impact one-sheet with integrated typography, not a film still, storyboard, technical grading demonstration, title card, or plain photograph with text added afterward.
 
 Every readable word inside the poster and every final prompt must be grammatical English. This includes props, documents, signs, maps, stamps, seals, screens, clothing, architecture, and environmental graphics. Use only English Latin letters, Arabic numerals, and standard punctuation; never show another writing system, gibberish, pseudo-letters, or placeholder copy.
 
@@ -10,13 +10,23 @@ Every list below is open-ended inspiration, not a menu, enum, preset library, qu
 
 CAST, ADULTHOOD, AND CONTENT
 
-Treat the CLI-requested cast as a creative seed, not a fixed visible headcount. A story or poster may foreground a subset, introduce additional story-relevant adults, or represent someone through absence, objects, text, shadow, or off-screen implication. Every depicted person must be an unmistakably mature Chinese adult aged 25 or older, alert, willing, responsive, and able to stop. Follow the CLI content level and its safety rules. When a person recurs, preserve identity, age, face, hair, body proportions, scars, garments, and other defining anchors.
+Use the exact requested cast and no additional people. Every requested person
+must appear clearly in every Theme premise and every poster; do not replace a
+person with absence, an object, text, shadow, or off-screen implication. Every
+depicted person must be an unmistakably mature Chinese adult aged 25 or older,
+alert, willing, responsive, and able to stop. Follow the requested content level.
+Preserve identity, age, face, hair, body proportions, scars, garments, and other
+defining anchors throughout a Theme.
 
-Both the fictional-film content and the poster's central creative concept must be generated specifically for the current CLI content level. The level must shape the premise, conflict, action, symbolism, composition, typography, visual emphasis, and emotional tone; do not reuse a concept from another level with only a label, pose, clothing, or isolated detail changed.
+Both the fictional-film content and the poster's central creative concept must be generated specifically for the requested content level. The level must shape the premise, conflict, action, symbolism, composition, typography, visual emphasis, and emotional tone; do not reuse a concept from another level with only a label, pose, clothing, or isolated detail changed.
 
 STORY CONCEPT FIRST
 
-Generate exactly the Theme and Frames-per-Theme counts requested by the CLI. Each Theme must define the mature Chinese cast its story needs; a specific Chinese place, period, season, and social world; one immediate conflict or impossible choice with emotional and practical stakes; one memorable relationship, secret, object, location, or motif; a distinct genre and tone; and an invented English title of one to five words.
+Each Theme must define the complete requested Chinese adult cast; a specific
+Chinese place, period, season, and social world; one immediate conflict or
+impossible choice with emotional and practical stakes; one memorable
+relationship, secret, object, location, or motif; a distinct genre and tone;
+and an invented English title of one to five words.
 
 Make the concept instantly understandable yet specific enough to inspire symbolism. Transform generic premises through an unusual setting, contradiction, profession, ritual, object, or consequence. Derive the title from the story and keep it exact across the Theme. Let each poster invent a distinct English tagline of three to twelve words that suits its particular creative direction. Do not use existing movie titles, franchises, copyrighted characters, real studios, or recognizable fictional worlds.
 

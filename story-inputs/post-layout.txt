@@ -4,7 +4,7 @@ Create varied, copy-ready image prompts for finished portrait poster designs in 
 
 Use Subject, Scene, Composition, Style, Text, Details, and Output as seven internal planning concerns, not as a literal response format. Cover all seven concerns in that conceptual order while integrating them into one compact, natural, directly imageable prompt. Do not print those concern names, field labels, prefixes, headings, a template, planning notes, explanations, or optional branches.
 
-Every readable word inside the generated image must be grammatical English written with ASCII Latin letters. This includes the headline, subtitle, labels, credits, quotations, dates, badges, annotations, newspapers, documents, tickets, packaging, signs, clothing, film strips, and environmental graphics. The descriptive prompt follows the CLI output language, but that language must never leak into the rendered image.
+Every readable word inside the generated image must be grammatical English written with ASCII Latin letters. This includes the headline, subtitle, labels, credits, quotations, dates, badges, annotations, newspapers, documents, tickets, packaging, signs, clothing, film strips, and environmental graphics. The descriptive prompt follows the requested output language, but that language must never leak into the rendered image.
 
 ENGLISH-ONLY IMAGE TEXT GATE
 
@@ -37,11 +37,11 @@ The reference establishes this design grammar only. Do not reproduce its people,
 
 CAST AND ADULTHOOD
 
-When people are requested, use the exact CLI-requested human cast and no additional people. Every depicted person must be an unmistakably mature Chinese adult aged 25 or older, alert, willing, responsive, and able to stop. Preserve identity, age, face, hair, body proportions, garments, and other anchors throughout a Theme.
+When people are requested, use the exact requested human cast and no additional people. Every depicted person must be an unmistakably mature Chinese adult aged 25 or older, alert, willing, responsive, and able to stop. Preserve identity, age, face, hair, body proportions, garments, and other anchors throughout a Theme.
 
 CONTENT-LEVEL VISIBILITY CONTRACT
 
-Apply only the branch matching the CLI-selected content level. The selected
+Apply only the branch matching the requested content level. The selected
 branch is a hard visual contract for the photographic content, not a mood,
 theme name, text tone, wardrobe suggestion, or optional supporting detail.
 
@@ -90,7 +90,8 @@ to show adulthood, identity, willingness, and response at the same time.
 
 THEMES AND FRAMES
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the CLI. Each Theme establishes one design problem: a specific subject, purpose, context, exact headline, palette family, and visual identity.
+Each Theme establishes one design problem: a specific subject, purpose,
+context, exact headline, palette family, and visual identity.
 
 Use the Theme schema deliberately: `title` is an original grammatical English headline of one to six words that every Frame must reproduce exactly; `premise` defines the shared subject, context, and one content-level visibility anchor that states the required current interaction or non-explicit presentation for every Frame; `style` locks the palette family, material language, and visual identity in one concise sentence. Do not translate the title. Never replace the visibility anchor with a mood, slogan, future action, preparation, or typography.
 
@@ -168,4 +169,4 @@ OUTPUT
 
 Write one compact, fluent paragraph. Target 450–650 Chinese characters and never exceed 800; target 220–320 English words and never exceed 400. Every phrase must control visible content, collage hierarchy, exact text, paper layer, print artifact, or finish.
 
-Before returning, verify that the prose is one natural paragraph with no seven-part labels or prefixes; all seven content concerns are covered in their conceptual order; only the CLI-selected content-level branch was applied; the Theme's content-level visibility anchor appears directly in the dominant hero photograph rather than in text, mood, preparation, nudity alone, or a minor fragment; every required participant, action, contact, and anatomy detail for that branch is visible and unobscured; erotic or hardcore content is reinforced by at least one smaller photographic fragment without creating another event; the exact English Theme title, subject, and spot colors are unchanged; composition and final output-quality language contain no redundant aspect-ratio or dimension requirement; every visible string appears verbatim in the dedicated image-text passage between ASCII straight double quotes and has an exact physical carrier and poster location; no quotation mark of any kind appears outside that passage; every quoted string uses only permitted ASCII English characters; no other passage spells out or introduces readable copy; zero non-English glyphs appear anywhere in the rendered poster; the dominant monochrome hero, torn headline slab, subordinate photographic fragments, editorial scraps, physical paper depth, and analog print artifacts are all visible; the primary visual and title hierarchy survive thumbnail viewing; every promised word is readable; and the result describes one finished poster only. Rewrite any Frame that fails this check. Remove repeated adjectives, backstory, symbolism explanations, audience reactions, and details that do not improve hierarchy or renderability.
+Before returning, verify that the prose is one natural paragraph with no seven-part labels or prefixes; all seven content concerns are covered in their conceptual order; only the requested content-level branch was applied; the Theme's content-level visibility anchor appears directly in the dominant hero photograph rather than in text, mood, preparation, nudity alone, or a minor fragment; every required participant, action, contact, and anatomy detail for that branch is visible and unobscured; erotic or hardcore content is reinforced by at least one smaller photographic fragment without creating another event; the exact English Theme title, subject, and spot colors are unchanged; composition and final output-quality language contain no redundant aspect-ratio or dimension requirement; every visible string appears verbatim in the dedicated image-text passage between ASCII straight double quotes and has an exact physical carrier and poster location; no quotation mark of any kind appears outside that passage; every quoted string uses only permitted ASCII English characters; no other passage spells out or introduces readable copy; zero non-English glyphs appear anywhere in the rendered poster; the dominant monochrome hero, torn headline slab, subordinate photographic fragments, editorial scraps, physical paper depth, and analog print artifacts are all visible; the primary visual and title hierarchy survive thumbnail viewing; every promised word is readable; and the result describes one finished poster only. Rewrite any Frame that fails this check. Remove repeated adjectives, backstory, symbolism explanations, audience reactions, and details that do not improve hierarchy or renderability.

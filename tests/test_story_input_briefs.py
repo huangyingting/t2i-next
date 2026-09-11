@@ -2,62 +2,76 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
-WOMAN_CENTERED_STORY_INPUTS = (
-    "anamorphic-room.txt",
-    "archival-reconstruction.txt",
-    "botanical-time-slice.txt",
-    "choreographic-score.txt",
-    "cinematic-cutaway.txt",
-    "color-relay.txt",
-    "environmental-portrait.txt",
-    "evidence-table.txt",
-    "forced-perspective.txt",
-    "light-echo.txt",
-    "living-map.txt",
-    "material-alchemy.txt",
-    "miniature-civic-system.txt",
-    "negative-space.txt",
-    "object-biography.txt",
-    "optical-layering.txt",
-    "practical-weather.txt",
-    "shadow-narrative.txt",
-    "spatial-rhythm.txt",
-    "threshold-worlds.txt",
-    "topographic-body.txt",
-)
+
+def test_story_inputs_use_only_the_current_authoring_contract() -> None:
+    story_inputs = sorted((REPOSITORY_ROOT / "story-inputs").glob("*.txt"))
+
+    assert story_inputs
+    assert not (REPOSITORY_ROOT / "story-inputs" / "multi-view-scenes.txt").exists()
+
+    for story_input in story_inputs:
+        brief = story_input.read_text(encoding="utf-8")
+
+        assert brief.startswith("BRIEF\n\n"), story_input.name
+        assert "Theme" in brief, story_input.name
+        assert "Frame" in brief, story_input.name
+        assert "CLI" not in brief, story_input.name
+        assert "Generate exactly the Theme count" not in brief, story_input.name
+        assert "Generate exactly the Theme and Frames-per-Theme counts" not in brief, (
+            story_input.name
+        )
+        assert "cast as a creative seed" not in brief, story_input.name
+        assert "time advances through causally connected beats" not in brief, (
+            story_input.name
+        )
 
 
-def test_new_story_inputs_require_a_visible_active_adult_woman() -> None:
-    for filename in WOMAN_CENTERED_STORY_INPUTS:
-        brief = (
-            REPOSITORY_ROOT / "story-inputs" / filename
-        ).read_text(encoding="utf-8")
-        normalized = " ".join(brief.split())
+def test_rebuilt_legacy_inputs_are_complete_story_descriptions() -> None:
+    required_sections = (
+        "BRIEF",
+        "THEME CONTRACT",
+        "FRAME CONTRACT",
+        "VARIATION AND REJECTION RULES",
+    )
 
-        assert "WOMAN CAST GATE" in brief
-        assert "Every Theme and every Frame must include at least one" in normalized
-        assert "unmistakably adult woman" in normalized
-        assert "This brief is incompatible with a zero-woman cast." in normalized
+    for filename in ("avantgarde.txt", "snofs.txt", "tentacle.txt"):
+        brief = (REPOSITORY_ROOT / "story-inputs" / filename).read_text(
+            encoding="utf-8"
+        )
+
+        assert all(section in brief for section in required_sections), filename
+        assert "At aesthetic level" in brief, filename
+        assert "At erotic level" in brief, filename
+        assert "At hardcore level" in brief, filename
+
+
+def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> None:
+    film_post = (REPOSITORY_ROOT / "story-inputs" / "film-post.txt").read_text(
+        encoding="utf-8"
+    )
+    zero_gravity = (
+        REPOSITORY_ROOT / "story-inputs" / "zero-gravity-intimacy.txt"
+    ).read_text(encoding="utf-8")
+
+    assert "Use the exact requested cast and no additional people" in film_post
+    assert "must appear clearly in every Theme premise and every poster" in film_post
+    assert "At hardcore level" in zero_gravity
+    assert "incompatible with hardcore" not in zero_gravity
+    assert "Keep intimate actions non-graphic" not in zero_gravity
 
 
 def test_dress_board_region_names_are_layout_only() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "dress.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = (REPOSITORY_ROOT / "story-inputs" / "dress.txt").read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
     assert "Do not render the Theme title or region names as visible text." in brief
     assert "Use region names only as internal layout references" in brief
     assert "Begin the scale at visibly sensual" in normalized
-    assert (
-        "compatible only with CLI cast settings of one woman and zero men"
-        in normalized
-    )
+    assert "requires a cast of one woman and zero men" in normalized
     assert "zero or one visually restrained body-safe adult product" in normalized
     assert "adult product-and-wearable fashion system" in normalized
     assert (
-        "Include one to three clearly designed body-safe adult products"
-        in normalized
+        "Include one to three clearly designed body-safe adult products" in normalized
     )
     assert "BDSM equipment-and-wardrobe design board" in normalized
     assert "Include three to six BDSM-specific designed elements" in normalized
@@ -130,18 +144,18 @@ def test_dress_board_region_names_are_layout_only() -> None:
     assert "Present one complete, opaque, non-erotic outfit." not in brief
     assert "At aesthetic level, include none." not in brief
 
-    wardrobe_pool = brief.split(
-        "\nCURATED HARDCORE WARDROBE ARCHETYPES\n", maxsplit=1
-    )[1].split("\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1)[0]
-    equipment_pool = brief.split(
-        "\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1
-    )[1].split("\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1)[0]
+    wardrobe_pool = brief.split("\nCURATED HARDCORE WARDROBE ARCHETYPES\n", maxsplit=1)[
+        1
+    ].split("\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1)[0]
+    equipment_pool = brief.split("\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1)[
+        1
+    ].split("\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1)[0]
     product_pool = brief.split(
         "\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1
     )[1].split("\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1)[0]
-    sex_toy_pool = brief.split(
-        "\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1
-    )[1].split("\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1)[0]
+    sex_toy_pool = brief.split("\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1)[
+        1
+    ].split("\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1)[0]
     material_pool = brief.split(
         "\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1
     )[1].split("\nSIX-VIEW BOARD CONTRACT\n", maxsplit=1)[0]
@@ -190,8 +204,7 @@ def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
     assert "one dominant monochrome photographic hero" in normalized
     assert "two to four smaller documentary" in normalized
     assert (
-        "one oversized condensed headline assembled on a torn paper slab"
-        in normalized
+        "one oversized condensed headline assembled on a torn paper slab" in normalized
     )
     assert "overlapping torn paper with irregular deckled edges" in normalized
     assert "halftone dots, photocopy grain, coarse newsprint" in normalized
@@ -297,13 +310,11 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
     assert "use one Frame per region" in normalized
     assert (
         "A portrait 2-column by 3-row grid forms one image with six cleanly "
-        "separated regions."
-        in normalized
+        "separated regions." in normalized
     )
     assert (
         "Every person remains outside all colossal everyday objects throughout "
-        "the board."
-        in normalized
+        "the board." in normalized
     )
     assert '"Region 1:" through "Region 6:"' in normalized
     assert "When frames_per_theme is 1" not in normalized
@@ -349,7 +360,7 @@ def test_edo_warai_e_brief_respects_all_content_levels() -> None:
     normalized = " ".join(brief.split())
 
     assert "ADULT CAST, CONSENT, AND CONTENT LEVEL" in normalized
-    assert "Honor the exact CLI-requested content_level" in normalized
+    assert "Honor the exact requested content level" in normalized
     assert "aesthetic: keep every adult fully dressed" in normalized
     assert "erotic: make unmistakable adult sensuality visible" in normalized
     assert "clearly erotic but non-explicit interaction" in normalized
@@ -368,9 +379,7 @@ def test_edo_warai_e_brief_respects_all_content_levels() -> None:
 
 
 def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "pose.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = (REPOSITORY_ROOT / "story-inputs" / "pose.txt").read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
     assert "RANDOM POSE-GROUP SELECTION" in normalized
@@ -445,9 +454,9 @@ def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
     assert len(occasion_entries) >= 40
     assert len(occasion_entries) == len(set(occasion_entries))
 
-    camera_pool = brief.split(
-        "\nCURATED CAMERA-ANGLE POOL\n", maxsplit=1
-    )[1].split("\nCURATED POSE POOL\n", maxsplit=1)[0]
+    camera_pool = brief.split("\nCURATED CAMERA-ANGLE POOL\n", maxsplit=1)[1].split(
+        "\nCURATED POSE POOL\n", maxsplit=1
+    )[0]
     camera_entries = [
         line.removeprefix("- ").strip()
         for line in camera_pool.splitlines()

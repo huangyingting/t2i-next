@@ -64,9 +64,17 @@ story-inputs/
 manifest 记录其 SHA-256 指纹，resume 始终使用冻结版本而不重新读取规则目录。
 
 只服务于一个输入的主题、媒介、版式、区域、镜头和词汇约束继续写在对应
-`story-inputs/*.txt` 中。多个输入共享但并非所有 story 都适用的项目规则写入
-`story-inputs/rules/`。所有 story 都必须遵守的阶段、schema、安全和一致性规则
-才属于包内 system rules。不要按文件名在 Python 中增加分支。
+`story-inputs/*.txt` 中。默认 `story-inputs/rules/` 中的项目规则会应用于从该
+项目启动的所有 story；只被部分输入共享的规则不能放进默认规则目录，可以保留在
+对应输入中，或放入显式选择的规则 profile 并通过 `--rules-dir` 使用。所有 story
+都必须遵守的阶段、schema、安全和一致性规则才属于包内 system rules。不要按文件名
+在 Python 中增加分支。
+
+`story-inputs/*.txt` 只描述当前 Story Description 契约，不保留旧格式或传输层
+术语。每个文件以 `BRIEF` 开始，并直接描述其 Theme、Frame、媒介、布局、领域池、
+变化轴和拒绝条件；它不重复请求中的 Theme/Frame 数量，也不引用 CLI。输入可以为
+特定人物组合或内容等级声明严格前置条件，但不得增删请求人物，也不得把多个 Frame
+改写成跨 Frame 的连续剧情。多个 Frame 始终是同一 Theme 的平行视觉方案。
 
 每个 run 在首次 provider 调用前创建。每批 Theme 和每个 Theme 的完整 Frame
 Sequence 都会原子保存；失败或进程退出后，只重新生成缺失部分：

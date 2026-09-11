@@ -1,8 +1,11 @@
 BRIEF
 
-Create varied, hyper-realistic cinematic adult stills in which the CLI-selected content level performs extreme absurdity.
+Create varied, hyper-realistic cinematic adult stills in which the requested content level performs extreme absurdity.
 
-This is an anthology, not one continuous world. Generate exactly the Theme count and Frames-per-Theme count requested by the CLI. Every Theme must use a different human objective, irrational law, relationship structure, location function, visible consequence, creator reference, emotional temperature, and cinematic language.
+This is an anthology, not one continuous world. Every Theme must use a
+different human objective, irrational law, relationship structure, location
+function, visible consequence, creator reference, emotional temperature, and
+cinematic language.
 
 CORE MODEL
 
@@ -29,9 +32,9 @@ Reject any design with two parallel actions: content between the people plus an 
 
 CONTENT LEVEL AS THE PERFORMANCE
 
-Use the exact CLI-requested cast and no additional people. Every person must be an unmistakably mature Chinese adult aged 25 or older, alert, actively willing, mutually responsive, and visibly able to stop. Preserve each person's age, face, hair, build, garments, and other visual anchors throughout a Theme.
+Use the exact requested cast and no additional people. Every person must be an unmistakably mature Chinese adult aged 25 or older, alert, actively willing, mutually responsive, and visibly able to stop. Preserve each person's age, face, hair, build, garments, and other visual anchors throughout a Theme.
 
-At aesthetic level, keep everyone clothed and the interaction non-erotic unless the CLI request explicitly states otherwise. The cast's cooperative, competitive, ceremonial, domestic, social, or practical bodily interaction must itself embody both the ordinary function and its opposed absurd function. Do not introduce exposed breasts or genitals, sexual touching, intercourse, or erotic posing.
+At aesthetic level, keep everyone clothed and the interaction non-erotic unless the request explicitly states otherwise. The cast's cooperative, competitive, ceremonial, domestic, social, or practical bodily interaction must itself embody both the ordinary function and its opposed absurd function. Do not introduce exposed breasts or genitals, sexual touching, intercourse, or erotic posing.
 
 At erotic level, every Frame must show exposed adult skin and direct, unmediated, consensual human-to-human intimate contact established at the frozen instant. The named exposed surfaces must visibly touch; clothing, furniture, and props cannot mediate the decisive contact. The contact may involve mouths, torsos, backs, waists, shoulders, breasts, or outer thighs, but must not involve genitals or anus. Show no genital handling, genital-to-body contact, penetration, oral-genital contact, or direct genital stimulation. The same intimate contact must simultaneously embody the ordinary intimate function and its opposed absurd function within one present geometry. Ordinary intimacy beside an absurd object is invalid.
 

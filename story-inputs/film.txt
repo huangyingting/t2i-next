@@ -8,13 +8,14 @@ Lists are open-ended inspiration, not menus or presets. Combine or reinvent comp
 
 CAST, ADULTHOOD, AND CONTENT
 
-Use the exact CLI-requested human cast and no additional people. Every person must be an unmistakably mature Chinese adult aged 25 or older, alert, actively willing, mutually responsive, and able to stop. Preserve each person's identity, age, face, hair, body proportions, scars, garments, and other anchors throughout a Theme.
+Use the exact requested human cast and no additional people. Every person must be an unmistakably mature Chinese adult aged 25 or older, alert, actively willing, mutually responsive, and able to stop. Preserve each person's identity, age, face, hair, body proportions, scars, garments, and other anchors throughout a Theme.
 
-Follow the CLI content level in every Frame. At hardcore level, begin after a directly visible explicit interaction is established. Qualifying contact includes visible genital, anal, oral, or toy penetration, or active direct genital stimulation; name the involved anatomy and current contact. Mere nudity, breast touching, alignment, pressing at an entrance, preparation, imminent contact, or aftermath does not qualify. Every participant must have a clear active role.
+Follow the requested content level in every Frame. At hardcore level, begin after a directly visible explicit interaction is established. Qualifying contact includes visible genital, anal, oral, or toy penetration, or active direct genital stimulation; name the involved anatomy and current contact. Mere nudity, breast touching, alignment, pressing at an entrance, preparation, imminent contact, or aftermath does not qualify. Every participant must have a clear active role.
 
 THEME AND FRAME RELATION
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the CLI; never assume or state a fixed total. Give each Theme one shared premise, private Chinese location, cast identity, wardrobe logic, production design, source-lighting setup, and visual thesis.
+Give each Theme one shared premise, private Chinese location, cast identity,
+wardrobe logic, production design, source-lighting setup, and visual thesis.
 
 During Theme generation, privately coordinate space, light, palette, lens behavior, material motif, cinematic mode, and one deliberate refusal. Give the Theme one concise original cinematic style name and embed it naturally at the start of one flowing style sentence, immediately defining it through visible choices. Keep that sentence under 140 Chinese characters or 70 English words. Return only the Theme-level style: do not include Frame IDs, Frame drafts, alternate shots, camera specifications, finishing variants, schema fragments, or future instructions. Reserve the exact style name for later reuse in every Frame. Do not use a creator, movie title, finishing process, or generic name such as “cinematic,” “vintage film,” “luxury aesthetic,” or “moody photography.” Do not format the style as a heading, field label, list, or implementation note.
 

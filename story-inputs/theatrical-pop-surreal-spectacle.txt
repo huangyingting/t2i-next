@@ -62,8 +62,7 @@ examples.
 
 ANTHOLOGY DIVERSITY
 
-This is an anthology, not one continuous universe. Generate exactly the Theme
-count and Frames-per-Theme count requested by the CLI.
+This is an anthology, not one continuous universe.
 
 Every Theme must differ from all others in:
 
@@ -106,7 +105,7 @@ The premise contains no more than two sentences:
 
 The premise must give every recurring person a stable compact identity:
 nationality, unmistakably adult age of twenty-five or older, complexion,
-build, face structure, and hair. Use exactly the cast requested by the CLI.
+build, face structure, and hair. Use exactly the requested cast.
 Repeated views of the same cast do not add people.
 
 The style field must describe an original production language using concrete
@@ -151,7 +150,7 @@ Every Frame must naturally restate:
 
 Open with the visual situation rather than a style label. Write one fluid prose
 paragraph without headings, bullets, field names, captions, or compliance
-language. Do not mention Theme, Frame, prompt, content level, CLI settings, or
+language. Do not mention Theme, Frame, prompt, content level, request settings, or
 the instructions.
 
 Every Frame freezes one decisive instant. Use active present-tense contact and
@@ -288,8 +287,8 @@ match the cast, pose, set geometry, and camera.
 
 CONTENT LEVEL
 
-Interpret the proposition through exactly the content level selected by the
-CLI. The selected level changes exposure and intimacy, not the ambition of the
+Interpret the proposition through exactly the requested content level. The
+selected level changes exposure and intimacy, not the ambition of the
 concept, the sophistication of the production, or the agency of the cast.
 
 At aesthetic level, use publication-safe body awareness, fashion tension, and

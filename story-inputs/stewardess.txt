@@ -21,7 +21,7 @@ not" are mandatory.
 
 CAST, ADULTHOOD, AND ROLE
 
-Use the exact CLI-requested human cast and no additional people. Every person
+Use the exact requested human cast and no additional people. Every person
 must be an unmistakably mature adult aged 25 or older with an original face,
 alert expression, stable identity, and clearly defined cabin-crew or compatible
 private-travel role. Preserve each person's face, age, hair, build, uniform
@@ -33,14 +33,12 @@ add passengers, pilots, ground staff, crowds, silhouettes, portraits, people on
 screens, mannequins, or human reflections. Keep the depicted aircraft area
 closed and private to the exact requested cast.
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the
-CLI; never assume, state, or encode a fixed total. Do not assign a country,
-region, uniform, activity, camera angle, or intensity by Theme ID, Frame ID, or
-ordinal position.
+Do not assign a country, region, uniform, activity, camera angle, or intensity
+by Theme ID, Frame ID, or ordinal position.
 
 CONTENT-LEVEL COMPLIANCE
 
-Honor the exact CLI-requested content level at both Theme and Frame stages. Do
+Honor the exact requested content level at both Theme and Frame stages. Do
 not silently raise, lower, relabel, postpone, or average the level.
 
 At aesthetic level, every person must remain fully and professionally dressed
@@ -86,7 +84,7 @@ Every Frame must preserve that same level and begin with its defining state
 already visible. Do not substitute preparation, undressing in progress,
 anticipated escalation, aftermath, obscured evidence, a distant establishing
 view, or a milder interaction. Reject and rewrite any Theme or Frame whose
-visible content reads below or above the CLI-requested level.
+visible content reads below or above the requested level.
 
 PROFESSIONAL AND CONSENT BOUNDARIES
 
@@ -229,7 +227,7 @@ action, and source light, while using a distinct camera relationship and visual
 center.
 
 Write every final Frame as one unbroken natural-language paragraph in the
-CLI-requested language. Do not output a screenplay, shot list, tag list,
+requested language. Do not output a screenplay, shot list, tag list,
 explanation, visible title, caption, airline advertisement copy, watermark, or
 interface element. Authentic airline branding may appear only as a natural part
 of the uniform or aircraft environment.
@@ -416,6 +414,6 @@ VARIATION AND REJECTION RULES
 - Reject any Theme or Frame whose uniform cannot plausibly function in an
   aircraft cabin.
 - Reject any Theme or Frame whose visible intensity does not match the exact
-  CLI-requested content level.
+  requested content level.
 - Preserve cultural respect, aviation credibility, stable cast identity, and a
   polished original editorial finish in every output.

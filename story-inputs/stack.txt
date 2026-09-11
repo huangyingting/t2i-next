@@ -19,7 +19,7 @@ Only statements using "must," "every," "exact," or "do not" are mandatory.
 
 CAST, ADULTHOOD, AND IDENTITY
 
-Use the exact CLI-requested human cast and no additional people. Every person
+Use the exact requested human cast and no additional people. Every person
 must be an unmistakably mature Chinese adult aged 25 or older, alert, actively
 willing, mutually responsive, and able to leave the arrangement. Give each
 adult a distinct original face, hairstyle, build, and stable visual anchor.
@@ -29,14 +29,12 @@ fictional characters, or identifiable real people. Do not add bystanders,
 assistants, crowds, mannequins, portraits, human images on screens, mirrors, or
 reflections that could create an ambiguous extra person.
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the
-CLI; never assume, state, or encode a fixed total. Do not assign concepts,
-positions, camera angles, or intensities by Theme ID, Frame ID, or ordinal
-position.
+Do not assign concepts, positions, camera angles, or intensities by Theme ID,
+Frame ID, or ordinal position.
 
 CONTENT-LEVEL COMPLIANCE
 
-Honor the exact CLI-requested content level at both Theme and Frame stages. Do
+Honor the exact requested content level at both Theme and Frame stages. Do
 not silently raise, lower, relabel, or postpone the level.
 
 At aesthetic level, use coherent sculptural fashion, fitted studio garments,
@@ -85,7 +83,7 @@ fully redescribe the exact cast and arrangement, and use a different compatible
 camera strategy, silhouette rhythm, or expression pattern.
 
 Write each final Frame as one unbroken natural-language paragraph in the
-CLI-requested language. Do not output a screenplay, shot list, tag list,
+requested language. Do not output a screenplay, shot list, tag list,
 instructional explanation, visible title, caption, label, logo, watermark, or
 interface element.
 
@@ -267,7 +265,7 @@ VARIATION AND REJECTION RULES
 - Reject any Frame whose arrangement would collapse without unsafe human
   load-bearing.
 - Reject any Frame with an ambiguous cast count, merged anatomy, extra limbs,
-  duplicated people, unexplained supports, or a content level below the CLI
+  duplicated people, unexplained supports, or a content level below the
   request.
 - Preserve a playful, sculptural, polished group-portrait identity while making
   every final image an original visual invention.

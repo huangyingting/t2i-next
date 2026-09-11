@@ -2,18 +2,18 @@ BRIEF
 
 Create varied, polished, hyper-realistic female fashion character boards. Each Frame is one finished six-view board presenting the same adult Chinese woman, one coherent outfit, its accessories, adult props when permitted, construction, materials, and content-level styling intensity.
 
-This is fashion, accessory, and product design, not a narrative scene, storyboard, transformation sequence, anatomical study, or sexual interaction. The CLI-selected content level controls garment coverage, sensual intensity, wearable adult accessories, adult-toy presence, and product-detail emphasis. No level requires sexual anatomy to be described, but erotic and hardcore may use standard explicit commercial product names such as nipple clamps, mouth gag, dildo, vibrator, or plug when that precision identifies the designed object.
+This is fashion, accessory, and product design, not a narrative scene, storyboard, transformation sequence, anatomical study, or sexual interaction. The requested content level controls garment coverage, sensual intensity, wearable adult accessories, adult-toy presence, and product-detail emphasis. No level requires sexual anatomy to be described, but erotic and hardcore may use standard explicit commercial product names such as nipple clamps, mouth gag, dildo, vibrator, or plug when that precision identifies the designed object.
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the CLI. Every Theme defines a different woman, wardrobe concept, accessory language, material system, palette, setting influence, and fashion attitude.
+Every Theme defines a different woman, wardrobe concept, accessory language,
+material system, palette, setting influence, and fashion attitude.
 
 CAST
 
 Use exactly one unmistakably mature Chinese woman aged 25 or older and no other people. She is alert, self-possessed, and physically safe. Do not add men, companions, crowds, assistants, silhouettes, portraits, mannequins, dolls, or human reflections.
 
-This single-model character-board brief is compatible only with CLI cast
-settings of one woman and zero men. A filename or request naming another cast
-does not change the board into a multi-person design; do not run this brief
-with incompatible cast counts.
+This single-model character-board brief requires a cast of one woman and zero
+men. A filename or request naming another cast does not change the board into a
+multi-person design; do not run this brief with incompatible cast counts.
 
 Give each Theme one stable woman with a specific age, facial structure, skin tone, body proportions, hair length, hair texture, and hairstyle. Preserve her exact identity and physical traits in every view and every Frame belonging to that Theme.
 
@@ -421,7 +421,7 @@ Return only Theme fields. Do not include Frame drafts, view-by-view prose, count
 
 FRAME-STAGE OUTPUT
 
-Write one directly imageable paragraph with no fixed character or word count. Write all descriptive prose in the CLI-requested output language. Do not mention theme.title or insert English label tokens to identify regions.
+Write one directly imageable paragraph with no fixed character or word count. Write all descriptive prose in the requested output language. Do not mention theme.title or insert English label tokens to identify regions.
 
 Begin by stating, in the requested output language, that one polished text-free six-view female character board fills a landscape canvas. Then state the woman's stable identity, complete outfit construction, fixed accessories, permitted adult props, six-region grid, each region's spatial position and visual function, per-view pose and crop, material details, background, and shared lighting.
 
@@ -450,7 +450,7 @@ FINAL VALIDATION
 Silently rewrite any Theme or Frame that fails one check:
 
 1. Exactly one adult Chinese woman aged 25 or older is depicted; all human views are the same person.
-2. The brief is used only with CLI cast settings of one woman and zero men; no filename or request declares an incompatible cast.
+2. The request specifies exactly one woman and zero men.
 3. The selected content level controls outfit coverage, wearable intensity, and adult-prop presence in every view.
 4. Aesthetic is sensual lingerie-led fashion with zero or one restrained adult product; erotic is an adult product-and-wearable system with one to three explicit products; hardcore is a BDSM wardrobe-and-equipment system with three to six BDSM-specific elements, including at least two wearable pieces and at least one explicit BDSM product that may be worn or displayed.
 5. Every hardcore Theme has one dominant silhouette statement, two secondary structures, at least three deliberate contrast axes, and one coherent wardrobe-archetype, equipment-system, sex-toy product direction, and material-color combination with no technology-shaped costume elements.

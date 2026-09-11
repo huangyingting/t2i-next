@@ -12,11 +12,11 @@ identifiable historical work.
 ADULT CAST, CONSENT, AND CONTENT LEVEL
 
 Every depicted person must be an unmistakably mature Japanese adult aged
-twenty-five or older. Use exactly the adult cast requested by the CLI and give
+twenty-five or older. Use exactly the requested adult cast and give
 each recurring person a stable face, build, hairstyle, social role, and kimono.
 All interaction must read as mutual, alert, warm, and freely chosen.
 
-Honor the exact CLI-requested content_level in every Theme and every Frame. Do
+Honor the exact requested content level in every Theme and every Frame. Do
 not silently average, postpone, sanitize, intensify, or relabel it.
 
 - aesthetic: keep every adult fully dressed in layered period clothing. Bodies
@@ -262,7 +262,6 @@ imitate, name, sign, or reproduce a composition by a known ukiyo-e artist.
 
 THEME CONTRACT
 
-Generate exactly the Theme and Frames-per-Theme counts requested by the CLI.
 Each Theme must establish:
 
 - a precise Edo-period date, Japanese location, season, hour, and social world;

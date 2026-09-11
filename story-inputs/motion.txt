@@ -8,7 +8,7 @@ Every list below is inspiration, not a menu, enum, preset library, or multiple-c
 
 CAST, ADULTHOOD, AND CONSENT
 
-Use the exact CLI cast and no additional humans. Every person must be an unmistakably mature Chinese adult aged 25 or older with an original face. Do not depict or resemble minors, youthful fictional characters, celebrities, public figures, or other identifiable real people.
+Use the exact requested cast and no additional humans. Every person must be an unmistakably mature Chinese adult aged 25 or older with an original face. Do not depict or resemble minors, youthful fictional characters, celebrities, public figures, or other identifiable real people.
 
 Every participant must be alert, actively willing, mutually responsive, and able to stop. Show this through deliberate eye contact, guiding hands, reciprocal grip, chosen positioning, and coordinated movement. Do not use unconsciousness, intoxication, panic, injury, bleeding, genuine distress, forced helplessness, non-consensual voyeurism, or inescapable restraint.
 
@@ -62,7 +62,9 @@ Let one primary action trigger one readable non-anatomical reaction: a robe brus
 
 INDEPENDENT FRAMES AND CONTINUITY
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the CLI; never assume, state, or imply a fixed total. For each Theme, create one concise shared premise, cast, location, and visual language. Treat every requested Frame as an independent alternate capture from that same adult session, not as a before-and-after sequence.
+For each Theme, create one concise shared premise, cast, location, and visual
+language. Treat every requested Frame as an independent alternate capture from
+that same adult session, not as a before-and-after sequence.
 
 Every Frame begins with a complete stable pose and directly shows its own explicit interaction. Vary expression, camera, clothing, light, fluids, props, and simple pose family between Frames, but never mention earlier Frames, previous body positions, pose changes, transitions, or aftermath inside final prose.
 

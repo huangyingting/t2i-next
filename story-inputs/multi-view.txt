@@ -8,7 +8,7 @@ Every list below is inspiration, not a menu or fixed preset. Combine compatible 
 
 CAST, ADULTHOOD, AND CONTINUITY
 
-Use the exact CLI-requested human cast and no additional people. Every person must be an unmistakably mature, consenting Chinese adult aged 25 or older: alert, actively participating, mutually responsive, and able to stop. Keep every background empty of other people. Do not add bystanders, crowds, silhouettes, portraits, human images on screens, mannequins, mirrors, or human reflections; use matte surfaces near bodies.
+Use the exact requested human cast and no additional people. Every person must be an unmistakably mature, consenting Chinese adult aged 25 or older: alert, actively participating, mutually responsive, and able to stop. Keep every background empty of other people. Do not add bystanders, crowds, silhouettes, portraits, human images on screens, mannequins, mirrors, or human reflections; use matte surfaces near bodies.
 
 The primary model is a 25-year-old Chinese woman, 170 cm tall, with a narrow waist, slender body, naturally large pendulous breasts, fair skin, no visible makeup, long wispy dark hair, side-parted bangs, and no pubic hair. Give every requested adult a distinct stable appearance. Preserve identity, mature age, face, hair, body proportions, and other anchors across all views.
 
@@ -53,4 +53,8 @@ Crop deliberately at clean torso or mid-limb locations, never through a face, ne
 
 Keep final prose under about 800 Chinese characters or 400 English words: write the required opening, one concise sentence for each view, and one brief shared style sentence. Complete every promised view before adding atmosphere; omit biographies, backstory, sound, smell, and decorative prose that do not clarify the image. Never include drafting notes, corrections, replacement versions, or alternate wording inside final prose; choose one definitive layout, identity, and physical state and state each once.
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the CLI; never assume a fixed total. Begin every Frame from the same unchanged room, wardrobe, and prop baseline. Do not carry state between Frames or mention progression, undressing, first contact, repeated contact, earlier or later events, or aftermath. Vary view count, tiling, shot mix, camera, stable pose family, explicit interaction, expression, palette, and lighting without repeating a fixed numerical cycle.
+Begin every Frame from the same unchanged room, wardrobe, and prop baseline.
+Do not carry state between Frames or mention progression, undressing, first
+contact, repeated contact, earlier or later events, or aftermath. Vary view
+count, tiling, shot mix, camera, stable pose family, explicit interaction,
+expression, palette, and lighting without repeating a fixed numerical cycle.

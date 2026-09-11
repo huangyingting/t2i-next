@@ -363,7 +363,7 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     payload = json.loads(messages[1].content)
 
     assert payload["content_level"] == level.value
-    assert "Apply only the branch matching the CLI-selected content level" in compiled
+    assert "Apply only the branch matching the requested content level" in compiled
     assert required_contract in compiled
     assert "content-level visibility anchor" in compiled
     assert "cannot satisfy the selected content level" in compiled

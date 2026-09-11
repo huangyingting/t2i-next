@@ -2,7 +2,7 @@ BRIEF
 
 Create varied, polished, hyper-realistic cinematic adult-romance Themes set
 inside spacecraft in zero gravity. Every Theme must center the exact
-CLI-requested cast sharing consensual, content-level-appropriate weightless
+requested cast sharing consensual, content-level-appropriate weightless
 intimacy. Make the spacecraft, floating objects, changing body orientation,
 inertia, handholds, light, facial expression, body coverage, skin contact,
 clothing or wearable-device movement, and celestial view concrete enough for
@@ -21,7 +21,7 @@ invent new equivalents. Only statements using "must," "every," "exact," or
 
 CONTENT LEVEL, BODY COVERAGE, AND WEAR
 
-Honor the exact CLI-requested content level; do not silently replace it with
+Honor the exact requested content level; do not silently replace it with
 another level. Body coverage, pose intensity, physical contact, camera distance,
 and visual emphasis must all agree with that setting.
 
@@ -41,14 +41,17 @@ romantic mood alone does not satisfy erotic level. Keep intimate contact
 non-graphic; do not use pornographic anatomical close-ups or explicit sexual
 acts.
 
-This non-graphic brief is incompatible with hardcore output. If the CLI requests
-hardcore, fail clearly instead of weakening, relabeling, or silently downgrading
-the requested content level.
+At hardcore level, show one clearly visible consensual adult sexual interaction
+already occurring in every Theme and Frame. Preserve believable zero-gravity
+contact geometry, reciprocal body response, active control, unobstructed
+breathing, and immediate access to handholds or quick-release personal
+wearables. Do not use life-critical spacecraft equipment as restraint or allow
+the explicit interaction to hide the spacecraft, floating state, or cast agency.
 
 CONTENT-LEVEL COMPLIANCE GATE
 
-The Theme stage must honor the CLI content level directly; do not defer content
-intensity to later Frame generation. Every Theme premise must state a current
+The Theme stage must honor the requested content level directly; do not defer
+content intensity to later Frame generation. Every Theme premise must state a current
 interaction, body-coverage state, and spacecraft-wearable logic that visibly
 meet the requested level. Every Theme style must reinforce that level through
 camera distance, composition, light, silhouette, and material detail without
@@ -58,7 +61,7 @@ The Frame stage must preserve the same content level in every generated prompt.
 Every Frame must begin with the content-level-defining state already visible and
 must not replace it with preparation, implication, anticipated escalation,
 aftermath, distant atmosphere, or a milder interaction. Reject and rewrite any
-Theme or Frame whose visible result reads below the CLI-requested level.
+Theme or Frame whose visible result reads below the requested level.
 
 Every garment and wearable must belong to the spacecraft setting. Use
 close-fitting, low-snag construction; secured closures; short cable runs; soft
@@ -69,8 +72,7 @@ a storage net rather than floating through the cabin.
 
 THEME AND FRAME CONTRACT
 
-Generate exactly the Theme count and Frames-per-Theme count requested by the
-CLI; never assume or state a fixed total. Every Theme must use a distinct
+Every Theme must use a distinct
 spacecraft zone, celestial background, floating-object system, relationship
 dynamic, emotional charge, lighting logic, and zero-gravity movement pattern.
 Themes must not differ only by camera angle.
@@ -89,7 +91,7 @@ stable identity and wardrobe anchors, and show a different current
 configuration, camera strategy, and emotional emphasis.
 
 Do not assign camera strategies, body configurations, locations, or emotional
-beats by Frame ID or ordinal position. Across the CLI-requested Frames, maximize
+beats by Frame ID or ordinal position. Across the requested Frames, maximize
 contrast by drawing non-sequentially from the camera-language pool below.
 Prioritize unused strategies before repeating one, including medium-long
 establishing views, top-down views, low-angle views, rolling side views, deep
@@ -135,7 +137,7 @@ narrate a sequence of poses inside one image.
 
 VISUAL PROSE CONTRACT
 
-Write final Frame prose in the CLI-requested language. Each Frame must be one
+Write final Frame prose in the requested language. Each Frame must be one
 unbroken natural-language paragraph, not a screenplay, shot list, tag list, or
 multi-beat story. Integrate the exact shot scale, camera height or angle,
 composition, depth, light direction, color, complete adult cast, facial
@@ -333,24 +335,24 @@ initial awkwardness becoming coordinated trust
 brief separation followed by a reassuring reunion
 wonder at Earth deepening into affection
 gentle laughter settling into reflective silence
-nervousness transformed by a steady guiding hand
-professional restraint giving way to an honest embrace
+nervousness steadied by a guiding hand
+professional restraint balanced by an honest embrace
 shared loneliness softened by physical closeness
-an unexpected spin becoming a moment of mutual care
+a shared spin held in a moment of mutual care
 the vastness outside making the connection inside feel precious
 
 
 FINAL IMAGE:
 the partners become small silhouettes against the blue Earth
-their joined hands remain centered as the camera retreats through a hatch
+their joined hands centered in a distant view through a circular hatch
 a floating photograph settles between them without touching either person
 two water droplets merge while the partners drift out of focus behind them
-the cabin rotates slowly around their motionless embrace
-sunrise outlines their faces before the image fades to white
-their reflections remain in the dark window after the camera turns away
+the rotating cabin geometry encircles their motionless embrace
+sunrise outlines their faces against a white-gold window
+their reflections hold clearly in the dark observation window
 the safety strap forms a loose circle around the distant pair
 the last visible object is a silver pen still turning in the quiet cabin
-the spacecraft window fills the frame as their silhouettes leave its edge
+the spacecraft window fills the frame around their edge-positioned silhouettes
 
 
 VARIATION AND REJECTION RULES
@@ -362,7 +364,8 @@ VARIATION AND REJECTION RULES
   hatches, windows, straps, and floating objects.
 - Alternate expansive observation-window Themes with confined interior Themes.
 - Vary emotional tone while keeping every relationship consensual and caring.
-- Keep intimate actions non-graphic and suitable for cinematic adult romance.
+- Keep intimate actions exactly at the requested content level while preserving
+  cinematic adult-romance photography.
 - Do not write category names or selected examples as a list in final prose.
 - Reject and rewrite any Frame with impossible support, contradictory momentum,
   duplicate anatomy, obscured cast count, an unsafe collision, or no visible
