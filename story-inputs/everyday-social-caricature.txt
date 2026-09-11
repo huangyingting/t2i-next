@@ -17,6 +17,23 @@ and original compositions. Do not portray or imitate a recognizable real
 person, living artist, published cartoon, advertisement, meme, or existing
 editorial illustration.
 
+EAST ASIAN CAST AND SETTING LOCK
+
+Every visible person is a fictional East Asian adult. Allowed identities are
+mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, and
+Singaporean Chinese. Include no person outside this list and no ambiguously
+identified person.
+
+Set every Theme and Frame in mainland China, Taiwan, Hong Kong, Japan, South
+Korea, or Singapore. Use plausible local names in ASCII Latin letters and normal
+Title Case. Treat ethnicity, region, and tradition as setting facts rather than
+stereotypes or punchlines.
+
+Every Theme premise must explicitly identify each person's allowed identity.
+Every Frame must identify every adult as an East Asian woman or East Asian man,
+then state the specific allowed identity before appearance, clothing, action,
+or exaggeration.
+
 ENGLISH OUTPUT AND REAL-PERSON PHOTOMONTAGE LOCK
 
 Write every Theme title, premise, style field, and complete Frame in English,
@@ -36,10 +53,13 @@ Begin every Frame with this exact ASCII phrase:
 Flat satirical photomontage assembled from photographs of real adult performers:
 
 This opening is part of the image description, not a heading. Continue
-immediately with the exact cast in this form, replacing the bracketed values
-with grammatical words: "Exactly [total] adults fill the image - [complete
-female phrase] and [complete male phrase] - with no other human figures." For
-example, use "two women and one man," not count tokens or schema language.
+immediately with the exact cast supplied by the generation request. Convert the
+requested female count, male count, and total into grammatical English words in
+this dynamic form: "Exactly [requested total] East Asian adults fill the image -
+[requested East Asian female phrase] and [requested East Asian male phrase] -
+with no other human figures." Omit a gender phrase when its requested count is
+zero. Never infer, default, or hard-code any count in this brief; the generation
+request is the only source of cast quantity.
 
 The second sentence must name each adult, identify each as a mature woman or
 man, and describe that person's complete head-to-foot outfit. At aesthetic
@@ -50,10 +70,10 @@ opposition, and the monumental metaphor. Do not describe any body change before
 all complete outfits are locked.
 
 Name and place each requested adult once. Near the end of the Frame, restate
-the same exact total and gender composition in a short sentence, then append
-the mandatory final image-text passage. Reflections, windows, screens, posters,
-shadows, background silhouettes, and cropped body parts must not resemble
-additional people.
+the same script-supplied total and gender composition in a short sentence, then
+append the mandatory final image-text passage. Reflections, windows, screens,
+posters, shadows, background silhouettes, and cropped body parts must not
+resemble additional people.
 
 All requested adults must be visually prominent. Show every person's complete
 head-to-foot body, face, torso, two arms, two hands, two legs, and two feet as
@@ -89,19 +109,20 @@ NON-NEGOTIABLE PRIORITY
 
 Resolve every Theme and Frame in this order:
 
-1. use the exact requested adult cast with everyone awake, alert, willing, and
-   visibly engaged;
-2. lock each adult's complete level-appropriate outfit;
-3. satisfy the selected content level through unmistakable present action;
-4. make the central woman's action cause or redirect the interaction;
-5. give every other person an active response inside that same interaction;
-6. make the contradiction dominate the outer silhouette through unmistakably
+1. use the exact requested adult cast and give every person one allowed East
+   Asian identity, with everyone awake, alert, willing, and visibly engaged;
+2. set the scene in one precise allowed East Asian location;
+3. lock each adult's complete level-appropriate outfit;
+4. satisfy the selected content level through unmistakable present action;
+5. make the central woman's action cause or redirect the interaction;
+6. give every other person an active response inside that same interaction;
+7. make the contradiction dominate the outer silhouette through unmistakably
    impossible caricatural deformation;
-7. assign opposing social roles concrete animal, object, or emblem labels and
+8. assign opposing social roles concrete animal, object, or emblem labels and
    bind them into one monumental metaphor system; and
-8. plan one exact, readable English label pair for the two opposing social
+9. plan one exact, readable English label pair for the two opposing social
    forces and eliminate all unplanned writing; and
-9. apply the editorial finish without weakening any earlier requirement.
+10. apply the editorial finish without weakening any earlier requirement.
 
 Later creativity must never dilute an earlier requirement. Being asleep,
 apparently asleep, unconscious, intoxicated, dissociated, frozen like a prop,
@@ -301,12 +322,10 @@ empty area. Then describe only what is already present in that finished image,
 following the viewer's scan order from dominant icon to secondary discovery.
 Do not add a new idea, object, gesture, expression, or meaning while writing.
 
-The first Frame sentence must show the whole visual icon at once: caricatured
-cast, impossible group silhouette, selected-content-level interaction, and
-monumental metaphor in one composition. Later sentences move inward to faces,
-visual labels, supporting symbols, material contact, and finally the compact
-print treatment. If a sentence must explain what a symbol means, stop, redesign
-the silent picture so the comparison becomes visible, and only then rewrite.
+The third Frame sentence must show the action, controlled exaggeration,
+whole-group opposition, and monumental metaphor together. Later sentences move
+to reactions, supporting symbol, material contact, and print treatment. If a
+symbol requires explanation, redesign it before writing.
 
 VISUAL LABEL AND POWER MAP
 
@@ -315,20 +334,10 @@ each side a concrete visual label: an animal analogy, familiar object, garment,
 tool, emblem, material, or repeated shape attached to that person's role. The
 labels must be visible in silhouette or color before close details are read.
 
-Animal comparison may appear as an expressive animal companion, cast shadow,
-mask-like facial echo, headdress, patterned garment, hybridized caricatural
-feature, or object shaped like the animal. It may sharpen appetite, caution,
-loyalty, vanity, patience, opportunism, territorial behavior, mimicry, or group
-instinct. Preserve the adult's recognizable human identity and agency, and aim
-the comparison at behavior rather than gender or appearance.
-
-The primary symbol system must act like a stage mechanism: a balance carries the
-people at unequal heights; a magnet bends bodies and possessions toward it; a
-nest envelops one alliance while excluding another; a crown becomes a shared
-seat; a handbag becomes a bottomless labor pit; an hourglass compresses the
-group into opposing chambers; an umbrella becomes a protective wall. These
-illustrate mechanisms, not reusable scene templates. Invent an equally direct
-original system.
+Animal comparison may use a companion, shadow, garment pattern, headdress, or
+animal-shaped object, always targeting behavior rather than identity. The
+primary symbol must physically position the cast as a stage mechanism, not sit
+beside them as decoration.
 
 If the scene can be mistaken for an ordinary lifestyle illustration at
 thumbnail size, reject it. If the viewer needs prose to know who wants what,
@@ -652,9 +661,10 @@ alternatives, explain intentions, or propose what a later Frame could contain.
 
 The premise must establish:
 
-- the explicit country, precise everyday location, era or year, and current
-  social occasion;
-- the exact recurring adult cast with stable visual anchors;
+- one allowed East Asian region, a precise everyday location, era or year, and
+  current social occasion;
+- the exact recurring adult cast, explicitly identifying every person's
+  allowed identity, with plausible local names and stable visual anchors;
 - the central woman's objective and every other person's role in the same
   interaction;
 - the familiar behavior or relationship contradiction;
@@ -698,8 +708,10 @@ photomontage, not a design discussion or a sequence of ideas.
 
 Naturally restate:
 
-- the country, precise everyday location, era or year, and immediate occasion;
-- every recurring adult's stable appearance and exact position;
+- the allowed East Asian region, precise everyday location, era or year, and
+  immediate occasion;
+- every recurring adult's specific allowed identity, stable appearance, and exact
+  position;
 - every adult's complete visible face, torso, arms, and level-appropriate outfit;
 - the central woman's present objective and decisive action;
 - every other person's distinct action, gaze, support, and reaction;
@@ -763,6 +775,10 @@ VARIATION AND REJECTION RULES
 
 Silently reject and replace any Theme or Frame when:
 
+- any person is not explicitly East Asian or has an identity outside the
+  allowed list;
+- the scene is set outside the allowed regions or uses mismatched identity
+  markers;
 - the woman is decorative, passive, anonymous, or absent from the causal center;
 - the supporting cast could be removed without changing the proposition;
 - the image is a portrait beside symbols rather than a visible interaction;
@@ -835,10 +851,11 @@ Silently reject and replace any Theme or Frame when:
   immediately visible comic contradiction.
 
 Before returning, verify that the exact adult cast is present, the central
-woman has decisive agency, the content level is directly visible, every
-metaphor belongs to the interaction, the caricature reads without words, every
-body remains coherent within the chosen deformation grammar, and each Frame is
-an independently complete editorial image.
+woman and every supporting adult have an allowed East Asian identity, the
+setting is in an allowed region, the central woman has decisive agency, the
+content level is directly visible, every metaphor belongs to the interaction,
+the caricature reads without words, every body remains coherent within the
+chosen deformation grammar, and each Frame is independently complete.
 
 When the current generation stage requests Themes rather than Frames, return
 only Theme fields. Do not continue with Frame prose, alternate views, internal

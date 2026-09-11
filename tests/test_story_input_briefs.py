@@ -319,6 +319,19 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     ).read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
+    assert "EAST ASIAN CAST AND SETTING LOCK" in normalized
+    assert "Every visible person is a fictional East Asian adult" in normalized
+    assert (
+        "mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, "
+        "and Singaporean Chinese"
+        in normalized
+    )
+    assert "Set every Theme and Frame in mainland China, Taiwan, Hong Kong" in normalized
+    assert "Use plausible local names in ASCII Latin letters" in normalized
+    assert "Every Theme premise must explicitly identify each person's allowed identity" in (
+        normalized
+    )
+    assert "Every Frame must identify every adult as an East Asian woman or East Asian man" in normalized
     assert "WOMAN-CENTERED AGENCY" in normalized
     assert "At least one adult woman is the unmistakable narrative" in normalized
     assert "Use exactly the requested cast and add no bystanders" in normalized
@@ -334,8 +347,12 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
         "performers:"
         in normalized
     )
-    assert "Exactly [total] adults fill the image" in normalized
-    assert "Near the end of the Frame, restate the same exact total" in normalized
+    assert "exact cast supplied by the generation request" in normalized
+    assert "Exactly [requested total] East Asian adults fill the image" in normalized
+    assert "Omit a gender phrase when its requested count is zero" in normalized
+    assert "Never infer, default, or hard-code any count in this brief" in normalized
+    assert "two East Asian women and one East Asian man" not in normalized
+    assert "restate the same script-supplied total and gender composition" in normalized
     assert "append the mandatory final image-text passage" in normalized
     assert "Every visible person must remain unmistakably photographic and human" in (
         normalized
@@ -381,10 +398,8 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "silently assemble one complete final photomontage" in normalized
     assert "separately photographed real adult performers" in normalized
     assert "following the viewer's scan order from dominant icon" in normalized
-    assert "The first Frame sentence must show the whole visual icon at once" in (
-        normalized
-    )
-    assert "If a sentence must explain what a symbol means" in normalized
+    assert "The third Frame sentence must show the action" in normalized
+    assert "If a symbol requires explanation, redesign it before writing" in normalized
     assert "fill thirty-five to fifty percent of the entire image area" in normalized
     assert "VISUAL LABEL AND POWER MAP" in normalized
     assert "Give each side a concrete visual label" in normalized
