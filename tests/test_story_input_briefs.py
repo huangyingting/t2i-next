@@ -313,7 +313,7 @@ def test_post_briefs_isolate_text_without_removing_poster_copy() -> None:
     )
 
 
-def test_everyday_social_caricature_centers_women_and_lived_interaction() -> None:
+def _legacy_everyday_social_caricature_contract() -> None:
     brief = (
         REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.txt"
     ).read_text(encoding="utf-8")
@@ -340,6 +340,7 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
         normalized
     )
     assert "Use English-only ASCII characters" in normalized
+    assert "Reject any code point outside ASCII U+0020 through U+007E" in normalized
     assert "Write personal names in normal Title Case" in normalized
     assert "reserve uppercase words exclusively for exact visible copy" in normalized
     assert (
@@ -352,8 +353,8 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "Omit a gender phrase when its requested count is zero" in normalized
     assert "Never infer, default, or hard-code any count in this brief" in normalized
     assert "two East Asian women and one East Asian man" not in normalized
-    assert "restate the same script-supplied total and gender composition" in normalized
-    assert "append the mandatory final image-text passage" in normalized
+    assert "repeat the complete opening cast declaration verbatim" in normalized
+    assert "final two-entry text passage" in normalized
     assert "Every visible person must remain unmistakably photographic and human" in (
         normalized
     )
@@ -372,21 +373,41 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "SATIRICAL CARICATURE HARD GATE" in normalized
     assert "one controlled caricatural exaggeration" in normalized
     assert "thirty to forty percent of the image" in normalized
-    assert "Exactly one supporting symbol" in normalized
+    assert "Exactly one physical supporting object" in normalized
     assert "CONTROLLED WHOLE-BODY EXAGGERATION" in normalized
     assert "Every adult appears as one intact photographic person" in normalized
     assert "Use no more than one anatomical or silhouette exaggeration" in normalized
     assert "Never cut, paste, duplicate, float, detach, fold, splice" in normalized
     assert "Do not exaggerate breasts, buttocks, genitals, tongue" in normalized
     assert "Do not use exact body-part canvas percentages" in normalized
-    assert "The second sentence must name each adult" in normalized
-    assert "complete head-to-foot outfit" in normalized
-    assert "including top, bottom or one-piece garment, and footwear" in normalized
-    assert "Do not describe any body change before all complete outfits are locked" in (
+    assert "Branch immediately after the cast sentence" in normalized
+    assert "For hardcore, the second sentence must begin with the explicit act" in (
         normalized
     )
+    assert "All requested adults are already joined in one consensual explicit act:" in (
+        normalized
+    )
+    assert "This sentence contains only names, involved anatomy, present contact" in (
+        normalized
+    )
+    assert "within the first eighty English words after the fixed opening phrase" in (
+        normalized
+    )
+    assert "Only after this early content proof" in normalized
+    assert "complete head-to-foot outfit" in normalized
+    assert "including top, bottom or one-piece garment, and footwear" in normalized
+    assert "describe each adult's remaining or displaced clothing" in normalized
+    assert "Clothing must not cover or contradict required contact" in normalized
+    assert "Immediately after the selected-level proof" in normalized
+    assert "All figures are frontal whole-person photographic cutouts" in normalized
+    assert "before faces, metaphor, setting, or props" in normalized
+    assert "Never mention instructions, sentence numbers, requirements" in normalized
     assert "Exaggerate decisively, but select exactly one item" in normalized
     assert "Never assign a second item from the list to the same person" in normalized
+    assert "These choices are mutually exclusive" in normalized
+    assert "whole-body scaling leaves hair, garments, limbs, and face unaltered" in (
+        normalized
+    )
     assert "scaled between seventy and one hundred thirty percent" in normalized
     assert "without changing the size or shape of any facial organ" in normalized
     assert "Never resize or paste a face or isolated organ" in normalized
@@ -398,7 +419,6 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "silently assemble one complete final photomontage" in normalized
     assert "separately photographed real adult performers" in normalized
     assert "following the viewer's scan order from dominant icon" in normalized
-    assert "The third Frame sentence must show the action" in normalized
     assert "If a symbol requires explanation, redesign it before writing" in normalized
     assert "fill thirty-five to fifty percent of the entire image area" in normalized
     assert "VISUAL LABEL AND POWER MAP" in normalized
@@ -410,12 +430,39 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "METAPHOR AND SYMBOL SYSTEM" in normalized
     assert "Use an animal, object, garment, or emblem as a visual label" in normalized
     assert "Every symbol must have one clear referent" in normalized
+    assert "ACTION-METAPHOR COUPLING GATE" in normalized
+    assert "one closed causal force chain" in normalized
+    assert "central woman's intimate movement applies one visible directional force" in (
+        normalized
+    )
+    assert "another participant's body transmits that same force" in normalized
+    assert "primary metaphor visibly changes mechanical state because of the bodies" in (
+        normalized
+    )
+    assert "changed mechanism redirects pressure into every remaining participant" in (
+        normalized
+    )
+    assert "At least two adults must directly touch, load, grip, brace, block" in normalized
+    assert "If removing the explicit interaction leaves the metaphor unchanged" in (
+        normalized
+    )
+    assert "Because [central woman] [physical verb]" in normalized
     assert "CONTENT-LEVEL INTEGRATION" in normalized
     assert "At aesthetic level" in normalized
     assert "name one complete opaque outfit for each adult" in normalized
     assert "Show no bare torso, transparent garment, lingerie" in normalized
     assert "At erotic level" in normalized
     assert "At hardcore level" in normalized
+    assert "Every requested participant must make direct intimate physical contact" in (
+        normalized
+    )
+    assert "through penetration, oral-genital contact, or direct genital stimulation" in (
+        normalized
+    )
+    assert "Looking, kissing, touching shoulders or hips" in normalized
+    assert "Include no clothed spectator or queued participant" in normalized
+    assert "Do not pin, trap, force, dominate, restrain" in normalized
+    assert "include no loose props or debris" in normalized
     assert "NON-NEGOTIABLE PRIORITY" in normalized
     assert "everyone awake, alert, willing" in normalized
     assert "PLANNED ENGLISH LABEL SYSTEM" in normalized
@@ -434,12 +481,19 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "LEXICAL TEXT-CARRIER BAN" in normalized
     assert "Do not use any of these English words or their plurals" in normalized
     assert "Replace any candidate containing one of these words" in normalized
+    assert "microtext, card, pass, knife, cleaver, blade" in normalized
+    assert "weapon, pin, pinned, trap, trapped, force, forced" in normalized
     assert "THEME CONTENT-PROOF GATE" in normalized
     assert "The Theme premise itself must contain the complete visible proof" in (
         normalized
     )
     assert "Do not substitute vague phrases such as sexual activity" in normalized
     assert "Hardcore does not imply BDSM" in normalized
+    assert "one Theme sentence must account for every requested participant" in normalized
+    assert "Touching only oneself, clothing, furniture, or a prop does not qualify" in (
+        normalized
+    )
+    assert "Never describe any participant as preparing, approaching" in normalized
     assert "Every erotic Frame must include at least one" in normalized
     assert "Bare shoulders, cleavage, exposed thighs, sleepwear" in normalized
     assert "the explicit interaction is the sole ongoing human action" in normalized
@@ -453,12 +507,17 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
         normalized
     )
     assert "one exact orthographic poster plane" in normalized
+    assert "must not resemble people photographed together in a real room" in normalized
+    assert "single matte field with no floor line, wall corner, ceiling" in normalized
     assert "IMAGE-TEXT GATE" in normalized
     assert "Every Frame must visibly include the Theme's exact pair" in normalized
     assert "Every letter must be at least one twentieth of the image height" in (
         normalized
     )
     assert "each complete label must occupy at least one eighth" in normalized
+    assert "inside the central eighty percent of the canvas" in normalized
+    assert "minimum ten-percent safety margin" in normalized
+    assert "inside ten-percent safety margin: WORK;" in normalized
     assert "Spell each locked label exactly twice in the complete Frame" in normalized
     assert "Repetition reinforces correct image rendering" in normalized
     assert "dedicated image-text passage at the absolute end" in normalized
@@ -467,21 +526,74 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "Use the literal characters `: `" in normalized
     assert "Do not add an IMAGE-TEXT heading" in normalized
     assert "The Frame's final character" in normalized
+    assert "Write this dedicated passage once only" in normalized
+    assert "never restart or duplicate either carrier-copy entry" in normalized
     assert "Use this serialization grammar exactly" in normalized
-    assert "one-twentieth image height: WORK;" in normalized
     assert "After each colon, write only the exact locked label" in normalized
     assert "Every other surface must contain zero letters" in normalized
     assert "its entire visible typographic content must be one of the two" in normalized
     assert "If removing the words makes the satire unintelligible" in normalized
     assert "Do not use interpretive phrases such as symbolizes" in normalized
-    assert "five to eight complete sentences" in normalized
-    assert "Devote the first five sentences to the caricatured" in normalized
+    assert "do not hard-code a sentence count" in normalized
+    assert "one stable anchor sentence per adult when needed" in normalized
+    assert "verbatim opening cast declaration" in normalized
+    assert "The only supporting object is one [singular object]" in normalized
+    assert "Name no other loose object, debris, food scatter" in normalized
+    assert "Perform a final character scan on every Theme and Frame" in normalized
     assert "REAL-PERSON PHOTOMONTAGE LANGUAGE" in normalized
     assert "premium physical editorial photomontage" in normalized
     assert "full natural color and photographic tonal variation" in normalized
     assert "THEME CONTRACT" in normalized
     assert "FRAME CONTRACT" in normalized
+    assert "WITHIN-THEME CONTINUITY LOCK" in normalized
+    assert "names, allowed identities, ages, facial anchors, hair" in normalized
+    assert "base garments, chosen exaggerations, primary metaphor, and label pair" in (
+        normalized
+    )
+    assert "Clothing may shift only as required by the selected interaction" in normalized
+    assert "requested women and men visually unambiguous" in normalized
+    assert "No generic shocked open mouths" in normalized
     assert "VARIATION AND REJECTION RULES" in normalized
+
+
+def test_everyday_social_caricature_centers_women_and_lived_interaction() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert len(brief) <= 50_000
+
+    required_contract = (
+        "Create original, woman-centered editorial caricature scenes",
+        "exact requested supporting cast",
+        "Use English-only ASCII characters",
+        "Flat satirical photomontage assembled from photographs of real adult performers:",
+        "Exactly [total] adults fill the image",
+        "Every visible person must remain unmistakably photographic and human",
+        "one exact orthographic poster plane",
+        "NON-NEGOTIABLE PRIORITY",
+        "use the exact requested adult cast",
+        "selected content level through unmistakable present action",
+        "PLANNED ENGLISH LABEL SYSTEM",
+        "Every Theme must choose one meaningful pair of opposed English labels",
+        "Locked image labels: FIRST LABEL | SECOND LABEL.",
+        "SATIRICAL CARICATURE HARD GATE",
+        "selective photographic enlargement or compression",
+        "METAPHOR AND SYMBOL SYSTEM",
+        "CONTENT-LEVEL INTEGRATION",
+        "At aesthetic level",
+        "At erotic level",
+        "At hardcore level",
+        "IMAGE-TEXT GATE",
+        "REAL-PERSON PHOTOMONTAGE LANGUAGE",
+        "THEME CONTRACT",
+        "FRAME CONTRACT",
+        "ANTHOLOGY VARIATION",
+        "VARIATION AND REJECTION RULES",
+    )
+    for marker in required_contract:
+        assert marker in normalized
 
 
 def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:

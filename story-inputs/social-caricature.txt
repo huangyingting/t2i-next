@@ -1,0 +1,150 @@
+BRIEF
+
+Create original woman-centered social caricatures from recognizable adult life.
+Use the exact script-supplied cast. The woman at the narrative center must act,
+cause a visible consequence, and remain more important than every prop.
+PRIORITY
+Resolve every Theme and Frame in this order:
+1. exact cast, allowed identities, mature adulthood, consent, and content level;
+2. one closed causal force chain joining bodies, satire, metaphor, and labels;
+3. visibly impossible but continuous anatomy with one exaggeration per person;
+4. flat real-person photographic cutouts with no environmental depth;
+5. exactly two readable English labels and no other visible writing.
+Reject a concept rather than weakening an earlier priority.
+EAST ASIAN CAST AND ENGLISH OUTPUT
+Every person is a fictional adult aged twenty-five or older. Allowed identities
+are mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, and
+Singaporean Chinese. Set the scene in one of those regions, use plausible local
+names in ASCII Latin letters, and never make identity the joke.
+Cast quantity comes only from the generation request. Never infer, default, or
+hard-code a female count, male count, or total. Add no bystander, reflection,
+portrait, mannequin, child, or human-like background figure.
+Write all Theme fields and Frames in English regardless of requested language.
+Use only ASCII U+0020 through U+007E plus line breaks. Before returning, scan
+every character and replace any non-ASCII candidate; use - instead of any en dash or em dash. Names use normal Title Case;
+never write a personal name in all capitals. Uppercase is reserved for labels.
+CONTENT LEVEL
+Honor exactly the requested level in every Theme and every independent Frame.
+Aesthetic: all adults wear complete opaque outfits and perform no sexual act.
+Erotic: every adult visibly gives and receives reciprocal sensual contact with another requested adult; show an exposed breast or buttock, but never call it an explicit act and show no
+penetration, oral-genital contact, direct genital stimulation, or sexual fluid.
+Hardcore: show one consensual explicit act already in progress and unobscured.
+Every requested participant must engage through penetration, oral-genital
+contact, or direct genital stimulation with another requested participant.
+Looking, kissing, holding shoulders, waiting, or holding a prop is insufficient.
+Repeat explicit anatomy nouns for every contact; motion words alone are invalid.
+State displaced clothing clearly; garments cannot cover or intersect contact.
+Everyone is awake, willing, actively responsive, supported, and able to stop.
+Use no coercion, humiliation, restraint, injury, intoxication, sleep, dangerous
+suspension, weapons, or unsafe objects near bodies.
+ACTION-METAPHOR COUPLING GATE
+Build one closed causal force chain, not a sexual tableau beside a symbolic prop:
+1. the central woman's intimate movement applies one visible directional force;
+2. another participant's body transmits that same force into the primary metaphor;
+3. the primary metaphor visibly changes mechanical state because of the bodies;
+4. the changed mechanism redirects pressure into every remaining participant;
+5. each response continues the same contact and changes the group silhouette.
+Use one shared physical verb family such as lift/drop, push/pull, open/close,
+give/take, carry/release, enter/block, or hold/yield. The bodily movement,
+metaphor mechanism, exaggerated feature, and two labels must express that same
+opposition. At least two adults must directly touch, load, grip, brace, block,
+tilt, open, close, stretch, or compress the primary metaphor through the action.
+Privately complete: "Because [central woman] [physical verb], [another body]
+transmits the force into [metaphor], which [visible change] and causes [remaining
+participant] to [reciprocal response]." Do not output this planning sentence.
+If removing the explicit interaction leaves the metaphor unchanged, or removing
+the metaphor leaves a generic sexual pose, reject and redesign the composition.
+METAPHOR AND SATIRE
+Start from one everyday contradiction involving labor, credit, privacy, status,
+attention, care, desire, etiquette, consumption, family, friendship, or work.
+Use one familiar object whose ordinary function physically performs the satire:
+a scale weighs, a door controls access, a conveyor transfers, a magnet attracts,
+an umbrella shelters, a table divides, or another original mechanism acts.
+The mechanism fills thirty-five to fifty percent of the canvas and supports,
+separates, carries, encloses, or redirects the people.
+Use exactly one additional physical supporting object from the same metaphor
+family. Write: "The only supporting object is one [singular object]." Include no
+second loose prop, pile, pair, debris, scattered food, or spilled liquid.
+The support cannot be a document, card, pass, panel, gauge, dial, or printed item.
+The joke must be understandable from action and geometry without explanation.
+EXAGGERATED PHYSIQUE AND DISTORTED VISUAL IMAGE
+Every adult remains one recognizable photographic person with one head, torso,
+two attached arms, two hands, two attached legs, and two feet. Show each person
+head to foot without cropping, merging, duplicated limbs, or hidden anatomy.
+Give every principal adult exactly one literal, visibly impossible proportion.
+Expression alone never counts. Choose one: an attached hand or arm at two and a
+half to three times normal scale; the entire attached head and hair at one and a
+half times normal scale; one continuous limb at nearly twice normal length; one
+whole-person cutout stretched to one and a half normal height or compressed to
+three-fifths normal width; or hair or garment volume at three times normal width.
+Immediately after the flat-photomontage sentence, write: "Human exaggeration is
+literal and dominant:" followed by every name, one exact altered feature, and
+its numeric scale. End: "These are impossible cutout proportions, not lens
+perspective or ordinary anatomy." Put no action, prop, or metaphor in this
+sentence. The altered human silhouettes must visually dominate the mechanism.
+Every altered feature must be load-bearing in the causal chain by gripping,
+weighing, blocking, bracing, tilting, or redirecting the primary mechanism.
+If normal proportions would preserve the composition, reject and exaggerate more.
+Choices are mutually exclusive. Keep joints and skin continuous; never detach,
+paste, float, splice, fold, melt, or separately enlarge an isolated facial
+organ, breast, buttock, genital, torso, hand, foot, or limb. Use no body horror,
+childlike anatomy, giant eyes, or sexual anatomy as the exaggerated feature.
+FLAT REAL-PERSON PHOTOMONTAGE
+Use photographs of real adult performers as hard-edged whole-person cutouts.
+After the content-proof sentence, include this exact sentence:
+"All figures are frontal whole-person photographic cutouts on one matte color
+field, one orthographic poster plane, uniform shadowless studio light, hard
+outer edges, narrow contact shadows, and zero environmental depth."
+Preserve pores, natural skin translucency, fine hair, fabric weave, and real eyes.
+Use no room box, floor line, wall corner, ceiling, recession, wide-angle view,
+high or low angle, foreshortening, bokeh, illustration, anime, CGI, or doll face.
+ENGLISH IMAGE LABELS
+Each Theme locks one opposed pair of one- or two-word uppercase ASCII labels:
+"Locked image labels: FIRST | SECOND." Each Frame preserves that exact pair.
+Place each label on the moving part that performs the force it names, not on a
+caption strip. Prefer parallel action verbs, not abstract nouns or statuses.
+Removing or swapping the labels must make the force map less clear.
+Each label appears exactly twice in a Frame: once on its described carrier and
+once in the final serialization. Use large horizontal block letters at least one
+twentieth of image height and one eighth of image width. Keep each complete label
+and carrier inside the central eighty percent with ten-percent edge safety; no
+body, hand, mechanism, or prop may overlap, split, or crop any letter. No other letters, digits, pseudo-writing, logos, fine print, barcode, or QR code.
+Avoid text-bearing objects such as screens, documents, books, cards, packaging,
+clocks, signs, uniforms with marks, or control panels; never name them in output.
+End every Frame with exactly two entries and an ASCII semicolon:
+"Large matte left carrier, center-left, horizontal heavy black letters at
+one-twentieth image height, inside ten-percent safety margin: FIRST; Large matte
+right carrier, center-right, horizontal heavy red letters at one-twentieth image
+height, inside ten-percent safety margin: SECOND;"
+THEME CONTRACT
+Return a concise title, a premise, and a style sentence. The premise states the
+allowed location, exact cast and identities, current relationship, selected-level
+proof, causal force chain, each person's one exaggeration, primary mechanism,
+only supporting object, and locked labels. The style states flat real-person
+photomontage, matte palette, frontal orthographic plane, and zero depth.
+End the premise exactly: "Locked image labels: FIRST | SECOND."
+FRAME CONTRACT
+Begin every Frame exactly:
+"Flat satirical photomontage assembled from photographs of real adult performers:"
+Continue with the dynamic cast declaration: "Exactly [requested total] East Asian
+adults fill the image - [requested women phrase] and [requested men phrase] -
+with no other human figures." Omit a zero-count gender phrase.
+For erotic, the next sentence begins exactly: "All requested adults visibly give and receive reciprocal sensual contact:". For hardcore, the next sentence begins exactly: "All requested adults are already
+joined in one consensual explicit act:" and accounts for every participant within
+eighty English words. Then write the exact flat-photomontage sentence above.
+Write the Human exaggeration sentence next, then stable people, causal mechanism,
+one support, first label occurrences, reactions, and decisive silhouette. Describe
+visible facts only; never explain symbolism or mention rules and sentence numbers.
+Immediately before final serialization, repeat the opening cast declaration
+verbatim. The final character is the second entry's semicolon.
+CONTINUITY, VARIATION, AND REJECTION
+Within one Theme, lock names, identities, ages, faces, hair, base garments,
+exaggerations, primary mechanism, support object, palette, and labels. Every
+Frame copies them unchanged while varying contact geometry, body arrangement,
+mechanism state, label-carrier position, negative space, and reaction intensity.
+Across Themes, vary life domain, relationship, mechanism, force verbs, layout,
+palette, and emotional tone. Reject ordinary photography, disconnected action
+and metaphor, passive women, spectators, wrong cast, mixed identities, ambiguous
+gender count, multiple exaggerations on one person, hidden contact, deep space,
+extra props, unsafe action, malformed anatomy, gibberish, cropped labels, or any
+Frame whose satire survives after either the bodily action or mechanism is removed.
