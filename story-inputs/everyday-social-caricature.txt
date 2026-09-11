@@ -1,250 +1,858 @@
 BRIEF
 
-Create original, woman-centered editorial caricatures from recognizable adult
-life. Turn one familiar social interaction into a bold visual joke, observation,
-or affectionate critique. The image must communicate through people, action,
-exaggerated anatomy, and physical metaphor before any words are read.
-This is an anthology of fictional adults and original compositions. Never copy
-a real person, artist, published cartoon, advertisement, or existing image.
-PRIORITY
+Create original, woman-centered editorial caricature scenes drawn from ordinary
+adult life. Every Theme turns a recognizable interaction between one or more
+women and the exact requested supporting cast into a bold visual joke, social
+observation, or affectionate critique. The other participants may be men,
+women, or a larger mixed group according to the requested cast.
+
+Use expressive exaggeration, concrete metaphor, and immediately readable group
+behavior. The result should communicate its human truth before the viewer reads
+any explanation. It may be sharp, tender, absurd, mischievous, glamorous,
+awkward, sensual, or confrontational, but it must never reduce a woman to a
+passive ornament, generic victim, or anonymous symbol.
+
+This is an anthology rather than one continuous world. Invent fictional adults
+and original compositions. Do not portray or imitate a recognizable real
+person, living artist, published cartoon, advertisement, meme, or existing
+editorial illustration.
+
+EAST ASIAN CAST AND SETTING LOCK
+
+Every visible person is a fictional East Asian adult. Allowed identities are
+mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, and
+Singaporean Chinese. Include no person outside this list and no ambiguously
+identified person.
+
+Set every Theme and Frame in mainland China, Taiwan, Hong Kong, Japan, South
+Korea, or Singapore. Use plausible local names in ASCII Latin letters and normal
+Title Case. Treat ethnicity, region, and tradition as setting facts rather than
+stereotypes or punchlines.
+
+Every Theme premise must explicitly identify each person's allowed identity.
+Every Frame must identify every adult as an East Asian woman or East Asian man,
+then state the specific allowed identity before appearance, clothing, action,
+or exaggeration.
+
+ENGLISH OUTPUT AND REAL-PERSON PHOTOMONTAGE LOCK
+
+Write every Theme title, premise, style field, and complete Frame in English,
+regardless of the requested output language. English is required because the
+final prose is sent directly to an image model and must preserve the exact
+caricature, symbol, and flat real-person photomontage vocabulary.
+
+Use English-only ASCII characters. Transliterate names and places with
+unaccented Latin letters. Before returning either stage, replace curly quotes
+with straight ASCII quotes, replace long dashes with a plain hyphen, and rewrite
+any remaining non-ASCII character. Write personal names in normal Title Case,
+never all uppercase; reserve uppercase words exclusively for exact visible copy
+declared at the end of a Frame.
+
+Begin every Frame with this exact ASCII phrase:
+
+Flat satirical photomontage assembled from photographs of real adult performers:
+
+This opening is part of the image description, not a heading. Continue
+immediately with the exact cast supplied by the generation request. Convert the
+requested female count, male count, and total into grammatical English words in
+this dynamic form: "Exactly [requested total] East Asian adults fill the image -
+[requested East Asian female phrase] and [requested East Asian male phrase] -
+with no other human figures." Omit a gender phrase when its requested count is
+zero. Never infer, default, or hard-code any count in this brief; the generation
+request is the only source of cast quantity.
+
+The second sentence must name each adult, identify each as a mature woman or
+man, and describe that person's complete head-to-foot outfit. At aesthetic
+level, every outfit must be opaque and must explicitly include a top, a bottom
+or one-piece garment, and footwear. The third sentence must establish the
+central woman's action, her one controlled exaggeration, the whole-group
+opposition, and the monumental metaphor. Do not describe any body change before
+all complete outfits are locked.
+
+At erotic or hardcore level, describe each adult's remaining or displaced
+clothing instead of pretending a fully closed outfit permits visible intimate
+contact. Explicitly state which garment is opened, raised, lowered, or removed
+where needed. Clothing must not cover, intersect, or contradict the anatomy and
+contact required by the selected level.
+
+Name and place each requested adult once. Near the end of the Frame, restate
+the same script-supplied total and gender composition in a short sentence, then
+append the mandatory final image-text passage. Reflections, windows, screens,
+posters, shadows, background silhouettes, and cropped body parts must not
+resemble additional people.
+
+All requested adults must be visually prominent. Show every person's complete
+head-to-foot body, face, torso, two arms, two hands, two legs, and two feet as
+one readable photographic cutout. No person may be hidden behind a prop,
+cropped by the frame, reduced to hands, omitted, merged with another body, or
+pushed into the background.
+
+Use concrete English image terms such as separately photographed real adults,
+hard-edged whole-person photographic cutouts, continuous attached-limb scaling,
+visible cut-paper outer edges, orthographic poster plane, zero spatial recession,
+matte solid backdrop, frontal full-body poses, uniform shadowless studio light,
+crisp focus, limited color blocks, and narrow contact shadows beneath overlapping
+whole-person cutouts.
+
+Every visible person must remain unmistakably photographic and human: natural
+skin translucency, pores, fine hair, fabric weave, real hands, real eyes, and
+photographic material response remain visible inside every cutout. Flatten the
+assembled space, not the people. The result looks like real adult photographs
+physically cut out, resized, and mounted onto one poster board.
+
+Do not use illustration, drawing, painting, ink outline, gouache, watercolor,
+anime, manga, chibi, kawaii, doll-like faces, 3D characters, CGI people, glossy
+digital painting, or a single naturalistic room photograph in any Theme or
+Frame. Also avoid cinematic location depth, wide-angle spectacle, shallow-focus
+bokeh, dramatic rain photography, glossy fashion retouching, practical facial
+prosthetics, silicone limbs, and ordinary lifestyle photography. The final
+style sentence must positively restate real photographic adult cutouts,
+controlled whole-body silhouette exaggeration, hard outer edges, a single
+orthographic poster plane,
+matte color fields, uniform light, and zero environmental depth.
+
+NON-NEGOTIABLE PRIORITY
+
 Resolve every Theme and Frame in this order:
-1. exact script-supplied cast, East Asian identity, adulthood, and consent;
-2. the central woman's decisive action and every other adult's active response;
-3. forceful real-person photographic caricature and impossible silhouette;
-4. one monumental metaphor physically joined to the interaction;
-5. flat editorial photomontage with no environmental depth;
-6. exactly two readable English labels and no other writing.
-Reject and redesign rather than weakening an earlier priority.
-EAST ASIAN CAST LOCK
-Every visible person is a fictional adult aged twenty-five or older and must be
-one of these identities only:
-- mainland Chinese;
-- Taiwanese;
-- Hong Kong Chinese;
-- Japanese;
-- South Korean; or
-- Singaporean Chinese.
-Set each Theme in mainland China, Taiwan, Hong Kong, Japan, South Korea, or
-Singapore. Use plausible local names written in ASCII Latin letters. State each
-person's allowed identity in the Theme premise and preserve it in every Frame.
-Never make nationality, ethnicity, accent, or physical appearance the joke.
-Cast quantity comes only from the generation request. Use exactly the requested
-female count, male count, and total. Never infer, default, demonstrate, or
-hard-code a cast quantity in this brief. Omit a zero-count gender phrase.
-Add no bystander, reflection, portrait, mannequin, child, background silhouette,
-or human-like figure.
-ENGLISH OUTPUT
-Write every Theme field and complete Frame in English regardless of requested
-language. Use only ASCII U+0020 through U+007E plus line breaks. Replace curly
-quotes, accented letters, and long dashes before returning. Write personal names
-in normal Title Case; reserve all-uppercase words for the two visible labels.
-Begin every Frame exactly:
-"Flat satirical photomontage assembled from photographs of real adult performers:"
-Immediately state:
-"Exactly [requested total] East Asian adults fill the image - [requested women
-phrase] and [requested men phrase] - with no other human figures."
-Then include exactly:
-"This is a deliberately assembled single-poster montage: every adult, enlarged
-feature, and metaphor is a separately photographed cutout mounted on one flat
-orthographic surface, never people sharing a room or lens perspective."
-VISUAL EQUATION
-Build one indivisible picture from:
-- one current everyday interaction;
-- one unequal desire, expectation, habit, burden, or misunderstanding;
-- one decisive action led by a woman;
-- two or more visibly caricatured human silhouettes;
-- one familiar object transformed into a monumental metaphor; and
-- one pair of opposed social forces.
-The people are the story. The metaphor exposes, compresses, reverses, carries,
-or obstructs what their bodies are already doing. Removing either the human
-interaction or the metaphor must destroy the joke.
-The central woman's action applies a visible force. Another adult receives,
-resists, assists, redirects, or amplifies it. Their bodies physically change the
-metaphor, and its changed state produces the next reaction. Do not compose an
-intimate tableau beside an unrelated giant prop.
-ACTION-OBJECT COUPLING GATE
-Every requested adult belongs to one closed mechanical circuit around the same
-primary object. Each person's hand, limb, torso, weight, or received pressure
-directly touches that object or another body already loading it.
-For every adult, describe in one sentence the directional action, exact contact
-point, and immediate visible change it causes in the object's position, angle,
-compression, opening, tension, balance, or shape. The changed object must return
-force into the next adult and alter that person's pose or reaction.
-No one performs a separate task, handles a supporting symbol, or gestures beside the mechanism. Supporting symbols stay attached to the mechanism and remain
-passive. Reject any composition if removing one adult's action leaves the
-object's state and every other pose unchanged.
+
+1. use the exact requested adult cast and give every person one allowed East
+   Asian identity, with everyone awake, alert, willing, and visibly engaged;
+2. set the scene in one precise allowed East Asian location;
+3. lock each adult's complete level-appropriate outfit;
+4. satisfy the selected content level through unmistakable present action;
+5. make the central woman's action cause or redirect the interaction;
+6. give every other person an active response inside that same interaction;
+7. make the contradiction dominate the outer silhouette through unmistakably
+   impossible caricatural deformation;
+8. assign opposing social roles concrete animal, object, or emblem labels and
+   bind them into one monumental metaphor system; and
+9. plan one exact, readable English label pair for the two opposing social
+   forces and eliminate all unplanned writing; and
+10. apply the editorial finish without weakening any earlier requirement.
+
+Later creativity must never dilute an earlier requirement. Being asleep,
+apparently asleep, unconscious, intoxicated, dissociated, frozen like a prop,
+or unaware of intimate contact is invalid at every content level.
+
+PLANNED ENGLISH LABEL SYSTEM
+
+Apply this gate before inventing a Theme. Every Theme must choose one meaningful
+pair of opposed English labels that names the two social forces already visible
+in the caricature, such as WORK and CREDIT, MINE and OURS, GIVE and TAKE, SEEN
+and UNSEEN, or WAIT and NOW. These examples demonstrate brevity and opposition;
+invent a pair specific to the Theme rather than copying them by default.
+
+Each label contains one or two short words using only uppercase ASCII letters A
+through Z and spaces. The pair must be grammatical, correctly spelled, easy to
+read, and conceptually parallel. Do not use names, digits, dates, prices,
+punctuation, abbreviations, brands, logos, slogans longer than two words, or
+wordplay that depends on ambiguous spelling.
+
+Lock the exact pair during Theme generation. End the Theme premise with exactly
+this ASCII pattern, replacing the placeholders with the selected copy:
+`Locked image labels: FIRST LABEL | SECOND LABEL.` Do not spell either label
+anywhere else in the premise or style. The Frame must preserve this exact pair
+without synonym, tense, number, spelling, or order changes.
+
+Give each label one large, simple physical carrier integrated into the primary
+metaphor: opposite scale pans, two halves of an umbrella, two plain badges, two
+large garment panels, two blank blocks, two sides of a door, or another pair of
+clean matte surfaces. Each carrier contains only its one declared label. Keep
+it free of borders, seals, icons, decorative marks, secondary lines, textures,
+grids, handwriting, fine print, numbers, or nearby glyph-like details.
+
+Text is part of the visual power map, not an explanation placed beneath it.
+Position each label directly on the force it names. The bodies, deformation,
+symbols, and metaphor must still communicate the contradiction without words,
+while the English pair makes the opposition faster to recognize.
+
+No other readable or pseudo-readable content may appear. If the scene includes
+a screen, receipt, bill, form, ledger, document, newspaper, magazine, notebook,
+book, menu, calendar, ticket, tag, stamp, certificate, map, clock, measuring
+tool, package, or garment that would normally contain writing, remove that
+object and replace it with a non-textual physical symbol. The two clean label
+carriers are the only text-bearing surfaces permitted. Never add a button word,
+interface, document layout, printed record, serial number, packaging panel,
+barcode, QR code, fine print, or third label.
+
+LEXICAL TEXT-CARRIER BAN
+
+Do not use any of these English words or their plurals anywhere in a generated
+Theme or Frame: phone, smartphone, screen, scoreboard, notebook, receipt, bill,
+invoice, form, ledger, newspaper, magazine, book, menu, calendar, ticket, tag,
+stamp, seal, certificate, map, keyboard, clock, dial, ruler, barcode, QR,
+currency, package, logo, interface, notification, message, serial, price, date,
+grid, handwriting, fine print, or microtext. Replace any candidate containing
+one of these words before returning it. This lexical ban does not apply to the
+source instructions; it applies to generated output.
+
+THEME CONTENT-PROOF GATE
+
+The Theme premise itself must contain the complete visible proof for the
+selected level; never defer that proof to a later Frame.
+
+- For aesthetic, explicitly establish a complete opaque head-to-foot outfit for
+  every adult, including top, bottom or one-piece garment, and footwear, before
+  establishing the central non-erotic interaction.
+- For erotic, explicitly name at least one exposed breast or exposed buttock
+  and the exact direct reciprocal sensual contact occurring between the adults.
+- For hardcore, identify every requested woman as a woman and every requested
+  man as a man, then name the exact explicit sexual act already occurring,
+  including the involved anatomy and present contact.
+
+Do not substitute vague phrases such as sexual activity, explicit behavior,
+intimate framework, bodies joined, intimate scene, BDSM role-play, or clear
+contact for the required visible fact. Hardcore does not imply BDSM. Do not add
+bondage, domination, submission, collars, restraints, tied wrists, neck pressure,
+cables or scarves around a body, or sex toys unless the Story Description
+specifically requests them.
+
+CORE VISUAL EQUATION
+
+Build every Theme from one indivisible equation:
+
+    one selected-content-level life interaction
+    + one unequal desire, expectation, habit, or misunderstanding
+    + one exaggerated human feature or gesture
+    + one concrete metaphor system
+    = one instantly legible social caricature
+
+The interaction is the story. The metaphor exposes, compresses, or reverses
+what the people are already doing; it must not create an unrelated fantasy
+beside them. A giant prop with people merely posing around it is not enough.
+Removing the people or their relationship must destroy the joke.
+
+The image must have two reading speeds:
+
+1. In the first second, the viewer reads the woman, the other participants,
+   their opposing or shared objective, and the decisive comic imbalance.
+2. On closer inspection, two or three object details reveal additional wit,
+   contradiction, complicity, tenderness, or hypocrisy.
+
+Do not depend on a caption, speech balloon, written slogan, or prior cultural
+knowledge to make the proposition understandable.
+
 SATIRICAL CARICATURE HARD GATE
-The first read must be an unmistakable photographic caricature, not ordinary
-lifestyle photography and not a drawn cartoon.
-Every Theme and Frame includes:
-1. the central woman's photographed face caricatured through mature expression,
-   hairstyle, and selective enlargement or compression of at least two facial
-   features such as brows, cheeks, mouth, jaw, or nose;
-2. one attached hand, foot, arm, leg, torso silhouette, garment, hairstyle, or
-   carried burden at roughly two to four times ordinary visual scale;
-3. at least one interacting adult with a different, equally obvious deformation;
-4. one impossible group arrangement such as extreme size imbalance, elastic
-   distance, seesaw balance, concentric crowding, or a body bent by obligation;
-5. one monumental metaphor occupying thirty-five to fifty percent of the canvas
-   and physically organizing the people; and
-6. exactly two smaller symbols from the same metaphor family.
-State what is enlarged, compressed, repeated, or stretched and how it changes
-the outer silhouette. Words such as exaggerated or cartoonish are insufficient.
-Do not use lens proximity, foreshortening, a mildly large hand, rubbery digital
-warping, or an oversized object beside normal bodies as substitutes.
-Describe scale through silhouette comparison: a giant hand is as wide as its
-owner's torso, a stretched arm crosses another complete body, or an enlarged
-head is wider than its shoulders while remaining on the same flat plane.
-Keep every adult recognizable and anatomically connected. Preserve real skin,
-hair, joints, hands, face identity, and readable contact. Never create detached
-organs, floating body parts, duplicated limbs, melted anatomy, body horror, or
-prosthetic-looking pieces. Do not use breasts, buttocks, genitals, or isolated
-sexual anatomy as the exaggerated feature.
-Faces remain unmistakably mature. Avoid giant sparkling eyes, tiny noses,
-rounded childlike heads, anime proportions, doll faces, and youthful styling.
+
+The first read must be a forceful real-person photographic caricature, not a
+naturalistic lifestyle photograph or drawn cartoon with one slightly enlarged
+hand. Every Theme and Frame must contain all of the following:
+
+1. The central woman has one controlled caricatural exaggeration that changes
+   her whole silhouette: one continuously attached hand or arm enlarged to
+   roughly one-and-a-half to two times normal size, one garment volume expanded
+   around her real body, one elongated but continuous posture, or one emphatic
+   adult facial expression.
+2. Each other adult has at most one different exaggeration. It may alter the
+   person's whole-body scale, posture, clothing silhouette, hair volume, or one
+   continuously attached limb, but it must remain secondary to the central
+   woman.
+3. One simple spatial opposition organizes the whole group: push versus pull,
+   high versus low, inside versus outside, weight versus lift, approach versus
+   retreat, or another immediately legible relation.
+4. One monumental metaphor structure occupies thirty to forty percent of the
+   image and physically organizes the people rather than sitting beside them.
+5. Exactly one supporting symbol reinforces the same comparison.
+6. The two locked English labels identify the opposed forces.
+
+Describe these six facts explicitly in every Theme premise and every Frame.
+The exaggeration must be obvious at thumbnail size but remain attached to a
+complete, continuous, clothed human body.
+
+CONTROLLED WHOLE-BODY EXAGGERATION
+
+Every adult appears as one intact photographic person with one head, one torso,
+two naturally attached arms, and two naturally attached legs. Preserve neck,
+shoulder, chest, waist, pelvis, and joint continuity. Keep each face recognizable
+and each center of mass supported.
+
+Use no more than one anatomical or silhouette exaggeration per person. Never
+cut, paste, duplicate, float, detach, fold, splice, or separately mount a face,
+eye, mouth, nose, jaw, breast, torso, hand, foot, or limb. Never create extra
+hands, repeated body positions, disconnected anatomy, exposed cut seams across
+skin, or a body compressed at the neck, sternum, waist, or pelvis.
+
+Do not exaggerate breasts, buttocks, genitals, tongue, or isolated facial organs.
+Do not use protruding tongues, giant standalone noses, child-sized adult bodies,
+rubbery limbs, melted anatomy, or body-horror forms. Caricature behavior through
+continuous posture, one attached limb, whole-body scale, expressive adult face,
+hair volume, garment volume, and relation to the monumental metaphor.
+
+Place the central woman's controlled exaggeration and every adult's complete
+opaque outfit within the first three Frame sentences. Then describe the other
+adults, the one group opposition, the primary metaphor, the single supporting
+symbol, and the label carriers. Do not use exact body-part canvas percentages,
+multiple distortions on one person, or numeric deformation checklists.
+
+All faces must remain unmistakably mature. Build adult caricature from prominent
+brows, noses, jaws, cheek tension, expression lines, narrowed or asymmetrical
+eyes, firm mouths, and forceful posture. Do not enlarge every head and
+both eyes into cute rounded proportions. Reject smooth doll faces, huge sparkling
+eyes, tiny noses, childlike head-to-body ratios, school-age styling, innocent
+chibi expressions, painted faces, or any figure who could be mistaken for a
+teenager.
+
 DRAW FIRST, DESCRIBE SECOND
-Before writing each Theme, privately compose at least three radically different
-black-shape thumbnails with one accent color. Place the central woman, every
-other requested adult, the deformed silhouettes, the monumental metaphor, two
-supporting symbols, and one reaction circuit before adding surface detail.
-Choose the thumbnail whose relationship remains clearest when viewed small,
-without text, color, or explanation. Reject it if normalizing the bodies,
-removing the metaphor, or removing one requested adult leaves the same idea.
-Before writing a Frame, privately assemble the finished photomontage from
-separately photographed real adults. Fix all cutouts, resized fragments,
-overlaps, grips, contact points, metaphor parts, label carriers, matte fields,
-and empty shapes. Then describe only that finished image in visual scan order.
+
+Never invent the picture while writing the final prose. Privately construct and
+judge the complete real-person photomontage first; only after the assembled
+picture works, translate that fixed picture into words. Do not output the
+private construction process.
+
+For every Theme, silently draw at least three radically different thumbnail
+compositions using only black shapes and one accent color. At this stage:
+
+1. place the central woman's caricatured head and full-body silhouette;
+2. place every other requested adult as a different readable silhouette;
+3. assign at most one continuous exaggeration to each intact, fully clothed
+   body before adding secondary detail;
+4. turn the primary metaphor into the floor, furniture, enclosure, balance,
+   machine, creature, weather system, or other structure holding the composition;
+5. attach each side's visual label and exactly one supporting symbol;
+6. block one decisive gesture and one closed circuit of reactions; and
+7. reserve only a few simple shapes for the everyday setting.
+
+Choose the thumbnail whose social relation remains clearest when viewed small,
+in silhouette, without color, text, facial detail, or explanation. Discard a
+thumbnail if removing the monumental metaphor leaves an ordinary scene, if the
+bodies return to normal proportion, or if the joke lives only in a small prop.
+Measure the primary metaphor against the canvas, not against a tabletop object:
+it must fill thirty-five to fifty percent of the entire image area, cross or
+support the principal bodies, and remain the first or second largest shape.
+
+For every Frame, silently assemble one complete final photomontage from
+separately photographed real adult performers before drafting any sentence.
+Fix every whole-person photographic cutout, continuous body silhouette, hard
+outer edge, object, overlap, contact point, label, symbol, flat color field, and
+empty area. Then describe only what is already present in that finished image,
+following the viewer's scan order from dominant icon to secondary discovery.
+Do not add a new idea, object, gesture, expression, or meaning while writing.
+
+The third Frame sentence must show the action, controlled exaggeration,
+whole-group opposition, and monumental metaphor together. Later sentences move
+to reactions, supporting symbol, material contact, and print treatment. If a
+symbol requires explanation, redesign it before writing.
+
+VISUAL LABEL AND POWER MAP
+
+Treat the people as opposing or cooperating forces in a compact power map. Give
+each side a concrete visual label: an animal analogy, familiar object, garment,
+tool, emblem, material, or repeated shape attached to that person's role. The
+labels must be visible in silhouette or color before close details are read.
+
+Animal comparison may use a companion, shadow, garment pattern, headdress, or
+animal-shaped object, always targeting behavior rather than identity. The
+primary symbol must physically position the cast as a stage mechanism, not sit
+beside them as decoration.
+
+If the scene can be mistaken for an ordinary lifestyle illustration at
+thumbnail size, reject it. If the viewer needs prose to know who wants what,
+who benefits, who carries the cost, or why the arrangement is contradictory,
+strengthen the visual labels, size hierarchy, and metaphor geometry.
+
+Use one blunt visual contest that survives without context: push against pull,
+weight against lift, appetite against scarcity, spotlight against shadow,
+shield against intrusion, hoarding against sharing, command against resistance,
+or another equally direct opposition. The primary metaphor must perform that
+contest physically. Subtle hesitation, private thoughts, deferred assistance,
+polite ambiguity, or a small symbolic object on an ordinary table is not enough.
+
 WOMAN-CENTERED AGENCY
-At least one adult woman is the narrative and compositional center. Her decision,
-labor, appetite, refusal, strategy, pleasure, mistake, or joke causes the visible
-change. Show agency through action, grip, weight, gaze, posture, spatial claim,
-or consequence rather than calling her empowered.
-Every other requested adult has a distinct objective, physical action, gaze,
-support, and reaction inside the same exchange. Nobody merely watches, waits,
-poses, points, or decorates the scene. Aim satire at behavior and relationships,
-not gender, nationality, anatomy, or humiliation.
+
+At least one adult woman is the unmistakable narrative and compositional
+center of every Theme and Frame. Her decision, appetite, labor, refusal,
+strategy, curiosity, pleasure, mistake, joke, or self-presentation drives the
+interaction. Show her agency through a specific action, grip, posture, gaze,
+spatial claim, or visible consequence rather than describing her as empowered.
+
+Women may cooperate, compete, flirt, negotiate, teach, interrupt, comfort,
+perform, bargain, celebrate, conspire, care for one another, or expose a shared
+contradiction. A man may be an ally, partner, rival, customer, colleague,
+friend, lover, family member, or comic counterweight, but he must have a
+specific responsive role rather than automatically controlling the scene.
+
+For a group, create a readable network of reactions instead of a hero surrounded
+by interchangeable extras. Give every requested person one distinct role in the
+same interaction and connect the group through eye lines, gestures, exchanged
+objects, shared pressure, or a single contested space. Use exactly the requested
+cast and add no bystanders, children, background crowds, portraits, reflections,
+screens, statues, or mannequins that resemble additional people.
+
+Every person is an unmistakably mature adult aged twenty-five or older, alert,
+willing, mutually responsive, and visibly able to stop or leave. Preserve each
+recurring person's age, face, hair, build, body proportions, and role throughout
+a Theme. Do not infer intelligence, morality, profession, status, dominance, or
+sexual availability from gender, body type, complexion, disability, or clothing.
+Every person's open eyes, directed gaze, purposeful hands, muscle engagement,
+or reciprocal expression must visibly prove wakefulness and present awareness.
+
 LIFE AS THE SOURCE
-Draw from ordinary adult contradictions involving domestic labor, friendship,
-dating, commitment, family expectations, caregiving, workplace credit, service
-work, money, status, beauty routines, privacy, etiquette, consumption, leisure,
-attention, imitation, approval, or self-presentation.
-Use a precise present situation rather than a general topic. Favor mixed motives:
-affection with irritation, solidarity with rivalry, desire with negotiation,
-care with exhaustion, confidence with self-consciousness, or generosity with
-scorekeeping. Do not default to helpless women or foolish men.
-METAPHOR AND POWER MAP
-Use one familiar object family whose ordinary function performs the satire: a
-scale weighs, a door admits or blocks, a conveyor transfers, a magnet attracts,
-an umbrella shelters, a table divides, an hourglass compresses, or an original
-equally direct mechanism acts.
-Choose a physical mechanism with naturally blank surfaces. Never use a phone,
-screen, document, book, package, sign, clock, gauge, map, or printed mechanism.
-The primary metaphor must carry, enclose, divide, squeeze, balance, lift, pull,
-or redirect the people. At least two adults directly grip, load, brace, block,
-tilt, stretch, open, close, or compress it. Its state visibly changes under
-their combined force.
-Give the opposing or cooperating sides concrete visual identities through an
-animal echo, garment, tool, emblem, material, color block, or repeated shape.
-Use exactly two smaller supporting symbols from the same object family. Do not
-mix several metaphors or scatter decorative props. Both supporting symbols are
-unmarked physical shapes with no letter, digit, icon, code, or pseudo-writing.
-Use one blunt visual contest such as push against pull, weight against lift,
-appetite against scarcity, spotlight against shadow, shelter against intrusion,
-hoarding against sharing, command against resistance, or another direct pair.
-CONTENT LEVEL
-Honor the requested content level without letting compliance language dominate
-the composition. Never write the internal level name in final output.
-Aesthetic: keep adults clothed and the interaction non-erotic.
-Erotic: show consensual adult sensuality, exposed breast or buttock, and direct
-reciprocal contact, but no penetration, oral-genital contact, direct genital
-stimulation, or sexual fluid.
-Hardcore: show one consensual explicit adult act already in progress; every
-requested adult actively performs, supports, or responds to that same act.
-Everyone is awake, willing, supported, responsive, and able to stop. Use no
-coercion, humiliation, intoxication, sleep, injury, restricted breathing,
-dangerous suspension, weapons, or unsafe objects near bodies. Nudity or anatomy
-is never the joke; the social relationship carries the satire.
-FLAT REAL-PERSON PHOTOMONTAGE
-Use premium physical editorial photomontage assembled from studio photographs
-of real adult performers. Each adult is a crisp whole-person cutout; enlarged
-features and objects are resized photographic fragments with deliberate clean
-cut edges or subtle paper seams.
-Photograph components separately, then visibly cut, mask, enlarge, compress,
-rotate, overlap, and remount them. Show a narrow paper seam, slight registration
-offset, or crisp edge halo where a resized fragment rejoins its owner. Align the
-joint cleanly so the body remains continuous and intentional.
-Use one orthographic poster plane, one matte background field, frontal or shallow
-side poses, uniform shadowless studio light, crisp focus, sparse color blocks,
-and narrow contact shadows. Preserve pores, skin translucency, fine hair, fabric
-weave, real eyes, and photographic material response.
-Flatten the assembled space, not the people. Use no room box, floor line, wall
-corner, ceiling, spatial recession, wide-angle view, dramatic perspective,
-bokeh, cinematic set, naturalistic group photograph, illustration, painting,
-anime, manga, chibi, CGI people, glossy digital art, or doll-like faces.
-The people and metaphor occupy at least four fifths of the image. Background
-context is reduced to a matte field and only essential diagnostic shapes.
-Use one integrated poster composition. Do not create a grid, contact sheet,
-comic panel, or multiple camera view unless the generation request requires it.
-ENGLISH IMAGE LABELS
-Each Theme chooses one meaningful pair of opposed one- or two-word English
-labels using uppercase ASCII letters and spaces only. End the Theme premise:
-"Locked image labels: FIRST LABEL | SECOND LABEL."
-Preserve the exact words, order, and spelling in every Frame. Put each label on
-one large plain matte carrier physically attached to the force it names. The
-pair clarifies a relationship already readable from bodies and geometry.
-Never place labels in a bottom title row, caption strip, footer, or detached
-typographic band.
-The two carriers are the only text-bearing surfaces. Remove screens, documents,
-books, receipts, menus, calendars, tickets, tags, maps, clocks, measuring tools,
-packages, logos, uniforms with marks, barcodes, QR codes, fine print, digits,
-pseudo-writing, and environmental text.
-Do not spell either label before the final image-text passage. End every Frame
-with exactly these two entries, replacing placeholders and carrier details:
-"Large matte first carrier, center-left, horizontal heavy black letters at
-one-twentieth image height: FIRST LABEL; Large matte second carrier,
-center-right, horizontal heavy red letters at one-twentieth image height:
-SECOND LABEL;"
-Each label appears exactly once. Both remain fully visible, unobstructed, inside
-the central eighty percent, and at least ten percent from every image edge.
-The Frame's final character is the second ASCII semicolon.
+
+Begin with an observed social behavior that could happen in a home, relationship,
+friendship, workplace, shop, restaurant, street, train, salon, gym, studio,
+clinic waiting room, hotel, celebration, neighborhood, or digital-age routine.
+Give the cast a concrete present-tense objective rather than a broad issue.
+
+Draw from open-ended areas such as:
+
+- invisible domestic labor, chores, hosting, cooking, repairs, and shared space;
+- friendship rituals, care, envy, advice, celebration, and reconciliation;
+- dating, courtship, commitment, boundaries, attraction, and negotiated intimacy;
+- workplace meetings, credit, mentorship, competition, and service labor;
+- beauty routines, fashion, wellness pressure, confidence, and aging;
+- shopping, luxury, convenience, abundance, scarcity, and delivery labor;
+- commuting, queues, elevators, umbrellas, luggage, and public etiquette;
+- attention, imitation, approval, self-presentation, rumor, and popularity;
+- family expectations, hospitality, matchmaking, caregiving, and inheritance;
+- sport, dance, hobbies, travel, nightlife, rest, food, and creative work.
+
+These are engines, not a checklist. Invent specific unfamiliar situations and
+include pleasure, solidarity, competence, and affectionate self-recognition as
+often as frustration or criticism. Do not make every Theme about oppression,
+beauty anxiety, romantic failure, domestic drudgery, or conflict with men.
+
+CARICATURE AND CONTROLLED DISTORTION
+
+Exaggerate decisively, but select exactly one item from this list for each
+person who is exaggerated:
+
+- one continuously attached hand or arm enlarged to no more than twice normal
+  scale, with no internal cut seam;
+- the person's entire intact head-to-foot body scaled between seventy and one
+  hundred thirty percent of the central woman's height;
+- one intact hairstyle or opaque garment volume expanded around the unchanged
+  real body;
+- one continuous theatrical posture that bends only at natural joints; or
+- one emphatic mature facial expression made by the real face without changing
+  the size or shape of any facial organ.
+
+Ordinary reaction expressions, gaze, and gestures may support the selected
+exaggeration, but describe them without words such as enlarged, compressed,
+stretched, elongated, swollen, oversized, distorted, or deformed. Never assign
+a second item from the list to the same person.
+
+Overloaded pockets, handbags, desks, shopping baskets, vanity surfaces, or
+stacked containers may externalize invisible burdens or desires, but these are
+props rather than additional body alterations. Exaggeration must look authored
+rather than accidentally malformed. Keep hands, contact, gaze, ownership, and
+every head-to-foot body legible. Do not use random extra limbs, fused bodies,
+broken fingers, duplicated faces, internal anatomical collage seams, accidental
+body horror, or grotesque distortion aimed at humiliating appearance.
+
+Never treat weight, age, complexion, facial structure, disability, nationality,
+or gender expression as the punchline. Direct satire toward behavior, systems,
+contradictions, performance, and relationships.
+
+METAPHOR AND SYMBOL SYSTEM
+
+Choose one primary metaphor family and exactly one supporting motif. Translate
+an invisible social relation into familiar concrete things with obvious ordinary
+functions. Productive families include:
+
+- scales, trays, bowls, or baskets for exchange and unequal contribution;
+- mirrors, masks, spotlights, or frames for presentation and judgment;
+- magnets, lights, or headphones for attention and mediated intimacy;
+- conveyor belts, hourglasses, containers, or knots for repetitive obligation;
+- umbrellas, doors, blankets, keys, or tables for access and boundaries;
+- plants, nests, weather, or animals for nurture and social instinct;
+- ropes, balloons, springs, seesaws, or ladders for unstable cooperation; and
+- uniforms, medals, podiums, or trophies for recognition and social theater.
+
+Use an animal, object, garment, or emblem as a visual label or analogy, not as a
+literal insult. Keep every adult's identity readable even when an animal echo,
+mask-like overlay, shadow, patterned accessory, hybridized feature, companion,
+or adjacent object makes the comparison unmistakable.
+
+Every symbol must have one clear referent and one visible relationship to the
+cast. A handbag cannot simultaneously mean wealth, secrecy, burden, romance,
+and imprisonment. Avoid random chessboards, puppeteer strings, cages, crowns,
+snakes, masks, scales, or broken mirrors when their ordinary function is not
+active in the scene.
+
+Prefer physical analogy over floating iconography. Objects have weight, contact,
+support, wear, and consequences. Keep metaphor props self-supporting and make
+their scale, ownership, and position unambiguous. Do not let symbols hide faces,
+decisive body contact, or the selected content level.
+
+CONTENT-LEVEL INTEGRATION
+
+Honor exactly the requested content level in every Theme and every Frame. The
+level changes the kind of adult interaction, bodily exposure, metaphor, humor,
+and social tension; it is not a decorative styling switch. Never write the
+internal level name in final output.
+
+At aesthetic level, keep the cast clothed and the interaction non-erotic.
+Build the caricature through social behavior, gesture, work, leisure, objects,
+space, expression, and clothing. Affection, flirtation, dancing, embraces, and
+close friendship may appear without exposed breasts or genitals, sexual
+touching, or sexual activity.
+In every aesthetic Frame, name one complete opaque outfit for each adult.
+Opaque garments fully cover every breast, buttock, and genital area. Show no
+bare torso, transparent garment, lingerie, swimwear, exposed breast, exposed
+buttock, or accidental nudity.
+
+At erotic level, show unmistakable consensual adult sensuality through exposed
+skin and direct intimate contact. Every erotic Frame must include at least one
+clearly exposed breast or buttock plus kissing, reciprocal sensual touch,
+deliberate body-to-body pressure, or playful erotic negotiation among the
+requested adults. Bare shoulders, cleavage, exposed thighs, sleepwear, nudity
+without intimate action, accidental knee contact, or one person watching
+another perform a private routine is insufficient. Keep the interaction
+non-explicit: show no penetration, oral-genital contact, direct genital
+stimulation, or sexual fluids. The sensual relation itself must carry the
+social joke or metaphor rather than appearing beside an unrelated caricature.
+Every participant remains awake and actively reciprocates.
+
+At hardcore level, every Theme and Frame must show a consensual explicit adult
+sexual act already in progress and directly visible. Mere nudity, suggestive
+posing, imminent contact, preparation, strategically concealed contact, or
+aftermath is insufficient. Integrate the explicit interaction into the same
+everyday relationship and metaphor system so that removing it destroys the
+caricature proposition. Every requested participant must make direct intimate
+physical contact with at least one other requested participant as part of the
+same explicit act. Looking, judging, waiting, holding a prop, or standing nearby
+does not count. Include no clothed spectator or queued participant. Preserve
+clear anatomy, physical support, mutual agency, and the ability to stop. Do not
+use injury, coercion, intoxication, sleep, restricted breathing, dangerous
+suspension, weapons, or unsafe objects near bodies.
+
+At erotic and hardcore levels, do not make nudity or anatomy itself the joke.
+The humor comes from desire, etiquette, attention, negotiation, habit,
+contradiction, or the collision between private intimacy and ordinary life.
+Use a private adult space unless the Story Description explicitly establishes
+another consensual setting.
+
+At hardcore level, the explicit interaction is the sole ongoing human action.
+No participant simultaneously reads, types, calculates, works, cooks, cleans,
+shops, photographs, checks a phone, operates a device, reaches for a document,
+or performs another ordinary task. Express the everyday contradiction through
+the participants' roles, gaze, distorted pose, division of attention, static
+objects, and present spatial arrangement inside the explicit contact. Supporting
+objects remain passive and must not require a second task. If the same joke
+would remain after replacing the explicit interaction with two clothed people
+in the same poses, reject the concept.
+
+DIRECT AND POPULAR LEGIBILITY
+
+Compose for immediate understanding across language and education. Establish
+one dominant silhouette, one decisive exchange or collision, and one clear
+reaction circuit. Faces, hands, the principal contact, and the primary metaphor
+must remain readable at thumbnail size.
+
+Use a poster-like hierarchy: caricatured faces first, impossible body silhouette
+second, monumental metaphor third, one supporting symbol fourth, sparse life
+context last. The central figures and metaphor occupy at least four fifths of
+the composition. Reduce the background to two or three diagnostic objects and
+one broad color field. Do not spend visual attention on realistic toiletries,
+furniture inventory, skin highlights, atmospheric steam, decorative clutter,
+or cinematic set dressing.
+
+Photograph each real performer frontally or in a shallow side pose with the same
+eye-level viewpoint, neutral focal scale, crisp focus, and uniform shadowless
+studio light. Assemble every cutout onto one exact orthographic poster plane;
+there is no foreground, middle distance, room corner, floor recession, or
+background architecture. Use overlap and relative cutout size only. Do not use
+overhead, high-angle, low-angle, wide-angle, selfie, or strong foreshortening.
+Do not enlarge a hand or foot by placing it close to the lens; enlarge its
+photographic cutout while keeping it on the same poster plane as the face.
+
+Favor a strong triangular, circular, seesaw, procession, face-off, or chain-
+reaction arrangement. Use overlap and scale to clarify power and attention,
+not to conceal anatomy or add clutter. The background supplies recognizable
+life context with a few diagnostic details; it does not become a scavenger hunt.
+
+Give reactions specific differences: one woman may remain dryly composed while
+another suppresses laughter; a man may realize he has misunderstood while a
+friend knowingly redirects the exchange; a group may split into alliances,
+mirror one another, or pass one burden down a chain. Do not fill the image with
+identical shock, open mouths, finger-pointing, or generic laughter.
+
+IMAGE-TEXT GATE
+
+Every Frame must visibly include the Theme's exact pair of English labels and
+no other text. Each label contains one or two short words using only uppercase
+ASCII letters A through Z and spaces. Render both horizontally in bold,
+high-contrast block capitals. Every letter must be at least one twentieth of
+the image height, and each complete label must occupy at least one eighth of the
+image width. Both labels sit in the same focal plane as the people and remain
+fully unobstructed.
+
+Spell each locked label exactly twice in the complete Frame: once in the visual
+description when identifying its plain carrier, and once after the corresponding
+ASCII colon in the final image-text passage. Repetition reinforces correct image
+rendering. Never spell either label a third time and never write any other
+all-uppercase word.
+
+Quarantine every exact visible string until one dedicated image-text passage at
+the absolute end of the Frame. Write exactly two entries. For each entry, state
+its physical carrier, exact image location, minimum letter height, horizontal
+orientation, type weight, text color, and plain background color, add an ASCII
+colon, write the exact uppercase English copy, and end with an ASCII semicolon.
+Use the literal characters `: ` before the copy and `;` after it. Never enclose
+copy in quotation marks or repeat either string anywhere else in the Frame.
+Do not add an IMAGE-TEXT heading, Text label, Copy label, or any other prefix.
+Begin directly with the first carrier description. The Frame's final character
+must be the second entry's ASCII semicolon.
+
+Write this dedicated passage once only. Immediately before it, write the final
+cast-restatement sentence. After the first carrier-copy entry begins, never
+write the cast again and never restart or duplicate either carrier-copy entry.
+
+Use this serialization grammar exactly, with Theme-specific carriers, positions,
+colors, and locked copy replacing the example values:
+`Large blue left scale pan, lower-left, horizontal heavy black letters at
+one-twentieth image height: WORK; Large cream right scale pan, lower-right,
+horizontal heavy red letters at one-twentieth image height: CREDIT;`
+After each colon, write only the exact locked label followed immediately by its
+semicolon. Do not write spelling, reading, saying, displaying, text, copy, label,
+or any typographic explanation after the colon.
+
+Every other surface must contain zero letters, words, digits, pseudo-letters,
+glyph-like marks, fine print, barcodes, or QR codes. Do not ask the image model
+to invent any environmental copy. If a text-bearing object is present, its
+entire visible typographic content must be one of the two declared labels;
+otherwise simplify it into a plain, mark-free shape.
+
+Visible copy confirms a relation already obvious from bodies, symbols, and
+composition. If removing the words makes the satire unintelligible, redesign
+the picture rather than adding more text.
+
+REAL-PERSON PHOTOMONTAGE LANGUAGE
+
+Treat every image as a premium physical editorial photomontage assembled from
+studio photographs of real adult performers. Each adult is photographed
+separately against the same neutral light, then cut out with a crisp continuous
+outer edge and mounted onto one matte poster surface. If an attached hand or arm
+is the person's single chosen exaggeration, scale it as a continuous extension
+of the intact whole-person photograph with no internal cut seam. Objects and
+symbols may be resized as separate photographic cutouts. Never resize or paste
+a face or isolated organ.
+
+Use four dominant colors for clothing, object cutouts, and the flat background
+while preserving full natural color and photographic tonal variation in human
+skin and hair. Separate silhouettes with contrast, narrow physical cut-paper
+seams, one-to-three-millimeter contact shadows, and empty space rather than
+drawn outlines. Pores, fine hair, fabric weave, object texture, and pressure at
+contact points remain photographic, while the assembled world has zero
+atmosphere, floor depth, wall depth, or lens recession.
+
+Do not imitate a named artist or publication. Avoid generic glossy 3D mascots,
+children's-book sweetness, superhero anatomy, anime defaults, meme templates,
+corporate vector art, random surreal collage, horror grotesquerie, illustrated
+people, painted skin, silicone body extensions, deep cinematic locations,
+glossy fashion imagery, and ordinary lifestyle photographs with only one
+oversized prop.
+
 THEME CONTRACT
-Return one concise original title, a premise of two to four sentences, and one
-concise style sentence. The premise states:
-- allowed location and current everyday occasion;
-- exact requested cast, allowed identity, age, and stable visual anchors;
-- central woman's objective and every other adult's active role;
-- social contradiction and present content-level proof;
-- each principal deformation and impossible group silhouette;
-- monumental metaphor, two supporting symbols, and force-changing interaction;
-- exact opposed label pair in the required final pattern.
-The style sentence locks real-person photographic cutouts, resized fragments,
-hard edges, matte palette, one orthographic plane, uniform light, and zero depth.
-Do not brainstorm, explain intentions, name an artist, or draft later Frames.
+
+Each Theme must return one concise original title, a premise of no more than two
+sentences, and one concise style sentence.
+
+Complete the private thumbnail selection before writing the title or premise.
+The premise records the already selected visual solution; it must not brainstorm
+alternatives, explain intentions, or propose what a later Frame could contain.
+
+The premise must establish:
+
+- one allowed East Asian region, a precise everyday location, era or year, and
+  current social occasion;
+- the exact recurring adult cast, explicitly identifying every person's
+  allowed identity, with plausible local names and stable visual anchors;
+- the central woman's objective and every other person's role in the same
+  interaction;
+- the familiar behavior or relationship contradiction;
+- each adult's single controlled exaggeration and the clear full-group
+  opposition they create;
+- each side's concrete visual label;
+- the monumental primary metaphor, its single supporting symbol, and their
+  concrete present functions, including that the primary structure fills
+  thirty-five to fifty percent of the canvas; and
+- the decisive frozen situation that makes the idea understandable without
+  text.
+
+The style sentence defines the real-person photographic cutouts, controlled
+whole-body silhouette exaggeration, crisp outer collage edges, matte palette,
+single orthographic poster plane, uniform studio light, zero environmental
+depth, and caricature intensity.
+Do not use a creator name, publication name, camera list, Frame drafts,
+workflow language, schema terms, or future instructions.
+
+A Theme must be deep enough to yield the requested number of genuinely
+different Frames without changing its people, relationship, location logic,
+metaphor family, deformation grammar, or visual medium.
+
+Before returning a Theme, verify its premise against THEME CONTENT-PROOF GATE.
+Reject it if one requested person's gender is changed, if level proof is vague
+or postponed, or if an unrequested BDSM element appears.
+
 FRAME CONTRACT
-Write one standalone finished-image paragraph, not a storyboard, split screen,
-comic strip, before-and-after comparison, or design discussion.
-After the fixed opening, dynamic cast declaration, and exact montage sentence,
-describe the decisive whole-image icon first. Then describe stable people, caricatured features,
-present interaction, physical force, changing metaphor, two supporting symbols,
-specific reactions, negative space, and photographic material. Use visible
-present-tense facts only; never explain what the metaphor represents.
-State the cast declaration once only and never revise its numbers. Finish with
-the exact two-entry image-text passage. Add nothing after its final semicolon.
-CONTINUITY AND VARIATION
-Within one Theme, preserve names, allowed identities, ages, faces, hair, base
-garments, relationship, deformations, metaphor family, supporting symbols,
-palette, and labels. Vary body arrangement, immediate tactic, contact geometry,
-mechanism state, group silhouette, negative space, and reaction intensity.
-Across Themes, vary country or region, everyday domain, relationship, emotional
-tone, metaphor family, deformation grammar, layout, palette, and scale. Do not
-repeatedly default to mirrors, phones, shopping, housework, beauty standards,
-office meetings, jealous couples, or identical shocked expressions.
-REJECTION
-Reject and replace any output with a wrong or extra person, non-East-Asian
-identity, ambiguous adulthood, passive central woman, spectator, disconnected
-action and metaphor, normal-looking proportions, weak silhouette, mixed metaphor,
-small tabletop symbol, deep room space, anime or painted person, malformed or
-detached anatomy, unsafe action, extra text, gibberish, misspelled labels,
-obstructed labels, or continuity drift.
-Return only the requested Theme fields or Frame prose. Never output planning,
-alternatives, explanations, schema commentary, compliance notes, or count tokens.
+
+Every Frame is one standalone finished image, not a storyboard, contact sheet,
+split screen, comic strip, before-and-after comparison, or multi-panel layout.
+Write one concise, directly imageable prose paragraph of five to eight complete
+sentences with no headings, bullets, field labels, explanation, moral, caption,
+or compliance language. Devote the first five sentences to the caricatured
+faces, impossible silhouette, visual labels, monumental metaphor, one supporting
+symbol, interaction, and reactions. Use at most one sentence for medium, color,
+graphic viewpoint, real photographic material detail, and narrow cutout contact
+shadows together. Do not inventory the room or narrate symbolism.
+The paragraph is a transcription of the privately finished real-person
+photomontage, not a design discussion or a sequence of ideas.
+
+Naturally restate:
+
+- the allowed East Asian region, precise everyday location, era or year, and
+  immediate occasion;
+- every recurring adult's specific allowed identity, stable appearance, and exact
+  position;
+- every adult's complete visible face, torso, arms, and level-appropriate outfit;
+- the central woman's present objective and decisive action;
+- every other person's distinct action, gaze, support, and reaction;
+- the unequal expectation, shared desire, habit, or misunderstanding;
+- each principal person's one continuous exaggeration and how it changes the
+  outer silhouette without breaking anatomical continuity;
+- the impossible spatial exaggeration compressing the whole relationship;
+- each side's concrete animal, object, garment, or emblem label;
+- the primary metaphor objects, their ordinary functions, owners, support,
+  contact, scale, thirty-five-to-fifty-percent canvas share, and spatial
+  relation to the cast;
+- exactly one supporting symbol from the same metaphor family;
+- the one-second visual read and the closer secondary discoveries;
+- foreground, middle ground, background, and negative-space organization;
+- identical frontal photographic viewpoint, one orthographic poster plane,
+  flat overlap hierarchy, real skin and material texture, matte color fields,
+  hard cut edges, and narrow contact shadows; and
+- the exact visible evidence required by the selected content level.
+
+Freeze one present-tense instant. Describe visible pose, pressure, overlap,
+compression, stretch, weight, grip, gaze, expression, and material response.
+Do not explain what the metaphor means, why the scene is funny, what happened
+earlier, what will happen next, or how an unseen mechanism works.
+Do not use interpretive phrases such as symbolizes, represents, visualizes,
+stands for, serves as a metaphor, makes clear, the viewer understands, humorous
+commentary, social critique, or explanatory note. Describe only the visual fact
+that permits the viewer to reach that conclusion.
+
+Frames within one Theme are parallel editorial alternatives rather than a
+chronological sequence. Preserve identity and concept while changing at least
+four of these between any two Frames:
+
+- the woman's tactic or immediate objective;
+- another participant's response or alliance;
+- the division of action across the cast;
+- the active component of the metaphor system;
+- the exaggerated gesture, feature, or spatial imbalance;
+- the dominant group silhouette;
+- the foreground entry or negative-space shape;
+- the viewpoint, distance, or perspective;
+- the color emphasis, texture, or light direction; and
+- the emotional temperature.
+
+Do not reuse one composition with only clothing, facial expression, color, or
+camera wording changed.
+
+ANTHOLOGY VARIATION
+
+Across Themes, vary the everyday domain, relationship grammar, emotional tone,
+metaphor family, deformation grammar, group arrangement, medium, palette, and
+scale of space. No more than two Themes in one batch may center the same broad
+life domain or use the same primary symbol family.
+
+Balance critique with delight. Include both private and public situations,
+cooperative and adversarial dynamics, quiet irony and exuberant farce, one-to-
+one exchange and group behavior when allowed by the requested cast. Do not
+default repeatedly to mirrors, shopping, housework, phones, beauty standards,
+office meetings, jealous couples, overburdened women, or clueless men.
+
+VARIATION AND REJECTION RULES
+
+Silently reject and replace any Theme or Frame when:
+
+- any person is not explicitly East Asian or has an identity outside the
+  allowed list;
+- the scene is set outside the allowed regions or uses mismatched identity
+  markers;
+- the woman is decorative, passive, anonymous, or absent from the causal center;
+- the supporting cast could be removed without changing the proposition;
+- the image is a portrait beside symbols rather than a visible interaction;
+- the joke depends on a caption, stereotype, bodily trait, or humiliation;
+- the metaphor is generic, mixed, text-dependent, or unrelated to ordinary use;
+- the central woman lacks one unmistakable controlled exaggeration;
+- any adult has a cute anime, manga, chibi, kawaii, doll-like, childlike, or
+  ambiguously young face or body proportion;
+- any person has more than one bodily exaggeration, or an exaggeration is too
+  subtle to alter the complete silhouette at thumbnail size;
+- any face, organ, torso, hand, foot, or limb is cut, pasted, duplicated,
+  floating, detached, folded, spliced, separately mounted, or transformed into
+  a body-horror form;
+- breasts, buttocks, genitals, tongue, or an isolated facial organ are used as
+  the exaggerated feature;
+- any requested adult is obscured, cropped, omitted, reduced to an isolated
+  body part, merged with another body, or placed behind the dominant action;
+- any requested adult is not visible head to foot with one head, one torso, two
+  attached arms, two hands, two attached legs, and two feet;
+- an aesthetic adult lacks a complete opaque outfit or shows a bare torso,
+  breast, buttock, genital area, lingerie, swimwear, or transparent garment;
+- an aesthetic Frame describes a body alteration before naming every adult's
+  complete outfit, including top, bottom or one-piece garment, and footwear;
+- the exact cast total and gender composition is not stated at both the
+  beginning and end of the Frame, or any extra human-like figure appears;
+- the exact opposed English label pair is absent, misspelled, repeated outside
+  the final dedicated passage, too small, obstructed, or not integrated into
+  the two opposing forces;
+- a Frame changes either label from the Theme's locked pair, or the Theme does
+  not end its premise with the exact `Locked image labels: ... | ....` pattern;
+- either locked label appears other than exactly twice, or any unrelated
+  all-uppercase word appears;
+- the final image-text passage contains anything other than exactly two
+  carrier-and-copy entries ending in ASCII semicolons;
+- any undeclared surface contains letters, numbers, pseudo-writing, gibberish,
+  filler copy, or glyph-like marks;
+- any text-bearing object exists beyond the two clean label carriers, including
+  a screen, receipt, document, notebook, publication, calendar, ticket, tag,
+  stamp, certificate, map, clock, measuring tool, package, barcode, or QR code;
+- any generated Theme or Frame contains a word prohibited by the LEXICAL
+  TEXT-CARRIER BAN;
+- deformation does not change the outer silhouette or could be mistaken for
+  ordinary perspective;
+- the monumental metaphor occupies less than thirty-five percent or more than
+  fifty percent of the complete canvas, or remains a tabletop prop;
+- either social side lacks a concrete visual label, or more or fewer than one
+  supporting symbol reinforces the primary comparison;
+- the result reads as a drawn illustration, anime, manga, doll art, CGI
+  character scene, deep cinematic still, wide-angle selfie, silicone-prosthetic
+  spectacle, or ordinary lifestyle photograph rather than a flat real-person
+  photographic montage;
+- exaggeration becomes accidental malformed anatomy or conceals the action;
+- every person has the same expression, gesture, or social role;
+- a crowd, reflection, portrait, screen figure, statue, or mannequin violates
+  the requested cast;
+- erotic or hardcore content is sanitized, hidden, detached from the metaphor,
+  or intensified beyond the requested level;
+- any person is asleep, apparently asleep, unaware, passive, or performing a
+  separate task outside the shared interaction;
+- an erotic Frame lacks both clearly exposed adult anatomy and direct
+  reciprocal sensual contact;
+- a hardcore participant lacks direct intimate physical contact with another
+  requested participant, remains fully clothed over required anatomy, merely
+  watches, waits, judges, or holds a prop;
+- a hardcore participant reads, types, calculates, works, checks a screen,
+  reaches for a document, or performs any second ongoing action;
+- the scene imitates a real person, named artist, known artwork, meme, cartoon,
+  advertisement, or publication identity;
+- props and background details overwhelm the central social equation;
+- another Theme in the batch already uses the same life problem, relationship
+  geometry, primary symbol, and deformation strategy; or
+- the result cannot be summarized as one woman-centered interaction and one
+  immediately visible comic contradiction.
+
+Before returning, verify that the exact adult cast is present, the central
+woman and every supporting adult have an allowed East Asian identity, the
+setting is in an allowed region, the central woman has decisive agency, the
+content level is directly visible, every metaphor belongs to the interaction,
+the caricature reads without words, every body remains coherent within the
+chosen deformation grammar, and each Frame is independently complete.
+
+When the current generation stage requests Themes rather than Frames, return
+only Theme fields. Do not continue with Frame prose, alternate views, internal
+keys, count values, or later-stage instructions.
