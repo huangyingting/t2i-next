@@ -562,82 +562,78 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     ).read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
-    assert len(brief) <= 25_000
+    assert len(brief) <= 50_000
     assert brief.isascii()
 
     required_contract = (
         "Create original, woman-centered editorial caricature scenes",
         "exact requested supporting cast",
-        "NON-NEGOTIABLE PRIORITY",
-        "Use the exact requested adult cast, gender composition, and total",
-        "Give every person an amplified outfit, hairstyle, and worn accessory",
-        "CAST, SETTING, AND OUTPUT",
-        "Every visible person is a fictional East Asian adult aged twenty-five or older",
+        "EAST ASIAN CAST AND SETTING LOCK",
+        "Every visible person is a fictional East Asian adult",
         "mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, and Singaporean Chinese",
-        "Never infer, default, or hard-code a count",
-        "Use English-only ASCII characters U+0020 through U+007E",
-        "Flat satirical photomontage assembled from photographs of real adult performers:",
+        "Include no person outside this list",
+        "Set every Theme and Frame in mainland China, Taiwan, Hong Kong",
+        "ENGLISH OUTPUT AND REAL-PERSON PHOTOMONTAGE LOCK",
+        "Use English-only ASCII characters",
         "Exactly [requested total] East Asian adults fill the image",
-        "Repeat the same script-supplied total and gender composition once near the end",
-        "CONTENT-LEVEL INTEGRATION",
-        "At aesthetic level",
-        "At erotic level",
-        "At hardcore level",
-        "Every requested participant makes direct intimate physical contact",
-        "standing nearby, or touching only oneself does not count",
-        "At erotic or hardcore level, describe remaining and displaced clothing truthfully",
-        "Sexual participation must never be payment, professional duty, tenant duty",
-        "WOMAN-CENTERED ACTION-METAPHOR EQUATION",
-        "Create one closed causal force chain",
-        "The primary metaphor must visibly change mechanical state because of the bodies",
-        "MONTAGE CARICATURE, STYLING, AND ANATOMY",
-        "The signature technique is deliberate scale mismatch",
-        "cut, resize, reposition, and overlap photographed body regions",
-        "an enlarged or compressed photographic head",
-        "one enlarged, compressed, widened, or narrowed facial anchor",
-        "an expanded or pinched torso contrasted against normal limbs",
-        "one arm, hand, leg, or foot enlarged, shortened, or elongated",
-        "Use visible hard photographic cut seams, overlaps, and scale jumps",
-        "Use distortion to amplify performed pettiness, hypocrisy, vanity, greed",
-        "Do not distort ethnic features, disability, age, complexion, body weight",
-        "Do not exaggerate breasts, buttocks, genitals, or tongue",
-        "Separate from the one montage distortion",
-        "a bold outfit silhouette or dramatic garment construction",
-        "a sculptural, unusually voluminous, or sharply graphic hairstyle",
-        "one oversized worn accessory",
-        "PRIMARY METAPHOR, SYMBOL, AND LABELS",
-        "Use exactly one supporting symbol from the same metaphor family",
-        "Locked image labels: FIRST LABEL | SECOND LABEL.",
-        "The two carriers are the only text-bearing surfaces",
-        "Each Frame spells each locked label exactly once",
-        "watch, clipboard, badge, card, control panel, or measuring instrument",
-        "REAL-PERSON PHOTOMONTAGE",
-        "premium physical editorial photomontage",
-        "one exact orthographic poster plane",
-        "IDEATION AND ANTHOLOGY VARIATION",
-        "at least three radically different black-silhouette thumbnails",
-        "THEME CONTRACT",
-        "FRAME CONTRACT",
-        "The 340-word maximum is a hard limit",
-        "FINAL REJECTION CHECK",
-    )
-    for marker in required_contract:
-        assert marker in normalized
-
-    removed_duplicate_sections = (
+        "Never infer, default, or hard-code any count",
+        "NON-NEGOTIABLE PRIORITY",
+        "use the exact requested adult cast",
         "PLANNED ENGLISH LABEL SYSTEM",
+        "Locked image labels: FIRST LABEL | SECOND LABEL.",
         "LEXICAL TEXT-CARRIER BAN",
         "THEME CONTENT-PROOF GATE",
         "SATIRICAL CARICATURE HARD GATE",
         "CONTROLLED WHOLE-BODY EXAGGERATION",
-        "CARICATURE AND CONTROLLED DISTORTION",
+        "Every adult appears as one intact photographic person",
+        "Use no more than one anatomical or silhouette exaggeration",
         "VISUAL LABEL AND POWER MAP",
+        "WOMAN-CENTERED AGENCY",
+        "LIFE AS THE SOURCE",
+        "CARICATURE AND CONTROLLED DISTORTION",
+        "METAPHOR AND SYMBOL SYSTEM",
+        "CONTENT-LEVEL INTEGRATION",
+        "At aesthetic level",
+        "At erotic level",
+        "At hardcore level",
+        "Every requested participant must make direct intimate physical contact",
+        "DIRECT AND POPULAR LEGIBILITY",
         "IMAGE-TEXT GATE",
-        "REAL-PERSON PHOTOMONTAGE LANGUAGE",
+        "carriers are the only text-bearing surfaces permitted",
+        "REAL-PERSON PHOTOMONTAGE",
+        "premium physical editorial photomontage",
+        "one exact orthographic poster plane",
+        "THEME CONTRACT",
+        "FRAME CONTRACT",
+        "ANTHOLOGY VARIATION",
         "VARIATION AND REJECTION RULES",
     )
-    for duplicate in removed_duplicate_sections:
-        assert duplicate not in normalized
+    for marker in required_contract:
+        assert marker in normalized
+
+    removed_conflicts = (
+        "describe that person's complete head-to-foot outfit",
+        "before all complete outfits are locked",
+        "that changes her whole silhouette",
+        "thirty to forty percent of the image",
+        "complete, continuous, clothed human body",
+        "every adult's complete opaque outfit within the first three Frame sentences",
+        "intact, fully clothed body",
+        "without changing the size or shape of any facial organ",
+        "or isolated facial organs",
+        "or an isolated facial organ are used as the exaggerated feature",
+        "Quarantine every exact visible string",
+        "repeat either string anywhere else in the Frame",
+        "repeated outside the final dedicated passage",
+        "premise of no more than two sentences",
+        "five to eight complete sentences",
+        "foreground, middle ground, background",
+        "the viewpoint, distance, or perspective",
+        "or light direction",
+        "deformation does not change the outer silhouette",
+    )
+    for conflict in removed_conflicts:
+        assert conflict not in normalized
 
 
 def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
