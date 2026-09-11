@@ -322,14 +322,61 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "WOMAN-CENTERED AGENCY" in normalized
     assert "At least one adult woman is the unmistakable narrative" in normalized
     assert "Use exactly the requested cast and add no bystanders" in normalized
+    assert "ENGLISH OUTPUT AND REAL-PERSON PHOTOMONTAGE LOCK" in normalized
+    assert "complete Frame in English, regardless of the requested output language" in (
+        normalized
+    )
+    assert "Use English-only ASCII characters" in normalized
+    assert "Write personal names in normal Title Case" in normalized
+    assert "reserve uppercase words exclusively for exact visible copy" in normalized
+    assert (
+        "Flat satirical photomontage assembled from photographs of real adult "
+        "performers:"
+        in normalized
+    )
+    assert "Exactly [total] adults fill the image" in normalized
+    assert "Near the end of the Frame, restate the same exact total" in normalized
+    assert "append the mandatory final image-text passage" in normalized
+    assert "Every visible person must remain unmistakably photographic and human" in (
+        normalized
+    )
+    assert "Do not use illustration, drawing, painting" in normalized
+    assert "anime, manga, chibi" in normalized
+    assert "real photographic adult cutouts" in normalized
+    assert "The final style sentence must positively restate" in normalized
     assert "LIFE AS THE SOURCE" in normalized
     assert "invisible domestic labor" in normalized
     assert "friendship rituals" in normalized
     assert "dating, courtship, commitment" in normalized
     assert "workplace meetings" in normalized
-    assert "social media attention" in normalized
+    assert "attention, imitation, approval, self-presentation" in normalized
     assert "CARICATURE AND CONTROLLED DISTORTION" in normalized
-    assert "Exaggerate selectively" in normalized
+    assert "Exaggerate decisively" in normalized
+    assert "SATIRICAL CARICATURE HARD GATE" in normalized
+    assert "roughly two to four times its ordinary visual scale" in normalized
+    assert "One monumental metaphor structure occupies roughly one third" in (
+        normalized
+    )
+    assert "A single long arm, a mildly large hand" in normalized
+    assert "All faces must remain unmistakably mature" in normalized
+    assert "Reject smooth doll faces, huge sparkling eyes" in normalized
+    assert "DRAW FIRST, DESCRIBE SECOND" in normalized
+    assert "silently draw at least three radically different thumbnail" in normalized
+    assert "using only black shapes and one accent color" in normalized
+    assert "silently assemble one complete final photomontage" in normalized
+    assert "separately photographed real adult performers" in normalized
+    assert "following the viewer's scan order from dominant icon" in normalized
+    assert "The first Frame sentence must show the whole visual icon at once" in (
+        normalized
+    )
+    assert "If a sentence must explain what a symbol means" in normalized
+    assert "fill thirty-five to fifty percent of the entire image area" in normalized
+    assert "VISUAL LABEL AND POWER MAP" in normalized
+    assert "Give each side a concrete visual label" in normalized
+    assert "Use one blunt visual contest that survives without context" in normalized
+    assert "If the scene can be mistaken for an ordinary lifestyle illustration" in (
+        normalized
+    )
     assert "METAPHOR AND SYMBOL SYSTEM" in normalized
     assert "Use an animal, object, garment, or emblem as a visual label" in normalized
     assert "Every symbol must have one clear referent" in normalized
@@ -339,6 +386,22 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "At hardcore level" in normalized
     assert "NON-NEGOTIABLE PRIORITY" in normalized
     assert "everyone awake, alert, willing" in normalized
+    assert "PLANNED ENGLISH LABEL SYSTEM" in normalized
+    assert "Every Theme must choose one meaningful pair of opposed English labels" in (
+        normalized
+    )
+    assert "Each label contains one or two short words" in normalized
+    assert "Lock the exact pair during Theme generation" in normalized
+    assert "Locked image labels: FIRST LABEL | SECOND LABEL." in normalized
+    assert "The Frame must preserve this exact pair" in normalized
+    assert "Give each label one large, simple physical carrier" in normalized
+    assert "No other readable or pseudo-readable content may appear" in normalized
+    assert "The two clean label carriers are the only text-bearing surfaces" in (
+        normalized
+    )
+    assert "LEXICAL TEXT-CARRIER BAN" in normalized
+    assert "Do not use any of these English words or their plurals" in normalized
+    assert "Replace any candidate containing one of these words" in normalized
     assert "THEME CONTENT-PROOF GATE" in normalized
     assert "The Theme premise itself must contain the complete visible proof" in (
         normalized
@@ -352,10 +415,38 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
     assert "The humor comes from desire, etiquette, attention" in normalized
     assert "DIRECT AND POPULAR LEGIBILITY" in normalized
     assert "understandable without text" in normalized
-    assert "No readable image text is required" in normalized
-    assert "Screens may show only blank color fields" in normalized
-    assert "do not describe any visible word, letter, numeral" in normalized
+    assert "Use a poster-like hierarchy" in normalized
+    assert "at least four fifths of the composition" in normalized
+    assert "Photograph each real performer frontally or in a shallow side pose" in (
+        normalized
+    )
+    assert "one exact orthographic poster plane" in normalized
+    assert "IMAGE-TEXT GATE" in normalized
+    assert "Every Frame must visibly include the Theme's exact pair" in normalized
+    assert "Every letter must be at least one twentieth of the image height" in (
+        normalized
+    )
+    assert "each complete label must occupy at least one eighth" in normalized
+    assert "Spell each locked label exactly twice in the complete Frame" in normalized
+    assert "Repetition reinforces correct image rendering" in normalized
+    assert "dedicated image-text passage at the absolute end" in normalized
+    assert "Write exactly two entries" in normalized
+    assert "minimum letter height, horizontal orientation, type weight" in normalized
+    assert "Use the literal characters `: `" in normalized
+    assert "Do not add an IMAGE-TEXT heading" in normalized
+    assert "The Frame's final character" in normalized
+    assert "Use this serialization grammar exactly" in normalized
+    assert "one-twentieth image height: WORK;" in normalized
+    assert "After each colon, write only the exact locked label" in normalized
+    assert "Every other surface must contain zero letters" in normalized
+    assert "its entire visible typographic content must be one of the two" in normalized
+    assert "If removing the words makes the satire unintelligible" in normalized
     assert "Do not use interpretive phrases such as symbolizes" in normalized
+    assert "five to eight complete sentences" in normalized
+    assert "Devote the first five sentences to the caricatured" in normalized
+    assert "REAL-PERSON PHOTOMONTAGE LANGUAGE" in normalized
+    assert "premium physical editorial photomontage" in normalized
+    assert "full natural color and photographic tonal variation" in normalized
     assert "THEME CONTRACT" in normalized
     assert "FRAME CONTRACT" in normalized
     assert "VARIATION AND REJECTION RULES" in normalized
