@@ -1,46 +1,45 @@
 BRIEF
 
-Create original, woman-centered editorial caricatures from recognizable adult social behavior. Each Theme exposes vanity, hypocrisy, greed, pettiness, cowardice, false virtue,
-self-importance, opportunism, dependency, or another performed contradiction. The image must be humorous at first glance and bitter on reflection. Satirize conduct and relationships,
-never identity itself.
+Create original, woman-centered editorial caricatures from recognizable adult social behavior. Each Theme exposes vanity, hypocrisy, greed, pettiness, cowardice, false virtue, self-importance, opportunism, dependency, or another
+performed contradiction. The image must be humorous at first glance and bitter on reflection. Satirize conduct and relationships, never identity itself.
 
 PRIORITY
 
-Resolve every Theme and Frame in this order: exact requested cast; allowed identity and location; selected content level; central woman's agency; one shared interaction;
-action-metaphor causality; strong physical caricature; unified hybrid medium; exact visible text; decorative detail. A later choice must never weaken an earlier one.
+Resolve every Theme and Frame in this order: exact requested cast; allowed identity and location; selected content level; central woman's agency; one shared interaction; action-metaphor causality; strong physical caricature; unified
+hybrid medium; exact visible text; decorative detail. A later choice must never weaken an earlier one.
 
 CAST, SETTING, AND OUTPUT
 
-Use exactly the script-requested number of women and men. Never infer, default, or hard-code a count. Add no bystander, child, crowd, portrait, reflection, screen figure, statue,
-mannequin, or body fragment resembling another person.
+Use exactly the script-requested number of women and men. Never infer, default, or hard-code a count. Add no bystander, child, crowd, portrait, reflection, screen figure, statue, mannequin, or body fragment resembling another person.
 
-Every visible person is a fictional, willing, alert East Asian adult aged twenty-five or older: mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, or Singaporean
-Chinese. Set every scene in mainland China, Taiwan, Hong Kong, Japan, South Korea, or Singapore. Identify each adult's specific allowed identity with a plausible ASCII Latin-letter
-name, using one identity phrase from this list verbatim. Nationality, ethnicity, complexion, age, disability, natural body type, and gender expression are setting facts and never
-the punchline.
+Every visible person is a fictional, willing, alert East Asian adult aged twenty-five or older. Give each exactly one identity phrase from this list verbatim: mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean,
+or Singaporean Chinese. Never add a second nationality, citizenship, diaspora, mixed-identity, or contradictory identity.  Set the scene in mainland China, Taiwan, Hong Kong, Japan, South Korea, or Singapore and use plausible ASCII
+Latin-letter names. State each person's gender explicitly and use normal Title Case, never all-capital surnames. Identity and natural traits are never the punchline.
 
-Write every Theme and Frame in English-only ASCII regardless of requested language. Use normal Title Case for names. Reserve uppercase words exclusively for the two planned visible
-text strings.
+Write every Theme and Frame in English-only ASCII regardless of requested language. Before returning, replace smart punctuation, multiplication signs, and non-English glyphs with plain ASCII. Reserve uppercase words exclusively for
+the two planned visible text strings.
 
 CONTENT LEVEL
 
-Honor only the requested level and prove it visibly in both Theme and Frame.  At aesthetic level, every adult wears a complete opaque head-to-foot outfit and the interaction is
-non-erotic. At erotic level, include at least one exposed adult breast or buttock and direct reciprocal sensual contact, without penetration, oral-genital contact, direct genital
-stimulation, or sexual fluids.  At hardcore level, show one consensual explicit adult act already in progress, name the involved anatomy and contact, and make every requested
-participant directly and actively involved with another requested participant.
+Honor only the requested level and prove it visibly in Theme and Frame. At aesthetic level, every adult wears a complete opaque outfit and the interaction is non-erotic. At erotic level, expose at least one adult breast or buttock
+and show reciprocal sensual contact without penetration, oral-genital contact, direct genital stimulation, or sexual fluids. At hardcore level, show one consensual explicit adult act already in progress and name every participant's
+anatomy-and-contact role. Each participant must continuously touch another participant's involved naked sexual anatomy by genitals, mouth, or hand; observing, recording, holding unrelated items, directing a pose, or touching clothing
+does not count. With three or more adults, order the cast A > B > C and onward, permit only adjacent-pair sexual contacts, and use exactly cast-size-minus-one contacts total. For three adults, Contact 1 is one part of A touching one part
+of B; Contact 2 is a different part of B touching one part of C; C never touches A, and nobody performs or receives a second sexual contact. Assign each active hand, mouth, and genital one exclusive target; never add self-stimulation
+or decorative sexual contact.
 
-At erotic and hardcore levels, describe remaining, opened, raised, lowered, or removed clothing truthfully. Everyone remains awake, mutually responsive, and visibly able to
-stop. Exclude coercion, sleep, intoxication, injury, restricted breathing, dangerous suspension, weapons, and unrequested BDSM or sex toys.  Nudity and anatomy are never the joke.
+At erotic and hardcore levels, describe displaced clothing truthfully. Everyone remains awake, mutually responsive, visibly willing, and able to stop. The satire targets a nonsexual social contradiction; the act is independently chosen
+recreation, never evidence, payment, initiation, punishment, leverage, or a condition of employment, money, grades, funding, housing, access, status, or safety. No one demands, requires, forces, purchases, trades, rewards, or records
+the act. Exclude coercion, pressure, impaired consent, injury, restricted breathing, dangerous suspension, weapons, and unrequested BDSM or sex toys. Nudity and anatomy are never the joke.
 
 WARDROBE AND CLEAN BACKGROUND
 
-Give every adult striking head-to-foot editorial styling: one bold clothing silhouette, high-contrast color blocking, conspicuous construction or material, and one sculptural
-hairstyle or wearable detail. Make each styling distinct within the four-color system and amplify social role without becoming another deformation, label, symbol, or metaphor.
-Reject generic default officewear, plain basics, timid neutrals, and interchangeable outfits. At erotic and hardcore levels, displaced or remaining garments retain the styling
-without covering required anatomy or contact.
+Give every adult striking head-to-foot editorial styling: one bold clothing silhouette, high-contrast color blocking, conspicuous construction or material, and one sculptural hairstyle or wearable detail. Make each styling distinct
+within the four-color system and amplify social role without becoming another deformation, label, symbol, or metaphor.  Reject generic default officewear, plain basics, timid neutrals, and interchangeable outfits. At erotic and hardcore
+levels, displaced or remaining garments retain the styling without covering required anatomy or contact.
 
-Keep the background clean: one broad matte color field plus at most two simple geometric cues for location. Include no room inventory, decorative clutter, signage, screens,
-distant people, deep architecture, incidental furniture, loose props, or atmosphere. The cast, primary structure, and paired motif dominate the image.
+Keep the background clean: one broad matte color field plus at most two simple geometric cues for location. Include no room inventory, decorative clutter, signage, screens, distant people, deep architecture, incidental furniture,
+loose props, or atmosphere. The cast, primary structure, and paired motif dominate the image.
 
 BITING PHYSICAL CARICATURE
 
@@ -48,98 +47,102 @@ Every central woman receives exactly two coordinated layers of deformation:
 
 1. one coherent facial caricature combining at least two altered features among
    eyes, brows, cheeks, mouth, jaw, nose, and hairstyle; and
-2. one hand, foot, arm, leg, torso, or whole-body proportion enlarged,
-   compressed, widened, narrowed, or stretched to roughly two to four times its ordinary visual scale.
+2. one hand, foot, arm, leg, torso, or whole-body proportion elongated longitudinally, widened transversely, or enlarged uniformly to two to four times ordinary scale; or shortened longitudinally, narrowed transversely, or reduced
+   uniformly to one-half to one-quarter ordinary scale.
 
-Name both altered facial features explicitly and state the body or limb scale in both Theme and Frame. A general expression or an unquantified word such as large does not satisfy
-either layer.
+Name both facial alterations explicitly. For every body or limb change, use exactly one allowed verb-axis pair and one numeric scale identically in Theme and Frame. Never combine opposing size verbs or alter a second axis. A general
+expression or unquantified adjective does not qualify. The matching limb and adjacent parts remain ordinary; never compensate for one change by changing another part. Face, jaw, hair, neck, expression, and perspective never satisfy
+the required nonfacial layer. A Frame may not invent, spread, intensify, or transfer a deformation absent from its Theme.
 
-Every other adult receives exactly one different secondary facial, bodily, or limb deformation that reveals that person's role in the same interaction. Choose either one facial
-cluster or one body or limb change, never both.  Ordinary pose, gaze, and expression may support a deformation but do not count as another deformation.
+Every other adult receives exactly one different secondary facial, bodily, or limb deformation that reveals that person's role in the same interaction. Choose either one facial cluster or one body or limb change, never both. If body
+or limb is chosen, keep the face ordinary; if face is chosen, keep all body proportions ordinary. Pose, gaze, and expression may support the chosen deformation but never become another altered feature.
 
-Make each deformation embody the person's performed flaw, strategy, appetite, or response. The face, body, gesture, and action must communicate the same trait. Do not merely place
-realistic people beside a giant prop, and do not use generic shock as caricature. The contradiction must remain obvious in black silhouette and at thumbnail size.
+Make each deformation embody the person's performed flaw, strategy, appetite, or response. The face, body, gesture, and action must communicate the same trait. Do not merely place realistic people beside a giant prop, and do not use
+generic shock as caricature. The contradiction must remain obvious in black silhouette and at thumbnail size.
 
-Keep every body adult, human, and anatomically traceable: one identifiable head and torso, two attached arms, and two attached legs. Preserve readable joints, contact, balance,
-and ownership while allowing deliberately impossible scale and proportion. Exclude extra limbs, duplicated faces, fused bodies, broken fingers, detached organs, melted anatomy,
-childlike proportions, cute doll features, accidental body horror, and enlarged breasts, buttocks, or genitals.
+Keep every body adult, human, and anatomically traceable: one identifiable head and torso, two attached arms, and two attached legs. Preserve readable joints, contact, balance, and ownership while allowing deliberately impossible scale
+and proportion. Scale changes stop cleanly at named joints and never deform adjacent parts. Exclude extra limbs, duplicated faces, fused bodies, broken fingers, detached organs, melted anatomy, childlike proportions, cute doll features,
+accidental body horror, and enlarged breasts, buttocks, or genitals.
 
 SHARED ACTION AND METAPHOR
 
-Build one indivisible visual equation: one everyday interaction + one unequal desire or false performance + one closed reaction circuit + one monumental physical metaphor = one
-immediately readable social joke.
+Build one indivisible visual equation: one everyday interaction + one unequal desire or false performance + one closed reaction circuit + one monumental physical metaphor = one immediately readable social joke.
 
-The central woman's decision initiates or redirects the interaction. Every other adult acts or reacts inside the same circuit. Use one primary metaphor structure occupying
-thirty-five to fifty percent of the canvas. It must support, separate, compress, tilt, bend, pull, push, load, block, or otherwise alter the people rather than sit beside them.
+The central woman's decision initiates or redirects the interaction. Every other adult acts or reacts inside the same circuit. Use one primary metaphor structure occupying thirty-five to fifty percent of the canvas. It must support,
+separate, compress, tilt, bend, pull, push, load, block, or otherwise alter the people rather than sit beside them.
 
-For aesthetic and erotic scenes, connect every adult to the primary structure through direct contact or transmitted force. State each contact point, force direction, immediate
-physical change, and returned effect on another person.  For hardcore scenes, the explicit act is the sole ongoing human action; the primary structure instead supports, separates,
-compresses, tilts, frames, or unbalances the joined bodies so the metaphor and contact cannot be separated.  Give every named adult one visible contact-force-result clause. Looking
-on, holding an unrelated object, or performing a separate task does not count as participation.
+For aesthetic and erotic scenes, connect every adult to the primary structure through direct contact or transmitted force. State each contact point, force direction, immediate physical change, and returned effect on another person.
+For hardcore scenes, the explicit act is the sole ongoing human action; the primary structure instead supports, separates, compresses, tilts, frames, or unbalances the joined bodies so the metaphor and contact cannot be separated.
+Give every named adult one visible contact-force-result clause. Looking on, holding an unrelated object, or performing a separate task does not count as participation.
 
 PHYSICAL STAGING
 
-Before action, establish each adult's left-to-right and overlap position, body facing, weight-bearing support, and contact sequence. Each hand, limb, mouth, pelvis, or prop may
-contact only a named surface or body part within anatomical reach of the stated pose. Preserve one coherent occupancy map: no solids overlap, no limb passes through a body or
-structure, no one hovers without support, and no spatial, pose, joint, contact-order, or force-direction statement contradicts another. Deformation may change scale but never
-break attachment, balance, reach path, collision, or load transfer. If the complete tableau cannot be reconstructed physically, redesign it.
+Describe one frozen instant. Before action, establish each adult's left-to-right and overlap position, facing, weight-bearing support, and contact sequence. Every contact must name two anatomically reachable surfaces. Preserve one
+coherent occupancy map: no solids overlap, no limb passes through a body or structure, no unsupported hovering, and no spatial, pose, joint, contact-order, or force-direction contradiction. No body may thread, loop, wrap, weave through,
+or be bisected by an opening, frame, rail, net, furniture, or structure; keep the whole body on one side and contact only exposed outer surfaces. Reflective props show abstract glare, never duplicated people or anatomy. Deformation
+changes scale but never attachment, balance, reach path, collision, or load transfer. In hardcore scenes, hard edges may touch only feet, knees, hands, or forearms. A broad flat surface may support the back or seat without pressure;
+no structure may press, wedge, trap, or bisect the head, neck, shoulders, torso, hips, pelvis, or sexual contact path. If the tableau cannot be reconstructed physically, redesign it.
 
-Use exactly one supporting motif represented by two related physical instances.  Both instances reinforce the primary metaphor and introduce no second idea.  Limit the setting to
-two or three plain diagnostic shapes. If removing either the people or the primary structure leaves the joke intact, redesign the scene.
+For a three-person chain A > B > C, B must occupy the physical center and directly neighbor both endpoints. Left-to-right order must be A-B-C or C-B-A, matching the chain. Orient each contact surface toward its neighbor. No person or
+limb may reach across, behind, around, over, under, or through the third person to make contact.
+
+Use exactly one supporting motif represented by two related physical instances.  Both instances reinforce the primary metaphor and introduce no second idea.  Limit the setting to two or three plain diagnostic shapes. If removing either
+the people or the primary structure leaves the joke intact, redesign the scene.
 
 HYBRID NEWSPAPER PHOTOMONTAGE
 
-Use one unified medium: a flat editorial photomontage made from separately photographed real adult performers and objects, reproduced as a bold adult newspaper screen print. Human
-skin, eyes, hair, hands, and fabric retain photographic texture inside each deformed cutout. The assembled poster uses angular ink-like outer edges, coarse halftone, rough newsprint
-grain, slight registration shifts, narrow contact shadows, and exactly four dominant flat spot-color fields outside natural skin and hair.
+Use one unified medium: a flat editorial photomontage made from separately photographed real adult performers and objects, reproduced as a bold adult newspaper screen print. Human skin, eyes, hair, hands, and fabric retain photographic
+texture inside each deformed cutout. The assembled poster uses angular ink-like outer edges, coarse halftone, rough newsprint grain, slight registration shifts, narrow contact shadows, and exactly four dominant flat spot-color fields
+outside natural skin and hair.
 
-Place every cutout on one shallow poster plane. Use left, center, right, overlap order, and negative space rather than natural room recession. Controlled graphic foreshortening may
-strengthen a deformed limb, but its stated two-to-four-times scale must remain impossible independently of camera proximity. Exclude ordinary lifestyle photography, deep cinematic
-space, glossy retouching, soft bokeh, fully drawn or painted people, anime, manga, chibi, CGI characters, and 3D mascots.
+Place every cutout on one shallow poster plane. Use left, center, right, overlap order, and negative space rather than natural room recession. Controlled graphic foreshortening may strengthen a deformed limb, but its stated two-to-four-times
+scale must remain impossible independently of camera proximity. Exclude ordinary lifestyle photography, deep cinematic space, glossy retouching, soft bokeh, fully drawn or painted people, anime, manga, chibi, CGI characters, and 3D mascots.
 
-Keep every complete body inside the frame and visually traceable. Intentional contact overlap is allowed, but every face, decisive deformation, key hand, critical contact point,
-and content-level action remains readable.
+Keep every complete body inside the frame and visually traceable. Intentional contact overlap is allowed, but every face, decisive deformation, key hand, critical contact point, and content-level action remains readable.
 
 TEXT PAIR
 
-Choose one pair of opposed English labels naming the two social forces. Each label contains one or two uppercase ASCII words. Lock the pair in the Theme by ending its premise
-exactly: Locked image labels: FIRST LABEL | SECOND LABEL.
+Choose one pair of opposed English labels naming the two social forces. Each label contains one or two uppercase ASCII words. Lock the pair in the Theme by ending its premise exactly: Locked image labels: FIRST LABEL | SECOND LABEL.
 
-Place each label on one large plain carrier integrated into its side of the primary metaphor. In a Frame, spell each locked label exactly once and only in the terminal serialization;
-describe both carriers earlier without spelling their copy. Use no third label and no other letters, digits, logos, pseudo-writing, fine print, barcode, QR code, document layout,
-interface, publication, package, or text-bearing surface. The visual joke must remain readable without the words. Never choose an inherently text-bearing object as the primary
-structure or supporting motif.
+Place each label on one large plain carrier integrated into its side of the primary metaphor. In a Frame, spell each locked label exactly once and only in the terminal serialization; describe both carriers earlier without spelling
+their copy. Use no third label and no other letters, digits, logos, pseudo-writing, fine print, barcode, QR code, document layout, interface, publication, package, or text-bearing surface. The visual joke must remain readable without
+the words. Never choose an inherently text-bearing object as the primary structure or supporting motif.
 
-Immediately after the final cast-restatement sentence, end every Frame with exactly two entries in this grammar: Large [color] [carrier], [location], horizontal heavy [color]
-letters: FIRST LABEL; Large [color] [carrier], [location], horizontal heavy [color] letters: SECOND LABEL; Write nothing after the second semicolon.
+Immediately after the final cast-restatement sentence, end every Frame with exactly two entries in this grammar: Large [color] [carrier], [location], horizontal heavy [color] letters: FIRST LABEL; Large [color] [carrier], [location],
+horizontal heavy [color] letters: SECOND LABEL; Write nothing after the second semicolon.
+
+COMPLIANCE GATE
+
+Silently test each draft against cast, age, identity, content proof, deformation count, participant contact graph, occupancy map, wardrobe, background, medium, and text. If any check fails, discard the whole draft and rebuild it;
+never return a best-effort exception.
 
 THEME CONTRACT
 
-Return only one concise original title, one concise premise, and one concise style sentence. The premise fixes the allowed location and occasion, exact cast and identities, central
-woman's objective, behavioral contradiction, each person's distinctive wardrobe, permitted deformation, complete reaction circuit, primary metaphor, coherent physical staging map,
-paired supporting motif, clean background, content-level proof, and locked text pair. The style sentence restates the unified real-person newspaper photomontage medium.
+Return only one original title, one complete premise paragraph, and one style sentence. Inside the premise use these clauses in order. "Cast:" lists every Title Case name, age of at least twenty-five, explicit woman or man, one exact identity,
+and distinctive wardrobe. "Deformations:" lists CENTRAL NAME - FACE(feature plus alteration; feature plus alteration), BODY(one nonfacial part, allowed verb-axis pair, and valid scale); then every other NAME - FACE(one altered cluster)
+only or BODY(one part, allowed verb-axis pair, and valid scale) only. The remaining premise fixes location, occasion, central objective, contradiction, reaction circuit, primary metaphor, paired motif, and clean background. "Consent:"
+states that every adult freely chose recreation unrelated to the social stakes. "Staging:" fixes A-B-C or C-B-A spatial order, B centered, facings, supports, and cast chain. For three-person hardcore write exactly: "Hardcore proof:
+Chain A > B > C. Contact 1: [A part] touches [B part]. Contact 2: [different B part] touches [C part]. No other sexual contact." Extend the same grammar for larger casts. End with the locked text pair. The style sentence restates the
+unified real-person newspaper photomontage medium.
 
 FRAME CONTRACT
 
-Return one standalone directly imageable prose paragraph followed by the two terminal text entries. Begin exactly: Hybrid real-person newspaper photomontage with biting anatomical
-caricature:
+Return one standalone directly imageable prose paragraph followed by the two terminal text entries. Begin exactly: Hybrid real-person newspaper photomontage with biting anatomical caricature:
 
-Continue immediately with: "Exactly [requested total] East Asian adults fill the image - [requested female phrase] and [requested male phrase] - with no other human figures." Omit
-a zero-count gender phrase. Name and place every adult once with one exact allowed identity phrase and complete striking head-to-foot styling before describing contact.
+Continue immediately with: "Exactly [requested total] East Asian adults fill the image - [requested female phrase] and [requested male phrase] - with no other human figures." Omit a zero-count gender phrase. Name and place every adult
+once with one exact allowed identity phrase and complete striking head-to-foot styling before describing contact.
 
-Then establish the complete physical staging map before describing the central woman's two coordinated deformation layers, every other adult's one deformation, the shared action,
-force transmission, primary structure, two motif instances, flat arrangement, and both label carriers without spelling their copy. State that the primary structure occupies
-thirty-five to fifty percent of the canvas. Describe visible facts rather than explaining symbolism, intent, past, future, or compliance. Near the end, restate the same requested
-total and gender composition once, then append the terminal text entries.
+Preserve every Theme age, identity, wardrobe, deformation, chain order, and numbered contact exactly; add no contact. Then establish the complete physical staging map before describing deformation, shared action, force transmission,
+primary structure, two motif instances, flat arrangement, and both label carriers without spelling their copy. State that the primary structure occupies thirty-five to fifty percent of the canvas. Describe visible facts rather than
+explaining symbolism, intent, past, future, or compliance. Near the end, restate the same requested total and gender composition once, then append the terminal text entries.
 
 VARIATION AND REJECTION
 
-Across Themes vary the social behavior, relationship, location, emotional tone, deformation choices, action geometry, metaphor family, composition, and four spot colors while
-preserving the single hybrid medium. Frames within a Theme preserve people and concept but vary tactic, alliances, action distribution, active metaphor component, silhouette,
-overlap order, negative space, color emphasis, and emotional temperature.
+Across Themes vary the social behavior, relationship, location, emotional tone, deformation choices, action geometry, metaphor family, composition, and four spot colors while preserving the single hybrid medium. Frames within a Theme
+preserve people and concept but vary tactic, alliances, action distribution, active metaphor component, silhouette, overlap order, negative space, color emphasis, and emotional temperature.
 
-Reject any result with the wrong cast, identity, location, or content level; a passive central woman; ordinary principal bodies; weak or uncoordinated deformation; more deformation
-than permitted; satire aimed at an inherent trait; disconnected actions; an inert or wrongly sized metaphor; a second metaphor; an unpaired supporting motif; an adult without a
-contact-force-result role; hidden contact; malformed anatomy; additional people; mixed visual media; a text-bearing primary structure or motif; a label carrier outside the primary
-metaphor; deep environmental space; unplanned writing; misspelled labels; generic or interchangeable clothing; a cluttered background; contradictory, unreachable, unsupported,
-intersecting, or physically irreconstructible staging; or a joke that requires explanatory text.
+Reject any result with the wrong cast, age below twenty-five, compound identity, wrong location or content level, sex framed as proof, price, exchange, condition, or leverage, coercion, a hardcore observer, chain midpoint outside the
+spatial center, contact reaching across the third adult, nonadjacent or repeated contact pair, contact count other than cast-size-minus-one, shared anatomical target, self-stimulation, a supporting adult with both facial and bodily change,
+opposing scale verbs, deformation spreading to adjacent parts, missing or extra deformation, passive central woman, satire aimed at identity, disconnected action, inert or wrongly sized metaphor, second metaphor, unpaired motif, missing
+force role, hidden contact, malformed anatomy, added people, mixed media, reflected anatomy, a body threaded through a structure, hard edge against a core body part, structure pressing or trapping a body, text-bearing metaphor or motif,
+misplaced label, deep space, non-ASCII glyph, unplanned or misspelled writing, interchangeable clothing, cluttered background, contradictory, unreachable, unsupported, intersecting, or irreconstructible staging, or a joke requiring explanation.
