@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typer.testing import CliRunner
 
 import t2i_story_pipeline.cli as story_cli
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.cli import app
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
@@ -35,6 +36,8 @@ def test_story_generate_exposes_only_generation_controls() -> None:
     assert "--concurrency" in result.stdout
     assert "--prompt-file" in result.stdout
     assert "--prompts-dir" in result.stdout
+    assert "--rules-dir" in result.stdout
+    assert "story-inputs/rules/" in result.stdout
     assert "--output-dir" not in result.stdout
     assert "[default: 8]" in result.stdout
     assert "--content-level" in result.stdout
@@ -51,8 +54,7 @@ def test_story_generate_reads_story_description_from_prompt_file(
 ) -> None:
     prompt_file = tmp_path / "story.txt"
     prompt_file.write_text(
-        "\n1930年代秋夜，两个成年人在旧车站重逢。\n"
-        "他们共同寻找遗失的行李。\n",
+        "\n1930年代秋夜，两个成年人在旧车站重逢。\n他们共同寻找遗失的行李。\n",
         encoding="utf-8",
     )
     captured = {}
@@ -60,12 +62,14 @@ def test_story_generate_reads_story_description_from_prompt_file(
     async def fake_generate(
         request,
         settings,
+        rules,
         *,
         concurrency,
         runs_directory,
         prompts_directory,
     ):
         captured["request"] = request
+        captured["rules"] = rules
         captured["concurrency"] = concurrency
         captured["runs_directory"] = runs_directory
         captured["prompts_directory"] = prompts_directory
@@ -102,12 +106,14 @@ def test_story_generate_reads_story_description_from_prompt_file(
 
     assert result.exit_code == 0
     assert captured["request"].story == (
-        "1930年代秋夜，两个成年人在旧车站重逢。\n"
-        "他们共同寻找遗失的行李。"
+        "1930年代秋夜，两个成年人在旧车站重逢。\n他们共同寻找遗失的行李。"
     )
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
     assert captured["request"].source_prompt_stem == "story"
+    assert "The Story Description is authoritative" in "\n".join(
+        captured["rules"].themes
+    )
     assert captured["concurrency"] == 8
     assert captured["runs_directory"] == tmp_path / "runs"
     assert captured["prompts_directory"] == tmp_path / "prompts"
@@ -129,6 +135,7 @@ def test_story_generate_direct_input_has_no_source_prompt_stem(
     async def fake_generate(
         request,
         settings,
+        rules,
         *,
         concurrency,
         runs_directory,
@@ -153,6 +160,100 @@ def test_story_generate_direct_input_has_no_source_prompt_stem(
 
     assert result.exit_code == 0
     assert captured["request"].source_prompt_stem is None
+
+
+def test_story_generate_loads_custom_rules(tmp_path, monkeypatch) -> None:
+    rules_dir = tmp_path / "custom-story-rules"
+    rules_dir.mkdir()
+    (rules_dir / "common.rules").write_text(
+        "Custom project-wide story rule.\n",
+        encoding="utf-8",
+    )
+    captured = {}
+
+    async def fake_generate(
+        request,
+        settings,
+        rules,
+        *,
+        concurrency,
+        runs_directory,
+        prompts_directory,
+    ):
+        captured["rules"] = rules
+        return SimpleNamespace(
+            run_id="test-run",
+            published=SimpleNamespace(
+                prompt_file=prompts_directory / "story.txt",
+            ),
+        )
+
+    monkeypatch.setattr(
+        story_cli,
+        "load_story_provider_settings",
+        lambda: object(),
+    )
+    monkeypatch.setattr(story_cli, "_generate", fake_generate)
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "generate",
+            "直接输入的故事",
+            "--rules-dir",
+            str(rules_dir),
+            "--prompts-dir",
+            str(tmp_path / "prompts"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "Custom project-wide story rule." in captured["rules"].themes
+    assert "Custom project-wide story rule." in captured["rules"].frames
+
+
+def test_story_generate_discovers_rules_inside_story_inputs(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    rules_dir = tmp_path / "story-inputs" / "rules"
+    rules_dir.mkdir(parents=True)
+    (rules_dir / "common.rules").write_text(
+        "Shared story-input rule.\n",
+        encoding="utf-8",
+    )
+    captured = {}
+
+    async def fake_generate(
+        request,
+        settings,
+        rules,
+        *,
+        concurrency,
+        runs_directory,
+        prompts_directory,
+    ):
+        captured["rules"] = rules
+        return SimpleNamespace(
+            run_id="test-run",
+            published=SimpleNamespace(
+                prompt_file=prompts_directory / "story.txt",
+            ),
+        )
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        story_cli,
+        "load_story_provider_settings",
+        lambda: object(),
+    )
+    monkeypatch.setattr(story_cli, "_generate", fake_generate)
+
+    result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
+
+    assert result.exit_code == 0
+    assert "Shared story-input rule." in captured["rules"].themes
+    assert "Shared story-input rule." in captured["rules"].frames
 
 
 def test_story_generate_rejects_story_and_prompt_file_together(
@@ -213,8 +314,9 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
         tmp_path / "prompts",
     )
     snapshot = store.create(
-        make_story_request(),
+        (request := make_story_request()),
         StoryRunSettings(provider=provider, concurrency=3),
+        resolve_story_rules(request),
     )
     captured = {}
 
@@ -260,10 +362,9 @@ def test_story_runs_lists_resumable_command(tmp_path) -> None:
         tmp_path / "prompts",
     )
     snapshot = store.create(
-        make_story_request(),
-        StoryRunSettings(
-            provider=StoryProviderSettings(model="test-model")
-        ),
+        (request := make_story_request()),
+        StoryRunSettings(provider=StoryProviderSettings(model="test-model")),
+        resolve_story_rules(request),
     )
 
     result = CliRunner().invoke(

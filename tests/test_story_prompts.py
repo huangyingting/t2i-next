@@ -6,8 +6,14 @@ from pathlib import Path
 
 import pytest
 
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.models import ContentLevel
-from t2i_story_pipeline.prompts import frame_messages, theme_messages
+from t2i_story_pipeline.prompts import (
+    frame_messages as compile_frame_messages,
+)
+from t2i_story_pipeline.prompts import (
+    theme_messages as compile_theme_messages,
+)
 from tests.story_factories import (
     make_story_request,
     make_theme,
@@ -15,6 +21,22 @@ from tests.story_factories import (
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+
+
+def theme_messages(request, **kwargs):
+    return compile_theme_messages(
+        request,
+        resolve_story_rules(request),
+        **kwargs,
+    )
+
+
+def frame_messages(request, theme):
+    return compile_frame_messages(
+        request,
+        theme,
+        resolve_story_rules(request),
+    )
 
 
 def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
@@ -29,22 +51,18 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     payload = json.loads(messages[1].content)
 
     assert payload["story"] == request.story
-    assert payload["batch_count"] == 10
+    assert payload["theme_ids"] == [f"T{index:03d}" for index in range(1, 11)]
     assert payload["content_level"] == "aesthetic"
     assert payload["semantic_name"] is None
     assert "concise lowercase English snake_case name" in prompt
-    assert "Premise must contain no more than two sentences" in prompt
-    assert "Do not put concrete poses, rope paths, equipment" in prompt
-    assert "Leave those details to each frame" in prompt
-    assert "unless the story explicitly requires them during Theme generation" in prompt
-    assert "material state or operating rule instead" in prompt
-    assert "non-narrative character or design board" in prompt
-    assert "campaign, editorial concept board" in prompt
-    assert "visual proposition, hero system, and conceptual leap" in prompt
-    assert "six distinct visual-stunt seeds separated by semicolons" in prompt
-    assert "even though shot-level detail is otherwise deferred" in prompt
-    assert "generic tactile exploration" in prompt
-    assert "relationship, setting function, decision, or conflict" in prompt
+    assert "The Story Description is the authoritative presentation contract" in prompt
+    assert "Follow any exact Theme-stage structure" in prompt
+    assert "Do not infer a known brief type" in prompt
+    assert "Theme-stage facts from Frame-stage rendering detail" in prompt
+    assert "unless the Story Description explicitly promotes that detail" in prompt
+    assert "Do not impose narrative conflict, chronology, or a decision" in prompt
+    assert "defines another organizing principle" in prompt
+    assert "axes that the Story Description makes important" in prompt
 
 
 def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
@@ -61,7 +79,7 @@ def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
     prompt = messages[0].content
     payload = json.loads(messages[1].content)
     assert payload["semantic_name"] == "lost_luggage_reunion"
-    assert "Return semantic_name exactly as lost_luggage_reunion" in prompt
+    assert "If semantic_name is supplied, return it exactly" in prompt
 
 
 def test_prompts_compile_exact_cast_constraints() -> None:
@@ -83,11 +101,8 @@ def test_prompts_compile_exact_cast_constraints() -> None:
             "female_count": 2,
             "male_count": 1,
         }
-        assert (
-            "exactly 2 adult female participant(s) and 1 adult male participant(s)"
-            in prompt
-        )
-        assert "Do not omit, replace, or add anyone" in prompt
+        assert "Use cast_constraints from the request exactly" in prompt
+        assert "Do not add, omit, merge, or replace people" in prompt
 
 
 def test_prompts_preserve_unspecified_cast_from_story() -> None:
@@ -106,7 +121,9 @@ def test_prompts_preserve_unspecified_cast_from_story() -> None:
             "female_count": None,
             "male_count": None,
         }
-        assert "must follow the explicit facts in the story" in messages[0].content
+        assert (
+            "Otherwise follow the people explicitly established" in messages[0].content
+        )
 
 
 def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
@@ -123,19 +140,11 @@ def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
     ):
         prompt = messages[0].content
 
-        assert "otherwise that person defaults to Chinese" in prompt
-        assert "Do not infer nationality from location, name, language" in prompt
-        assert (
-            "Every theme premise and frame prose must state each person's "
-            "nationality explicitly"
-        ) in prompt
-        assert 'Use "Chinese" in English output' in prompt
-        assert "otherwise the setting defaults to China" in prompt
-        assert "Do not move it to another country" in prompt
-        assert (
-            "Every theme premise and frame prose must state the country explicitly"
-            in prompt
-        )
+        assert "otherwise each person's nationality defaults" in prompt
+        assert "Never infer nationality from setting, name, language" in prompt
+        assert "state it explicitly in every Theme premise and Frame" in prompt
+        assert "otherwise the setting country defaults to China" in prompt
+        assert "State the country explicitly in every Theme premise and Frame" in prompt
 
 
 def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
@@ -154,45 +163,59 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
         "F05",
         "F06",
     ]
-    assert "Narrative coherence, fluency, and visual plausibility" in prompt
-    assert "Treat each frame as the only image in the set" in prompt
-    assert (
-        "Fully redescribe every visible person's unmistakable adult identity"
-        in prompt
-    )
-    assert "currently visible state and direct physical result" in prompt
+    assert "Each Narrative Frame is one standalone renderable image" in prompt
+    assert "Fully redescribe every visible person's adult identity" in prompt
+    assert "currently visible states and direct physical results" in prompt
     assert "one physically possible held pose" in prompt
     assert "must not travel between positions" in prompt
-    assert "repeated views of the same person" in prompt
-    assert "every region must deliver a distinct visual stunt" in prompt
-    assert "Realize all six stunt seeds recorded in the Theme premise" in prompt
-    assert "Explicitly describe Region 1 through Region 6" in prompt
-    assert "general board synopsis" in prompt
-    assert (
-        "every Narrative Frame must independently contain one complete board"
-        in prompt
-    )
-    assert "regardless of frames_per_theme" in prompt
-    assert "Never distribute one board across multiple Frames" in prompt
-    assert "use one Frame per region" in prompt
-    assert "When frames_per_theme is 1" not in prompt
-    assert "roughly 450 to 650 words" in prompt
-    assert "flexible panel dramaturgy" in prompt
-    assert "do not impose a fixed climax position" in prompt
-    assert "Camera and lighting must be explicit and professional" in prompt
-    assert "final state explicitly required by the story must appear directly" in prompt
-    assert "read theme.theme_id from the current payload first" in prompt
-    assert "apply only requirements matching that ID" in prompt
-    assert "Explicit story constraints take priority" in prompt
+    assert "The Story Description is the authoritative Frame contract" in prompt
+    assert "Follow any exact fields, labels, order, counts, grouping" in prompt
+    assert "subdivisions of that one renderable image" in prompt
+    assert "do not spread one required image across Narrative Frames" in prompt
+    assert "Repeated depictions of one named person inside a single image" in prompt
+    assert "Preserve the requested medium" in prompt
+    assert "Do not default to cinematic photography" in prompt
+    assert "viewpoint and illumination in terms appropriate to that medium" in prompt
+    assert "final state explicitly required by the Story Description" in prompt
+    assert "Resolve conditional instructions only from the current request" in prompt
+    assert "never borrow a branch assigned to another alternative" in prompt
+    assert "Explicit Story Description constraints take priority" in prompt
     assert "rope art" not in prompt
-    assert "do not mix in English pronouns" in prompt
-    assert "not in the requested output language" in prompt
+    assert "do not mix in untranslated foreign prose" in prompt
     assert "parallel visual alternatives" in prompt
-    assert "Length should be driven by cast size and visual complexity" in prompt
+    assert "Let length follow the Story Description's exact contract" in prompt
     assert "follow exactly six sections" not in prompt
     assert "must begin exactly with" not in prompt
     assert "penultimate sentence" not in prompt
     assert "exact quality gate" not in prompt
+
+
+def test_prompt_compiler_does_not_encode_story_input_archetypes() -> None:
+    request = make_story_request()
+    prompts = (
+        theme_messages(
+            request,
+            start_index=1,
+            count=1,
+            existing_themes=[],
+        )[0].content,
+        frame_messages(request, make_theme())[0].content,
+    )
+
+    archetype_phrases = (
+        "campaign",
+        "design board",
+        "multi-view",
+        "six-region",
+        "Region 1",
+        "miniature-world",
+        "thumbnail scale",
+        "visual-stunt",
+        "rope paths",
+    )
+    assert all(
+        phrase not in prompt for prompt in prompts for phrase in archetype_phrases
+    )
 
 
 def test_english_frame_prompt_requires_english_only_output() -> None:
@@ -200,9 +223,9 @@ def test_english_frame_prompt_requires_english_only_output() -> None:
 
     prompt = frame_messages(request, make_theme())[0].content
 
-    assert "Write every prose paragraph entirely" in prompt
-    assert "Do not include Chinese characters" in prompt
-    assert "or switch to another language" in prompt
+    assert "Write every natural-language output field" in prompt
+    assert "in precise, fluent English" in prompt
+    assert "Preserve only literal foreign text explicitly required" in prompt
 
 
 def test_chinese_prompts_allow_story_required_english_labels_and_copy() -> None:
@@ -216,13 +239,10 @@ def test_chinese_prompts_allow_story_required_english_labels_and_copy() -> None:
     )[0].content
     frame_prompt = frame_messages(request, make_theme())[0].content
 
-    assert "explicitly requires a foreign-language title verbatim" in theme_prompt
-    assert "requires a fixed field structure" in frame_prompt
-    assert "English labels or visible image text explicitly required" in frame_prompt
-    assert (
-        "fixed field labels explicitly required by the story are allowed"
-        in frame_prompt
-    )
+    assert "in precise, fluent Chinese" in theme_prompt
+    assert "in precise, fluent Chinese" in frame_prompt
+    assert "Preserve only literal foreign text explicitly required" in theme_prompt
+    assert "Preserve only literal foreign text explicitly required" in frame_prompt
 
 
 @pytest.mark.parametrize("output_language", ("chinese", "english"))
@@ -292,14 +312,8 @@ def test_prompts_compile_only_selected_content_level(
         prompt = messages[0].content
         assert required in prompt
         assert all(item not in prompt for item in excluded)
-        assert (
-            "If the story sets stricter visible requirements for this selected "
-            "level, every one of them is mandatory"
-        ) in prompt
-        assert "presentation contract" in prompt
-        assert "non-narrative design or pose board" in prompt
-        assert "wardrobe, coverage, and pose-intensity rules" in prompt
-        assert "do not invent a sexual act or missing partner" in prompt
+        assert "more specific" in prompt
+        assert "without importing requirements from another content level" in prompt
 
 
 @pytest.mark.parametrize(
@@ -369,6 +383,6 @@ def test_prompts_express_era_consistency_holistically() -> None:
     ):
         prompt = messages[0].content
         assert "Architecture, furnishings, objects, materials, clothing, hair" in prompt
-        assert "era, region, season, time of day, and social setting" in prompt
+        assert "titles, etiquette, season, and language" in prompt
         assert "When historical facts are uncertain" in prompt
-        assert "time travel, alternate history, or temporal dislocation" in prompt
+        assert "temporal dislocation" in prompt

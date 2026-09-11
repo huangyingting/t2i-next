@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import (
     StoryProviderResponseError,
     StoryProviderTruncatedOutputError,
@@ -81,13 +82,12 @@ def make_studio(
             directory / "prompts",
         ),
         settings,
+        resolve_story_rules(make_story_request()),
     )
 
 
 def test_story_studio_defaults_to_eight_concurrent_frame_sequences() -> None:
-    settings = StoryRunSettings(
-        provider=StoryProviderSettings(model="test-model")
-    )
+    settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
 
     assert settings.concurrency == 8
 
@@ -141,12 +141,10 @@ async def test_studio_generates_one_hundred_themes_and_six_hundred_frames(
     tmp_path,
 ) -> None:
     values: list[object] = [
-        make_theme_batch(start=start, count=10)
-        for start in range(1, 101, 10)
+        make_theme_batch(start=start, count=10) for start in range(1, 101, 10)
     ]
     values.extend(
-        make_frame_sequence(frame_count=6, theme_index=index)
-        for index in range(1, 101)
+        make_frame_sequence(frame_count=6, theme_index=index) for index in range(1, 101)
     )
     model = FakeStoryModel(values)
 
@@ -167,10 +165,7 @@ async def test_studio_supports_smaller_theme_batches(tmp_path) -> None:
         [
             make_theme_batch(start=1, count=3),
             make_theme_batch(start=4, count=3),
-            *[
-                make_frame_sequence(theme_index=index)
-                for index in range(1, 7)
-            ],
+            *[make_frame_sequence(theme_index=index) for index in range(1, 7)],
         ]
     )
 
@@ -195,10 +190,7 @@ async def test_studio_normalizes_theme_ids_by_response_order(tmp_path) -> None:
         [
             make_theme_batch(count=5),
             duplicate_batch,
-            *[
-                make_frame_sequence(theme_index=index)
-                for index in range(1, 11)
-            ],
+            *[make_frame_sequence(theme_index=index) for index in range(1, 11)],
         ]
     )
 
@@ -251,9 +243,7 @@ async def test_studio_retries_provider_shape_failure_and_counts_usage(
     assert model.stages.count(StoryStage.THEMES) == 2
     assert "invalid themes" in model.messages[1][-1].content
     assert result.usage.total_tokens == 60
-    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(
-        completed.run_id
-    )
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
     assert attempts[0].requested_ids == ["T001"]
     assert attempts[0].accepted_ids == []
     assert attempts[0].outcome == StoryAttemptOutcome.REJECTED
@@ -279,9 +269,7 @@ async def test_studio_expands_budget_after_truncated_output(tmp_path) -> None:
     completed = await make_studio(model, tmp_path, concurrency=1).run(
         make_story_request()
     )
-    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(
-        completed.run_id
-    )
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
 
     assert model.max_output_tokens == [6000, 32768, 32768]
     assert attempts[0].max_output_tokens == 6000
@@ -319,31 +307,23 @@ async def test_studio_preserves_truncation_budget_across_resume(
     with pytest.raises(StoryRunIncompleteError) as failure:
         await studio.run(make_story_request())
 
-    snapshot = LocalStoryRunStore(tmp_path / "runs").inspect(
-        failure.value.run_id
-    )
-    resumed_model = FakeStoryModel(
-        [make_theme_batch(), make_frame_sequence()]
-    )
+    snapshot = LocalStoryRunStore(tmp_path / "runs").inspect(failure.value.run_id)
+    resumed_model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
     completed = await StoryStudio(
         resumed_model,
         LocalStoryRunStore(tmp_path / "runs"),
         snapshot.manifest.settings,
+        snapshot.rules,
     ).resume(snapshot.run_id)
 
     assert completed.result.usage.total_tokens == 80
     assert resumed_model.max_output_tokens == [32768, 32768]
-    assert "List should have at least 1 item" in (
-        resumed_model.messages[0][-1].content
-    )
+    assert "List should have at least 1 item" in (resumed_model.messages[0][-1].content)
 
 
 @pytest.mark.asyncio
 async def test_studio_records_all_structured_output_issues(tmp_path) -> None:
-    validation_issues = tuple(
-        f"themes.{index}: Field required"
-        for index in range(40)
-    )
+    validation_issues = tuple(f"themes.{index}: Field required" for index in range(40))
     model = FakeStoryModel(
         [
             StoryStructuredOutputError(
@@ -360,9 +340,7 @@ async def test_studio_records_all_structured_output_issues(tmp_path) -> None:
     completed = await make_studio(model, tmp_path, concurrency=1).run(
         make_story_request()
     )
-    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(
-        completed.run_id
-    )
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
 
     assert len(attempts[0].issues) == 41
     assert attempts[0].issues[-1] == validation_issues[-1]
@@ -407,9 +385,7 @@ async def test_studio_resumes_only_missing_frame_sequences(tmp_path) -> None:
     with pytest.raises(StoryRunIncompleteError) as failure:
         await studio.run(make_story_request(theme_count=2))
 
-    snapshot = LocalStoryRunStore(tmp_path / "runs").inspect(
-        failure.value.run_id
-    )
+    snapshot = LocalStoryRunStore(tmp_path / "runs").inspect(failure.value.run_id)
     assert [theme.theme_id for theme in snapshot.themes] == ["T001", "T002"]
     assert set(snapshot.frames) == {"T001"}
 
@@ -418,6 +394,7 @@ async def test_studio_resumes_only_missing_frame_sequences(tmp_path) -> None:
         resumed_model,
         LocalStoryRunStore(tmp_path / "runs"),
         snapshot.manifest.settings,
+        snapshot.rules,
     ).resume(snapshot.run_id)
 
     assert len(resumed.result.themes) == 2
@@ -437,9 +414,8 @@ async def test_studio_completed_resume_is_idempotent(tmp_path) -> None:
     resumed = await StoryStudio(
         resumed_model,
         LocalStoryRunStore(tmp_path / "runs"),
-        StoryRunSettings(
-            provider=StoryProviderSettings(model="different-model")
-        ),
+        StoryRunSettings(provider=StoryProviderSettings(model="different-model")),
+        resolve_story_rules(make_story_request()),
     ).resume(completed.run_id)
 
     assert resumed == completed
@@ -489,9 +465,12 @@ async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
         concurrency=2,
     )
     task = asyncio.create_task(
-        StoryStudio(model, store, settings).run(
-            make_story_request(theme_count=2)
-        )
+        StoryStudio(
+            model,
+            store,
+            settings,
+            resolve_story_rules(make_story_request()),
+        ).run(make_story_request(theme_count=2))
     )
     await asyncio.wait_for(model.all_frames_started.wait(), timeout=1)
 

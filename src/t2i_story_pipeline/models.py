@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from enum import StrEnum
 from functools import lru_cache
@@ -53,6 +55,11 @@ StoryText = Annotated[
     str,
     StringConstraints(min_length=1, max_length=50000, strip_whitespace=True),
 ]
+RuleText = Annotated[
+    str,
+    StringConstraints(min_length=1, strip_whitespace=True),
+    AfterValidator(_single_line),
+]
 NarrativeProse = Annotated[
     str,
     StringConstraints(min_length=1, max_length=32768, strip_whitespace=True),
@@ -96,6 +103,28 @@ class StoryStage(StrEnum):
     FRAMES = "frames"
 
 
+class StoryRuleSet(Model):
+    themes: tuple[RuleText, ...] = Field(min_length=1)
+    frames: tuple[RuleText, ...] = Field(min_length=1)
+
+    def for_stage(self, stage: StoryStage) -> tuple[str, ...]:
+        if stage == StoryStage.THEMES:
+            return self.themes
+        return self.frames
+
+    def text_for(self, stage: StoryStage) -> str:
+        return "\n".join(self.for_stage(stage))
+
+    def fingerprint(self) -> str:
+        payload = json.dumps(
+            self.model_dump(mode="json"),
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
+
 class StoryRequest(Model):
     story: StoryText
     source_prompt_stem: SourcePromptStem | None = None
@@ -109,9 +138,7 @@ class StoryRequest(Model):
     @model_validator(mode="after")
     def cast_constraints_fit(self) -> StoryRequest:
         counts = tuple(
-            count
-            for count in (self.female_count, self.male_count)
-            if count is not None
+            count for count in (self.female_count, self.male_count) if count is not None
         )
         if self.female_count == 0 and self.male_count == 0:
             raise ValueError("人物约束不能同时为零")

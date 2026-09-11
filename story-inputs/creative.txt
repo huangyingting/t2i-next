@@ -1,265 +1,426 @@
 BRIEF
 
-Create varied, award-caliber, hyper-realistic six-panel campaign concept boards.
-Each Theme must be a fresh visual invention, not a variation on a prescribed
-subject. Every board contains one recurring miniature adult cast and one
-familiar everyday object enlarged to colossal scale. The cast always remains
-outside that object and uses its recognizable exterior properties to make six
-impossible but instantly legible images possible.
+Create varied, award-caliber, hyper-realistic six-region campaign concept
+boards. Every Theme places one recurring miniature adult cast inside a real
+everyday environment where one or more familiar objects appear colossal.
+People interact with complete objects from the outside; they never inhabit
+them. Imagine that the adults genuinely live at miniature scale among ordinary
+human possessions rather than visiting one isolated oversized prop.
 
-This is explicitly a non-narrative high-concept campaign board. Conceptual
-invention replaces conventional plot, relationship conflict, or a person merely
-exploring a setting. The colossal object remains a complete freestanding object,
-not architecture, a habitable interior, or a miniature world.
+This is a non-narrative visual-invention brief. Each Theme needs one idea that
+can be understood in a glance and becomes richer across six images. A large
+prop, elaborate lore, sensual posing, or beautiful material study is not yet an
+idea.
 
-OPEN SUBJECT SELECTION
+NON-NEGOTIABLE OUTPUT
 
-Choose one familiar everyday physical object freely and unpredictably for each
-Theme. It must be recognizable from ordinary human life before enlargement:
-for example a household item, food, tool, garment, accessory, package, desk
-object, grooming item, toy, sport object, or similarly common thing. These
-examples are open-ended, not a menu. Do not assign categories, moods, objects,
-materials, or intensities by theme_id. Theme IDs identify outputs only.
+- Choose either one dominant familiar object or a coherent ensemble of two to
+  five familiar objects per Theme.
+- Keep every person physically outside every object in every Theme, Frame, and
+  region.
+- Make each important object's complete form and ordinary identity immediately
+  recognizable.
+- Give the cast an active reason to interact with this specific object or
+  object relationship.
+- Build six visibly different proofs of one surprising proposition.
+- Produce one complete portrait 2-column by 3-row grid in every Narrative
+  Frame, regardless of frames_per_theme.
+- Render no title, caption, region label, typography, logo, watermark, border
+  text, interface element, or explanatory diagram inside the image.
 
-Across requested Themes, maximize distance in subject, world logic, material
-behavior, human activity, palette, and visual rhythm. Do not choose several
-subjects that all become caves, forests, mazes, baths, beds, shelters, or
-landscapes.
+PLAN THE WHOLE BATCH FIRST
 
-THE CONCEPT EQUATION
+Before writing any Theme, privately plan the current batch as a set. Generate
+at least twice as many candidate concepts as requested, with a minimum of
+twelve candidates. Do not keep the first workable ideas. Compare all candidates
+before selecting the final set.
 
-Build each concept with this equation:
+For a full ten-Theme batch:
 
-    familiar everyday object enlarged to colossal scale
-    + distant system or ritual + truthful exterior material mechanism
-    = one surprising campaign proposition
+- include a visible mix of single-object and multi-object ensemble Themes,
+  aiming for roughly half of each without forcing unrelated objects together;
+- use at least eight clearly different ordinary-use families;
+- span at least five normal size bands, from fingertip or pocket scale through
+  hand, forearm, torso, furniture, appliance, or larger everyday scale;
+- use at least seven different dominant material systems and seven different
+  outer silhouettes;
+- choose at least three objects that are normally larger than an adult hand;
+- choose no more than three objects that fit completely inside a closed adult
+  hand; and
+- use no more than two objects from any one family such as grooming, sewing,
+  fastening, stationery, packaging, kitchen tools, clothing, toys, electronics,
+  furniture, or sport.
 
-The distant system or ritual must change what the object's exterior does and
-what the outside cast can do with it. Scale by itself is not an idea.
+For smaller batches, maximize the same kinds of distance proportionally. Treat
+existing Themes as exclusions, not inspiration. Do not assign an object,
+material, idea engine, mood, setting, or intensity by theme_id.
 
-The hero remains one complete, recognizable object rather than dissolving into
-an environment. Build an external hero system from several of its real surface
-features, attached components, operating states, detachable parts, byproducts,
-packaging elements, or outward effects. They may acquire useful new roles, but
-the object's familiar outer silhouette, construction, scale, and original
-identity must remain legible.
+Avoid a batch dominated by tiny accessories, fasteners, elastic loops, thin
+elongated tools, packaging, polished metal, or objects chosen mainly because
+people can grip, press, straddle, rub, or balance on them.
 
-A strong proposition completes this sentence with concrete, visible nouns and
-verbs:
+ONE-OBJECT AND MULTI-OBJECT MODES
 
-    This is not merely a giant [everyday object]. Its external [real property
-    or component] becomes [unexpected function], so the miniature cast outside
-    it can [specific desire, ritual, service, game, contradiction, or
-    transformation].
+A single-object Theme gives one familiar object a strong iconic silhouette and
+extracts several different consequences from its ordinary behavior.
 
-Reject the proposition if the final clause is only "explore it," "feel it,"
-"connect with it," "be immersed in it," or another vague sensory treatment.
+An ensemble Theme uses two to five objects that plausibly coexist in one real
+setting: for example objects from a breakfast table, sewing box, bathroom
+counter, desk drawer, laundry shelf, toolbox, picnic blanket, grocery bag,
+workbench, bedside table, or another ordinary context. These examples are not a
+menu. The objects must act on one another or give the cast different routes,
+tools, hazards, resources, social roles, or scale references. Do not scatter
+unrelated giant props as decoration.
+
+The miniature cast should read as small inhabitants of a real everyday
+environment. They may travel between objects, coordinate actions across them,
+use one object to alter another, or exploit the gap, shadow, reflection,
+friction, flow, leverage, or ordinary operation created between objects.
+External surfaces may become paths or work areas, but every object must retain
+its familiar complete identity.
+
+THE ONE-SENTENCE IDEA
+
+Privately reduce each candidate to:
+
+    Because this familiar object or object ensemble is colossal, its truthful
+    ordinary behavior or interaction now [causes one impossible visual
+    consequence], so the outside cast must [pursue one concrete human desire in
+    an arrangement-specific way].
+
+The three indispensable layers are:
+
+1. OBJECT TRUTH — a recognizable use, movement, failure, trace, transformation,
+   material behavior, cultural association, or relationship unique to the
+   selected object arrangement.
+2. HUMAN STAKE — something the cast visibly wants, risks, exchanges, conceals,
+   celebrates, repairs, performs, protects, or chooses.
+3. CONCEPT ENGINE — the impossible cause-and-effect binding object truth to
+   human stake.
+
+The image, not a caption, must reveal all three. If replacing the object
+arrangement leaves the idea unchanged, it is generic. If removing the cast
+leaves a materials demonstration, it is shallow. If the idea needs readable
+words, numbers, dates, screen content, labels, or lore, it is not visually
+legible.
+
+CREATIVE-ENGINE SPREAD
+
+Choose primary concept engines freely. Possibilities include an ordinary-use
+collision, visual metaphor made literal, impossible product benefit, scale
+comedy, object-as-character, collaborative craft, domestic action becoming
+weather, forced-perspective illusion, material transaction, role reversal,
+public service made from private behavior, elegant practical joke, or an
+equally strong invention specific to the object. This is inspiration, not a
+menu.
+
+Across a full ten-Theme batch, use at least six substantially different primary
+engines. No more than two Themes may center on any rule-governed institution
+such as a contest, test, economy, permission system, tribunal, auction,
+hierarchy, ritual, or ceremony. No more than two may share one relationship
+grammar such as competing for control, earning intimacy, trading
+vulnerability, rescuing one another, performing for surveillance, or jointly
+operating machinery.
+
+Vary emotional temperature: playful, tender, glamorous, mischievous, deadpan,
+absurdly practical, celebratory, inconvenient, seductive, uncanny,
+transformative, or other object-specific tones. Do not make every Theme solemn,
+adversarial, ceremonial, dangerous, or concerned with proving worth.
+
+CANDIDATE TOURNAMENT
+
+Score candidates privately on:
+
+- instant visual readability without text;
+- specificity to the chosen object's ordinary identity;
+- semantic distance between object and transformed purpose;
+- a concrete two-person stake;
+- truthful material cause and effect;
+- six genuinely different image opportunities; and
+- a final surprise that is more than scale or erotic contact.
+
+Prefer a stronger alternative when a candidate:
+
+- it is merely people posing on, beside, or against a large object;
+- six images simply tour six components, textures, or camera angles;
+- technical calibration, testing, measuring, maintenance, or operation is the
+  idea rather than evidence for it;
+- pseudo-science or words such as ritual, ceremony, oracle, sacred, annual,
+  equinox, tribunal, governance, or rite disguise an ordinary action;
+- the concept is a competition, market, permission system, or intimacy economy
+  that could be transferred unchanged to another object;
+- random weather, a bird shadow, a passing crane, or an unrelated machine
+  supplies the only surprise;
+- sensuality carries an otherwise weak proposition; or
+- the title sounds inventive but the images do not.
+
+ORDINARY-USE COLLISION
+
+The object must actively do something; it must not remain an abandoned monument
+that only the miniature cast operates. In at least two of the six regions, an
+outside-scale hand, body, companion object, environmental force, or real
+mechanism uses the object in a way instantly recognizable from everyday life.
+The miniature cast remains outside and exploits, redirects, collaborates with,
+interrupts, or adapts to the resulting force.
+
+Make the intervention object-specific: the outside scale may turn, fold, pour,
+wipe, wind, stamp, squeeze, shake, roll, fasten, wear, throw, plug in, inflate,
+cut, open, close, or otherwise use the object as designed. At least one
+ordinary-use collision must provide the board's strongest visual punchline.
+In an ensemble Theme, let ordinary use of one object visibly alter another
+object as well as the cast. Do not place the same collision in a fixed region
+across Themes.
 
 EXTERIOR-ONLY SCALE CONTRACT
 
-Every person remains physically outside the colossal object in every Theme,
-every Narrative Frame, and every grid region. People may work beside it, cross
-or brace against its outer surface, handle an externally reachable component,
-ride an exterior moving part, redirect an outward flow, or respond to an effect
-emitted into the surrounding space.
+Every person remains on the environment side of every object surface. People
+may cross an outer surface, work beside or between objects, handle externally
+reachable parts, ride an exterior moving part, redirect an outward flow, or
+respond to effects emitted into the surrounding space.
 
-Never place a person inside the object, inside one of its cavities, beneath its
-outer shell, within a container volume, behind a cutaway wall, or across an
-opening, rim, seam, hatch, mouth, pocket, sleeve, or other threshold leading
-into it. Never use an interior viewpoint. An opened, split, peeled, or cut
-object may expose a surface to the outside, but every person must remain on the
-environment side of that exposed surface without entering the object's volume.
+Never place any body inside the object, inside a cavity or container volume,
+beneath its shell, behind a cutaway, or across a rim, mouth, seam, hatch,
+pocket, sleeve, jaw gap, opening, or threshold leading inward. Never use an
+interior viewpoint. For bags, boxes, vessels, garments, appliances, vehicles,
+and other enclosing objects, keep the object closed or keep every person
+clearly away from the opening on its exterior side. Ordinary use never
+authorizes entry.
 
-Do not turn the object into a building, room, cave, tunnel, vehicle cabin,
-arena, landscape, planet, or self-contained habitat. Surround it with a
-credible external setting and familiar scale references. In at least three
-regions, show enough of the complete or nearly complete outer silhouette for
-the original everyday object and the cast-to-object scale ratio to read
-immediately.
+Do not transform an object interior into a building, room, cave, tunnel, cabin,
+or self-contained habitat. Object exteriors and the ordinary environment
+between several objects may function as miniature terrain, but they must not
+dissolve into an unrecognizable generic landscape. An opened, peeled, broken,
+or cut object may expose a material face, but nobody may enter or occupy the
+exposed volume.
 
-SECOND-ORDER LEAP
+For a single-object Theme, show its complete or nearly complete outer silhouette
+in at least three regions. For an ensemble Theme, show the complete primary
+object and at least one clearly recognizable secondary object in at least three
+regions. Include familiar external scale references so object identity,
+object-to-object relationships, and cast-to-object ratios read immediately.
 
-Before writing, generate multiple unrelated candidates and select the one with
-the clearest second-order leap. The final idea must combine at least three
-compatible creative operations, chosen for the selected subject rather than by
-quota:
+SIX PROOFS, NOT SIX PARTS
 
-- function transfer: an exterior component becomes a transport path, wearable,
-  outdoor furnishing, exposed machine, service tool, stage device, sport
-  apparatus, or another unexpected working role;
-- state drama: different physical states create different actions and images;
-- miniature logistics: the outside cast builds a working tool, route, rig,
-  workshop, delivery system, or public service around or across the exterior;
-- scale crossing: a hand, tool, flow, mechanism, shadow, or force from another
-  scale intervenes from outside and changes the visible interaction;
-- character shift: the complete object or an external component acts as host,
-  companion, rival, audience, performer, guide, or creature without turning
-  cartoonish;
-- material weather: a truthful byproduct travels outward and becomes climate,
-  light, atmosphere, precipitation, or environmental force around the object;
-- ritual or game: an ordinary use becomes a ceremony, courtship rule, sport,
-  feast, performance, challenge, or elegant practical joke;
-- hero reveal: exterior components resolve into the iconic full silhouette,
-  service moment, presentation, or other visible payoff.
+Invent more than six stunts and retain the strongest six. They are six proofs
+of one proposition, not a component tour. Each must work as a standalone
+campaign key visual while remaining unmistakably part of the same concept.
 
-These are open creative operations, not Theme assignments or fixed panel roles.
-Invent other operations when they serve the proposition better.
+Across the six, include these functions in any order:
 
-THE SIX-STUNT TEST
+- one iconic whole-object or coherent ensemble image that communicates the idea
+  immediately;
+- one object-specific ordinary-use collision from outside scale;
+- one intimate two-person negotiation with visible reciprocal agency;
+- one ingenious use of residue, packaging, reflection, shadow, sound, heat,
+  airflow, waste, or another secondary effect;
+- one role reversal, perspective reversal, or transfer of power; and
+- one payoff that changes how the viewer understands the proposition without
+  requiring chronology.
 
-Invent more than six visual stunts, then retain the six strongest. Every retained
-stunt must:
+At least four stunts must change the cast's goal, role, tactic, or consequence,
+not merely the contacted component, camera, pose, or material state. At least
+two must remain compelling if all sensual content is removed.
 
-- work as a standalone campaign key visual;
-- use a different exterior role, state, process, component, scale, or physical
-  force;
-- show the adult cast doing something necessary outside the object;
-- contain clear contact, force, response, and material consequence when bodies
-  or tools interact with the object's exterior;
-- remain understandable without a caption; and
-- belong unmistakably to the same complete everyday object.
+Avoid letting three or more stunts repeat one interaction grammar: gripping for
+leverage, pressing skin to a surface, balancing on a component, routing liquid
+over bodies, transferring residue to skin, climbing, reclining, using a surface
+as furniture, or reading a measurement.
 
-Most stunts must change function or state, not merely change camera angle or
-body pose. At least one stunt must contain a category-breaking event such as a
-working miniature system, an outside-scale intervention, material weather, a
-component with a social role, or an equally strong external invention arising
-naturally from the object.
+THEME-STAGE CONTRACT
 
-HARD REJECTION GATE
+Use the Theme schema normally. The premise has exactly two sentences:
 
-Discard and replace the entire Theme if any stunt puts a person inside the
-object or treats its interior, cavity, opening, or hollow volume as a location.
-Also discard it if the object stops reading as one familiar enlarged object and
-becomes generic architecture, terrain, or an immersive micro-world.
-
-Discard and replace the entire Theme when four or more stunts can be summarized
-with passive bodily verbs such as walk through, stand beside, gaze at, touch,
-stroke, lean on, lie on, bathe in, embrace, or climb.
-
-The following are beginnings, not finished concepts:
-
-- repeated long things becoming a forest;
-- lines or fabric becoming a maze;
-- liquid becoming a bath;
-- a curved surface becoming a bed or slide;
-- a mushroom, shell, leaf, or cloth becoming shelter;
-- a large device merely being operated at scale.
-
-One of these forms may appear only if another idea overturns it through changed
-function, ritual, law, social meaning, logistics, or scale. Sensual photography
-cannot compensate for a weak proposition.
-
-THEME-STAGE OUTPUT CONTRACT
-
-Use the Theme schema normally, but make the two-sentence premise carry an
-auditable creative plan:
-
-1. Sentence one names the familiar everyday object, its colossal complete outer
-   form, the cast outside it, the distant system or ritual, and the external
-   physical mechanism that creates the second-order conceptual leap.
+1. Sentence one identifies the familiar object or coherent object ensemble,
+   colossal complete outer forms, the adult cast outside them, the object truth,
+   human stake, primary concept engine, and immediate visual cause-and-effect.
 2. Sentence two contains exactly six concise visual-stunt seeds separated by
-   semicolons. Each seed names the transformed exterior component or state, its
-   new function, and a concrete cast action outside the object.
+   exactly five semicolons. Each seed states a different proof: cast goal or
+   role, concrete outside action, object response, and visible consequence.
 
-Do not spend the premise on generic mood, intimacy, exploration, or backstory.
-The style field carries medium, palette, light, material rendering, and visual
-rhythm. The six seeds may use any order; no panel position has a permanently
-assigned narrative function.
+Write direct campaign language, not lore. The reader must be able to paraphrase
+one surprising object-specific idea and explain why both people care. Put
+medium, palette, lighting, material rendering, and visual rhythm in style.
 
-FRAME-STAGE OUTPUT CONTRACT
+FRAME-STAGE GRID CONTRACT
 
-Every Narrative Frame is one complete 2-column by 3-row grid, regardless of
-frames_per_theme. It is one portrait image containing six cleanly separated
-regions with consistent gutters and no visible title, caption, label,
-typography, logo, watermark, border text, or interface element. Regions are
-spatial subdivisions inside that one image; they are not Narrative Frames.
+Every Narrative Frame is one complete portrait 2-column by 3-row grid,
+regardless of frames_per_theme. Regions are subdivisions of that one image, not
+separate Narrative Frames. Multiple Frames are different complete board
+proposals for the same Theme.
 
-When multiple Frames are requested, every Frame must independently redescribe a
-different complete six-region board for the same Theme. Never distribute one
-board across multiple Frames, never use one Frame per region, and never
-continue a board or region in the next Frame. Put the board overview and all six
-region descriptions inside each Frame's single unbroken prose paragraph.
+Begin every Frame with these exact two prose sentences:
 
-Realize all six stunt seeds from the Theme premise, one per region. Do not
-replace, merge, or dilute them. Explicitly describe Region 1 through Region 6;
-a general board synopsis without six expanded region descriptions is invalid.
-Each complete Narrative Frame should use roughly 450 to 650 words, or equivalent
-detail in the requested language. Expand each seed into a photographic scene
-with:
+    A portrait 2-column by 3-row grid forms one image with six cleanly separated
+    regions. Every person remains outside all colossal everyday objects
+    throughout the board.
 
-- the recurring cast's exact action and leverage;
-- explicit evidence that the cast remains outside the object;
-- the external component's scale, role, and physical state;
-- visible cause and effect;
-- tactile deformation, displacement, spray, tension, fracture, compression,
-  flow, reflection, residue, or another truthful material response;
-- composition, camera distance and angle, lens character, focus, lighting, and
-  color; and
-- enough surrounding context to make both scale and concept immediately clear.
+Then introduce all expanded descriptions in order with the exact prose cues
+"Region 1:" through "Region 6:". These cues organize the prompt and must not
+appear as rendered text. Put the overview and all six regions in one unbroken
+paragraph. Never distribute a board across Frames, use one Frame per region,
+continue a region in another Frame, or return a general board synopsis.
 
-The six regions form a flexible visual rhythm, not six equal poses and not a
-mandatory beginning-middle-climax sequence. Any region may be quiet, comic,
-intimate, kinetic, monumental, or revelatory when the chosen concept calls for
-it.
+Realize every Theme seed without replacement or dilution. In each region,
+describe the cast's current goal, role, action, agency, and leverage; exterior
+object scales, relationships, and states; visible cause and effect; truthful
+deformation,
+displacement, spray, tension, fracture, compression, flow, reflection, residue,
+or other response; setting; composition; camera; focus; light; and color.
 
-CAST AND CONTINUITY
+Keep each Frame concise enough to function as one image prompt while giving all
+six regions concrete photographic detail. Change visual verb, cast tactic,
+social relation, consequence, shot scale, and composition across regions. Do
+not expand six seeds into six variations of bracing, pressing, gripping,
+balancing, rubbing, climbing, or receiving material on skin.
 
-Use exactly the requested number of adult women and adult men. All depicted
-people are clearly adults. The same cast recurs across the six regions; repeated
-views do not add people. If multiple Narrative Frames are requested, that same
-cast also recurs in every complete board. Give each person a stable compact
-identity: apparent age, ancestry or complexion, body build, face structure, and
-hair.
+CAST AND CONTENT LEVEL
 
-Preserve identity, body details, styling logic, and any transformed wardrobe or
-body marks across all regions unless the proposition visibly changes them.
-Supporting tools must be built from or materially linked to the hero ecology,
-not added as arbitrary spectacle.
+Use exactly the CLI-requested number of adult women and adult men. Repeated
+views in the grid do not add people. Preserve each person's unmistakable adult
+age, face, build, hair, body details, and styling across all six regions and all
+Frames of the Theme.
 
-CONTENT LEVEL
-
-Interpret the chosen concept specifically through the requested content_level.
-Do not let content intensity choose or limit the subject.
+Interpret the proposition through the selected content_level without allowing
+content intensity to choose the object or substitute for invention.
 
 - aesthetic: elegant, non-explicit, publication-safe body awareness and
   interaction;
-- erotic: clearly adult sensual charge, intentional exposure or concealment,
-  intimate self-touch where conceptually useful, and strong physical tension
-  without explicit sexual acts;
+- erotic: unmistakably adult sensual charge, intentional exposure or
+  concealment, reciprocal intimacy, and strong physical tension without
+  explicit sexual acts;
 - hardcore: clearly adult explicit sexual action may be central when requested,
-  while anatomy, contact, agency, physical plausibility, and the high-concept
-  campaign proposition remain precise.
+  while anatomy, contact, agency, plausibility, and the high-concept proposition
+  remain precise.
 
-Do not sanitize erotic or hardcore into neutral wellness imagery. Do not add
-sexual content beyond the selected level.
+Do not sanitize erotic or hardcore into neutral imagery. Do not exceed the
+selected level. Every adult remains alert, willing, responsive, and able to
+stop.
 
-PHOTOGRAPHIC STANDARD
+MINIATURE-WORLD CAMERA LANGUAGE
 
-Render the impossible as premium practical photography: believable gravity,
-scale, optics, material microtexture, skin texture, moisture, fibers, particles,
-reflections, shadows, contact deformation, exterior depth cues, and a readable
-cast-to-object size ratio. Favor one controlled visual language with enough
-contrast between regions to keep the grid alive. Avoid generic fantasy haze,
-decorative clutter, cartoon physics, interior cutaways, empty spectacle, and six
-near-identical camera views.
+Photograph every region from the visual logic of a miniature world. The people
+must read as tiny real adults living among and interacting with overwhelmingly
+large but familiar everyday objects, not as full-size adults beside abstract
+architecture.
 
-FINAL SILENT CHECK
+Use close-focus commercial photography and controlled tilt-shift or macro-style
+selective focus where it strengthens scale. Keep the cast, the exact contact
+point, and enough recognizable object exteriors sharply resolved while
+allowing foreground and background planes to fall away cleanly. Do not blur so
+much that faces, actions, material response, or complete object identities
+become unreadable.
 
-Before returning output, verify:
+THUMBNAIL SCALE HIERARCHY
 
-- the subject was freely invented and not inferred from theme_id;
-- the subject is one familiar everyday object enlarged to colossal scale;
-- every person remains outside it in all six regions;
-- at least three regions reveal its complete or nearly complete outer silhouette;
-- the premise follows the exact two-sentence contract;
-- sentence two contains six semicolon-separated, visibly different stunts;
-- at least three creative operations combine into one coherent proposition;
-- the object appears through multiple truthful exterior components, states, or
-  effects without becoming an interior world;
-- most cast actions are active and consequential rather than passive contact;
-- all six stunt seeds are realized in the Frame;
-- every Narrative Frame is independently one complete six-region grid;
-- the requested cast count and content level are exact; and
-- the final grid contains no rendered text.
+Design every region to read first at thumbnail size: one dominant familiar
+object, coherent object ensemble, or unmistakable exterior feature; one or two
+visibly tiny complete adult bodies; one clear action silhouette; and one simple
+color contrast. The viewer must understand "tiny people living among huge
+everyday objects" before noticing erotic detail, facial expression, or material
+microtexture.
 
-If any check fails, revise before returning.
+Across each six-region board:
+
+- use at least four wide or medium views showing complete adult bodies and
+  enough object silhouettes, relationships, or iconic geometry to establish
+  scale;
+- reserve no more than two regions for close detail, and anchor each close view
+  with a familiar oversized feature or external reference;
+- keep the adults visually subordinate to the object arrangement rather than
+  filling the frame like full-size fashion models;
+- vary the relative scale dramatically, including one whole-object or ensemble
+  hero view where the adults are almost toy-like and one closer interaction
+  view where body mechanics remain legible;
+- avoid using a broad featureless flank as a wall or backdrop; include an edge,
+  curve, handle, seam, button, groove, tooth, marking system, moving part, or
+  other instantly identifying geometry; and
+- do not let steam, mist, smoke, darkness, reflection, fabric, or shallow focus
+  conceal the cast-to-object ratio.
+
+Bold printed patterns, molded marks, repeated ticks, grooves, dots, ridges, and
+other graphic surface systems may reinforce scale even when their exact text or
+numbers are unreadable. The concept itself must not depend on reading them.
+
+Vary useful miniature viewpoints across the six regions: miniature eye level
+along the object's surface, low angles that make an ordinary edge monumental,
+high oblique views revealing tiny bodies against the full silhouette, precise
+top-down arrangements, and close detail views anchored by a recognizable
+large-scale feature. Include ordinary external scale references such as a
+fingertip, tabletop grain, fabric weave, floor joint, utensil, packaging edge,
+droplet, crumb, or hardware only when they clarify size.
+
+This is crisp editorial advertising photography, not a movie still. Do not use
+cinematic color grading, teal-and-orange treatment, crushed blacks, murky
+shadows, sepia, film grain, anamorphic flare, dramatic fog, smoky atmosphere,
+noir chiaroscuro, or vague blockbuster spectacle.
+
+BRIGHT CLEAN COLOR STANDARD
+
+Use bright, clean, high-key color with clear separation between skin, object,
+wardrobe, and background. Favor fresh whites, luminous daylight, polished
+pastels, vivid object colors, clean primaries, and deliberate complementary
+contrast. Saturation may be bold but must remain premium, natural, and
+material-specific rather than neon or synthetic.
+
+Give the object arrangement one immediately legible dominant color relationship
+or graphic pattern against a simpler contrasting background. Prefer colored
+enamel, dyed plastic, paint, paper, fabric, food color, translucent color, or
+another truthful bright finish when objects permit it. For naturally neutral
+metal, glass, wood, or white objects, use a bold surrounding color field and
+crisp edge light rather than gray-on-gray realism.
+
+Avoid boards dominated by stainless steel gray, beige, black, brown, vapor
+white, or low-saturation environmental color. Do not place pale skin, pale
+wardrobe, pale object, and pale background in the same tonal band. Give the
+cast clothing or accessories that clearly separate their bodies from both the
+hero and background while preserving the requested content level.
+
+Light the board like a meticulous commercial tabletop campaign: broad soft
+key light, crisp controlled highlights, open shadows with visible detail, and
+small contact shadows that pin every miniature body to the surface. Keep
+backgrounds uncluttered and color-blocked where useful. Each Theme may choose a
+different bright palette, but all six regions in one Frame must belong to the
+same clean campaign system.
+
+PHOTOGRAPHIC MATERIAL STANDARD
+
+Render the impossible as premium practical photography with believable gravity,
+scale, optics, skin, fibers, particles, reflections, shadows, contact
+deformation, exterior depth cues, and material microtexture. Preserve realistic
+faces and anatomy even when tilt-shift focus exaggerates scale. Use one coherent
+campaign language with enough compositional contrast to keep the grid alive.
+Avoid fantasy haze, decorative clutter, cartoon physics, interior cutaways,
+generic spectacle, and six near-identical views.
+
+FINAL CREATIVE PRIORITIES
+
+Before returning, use these as creative priorities:
+
+- the batch has real distance in ordinary size, family, silhouette, material,
+  primary engine, relationship grammar, emotional tone, and setting;
+- the batch includes both single-object and multi-object miniature worlds;
+- each Theme has one coherent object arrangement, one human stake, and one
+  arrangement-specific concept engine;
+- one or more objects actively undergo recognizable ordinary use in at least
+  two regions;
+- every person stays outside every object and no object interior becomes an
+  inhabitable world;
+- no concept depends on readable text or explanatory lore;
+- every region passes the thumbnail read of giant familiar object, tiny complete
+  people, clear action, and clean color separation;
+- at least four regions show complete bodies with strong scale evidence, while
+  close views remain anchored by iconic object geometry;
+- the premise has exactly two sentences and sentence two has six seeds divided
+  by exactly five semicolons;
+- the six stunts are different conceptual proofs rather than six parts or
+  contact poses;
+- every Frame independently contains the complete text-free 2-by-3 grid,
+  exact opening, and Region 1 through Region 6; and
+- every region uses miniature-world scale cues, bright clean commercial color,
+  readable contact, and no cinematic treatment; and
+- cast, consent, content level, physical plausibility, and photographic quality
+  are exact.
+
+These priorities guide selection and revision; they are not a hard quality gate
+and must not block an otherwise structurally valid result. The non-negotiable
+grid, cast, exterior-only, content-level, and schema contracts remain mandatory.

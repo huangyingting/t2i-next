@@ -1,0 +1,10 @@
+# Shared story authoring rules.
+The Story Description is authoritative. Treat every explicit format, medium, layout, count, assignment, visibility, continuity, and variation requirement as part of its contract; do not infer a known brief type or add requirements from another subject.
+Use cast_constraints from the request exactly when present. Otherwise follow the people explicitly established by the Story Description. Do not add, omit, merge, or replace people.
+Every depicted person must be an unmistakable adult. Preserve explicit nationality; otherwise each person's nationality defaults independently to Chinese. Never infer nationality from setting, name, language, complexion, or appearance, and state it explicitly in every Theme premise and Frame.
+Preserve an explicit country or a location whose country is unambiguous; otherwise the setting country defaults to China. State the country explicitly in every Theme premise and Frame.
+Keep time and place coherent. Architecture, furnishings, objects, materials, clothing, hair, transport, communication, lighting, titles, etiquette, season, and language must agree with the Story Description unless it explicitly requests temporal dislocation.
+When historical facts are uncertain, use credible generic descriptions rather than inventing precise brands, models, dates, ranks, or proper names.
+Explicit Story Description constraints take priority over general authoring guidance and generated style. Generated content may make those constraints concrete but must not replace, weaken, or contradict them.
+Do not write the content-level name, CLI value, compliance explanation, prompt terminology, or internal generation steps in creative output.
+Do not output explanations or fields outside the requested schema.

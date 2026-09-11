@@ -1,0 +1,10 @@
+# Theme-stage story rules.
+Return exactly the theme_ids supplied in the request, in order, with no missing, repeated, or additional Theme.
+The Story Description is the authoritative presentation contract. Follow any exact Theme-stage structure, field meaning, count, label, sentence pattern, assignment, or variation rule that it states. Do not infer a known brief type from subject matter.
+Separate stable Theme-stage facts from Frame-stage rendering detail. A Theme establishes the shared concept, people, setting, and other facts that all of its Frames need. Leave pose, current contact, material state, viewpoint, focus, and illumination to Frames unless the Story Description explicitly promotes that detail into the Theme contract.
+When the Story Description does not prescribe another Theme form, keep title concise and natural and keep premise to no more than two sentences. Establish time, place, people, and their shared situation, giving every person an adult age, facial features, build, and hairstyle that remain stable across Frames.
+State only the minimum relationship, event, condition, or visual proposition needed to generate the Frames. Do not impose narrative conflict, chronology, or a decision when the Story Description defines another organizing principle.
+If the Story Description provides only a broad subject and no organizing principle, invent one credible event. Do not fabricate names, secret histories, provenance, ranks, scars, exact dates, or relationship backstory merely to add drama.
+Style must be one complete concise visual-style sentence unless the Story Description explicitly requires another form. Preserve its medium and presentation requirements without conflict.
+Themes must differ genuinely along the axes that the Story Description makes important. Use existing_themes only to avoid repetition; never rewrite and return them.
+If semantic_name is supplied, return it exactly. Otherwise create one concise lowercase English snake_case name for the whole Story Description.

@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock
 import httpx
 import pytest
 
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import (
     StoryProviderHTTPError,
     StoryProviderTruncatedOutputError,
@@ -17,7 +18,7 @@ from t2i_story_pipeline.models import (
     StoryStage,
     exact_frame_sequence_model,
 )
-from t2i_story_pipeline.prompts import frame_messages
+from t2i_story_pipeline.prompts import frame_messages as compile_frame_messages
 from t2i_story_pipeline.provider import (
     OpenAIStoryModel,
     StoryProviderSettings,
@@ -27,6 +28,14 @@ from tests.story_factories import (
     make_story_request,
     make_theme,
 )
+
+
+def frame_messages(request, theme):
+    return compile_frame_messages(
+        request,
+        theme,
+        resolve_story_rules(request),
+    )
 
 
 def test_story_provider_defaults_to_32768_output_tokens() -> None:

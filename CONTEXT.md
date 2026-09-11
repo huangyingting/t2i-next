@@ -54,6 +54,20 @@ The user's prose account of time, place, adult characters, relationships,
 interaction, action, emotion, environment, camera intent, and lighting intent.
 _Avoid_: Brief, configuration
 
+**Story Rule Set**:
+The immutable ordered authoring rules compiled for the Theme and Frame stages
+of one story run. Built-in rules define only stage semantics and universal
+contracts; optional rules from `story-inputs/rules/` add reusable project
+policy. The resolved set is frozen with the run and reused on resume.
+_Avoid_: Story Description, Prompt Generation rules, per-input special case
+
+**Story Description Authority**:
+The rule that medium, layout, regions, views, scale systems, visual hierarchy,
+and other subject-specific presentation behavior live in the Story Description
+rather than Python branches. The story compiler understands stages and schema,
+not named input archetypes.
+_Avoid_: Brief-type detection, story-input adapter
+
 **Story Content Level**:
 The requested visible-content floor for every Narrative Frame: `aesthetic`,
 `erotic`, or `hardcore`. It changes authoring instructions, never the adult

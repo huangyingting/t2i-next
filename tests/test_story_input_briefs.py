@@ -245,58 +245,126 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
     )
     normalized = " ".join(brief.split())
 
-    assert "OPEN SUBJECT SELECTION" in normalized
-    assert "THE CONCEPT EQUATION" in normalized
-    assert "SECOND-ORDER LEAP" in normalized
-    assert "THE SIX-STUNT TEST" in normalized
-    assert "HARD REJECTION GATE" in normalized
-    assert "THEME-STAGE OUTPUT CONTRACT" in normalized
-    assert "scale crossing" in normalized
-    assert "miniature logistics" in normalized
-    assert "hero reveal" in normalized
-    assert "generate multiple unrelated candidates" in normalized
-    assert "Do not assign categories, moods, objects" in normalized
+    assert "PLAN THE WHOLE BATCH FIRST" in normalized
+    assert "at least twice as many candidate concepts as requested" in normalized
+    assert "ONE-OBJECT AND MULTI-OBJECT MODES" in normalized
+    assert "visible mix of single-object and multi-object ensemble Themes" in normalized
+    assert "aiming for roughly half of each" in normalized
+    assert "coherent ensemble of two to five familiar objects" in normalized
+    assert "small inhabitants of a real everyday environment" in normalized
+    assert "travel between objects" in normalized
+    assert "use one object to alter another" in normalized
+    assert "Do not scatter unrelated giant props" in normalized
+    assert "use at least eight clearly different ordinary-use families" in normalized
+    assert "span at least five normal size bands" in normalized
+    assert "choose at least three objects" in normalized
+    assert "larger than an adult hand" in normalized
+    assert "choose no more than three objects" in normalized
+    assert "inside a closed adult hand" in normalized
+    assert "THE ONE-SENTENCE IDEA" in normalized
+    assert "OBJECT TRUTH" in normalized
+    assert "HUMAN STAKE" in normalized
+    assert "CONCEPT ENGINE" in normalized
+    assert "If removing the cast leaves a materials demonstration" in normalized
+    assert "CREATIVE-ENGINE SPREAD" in normalized
+    assert "at least six substantially different primary engines" in normalized
+    assert "No more than two Themes may center on" in normalized
+    assert "No more than two may share one relationship grammar" in normalized
+    assert "CANDIDATE TOURNAMENT" in normalized
+    assert "six genuinely different image opportunities" in normalized
+    assert "six images simply tour six components" in normalized
+    assert "competition, market, permission system, or intimacy economy" in normalized
+    assert "ORDINARY-USE COLLISION" in normalized
+    assert "In at least two of the six regions" in normalized
+    assert "uses the object in a way instantly recognizable" in normalized
+    assert "use the object as designed" in normalized
+    assert "EXTERIOR-ONLY SCALE CONTRACT" in normalized
+    assert "Never place any body inside the object" in normalized
+    assert "Ordinary use never authorizes entry" in normalized
+    assert "SIX PROOFS, NOT SIX PARTS" in normalized
+    assert "one object-specific ordinary-use collision" in normalized
+    assert "At least four stunts must change the cast's goal" in normalized
+    assert "At least two must remain compelling" in normalized
+    assert "THEME-STAGE CONTRACT" in normalized
+    assert "exactly five semicolons" in normalized
+    assert "FRAME-STAGE GRID CONTRACT" in normalized
     assert (
-        "no panel position has a permanently assigned narrative function"
-        in normalized
-    )
-    assert (
-        "exactly six concise visual-stunt seeds separated by semicolons"
-        in normalized
-    )
-    assert "Realize all six stunt seeds from the Theme premise" in normalized
-    assert "Explicitly describe Region 1 through Region 6" in normalized
-    assert (
-        "general board synopsis without six expanded region descriptions"
-        in normalized
-    )
-    assert (
-        "Every Narrative Frame is one complete 2-column by 3-row grid"
+        "Every Narrative Frame is one complete portrait 2-column by 3-row grid"
         in normalized
     )
     assert "regardless of frames_per_theme" in normalized
-    assert "Never distribute one board across multiple Frames" in normalized
-    assert "never use one Frame per region" in normalized
-    assert "one familiar everyday object enlarged to colossal scale" in normalized
-    assert "Every person remains physically outside the colossal object" in normalized
+    assert "Never distribute a board across Frames" in normalized
+    assert "use one Frame per region" in normalized
     assert (
-        "Never place a person inside the object, inside one of its cavities"
+        "A portrait 2-column by 3-row grid forms one image with six cleanly "
+        "separated regions."
         in normalized
     )
+    assert (
+        "Every person remains outside all colossal everyday objects throughout "
+        "the board."
+        in normalized
+    )
+    assert '"Region 1:" through "Region 6:"' in normalized
     assert "When frames_per_theme is 1" not in normalized
-    assert "roughly 450 to 650 words" in normalized
-    assert (
-        "four or more stunts can be summarized with passive bodily verbs"
-        in normalized
-    )
     assert "work as a standalone campaign key visual" in normalized
-    assert (
-        "Do not sanitize erotic or hardcore into neutral wellness imagery"
-        in normalized
-    )
+    assert "Do not sanitize erotic or hardcore into neutral imagery" in normalized
+    assert "MINIATURE-WORLD CAMERA LANGUAGE" in normalized
+    assert "controlled tilt-shift or macro-style selective focus" in normalized
+    assert "THUMBNAIL SCALE HIERARCHY" in normalized
+    assert "read first at thumbnail size" in normalized
+    assert "at least four wide or medium views" in normalized
+    assert "showing complete adult bodies" in normalized
+    assert "no more than two regions for close detail" in normalized
+    assert "one whole-object or ensemble hero view" in normalized
+    assert "avoid using a broad featureless flank as a wall" in normalized
+    assert "conceal the cast-to-object ratio" in normalized
+    assert "graphic surface systems may reinforce scale" in normalized
+    assert "miniature eye level along the object's surface" in normalized
+    assert "high oblique views revealing tiny bodies" in normalized
+    assert "This is crisp editorial advertising photography" in normalized
+    assert "not a movie still" in normalized
+    assert "Do not use cinematic color grading" in normalized
+    assert "BRIGHT CLEAN COLOR STANDARD" in normalized
+    assert "bright, clean, high-key color" in normalized
+    assert "deliberate complementary contrast" in normalized
+    assert "one immediately legible dominant color relationship" in normalized
+    assert "bold surrounding color field" in normalized
+    assert "Avoid boards dominated by stainless steel gray" in normalized
+    assert "same tonal band" in normalized
+    assert "commercial tabletop campaign" in normalized
+    assert "open shadows with visible detail" in normalized
+    assert "PHOTOGRAPHIC MATERIAL STANDARD" in normalized
+    assert "FINAL CREATIVE PRIORITIES" in normalized
+    assert "they are not a hard quality gate" in normalized
+    assert "Eliminate a candidate when" not in normalized
+    assert "Reject the Theme when" not in normalized
     assert "- T001:" not in brief
-    assert "roughly forty to seventy percent" not in normalized
-    assert "Panel 5 is the strongest" not in normalized
+
+
+def test_edo_warai_e_brief_respects_all_content_levels() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "ADULT CAST, CONSENT, AND CONTENT LEVEL" in normalized
+    assert "Honor the exact CLI-requested content_level" in normalized
+    assert "aesthetic: keep every adult fully dressed" in normalized
+    assert "erotic: make unmistakable adult sensuality visible" in normalized
+    assert "clearly erotic but non-explicit interaction" in normalized
+    assert "hardcore: show an explicit, consensual adult sexual act" in normalized
+    assert "already occurring in every Theme and Frame" in normalized
+    assert "do not hide the defining content" in normalized
+    assert "LEVEL-AWARE CLOTHING AND BODY" in normalized
+    assert "At erotic level, robes may fall open" in normalized
+    assert "At hardcore level, adults may be partly or fully nude" in normalized
+    assert "directly establish the requested content level" in normalized
+    assert "Begin every Frame with the selected level's defining state" in normalized
+    assert "preserve the Theme's explicit act in every Frame" in normalized
+    assert "intimate but fully clothed interaction" not in normalized
+    assert "human anatomy natural and fully covered" not in normalized
+    assert "Reject any Frame that depends on nudity" not in normalized
 
 
 def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:

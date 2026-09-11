@@ -8,6 +8,7 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.config import load_story_provider_settings
 from t2i_story_pipeline.errors import (
     StoryConfigurationError,
@@ -18,6 +19,7 @@ from t2i_story_pipeline.models import (
     ContentLevel,
     OutputLanguage,
     StoryRequest,
+    StoryRuleSet,
 )
 from t2i_story_pipeline.provider import (
     OpenAIStoryModel,
@@ -117,14 +119,18 @@ def generate_command(
         file_okay=False,
         help="增量 checkpoint 和运行记录目录。",
     ),
+    rules_dir: Path | None = typer.Option(
+        None,
+        "--rules-dir",
+        file_okay=False,
+        help="可选 story 用户规则目录；默认使用 story-inputs/rules/。",
+    ),
 ) -> None:
     """Generate themes and final narrative paragraphs from one story."""
     try:
         request = StoryRequest(
             story=_resolve_story_input(story, prompt_file),
-            source_prompt_stem=(
-                prompt_file.stem if prompt_file is not None else None
-            ),
+            source_prompt_stem=(prompt_file.stem if prompt_file is not None else None),
             theme_count=themes,
             frames_per_theme=frames,
             female_count=female_count,
@@ -132,11 +138,22 @@ def generate_command(
             content_level=content_level,
             output_language=output_language,
         )
+        default_rules_directory = Path("story-inputs") / "rules"
+        user_rules_directory = (
+            rules_dir
+            if rules_dir is not None
+            else (default_rules_directory if default_rules_directory.is_dir() else None)
+        )
+        rules = resolve_story_rules(
+            request,
+            user_directory=user_rules_directory,
+        )
         settings = load_story_provider_settings()
         completed = asyncio.run(
             _generate(
                 request,
                 settings,
+                rules,
                 concurrency=concurrency,
                 runs_directory=runs_dir,
                 prompts_directory=prompts_dir,
@@ -256,6 +273,7 @@ def _resolve_story_input(
 async def _generate(
     request: StoryRequest,
     settings: StoryProviderSettings,
+    rules: StoryRuleSet,
     *,
     concurrency: int,
     runs_directory: Path = Path("runs"),
@@ -271,6 +289,7 @@ async def _generate(
             model,
             store,
             run_settings,
+            rules,
             on_progress=typer.echo,
         ).run(request)
 
@@ -281,11 +300,13 @@ async def _resume(
     settings: StoryRunSettings,
     store: LocalStoryRunStore,
 ) -> CompletedStoryRun:
+    rules = store.inspect(run_id).rules
     async with OpenAIStoryModel(provider) as model:
         return await StoryStudio(
             model,
             store,
             settings,
+            rules,
             on_progress=typer.echo,
         ).resume(run_id)
 
@@ -320,8 +341,7 @@ def _print_run_summary(
     if summary.error:
         typer.echo(f"    错误：{_ellipsize(summary.error, 72)}")
     typer.echo(
-        f"    继续：uv run t2i-story resume {summary.run_id} "
-        f"--runs-dir {runs_dir}"
+        f"    继续：uv run t2i-story resume {summary.run_id} --runs-dir {runs_dir}"
     )
 
 
@@ -333,8 +353,7 @@ def _exit_for_error(error: Exception, runs_dir: Path) -> None:
     typer.secho(f"生成失败：{error}", fg=typer.colors.RED, err=True)
     if isinstance(error, StoryRunIncompleteError):
         typer.echo(
-            f"继续命令：uv run t2i-story resume {error.run_id} "
-            f"--runs-dir {runs_dir}",
+            f"继续命令：uv run t2i-story resume {error.run_id} --runs-dir {runs_dir}",
             err=True,
         )
     raise typer.Exit(code=2) from error

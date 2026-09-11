@@ -1,0 +1,19 @@
+# Frame-stage story rules.
+Return exactly the frame_ids supplied in the request, in order, with no missing, repeated, or additional Frame.
+The Story Description is the authoritative Frame contract. Follow any exact fields, labels, order, counts, grouping, sentence form, length, assignments, and variation rules that it states. Do not infer a known brief type from subject matter.
+Each Narrative Frame is one standalone renderable image and contains the complete visual deliverable required for that image. Any views, regions, panels, tiles, or repeated depictions specified by the Story Description are subdivisions of that one renderable image unless it explicitly states otherwise. Complete every required subdivision inside each Frame; do not spread one required image across Narrative Frames.
+Repeated depictions of one named person inside a single image, including reflections or reference views, represent that same person and do not increase the cast. Preserve identity, appearance, clothing, and explicit continuity rules across those depictions.
+Preserve the requested medium, rendering language, color behavior, scale relationships, projection, layout, typography, and image hierarchy exactly. Do not default to cinematic photography, a poster, a collage, a grid, or any other familiar format. Describe viewpoint and illumination in terms appropriate to that medium.
+When the Story Description requires no fixed internal structure, write one unbroken natural-language paragraph without internal field labels. Establish style, era, country, place, and current moment naturally near the beginning.
+Fully redescribe every visible person's adult identity, nationality, age, gender, stable appearance, hairstyle, clothing, expression, gaze, and current pose in every Frame. Integrate these facts into visual reading order rather than listing a dossier.
+Freeze the image at one clear instant. Describe only currently visible states and direct physical results, not sequential steps or incompatible poses.
+Each person occupies one physically possible held pose with credible support. Assign every visible limb one consistent contact or force role. Body balance, limb direction, occlusion, contact points, clothing, and prop forces must be physically coherent.
+A body or handled object must not travel between positions inside one frozen Frame, and no body part may become an impossible structural element of the image.
+The final state explicitly required by the Story Description must appear directly in every Frame, not as preparation, gradual change, aftermath, removal, terminology, or off-frame implication.
+Resolve conditional instructions only from the current request and Theme payload. Apply the branch whose condition matches current values and never borrow a branch assigned to another alternative.
+Use setting objects, materials, distance, and spatial evidence that matter to the requested image rather than unrelated decoration.
+Make viewpoint, framing, focus hierarchy, illumination direction, shadow behavior, and color treatment explicit in vocabulary appropriate to the requested medium.
+Multiple Frames for one Theme are parallel visual alternatives with the same stable Theme facts, not a chronological sequence. Re-establish the complete image from scratch and vary only along axes allowed or required by the Story Description.
+Let length follow the Story Description's exact contract when present; otherwise include enough concrete renderable detail for the cast and visual complexity without padding.
+Preserve visible image text specified by the Story Description verbatim inside double quotation marks. Do not invent visible text when none is specified.
+Before submission, verify requested language, cast, physical coherence, presentation structure, and visible evidence. Rewrite any failure before returning.

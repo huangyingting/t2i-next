@@ -25,6 +25,7 @@ from t2i_story_pipeline.models import (
     NarrativeThemeResult,
     StoryRequest,
     StoryResult,
+    StoryRuleSet,
     StoryStage,
     TokenUsage,
     exact_frame_sequence_model,
@@ -52,16 +53,18 @@ class StoryStudio:
         model: StoryModel,
         store: LocalStoryRunStore,
         settings: StoryRunSettings,
+        rules: StoryRuleSet,
         *,
         on_progress: ProgressCallback | None = None,
     ) -> None:
         self._model = model
         self._store = store
         self._settings = settings
+        self._rules = rules
         self._on_progress = on_progress
 
     async def run(self, request: StoryRequest) -> CompletedStoryRun:
-        snapshot = self._store.create(request, self._settings)
+        snapshot = self._store.create(request, self._settings, self._rules)
         self._emit(f"Run 已创建：{snapshot.run_id}")
         return await self._drive(snapshot, restarting=False)
 
@@ -72,6 +75,8 @@ class StoryStudio:
             return snapshot.completed
         if snapshot.manifest.settings != self._settings:
             raise StoryStorageError("当前生成配置与 story run manifest 不一致")
+        if snapshot.rules != self._rules:
+            raise StoryStorageError("当前 story rules 与 run 冻结规则不一致")
         self._emit(f"继续 Run：{run_id}")
         return await self._drive(snapshot, restarting=True)
 
@@ -100,9 +105,11 @@ class StoryStudio:
         snapshot: StoryRunSnapshot,
     ) -> CompletedStoryRun:
         request = snapshot.request
+        rules = snapshot.rules
         themes = await self._generate_themes(
             snapshot.run_id,
             request,
+            rules,
             list(snapshot.themes),
             snapshot.manifest.semantic_name,
         )
@@ -119,6 +126,7 @@ class StoryStudio:
                     snapshot.run_id,
                     request,
                     theme,
+                    rules,
                 )
                 self._store.checkpoint_frames(
                     snapshot.run_id,
@@ -136,9 +144,7 @@ class StoryStudio:
             return_exceptions=True,
         )
         causes = tuple(
-            str(outcome)
-            for outcome in outcomes
-            if isinstance(outcome, Exception)
+            str(outcome) for outcome in outcomes if isinstance(outcome, Exception)
         )
         snapshot = self._store.inspect(snapshot.run_id)
         if len(snapshot.frames) != request.theme_count:
@@ -168,6 +174,7 @@ class StoryStudio:
         self,
         run_id: str,
         request: StoryRequest,
+        rules: StoryRuleSet,
         themes: list[NarrativeTheme],
         semantic_name: str | None,
     ) -> list[NarrativeTheme]:
@@ -179,6 +186,7 @@ class StoryStudio:
             )
             messages = theme_messages(
                 request,
+                rules,
                 start_index=start_index,
                 count=count,
                 existing_themes=themes,
@@ -221,13 +229,9 @@ class StoryStudio:
                 ):
                     theme.theme_id = theme_id
 
-            operation_id = (
-                f"themes-T{start_index:03d}-"
-                f"T{start_index + count - 1:03d}"
-            )
+            operation_id = f"themes-T{start_index:03d}-T{start_index + count - 1:03d}"
             requested_ids = tuple(
-                f"T{index:03d}"
-                for index in range(start_index, start_index + count)
+                f"T{index:03d}" for index in range(start_index, start_index + count)
             )
             value, _ = await self._generate_validated(
                 run_id=run_id,
@@ -249,8 +253,7 @@ class StoryStudio:
             semantic_name = value.semantic_name
             themes.extend(value.themes)
             self._emit(
-                f"{value.themes[0].theme_id}–{value.themes[-1].theme_id} "
-                "Theme 已保存"
+                f"{value.themes[0].theme_id}–{value.themes[-1].theme_id} Theme 已保存"
             )
         return themes
 
@@ -259,11 +262,9 @@ class StoryStudio:
         run_id: str,
         request: StoryRequest,
         theme: NarrativeTheme,
+        rules: StoryRuleSet,
     ) -> NarrativeFrameSequence:
-        expected = [
-            f"F{index:02d}"
-            for index in range(1, request.frames_per_theme + 1)
-        ]
+        expected = [f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)]
 
         def validate_ids(
             value: BaseModel,
@@ -288,14 +289,11 @@ class StoryStudio:
             run_id=run_id,
             operation_id=f"frames-{theme.theme_id}",
             requested_ids=tuple(
-                f"{theme.theme_id}-{frame_id}"
-                for frame_id in expected
+                f"{theme.theme_id}-{frame_id}" for frame_id in expected
             ),
             stage=StoryStage.FRAMES,
-            messages=frame_messages(request, theme),
-            response_model=exact_frame_sequence_model(
-                request.frames_per_theme
-            ),
+            messages=frame_messages(request, theme, rules),
+            response_model=exact_frame_sequence_model(request.frames_per_theme),
             max_output_tokens=self._settings.frame_output_tokens,
             validate=validate_ids,
         )
@@ -317,10 +315,7 @@ class StoryStudio:
     ) -> tuple[BaseModel, TokenUsage]:
         base_messages = messages
         usage = TokenUsage()
-        prior_attempts = tuple(
-            attempt
-            for attempt in self._store.attempts(run_id)
-        )
+        prior_attempts = tuple(attempt for attempt in self._store.attempts(run_id))
         feedback_issues = list(
             self._recent_attempt_issues(
                 prior_attempts,
@@ -334,8 +329,7 @@ class StoryStudio:
                 tuple(feedback_issues[-3:]),
             )
         attempt_offset = sum(
-            attempt.operation_id == operation_id
-            for attempt in prior_attempts
+            attempt.operation_id == operation_id for attempt in prior_attempts
         )
         relevant_attempts = tuple(
             attempt
@@ -504,9 +498,7 @@ class StoryStudio:
             messages.append(
                 ChatMessage(
                     role="assistant",
-                    content=rejected_value.model_dump_json(
-                        ensure_ascii=False
-                    ),
+                    content=rejected_value.model_dump_json(ensure_ascii=False),
                 )
             )
         messages.append(
@@ -548,12 +540,8 @@ class StoryStudio:
     ) -> StoryRunIncompleteError:
         return StoryRunIncompleteError(
             snapshot.run_id,
-            missing_themes=(
-                snapshot.request.theme_count - len(snapshot.themes)
-            ),
-            missing_frames=(
-                snapshot.request.theme_count - len(snapshot.frames)
-            ),
+            missing_themes=(snapshot.request.theme_count - len(snapshot.themes)),
+            missing_frames=(snapshot.request.theme_count - len(snapshot.frames)),
             causes=causes,
         )
 

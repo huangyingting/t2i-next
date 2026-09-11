@@ -1,0 +1,334 @@
+BRIEF
+
+Create varied, historically grounded fine-art editorial photography Themes that
+stage Edo-period Japanese scenes through the playful visual language of
+ukiyo-e warai-e. Combine sumptuous clothing, intimate adult companionship,
+theatrical exaggeration, everyday humor, and the graphic discipline of masterful
+print design. Every result must be an unmistakable photograph of real adults in
+a meticulously constructed practical set, not an illustration, woodblock print,
+painted image, anime frame, CGI render, photographed museum print, or copy of an
+identifiable historical work.
+
+ADULT CAST, CONSENT, AND CONTENT LEVEL
+
+Every depicted person must be an unmistakably mature Japanese adult aged
+twenty-five or older. Use exactly the adult cast requested by the CLI and give
+each recurring person a stable face, build, hairstyle, social role, and kimono.
+All interaction must read as mutual, alert, warm, and freely chosen.
+
+Honor the exact CLI-requested content_level in every Theme and every Frame. Do
+not silently average, postpone, sanitize, intensify, or relabel it.
+
+- aesthetic: keep every adult fully dressed in layered period clothing. Bodies
+  may lean together, embrace, exchange teasing glances, adjust robes, or share
+  a private joke, but garments and composition fully conceal breasts, buttocks,
+  and genitals. Show no sexual act or erotic self-touch.
+- erotic: make unmistakable adult sensuality visible through loosened or partly
+  removed robes, exposed breasts or buttocks, intimate reciprocal touch,
+  sensual self-touch, close body pressure, or another clearly erotic but
+  non-explicit interaction. Do not depict penetration, oral sex, genital
+  contact, sexual fluids, or pornographic anatomical emphasis.
+- hardcore: show an explicit, consensual adult sexual act already occurring in
+  every Theme and Frame. Establish the act through action-level language,
+  aligned pelvises, pose geometry, visible contact, relevant physical outcome,
+  and both adults' reciprocal response without directly naming or describing
+  male reproductive anatomy. Keep faces, agency, period setting, textile design,
+  humor, and photographic quality as important as the act.
+
+At erotic and hardcore levels, do not hide the defining content behind screens,
+fans, quilts, sleeves, furniture, strategic cropping, a distant silhouette, or
+the comic interruption. Every adult remains alert, willing, responsive, and
+able to stop. Do not depict coercion, distress, intoxication, sleep, violence,
+non-consensual voyeurism, fetishized age ambiguity, or animals participating in
+sexual contact.
+
+MALE BODY VOCABULARY GATE
+
+When referring to the man's body, use only neutral external terms from this
+allowlist: body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands,
+fingers, thighs, knees, legs, calves, ankles, feet, and toes. Inflected singular
+or plural forms of these allowed terms are acceptable. Do not directly name any
+male reproductive body part, physiological state specific to it, slang term,
+erotic nickname, coy synonym, or object metaphor. This applies
+case-insensitively to every Theme title, premise, style field, Frame prose,
+rendered text, and drafting note.
+
+Do not evade the gate with coy object metaphors, anatomical measurements,
+color, veins, surface description, or indirect wordplay. At hardcore level,
+remain visually unambiguous by naming the act rather than restricted anatomy:
+penetration is already occurring, oral contact is already occurring, manual
+stimulation is already occurring, or the adults maintain direct aligned pelvic
+contact. Identify the man through his age, face, build, hair, pose, gaze,
+pelvis, limbs, support, and response. The lexical restriction changes only the
+wording, not the requested content level, consent, action, visibility, or
+spatial precision. Never explain or quote this vocabulary rule in generated
+output.
+
+HISTORICAL WORLD
+
+Set each Theme in Japan during the Edo period, between 1603 and 1868. Name a
+specific year or sub-period, season, time of day, and plausible place such as a
+merchant townhouse in Edo, a Kyoto teahouse room, an Osaka bookseller's upper
+floor, an inn beside the Tokaido, a pleasure-district dressing room, or a
+festival-night riverside pavilion. Architecture, tatami layout, shoji, lamps,
+bedding, lacquerware, ceramics, hairstyles, textiles, household objects, and
+social roles must fit the selected time and place. Do not mix in Meiji,
+contemporary, Chinese, or generalized fantasy elements.
+
+The production is photographed with modern professional equipment, but no
+modern object may appear inside the depicted world. The camera, crew, studio
+hardware, electrical cables, contemporary closures, synthetic props, and
+off-set environment remain outside the frame.
+
+LEVEL-AWARE CLOTHING AND BODY
+
+Make lavish clothing the primary sensual and graphic device. Preserve layered
+kosode or kimono, obi, under-robes, patterned hems, long sleeves, and elaborate
+period hairstyles as clearly readable forms according to the selected level.
+Render textile patterns with controlled variety: seasonal blossoms, flowing
+water, clouds, fans, cranes, geometric checks, or auspicious motifs appropriate
+to the character and season.
+
+At aesthetic level, preserve the complete layered ensemble and use loosened
+collars, overlapping folds, compressed cushions, tangled sleeves, displaced
+hair ornaments, and close body spacing without revealing intimate anatomy. At
+erotic level, robes may fall open, slide from shoulders or hips, or lie nearby
+while enough period textile, obi, sleeve, hair ornament, or patterned under-robe
+remains visible to anchor the scene. At hardcore level, adults may be partly or
+fully nude, but retained or nearby garments must remain compositionally
+important and historically specific rather than becoming generic discarded
+fabric.
+
+AGENCY AND RELATIONSHIP RANGE
+
+Do not default to one active figure and one passive decorative figure. Give
+every adult a readable intention and response through hands, posture, gaze, and
+control of an object or garment. When a woman appears, make her pleasure,
+wit, and agency visually unmistakable: she may initiate the embrace, redirect
+the joke, rescue the falling screen, hide a love letter, reclaim her sash, or
+meet another adult's gaze on equal terms.
+
+Vary adult relationships according to the requested cast: an established
+married couple sharing a private joke, long-separated lovers at an inn, two
+women exchanging festival gifts, two men laughing over a wardrobe mishap, or a
+small circle of trusted companions. These are open-ended examples, not fixed
+templates. Never infer dominance, profession, or social rank solely from
+gender, and never make unequal status substitute for visible mutuality.
+
+WARAI-E HUMOR
+
+Build every Theme around one affectionate comic interruption that changes the
+composition: a cat steals a sash, a dog noses through a screen, a pet mouse
+escapes a box, a servant announces tea from outside the room, a paper lantern
+tilts at the wrong moment, a folding screen begins to topple, a sleeve catches
+on a hairpin, or another original period-plausible mishap. The adults should
+respond with distinct amused expressions, gestures, and eye lines. Humor must
+humanize the scene rather than humiliate anyone.
+
+Do not use a non-consensual hidden watcher. If an onlooker appears, that person
+must belong to the requested adult cast, be openly acknowledged, and take part
+in the shared joke.
+
+VISUAL STORYTELLING
+
+The image must communicate a precise present-tense story without relying on a
+caption. Use converging eye lines, interrupted gestures, a displaced object,
+fabric tension, compressed cushions, footprints, spilled tea, or a moving
+screen to connect cause and reaction. Every visible hand must have a clear
+anatomically plausible task. Keep faces distinct and expressive rather than
+using identical masks, generic smiles, or vacant glamour poses.
+
+Compose three readable layers even within flattened perspective: a close
+cropped foreground clue, the adult interaction in the dominant middle field,
+and a sparse architectural or seasonal background that completes the joke.
+Use partial occlusion deliberately, never as accidental anatomical confusion.
+Avoid generic reclining figures who merely display clothing without a shared
+action, decision, or comic consequence.
+
+SPATIAL AND CONTACT GEOMETRY
+
+Build every Frame as one solvable three-dimensional arrangement before adding
+decorative detail. Establish a fixed camera-relative map using camera-left,
+camera-right, foreground, middle ground, and background; reserve anatomical
+left and right only for a named person's own limbs. State each major position
+once and never contradict it later in the prose.
+
+Anchor the woman, man, furniture, bedding, screens, lamps, pet, and foreground
+objects to named surfaces or edges. For each adult, specify torso and pelvis
+orientation, the direction the face turns, the broad surface carrying body
+weight, and which knee, foot, forearm, hand, hip, back, or shoulder provides
+secondary support. Every center of mass must fall over a credible base of
+support. Tatami, futon, floor, wall, bench, or another sturdy period surface may
+carry weight; loose robes, screens, lanterns, animals, and handheld props may
+not.
+
+Keep each body singular and traceable: one head, two arms, two hands, two legs,
+and two feet per adult, with every visible limb following an uninterrupted path
+from its shoulder or hip to its endpoint. Identify hands by owner and
+anatomical side whenever bodies overlap. Give every visible hand and foot one
+compatible task; never let a limb support weight while also reaching through
+another body, garment, or solid object.
+
+For any intimate or explicit contact, align both adults at compatible heights,
+distances, joint ranges, pelvis angles, and contact axes. Describe the complete
+visible contact path through action, pelvis alignment, limb placement, and
+supports without naming male reproductive anatomy. Do not use a pose that depends on
+unseen levitation, impossible spinal rotation, dislocated hips or shoulders,
+reversed knees or elbows, intersecting pelvises, compressed solid furniture, or
+anatomy bending through fabric.
+
+Use occlusion only when the hidden continuation remains obvious from the
+visible source body. Robes must wrap, bunch, stretch, hang, and compress around
+bodies rather than pass through them. Cushions and futons deform under actual
+weight; tatami and wood remain rigid. Pets, screens, fans, lanterns, hair
+ornaments, and lacquerware must occupy their own volumes without intersecting
+people or obscuring the decisive contact.
+
+OPTIONAL FOLKLORE PLAY
+
+Some Themes may replace the pet or household accident with one gentle
+period-appropriate folklore disruption: a fox mask appears in the wrong chest,
+a painted paper ghost droops from a screen, a tiny umbrella spirit tugs a
+sleeve, or a tanuki-shaped kettle seems to wink. Keep it ambiguous whether the
+event is supernatural or part of a prank. Folklore must remain humorous,
+non-threatening, and visually subordinate to the adult cast; do not introduce
+horror, monsters touching bodies, tentacles, possession, or bodily
+transformation.
+
+PHOTOGRAPHIC TRANSLATION OF PRINT LANGUAGE
+
+Translate nishiki-e design principles into physical photography rather than
+simulating a printed surface. Create assertive contour separation with dark
+textile edges, precise blocking, and controlled rim light; translate flat color
+fields into saturated practical set planes; translate bokashi into smooth
+in-camera light falloff and atmospheric gradients; translate mica shimmer into
+restrained mineral pigment, lacquer, metallic thread, and powdered-gold
+highlights on real objects. Use indigo, saffron, persimmon, tea brown, soft
+rose, malachite, and warm cream as a limited art-directed palette.
+
+Preserve the strongest graphic qualities of ukiyo-e through flattened spatial
+stacking, cropped figures, patterned negative space, rhythmic diagonals,
+overlapping textiles, and expressive hands and faces. The illusion may look
+strikingly print-like at thumbnail size, but close inspection must reveal
+three-dimensional real people, natural skin, woven fibers, individual hairs,
+lacquer reflections, paper translucency, tatami texture, and optical depth.
+Never add carved outlines, halftones, ink bleed, printed paper grain,
+misregistration, foxing, deckled borders, or a scanned-sheet appearance.
+
+Choose a coherent photographic format for each Theme: intimate horizontal
+editorial frame, balanced 4:5 portrait, tall full-body fashion portrait, or
+another deliberate single-image proportion. Fill the image with the staged
+scene itself, never a framed artwork, book mockup, gallery display, contact
+sheet, print border, or photograph of a historical image.
+
+Do not render readable Japanese, pseudo-calligraphy, subtitles, speech
+balloons, modern labels, signatures, publisher marks, or imitation artist
+seals. If a cartouche-like shape strengthens the composition, construct it as a
+blank physical paper panel or an unlettered patch of negative space within the
+set.
+
+PHOTOGRAPHIC REALISM
+
+Every Frame must explicitly identify itself as high-resolution fine-art
+editorial photography of real adult performers. Specify a plausible full-frame
+or medium-format camera position, portrait or normal prime lens between 35 mm
+and 85 mm equivalent, camera height, viewing angle, subject distance, aperture
+behavior, focal plane, and depth separation. Favor deliberate perspective
+compression over ultra-wide distortion.
+
+Light the practical set with a motivated key resembling shoji daylight,
+lantern glow, moonlight, or another period source, augmented invisibly by soft
+studio fill, negative fill, flags, bounce, and a restrained edge light. Describe
+direction, hardness, falloff, catchlights, shadow density, and color
+temperature. Preserve realistic exposure in faces, skin, and the decisive
+contact area while keeping patterned garments luminous and dimensional.
+
+Require photographic evidence throughout: natural pores and fine body hair,
+subtle skin variation, anatomically coherent joints and weight, compressed
+flesh at contact points, authentic woven silk and cotton, loose threads,
+creases responding to gravity, shallow specular highlights on lacquer, slight
+translucency in paper screens, and physically plausible reflections. Avoid
+plastic skin, beauty-filter smoothing, painterly anatomy, cel shading, vector
+contours, synthetic 3D surfaces, impossible fabric, and excessive cinematic
+fog.
+
+Allow playful exaggeration in billowing sleeves, cascading fabric, oversized
+fans, leaning screens, startled pets, and theatrical expressions, but keep
+human anatomy coherent and coverage exact for the selected content level. At
+hardcore level, make the explicit act visually unambiguous without naming,
+enlarging, measuring, or separately describing male reproductive anatomy. Do not
+imitate, name, sign, or reproduce a composition by a known ukiyo-e artist.
+
+THEME CONTRACT
+
+Generate exactly the Theme and Frames-per-Theme counts requested by the CLI.
+Each Theme must establish:
+
+- a precise Edo-period date, Japanese location, season, hour, and social world;
+- the exact recurring adult cast with stable visual identities and relationship;
+- body coverage, garment state, current interaction, and visible content-level
+  proof that directly establish the requested content level;
+- one private, mutually affectionate situation in which every adult visibly
+  initiates or responds;
+- one internally consistent camera-relative body map with credible support,
+  reach, occlusion, contact alignment, and unambiguous limb ownership;
+- one period-plausible comic interruption with a visible cause and reaction;
+- one decisive action in which each adult has agency and a necessary role;
+- one textile motif and one household object that organize the composition; and
+- one distinct photographic palette, frame proportion, lens strategy, focal
+  hierarchy, and motivated lighting design.
+
+Vary Themes in class setting, room type, season, comic mechanism, emotional
+temperature, relationship, dominant textile pattern, palette, frame proportion,
+lens, camera height, crop, lighting, and composition. Rotate among domestic,
+travel, festival, artistic, commercial, theatrical, and literary social worlds
+without stereotyping their occupants. Do not repeat the same bedroom, cat gag,
+embracing pose, falling screen, foreground object, or dominant body
+arrangement.
+
+FRAME CONTRACT
+
+Every Frame is a standalone staged fine-art editorial photograph from the same
+Theme, not a storyboard, contact sheet, collage, split screen, illustration,
+woodblock print, or museum reproduction. Begin the prose by identifying the
+image as photography. Immediately follow with one compact spatial-map sentence
+that places every adult using the literal camera-relative terms camera-left,
+center, or camera-right and foreground, middle ground, or background. In that
+same sentence, name the rigid or padded surface supporting each adult and state
+the direction of each torso and pelvis. Do not rely on a pose name alone.
+
+Then restate the period, place, current moment, complete adult cast, stable
+appearance, exact level-appropriate garment state, current intimate or sexual
+interaction, comic interruption, foreground and background objects, physical
+set construction, camera, lens, focus, lighting, palette, and composition so
+the prose can be used directly for image generation.
+
+Begin every Frame with the selected level's defining state already visible. Do
+not substitute preparation, undressing in progress, anticipated escalation,
+aftermath, concealment, a distant establishing view, or a milder interaction.
+For hardcore output, preserve the Theme's explicit act in every Frame while
+varying pose geometry, viewpoint, fabric rhythm, and comic reaction.
+
+Change the decisive instant and graphic arrangement between Frames: discovery,
+suppressed laughter, coordinated recovery, playful blame, or calm aftermath.
+Preserve identities and setting while varying body geometry, eye lines, fabric
+rhythm, crop, dominant diagonal, negative space, foreground clue, and the
+interruption's state. At least one Frame must make the humor legible through
+gesture alone, and at least one must make the clothing pattern the dominant
+graphic structure without reducing the adults to decoration.
+
+Before returning, verify that aesthetic output is fully clothed and
+non-explicit, erotic output is visibly sensual but non-explicit, and hardcore
+output contains a current explicit consensual adult act. Also verify that no
+Frame looks like an illustration, painting, woodblock print, ink drawing,
+anime frame, CGI render, photographed printed artwork, or generic studio set.
+Reject any Frame whose opening lacks literal camera-left, center, or
+camera-right placement for every adult, foreground-depth placement, named
+support surfaces, or torso and pelvis directions. Also reject random
+pseudo-Japanese text, a copied historical composition, malformed or surplus
+limbs, ambiguous limb ownership, contradictory left-right directions,
+unsupported weight, intersecting bodies or props, impossible contact axes, a
+decontextualized pin-up pose, or humor unrelated to the visible action.
+Finally, scan every output field case-insensitively and rewrite it if it
+uses a male-body term outside the male body vocabulary gate.

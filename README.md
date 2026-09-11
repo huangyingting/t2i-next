@@ -32,6 +32,42 @@ uv run t2i-story generate \
 内部换行会原样保留。`--female-count` 和 `--male-count` 可以分别约束每个主题
 及每帧中的成年女性和成年男性人数；省略时遵循 Story Description 明示的人物。
 
+story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不复用
+`t2i_prompt_pipeline` 的规则。内置规则位于
+`src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
+schema、人物一致性和内容等级。媒介、版式、区域、视图、比例关系及其他特定视觉
+行为由 Story Description 自己定义，Python 不识别具体 `story-inputs/*.txt`
+类型。
+
+`story-inputs/` 同时承载具体输入和可复用项目规则。可以通过 `--rules-dir`
+显式使用其他规则目录；未传入时，如果当前目录存在 `story-inputs/rules/`，
+会自动使用它：
+
+```text
+story-inputs/
+├── creative.txt
+├── edo-warai-e.txt
+├── ...
+└── rules/
+    ├── common.rules
+    ├── themes.rules
+    ├── frames.rules
+    └── content_levels/
+        ├── aesthetic.rules
+        ├── erotic.rules
+        └── hardcore.rules
+```
+
+每个文件一行一条规则，空行和 `#` 注释会被忽略；缺失的用户规则文件不会报错。
+加载顺序是内置 `common → stage → selected content level`，然后按相同顺序追加
+用户规则，最后追加输出语言规则。解析后的规则保存在 run 的 `rules.json`，
+manifest 记录其 SHA-256 指纹，resume 始终使用冻结版本而不重新读取规则目录。
+
+只服务于一个输入的主题、媒介、版式、区域、镜头和词汇约束继续写在对应
+`story-inputs/*.txt` 中。多个输入共享但并非所有 story 都适用的项目规则写入
+`story-inputs/rules/`。所有 story 都必须遵守的阶段、schema、安全和一致性规则
+才属于包内 system rules。不要按文件名在 Python 中增加分支。
+
 每个 run 在首次 provider 调用前创建。每批 Theme 和每个 Theme 的完整 Frame
 Sequence 都会原子保存；失败或进程退出后，只重新生成缺失部分：
 

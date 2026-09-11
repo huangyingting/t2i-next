@@ -29,6 +29,7 @@ from t2i_story_pipeline.models import (
     SemanticName,
     StoryRequest,
     StoryResult,
+    StoryRuleSet,
     StoryStage,
     TokenUsage,
     exact_frame_sequence_model,
@@ -65,8 +66,7 @@ def _cast_slug(request: StoryRequest) -> str:
             )
         if male_count:
             parts.append(
-                f"{_COUNT_NAMES[male_count]}_"
-                f"{'man' if male_count == 1 else 'men'}"
+                f"{_COUNT_NAMES[male_count]}_{'man' if male_count == 1 else 'men'}"
             )
         return "_".join(parts)
 
@@ -75,15 +75,13 @@ def _cast_slug(request: StoryRequest) -> str:
         parts.append("unspecified_women")
     else:
         parts.append(
-            f"{_COUNT_NAMES[female_count]}_"
-            f"{'woman' if female_count == 1 else 'women'}"
+            f"{_COUNT_NAMES[female_count]}_{'woman' if female_count == 1 else 'women'}"
         )
     if male_count is None:
         parts.append("unspecified_men")
     else:
         parts.append(
-            f"{_COUNT_NAMES[male_count]}_"
-            f"{'man' if male_count == 1 else 'men'}"
+            f"{_COUNT_NAMES[male_count]}_{'man' if male_count == 1 else 'men'}"
         )
     return "_".join(parts)
 
@@ -111,9 +109,7 @@ def _normalize_source_prompt_stem(value: str) -> str:
     normalized = re.sub(r"[^\w-]+", "_", value.lower())
     normalized = re.sub(r"_+", "_", normalized).strip("_-")
     if not normalized:
-        raise StoryStorageError(
-            "提示词文件名必须至少包含一个可用于输出文件名的字符"
-        )
+        raise StoryStorageError("提示词文件名必须至少包含一个可用于输出文件名的字符")
     return normalized
 
 
@@ -164,6 +160,7 @@ class StoryRunManifest(_Model):
     created_at: str
     updated_at: str
     settings: StoryRunSettings
+    rules_fingerprint: str
     prompts_directory: str
     semantic_name: SemanticName | None = None
     prompt_file: str | None = None
@@ -198,6 +195,7 @@ class CompletedStoryRun:
 class StoryRunSnapshot:
     run_id: str
     request: StoryRequest
+    rules: StoryRuleSet
     manifest: StoryRunManifest
     themes: tuple[NarrativeTheme, ...]
     frames: dict[str, NarrativeFrameSequence]
@@ -240,6 +238,7 @@ class LocalStoryRunStore:
         self,
         request: StoryRequest,
         settings: StoryRunSettings,
+        rules: StoryRuleSet,
     ) -> StoryRunSnapshot:
         if self._prompts_root is None:
             raise StoryStorageError("创建 story run 需要 prompts 目录")
@@ -253,17 +252,17 @@ class LocalStoryRunStore:
             created_at=now,
             updated_at=now,
             settings=settings,
+            rules_fingerprint=rules.fingerprint(),
             prompts_directory=str(self._prompts_root),
         )
         try:
             durable_mkdir(self._runs_root)
-            staging = Path(
-                tempfile.mkdtemp(prefix=f".{run_id}-", dir=self._runs_root)
-            )
+            staging = Path(tempfile.mkdtemp(prefix=f".{run_id}-", dir=self._runs_root))
             durable_mkdir(staging / "themes")
             durable_mkdir(staging / "frames")
             durable_mkdir(staging / "attempts")
             _write_json(staging / "request.json", request.model_dump(mode="json"))
+            _write_json(staging / "rules.json", rules.model_dump(mode="json"))
             _write_json(
                 staging / "manifest.json",
                 manifest.model_dump(mode="json"),
@@ -283,6 +282,7 @@ class LocalStoryRunStore:
         return StoryRunSnapshot(
             run_id=run_id,
             request=request,
+            rules=rules,
             manifest=manifest,
             themes=(),
             frames={},
@@ -294,13 +294,16 @@ class LocalStoryRunStore:
             request = StoryRequest.model_validate_json(
                 (directory / "request.json").read_text(encoding="utf-8")
             )
+            rules = StoryRuleSet.model_validate_json(
+                (directory / "rules.json").read_text(encoding="utf-8")
+            )
             manifest = StoryRunManifest.model_validate_json(
                 (directory / "manifest.json").read_text(encoding="utf-8")
             )
             if manifest.run_id != run_id:
-                raise StoryStorageError(
-                    f"Run {run_id} 的 manifest run_id 不匹配"
-                )
+                raise StoryStorageError(f"Run {run_id} 的 manifest run_id 不匹配")
+            if rules.fingerprint() != manifest.rules_fingerprint:
+                raise StoryStorageError(f"Run {run_id} 的 rules.json 指纹不匹配")
             themes = self._load_themes(directory, request)
             frames = self._load_frames(directory, request, themes)
             if manifest.status == StoryRunStatus.COMPLETED:
@@ -314,6 +317,7 @@ class LocalStoryRunStore:
                 return StoryRunSnapshot(
                     run_id=run_id,
                     request=request,
+                    rules=rules,
                     manifest=manifest,
                     themes=themes,
                     frames=frames,
@@ -322,12 +326,11 @@ class LocalStoryRunStore:
         except StoryStorageError:
             raise
         except (OSError, ValidationError, ValueError) as exc:
-            raise StoryStorageError(
-                f"Run {run_id} 的 checkpoint 损坏：{exc}"
-            ) from exc
+            raise StoryStorageError(f"Run {run_id} 的 checkpoint 损坏：{exc}") from exc
         return StoryRunSnapshot(
             run_id=run_id,
             request=request,
+            rules=rules,
             manifest=manifest,
             themes=themes,
             frames=frames,
@@ -342,9 +345,7 @@ class LocalStoryRunStore:
             if not directory.is_dir() or _RUN_ID.fullmatch(directory.name) is None:
                 continue
             try:
-                request_text = (directory / "request.json").read_text(
-                    encoding="utf-8"
-                )
+                request_text = (directory / "request.json").read_text(encoding="utf-8")
                 request_payload = json.loads(request_text)
             except (OSError, json.JSONDecodeError):
                 unreadable.append(directory.name)
@@ -358,9 +359,7 @@ class LocalStoryRunStore:
             try:
                 manifest = self._read_manifest(directory)
                 if manifest.run_id != directory.name:
-                    raise StoryStorageError(
-                        "manifest run_id 与目录名称不匹配"
-                    )
+                    raise StoryStorageError("manifest run_id 与目录名称不匹配")
                 request = StoryRequest.model_validate_json(request_text)
             except (OSError, ValidationError, StoryStorageError):
                 unreadable.append(directory.name)
@@ -417,17 +416,14 @@ class LocalStoryRunStore:
         actual_ids = [theme.theme_id for theme in themes]
         if actual_ids != expected_ids:
             raise StoryStorageError(
-                f"Theme checkpoint 不连续：expected={expected_ids}, "
-                f"actual={actual_ids}"
+                f"Theme checkpoint 不连续：expected={expected_ids}, actual={actual_ids}"
             )
         directory = self._run_directory(run_id)
         if (
             snapshot.manifest.semantic_name is not None
             and snapshot.manifest.semantic_name != semantic_name
         ):
-            raise StoryStorageError(
-                "Theme checkpoint semantic_name 与 run 不一致"
-            )
+            raise StoryStorageError("Theme checkpoint semantic_name 与 run 不一致")
         if snapshot.manifest.semantic_name is None:
             self._write_manifest(
                 directory,
@@ -461,8 +457,7 @@ class LocalStoryRunStore:
                     f"Frame checkpoint 缺少 Theme checkpoint：{theme_id}"
                 )
             expected_ids = [
-                f"F{index:02d}"
-                for index in range(1, request.frames_per_theme + 1)
+                f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
             ]
             actual_ids = [frame.frame_id for frame in sequence.frames]
             if actual_ids != expected_ids:
@@ -503,9 +498,7 @@ class LocalStoryRunStore:
         directory = self._run_directory(run_id) / "attempts"
         try:
             attempts = [
-                StoryAttempt.model_validate_json(
-                    path.read_text(encoding="utf-8")
-                )
+                StoryAttempt.model_validate_json(path.read_text(encoding="utf-8"))
                 for path in directory.glob("*.json")
             ]
         except (OSError, ValidationError) as exc:
@@ -572,10 +565,7 @@ class LocalStoryRunStore:
             )
             for theme in snapshot.themes
         ]
-        actual_themes = [
-            (item.theme, item.frames)
-            for item in result.themes
-        ]
+        actual_themes = [(item.theme, item.frames) for item in result.themes]
         if actual_themes != expected_themes:
             raise StoryStorageError("完成结果与已保存 checkpoint 不匹配")
         if result.usage != self.total_usage(run_id):
@@ -614,9 +604,7 @@ class LocalStoryRunStore:
                 raise
         _write_json(result_file, result.model_dump(mode="json"))
         published = publish_story(result, prompt_path)
-        self._remove_reservation(
-            prompt_path.parent / f".{prompt_path.name}.reserve"
-        )
+        self._remove_reservation(prompt_path.parent / f".{prompt_path.name}.reserve")
         manifest = completion_manifest.model_copy(
             update={
                 "status": StoryRunStatus.COMPLETED,
@@ -663,22 +651,16 @@ class LocalStoryRunStore:
     ) -> tuple[NarrativeTheme, ...]:
         themes: list[NarrativeTheme] = []
         for path in sorted((directory / "themes").glob("T*.json")):
-            theme = NarrativeTheme.model_validate_json(
-                path.read_text(encoding="utf-8")
-            )
+            theme = NarrativeTheme.model_validate_json(path.read_text(encoding="utf-8"))
             if path.stem != theme.theme_id:
                 raise StoryStorageError(
                     f"Theme checkpoint 文件名与内容不匹配：{path.name}"
                 )
             themes.append(theme)
-        expected_ids = [
-            f"T{index:03d}" for index in range(1, len(themes) + 1)
-        ]
+        expected_ids = [f"T{index:03d}" for index in range(1, len(themes) + 1)]
         actual_ids = [theme.theme_id for theme in themes]
         if actual_ids != expected_ids or len(themes) > request.theme_count:
-            raise StoryStorageError(
-                f"Theme checkpoint 序列损坏：{actual_ids}"
-            )
+            raise StoryStorageError(f"Theme checkpoint 序列损坏：{actual_ids}")
         return tuple(themes)
 
     def _load_frames(
@@ -689,8 +671,7 @@ class LocalStoryRunStore:
     ) -> dict[str, NarrativeFrameSequence]:
         theme_ids = {theme.theme_id for theme in themes}
         expected_frame_ids = [
-            f"F{index:02d}"
-            for index in range(1, request.frames_per_theme + 1)
+            f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
         ]
         frames: dict[str, NarrativeFrameSequence] = {}
         response_model = exact_frame_sequence_model(request.frames_per_theme)
@@ -733,19 +714,11 @@ class LocalStoryRunStore:
             manifest.semantic_name is None
             or result.semantic_name != manifest.semantic_name
         ):
-            raise StoryStorageError(
-                "已完成 run 的 semantic_name 与 manifest 不匹配"
-            )
+            raise StoryStorageError("已完成 run 的 semantic_name 与 manifest 不匹配")
         if len(themes) != request.theme_count or len(frames) != request.theme_count:
             raise StoryStorageError("已完成 run 的 checkpoint 不完整")
-        expected_themes = [
-            (theme, frames[theme.theme_id].frames)
-            for theme in themes
-        ]
-        actual_themes = [
-            (item.theme, item.frames)
-            for item in result.themes
-        ]
+        expected_themes = [(theme, frames[theme.theme_id].frames) for theme in themes]
+        actual_themes = [(item.theme, item.frames) for item in result.themes]
         if actual_themes != expected_themes:
             raise StoryStorageError("已完成 run 的 result 与 checkpoint 不匹配")
         if result.usage != self.total_usage(manifest.run_id):
@@ -787,9 +760,7 @@ class LocalStoryRunStore:
             except FileExistsError:
                 continue
             except OSError as exc:
-                raise StoryStorageError(
-                    f"无法分配提示词文件序号：{exc}"
-                ) from exc
+                raise StoryStorageError(f"无法分配提示词文件序号：{exc}") from exc
             try:
                 os.close(descriptor)
                 fsync_directory(prompts_directory)
@@ -798,9 +769,7 @@ class LocalStoryRunStore:
                     continue
                 return final_path
             except OSError as exc:
-                raise StoryStorageError(
-                    f"无法分配提示词文件序号：{exc}"
-                ) from exc
+                raise StoryStorageError(f"无法分配提示词文件序号：{exc}") from exc
         raise StoryStorageError("无法分配提示词文件序号")
 
     @staticmethod
@@ -809,9 +778,7 @@ class LocalStoryRunStore:
             path.unlink(missing_ok=True)
             fsync_directory(path.parent)
         except OSError as exc:
-            raise StoryStorageError(
-                f"无法清理提示词文件 reservation：{exc}"
-            ) from exc
+            raise StoryStorageError(f"无法清理提示词文件 reservation：{exc}") from exc
 
     def _run_directory(self, run_id: str) -> Path:
         if _RUN_ID.fullmatch(run_id) is None:
@@ -891,7 +858,6 @@ def _write_text(path: Path, text: str) -> None:
                 temporary.unlink(missing_ok=True)
             except OSError as cleanup_error:
                 raise StoryStorageError(
-                    f"无法原子写入 {path}：{exc}；同时无法清理临时文件："
-                    f"{cleanup_error}"
+                    f"无法原子写入 {path}：{exc}；同时无法清理临时文件：{cleanup_error}"
                 ) from exc
         raise StoryStorageError(f"无法原子写入 {path}：{exc}") from exc
