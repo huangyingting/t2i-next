@@ -1,0 +1,542 @@
+BRIEF
+
+Create varied, publication-ready portrait magazine-cover Themes and finished
+front-cover Frames. Every Theme invents one original magazine identity and one
+specific issue concept; every Frame is a parallel cover proposal for that same
+issue. The result must look like a professionally art-directed magazine sold on
+a newsstand, not a film poster, social-media post, advertisement, title card,
+editorial spread, moodboard, contact sheet, or photograph with arbitrary text
+placed over it.
+
+Every cover combines one decisive editorial photograph with an integrated
+masthead, one dominant feature line, a restrained set of secondary cover lines,
+and compact issue information. Image, typography, negative space, crop, color,
+and hierarchy must work as one designed object.
+
+MAGAZINE, NOT POSTER
+
+The cover must communicate a recurring publication, a particular issue, and an
+editorial package at first glance.
+
+Mandatory magazine signals:
+
+- one original recurring masthead at the top;
+- one issue-specific hero subject or interaction;
+- one dominant feature line tied to that hero;
+- exactly two short secondary cover lines suggesting other issue contents;
+- one compact alphabetic season marker;
+- deliberate cover-line placement around the hero silhouette; and
+- a flat, front-facing portrait trim with visible cover edges.
+
+Do not use movie-poster signals: no film title treatment, tagline, theatrical
+billing block, cast credits, studio mark, release date, review stars, festival
+laurels, streaming badge, one-sheet metaphor, or cinematic key-art campaign.
+
+Do not use social-post signals: no username, avatar, reaction count, comment,
+share icon, interface chrome, carousel dots, square feed crop, device frame, or
+platform branding.
+
+Do not show a physical mockup. The image is the finished front cover itself,
+not a magazine lying on a table, held by hands, displayed on a phone, wrapped
+around a 3D object, opened to a spread, stacked with other issues, or shown with
+a spine or back cover.
+
+EXAMPLES ARE OPEN-ENDED
+
+Every list below is open-ended inspiration, not a menu, enum, preset sequence,
+or assignment by Theme ID. Combine compatible approaches or invent new ones.
+Only statements using "must," "every," "exact," or "do not" are mandatory.
+
+CAST, ADULTHOOD, AND CONTINUITY
+
+Use the exact requested human cast and no additional people. Every depicted
+person must be an unmistakably mature Chinese adult aged 25 or older, alert,
+willing, responsive, and able to stop. Preserve each person's age, face, hair,
+body proportions, garments, body marks, and other identity anchors throughout
+one Theme.
+
+Every requested adult must appear clearly in the hero photograph of every
+Frame. Do not replace anyone with a silhouette, reflection, shadow, illustration,
+typography, cropped body fragment, inset portrait, or off-cover implication.
+Background crowds, staff, passersby, printed portraits, screen figures, statues,
+and reflected people count as additional people and must not appear.
+
+Repeated cover text, drop shadows, printed patterns, and abstract graphics must
+not create a second face or body. Use one visible body per requested person and
+keep anatomy, hands, gaze, support, and physical contact coherent.
+
+EDITORIAL CONCEPT FIRST
+
+Every Theme defines a real editorial proposition rather than a generic portrait
+plus fashionable words. Establish:
+
+- one original publication name and audience;
+- one issue category and editorial mission;
+- one exact hero subject, activity, relationship, or event;
+- one specific Chinese location, era or year, season, and social context;
+- one issue-level question, tension, discovery, celebration, or practical stake;
+- one visual thesis connecting the hero photograph to the cover hierarchy; and
+- one publication voice expressed through concise cover-line language.
+
+The hero image must visibly support the main feature line. If the headline could
+be exchanged for an unrelated subject without changing the photograph, the
+cover concept is too generic. Do not depend on prose outside the image to
+explain why this person, action, object, or place leads the issue.
+
+Invent fictional editorial subjects and original publication identities. Do
+not reproduce or closely imitate an existing magazine name, masthead, famous
+cover, celebrity portrait, brand campaign, copyrighted character, recognizable
+artwork, or established publication grid.
+
+THEME CONTRACT
+
+Use the Theme schema deliberately.
+
+The Theme title is the magazine's exact recurring English masthead. It contains
+one to three short words made only of uppercase ASCII letters and spaces, is
+grammatical or intentionally name-like, and remains identical across every
+Frame in that Theme. Do not translate it, decorate it with issue information,
+or use an existing publication name.
+
+The premise uses no more than two sentences. Sentence one establishes the
+publication's category, audience, precise issue concept, complete adult cast,
+hero action, Chinese setting, and content-level visibility anchor. Sentence two
+states the editorial question or promise, the main feature angle, and the
+essential magazine hierarchy that every cover must preserve.
+
+The style sentence defines one original publication system through masthead
+character, typography class, palette, photographic treatment, background
+discipline, spacing, print finish, and editorial tone. It does not prescribe one
+fixed Frame layout and does not name an existing magazine or designer.
+
+During Theme generation, return only the masthead title, shared issue premise,
+and shared publication style. Do not write Frame drafts, alternate covers,
+visible-copy inventories, schema keys, count values, or future instructions.
+
+FRAME CONTRACT
+
+Every Frame is one standalone finished cover and one parallel design proposal
+for the same issue, never a chronological story beat or another page in the
+magazine. Preserve the exact masthead, issue concept, adult cast, identity
+anchors, hero subject, content-level anchor, audience, and publication DNA.
+
+Each Frame may invent a different exact main feature line and secondary cover
+line package when they remain faithful to the same issue. Vary crop, pose,
+negative space, masthead interaction, typography placement, palette emphasis,
+background treatment, eye path, and print finish substantially. Do not vary
+only color, camera angle, or wording.
+
+Every Frame must independently describe:
+
+- the complete hero photograph and exact adult cast;
+- current action, expression, gaze, body support, and interaction;
+- magazine category, issue subject, and intended audience;
+- front-cover crop, trim, safe margins, and visual hierarchy;
+- exact masthead placement and masthead-to-subject overlap;
+- one exact main feature line and exactly two exact secondary cover lines;
+- one exact alphabetic season marker;
+- typography families, weights, scale, alignment, leading, and color;
+- background, palette, source light, photographic treatment, and print finish;
+- protected areas where text must not cover critical faces, hands, products, or
+  content-level contact; and
+- no other visible text or graphic interface.
+
+Restate each cover completely. Do not use "same," "still," "again," "another
+version," or any continuity shortcut.
+
+FRONT-COVER FORMAT
+
+Build one flat, full-bleed portrait 3:4 front cover with clean visible trim
+edges. Do not create an open spread, gatefold, interior page, contents page,
+poster, diptych, contact sheet, tiled grid, collage of cover alternatives, or
+multiple magazines.
+
+Keep important text and faces inside a consistent inner safe margin of roughly
+four to six percent of the cover width. Background color, texture, photograph,
+or intentional white space may bleed to the edges. Nothing should look
+accidentally clipped.
+
+Use one dominant hero image occupying roughly sixty to eighty percent of the
+cover. The masthead and face establish the first read; the main feature line is
+the second read; the current action or relationship is the third read;
+secondary cover lines and issue metadata form the final read.
+
+At thumbnail size, the viewer must recognize:
+
+1. a magazine masthead;
+2. the hero person or group;
+3. one main editorial subject;
+4. a deliberate family of cover lines; and
+5. a coherent publication identity.
+
+MASTHEAD CONTRACT
+
+The exact Theme title is rendered once as the masthead in large, custom,
+high-contrast English lettering across the top eight to sixteen percent of the
+cover. Preserve its spelling exactly.
+
+The masthead may sit fully in front of the hero, fully behind the head, or use
+one controlled foreground-background weave. If the head overlaps it, keep at
+least seventy percent of every letter legible and preserve the complete first
+and last letters. Do not scatter, rotate, repeat, stack into unrelated pieces,
+or turn the masthead into a movie title.
+
+Make the masthead feel recurring and publication-specific through proportion,
+spacing, terminals, stroke contrast, case, and color. It remains consistent
+across one Theme while Frames explore different image relationships around it.
+Do not add a separate logo, trademark symbol, registered mark, superscript,
+badge, seal, or tiny characters beside the masthead.
+
+COVER-LINE PACKAGE
+
+Every Frame includes exactly:
+
+- one masthead of one to three words;
+- one main feature line of two to five words;
+- exactly two secondary cover lines of two to four words each;
+- one season marker chosen from SPRING, SUMMER, AUTUMN, WINTER, or SPECIAL.
+
+Keep total visible copy under twenty-four English words. Do not fill the cover
+with paragraphs, decks, captions, biographies, article summaries, pull quotes,
+credits, slogans, hashtags, web addresses, or placeholder text.
+
+The main feature line must be the largest text after the masthead. Place it near
+the hero's strongest negative space or align it with the decisive gesture,
+object, garment edge, architecture, or gaze. It may overlap low-information
+background but must not cross eyes, mouth, hands, decisive products, or required
+physical contact.
+
+Secondary cover lines form one controlled system inside a single aligned
+information block shared with the season marker. Place that block in one clear
+side or lower area with generous line spacing. Vary weight without scattering
+small type around empty gaps, and do not make every line compete with the main
+feature.
+
+The season marker belongs near the masthead or in one upper corner. It must be
+exactly one allowed season word, never a date, month, year, volume, edition,
+number word, or spelled-out number. Do not render a barcode, QR code, ISBN,
+ISSN, SKU, price, currency symbol, serial number, issue number, web address,
+copyright line, certification, retail sticker, numeric code, vertical bars, or
+small retail box anywhere on the cover. Leave lower corners as clean
+photography, color, or intentional negative space.
+
+NO MICROTEXT
+
+Every text element must be deliberately readable at thumbnail size. The
+smallest secondary cover line or season marker uses letters at least roughly
+four percent of the cover height. Do not create tiny captions, fine print,
+legal copy, credits, footnotes, labels, decorative pseudo-type, rows of digits,
+or any cluster of marks that an image model may interpret as miniature writing.
+If there is not enough clean space, remove a secondary cover line rather than
+shrinking it.
+
+ENGLISH-ONLY IMAGE TEXT GATE
+
+Every readable string inside the cover must be exact grammatical English using
+only uppercase ASCII letters A through Z and spaces. Do not use lowercase
+letters, digits, punctuation, symbols, or accented letters in visible copy. The
+descriptive prompt follows the requested output language, but that language
+must never leak into the rendered cover.
+
+Every exact string must match `[A-Z]+( [A-Z]+)*`: uppercase words separated by
+single spaces, with no apostrophe, quotation mark, hyphen, colon, ampersand,
+period, or other mark inside the string. Each word contains two to twelve
+letters. Never use `&`; write `AND` instead. Silently replace any string that
+fails this pattern.
+
+The dedicated image-text passage inside the Frame prose is the sole source of
+visible copy. It contains exactly five entries in this order: masthead, main
+feature line, first secondary line, second secondary line, and season marker.
+For each entry, first state its exact cover location and printed role, add a
+colon, then write the exact uppercase text, ending the entry with a semicolon.
+Never surround visible text with quotation marks, brackets, boxes, code
+formatting, or decorative marks. Text following the colon is printed on the
+cover; location and role wording is descriptive only.
+
+Outside that dedicated passage, do not repeat visible copy, translate it,
+paraphrase it, or imply additional words. If a string is not declared after a
+colon in that passage, it must not be readable anywhere in the image.
+Before that passage, refer only to generic roles such as masthead, main feature
+line, secondary lines, and season marker; never spell any planned cover string.
+
+Render zero Chinese characters, Japanese kana, Korean hangul, Cyrillic,
+accented Latin letters, invented glyphs, pseudo-letters, lorem ipsum, or
+gibberish. Chinese people, places, clothing, documents, architecture, and
+products do not authorize non-English image text.
+
+Environmental signs, labels, packaging, screens, books, newspapers, garments,
+equipment, and props must be blank, turned away, cropped, abstracted, or too
+soft to read. They must not compete with the controlled cover-copy package.
+
+Typography must be correctly spelled, horizontal, high contrast, and large
+enough to read. Use no more than two type families and three weights. Keep
+kerning, leading, baselines, punctuation, and alignment consistent. Do not
+simulate editorial richness through tiny unreadable text.
+
+TEXT-LAYER ISOLATION LOCK
+
+Frame prose must use English throughout, regardless of the requested output
+language. This is a render-safety requirement: non-English descriptive prose
+can leak into the generated cover as unintended writing. Transliterate Chinese
+names and places with unaccented ASCII letters, or identify adults by role when
+a clean transliteration is unavailable. Prefer a generic English location such
+as a bridge in Xinjiang over pasting an original Chinese proper name. Every
+character in the complete Frame must be ASCII code point 0 through 127. A
+single non-ASCII character invalidates the Frame and requires a complete
+rewrite.
+
+Begin every Frame with this exact sentence: "The cover contains exactly five
+readable English strings and zero other letters, words, numbers, symbols,
+pseudo-letters, or glyph-like marks." Follow it immediately with the hero
+photograph description.
+
+Use exactly three controlled typography zones:
+
+1. the masthead alone across the top;
+2. the main feature line alone in the strongest negative-space area; and
+3. one aligned information block containing both secondary lines and the season
+   marker with generous spacing.
+
+All five strings run horizontally from left to right. Do not use vertical,
+rotated, arched, circular, fragmented, repeated, mirrored, or perspective text.
+Keep the information block in one location rather than distributing small type
+across several corners. Do not add decorative initials, letter fragments,
+column ornaments, faux editorial notation, or linear marks that resemble tiny
+characters.
+
+Immediately before the dedicated image-text passage, write this exact sentence:
+"The five declared English strings are the complete typographic layer; all
+remaining cover areas are pure photography, uninterrupted color, or blank
+negative space." The dedicated passage must then be the final text in the
+Frame.
+
+Quarantine all exact visible copy until that final passage. Before the passage,
+use only generic lowercase role phrases such as the masthead, the main feature
+line, the information block, and the season marker. Do not write the Theme
+title, candidate headline, secondary line, season word, or any all-uppercase
+sequence of two or more letters anywhere earlier in the Frame. Each of the five
+exact strings appears once and only once, after its assigned colon in the final
+passage. The Frame's final character is the semicolon ending the season-marker
+entry.
+
+HERO PHOTOGRAPH
+
+The hero photograph is one coherent exposure, not a montage of unrelated
+images. It must look commissioned for this issue rather than selected from
+generic stock.
+
+Choose the crop according to the editorial subject:
+
+- a close portrait may emphasize face, hair, makeup, jewelry, or psychological
+  expression while retaining enough shoulders and posture to avoid a floating
+  head;
+- a three-quarter fashion or culture portrait may emphasize garment silhouette,
+  body line, object, craft, or environment;
+- a wider group portrait must keep every requested adult recognizable and make
+  their relationship legible;
+- an action cover must freeze one decisive movement with coherent anatomy and
+  protected negative space; and
+- an environmental cover may make the cast smaller only when location scale is
+  the main editorial fact and every face remains identifiable.
+
+Maintain realistic skin, pores, hair, fabric, contact shadows, reflections, and
+material response. Keep hands anatomically correct, limbs traceable, and body
+weight supported. Do not duplicate the cast through mirrors, screens, shadows,
+cutouts, thumbnails, or inset photographs.
+
+Direct the gaze intentionally. Eye contact with the reader creates authority or
+intimacy; off-camera gaze must point toward a visible person, object, or action.
+Do not leave every face vacant, closed-eyed, or looking in unrelated directions.
+
+Protect the face. The masthead may overlap hair, but no cover line crosses the
+eyes, nose, mouth, or defining facial contour. At erotic and hardcore levels,
+typography must not conceal required anatomy, decisive contact, or active
+participation.
+
+CONTENT-LEVEL DIRECTION
+
+Apply only the branch matching the requested content level. The selected level
+controls the visible hero photograph, not merely copy, mood, wardrobe, or
+publication category.
+
+At aesthetic level, create a non-explicit editorial cover. Use fashion,
+portraiture, culture, design, travel, food, sport, science, art, or another
+publication-specific subject. Do not add sexual activity.
+
+At erotic level, the hero photograph must visibly show adult nudity,
+non-explicit intimate contact, sensual body tension, or another unmistakably
+erotic adult subject. Every requested adult remains alert, willing, responsive,
+and able to stop. Do not hide the erotic anchor behind the masthead or cover
+lines, and do not introduce explicit sexual activity.
+
+At hardcore level, the hero photograph must visibly show one explicit,
+consensual adult sexual interaction already in progress. Name the involved
+anatomy and exact current contact in the Frame prose. Every requested adult has
+an active visible role and remains alert, willing, responsive, and able to
+stop. Mere nudity, suggestive copy, preparation, obscured contact, or a tiny
+inset image does not qualify.
+
+At every level, the cover remains a designed magazine cover rather than a plain
+photograph. Typography supports the editorial proposition but never replaces
+the required visible content.
+
+MAGAZINE CATEGORIES
+
+Vary publication categories freely. Possibilities include high fashion,
+independent style, contemporary art, architecture, interiors, industrial
+design, photography, cinema culture, music, performance, literature, ideas,
+science, ecology, technology, food, travel, urban life, craft, sport, movement,
+wellness, collecting, social observation, or an original hybrid with a clear
+audience.
+
+The category must influence the photograph and cover system:
+
+- fashion may use sculptural styling, controlled gaze, fabric movement, and
+  severe typography;
+- art and culture may use conceptual portraiture, unusual negative space, and
+  intellectually precise cover lines;
+- architecture and design may use grids, material detail, spatial rhythm, and
+  disciplined alignments;
+- science and technology may use clear diagrams or abstract non-text graphics
+  without becoming an interface;
+- food may use tactile ingredients, table geometry, and human appetite without
+  resembling packaging;
+- travel and ecology may use environmental scale and place-specific light
+  without tourism clichés;
+- music and performance may use gesture, stage energy, and rhythmic typography
+  without becoming an album cover; and
+- sport and movement may use decisive action and bold hierarchy without
+  becoming an event poster.
+
+These are directional examples, not fixed templates.
+
+COVER DESIGN DIRECTIONS
+
+Choose one dominant design direction per Frame:
+
+- clean fashion authority: large masthead, direct gaze, restrained cover lines,
+  immaculate background, and exact garment silhouette;
+- dense newsstand energy: bold feature line, controlled side stacks, crisp
+  color contrast, and energetic but ordered typography;
+- independent culture journal: generous negative space, unusual crop, quiet
+  masthead, and intellectually spare cover lines;
+- special monochrome issue: black-and-white hero, one spot color, strong paper
+  texture, and highly controlled type;
+- color-field portrait: one saturated background, sharply separated skin and
+  wardrobe, and minimal high-contrast typography;
+- environmental issue: smaller cast within one powerful location while the
+  masthead and feature line remain dominant;
+- tactile print edition: uncoated stock, restrained halftone, embossed masthead,
+  foil accent, overprint, or subtle registration character;
+- photographic intervention: one controlled crop, shadow, translucent color
+  block, hand-drawn non-text mark, or die-cut illusion tied to the issue; or
+- typographic framing: masthead, feature line, and margin copy create a precise
+  frame around the hero without turning the cover into a poster.
+
+Use one direction coherently. Do not stack every effect, create random sticker
+clutter, or imitate a known cover.
+
+COLOR, LIGHT, AND PRINT FINISH
+
+Choose one dominant palette relationship specific to the publication. Maintain
+clear separation among skin, hair, wardrobe, background, masthead, feature line,
+and secondary copy.
+
+Use editorially motivated light: broad studio key, hard beauty flash, luminous
+window light, crisp daylight, restrained stage light, environmental practicals,
+or another coherent setup. Preserve facial catchlights and readable skin.
+Avoid generic cinematic teal-orange grading, muddy shadows, uncontrolled bloom,
+or effects that reduce text contrast.
+
+Print finish may use coated gloss, uncoated matte, soft-touch laminate, subtle
+paper tooth, restrained foil, spot varnish, embossing, debossing, fluorescent
+ink, metallic ink, halftone, or slight registration character. Apply each finish
+to a named cover element and state its visible effect. Do not cover the whole
+image in arbitrary distress, scratches, torn paper, or aged-film damage unless
+the publication concept specifically requires it.
+
+VARIETY ACROSS THEMES
+
+Plan the requested Theme batch as a set. Generate more candidate publications
+than required, compare them, and select the strongest distinct identities.
+
+Across Themes, vary:
+
+- publication category and target reader;
+- masthead name, proportions, case, and type character;
+- issue question and main editorial promise;
+- hero activity, relationship, crop, and gaze;
+- Chinese location, era, season, and social context;
+- cover density from minimal to newsstand-rich;
+- palette, background, light, and photographic treatment;
+- text alignment, side balance, and masthead overlap;
+- print stock and finishing accent; and
+- emotional temperature.
+
+Do not assign categories or layouts by Theme ID. Reject a batch dominated by
+fashion portraits, blank studio backgrounds, centered faces, red mastheads,
+identical side stacks, luxury language, monochrome minimalism, or generic
+celebrity-cover expressions.
+
+OUTPUT
+
+During Frame generation, write one compact, fluent, directly imageable paragraph
+for one finished magazine cover. Follow the natural order of hero photograph,
+cover composition, publication style, supporting graphic details, print finish,
+and the dedicated exact image-text passage without exposing section labels or
+planning notes.
+
+Begin with the exact text-layer isolation sentence, then the hero photograph,
+never an issue label, publication name, or visible copy. End with the exact
+typographic-layer lock followed by the dedicated five-entry image-text passage.
+Do not spell any visible copy before that final passage.
+
+Do not print schema fields, Theme IDs, Frame IDs, templates, bullet lists,
+optional branches, explanations, or quality-check language. Write the complete
+Frame prompt in English and keep the dedicated image copy uppercase English.
+
+Keep the prompt concise enough to preserve hierarchy. Remove backstory,
+interpretation, repeated character anchors, and decorative details that do not
+control the visible cover.
+
+FINAL SILENT CHECK
+
+Before returning any Theme or Frame, verify:
+
+- the result is one flat portrait 3:4 magazine front cover, not a poster, post,
+  spread, mockup, advertisement, or photograph of a magazine;
+- the exact original masthead appears once at the top and remains legible;
+- one hero photograph dominates and every requested adult appears exactly once;
+- the hero image visibly supports the issue's main feature;
+- the selected content level is directly visible and unobscured;
+- one main feature line, exactly two secondary cover lines, and one allowed
+  season marker form a clear hierarchy in exactly three typography zones;
+- total visible copy remains under twenty-four English words;
+- exactly five visible strings appear once each, in the required order, after
+  colons in the final dedicated image-text passage, with precise cover
+  locations and no enclosing marks;
+- every visible string matches `[A-Z]+( [A-Z]+)*` and uses `AND`, never `&`;
+- no undeclared, non-English, lowercase, punctuated, malformed, placeholder,
+  environmental, interface, brand, or logo text appears;
+- the Frame prompt itself contains only English descriptive prose and the five
+  declared uppercase English strings, with no non-ASCII script that could leak
+  into the cover;
+- every Frame character is ASCII code point 0 through 127, including names and
+  place references;
+- no masthead or cover line crosses eyes, mouth, decisive hands, products,
+  required anatomy, or defining physical contact;
+- typography uses no more than two families and three weights with coherent
+  alignment, spacing, and contrast;
+- safe margins, trim edges, bleed, negative space, and thumbnail readability are
+  credible;
+- no barcode, QR code, ISBN, ISSN, price, currency symbol, digits, spelled-out
+  number, date, year, retail box, numeric code, or microtext appears;
+- cast identity, anatomy, support, gaze, contact, lighting, and reflections are
+  physically coherent;
+- the cover does not reproduce an existing magazine, famous cover, celebrity,
+  brand campaign, or copyrighted visual identity;
+- Frames remain parallel cover proposals rather than sequential pages; and
+- Themes differ substantially in publication, subject, audience, hierarchy,
+  typography, color, photography, and finish.
+
+Silently rewrite any output that fails one of these checks.

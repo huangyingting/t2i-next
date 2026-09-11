@@ -4,17 +4,39 @@ Create varied, copy-ready image prompts for finished portrait poster designs in 
 
 Use Subject, Scene, Composition, Style, Text, Details, and Output as seven internal planning concerns, not as a literal response format. Cover all seven concerns in that conceptual order while integrating them into one compact, natural, directly imageable prompt. Do not print those concern names, field labels, prefixes, headings, a template, planning notes, explanations, or optional branches.
 
-Every readable word inside the generated image must be grammatical English written with ASCII Latin letters. This includes the headline, subtitle, labels, credits, quotations, dates, badges, annotations, newspapers, documents, tickets, packaging, signs, clothing, film strips, and environmental graphics. The descriptive prompt follows the requested output language, but that language must never leak into the rendered image.
+Every readable word inside the generated image must be grammatical English written with ASCII Latin letters. This includes the headline, subtitle, labels, credits, quotations, dates, badges, annotations, newspapers, documents, tickets, packaging, signs, clothing, film strips, and environmental graphics.
 
 ENGLISH-ONLY IMAGE TEXT GATE
 
-The dedicated image-text passage inside the natural prose is the sole source of visible image copy. For every visible string, first state its exact physical carrier and location in the poster, then write the string exactly as it must appear between literal ASCII straight double-quote characters `"`, never curly quotation marks. A quoted string without a concrete location is invalid. Outside that passage, use no quoted strings and do not spell out, repeat, translate, or paraphrase image copy; refer only to generic roles such as the headline, subtitle, or credit block.
+The dedicated image-text passage inside the natural prose is the sole source of visible image copy and must be the final part of the Frame. Quarantine all exact copy until that passage. Earlier prose refers only to generic roles such as the headline, subtitle, credit block, date, or quotation and never spells, quotes, translates, or paraphrases a visible string.
+
+The passage may contain as many entries as the design requires. For every visible string, state its exact physical carrier, poster location, and typographic behavior, add an ASCII colon, write the exact copy, and end with an ASCII semicolon. Never enclose copy in quotation marks. A string without a concrete carrier and location is invalid.
 
 Use only unaccented English letters A-Z and a-z, Arabic numerals 0-9, spaces, and standard ASCII punctuation in visible image copy. Render zero Chinese characters, Japanese kana, Korean hangul, Cyrillic, accented Latin letters, non-English scripts, pseudo-letters, lorem ipsum, or invented glyphs.
 
-Chinese people, places, eras, and objects do not authorize Chinese writing in the image. Do not place a Chinese name, title, slogan, handwriting sample, newspaper masthead, factory badge, archive label, street sign, or document wording in quotation marks anywhere in the descriptive prompt. When an authentic object would normally contain local-language text, either leave its printed area blank, crop it out, turn it away, reduce it to non-readable paper texture, or replace it with short exact English copy already quoted with its location in the image-text passage.
+Chinese people, places, eras, and objects do not authorize Chinese writing in the image. When an authentic object would normally contain local-language text, either leave its printed area blank, crop it out, turn it away, reduce it to non-readable paper texture, or replace it with short exact English copy already declared with its location in the image-text passage.
 
-Newspaper and archival fragments must not contain dense generated paragraphs. Use blank column texture and halftone rules, or only short exact English snippets quoted with their locations in the image-text passage. If a word is not explicitly quoted in that passage, it must not be readable anywhere in the image.
+Newspaper and archival fragments must not contain dense generated paragraphs. Use blank column texture and halftone rules, or only short exact English snippets declared with their locations in the image-text passage. If a word is not explicitly declared in that passage, it must not be readable anywhere in the image.
+
+TEXT-LAYER ISOLATION LOCK
+
+Frame prose must use English throughout, regardless of the requested output
+language. During Theme generation, write the title, premise, and style in
+English-only ASCII as well. Every character in the complete Frame must be ASCII
+code point 0 through 127. Before returning either stage, replace U+2018 and
+U+2019 with a straight apostrophe, U+201C and U+201D with a straight double
+quote, U+2013, U+2014, and U+2011 with a plain hyphen, U+00B7 with a comma, and
+U+00A0 with a normal space; rewrite any remaining non-ASCII character.
+
+Visible-copy serialization must not change the poster design. There is no fixed
+number of strings or typography zones. Do not remove or simplify editorial
+fragments, credits, quotations, dates, venue details, badges, annotations,
+archival materials, carrier variety, vertical or rotated type, or experimental
+typography. Author every readable string exactly and use specified lines rather
+than filler, gibberish, malformed text, or unreadable microtext. Each final
+entry uses the literal characters `: ` before copy and `;` after it; never
+write the words colon or semicolon or enclose copy in quotation marks. The
+Frame's final character is `;`.
 
 EXAMPLES ARE OPEN-ENDED
 
@@ -27,7 +49,7 @@ Every Frame must visibly belong to one analog editorial poster family:
 - one dominant monochrome photographic hero whose crop is wide enough to carry the selected content-level subject, relationship, and defining physical interaction rather than reducing them to a face alone;
 - two to four smaller documentary, environmental, object, silhouette, or film-strip image fragments that enrich the subject without competing with the hero;
 - one oversized condensed headline assembled on a torn paper slab and integrated into the middle or lower visual hierarchy;
-- a few short English editorial fragments, credits, quotation blocks, date or venue details, or review-like pull quotes arranged as authentic print matter, each quoted verbatim with its exact physical location;
+- a few short English editorial fragments, credits, quotation blocks, date or venue details, or review-like pull quotes arranged as authentic print matter, each declared verbatim with its exact physical location;
 - overlapping torn paper with irregular deckled edges, pasted seams, slight curl, glue shadows, and visible layer depth;
 - warm aged cream paper, dense black ink, and a restrained set of one to three saturated spot colors such as vermilion, cobalt, or mustard;
 - halftone dots, photocopy grain, coarse newsprint, ink spread, slight registration error, fold wear, scuffs, and occasional film perforations; and
@@ -81,7 +103,7 @@ fragment containing a participant must preserve the same identity, clothing
 state, relationship, and current interaction context; it must not contradict
 the dominant hero with a neutral or fully disconnected depiction.
 
-Typography, quoted copy, nudity by itself, facial expression, color, and a
+Typography, poster copy, nudity by itself, facial expression, color, and a
 minor supporting fragment cannot satisfy the selected content level. No paper
 slab, photograph crop, torn edge, headline, shadow, or overlapping fragment may
 hide the defining contact, required anatomy, active participation, or
@@ -120,11 +142,10 @@ must not appear as labels, headings, or prefixes in the response:
    aspect ratio.
 4. Define one coherent visual language through material, lighting, color, era,
    texture, and editorial tone.
-5. Place the exact English Theme title and every other visible string on a
-   specific physical paper layer or object in a specific poster zone, then
-   write each string verbatim between literal ASCII straight double quotes.
-   If no supporting copy is needed, include only the title. Nothing outside
-   this image-text passage may quote, repeat, or add visible copy.
+5. Plan the exact English Theme title and every other visible string on a
+   specific physical paper layer or object in a specific poster zone without
+   spelling the copy yet. Serialize every planned string in the final
+   image-text passage using one carrier-and-location colon entry per string.
 6. Add only the few supporting objects, callouts, paper layers, or decorative
    elements that strengthen the main idea.
 7. Finish with image quality, edge treatment, text fidelity, print finish, and
@@ -134,8 +155,8 @@ must not appear as labels, headings, or prefixes in the response:
 Write one compact, fluent paragraph rather than seven labeled lines. Let the
 seven concerns shape the paragraph's information flow without exposing the
 template. Do not leave brackets, placeholders, implementation notes, or
-multiple-choice wording in the final prompt. Apart from quoted English image
-copy, the prose must remain entirely in the requested output language.
+multiple-choice wording in the final prompt. The complete Frame prose must
+remain English-only ASCII regardless of the requested output language.
 
 COLLAGE LAYOUT AND FOCAL HIERARCHY
 
@@ -147,7 +168,7 @@ Deliberate collage is mandatory, but it must resolve into one poster proposition
 
 TEXT AND GRAPHIC DISCIPLINE
 
-Treat text as physical printed matter inside the collage, not as a caption added afterward. Lock the exact English headline across a Theme. Keep supporting copy minimal, purposeful, fully specified, and English-only; never invite the model to invent filler paragraphs. For every quoted string, identify whether it is printed on a headline slab, pasted scrap, ticket, photograph edge, credit strip, badge, sign, or another concrete carrier and state its exact poster location. Text may support the selected content level but must never carry or replace its required physical evidence. Repeat no visible string outside the dedicated image-text passage and add no environmental copy by implication. Prohibit Chinese or other writing systems, gibberish, pseudo-letters, fake logos, watermarks, lorem ipsum, and unreadable microtext.
+Treat text as physical printed matter inside the collage, not as a caption added afterward. Lock the exact English headline across a Theme. Keep supporting copy minimal, purposeful, fully specified, and English-only; never invite the model to invent filler paragraphs. For every exact string, identify whether it is printed on a headline slab, pasted scrap, ticket, photograph edge, credit strip, badge, sign, or another concrete carrier and state its exact poster location in the final image-text passage. Text may support the selected content level but must never carry or replace its required physical evidence. Repeat no visible string outside the dedicated image-text passage and add no environmental copy by implication. Prohibit Chinese or other writing systems, gibberish, pseudo-letters, fake logos, watermarks, lorem ipsum, and unreadable microtext.
 
 Specify type scale, weight, alignment, spacing, contrast, physical paper substrate, and relation to adjacent tears and photographs without naming a copyrighted identity. The headline must use oversized condensed block lettering with convincing ink texture; secondary copy may use compact grotesque, slab-serif, or typewriter-like print. Keep the headline immediately readable and use no more than two additional text levels.
 
@@ -167,6 +188,6 @@ Protect all required text with adequate contrast and uncluttered space. Do not p
 
 OUTPUT
 
-Write one compact, fluent paragraph. Target 450–650 Chinese characters and never exceed 800; target 220–320 English words and never exceed 400. Every phrase must control visible content, collage hierarchy, exact text, paper layer, print artifact, or finish.
+Write one compact, fluent English paragraph. Target 220 to 320 English words and never exceed 400. Every phrase must control visible content, collage hierarchy, exact text, paper layer, print artifact, or finish. End with the dedicated image-text passage using colon-and-semicolon entries.
 
-Before returning, verify that the prose is one natural paragraph with no seven-part labels or prefixes; all seven content concerns are covered in their conceptual order; only the requested content-level branch was applied; the Theme's content-level visibility anchor appears directly in the dominant hero photograph rather than in text, mood, preparation, nudity alone, or a minor fragment; every required participant, action, contact, and anatomy detail for that branch is visible and unobscured; erotic or hardcore content is reinforced by at least one smaller photographic fragment without creating another event; the exact English Theme title, subject, and spot colors are unchanged; composition and final output-quality language contain no redundant aspect-ratio or dimension requirement; every visible string appears verbatim in the dedicated image-text passage between ASCII straight double quotes and has an exact physical carrier and poster location; no quotation mark of any kind appears outside that passage; every quoted string uses only permitted ASCII English characters; no other passage spells out or introduces readable copy; zero non-English glyphs appear anywhere in the rendered poster; the dominant monochrome hero, torn headline slab, subordinate photographic fragments, editorial scraps, physical paper depth, and analog print artifacts are all visible; the primary visual and title hierarchy survive thumbnail viewing; every promised word is readable; and the result describes one finished poster only. Rewrite any Frame that fails this check. Remove repeated adjectives, backstory, symbolism explanations, audience reactions, and details that do not improve hierarchy or renderability.
+Before returning, verify that the prose is one natural ASCII English paragraph with no seven-part labels or prefixes; all seven content concerns are covered in their conceptual order; only the requested content-level branch was applied; the Theme's content-level visibility anchor appears directly in the dominant hero photograph rather than in text, mood, preparation, nudity alone, or a minor fragment; every required participant, action, contact, and anatomy detail for that branch is visible and unobscured; erotic or hardcore content is reinforced by at least one smaller photographic fragment without creating another event; the exact English Theme title, subject, and spot colors are unchanged; composition and final output-quality language contain no redundant aspect-ratio or dimension requirement; every visible string appears once in the final dedicated image-text passage after an ASCII colon and before an ASCII semicolon, with an exact physical carrier and poster location; no quotation mark surrounds visible copy; every string uses only permitted ASCII English characters; no other passage spells out or introduces readable copy; zero non-English glyphs appear anywhere in the rendered poster; the dominant monochrome hero, torn headline slab, subordinate photographic fragments, editorial scraps, physical paper depth, and analog print artifacts are all visible; the primary visual and title hierarchy survive thumbnail viewing; every promised word is readable; and the result describes one finished poster only. Rewrite any Frame that fails this check. Remove repeated adjectives, backstory, symbolism explanations, audience reactions, and details that do not improve hierarchy or renderability.

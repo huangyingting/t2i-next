@@ -227,14 +227,14 @@ def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
         "dedicated image-text passage inside the natural prose is the sole "
         "source of visible image copy"
     ) in normalized
-    assert "exact physical carrier and location in the poster" in normalized
-    assert "A quoted string without a concrete location is invalid" in normalized
-    assert "literal ASCII straight double-quote character" in normalized
-    assert "Outside that passage, use no quoted strings" in normalized
+    assert "exact physical carrier, poster location" in normalized
+    assert "add an ASCII colon" in normalized
+    assert "end with an ASCII semicolon" in normalized
+    assert "Never enclose copy in quotation marks" in normalized
     assert "zero Chinese characters" in normalized
     assert "do not authorize Chinese writing in the image" in normalized
-    assert "no quotation mark of any kind appears outside that passage" in normalized
-    assert "If a word is not explicitly quoted in that passage" in normalized
+    assert "no quotation mark surrounds visible copy" in normalized
+    assert "If a word is not explicitly declared in that passage" in normalized
     assert "zero non-English glyphs appear anywhere" in normalized
     assert "Composition: one exact aspect ratio" not in normalized
     assert "Output: resolution matching" not in normalized
@@ -250,6 +250,115 @@ def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
     ):
         assert label not in brief
     assert "turn one finished design into a collage of proposals" not in normalized
+
+
+def test_post_briefs_isolate_text_without_removing_poster_copy() -> None:
+    film_post = (
+        REPOSITORY_ROOT / "story-inputs" / "film-post.txt"
+    ).read_text(encoding="utf-8")
+    post_layout = (
+        REPOSITORY_ROOT / "story-inputs" / "post-layout.txt"
+    ).read_text(encoding="utf-8")
+
+    for filename, brief in (
+        ("film-post.txt", film_post),
+        ("post-layout.txt", post_layout),
+    ):
+        normalized = " ".join(brief.split())
+
+        assert "TEXT-LAYER ISOLATION LOCK" in normalized, filename
+        assert "Frame prose must use English throughout" in normalized, filename
+        assert "During Theme generation" in normalized, filename
+        assert (
+            "Every character in the complete Frame must be ASCII code point"
+            in normalized
+        ), filename
+        assert "U+2018 and U+2019 with a straight apostrophe" in normalized, filename
+        assert "dedicated image-text passage" in normalized, filename
+        assert "add an ASCII colon" in normalized, filename
+        assert "end with an ASCII semicolon" in normalized, filename
+        assert "the literal characters `: `" in normalized, filename
+        assert "never write the words colon or semicolon" in normalized, filename
+        assert "The Frame's final character is `;`" in normalized, filename
+        assert "gibberish" in normalized, filename
+        assert "unreadable microtext" in normalized, filename
+        assert "exactly three readable English strings" not in normalized, filename
+        assert "exactly three controlled typography zones" not in normalized, filename
+
+    film_normalized = " ".join(film_post.split())
+    assert (
+        "Keep the original theatrical copy package and typography freedom"
+        in film_normalized
+    )
+    assert "title, tagline, release line, billing block, credits" in film_normalized
+    assert "one original English tagline written for that design" in film_normalized
+    assert "and a compact fictional English billing block" in film_normalized
+    assert "evidence and archive: receipts, letters, maps" in film_normalized
+    assert "handwritten evidence" in film_normalized
+
+    layout_normalized = " ".join(post_layout.split())
+    assert "Visible-copy serialization must not change the poster design" in (
+        layout_normalized
+    )
+    assert (
+        "Do not remove or simplify editorial fragments, credits, quotations, "
+        "dates, venue details" in layout_normalized
+    )
+    assert (
+        "a few short English editorial fragments, credits, quotation blocks, "
+        "date or venue details" in layout_normalized
+    )
+    assert (
+        "ticket, photograph edge, credit strip, badge, sign" in layout_normalized
+    )
+
+
+def test_everyday_social_caricature_centers_women_and_lived_interaction() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert "WOMAN-CENTERED AGENCY" in normalized
+    assert "At least one adult woman is the unmistakable narrative" in normalized
+    assert "Use exactly the requested cast and add no bystanders" in normalized
+    assert "LIFE AS THE SOURCE" in normalized
+    assert "invisible domestic labor" in normalized
+    assert "friendship rituals" in normalized
+    assert "dating, courtship, commitment" in normalized
+    assert "workplace meetings" in normalized
+    assert "social media attention" in normalized
+    assert "CARICATURE AND CONTROLLED DISTORTION" in normalized
+    assert "Exaggerate selectively" in normalized
+    assert "METAPHOR AND SYMBOL SYSTEM" in normalized
+    assert "Use an animal, object, garment, or emblem as a visual label" in normalized
+    assert "Every symbol must have one clear referent" in normalized
+    assert "CONTENT-LEVEL INTEGRATION" in normalized
+    assert "At aesthetic level" in normalized
+    assert "At erotic level" in normalized
+    assert "At hardcore level" in normalized
+    assert "NON-NEGOTIABLE PRIORITY" in normalized
+    assert "everyone awake, alert, willing" in normalized
+    assert "THEME CONTENT-PROOF GATE" in normalized
+    assert "The Theme premise itself must contain the complete visible proof" in (
+        normalized
+    )
+    assert "Do not substitute vague phrases such as sexual activity" in normalized
+    assert "Hardcore does not imply BDSM" in normalized
+    assert "Every erotic Frame must include at least one" in normalized
+    assert "Bare shoulders, cleavage, exposed thighs, sleepwear" in normalized
+    assert "the explicit interaction is the sole ongoing human action" in normalized
+    assert "No participant simultaneously reads, types, calculates" in normalized
+    assert "The humor comes from desire, etiquette, attention" in normalized
+    assert "DIRECT AND POPULAR LEGIBILITY" in normalized
+    assert "understandable without text" in normalized
+    assert "No readable image text is required" in normalized
+    assert "Screens may show only blank color fields" in normalized
+    assert "do not describe any visible word, letter, numeral" in normalized
+    assert "Do not use interpretive phrases such as symbolizes" in normalized
+    assert "THEME CONTRACT" in normalized
+    assert "FRAME CONTRACT" in normalized
+    assert "VARIATION AND REJECTION RULES" in normalized
 
 
 def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
@@ -666,3 +775,105 @@ def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
         "HANDS-AND-KNEES AND FOREARM-SUPPORTED",
     ):
         assert family in pool
+
+
+def test_threshold_emergence_brief_locks_cast_geometry_and_batch_variety() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "threshold-emergence.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "EMERGING WOMEN + WITNESS WOMEN = REQUESTED WOMEN" in normalized
+    assert "EMERGING MEN + WITNESS MEN = REQUESTED MEN" in normalized
+    assert "Never treat the requested cast as witnesses" in normalized
+    assert "Every visible or implied human counts toward the cast" in normalized
+    assert "The source-side body must remain recognizably human anatomy" in normalized
+    assert "The source plane intersects the emerging person once" in normalized
+    assert "HALF-IN, HALF-OUT SILHOUETTE" in normalized
+    assert "roughly forty to sixty percent of the body is on each side" in normalized
+    assert "the pelvis plus at least one complete connected leg inside" in normalized
+    assert "REFERENCE CRAWL CHOREOGRAPHY" in normalized
+    assert "The adult crawls headfirst perpendicular to the screen" in normalized
+    assert "the bezel stays fully visible around the waist" in normalized
+    assert "SINGLE-SCENE RENDERING CONTRACT" in normalized
+    assert "one camera, one continuous outer location" in normalized
+    assert "appears only inside the exact bounded area" in normalized
+    assert "End every Frame with one concise geometry-lock sentence" in normalized
+    assert "no split screen, second set, reflected duplicate" in normalized
+    assert "Do not flatten, paint, pixelate, dissolve" in normalized
+    assert "no full-body ripple, translucent overlay" in normalized
+    assert "same natural skin, clothing, volume" in normalized
+    assert "Do not promise text and then negate it elsewhere" in normalized
+    assert "Use each lane exactly once in a five-Theme batch" in normalized
+    assert "one home, dinner, party, or other private social setting" in normalized
+    assert (
+        "one cinema, theater, concert, sports, game, or other communal leisure setting"
+        in normalized
+    )
+    assert "one garden, park, beach, mountain, farm" in normalized
+    assert "one train, station, ferry, airport, road stop" in normalized
+
+
+def test_magazine_cover_brief_builds_a_finished_newsstand_cover() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "magazine-cover.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "MAGAZINE, NOT POSTER" in normalized
+    assert "one original recurring masthead at the top" in normalized
+    assert "exactly two short secondary cover lines" in normalized
+    assert "Do not use movie-poster signals" in normalized
+    assert "Do not use social-post signals" in normalized
+    assert "Do not show a physical mockup" in normalized
+    assert "flat, full-bleed portrait 3:4 front cover" in normalized
+    assert "MASTHEAD CONTRACT" in normalized
+    assert "COVER-LINE PACKAGE" in normalized
+    assert "Keep total visible copy under twenty-four English words" in normalized
+    assert "NO MICROTEXT" in normalized
+    assert "four percent of the cover height" in normalized
+    assert "Do not render a barcode, QR code, ISBN, ISSN" in normalized
+    assert "Do not use lowercase letters, digits, punctuation" in normalized
+    assert "Every exact string must match `[A-Z]+( [A-Z]+)*`" in normalized
+    assert "Never use `&`; write `AND` instead" in normalized
+    assert "never a date, month, year, volume, edition" in normalized
+    assert "trademark symbol, registered mark, superscript" in normalized
+    assert "ENGLISH-ONLY IMAGE TEXT GATE" in normalized
+    assert "TEXT-LAYER ISOLATION LOCK" in normalized
+    assert "Frame prose must use English throughout" in normalized
+    assert (
+        "Every character in the complete Frame must be ASCII code point" in normalized
+    )
+    assert "A single non-ASCII character invalidates the Frame" in normalized
+    assert (
+        "The cover contains exactly five readable English strings and zero other "
+        "letters, words, numbers, symbols, pseudo-letters, or glyph-like marks."
+        in normalized
+    )
+    assert "exactly three controlled typography zones" in normalized
+    assert "one aligned information block" in normalized
+    assert (
+        "The five declared English strings are the complete typographic layer"
+        in normalized
+    )
+    assert (
+        "all remaining cover areas are pure photography, uninterrupted color, "
+        "or blank negative space" in normalized
+    )
+    assert "Quarantine all exact visible copy until that final passage" in normalized
+    assert (
+        "any all-uppercase sequence of two or more letters anywhere earlier"
+        in normalized
+    )
+    assert "Each of the five exact strings appears once and only once" in normalized
+    assert "The Frame's final character is the semicolon" in normalized
+    assert "dedicated image-text passage" in normalized
+    assert "It contains exactly five entries in this order" in normalized
+    assert "add a colon, then write the exact uppercase text" in normalized
+    assert "Never surround visible text with quotation marks" in normalized
+    assert (
+        "one dominant hero image occupying roughly sixty to eighty percent"
+        in normalized
+    )
+    assert "At hardcore level" in normalized
+    assert "the result is one flat portrait 3:4 magazine front cover" in normalized

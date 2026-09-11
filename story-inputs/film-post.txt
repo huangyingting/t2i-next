@@ -4,6 +4,35 @@ Create original theatrical movie-poster Themes for fictional feature films. For 
 
 Every readable word inside the poster and every final prompt must be grammatical English. This includes props, documents, signs, maps, stamps, seals, screens, clothing, architecture, and environmental graphics. Use only English Latin letters, Arabic numerals, and standard punctuation; never show another writing system, gibberish, pseudo-letters, or placeholder copy.
 
+TEXT-LAYER ISOLATION LOCK
+
+Frame prose must use English throughout, regardless of the requested output
+language. During Theme generation, write the title, premise, and style in
+English-only ASCII as well. Every character in the complete Frame must be ASCII
+code point 0 through 127. Before returning either stage, replace U+2018 and
+U+2019 with a straight apostrophe, U+201C and U+201D with a straight double
+quote, U+2013, U+2014, and U+2011 with a plain hyphen, U+00B7 with a comma, and
+U+00A0 with a normal space; rewrite any remaining non-ASCII character.
+
+Visible-copy serialization must not change the poster design. There is no fixed
+number of strings or typography zones. Keep the original theatrical copy
+package and typography freedom: title, tagline, release line, billing block,
+credits, environmental copy, vertical or perspective type, fragmented type,
+handwriting, and typographic imagery all remain available.
+
+Quarantine all exact copy until the final dedicated image-text passage. It may
+contain as many entries as the design requires. For every visible string, state
+its exact carrier, location, and typographic behavior, add an ASCII colon, write
+the exact copy, and end with an ASCII semicolon. Each entry uses the literal
+characters `: ` before copy and `;` after it; never write the words colon or
+semicolon or enclose copy in quotation marks. The Frame's final character is
+`;`.
+
+Every other text-bearing surface must use exact English copy declared there or
+remain blank or unreadable. Billing blocks, credits, evidence, maps, forms,
+tickets, and archival fragments remain available, but use fully specified
+lines rather than filler, gibberish, malformed text, or unreadable microtext.
+
 EXAMPLES ARE OPEN-ENDED
 
 Every list below is open-ended inspiration, not a menu, enum, preset library, quota, sequence, or multiple-choice instruction. Select, combine, transform, or invent approaches as the story demands. Only statements using "must," "every," "exact," or "do not" are mandatory.
@@ -175,4 +204,12 @@ VARIETY AND FINAL OUTPUT
 
 Across Themes, vary genre, conflict, place, period, season, profession, relationship, motif, palette, typography, print language, composition, protagonist scale, and emotional promise. Genre must control the visual logic, not appear only as a label.
 
-Write each final prompt as one concise English paragraph. Begin with the story hook, then describe one poster concept, cast, composition, symbolic device, setting, lighting, palette, exact English typography and placement, release line, fictional billing block, and visible print or finishing character. Prioritize one unforgettable central idea. The result must unmistakably be a professionally designed theatrical poster, not a still with added text.
+Write each final prompt as one concise English paragraph. Begin with the story hook, then describe one poster concept, cast, composition, symbolic device, setting, lighting, palette, typography and placement, release line, fictional billing block, and visible print or finishing character without spelling exact copy. End with the dedicated image-text passage using colon-and-semicolon entries. Prioritize one unforgettable central idea. The result must unmistakably be a professionally designed theatrical poster, not a still with added text.
+
+Before returning, silently verify that the Frame uses only ASCII English prose;
+every title, tagline, release line, billing line, credit, sign, label, document,
+and environmental word is declared once with exact spelling and location in
+the final image-text passage; no quotation marks surround copy; no undeclared,
+non-English, malformed, placeholder, or gibberish text appears; all promised
+copy remains legible; and the original theatrical design features remain
+intact.
