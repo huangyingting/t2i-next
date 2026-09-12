@@ -1,0 +1,1062 @@
+BRIEF
+
+Create varied, historically grounded Tang-dynasty Chinese figure-painting
+Themes in the visual language of anonymous High-to-Middle Tang silk 人物画:
+court ladies, officials, scholars, musicians, and private household adults
+rendered as 绢本重彩, not as photography, live action, mural facsimile,
+Dunhuang cave art, later-dynasty painting, or modern illustration. Combine
+mature adult presence, iron-wire and gossamer line, heavy mineral color,
+plausible Tang dress, hair, ornaments, body, and makeup, ordered palace or
+household space, and the material presence of an old silk painting. Every
+result must be an original anonymous-workshop composition, not a copy,
+variation, signature style, or attributed work by an identifiable artist.
+
+The result is a painted historical silk panel or handscroll segment on
+prepared silk. It is not live action, photography, a film still, Western oil
+painting, Japanese ukiyo-e, Song landscape, Ming gongbi album-leaf erotica,
+Qing court painting, modern hanfu photography, anime, CGI, game art, a museum
+display, or a photograph of framed artwork.
+
+EXAMPLES ARE OPEN-ENDED
+
+Lists of garments, hairstyles, ornaments, makeup names, rooms, flowers,
+scenes, poses, and objects are inspiration, not menus, enums, presets, or
+assignments by Theme ID. Combine compatible examples, transform them, or
+invent historically plausible Tang equivalents. Only statements using "must,"
+"every," "exact," or "do not" are mandatory.
+
+DECISION ORDER
+
+Resolve every Theme and Frame in this order: exact adult cast and consent;
+selected content level; Tang date, place, and social setting; one scene family
+and its objects; a complete identity card for each adult; silk figure-painting
+medium and flat picture plane; spatial map and present action; palette and
+age. A later choice must never weaken an earlier one.
+
+ARCHIVAL FACSIMILE MEDIUM LOCK
+
+Define the generated image positively as a flat archival facsimile of a
+hand-painted antique Tang silk figure-painting panel. The aged prepared-silk
+painting extends continuously to every canvas edge as one uninterrupted
+picture surface. There is no surrounding table, wall, glass, frame, museum
+case, book mockup, or three-dimensional presentation of the artifact.
+
+Every person, garment, object, and architectural plane exists only as ink
+contour and mineral pigment on silk. The same visible silk weave, age tone,
+and shallow surface irregularity continue beneath reserved areas and thin
+color washes, binding figures and setting to one physical picture plane.
+Adults are individualized 工笔 portraits with mature facial line differences,
+plausible adult proportions, clear joint structure, and supported poses, while
+every mark remains visibly ink or mineral color on silk.
+
+Describe plants, furniture, fabric, skin, hair, and contact as drawn contours
+and painted color shapes. Do not request pores, specular highlights, realistic
+reflections, naturalistic illumination, cinematic atmosphere, optical focus,
+or physically rendered materials. The artifact's silk weave and pigment
+granularity remain the dominant surface reality.
+
+BORDERLESS FULL-BLEED SILK GATE
+
+Use a borderless full-bleed composition. The aged prepared-silk painting
+extends continuously to every canvas edge, with painted architecture, reserved
+silk, garment shapes, foliage, or cropped objects naturally reaching and
+leaving the image boundaries. Show no visible mounting margin, mat, frame,
+border, or rectangular edge band.
+
+Keep age visible without outlining the picture. Edge patina must break, vary,
+and dissolve inward irregularly: one corner may show rubbed silk fibers, part
+of one side may carry tea-brown oxidation, and another edge may retain cleaner
+warm-ivory silk. Never connect these traces into a continuous rectangle, inner
+picture outline, evenly colored edge enclosure, decorative rule, or blank
+paper surround.
+
+ADULT CAST, CONSENT, AND CONTENT LEVEL
+
+Use exactly the requested cast. Every depicted person must be an unmistakably
+mature Han Chinese adult aged twenty-five or older, with stable facial
+structure, build, hairstyle, ornaments, makeup, social role, clothing, and
+relationship throughout the Theme. Make adulthood legible through mature
+facial proportions, composed behavior, adult social context, and
+individualized features rather than labels alone.
+
+Every interaction must be alert, mutual, warm, freely chosen, and responsive.
+Each adult must visibly initiate, guide, reciprocate, or redirect the shared
+action through hands, posture, gaze, and body orientation. Do not depict
+coercion, distress, intoxication, sleep, injury, humiliation, non-consensual
+voyeurism, fetishized age ambiguity, or an adult unable to stop.
+
+Honor the requested content level in every Theme and every Frame:
+
+- At aesthetic level, keep every adult fully dressed in complete Tang layers.
+  Allow private conversation, exchanged objects, teasing glances, intertwined
+  sleeves, shared music, a garden stroll, or a tender embrace, but conceal
+  breasts, buttocks, and genitals and show no sexual act or erotic self-touch.
+- At erotic level, show unmistakable adult sensuality through loosened or
+  partly removed garments, exposed breasts or buttocks, reciprocal intimate
+  touch, sensual self-touch, close body pressure, or another clearly erotic
+  but non-explicit interaction. Do not show penetration, oral sex, genital
+  contact, sexual fluids, or pornographic anatomical emphasis.
+- At hardcore level, show a clearly visible consensual adult sexual act
+  already occurring in every Theme and Frame. Establish it through direct
+  action language, compatible pelvis and limb geometry, visible contact,
+  relevant physical response, and reciprocal agency without directly naming
+  or describing male reproductive anatomy.
+
+At erotic and hardcore levels, do not hide the defining content behind a
+screen, curtain, quilt, sleeve, furniture, strategic crop, distant silhouette,
+symbolic flower, or poetic metaphor. The painting may remain elegant and
+restrained, but the selected content level must be visually unambiguous.
+
+MALE BODY VOCABULARY GATE
+
+When referring to a man's body, use only neutral external terms from this
+allowlist: body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows,
+hands, fingers, thighs, knees, legs, calves, ankles, feet, and toes.
+Inflected singular or plural forms are acceptable. Do not directly name any
+male reproductive body part, physiological state specific to it, slang term,
+coy synonym, erotic nickname, anatomical measurement, or object metaphor.
+
+At hardcore level, preserve clarity by naming the occurring act and describing
+pelvis alignment, limb placement, support, contact axis, clothing
+displacement, and mutual response. The vocabulary restriction changes only the
+wording, not the requested action, visibility, consent, or spatial precision.
+Enforce this silently and never quote or explain the gate in generated prose.
+
+TANG WORLD
+
+Set every Theme between 618 and 907 in a historically plausible Tang location
+such as Chang'an, Luoyang, Yangzhou, Chengdu, or a prefectural city within the
+empire. Prefer High Tang and Middle Tang civic and palace life: years in the
+Kaiyuan, Tianbao, Dali, or Zhenyuan reigns are welcome when they fit the
+scene. Name a precise year, season, time of day, city or ward, room or garden
+function, and adult social context.
+
+Rotate among palace terraces, inner-court galleries, official residences,
+scholar courtyards, music rooms, embroidery chambers, peony gardens, covered
+corridors, private baths adjoining a chamber, guest pavilions, and canal-side
+upper rooms. Do not turn every setting into a brothel, battlefield, or
+temple mural.
+
+Use coherent Tang architecture and furnishings: rammed-earth or brick
+platforms, vermilion columns, white plaster walls, bracket sets, lattice
+doors, hanging bamboo blinds, low 榻 and 床 platforms, 胡床 folding stools,
+round 坐墩, moon-bench seats, low 案 tables, painted 屏风, bronze lamps,
+incense burners, garment racks, and quilted bedding on a wooden platform.
+Keep joinery, scale, wood, lacquer, ceramics, bedding, and room use internally
+consistent. Do not import Ming luohan couches, Qing carved beds, Song
+yoke-back chairs as the dominant seat, or modern furniture.
+
+Do not mix in Song beizi and narrow silhouettes, Ming cloud-collar jackets as
+a default, Qing queues, Manchu court dress, qipao, modern cheongsam, Japanese
+kimono or obi, contemporary lingerie, synthetic fabrics, electrical light, or
+generalized pan-Asian decor.
+
+PERIOD AND CLASS REGISTER
+
+Keep one period register per Theme so body, brow, bun, makeup, and textile
+weight agree:
+
+- Early Tang: a slightly slimmer adult body than High Tang, longer narrow
+  brows, modest 花钿, lower piled hair, more 交领 or closer necklines, and
+  lighter gauze;
+- High Tang: the default court-lady canon of this brief: ample body, 阔眉 or
+  倒晕眉, 开额, 义髻, 簪花, generous neckline above a 齐胸裙, and heavy
+  mineral color;
+- Middle to Late Tang: still adult and ample, with more tilted 堕马髻 or
+  towering piles, optional 时世妆 of paler powder and darker 乌膏 lips, and
+  more agitated 披帛.
+
+Do not mix a High Tang flowered 义髻 with Song slenderness, or Late Tang
+乌唇 with Early Tang Sui-like slimness, inside one Theme.
+
+Give each adult a stable social class and dress her or him down or up to
+match. A noble or 命妇 may wear 大袖衫, 簪花, 步摇, and 臂钏. A household
+wife uses fewer pins, a simpler 高髻, and quieter damask. An adult attendant,
+when she is part of the requested cast, uses a lower bun or mature 双鬟, a
+plain 披帛, and little or no 花钿. Do not costume every woman as the same
+flower-crowned court lady.
+
+WOMEN'S CLOTHING
+
+Dress each adult woman as a designed Tang ensemble, named layer by layer from
+the body outward. Keep the garments historically specific even when loosened
+or removed. Describe fiber, weave, motif, color family, closure, and how
+weight hangs from shoulders, chest-band, or waist.
+
+Typical inner-to-outer order for a court or household woman:
+
+- 诃子 or 抹胸 as the chest wrap, usually plain silk or light brocade, tied
+  at the back or side;
+- an inner 襦 or 中单 with a close collar or a softly open neck;
+- a 齐胸襦裙 or high-tied 裙 whose waistband sits at or just below the
+  bust, with a long trailing skirt and visible 裙带 ends;
+- a short 襦, 半袖襦, or 半臂 of brocade or damask, often with a low
+  neckline in High Tang court dress;
+- for noble or ceremonial scenes, a sheer 大袖衫 of gauze with wide hanging
+  sleeves;
+- a 披帛, a long narrow silk shawl looping the shoulders and arms, with
+  ends that respond to gesture;
+- 罗袜 on natural adult feet;
+- 高头履, 云头履, 凤头履, or patterned 锦靴, with upturned toes when the
+  feet are visible.
+
+Name the skirt more precisely when it is the graphic center: a 石榴裙 in
+pomegranate red, a 间色裙 of vertical color panels, or a damask skirt with
+宝相花. Long 裙带 hang from the high band and may end in 同心结; they are
+separate ribbons, not a modern belt.
+
+A 半臂 is a short, elbow-length jacket of contrasting 锦, worn over the 襦
+and shorter than the skirt band is high. It closes at the chest, not with
+later frogs or zippers. A 披帛 is typically more than body-length: one common
+drape passes behind the neck, loops each forearm, and lets both ends fall;
+another knots loosely at the chest and trails. Paint it as a flying but
+weighty silk strip with continuous edges, never as opera 水袖 attached to
+the garment.
+
+High Tang court dress may show a generous neckline and bare upper chest above
+the skirt band while remaining fully dressed at aesthetic level: the 齐胸裙
+and 披帛 still complete the costume. Do not turn this historical neckline
+into modern lingerie, a corset, or an off-the-shoulder evening gown.
+
+Hu-style riding or outing dress is permitted when the scene needs it: women
+as well as men may wear a round-collar or lapel 窄袖袍, striped or plain
+trousers, a 蹀躞带 with hanging plaques and small useful fittings, and high
+锦靴. Travel veils such as 帷帽 or 幂篱 may appear outdoors. These are Tang
+fashions worn by Han adults, not an excuse to import later Central-Asian
+fantasy armor.
+
+Skirt and robe motifs should stay inside Tang textile language: 宝相花,
+peony sprays, 卷草, 联珠纹 roundels, paired birds or animals inside roundels,
+grapevine, small clustered flowers, and 晕繝 graded color bands at sleeve or
+skirt borders. Name the weave: 锦, 绫, 罗, 纱, 縠, or embroidered silk.
+Summer favors 纱 and 罗; winter favors 锦 and lined damask. Gold-wrapped
+thread may appear as a narrow luxury edge, not as a metallic costume.
+
+Keep layer logic visible. A 半臂 is shorter than the 襦 beneath it. A 披帛
+is a separate length of silk, not a glued-on scarf. Skirt volume falls from
+the high band in long vertical folds; it does not cling like jersey. Gauze
+reveals the color of the layer below as a painted transparency, not as
+photographic see-through skin.
+
+Do not dress women in Song 褙子, Ming 比甲 as the main coat, Qing 旗装,
+凤冠霞帔, opera 水袖, modern revival hanfu with elastic chest-high tubes or
+incorrect overlapping collars, Japanese furisode, Western bodices, zippers,
+lace bras, or stiletto shoes.
+
+MEN'S CLOTHING
+
+Dress each adult man in a complete Tang official, scholar, or household
+ensemble with stable rank color and headgear.
+
+Typical inner-to-outer order:
+
+- trousers and an inner 中单;
+- a 圆领缺骻袍, the round-collar robe with side slits from the hip down for
+  stride or riding, or a 襕衫 for a scholar;
+- a leather 革带 with 銙 plaques sitting at the true waist; officials may
+  add a 鱼袋 hung from the belt;
+- 幞头 in a shape that fits the role: soft-legged, stiff-legged, or
+  spreading-legged court 幞头, wrapped so the cloth covers a bound hair knot
+  and the two 脚 hang or project as designed, not as a modern hat perched on
+  loose hair;
+- 乌皮靴 or patterned boots; indoor scenes may show cloth shoes once boots
+  are removed beside the 榻.
+
+Robe color should follow a plausible Tang hierarchy without turning the
+picture into a rank chart: purple or deep crimson for high office, scarlet
+or pomegranate for mid officials, green or cyan for lower office, and quieter
+plain silk for private scholars. Motifs stay restrained compared with women's
+brocade: small roundels, dark damask, or unpatterned silk. A private indoor
+man may loosen the collar and set the 幞头 aside, revealing a mature topknot
+secured by one pin.
+
+Do not give men Qing queues, Song square official hats as the default, Ming
+winged 乌纱帽, Japanese topknots, or modern suit collars. Facial hair, when
+present, must look like a mature Tang beard or whiskers painted with fine
+strokes, not a contemporary fade.
+
+HAIRSTYLES
+
+Give every adult a stable, historically adult Tang hairstyle and keep it
+identical across Frames of the same Theme.
+
+Women must wear mature coiled or piled styles suited to married or otherwise
+adult status. Preferred families include 高髻, 峨髻, 惊鹄髻, 堕马髻,
+抛家髻, 反绾髻, 盘桓髻, 百合髻, 同心髻, and 凌云髻. High Tang court
+women often carry a tall, forward-leaning or broadly piled bun that adds
+height above the crown; that volume is commonly an 义髻 or 假髻 of extra
+hair, lacquered and padded, not a small modern bun of the wearer's own hair
+alone. A 堕马髻 slumps to one side with deliberate asymmetry. Flowers may be
+set into the bun, but the bun itself remains sculpted hair, not a flower hat.
+
+Open the forehead: an 开额 with a high, rounded hairline leaves a broad
+panel for 花钿. Temple hair is 蝉鬓, thin cicada-wing locks swept back and
+slightly transparent at the edge, not thick modern sideburns or bangs.
+Describe the hair as painted ink masses with fine edge strands: that high
+hairline, 蝉鬓, a few escaped hairs at the nape, and a bun whose coil
+direction is readable. Hair is generally black, with a slightly blue-black
+ink sheen painted as a hard silhouette, not as glossy CGI hair. Do not add
+modern bangs, layered salon cuts, ponytails, loose waist-length waterfall
+hair as the complete style, or Song-style flattened 冠梳.
+
+Do not use 双丫髻, 垂髫, 总角, or any other child's or very young unmarried
+girl's hair. Double side-buns are allowed only when they are mature 双鬟
+worn high by an adult, with adult facial structure and adult clothing.
+
+Men's hair is bound under the 幞头 or, in private, drawn into a mature top
+knot. Do not show loose contemporary long hair on men unless a private
+unwrapping of the 幞头 is the scene, and even then keep the hair long enough
+only to tie, not a fantasy mane.
+
+HAIR ORNAMENTS
+
+Treat ornaments as designed metal, jade, pearl, kingfisher, and flower
+objects with weight, pins, and placement, not as generic sparkles.
+
+Build each woman's head from a small coherent set:
+
+- structural pins such as 金钗, 银钗, 玉簪, or 搔头 locking the bun;
+- one swaying 步摇 or 翠翘 whose dangling parts would move if the head
+  turned;
+- optional 梳篦 seated in the bun;
+- optional 金钿, 宝钿, or 胜 plaques;
+- optional 簪花: peony, lotus, crabapple, or silk-flower clusters for High
+  Tang court display;
+- pearls, small jade rings, or kingfisher inlay as accents, not a crown.
+
+A 步摇 has a pin shaft plus a springing or dangling unit of gold, pearls, or
+leaf-shaped drops; paint the shaft entering the bun and the drops hanging
+beside the temple. 簪花 sit on top or slightly forward of an 义髻, with
+stems or wires that could actually hold. Place ornaments where a pin can
+enter the bun: left and right of the coil, at the crown, or slightly forward
+on an 峨髻. Keep the count restrained: three to seven visible pieces is
+enough for a noble woman; a household woman may wear one comb and two pins.
+
+Men's headgear is the 幞头 itself. A small hairpin may secure a private
+knot. Do not load men with women's 步摇.
+
+Do not use Japanese kanzashi ensembles, Qing court-pearl boards, bridal
+phoenix crowns, opera 凤冠, rhinestones, or plastic flowers.
+
+BODY JEWELRY AND SMALL ACCESSORIES
+
+Beyond the head, give each woman a short, coherent accessory set that
+matches class:
+
+- 臂钏 as one or two rigid rings on the upper arm, highly typical of Tang
+  court dress and often visible when a 半臂 or 大袖衫 opens;
+- optional 手镯 at the wrist, 耳坠 at a visible ear, a small 香囊 at the
+  skirt band, or a 指环;
+- a 纨扇, round 铜镜, or cup in the hand when the action needs an object.
+
+Keep metal as painted gold, silver, or jade silhouettes with a few interior
+lines, not as chrome highlights. Do not pile on 璎珞 as if this were a
+Buddhist statue, and do not add modern watches, eyeglasses, or handbags.
+
+BODY AND STATURE
+
+Tang figure painting prefers a mature, ample, grounded body, especially for
+High Tang court women. Do not default to later-dynasty slenderness or to
+modern fashion-model proportions.
+
+Women:
+
+- age twenty-five or older, with mature facial bone, not a teen face on a
+  large body;
+- a full, rounded face: round, oval, or softly square, with cheeks that take
+  rouge; a light double chin is historically welcome;
+- a high 开额 forehead, small elongated 丹凤 or fine eyes, a short-to-medium
+  nose, and a small closed 樱桃 mouth; do not use large anime eyes, heavy
+  Western lids, or a toothy smile;
+- a short-to-medium neck, rounded shoulders, and a substantial bust that
+  fills the 诃子 and high skirt band;
+- a thicker waist than Song or Ming beauties, with a continuous torso rather
+  than an hourglass cut-in;
+- full upper arms, rounded forearms, and small but adult hands, often 笼袖
+  or holding a fan, cup, pin, or 琵琶 with softly bent fingers;
+- full hips and thighs under the skirt, with weight that sits on 榻, 墩, or
+  shoes;
+- natural, unbound adult feet in 罗袜 and 高头履; toes and foot length are
+  ordinary adult size, never 缠足, never Song or Qing lotus shoes, never
+  child-scale feet on an adult body;
+- height in a middle adult range; presence comes from volume and drapery, not
+  from tall thin limbs.
+
+Painted 三白 may lighten forehead, nose ridge, and chin as three reserved
+pale zones inside the powder ground. That is a face-painting device, not
+Western contouring.
+
+Typical supports: standing with weight on one foot and 披帛 hanging; sitting
+on a 榻 with both legs folded to one side and the skirt pooling; sitting on
+a 坐墩 with 高头履 visible; kneeling-sitting on a platform. Do not default
+to modern chair sitting with a ninety-degree knee, fashion contraposto, a
+hand-on-hip pin-up, or a Buddhist lotus seat.
+
+Men:
+
+- mature faces with clear jaw, nose wing, and brow; officials may be broader,
+  scholars slightly longer in the face;
+- a stable torso inside the 圆领袍, neither bodybuilder nor reed-thin;
+- adult hands that can hold a 笏, cup, or scroll;
+- standing weight through boots, or seated weight through the 榻;
+- natural adult feet, never later bound-foot stylization.
+
+Keep anatomy human and painted. Joints bend in natural ranges. Shoulders,
+ribcage, pelvis, knees, and feet must agree with the pose. Vary individuals
+across Themes: one woman more plump, another slightly firmer; one man
+square-faced, another narrower. Never collapse the run into identical doll
+faces, childlike heads, anime eyes, Barbie waists, or elongated fashion legs.
+
+MAKEUP
+
+Tang women's makeup is a graphic, readable system painted on the silk face.
+Describe it as mineral and organic pigment sitting on a pale powder ground,
+not as modern contour makeup.
+
+Build each adult woman's face from these layers, all historically compatible
+with the Theme's period register:
+
+- 铅粉 or clam-white 妆粉 over forehead, nose ridge, and cheeks, leaving a
+  matte shell-white or warm pale ground, with optional 三白 on forehead, nose,
+  and chin;
+- 胭脂 in one named family: 桃花妆 for a light blossom flush, 飞霞妆 for a
+  broader rose wash, or 酒晕妆 for a heavier wine-red cheek;
+- brows in one Tang family: High Tang 阔眉 or 倒晕眉 that are short, wide,
+  and softly darkened; or 蛾眉, 远山眉, or 柳叶眉 in a narrower register;
+  黛 may read slightly blue-black;
+- 花钿 on the 开额: a plum blossom, peach bloom, gold foil, 翠羽 inlay,
+  painted bird, coin, or small paper cutout, clearly placed between the brows
+  or on the upper forehead;
+- 斜红 as a crescent, new-moon, or two short slashes of red near the outer
+  temple, used when the Theme wants a stronger court face;
+- 面靥 as a small red or gold dot near each mouth corner;
+- optional 额黄 as a pale yellow forehead wash in earlier or more
+  conservative court looks;
+- lips as a small concentrated 樱桃 or 檀唇 mouth in cinnabar, rouge, or
+  sandalwood-red, with the color densest at the center; late-Tang 时世妆 may
+  use darker 乌膏, but keep it an adult fashion, not a goth overlay.
+
+花钿 is a physical applique or painted plaque sitting on powder, not a
+tattoo and not a bindi. 斜红 sits on the temple beside 蝉鬓, not on the
+cheek like modern blush streaks. Eyes stay small, elongated, and finely
+lined; do not add eyeshadow, false lashes, or eyeliner wings.
+
+Keep makeup asymmetrical only in tiny human ways: one 面靥 slightly stronger,
+one brow a hair wider. Do not mix a full High Tang 阔眉 with modern carved
+eyebrows, smoky eyeshadow, highlighted nose contour, or ombre lipstick.
+Men may have no cosmetic beyond a healthy painted complexion, or a very
+light powder on an official attending court; do not give men 花钿.
+
+Faces remain gongbi faces: three bounded skin tones, fine eye lines, and
+makeup as flat pigment shapes. Rouge is a transparent wash; 花钿 is a small
+opaque or gold shape; brows are repeated hair-thin strokes.
+
+PERSON IDENTITY CARD
+
+Every Theme must mint one identity card per adult and keep it unchanged across
+Frames. Every Frame must restate that card in left-to-right order before
+lingering on furniture or mood. Density should match a costume-plot: name,
+age, class, face, hair, ornaments, makeup, body, and full clothing stack all
+appear as visible facts, not as a later footnote.
+
+For each adult lock all of the following:
+
+- a Tang-plausible name (surname plus given name) and explicit woman or man;
+- an age of twenty-five or older;
+- class and role: 命妇, household wife, adult attendant, official, scholar,
+  or household musician belonging to the requested cast;
+- the Theme's period register;
+- face: shape, 开额, eye shape, brow family, mouth, and the full makeup
+  stack;
+- hair: bun family, 义髻 or own hair, coil direction, 蝉鬓;
+- each ornament with material and placement;
+- body: fullness, shoulder, waist, bust or chest, hands, natural feet;
+- clothing from the body outward, each layer with weave, color family, motif,
+  and how it hangs;
+- jewelry and handheld object;
+- footwear.
+
+Do not leave a woman described as "in Tang dress" or a man as "in a robe."
+If two women share a Theme, their buns, 花钿 shapes, 披帛 colors, and skirt
+families must differ. Restate garment state for the selected content level in
+the Frame, but do not change the designed pieces.
+
+SCENE AND ACTIVITY POOL
+
+Choose one adult situation per Theme and stage it with original blocking. Do
+not reconstruct a named famous painting. Invent equivalents freely; the
+following families show the intended specificity.
+
+- 对镜梳妆: a grape-vine 铜镜 on a low stand or held in one hand; comb,
+  powder box, and a pin dish on a 案; one woman inserts a 钗 while another
+  steadies the 义髻 or holds the mirror.
+- 庭中簪花: peony, lotus, or crabapple stems being set into a bun; fallen
+  petals on a brick platform; a flower basket on the 榻 edge.
+- 捣练熨帛: a long white silk length over a pounding stone or low board;
+  wooden mallets; an iron pan of coals for smoothing; adults leaning, pulling,
+  or folding the cloth.
+- 宫乐: 琵琶 held across the body, 箜篌, 筝, 拍板, or 笙; a low 案 with
+  a wine ewer; listeners seated on 坐墩 with 披帛 still.
+- 烹茶: tea 鍑, 碾, 罗, and spoons on a 几; steam as a pale wash, not as
+  photographic vapor; two adults sharing the mill or passing a bowl.
+- 对弈: 围棋 or 双陆 with a readable board geometry and a small number of
+  pieces; one hand hovering a piece, the other adult watching the board.
+- 听琴: a 琴 across the 榻; one adult's hands on the strings, the other
+  turned toward the sound, 纨扇 resting.
+- 凭栏游春: vermilion rail, willow or lotus water beyond as a flat band;
+  披帛 lifted by a painted breeze; 高头履 on the platform.
+- 牡丹花下: tree peonies as large mineral-color blooms, not Western oil
+  roses; one adult pointing or pinning a bloom, another holding a basket.
+- 刺绣: a hoop, stand, and colored silk threads; needle in one hand, fabric
+  taut in the other.
+- 夜宴灯下: 连枝灯 or bronze lamp as a painted motif without cast glow;
+  fruit, wine, and a 琵琶 set aside.
+- 调鹦鹉: a parrot on a perch or wrist; no animal in intimate contact.
+- 胡服试骑 or 马球准备: 窄袖袍, 蹀躞带, 锦靴, a horse as a painted
+  object if needed; polo mallets optional; keep the horse out of sexual
+  contact and out of the requested human cast.
+- 乞巧 or 玩月: needle, thread, or a moon disc as a pale reserved-silk
+  circle; rooftop or garden platform.
+- 展卷: a blank or faintly ruled scroll with no readable characters; hands
+  holding the rollers.
+- 投壶: a slender pot and arrows; one adult aiming, another counting.
+- 浴后理衣: a basin, towel, and garments on a rack; coverage follows the
+  selected content level; everyone remains alert and standing or seated, never
+  asleep.
+
+Keep every human in the scene inside the requested cast. If the family
+normally implies a servant, either assign that role to a requested adult or
+choose a self-contained version.
+
+OBJECT AND FURNISHING POOL
+
+Use a few complete, scaled objects. Describe construction, not treasure-hunt
+labels, and do not cite archaeological hoards or museum inventory numbers.
+
+Furniture: low 榻 with mat and low rail; 床 platform with curtains that
+part; round 坐墩 or 筌蹄; 胡床 folding stool; low 案 or 几; multi-panel
+屏风 with birds, garden, or blank silk; 衣架; brick or rammed-earth
+platform; vermilion column and simple bracket.
+
+Mirrors and grooming: circular bronze 海兽葡萄镜 on a stand or in the hand;
+lacquer 粉盒; comb and 篦; pin dish.
+
+Vessels: lotus-petal stemmed cup; bird-head ewer; round 三彩 or plain
+ceramic jar; wine ewer and ear-cups; tea 鍑, mill, and sieve.
+
+Light and scent: 连枝灯, single bronze lamp, 香炉 or animal-shaped censer,
+with flame or smoke as bounded color, not illumination.
+
+Music: pear-shaped 琵琶, 箜篌, 阮咸, 筝, 拍板, 笙, 琴.
+
+Play: 围棋 board, 双陆, 投壶 pot, 纨扇, round or folding fan.
+
+Garden: peony, willow, lotus, crabapple, plantain, taihu-like rock used
+sparingly and not in Ming garden density.
+
+Every object needs a support, a scale relative to a hand or 榻, and a job in
+the present action. Do not fill the silk with an antique shop.
+
+POSE AND GESTURE POOL
+
+Choose poses that Tang figure painting can hold in shallow space:
+
+- standing, weight on one foot, 披帛 hanging, 笼袖 or one hand on the rail;
+- walking with a small step, skirt folds trailing, 高头履 visible;
+- sitting on a 榻 with both legs folded to one side, skirt pooling;
+- sitting on a 坐墩, feet together or slightly apart, toes of the shoes
+  showing;
+- kneeling-sitting on a platform, spine upright;
+- leaning on a vermilion rail, torso three-quarters to the picture plane;
+- raising both hands to insert a 钗 or flower into the 义髻;
+- holding a 铜镜 beside the face, other hand touching 蝉鬓 or 面靥;
+- 琵琶 across the torso, left hand on the neck, right hand near the strings;
+- both hands on a 琴 or tea mill;
+- one adult adjusting the other adult's 披帛, pin, or skirt band.
+
+Keep torsos mostly parallel to the silk. Hands have five fingers and a named
+task. Do not use fashion contraposto, hand-on-hip pin-up, yoga, modern chair
+sitting at a ninety-degree knee as the default, or a toothy laugh.
+
+PRIVATE NARRATIVE AND AGENCY
+
+Make the emotional tone intimate, composed, and observant rather than
+slapstick. Build each Theme around a precise adult situation: a music gathering
+after guests leave, two women comparing peony hairpins, an official and his
+wife closing a gallery against spring wind, companions sharing tea beside a
+lotus channel, or a scholar setting down a 琴. These are examples, not fixed
+templates.
+
+Give every adult an independent intention and a visible contribution. Avoid
+one active person paired with a passive decorative body. Make each woman's
+desire, judgment, and agency unmistakable through her gaze, hand placement,
+posture, garment control, and response. Never infer dominance, profession, or
+status from gender, and never use unequal status as a substitute for consent.
+
+Use one small present-tense narrative trace to make the image lived-in: a
+fallen 步摇, cooling incense, a half-rolled scroll, a displaced screen,
+spilled tea, an unfinished embroidery frame, a 披帛 slipped from one
+shoulder, a 铜镜 still in the hand, or shoes left at the 榻 edge. The trace
+must support the adults' action without becoming a comic spectacle or
+introducing an unrequested onlooker.
+
+Every human mentioned in the Theme or Frame must belong to the requested cast
+and be visibly present. Do not introduce an absent spouse, owner, servant,
+guest, client, official, watcher, or other off-scene person as backstory,
+motivation, implied witness, or recipient of a letter. Keep the private
+situation complete within the depicted adults.
+
+LEVEL-AWARE CLOTHING AND BODY
+
+Make Tang silk, gauze, brocade, damask, and embroidered edging major graphic
+structures. Describe each adult's outer layer, under-layer, sash or 裙带,
+motif, color family, and garment state. Use garment folds to clarify gravity,
+weight, reach, and movement rather than to conceal the selected content
+level.
+
+At aesthetic level, keep the complete ensemble closed and correctly layered.
+At erotic level, collars, 半臂, skirts, robes, or 诃子 may loosen, open, or
+fall aside while remaining recognizable. At hardcore level, adults may be
+partly or fully nude, but retained garments, folded robes, displaced 披帛,
+shoes, hair ornaments, and bedding must remain historically specific and
+compositionally important.
+
+Keep human anatomy proportional and physically coherent. Do not imitate the
+enlarged anatomy, aggressive foreshortening, or grotesque exaggeration
+associated with other erotic traditions. Use mature round, oval, square, and
+long faces; varied ample builds; natural joint ranges; and individualized
+hands, feet, hairlines, and expressions. Avoid doll faces, identical
+beauties, childlike proportions, impossible flexibility, and generic pin-up
+poses.
+
+HUMANIZED FIGURE DETAIL
+
+Human specificity comes from line drawing and bounded washes, never optical
+realism. Give each adult an individualized mature portrait with specific
+facial bone structure, subtle facial asymmetry, unequal eyelid folds, distinct
+brows, nose wings, lip shape, jaw, hairline, ears, fingers, nail beds, and
+age-appropriate expression. The result is convincingly human but
+unmistakably painted.
+
+Within each contour-enclosed skin shape, use exactly three restrained skin
+tones: shell-white or pale ochre base, one transparent warm flesh wash at
+cheeks, joints, palms, and contact areas, and one narrow deeper line-wash
+beneath the jaw or overlapping limb. Keep transitions visibly brushed and
+bounded, never glossy, airbrushed, continuously shaded, or cool-highlighted.
+
+Use plausible adult shoulder, ribcage, abdomen, pelvis, knee, hand, and foot
+proportions, biased toward Tang fullness rather than later slenderness.
+Convey support through contour overlap, bent-joint geometry, cushion
+deformation, garment tension, and hand placement rather than realistic skin
+indentation, muscle rendering, or sculpted volume. Preserve small drawn
+asymmetries instead of smoothing every figure into an idealized diagram.
+
+Expressions carry adult attention and reciprocal response through focused
+inked eyes, asymmetric mouth contours, a light rouge cheek wash, and
+deliberate hand placement. Keep every humanizing detail subordinate to the
+continuous silk surface, flat silhouette, and fine 工笔 line.
+
+SPATIAL AND CONTACT GEOMETRY
+
+Build each Frame as one solvable arrangement before adding ornament.
+Establish image-left, center, image-right, foreground, middle ground, and
+background. State each adult's torso and pelvis direction, face turn, primary
+support surface, secondary support limb, and visible hand task without
+contradicting those positions later.
+
+For intimate or explicit contact, place adults at compatible heights,
+distances, pelvis angles, joint ranges, and contact axes. Every center of
+mass must fall over a credible base such as a 榻, 床, 坐墩, 胡床, floor,
+column base, cushion, or another adult whose own support is clear. Curtains,
+loose 披帛, screens, fans, lamps, and delicate tables cannot carry adult
+weight.
+
+Keep every body singular and traceable: one head, two arms, two hands, two
+legs, and two feet per adult. Identify hands by owner and anatomical side
+where bodies overlap. Every visible limb must follow an uninterrupted path
+from shoulder or hip to endpoint. Robes wrap, hang, bunch, and compress
+around bodies instead of passing through them; cushions and bedding deform
+under actual weight while hardwood frames remain rigid.
+
+Use partial occlusion only when the hidden continuation remains obvious.
+Reject unsupported bodies, intersecting anatomy, reversed joints, impossible
+spinal rotation, extra limbs, ambiguous ownership, disconnected hands,
+contradictory left-right directions, or contact geometry hidden behind
+decorative furniture.
+
+LINE DISCIPLINE
+
+Render the painting through controlled Tang 工笔 line. Use fine, continuous,
+pressure-sensitive ink contours with 游丝描 gossamer-line delicacy for skin
+and facial features, 铁线描 iron-wire steadiness for garments, 披帛, and
+furniture, and hair-thin repeated strokes for brows, lashes, bun coils, textile
+edges, plant veins, and carved detail.
+
+Keep contour weight varied but restrained. Faces, fingers, toes, garment
+openings, and the defining contact must remain precise at close inspection.
+Use ruled-line architectural discipline for platforms, columns, screens,
+tables, lattice, and floor edges. Curves and straight edges must meet cleanly
+without vector-like sterility.
+
+Do not use ukiyo-e keyblock outlines, comic inking, calligraphic splash
+marks, dry-brush expressionism, boneless flower painting as the dominant
+method, freehand 写意, ink-wash abstraction, Western hatching, airbrushed
+edges, or digital line-art uniformity. Do not imitate Wu-Daozi-like flying
+drapery as a splashy brush performance; keep court-figure drapery ordered.
+
+LAYERED MINERAL COLOR
+
+Use Tang 绢本重彩 logic: opaque mineral fields over a silk ground, with
+limited transparent washes for flesh, gauze, and blush. Combine precise
+local-color fills with thin successive glazes. Keep faces and bodies inside
+narrow value ranges with minimal tonal modeling: exactly three restrained
+skin tones plus fine contour detail. Use a pale base, one transparent warm
+flesh wash, and one narrow overlap line-wash. Do not round forms with
+continuous gradients, cool counter-light, cast shadows, chiaroscuro, glossy
+highlights, or Western volumetric rendering.
+
+Preserve mineral-pigment materiality. 石青 and 石绿 may appear slightly
+granular and opaque in protected details; 朱砂 and 胭脂 remain warm but
+controlled; 赭石, 藤黄, soot ink, and pale 蛤粉 or lead-white complete the
+hierarchy. 泥金 may appear only as a small luxury accent on jewelry,
+textile edges, furniture fittings, or 花钿.
+
+Every Theme and Frame must explicitly name a Tang mineral-color palette of
+five to seven principal color families:
+
+- an aged warm-ivory or pale-tea prepared-silk ground;
+- soot ink, charred ink, or dark blue-black as the linear anchor;
+- one or two warm colors such as 胭脂, 朱砂, 赭石, pomegranate, or 藤黄;
+- one or two cool colors such as 石青, 石绿, or muted blue-green;
+- one quiet textile neutral such as moon white, lotus-root pink, apricot,
+  sandalwood brown, or muted indigo; and
+- at most one restrained shell-white or 泥金 accent.
+
+Let the warm silk ground occupy the largest continuous area. Concentrate
+rouge, cinnabar, and ochre in garments, lips, cheeks, 披帛, and selected
+objects; use 石青 or 石绿 to balance the warm field in 半臂, garden leaves,
+or a screen panel. Keep natural skin inside the palette rather than turning
+it into a separate beauty color system. Avoid rainbow color, neon saturation,
+teal-orange grading, uniform beige, muddy brown monochrome, and Japanese
+nishiki-e color-block logic.
+
+FLAT PICTURE-PLANE GATE
+
+The flat picture plane must dominate the first read, including at thumbnail
+size. Arrange adults, furniture, curtains, and architecture as two to four
+shallow, stacked, overlapping bands parallel to the silk surface. Bodies
+remain anatomically coherent, but their silhouettes, garment contours, and
+enclosed local-color shapes carry the form; they must not look sculpted,
+cinematic, or three-dimensional.
+
+Use contour-enclosed color fields and minimal tonal modeling. Keep each skin,
+garment, wall, floor, and furniture area within a narrow tonal span. Garments
+and architecture use two or three closely related values; skin uses exactly
+three bounded tones for mature human specificity. Let a thin blush wash, a
+narrow garment-edge wash, or a restrained under-chin line-wash suggest turning
+without creating rounded volume. Use no volumetric light-and-shadow modeling,
+cast shadows, spotlight falloff, glossy skin highlights, deep recessive
+darkness, atmospheric perspective, or realistic light wrapping around bodies.
+
+Keep torsos and major limbs mostly parallel or gently oblique to the picture
+plane. Avoid aggressive foreshortening, extreme low or high views, dramatic
+depth recession, and objects projecting toward the viewer. Architectural
+platforms, screens, 榻 rails, and floor edges establish shallow spatial order
+without converging into a Western vanishing point.
+
+The prepared-silk surface must remain visibly continuous through reserved
+areas and thin washes. Blank wall, sky, floor, and curtain zones should read
+as aged silk carrying painted shapes, not as a physically deep room. Reject
+any Frame whose first impression is a realistic interior populated by
+volumetric people rather than a flat Tang silk painting.
+
+CHINESE PAINTING SPACE
+
+Use scattered perspective, an oblique or gently elevated viewing position,
+and ordered shallow overlapping planes. Build only enough depth to clarify
+placement through stacking, architectural frames, textile overlap, and
+reserved silk. Do not use scale recession or a single Western vanishing point
+to create an illusionistic room. Let platforms and screens stabilize the
+adults' curving forms while remaining visibly parallel to the painted surface.
+
+Prefer a horizontal handscroll segment or a near-square panel, with occasional
+vertical panels or a round 纨扇 format when suited to the Theme. Compose a
+foreground clue, dominant middle-ground adult interaction, and sparse
+architectural or garden background. Reserve meaningful blank silk or a quiet
+wall plane so ornament does not overwhelm the figures.
+
+Use no lens terminology, technical capture specification, cinematic lighting,
+depth of field, bokeh, photographic realism, dramatic rim light, volumetric
+light, or modern color grading. Do not describe illumination as physically
+realistic. Represent time through bounded local color, pale silk reserves,
+and restrained wash zones: a lamp, candle, moon, or lattice appears as a
+painted motif without directional cast shadows, glow falloff, reflected
+light, or atmospheric depth.
+
+SYMBOLISM AND OBJECT RESTRAINT
+
+Use at most one or two symbolic motifs in a Frame. Appropriate choices
+include peonies, lotus, willow, crabapple, mandarin ducks, paired
+butterflies, pomegranate, grapes, a parrot, a 铜镜, a half-open curtain, a
+leaning flower branch, or fallen hair ornaments. Symbols enrich mood and
+composition but never replace visible human action.
+
+Select only a few functional objects: grape-vine bronze mirror, incense
+burner, candle stand, round fan, 三彩 or plain ceramic vessel, lacquer box,
+tea bowl, wine ewer, 琵琶, 琴, 箜篌, music score, scroll, comb, hairpin,
+embroidered shoe, 披帛, garment rack, or embroidery hoop. Every object must
+have a plausible scale, support, location, and narrative role. Avoid turning
+the Frame into an antique inventory.
+
+TEXT AND ATTRIBUTION GATE
+
+Do not generate readable Chinese, pseudo-calligraphy, poems, captions, speech
+balloons, titles, signatures, artist names, workshop names, reign marks, or
+imitated colophons. A title slip must remain blank. At most one or two small,
+faded, abstract vermilion collector-seal shapes may touch a lower image edge;
+they must contain no legible or simulated characters and must not overlap a
+face, body, or defining action.
+
+Do not imitate, attribute, name, sign, or reproduce a known historical
+composition or living artist's style. Describe the work only as an anonymous
+Tang-dynasty silk figure-painting panel.
+
+AGED SILK AND PIGMENT PATINA
+
+Age must be visible at first glance and thumbnail size. Make the work read as
+a carefully preserved but unmistakably old silk painting, with painting
+technique contributing roughly two-thirds of the impression and one-third
+from visible material age. The figures and line work remain legible, but the
+warm silk field, pigment condition, edge wear, and handling history must
+register before close inspection.
+
+Give every Frame one field-scale age structure: visibly uneven warm-tea silk
+across reserved walls, floor, sky, and blank areas; one broken patch of
+darker tea-brown edge oxidation dissolving inward from part of an image edge;
+one gently rubbed corner; and one shallow age crease crossing only blank silk
+or architecture. Keep protected mineral color noticeably richer than exposed
+outer pigment. This structure belongs to the full-bleed silk picture surface,
+not a separate frame, mounting border, tabletop, gallery display, or
+photographic overlay.
+
+Every Theme and Frame must include three to five localized, physically
+plausible age cues in addition to that field-scale structure:
+
+- visible silk warp and weft, paper fiber, or a restrained fold clearly
+  visible in reserved areas;
+- 石青 or 石绿 remaining jewel-like in protected recesses while exposed
+  grains show visible powdering or small losses;
+- 胭脂, 藤黄, or light organic dye naturally fading more than soot ink,
+  朱砂, mineral green, or protected textile color;
+- a few softened outer ink contours, pigment flakes, abraded silk fibers, or
+  faint handling polish away from faces and defining contact; and
+- one muted collector-seal shape or blank title slip touching a lower image
+  edge without creating a surrounding margin.
+
+Age must follow exposure, handling, folding, pigment chemistry, and mounting
+construction. Protect faces, hands, anatomy, eye lines, garment structure,
+hair ornaments, makeup, and the defining interaction from major damage.
+Preserve crisp ink in important contours and stronger mineral color in
+sheltered areas.
+
+Do not apply a global sepia filter, yellow veil, gray desaturation,
+photographic grain, scratches across the entire image, vignette, faded-film
+effect, burned edges, heavy foxing, mold, broad water stains, dense
+wormholes, dramatic tears, fake craquelure over skin, artificial ink bleed,
+or generalized dirt. Do not make the painting look abandoned, excavated,
+scorched, or digitally distressed.
+
+THEME CONTRACT
+
+Each Theme must establish:
+
+- a precise Tang year, city, season, hour, and private social setting;
+- one scene family with its few functional objects;
+- the exact recurring adult cast, each with a complete identity card: name,
+  age, class, period register, face, makeup, hair, ornaments, body, clothing
+  stack, accessories, and footwear;
+- the selected content level proven by current visible action and reciprocal
+  agency;
+- one coherent image-left-to-image-right body map with credible supports,
+  contact geometry, reach, occlusion, and limb ownership;
+- one near-square, horizontal, vertical, 纨扇, or handscroll-segment
+  composition;
+- one 游丝描 and 铁线描 line hierarchy and one architectural structure;
+- one first-read flat picture-plane plan using two to four shallow stacked
+  bands and contour-enclosed color fields;
+- one five-to-seven-family mineral-color palette with layered-wash behavior;
+- one restrained present-tense narrative trace and at most two symbolic
+  motifs;
+- a small set of Tang furniture, textiles, and functional objects; and
+- one field-scale borderless aged-silk structure plus three to five localized
+  pigment, ink, fiber, or handling cues.
+
+Vary class setting, city, room function, scene family, season, relationship,
+pose, garment state, textile motif, furniture, period register, hairstyle
+family, 义髻 height, 蝉鬓, ornament set, 臂钏 and other accessories, makeup
+family, body fullness, skirt type, 披帛 drape, foreground clue, symbolic
+motif, image format, viewing height, dominant diagonal, palette anchor, cool
+accent, blank-space shape, and age pattern. Do not repeat one bedchamber,
+couch pose, spilled-tea device, peony symbol, color hierarchy, or furniture
+arrangement across Themes. Do not restage a famous surviving Tang composition.
+
+FRAME CONTRACT
+
+Every Frame is one standalone Tang silk figure-painting design from the same
+Theme, not a storyboard, sequence, collage, split screen, contact sheet,
+multi-panel comic, framed museum object, or photograph of a painting. Begin
+every Frame with exactly these five sentences:
+
+"Full-canvas continuous-silk flat archival facsimile of a hand-painted antique
+Tang-dynasty 绢本重彩 figure-painting panel. The aged prepared-silk painting
+extends continuously to every canvas edge as an uninterrupted uneven warm-tea
+field. Every person, garment, object, and architectural plane exists only as
+ink contour and pigment on silk; adult figures use individualized mature
+facial lines, ample Tang proportions, clear joints, and exactly three bounded
+skin tones in the same silk plane. Flat 工笔 picture plane with shallow
+stacked spaces, contour-enclosed color fields, dominant flat silhouettes, no
+volumetric light-and-shadow modeling or cast shadows.
+Fine 游丝描 and 铁线描 contours, thin layered mineral-color washes, ruled
+platforms and screens, visible silk weave, softened outer pigments, rubbed
+silk fibers at one isolated edge, and small age creases."
+
+Immediately follow with one compact spatial-map sentence placing every adult
+at image-left, center, or image-right and in the foreground, middle ground,
+or background. In that sentence, state each torso and pelvis direction, named
+support surface, secondary support limb, and visible hand task.
+
+Then write one standalone present-action sentence beginning with the exact
+phrase for the selected content level:
+
+- aesthetic: "The current fully clothed non-erotic interaction is"
+- erotic: "The current erotic but non-explicit interaction is"
+- hardcore: "The current explicit consensual adult sexual act is"
+
+Complete that sentence with the occurring action, garment state, contact
+geometry, and reciprocal response that prove the level. At hardcore level,
+name the act directly rather than substituting symbolic flowers, generic
+closeness, aligned pelvises alone, preparation, implication, or aftermath.
+
+Repeat this compact medium lock immediately after the present-action
+sentence: "Every person, garment, object, and architectural plane exists only
+as ink contour and pigment on visibly aged silk; adults remain
+contour-defined 工笔 figures with mature facial specificity, Tang hairstyle,
+ornaments, makeup, and plausible ample proportions." Then describe all
+remaining details as drawn lines, bounded washes, reserved silk, or
+mineral-pigment shapes rather than as physically realistic materials.
+
+After the repeated lock, write exactly one person-block per adult in
+image-left to image-right order. Each person-block is one or two sentences
+and is exempt from the sixty-word limit. Follow this grammar closely:
+
+"[Name], [woman or man], [age], [class], occupies [image-left, center, or
+image-right] in the [foreground, middle ground, or background]: [face shape,
+开额, eyes, brow family, mouth, and makeup stack]; [bun family, 义髻, 蝉鬓,
+and each ornament with placement]; [body fullness, shoulders, waist, hands,
+and natural feet]; [clothing from the body outward with weave, color, motif,
+and hang]; [臂钏 or other jewelry]; [named support and pose]; left hand
+[task], right hand [task]; [content-level garment state]; gaze toward
+[target]."
+
+Do not skip a layer, an ornament, or a hand. If the Theme minted the card,
+the Frame must still spell it. For a man, replace bun, 花钿, and 臂钏 clauses
+with 幞头 or topknot, beard if any, 圆领袍 or 襕衫 stack, 革带, and boots or
+indoor shoes. Then use exactly four descriptive sentences followed by the
+final medium lock:
+
+1. one sentence combining exact date, place, season, hour, private situation,
+   and the adults' expressions and eye lines without repeating the
+   person-blocks;
+2. one sentence combining furniture, architecture, at most two symbolic
+   motifs, reserved silk, ruled platforms, and the literal phrase "three
+   shallow stacked bands";
+3. one sentence combining the five-to-seven-family palette, contour-enclosed
+   color fields, exactly three bounded skin tones, line hierarchy, and
+   layered washes;
+4. one sentence combining the uneven warm-tea field, full-bleed silk reaching
+   every canvas edge, one broken asymmetrical edge-oxidation patch, one
+   rubbed corner, one age crease, and exactly three localized pigment, ink,
+   or fiber changes whose isolated edge traces dissolve inward separately;
+   and
+5. this exact final medium lock: "The entire image remains a visibly aged,
+   flat, hand-painted Tang silk figure painting made from ink contours and
+   mineral pigment, with individualized mature adult faces defined by fine
+   line."
+
+Except for the person-blocks, no sentence after the fixed five-sentence
+opening may exceed 60 English words; semicolon-separated clauses still count
+toward that sentence limit. Keep the spatial-map sentence and present-action
+sentence below 60 words each. Compress attributes into precise phrases
+instead of adding backstory or secondary decor.
+
+Every Frame must restate enough information to function independently as an
+image-generation prompt. Hard limit each Frame to between 450 and 950 English
+words, or up to 1100 when the cast has three or more adults, or an equivalent
+information density in another requested language. Count before returning; if
+the draft exceeds the limit, rewrite it by removing secondary decor,
+backstory, and redundant material explanation, never by dropping an identity
+card. Preserve the Theme's identities,
+relationship, setting, furniture anchors, medium, palette logic, and selected
+content level while varying body geometry, garment rhythm, viewing height,
+crop, overlap, foreground clue, blank-space shape, symbolic accent, and color
+emphasis.
+
+Return only positive prose describing the depicted silk painting. Enforce
+every rule silently. Never discuss instructions, gates, compliance,
+validation, requested cast, internal content levels, vocabulary
+restrictions, or what the output omits. Every natural-language word must use
+the requested output language except established Chinese names, garment
+terms, hair terms, makeup terms, painting terms, and place names.
+
+VARIATION AND REJECTION RULES
+
+Reject any Theme or Frame that:
+
+- mixes Tang clothing, architecture, furniture, hair, or makeup with Song,
+  Ming, Qing, Japanese, modern, or generalized fantasy elements;
+- uses child hairstyles, childlike faces, slim later-dynasty beauty canons,
+  modern makeup, salon haircuts, anime eyes, toothy smiles, bound 缠足, lotus
+  shoes, opera 水袖, or 凤冠霞帔;
+- mixes Early, High, and Late Tang body-and-makeup canons inside one Theme;
+- resembles photography, live action, Western oil painting, ukiyo-e, Dunhuang
+  mural photography, modern guochao illustration, anime, CGI, game art, 写意
+  ink wash, or digital line art;
+- describes people as performers or gives skin, hair, fabric, furniture, or
+  windows photographic texture, optical focus, realistic reflection, or
+  naturalistic illumination instead of painted line and pigment;
+- omits fine 工笔 contour work, layered mineral washes, prepared-silk ground,
+  first-read flat picture plane, shallow stacked bands, scattered
+  perspective, or reserved blank space;
+- omits a person-block, a name, an age, a class, specific Tang clothing
+  layers, hairstyle, ornaments, body fullness, or makeup system for any adult
+  woman, or specific robe, 幞头, and belt for any adult man;
+- describes anyone only as wearing Tang dress, a robe, or period costume;
+- uses a generic modern palette instead of the required five-to-seven-family
+  Tang mineral palette;
+- lets antique damage obscure faces, hands, anatomy, eye lines, clothing
+  structure, ornaments, makeup, or the defining interaction;
+- adds a visible mounting margin, mat, frame, blank paper surround, inner
+  rectangle, continuous dark edge enclosure, decorative border, or evenly
+  aged edge band;
+- uses rounded volumetric bodies, continuous shading gradients, cast shadows,
+  dramatic depth, realistic light falloff, or illusionistic interior
+  recession;
+- substitutes global sepia, gray desaturation, fake paper damage, film wear,
+  or generalized dirt for localized material aging;
+- includes readable or pseudo-Chinese writing, artist attribution, a copied
+  famous Tang composition, prominent seal text, or a framed museum display;
+- weakens, hides, postpones, or exceeds the requested content level;
+- introduces extra or off-scene people, an absent spouse, an unrequested
+  watcher, ambiguous consent, passive adults, childlike features, or an
+  animal participating in intimate contact;
+- contains malformed anatomy, surplus limbs, ambiguous limb ownership,
+  unsupported weight, contradictory directions, intersecting furniture,
+  impossible contact axes, or generic display poses; or
+- repeats another Theme or Frame with only names, colors, or props changed.
+
+Before returning, verify that the painting first reads as an original Tang
+silk figure painting, then as a precise mature private scene with readable
+dress, hair, ornaments, body, and makeup, and only then as a carefully aged
+artifact. Fine line, layered color, historical order, human agency, and
+spatial clarity must remain stronger than decoration or damage.
