@@ -7,6 +7,14 @@ This is fashion, accessory, and product design, not a narrative scene, storyboar
 Every Theme defines a different woman, wardrobe concept, accessory language,
 material system, palette, setting influence, and fashion attitude.
 
+DECISION ORDER
+
+Resolve every Theme and Frame in this order: exact cast and six-view board;
+selected content-level inventory; product authenticity and visible safety;
+identity, outfit, and placement continuity; exaggerated bright character
+styling; presentation variation; output-language and text-free requirements.
+A later choice must never weaken an earlier one.
+
 CAST
 
 Use exactly one unmistakably mature Chinese woman aged 25 or older and no other people. She is alert, self-possessed, and physically safe. Do not add men, companions, crowds, assistants, silhouettes, portraits, mannequins, dolls, or human reflections.
@@ -64,20 +72,33 @@ THEME DESIGN
 
 Each Theme defines one complete fashion identity:
 
-1. one original English look name of one to four words;
+1. one original internal look name in the requested output language, unique within the run;
 2. one mature female identity with stable physical anchors;
 3. one wardrobe archetype and silhouette;
 4. one exact layer order from body outward;
 5. one dominant material and one contrasting material;
-6. one restrained palette of two to four named colors;
+6. one limited high-chroma palette of two to four named colors;
 7. one closure and construction logic;
 8. two to five coordinated accessories with fixed body locations plus only the adult props permitted by the selected level;
-9. one hairstyle that exposes important garment and accessory details; and
-10. one studio or environmental design influence that supports the look without becoming a story.
+9. one sculptural hairstyle that exposes important garment and accessory details;
+10. one heightened expression direction for every view where her face is visible; and
+11. one studio or environmental design influence that supports the look without becoming a story.
 
 Across Themes, vary silhouette family, body coverage, neckline, shoulder treatment, waist construction, sleeve logic, hem geometry, footwear category, accessory scale, material behavior, palette temperature, era influence, and social attitude.
 
 Do not create several recolors of the same gown, repeat the same corset-and-stockings formula, default every Theme to bridal couture, or change only hairstyle and jewelry.
+
+EXAGGERATED BRIGHT CHARACTER STYLING
+
+Every Theme and Frame must make the woman's hairstyle, outfit design, worn
+styling, and visible facial expression boldly exaggerated, vivid, and visually
+bright. Use a sculptural high-impact hairstyle, amplified yet buildable garment
+silhouettes and layer presentation, high-chroma color blocking with clear
+material contrast, and a heightened expression that reads immediately wherever
+her face is visible. Keep the treatment polished, mature, physically wearable,
+anatomically coherent, consistent across all views, and compatible with the
+selected content level. Never satisfy this rule with bright lighting alone or
+by obscuring garment construction.
 
 WARDROBE SPECIFICATION
 
@@ -123,7 +144,7 @@ For each permitted adult prop, lock:
 - color and hardware language;
 - visible controls, seams, joints, or charging features;
 - worn fit, garment attachment, holster, case, stand, or storage position; and
-- exact presence in HERO, ACCESSORIES, and MATERIALS.
+- exact presence or absence in HERO, ACCESSORIES, and MATERIALS.
 
 Describe adult props through product category, visible form, material, finish, controls, fit, fastening, quick release, attachment, holster, case, stand, and storage. Outside a permitted standard commercial product name, do not describe sexual organs, body openings, internal placement, insertion, stimulation, fluid, or sexual action. Keep every product clean, intact, and physically supported.
 
@@ -242,10 +263,6 @@ CURATED HARDCORE WARDROBE ARCHETYPES
 - A midnight velvet cape over a sharply boned waist corset, open-sided briefs, thigh harnesses, long gloves, and over-the-knee boots.
 - An equestrian-inspired leather bodice with a high collar, tailored tails, a broad riding belt, fitted gloves, thigh straps, and polished boots.
 - A gothic lace corset with leather pannier-like hip structures, a narrow body-chain grid, sheer stockings, and sharply buckled footwear.
-- A severe black leather apron dress opened over a satin harness foundation, with a broad waist cincher, wrist gauntlets, and heavy-soled boots.
-- A burgundy satin longline corset framed by black coated webbing, asymmetric shoulder straps, a split train, cuffs, and high lace-up boots.
-- A minimal metal-chain and leather-panel look anchored by a sculptural waist cage, a dramatic collar, elbow gloves, and thigh-high boots.
-- A baroque black-and-gold corset ensemble with velvet drape, radiating torso straps, ornate cuffs, a structured hip belt, and tall heeled boots.
 
 CURATED HARDCORE EQUIPMENT SYSTEMS
 
@@ -257,31 +274,18 @@ CURATED HARDCORE EQUIPMENT SYSTEMS
 - A leather body-chain grid with padded neck, wrist, and ankle pieces, a compact posture bar, and one rigid display stand sharing the same finish.
 - A cape-integrated shoulder harness, broad corset belt, glove-mounted cuff structures, and a detachable display leash stored in a side case.
 - An equestrian-derived chest and waist harness, tall-boot ankle straps, padded cuffs, and a short leather lead mounted on a belt hook.
-- A velvet-lined collar-and-gauntlet set, radiating torso straps, thigh bands, and a decorative rope coil secured inside a structured carry case.
-- A lacquered hip cage with belt-mounted rings, paired wrist cuffs, thigh straps, and a polished posture bar mounted on the materials display.
-- A layered corset harness with front and rear release tabs, matched cuffs, a narrow display lead, and a modular leather equipment tray.
-- A ceremonial collar, broad shoulder straps, waist-and-thigh belt network, quick-release cuffs, and a coiled satin rope set in a fitted box.
 
 CURATED EXPLICIT BDSM PRODUCT CATEGORIES
 
 - Paired low-tension nipple clamps with broad silicone-padded tips, fine adjustment screws, release tabs, and a short decorative chain.
-- Tweezer-style nipple clamps with soft silicone sleeves, a visible pressure-limiting stop, quick-release loops, and matched metal finish.
-- Magnetic nipple-clamp ornaments with wide padded contact discs, breakaway chain links, and a clearly non-deforming fit.
 - A ventilated silicone ball gag with multiple breathing channels, loose adjustable straps, padded edges, and side quick-release buckles.
 - A soft silicone bit gag with a wide flexible mouthpiece, loose double straps, padded cheek contact, and immediate side release.
 - An open-center mouth gag with a broad soft rim, unobstructed central breathing path, loose straps, and visible quick-release tabs.
-- A padded panel gag with a ventilated silicone mouthpiece, soft face contact, adjustable loose straps, and paired side releases.
 - A matched quick-release wrist-and-ankle cuff set with broad padding, rounded edges, breakaway connectors, and no joined limbs.
-- A bondage-inspired waist belt with multiple display rings, detachable holsters, padded lining, and a prominent front release.
-- A short display leash with a lightweight breakaway clip, soft leather handle, decorative chain section, and belt-mounted storage loop.
-- A packaged decorative rope-harness kit using soft satin rope, finished ends, quick-release connectors, and a fitted carry case.
-- A padded posture bar with rounded ends, lightweight construction, visible release clips, and a dedicated non-load-bearing holster.
 - A chastity-inspired waist belt with a sculpted front shield, padded edges, decorative lock plate, and a separate immediate-release buckle.
 - A ventilated leather half-mask with removable blindfold panels, padded eye surrounds, open nostrils, and bilateral quick-release straps.
 - A wide posture collar with flexible internal support, thick padding, unrestricted throat space, and a prominent rear release tab.
 - A pair of bondage mitts with soft lining, open ventilation panels, detachable wrist straps, and immediate pull-tab releases.
-- A torso-and-hip body harness with broad load-free bands, adjustable side buckles, removable chain accents, and front release hardware.
-- A coordinated thigh-and-ankle cuff array with wide padding, independent closures, decorative connectors, and no joined limbs.
 - A breast-framing leather harness with a detachable low-tension clamp chain, broad padded contact pieces, and visible release tabs.
 - A lightweight padded spreader bar with sliding attachment points, breakaway clips, and a fit that does not force joint range.
 - A soft suede flogger carried in a dedicated thigh holster, with rounded strands, a padded handle, and a retaining safety loop.
@@ -293,20 +297,13 @@ CURATED SEX TOY PRODUCT CATEGORIES
 
 - A full-size wand massager secured in a sculpted thigh holster, with a matte silicone head, metal controls, and a detachable matching power base.
 - A palm vibrator fitted into a transparent waist-harness pocket, with a smooth silicone shell, visible controls, and a magnetic release flap.
-- A lipstick vibrator carried upright in a corset-mounted hard case, with a lacquered cap, metal control ring, and matching belt clip.
-- A bullet vibrator displayed in a garter-mounted capsule, with a polished metal shell, silicone control button, and detachable chain mount.
 - A wearable external vibrator seated in a purpose-built front harness panel, with a visible silicone silhouette, removable mount, and no concealed body contact.
 - A suction stimulator attached to a waist-belt display bracket, with a soft silicone rim, visible control surface, and quick-release cradle.
-- A vibrating nipple-clamp set worn with broad padded tips, low-tension limiters, an inactive control module, and release tabs.
 - A strap-on harness carrying a removable silicone dildo externally, with a broad padded waist belt, stable base plate, and front quick-release buckle.
 - A classic silicone dildo mounted vertically on a weighted display stand, with a smooth matte surface, flared base, and fitted protective case.
-- A curved glass dildo secured inside a velvet-lined transparent case, with rounded ends, visible scale, and a locking display cradle.
 - A rabbit vibrator presented on a molded charging stand, with soft silicone surfaces, distinct controls, and a matching hard-shell case.
-- A remote egg vibrator stored in an open charging capsule, with a seamless silicone shell, separate remote, and fitted belt holster.
 - A jeweled silicone butt plug mounted in a shaped display recess, with a flared base, polished ornament, and dedicated protective case.
-- A tail plug displayed in a long fitted case, with a silicone flared base, detachable faux-fur tail, and matching metal hardware.
 - A graduated anal-bead set organized in a sealed molded tray, with flexible silicone links, a retrieval ring, and a fitted travel case.
-- A double-ended dildo arranged in a curved presentation cradle, with a flexible silicone body, contrasting end shapes, and protective sleeves.
 - A paired kegel-ball set stored in a jewelry-like charging case, with smooth silicone shells, retrieval loops, and a small control module.
 - A textured masturbation sleeve displayed in a rigid cylindrical case, with a removable cap, soft internal material, and coordinated exterior finish.
 - A vibrating penis ring presented as a product pair in a fitted metal-and-velvet case, with flexible silicone bands and detachable control pods.
@@ -322,10 +319,6 @@ CURATED HARDCORE MATERIAL AND COLOR SYSTEMS
 - Midnight-blue velvet, black coated webbing, silver steel, and one cold white satin accent.
 - Dark brown bridle leather, cream silk, aged brass, and black polished boots.
 - Black calfskin, emerald velvet, gold-tone hardware, and sheer charcoal hosiery.
-- White patent leather, black satin, chrome hardware, and a single crimson lining.
-- Plum lacquered leather, black mesh, dark nickel hardware, and violet velvet.
-- Matte black leather, mirror-finish steel, transparent smoke-gray panels, and a restrained red edge line.
-- Black velvet, gold brocade, polished brass, and deep red leather used only for structural accents.
 
 SIX-VIEW BOARD CONTRACT
 
@@ -348,7 +341,7 @@ FRAMING AND POSE
 
 Show the entire body from head to footwear in HERO, FRONT, BACK, and PROFILE. Keep the camera near waist height with normal perspective so proportions remain comparable.
 
-Use neutral, stable, fashion-reference poses. FRONT and BACK use balanced weight and relaxed arms that do not cover garment construction or required anatomy. PROFILE preserves a true side silhouette. HERO may use a restrained editorial contrapposto without twisting the outfit into a different design.
+Use stable, visually assertive fashion-reference poses. FRONT and BACK use balanced weight and relaxed arms that do not cover garment construction or required anatomy. PROFILE preserves a true side silhouette. HERO may use an exaggerated but anatomically grounded editorial stance and heightened expression without twisting the outfit into a different design.
 
 The woman has one anatomically possible pose per view. Keep limbs traceable, joints natural, hands complete, feet grounded, and weight visibly supported. Do not use motion, walking, spinning, wind-driven action, acrobatics, extreme foreshortening, or pose transitions.
 
@@ -396,7 +389,7 @@ THEMES AND FRAMES
 
 Themes are different women and fashion concepts, not scenes in one story.
 
-Frames within one Theme are parallel board-layout alternatives for the same woman and the same complete look. Preserve identity, outfit, accessories, adult props, coverage, palette, and material system. Vary only grid proportions, dominant portrait pose, crop emphasis inside the detail views, background treatment, and graphic hierarchy.
+Frames within one Theme are parallel board-layout alternatives for the same woman and the same complete look. Preserve identity, outfit, accessories, adult props, coverage, palette, material system, and expressive character direction. Vary presentation rather than design facts.
 
 Every Frame in one Theme must be a genuinely different presentation, not a
 paraphrase of the previous Frame. Change at least four of these while
@@ -413,25 +406,29 @@ THEME-STAGE OUTPUT
 
 Use the Theme schema as follows:
 
-- `title`: an internal original English look name that guides the design but is not rendered on the board;
-- `premise`: the woman, selected content-level styling intensity, complete outfit, layer order, fixed accessories, and permitted adult props;
-- `style`: the shared board layout language, palette, materials, background, graphic hierarchy, and lighting.
+- `title`: a unique internal look name in the requested output language that guides the design but is not rendered on the board;
+- `premise`: at most two compact sentences locking the woman, selected styling intensity, complete outfit and layer order, fixed accessories, and permitted adult props;
+- `style`: one compact sentence locking the shared board layout language, palette, materials, background, graphic hierarchy, and lighting.
 
 Return only Theme fields. Do not include Frame drafts, view-by-view prose, count values, schema explanations, or later-stage instructions.
 
 FRAME-STAGE OUTPUT
 
-Write one directly imageable paragraph with no fixed character or word count. Write all descriptive prose in the requested output language. Do not mention theme.title or insert English label tokens to identify regions.
+Write one compact, directly imageable paragraph in the requested output
+language. State shared identity, outfit, palette, and inventory facts once, then
+describe only the information that differs by region. Do not repeat the full
+garment or product specification for every view, mention theme.title, or insert
+internal label tokens to identify regions.
 
 Begin by stating, in the requested output language, that one polished text-free six-view female character board fills a landscape canvas. Then state the woman's stable identity, complete outfit construction, fixed accessories, permitted adult props, six-region grid, each region's spatial position and visual function, per-view pose and crop, material details, background, and shared lighting.
 
 Express the selected intensity entirely through visible clothing, equipment,
 products, pose, materials, and light. Do not write the internal level names
 aesthetic, erotic, or hardcore; do not write phrases such as content level,
-hardcore level, compliant, safety requirement, or validation. The standard
-genre acronym BDSM may appear at most once when needed, but ordinary prose
-must remain entirely in the requested language. Do not leak English workflow
-words such as anchored, coiled, hero, accessories, materials, or flat lay.
+hardcore level, compliant, safety requirement, or validation. The standard genre acronym BDSM may appear at most once when needed. When the
+requested output language is not English, do not leak untranslated English
+workflow words such as anchored, coiled, hero, accessories, materials, or flat
+lay; use natural requested-language descriptions of position and function.
 
 State safety through visible construction details such as padding,
 ventilation, rounded edges, limited-tension hardware, and quick-release
@@ -439,9 +436,10 @@ buckles. Do not pad final prose with compliance-shaped negations such as
 inactive, unused, no contact, no load, no pressure, not inserted, not
 stimulating, harmless, or safe.
 
-Give at least one selected BDSM product or sex toy a clear visual role in the
-dominant portrait or accessory close-up. A product shown only as a small item
-in the material flat lay does not satisfy hardcore product emphasis.
+When the selected level includes any adult product, give at least one selected
+product a clear visual role in the dominant portrait or accessory close-up. At
+hardcore level, a BDSM product or sex toy shown only as a small item in the
+material flat lay does not satisfy product emphasis.
 
 Describe the final visible board only. Do not include alternatives, optional wording, design rationale, backstory, symbolism, sequence, dressing actions, internal instructions, or statements explaining that a product is unused or that a prohibited act is absent.
 
@@ -449,25 +447,15 @@ FINAL VALIDATION
 
 Silently rewrite any Theme or Frame that fails one check:
 
-1. Exactly one adult Chinese woman aged 25 or older is depicted; all human views are the same person.
-2. The request specifies exactly one woman and zero men.
-3. The selected content level controls outfit coverage, wearable intensity, and adult-prop presence in every view.
-4. Aesthetic is sensual lingerie-led fashion with zero or one restrained adult product; erotic is an adult product-and-wearable system with one to three explicit products; hardcore is a BDSM wardrobe-and-equipment system with three to six BDSM-specific elements, including at least two wearable pieces and at least one explicit BDSM product that may be worn or displayed.
-5. Every hardcore Theme has one dominant silhouette statement, two secondary structures, at least three deliberate contrast axes, and one coherent wardrobe-archetype, equipment-system, sex-toy product direction, and material-color combination with no technology-shaped costume elements.
-6. Every named product has its real shape and intended fit: worn nipple clamps attach to nipples rather than fabric, worn gags sit at the mouth, wearable vibrators occupy explicit external mounts, and every displayed insertive toy has a visible support.
-7. Every garment and equipment connection follows a visible physical path; non-adjacent pieces never merge, transform into one another, or use disappearing connectors.
-8. The same single outfit, layer order, construction, colors, and coverage appear in the dominant portrait, front view, rear view, side view, and accessory close-up.
-9. Every accessory preserves its count, side, position, material, scale, and fastening; the material flat lay shows complete pairs, including two shoes and two gloves, rather than one sample item.
-10. All poses are static, anatomically possible, grounded, unobstructed, and useful for reading the design.
-11. The dominant portrait, front view, rear view, side view, accessory close-up, and material flat lay each occupy exactly one non-overlapping region.
-12. The dominant portrait, front view, rear view, and side view all show the complete body from head through footwear without cropping; “three-quarter” may describe viewing angle only. Every coverage statement agrees with the visible garment layers. Outside standard commercial product names such as nipple clamps, mouth gag, dildo, vibrator, or plug, product prose does not expand into anatomical description.
-13. The material flat lay contains only the exact garments, fabrics, hardware, footwear, removable accessories, and permitted adult props used by the design, with no spare or alternate pieces; every adult product has a clear recognized category and only visible form, fit, control, release, attachment, or storage details.
-14. Every Frame differs from other Frames in its Theme on at least four presentation axes and is not a near-paraphrase.
-15. Every hardcore Frame uses dramatic silhouette-separating light and a deliberate non-generic background; it does not use flat shadowless catalog light, generic gray or beige, futuristic language, exoskeleton metaphors, or technology-shaped costume elements.
-16. At least one BDSM product or sex toy has a clear role in the dominant portrait or accessory close-up rather than appearing only as a small flat-lay object.
-17. Final prose never states an internal content level, compliance or validation language, or safety-shaped negations; BDSM appears at most once, and no unrequested English prose token remains.
-18. The finished board contains no visible title, region labels, typography, letters, numbers, logos, captions, or pseudo-text.
-19. At hardcore level, any selected BDSM product may be worn, but all equipment remains non-load-bearing, low-pressure, visibly releasable, and shown without a tied body, immobilization, blocked breathing, neck loading, suspension, forced posture, impact, pain, fear, skin marks, or injury; worn clamps use padded limited tension, and worn gags preserve a visible breathing path and relaxed jaw.
-20. External wearable sex toys may be fitted to clothing or harness hardware, while every insertive product remains completely outside the body in an explicit holster, case, cradle, stand, tray, or material flat lay with no implied insertion, activation, stimulation, or sexual action.
-21. Lighting, skin, hair, outfit, materials, BDSM equipment, sex toys, and background remain coherent across the entire board.
-22. All descriptive prose uses the requested output language, identifies the six-view board at the beginning, and ends with complete sentence punctuation.
+1. Exactly one adult Chinese woman aged 25 or older appears; every human view is the same person, with no additional figure or human-like object.
+2. The selected level alone determines coverage and inventory: Aesthetic is sensual lingerie-led fashion with zero or one restrained product; erotic uses a coherent wearable system with one to three explicit products; hardcore is a BDSM wardrobe-and-equipment system with three to six BDSM-specific elements plus one to three sex toys.
+3. The woman's hairstyle, outfit design, worn styling, and visible facial expression are all boldly exaggerated, vivid, and visually bright through character design rather than lighting alone.
+4. Identity, hairstyle, outfit state, layer order, construction, palette, coverage, accessories, and product inventory remain coherent across all views; every physical connection is buildable and traceable.
+5. Every named product has its real shape and intended fit, every displayed product has visible support, and every worn product shows the required body-safe fit and release without sexual action, distress, or injury.
+6. The board contains exactly six non-overlapping regions: four complete head-to-foot human views, one connected accessory close-up, and one body-free material flat lay containing the exact complete inventory and every paired item.
+7. Every pose is static, grounded, anatomically possible, unobstructed, and useful for reading the design.
+8. Every Frame differs from other Frames in its Theme on at least four permitted presentation axes without changing design facts.
+9. Every hardcore design has one dominant statement, two secondary structures, at least three contrast axes, dramatic silhouette-separating light, a deliberate background, and no technology-shaped costume language.
+10. Final prose never states an internal content level, compliance language, safety-shaped negations, or internal region tokens; BDSM appears at most once and no untranslated workflow prose remains.
+11. The finished board contains no visible title, region labels, typography, letters, numbers, logos, captions, pseudo-text, or watermark.
+12. Theme fields follow their exact schema; Frame prose uses the requested language, identifies the six-view board at the beginning, states shared facts once, and ends with complete sentence punctuation.

@@ -73,6 +73,15 @@ def test_dress_board_region_names_are_layout_only() -> None:
     assert (
         "Include one to three clearly designed body-safe adult products" in normalized
     )
+    assert "EXAGGERATED BRIGHT CHARACTER STYLING" in normalized
+    assert (
+        "hairstyle, outfit design, worn styling, and visible facial expression"
+        in normalized
+    )
+    assert "bright lighting alone" in normalized
+    assert "DECISION ORDER" in normalized
+    assert "A later choice must never weaken an earlier one" in normalized
+    assert "limited high-chroma palette" in normalized
     assert "BDSM equipment-and-wardrobe design board" in normalized
     assert "Include three to six BDSM-specific designed elements" in normalized
     assert "BDSM EQUIPMENT SPECIFICATION" in normalized
@@ -127,9 +136,9 @@ def test_dress_board_region_names_are_layout_only() -> None:
     assert "Change at least four of these" in normalized
     assert "Do not write the internal level names" in normalized
     assert "BDSM may appear at most once" in normalized
-    assert "Do not leak English workflow words" in normalized
+    assert "do not leak untranslated English workflow words" in normalized
     assert "Do not pad final prose with compliance-shaped negations" in normalized
-    assert "does not satisfy hardcore product emphasis" in normalized
+    assert "does not satisfy product emphasis" in normalized
     assert "Do not use the words futuristic" in normalized
     assert "generic mid-gray walls" in normalized
     assert "flat, shadowless catalog lighting" in normalized
@@ -137,6 +146,10 @@ def test_dress_board_region_names_are_layout_only() -> None:
     assert "Every Frame differs from other Frames" in normalized
     assert "Final prose never states an internal content level" in normalized
     assert "cybernetic body parts" in normalized
+    assert (
+        "State shared identity, outfit, palette, and inventory facts once"
+        in normalized
+    )
     assert "technology-shaped costume components" in normalized
     assert "utilitarian futurism" not in normalized
     assert "Aesthetic is sensual lingerie-led fashion" in normalized
@@ -171,7 +184,7 @@ def test_dress_board_region_names_are_layout_only() -> None:
             for line in pool.splitlines()
             if line.startswith("- ")
         ]
-        assert len(entries) >= 12
+        assert len(entries) >= 8
         assert len(entries) == len(set(entries))
 
     explicit_product_entries = [
@@ -179,13 +192,13 @@ def test_dress_board_region_names_are_layout_only() -> None:
         for line in product_pool.splitlines()
         if line.startswith("- ")
     ]
-    assert len(explicit_product_entries) >= 24
+    assert len(explicit_product_entries) >= 12
     sex_toy_entries = [
         line.removeprefix("- ").strip()
         for line in sex_toy_pool.splitlines()
         if line.startswith("- ")
     ]
-    assert len(sex_toy_entries) >= 20
+    assert len(sex_toy_entries) >= 10
 
     assert (
         "The Theme title appears exactly once and the six region labels "

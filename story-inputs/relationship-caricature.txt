@@ -12,7 +12,8 @@ result must be funny at first glance and uncomfortably truthful on reflection.
 Satirize conduct and relationship patterns, never gender, nationality,
 ethnicity, age, disability, body type, or identity itself.
 
-Every image uses a clean, minimal stage, one dominant interaction, and a small
+Every image uses either a clean minimal editorial stage or one clean,
+recognizable real-world environment, one dominant interaction, and a small
 amount of exact English copy that states the central opposition. Do not build a
 cluttered naturalistic room or scatter many symbolic props.
 
@@ -52,31 +53,56 @@ attached legs, and two feet. Keep limbs traceable, ownership unambiguous,
 contacts reachable, and support physically coherent despite deliberate
 caricatural scale changes.
 
+ANATOMICAL AND PHYSICAL COHERENCE
+
+Caricature may violate normal scale but never human topology or scene
+mechanics. Treat every body, object, support, garment, shadow, and contact as
+part of one physically explainable instant.
+
+- Preserve exactly one head, one continuous torso, two shoulder-elbow-wrist-
+  hand chains, and two hip-knee-ankle-foot chains per adult.
+- Keep all joints attached, bending in a readable direction, with fingers
+  belonging to the correct hand and every limb traceable back to its owner.
+- Prevent bodies, limbs, garments, and solid objects from passing through,
+  merging with, or occupying the same volume as one another.
+- Give every body a plausible center of mass and an unbroken support path
+  through feet, knees, hands, a stable object, or a consenting participant to
+  the floor or another stable environmental surface.
+- Match every lean, lift, kneel, recline, suspension, or raised limb with
+  visible counterbalance and enough support for the depicted weight.
+- Make contact surfaces meet on the correct side with visible compression,
+  tension, grip, displacement, or contact shadow appropriate to the force.
+- Make every object's tilt, bend, stretch, compression, and motion direction
+  follow from the stated push, pull, load, or torque; the reaction force must
+  affect the bodies producing it.
+- Keep gravity, hair direction, loose fabric, shadows, and any displaced
+  garment consistent with the same body orientation and floor or support plane.
+- Do not float a person or object unless the selected concept explicitly
+  provides a visible suspension or support mechanism.
+- Use occlusion only when limb ownership and complete anatomy remain
+  unmistakable; never hide an arm, hand, leg, or foot so fully that it appears
+  absent.
+
+Before accepting a Theme or Frame, privately trace two things: every person's
+full anatomy from head through both hands and both feet, and every load from
+its point of application through supports to the floor or stable environmental
+surface. Reject and rebuild the composition if either trace breaks.
+
 CAST-TO-RELATIONSHIP SELECTION
 
 Choose a relationship premise compatible with the actual requested cast. The
 following are priorities, not fixed plots:
 
-- one adult: the person's relationship with domestic labor, self-image,
-  social performance, attention, consumption, perfectionism, procrastination,
-  or the pressure to handle everything alone;
-- two women and no men: supervisor and subordinate, colleagues dividing labor
-  and credit, sisters, friends, roommates, neighbors, mentor and protege, or
-  two women refusing an externally imposed rivalry;
-- one woman and one man: spouses, long-term partners, dates, colleagues,
-  neighbors, siblings, or friends caught in unequal care, selective listening,
-  weaponized incompetence, emotional scorekeeping, status performance, or a
-  petty dispute that conceals a deeper need;
-- two women and one man: manufactured romantic competition, workplace
-  triangulation, alliance against manipulation, unequal credit, family
-  mediation, friendship under pressure, or one participant using the other two
-  to validate status;
-- one woman and two men: emotional labor, workplace hierarchy, competitive
-  posturing, family expectations, alliance, gatekeeping, or two participants
-  transferring responsibility to the third;
-- all-woman or all-man groups of other sizes: friendship, family, household,
-  peer, workplace, status, care, and credit dynamics suited to the exact cast;
-  and
+- one adult: domestic labor, self-image, social performance, consumption,
+  perfectionism, procrastination, or carrying everything alone;
+- two adults: partners, dates, relatives, friends, roommates, neighbors,
+  colleagues, or supervisor and subordinate in unequal care, labor, credit,
+  attention, listening, competence, status, or emotional scorekeeping;
+- three adults: manufactured competition, triangulation, alliance, unequal
+  credit, mediation, gatekeeping, transferred responsibility, or status
+  validation;
+- single-gender groups: suitable friendship, family, household, peer,
+  workplace, status, care, or credit dynamics; and
 - larger mixed groups: one coherent relationship network with a single
   readable division of labor, attention, access, responsibility, or credit.
 
@@ -86,11 +112,9 @@ content level and the safety rules below. At erotic and hardcore levels, use
 solo self-relationship or consenting adult spouses, established partners,
 dates, lovers, or peer-status intimate partners. Never sexualize relatives,
 workplace authority, mentorship, caregiving dependency, financial dependency,
-housing dependency, or another power relationship in which refusal could carry
-a penalty. Do not default to jealousy, romance, gender conflict, or women
-competing for a man. Give women and men agency, flaws, strategies, and
-reactions according to the specific behavior being satirized rather than a
-gender stereotype.
+housing dependency, or another power relationship in which refusal could carry a penalty. Do not
+default to jealousy, romance, gender conflict, or women competing for a man.
+Assign agency, flaws, strategies, and reactions by conduct, not gender.
 
 CORE SATIRICAL EQUATION
 
@@ -103,12 +127,8 @@ Build every Theme from one indivisible visual equation:
     + one opposed pair of English text phrases
     = one instantly readable social truth
 
-The contradiction must be visible without explanation. Examples include work
-moving downward while credit moves upward, one partner demanding care while
-pretending not to need it, a tiny domestic object carrying an enormous
-emotional argument, a self-important person manufacturing rivalry, everybody
-waiting for somebody else to act, or generosity performed only when observed.
-Invent original equivalents rather than copying these examples by default.
+The contradiction must be visible without explanation and specific to the
+chosen conduct. Do not recycle one plot with different props.
 
 Privately complete this sentence before accepting a concept:
 
@@ -138,14 +158,14 @@ Show the action at its most revealing instant. State:
   state; and
 - how that change returns pressure or consequence to the initiator.
 
-Every participant must touch, pull, push, brace, carry, block, redirect, or
-visibly react to the same interaction. A gaze, facial reaction, recoil,
-observation, or symbolic presence alone is insufficient: every adult must make
-direct hand, foot, or supported torso contact with the selected metaphor object
-or with another participant who is transmitting force through the body-position
-system. Do not call a disconnected observer "integral." Do not pose disconnected
-people beside separate symbols. Expressions must correspond to the current
-force and must not look like generic smiling, surprise, or anger.
+Every participant must touch, pull, push, brace, carry, block, or redirect the
+same interaction. A gaze, facial reaction, recoil, observation, or symbolic
+presence alone is insufficient: every adult must make direct hand, foot, or
+supported torso contact with the selected metaphor object or with another
+participant who is transmitting force through the body-position system. Do not
+call a disconnected observer "integral." Do not pose disconnected people
+beside separate symbols. Expressions must correspond to the current force and
+must not look like generic smiling, surprise, or anger.
 
 At erotic and hardcore levels, intimate body contact and sexual positioning
 may transmit the force directly, so the bodies themselves can be the primary
@@ -157,12 +177,21 @@ EXTREME FACIAL PERFORMANCE
 Give every adult one coherent facial-caricature cluster that combines two or
 three visibly altered features. Suitable changes include:
 
-- enlarged or narrowed eyes with an exact gaze target;
+- paired eyes enlarged to at most 1.4 times normal size or narrowed to 0.7
+  times normal opening, with one exact gaze target;
 - asymmetrically raised, sharply lowered, or hook-shaped brows;
-- a widened megaphone mouth, compressed line mouth, triangular shout, smug
-  crescent, or tiny guilty O-shaped mouth;
-- inflated cheeks, tightened cheek muscles, or a widened jaw;
-- a raised or compressed nose with visibly flared nostrils; and
+- a complete mouth widened to 1.5 times normal width, compressed to 0.7 times
+  normal width, shaped into a megaphone, line, triangular shout, smug crescent,
+  or guilty O, with lips thickened or thinned coherently;
+- paired ears enlarged to 1.5 times normal size or reduced to 0.75 times normal
+  size when listening, surveillance, gossip, or selective attention is the
+  satire;
+- cheeks inflated to 1.5 times normal volume, hollowed coherently, or tightened
+  by visible muscular strain;
+- complete jaw widened to 1.5 times normal width, narrowed to 0.75 times normal
+  width, lengthened, or shortened while remaining attached to one face;
+- complete nose lengthened, shortened, widened, or compressed between 0.75 and
+  1.5 times normal scale, with visibly flared or pinched nostrils; and
 - hair volume or direction that reinforces the reaction.
 
 Make the emotional contrast unmistakable. Productive pairings include smug
@@ -170,50 +199,153 @@ versus furious, performatively cheerful versus exhausted, dismissive versus
 wounded, triumphant versus trapped, self-important versus unconvinced, or
 manipulative versus newly allied.
 
-Name the altered features and their relationship to the action. Do not write
-only "an exaggerated expression." Preserve one coherent face with two eyes,
-one nose, and one mouth. Do not add facial organs, detach features, melt skin,
-create a mask, or make an adult look childlike.
+Name the altered features, numeric scale when size changes, and their
+relationship to the action. Do not write only "an exaggerated expression."
+Preserve one coherent face with exactly two eyes, two ears, one nose, one
+mouth, and one continuously attached jaw. Do not enlarge one isolated eyeball
+or lip independently, add facial organs, detach features, melt skin, create a
+mask, or make an adult look childlike.
+
+EXUBERANT CHARACTER STYLING
+
+Make every adult visually heightened before body distortion is considered.
+Hair, wardrobe or body-coverage styling, color, material, and expression must
+all reinforce that person's role and current reaction. Avoid generic realism,
+muted catalog styling, interchangeable gray suits, plain T-shirts on everyone,
+and understated faces.
+
+Give each adult:
+
+- one distinct, exaggerated hairstyle silhouette, such as a razor-sharp
+  geometric bob, towering ponytail arc, sculpted wave mass, fan-shaped braid,
+  severe swept-back crest, springy curl halo, or wind-driven asymmetry;
+- one dominant saturated hue and one contrasting accent suited to the shared
+  palette, with neutrals used only as support rather than the whole look;
+- one unmistakable clothing or body-coverage silhouette appropriate to the
+  content level, using assertive tailoring, amplified collars, asymmetric
+  drape, bold color blocking, graphic non-letter patterns, structured folds,
+  or a displaced garment whose position is physically explained;
+- one clear material identity, such as lacquered leather, crisp cotton, glossy
+  satin, coarse knit, translucent organza over opaque coverage, metallic
+  textile, matte wool, or ribbed technical fabric; and
+- one theatrical facial-caricature cluster readable at thumbnail size, with
+  the gaze target and muscular tension tied to the force chain.
+
+Hair may be vivid black, silver, copper, burgundy, electric blue, violet, or
+another scene-compatible color. Makeup may use one bold graphic accent around
+eyes, brows, cheeks, or lips when appropriate, but must remain photographic
+and must not resemble face paint or an extra facial organ. Hair shape can be
+exaggerated through styling, direction, and color without becoming an
+undeclared body-scale change; if its volume is numerically enlarged, declare
+that change in the body map.
+
+At aesthetic level, styling remains fully opaque. At erotic and hardcore
+levels, exposed bodies still require deliberate visual styling through hair,
+makeup, footwear, jewelry limited to one statement piece per adult, or one
+coherent partially removed or displaced garment. Clothing, hair, and
+accessories must never hide a face, hand, defining contact, limb connection,
+support point, or locked phrase. They contain no logos or writing except a
+locked phrase when selected as its natural carrier.
+
+At aesthetic level, each adult's dominant saturated hue must cover at least
+half of their visible clothing area. Black, gray, beige, white, brown, and
+muted navy may appear only in small footwear, trim, piping, hardware, or one
+minor accessory; they cannot be the main color of a suit, blazer, dress,
+jumpsuit, shirt, trousers, skirt, coat, robe, lingerie set, or other major
+garment. A neutral suit with a bright shirt, tie, lining, or pocket square does
+not satisfy this rule. At erotic and hardcore levels, every garment or
+accessory that remains visible must use the same deliberate vivid palette
+rather than default black, gray, or beige styling. A named garment color must
+match its declared dominant hue; never name a neutral garment and then claim
+that most of it is vivid.
 
 BODY-SILHOUETTE CARICATURE
 
 Give every adult one or more coordinated nonfacial proportion changes that
-expose their role in the relationship. Choose one or combine compatible
-changes:
+expose their role in the relationship. Nearly every existing body region may
+be enlarged, reduced, lengthened, shortened, widened, narrowed, thickened, or
+slenderized when its shape actively carries the satire. Choose one or combine
+compatible changes from these families:
 
-- one attached arm elongated to two or three times normal length;
-- both attached hands enlarged to two or three times normal size;
-- the complete head and hair enlarged to one and a half times normal size;
-- the continuous upper torso widened to twice normal width;
-- the complete torso compressed to one-half normal width;
-- the whole body stretched to one and a half times normal height;
-- the whole body compressed to three-fifths normal height; or
-- one garment volume inflated to three times normal width around an otherwise
-  complete body.
+- whole silhouette: complete body stretched to 1.5 times normal height,
+  compressed to 0.6 times normal height, widened to 1.5 times normal width, or
+  narrowed to 0.65 times normal width;
+- head and hair: complete head and hair enlarged to 1.5 times normal size,
+  reduced to 0.75 times normal size, or hair volume expanded to 2 or 3 times
+  normal volume;
+- neck and shoulders: neck lengthened to 1.5 or 2 times normal length,
+  shortened to 0.6 times normal length, shoulder span widened to 1.5 or 2
+  times normal width, or narrowed to 0.7 times normal width;
+- arms and hands: one or both complete attached arms lengthened to 2 or 3
+  times normal length, shortened to 0.6 times normal length, thickened to 1.5
+  or 2 times normal girth, slenderized to 0.6 times normal girth, or both
+  attached hands enlarged to 2 or 3 times normal size or reduced to 0.65 times
+  normal size;
+- torso and posture: upper torso, ribcage, abdomen, waist, or complete torso
+  widened to 1.5 or 2 times normal width, compressed or narrowed to 0.5 or
+  0.65 times normal width, lengthened to 1.5 times normal length, or shortened
+  to 0.7 times normal length;
+- chest, hips, and buttocks: complete chest plane, paired breasts, hip span, or
+  paired buttocks enlarged to 1.5 or 2 times normal volume, reduced to 0.65
+  times normal volume, widened or narrowed to the same scale, or reshaped into
+  one coherent broad, compact, elongated, or strongly projected silhouette;
+- legs and feet: one or both complete attached legs or thighs lengthened to
+  1.5 or 2 times normal length, shortened to 0.65 times normal length,
+  thickened to 1.5 or 2 times normal girth, slenderized to 0.6 times normal
+  girth, or both attached feet enlarged to 1.5 or 2 times normal size or
+  reduced to 0.7 times normal size;
+- sexually explicit anatomy at hardcore level only: existing penis, testicles,
+  vulva, or external genital region enlarged to at most 1.5 times normal size,
+  reduced to at least 0.7 times normal size, lengthened, shortened, widened,
+  narrowed, thickened, or slenderized within those limits; or
+- clothing silhouette: one coherent garment region inflated, widened,
+  narrowed, lengthened, shortened, stiffened, or compressed to 1.5, 2, or 3
+  times its relevant normal dimension around an otherwise complete body.
 
 Each altered part must actively perform the satire by gripping, pulling,
 pointing, carrying, blocking, claiming, shielding, inflating, or redirecting
 the central interaction. State the numeric scale explicitly in every Frame.
-Keep adjacent joints attached and readable. Never enlarge breasts, buttocks,
-genitals, a pregnant abdomen, or another sexual characteristic for humor.
+For non-gripping regions, state the exact mechanical or compositional role:
+bearing weight, occupying space, restricting reach, changing balance,
+controlling access, receiving attention, demanding support, dominating the
+silhouette, or revealing unequal effort. Keep adjacent joints and paired
+anatomy attached, complete, symmetric unless intentional asymmetry is stated,
+and readable.
+
+At aesthetic level, breasts, buttocks, genitals, and the groin remain fully
+opaque and are not described anatomically; express chest, hip, buttock, or
+groin proportions through the complete clothed silhouette and garment
+deformation. At erotic level, breasts and buttocks may be visibly enlarged,
+reduced, broad, compact, elongated, or strongly projected as part of an adult
+sensual silhouette, but genitals remain non-explicit and are not the
+caricatural focal point. At hardcore level, breasts, buttocks, and existing
+external genitals may be proportionally altered only when the change directly
+supports the current consensual act and relationship metaphor. Never alter a
+pregnant abdomen, use pregnancy for humor, isolate a sexual body part from its
+owner, or make anatomy look injured, diseased, mutilated, swollen, childlike,
+nonhuman, or grotesquely impossible.
 
 Layered changes are allowed: for example, one existing arm may be elongated
-while its attached hand is enlarged, or an enlarged head may accompany a
-widened torso. Every change must affect existing anatomy only. Never add,
-remove, duplicate, detach, fuse, or replace a head, torso, arm, hand, leg,
-foot, joint, or finger. Preserve a continuous shoulder-elbow-wrist-hand chain
-for each arm and a continuous hip-knee-ankle-foot chain for each leg. Keep both
-legs and both feet visible, anatomically attached, and physically supported;
-they need not bear weight when a support or another consenting adult safely
-carries that weight. Avoid broken joints, melted anatomy, accidental body
-horror, or a change that exists only because of lens perspective.
+while its attached hand is enlarged, widened shoulders may accompany a narrow
+waist, or enlarged hips may accompany thickened thighs. Every change must
+affect existing anatomy only and preserve one coherent adult body. Never add,
+remove, duplicate, detach, fuse, or replace a head, torso, breast, buttock,
+genital, arm, hand, leg, foot, joint, or finger. Preserve a continuous
+shoulder-elbow-wrist-hand chain for each arm and a continuous
+hip-knee-ankle-foot chain for each leg. Keep both legs and both feet visible,
+anatomically attached, and physically supported; they need not bear weight
+when a support or another consenting adult safely carries that weight. Avoid
+broken joints, melted anatomy, accidental body horror, or a change that exists
+only because of lens perspective.
 
 In every Theme premise and Frame, serialize the body changes once in this exact
 dynamic form:
 
     Body exaggerations: [PERSON] - [FEATURE] at [NUMERIC SCALE], [OPTIONAL
     ADDITIONAL FEATURE] at [NUMERIC SCALE]; [PERSON] - [FEATURE] at [NUMERIC
-    SCALE]; all unlisted body parts remain at normal scale.
+    SCALE]; all unlisted body parts remain at normal scale, all paired anatomy
+    remains complete, and all altered regions remain continuously attached to
+    their owner.
 
 Include every requested adult exactly once and list every changed feature for
 that person in the same entry. Coordinated layered changes may share one entry.
@@ -259,17 +391,37 @@ plus any hand, foot, limb, or support contact needed to make the geometry safe
 and readable. A hardcore contact map containing only hands, feet, posing,
 bracing, or nearby body placement is invalid.
 
-CLEAN BACKGROUND AND METAPHOR BUDGET
+CLEAN SETTING AND METAPHOR BUDGET
 
-Use a constructed editorial stage rather than a furnished room. The background
-must contain:
+Choose one of two background modes:
 
-- one broad matte color field or very smooth two-color gradient;
-- zero environmental depth and no visible wall-floor corner;
-- at most two simple geometric location cues;
+- a constructed editorial stage using a saturated color field, smooth
+  two-color gradient, restrained graphic color blocks, or shallow sculptural
+  geometry; or
+- a clean, sparse, recognizable environment directly connected to the
+  relationship friction, such as an uncluttered apartment kitchen, orderly
+  laundry nook, minimal dining corner, clean entryway, stripped-back office or
+  meeting area, empty elevator lobby, simple cafe booth, sparse dressing area,
+  private bedroom, restrained hotel room, or minimal studio loft.
+
+At erotic and hardcore levels, environmental settings must be private,
+appropriate for consenting intimate partners, and free of workplace, family,
+caregiving, financial, or surveillance implications.
+
+Every background must contain:
+
+- one dominant color and architectural or surface system;
+- shallow or moderate controlled depth with clean sightlines;
+- one large built-in environmental anchor and at most two restrained location
+  cues, or one coherent abstract-stage geometry system;
 - exactly one primary metaphor mechanism shared by the whole cast, built from
   either one object or the cast's own body-position and force system; and
 - at most one small supporting object from the same situation.
+
+Built-in architecture that remains untouched is background, not a prop. If a
+counter, door, bed, chair, table, or other environmental element supports a
+body, receives force, carries copy, or changes state, count it as the primary
+mechanism or the sole supporting object.
 
 When an object carries the primary metaphor, it occupies roughly 25 to 45
 percent of the canvas and participates mechanically in the action. Suitable
@@ -281,15 +433,29 @@ use no separate symbolic object; one simple support such as a bed, sofa, chair,
 or platform may establish safe contact and must not compete as a second
 metaphor.
 
-Do not include room inventory, scattered household objects, shelves, plants,
-wall art, windows, screens, incidental furniture, distant architecture,
-debris, decorative signage, crowds, or multiple competing metaphors. Preserve
-at least 25 percent clean negative space around the central interaction.
+Use the minimum environment detail needed to identify the place: for example,
+one uninterrupted counter, one closed cabinet plane, one bed and headboard,
+one clean meeting table edge, one elevator-door plane, or one cafe bench.
+Do not include open shelves, scattered household objects, plants, wall art,
+visible screens, incidental furniture, table settings, loose toiletries,
+paperwork piles, distant architecture, debris, decorative signage, crowds,
+reflected people, or multiple competing metaphors. A single window is allowed
+only as a broad light source with no readable city detail, signage, or human
+figures. Preserve at least 20 percent clean negative space around the central
+interaction.
 
-Every visible surface must be blank except for the two locked English phrases.
-Do not decorate paper, books, reports, boards, screens, clothing, walls, or
-props with diagrams, formulas, handwriting, charts, icons, interface marks,
-fake fine print, or ornamental lettering.
+The environment must participate in the same art direction as the cast:
+repeat one or two palette colors in a wall, floor, upholstery, cabinet, tile,
+or architectural plane; match light direction and contact shadows; and let one
+material echo the primary mechanism. Never paste brightly styled people into
+an unrelated stock-photo room.
+
+Every visible surface must be free of writing except for the two locked English
+phrases. Non-glyph geometric color blocks, stripes, checks, dots, and material
+textures are allowed when they support the palette and cannot be mistaken for
+letters. Do not decorate paper, books, reports, boards, screens, clothing,
+walls, or props with diagrams, formulas, handwriting, charts, icons, interface
+marks, fake fine print, or ornamental lettering.
 
 If a selected object normally contains information - including a schedule,
 report, chart, clipboard, phone, book, control panel, calendar, form, or
@@ -297,6 +463,61 @@ packaging - render its entire surface blank except for the two locked phrases.
 Do not mention dense formatting, lines of copy, list entries, data, controls,
 page contents, or marks that the image model could interpret as additional
 writing.
+
+Never invent or name a title, heading, label, file name, subject line, chapter,
+brand, interface field, or expected contents for a text-bearing object. In the
+contact map, content-level proof, style map, and free prose, call it a blank
+report, blank page, blank screen, blank package, or equivalent generic object
+until describing one of the two locked phrases.
+
+CONTROLLED VISUAL RICHNESS
+
+Richness must come from styling, color, geometry, material, light, shadow, and
+the shape of the interaction, not from extra objects or background inventory.
+For each Theme, choose one strong option from every axis below and make the
+choices work as one art direction:
+
+- setting and geometry: seamless cyclorama, shallow stepped platform, single
+  arch, split-color floor plane, sloped plane, translucent panel, radial floor
+  inlay, clean kitchen counter and cabinet plane, sparse bedroom with one bed
+  and headboard, minimal meeting area, orderly laundry wall, empty elevator
+  lobby, simple cafe booth, clean entryway, or restrained hotel-room corner;
+- composition: balanced face-off, diagonal force chain, triangular tension,
+  vertical stack, circular entanglement, compressed side cluster, mirrored
+  asymmetry, or deliberately off-center imbalance;
+- palette: cobalt with tangerine, magenta with teal, acid yellow with violet,
+  coral with ultramarine, scarlet with cyan, emerald with hot pink, or another
+  vivid complementary or split-complementary system;
+- lighting: hard theatrical side light, crisp overhead pool, complementary
+  color split, luminous back rim with frontal fill, sharp patterned shadow,
+  low raking light, or clean high-key commercial light;
+- material contrast: matte with lacquer, satin with raw wood, knit with metal,
+  translucent acrylic with opaque fabric, polished chrome with rubber, or
+  another tactile pair belonging to the action; and
+- movement accent: directional hair sweep, garment flare, stretched fabric,
+  compressed upholstery, taut rope or limb line, displaced shadow, tilted
+  support, or visible object deformation caused by the force chain; and
+- emotional performance: candy-coated hostility, brittle elegance,
+  melodramatic exhaustion, smug spectacle, awkward tenderness, conspiratorial
+  alliance, theatrical martyrdom, or controlled panic.
+
+Use a disciplined color hierarchy of roughly 60 percent dominant field, 30
+percent contrasting cast and mechanism, and 10 percent high-energy accent.
+Give adjacent adults clearly different clothing or styling colors while
+keeping them inside the same palette. Keep skin tones natural and readable
+under colored light.
+
+Across Themes in one run, do not repeat the same setting mode or geometry,
+composition, palette family, lighting setup, material pair, movement accent,
+hairstyle family, or emotional performance until the available alternatives
+are exhausted. When generating two or more Themes, do not reuse the same
+setting archetype; clean real-world environments may be used more often than
+abstract editorial stages. When generating four or more Themes, at least half
+must use clean real-world environments unless the Story Description explicitly
+requests an abstract series. Change at least four axes between consecutive
+Themes. Richness must still read in this order at thumbnail size: first the
+human silhouette and action, second the metaphor mechanism, third the two
+integrated phrases, and only then surface detail.
 
 ENGLISH-ONLY IMAGE COPY
 
@@ -316,21 +537,19 @@ Each phrase must:
 - avoid names, brands, hashtags, numbers, abbreviations, fine print, and
   generic words such as GOOD, BAD, YES, or NO by themselves.
 
-Examples of productive opposition include "MY SUCCESS" versus "HER WORK",
-"YOU NEVER CARE!" versus "JUST A CAP?", "FIGHT FOR ME" versus "WE OPT OUT",
-"NOT DONE YET?" versus "I'LL DO IT", "EASY LIFE" versus "ONE MORE THING",
-or "I'M LISTENING" versus "LET ME SPEAK".
-These examples show brevity and parallel conflict; invent new phrases suited to
-each Theme instead of repeatedly copying them.
-
-Integrate each phrase into a diegetic carrier that already belongs naturally
-to the action and environment. Prefer lettering stamped, painted, engraved,
-embossed, woven, stitched, printed, or projected onto the broad face of the
-primary object, two existing regions of one support, garment panels, bedding,
-upholstery, or one simple geometric stage cue. Do not introduce separate props
-solely to hold the words. Do not use floating editorial caption blocks,
-speech balloons, subtitles, interface overlays, detached placards, or text
-hovering in empty space.
+Integrate both phrases into two readable regions of the same diegetic carrier
+that already belongs naturally to the action and environment. When an object
+carries the primary metaphor, place both phrases on two regions of that same
+object. When the bodies carry the primary metaphor, place both phrases on two
+regions of the one existing support, floor, or architectural surface. Prefer
+lettering stamped, painted, engraved, embossed, woven, stitched, printed, or
+projected onto that carrier. "Same carrier" means one physical object and
+material substrate: fabric draped over furniture, paper attached to a wall, or
+clothing touching a support remains a separate carrier and is invalid. Do not
+introduce a second carrier or separate prop solely to hold words. Do not use
+floating editorial caption blocks,
+speech balloons, subtitles, interface overlays, detached placards, floating
+paper, unsupported signage, or text hovering in empty space.
 
 The lettering must inherit the carrier's perspective, curvature, folds,
 surface texture, material response, lighting direction, shadow, and degree of
@@ -338,7 +557,10 @@ wear while remaining fully readable. Its type treatment and color must belong
 to the scene's palette rather than looking pasted on afterward. Keep both
 phrases in the central 80 percent of the image, away from faces, hands, body
 contours, and each other. Use large bold horizontal lettering with enough
-material contrast for immediate legibility.
+material contrast for immediate legibility. Give each phrase strong local
+light-dark or complementary-hue contrast against its exact carrier region.
+Never place white or pale lettering on a white or pale region, dark lettering
+on a dark region, or similarly valued colors on one another.
 
 Lock the pair in every Theme premise with this exact English syntax:
 
@@ -396,7 +618,7 @@ actively give, receive, support, guide, or redirect contact within the same
 consensual act.
 
 The explicit act cannot exist only in the content-level proof sentence. Within
-the first 80 words after the four mandatory opening sentences, redescribe its
+the first 80 words after the five mandatory opening sentences, redescribe its
 defining current contact and unobstructed spatial relationship as visible image
 content. Do not replace this with a nearby kneel, embrace, suggestive pose,
 almost-contact, strategically hidden anatomy, or support gesture.
@@ -462,6 +684,37 @@ Use only the line matching the requested content level. This must be the
 fourth sentence, immediately after the contact map. Do not mention a rule,
 rating, or future action; state only what is visibly present now.
 
+STYLE AND ART-DIRECTION MAP
+
+Serialize the complete visual design once in every Theme premise and Frame as
+the fifth sentence:
+
+    Style map: [PERSON] - [EXAGGERATED HAIRSTYLE], [WARDROBE OR BODY-COVERAGE
+    SILHOUETTE], [DOMINANT VIVID HUE COVERING MOST VISIBLE GARMENT AREA],
+    [CONTRASTING ACCENT], [NAMED MATERIAL], [FACIAL-CARICATURE CLUSTER];
+    [PERSON] - [THE SAME SIX FIELDS]; setting -
+    [GEOMETRY], [COMPOSITION], [PALETTE], [LIGHTING], [MATERIAL CONTRAST],
+    [MOVEMENT ACCENT], [EMOTIONAL PERFORMANCE]; copy integration -
+    "[FIRST PHRASE]" [HIGH-CONTRAST LETTERING COLOR] [PHYSICAL LETTERING
+    METHOD] in [LOCAL CARRIER COLOR AND REGION A OF ONE SUPPORTED NATURAL
+    CARRIER], "[SECOND PHRASE]" [HIGH-CONTRAST LETTERING COLOR] [PHYSICAL
+    LETTERING METHOD] in [LOCAL CARRIER COLOR AND REGION B OF THE SAME
+    CARRIER].
+
+Include every requested adult exactly once, with all six person fields
+completed. Distinguish adjacent adults by hairstyle family, silhouette,
+dominant hue, accent, and material. Both locked phrases, two distinct carrier
+regions, and their one shared carrier must appear in the copy-integration
+clause. Put the dominant vivid hue directly in the wardrobe/body-coverage
+field; no neutral garment may precede a contradictory vivid-hue claim. The
+lettering method must match the carrier. Later prose may clarify but never
+replace, omit, or contradict these choices.
+
+The two locked phrases are the only quoted or named copy allowed anywhere in a
+Theme or Frame. Do not put a third quoted phrase, document title, object label,
+or implied pseudo-writing in the cast, body, contact, content, style, or
+free-prose sections.
+
 THEME CONTRACT
 
 Every Theme defines one complete caricature system:
@@ -473,34 +726,43 @@ Every Theme defines one complete caricature system:
   body-position system, and at most one supporting object;
 - one facial-caricature cluster per adult;
 - all numeric body-proportion changes for every adult;
-- one clean matte background and no environmental clutter;
+- one exaggerated hairstyle, vivid styling silhouette, dominant hue,
+  contrasting accent, and material identity per adult;
+- one clean, visually directed stage or real-world environment with no clutter;
 - one locked pair of short English phrases integrated into scene-compatible
   diegetic carriers;
 - one content-level proof whose action physically carries the satire;
-- one frontal or slightly elevated camera relationship; and
-- one high-contrast palette and simple motivated lighting system.
+- one controlled full-body camera relationship; and
+- one selected setting geometry, composition, palette, lighting system,
+  material contrast, and movement accent.
 
-Give each Theme one concise natural title. Its premise must use exactly four
+Give each Theme one concise natural title. Its premise must use exactly five
 sentences to identify the complete cast, relationship, contradiction,
 shared action, metaphor, exaggerations, and locked English copy. Its style must
-be one flowing sentence defining the clean stage, camera, crop, palette,
-lighting, photographic realism, and caricatural finish.
+be one flowing sentence defining the selected setting and geometry, composition,
+camera, crop, 60/30/10 palette, lighting, material contrast, movement accent,
+photographic realism, and caricatural finish.
 
 The Theme premise's first sentence must begin with the dynamic cast
 declaration. Its second sentence must begin with "Body exaggerations:", list
 each person exactly once, and end with "all unlisted body parts remain at
-normal scale." Its third sentence must begin with "Contact map:", list each
-person exactly once, and state the force-transmitting contact. Its fourth
+normal scale, all paired anatomy remains complete, and all altered regions
+remain continuously attached to their owner." Its third sentence must begin
+with "Contact map:", list each person at least once, and state the
+force-transmitting contact. Its fourth
 sentence must begin with the matching "Content-level proof:" prefix, state the
 relationship contradiction, content-level-specific action, dominant metaphor
-mechanism, and locked image-copy pair. Do not place an undeclared body change,
-alternate contact, or contradictory content-level action elsewhere in the
-premise.
+mechanism, and locked image-copy pair. Its fifth sentence must be the complete
+"Style map:" serialization for every adult, the setting, and both copy carriers.
+Do not place an undeclared body change, alternate contact, contradictory
+content-level action, or alternate visual design elsewhere in the premise.
 
 Themes must differ substantially in relationship type, unequal desire,
 interaction verb, metaphor mechanism, facial contrast, body deformation, copy
-pair, palette, and composition. Do not assign concepts according to Theme ID
-or reuse one domestic argument with different props.
+pair, hairstyle family, wardrobe silhouette, setting and geometry, palette,
+lighting, material contrast, movement accent, camera, and composition. Do not
+assign concepts according to Theme ID or reuse one domestic argument with
+different props.
 
 FRAME CONTRACT
 
@@ -514,14 +776,17 @@ language. Use one unbroken natural-language paragraph. The first sentence must
 be the exact dynamic cast declaration and exclude all additional people. The
 second sentence must be the complete "Body exaggerations:" serialization. The
 third sentence must be the complete "Contact map:" serialization. The fourth
-sentence must be the matching "Content-level proof:" serialization. Do
-not introduce a name, wardrobe, face, action, prop, or setting before these
-four mandatory sentences are complete.
+sentence must be the matching "Content-level proof:" serialization. The fifth
+sentence must be the complete "Style map:" serialization. Do not add
+free-form description before these five mandatory sentences are
+complete; within them, include only information required by their schemas.
 Naturally include:
 
 - every adult's Chinese identity, age of at least 25, stable appearance,
   content-level-appropriate wardrobe or nudity state, relationship role, and
   full-body placement;
+- every adult's exaggerated hairstyle silhouette, vivid color pair, styling
+  silhouette, material identity, and optional single statement accessory;
 - each person's exact facial alterations, gaze target, expression, and all
   numeric body-proportion changes;
 - the initiating action, force direction, every participant's response, and
@@ -529,21 +794,31 @@ Naturally include:
 - the primary object or body-position mechanism and sole optional supporting
   object;
 - the social truth made visible by the interaction;
-- the matte background, negative space, camera, crop, focus, and lighting;
-- the exact two English phrases, their carriers, size, color, and placement;
-  and
-- the mandatory final English-copy sentence.
+- the selected setting and geometry, disciplined palette, negative space, camera,
+  crop, focus, lighting, material contrast, and movement accent;
+- the exact two English phrases, their shared carrier, two regions, size,
+  color, and placement.
 
-Near the end, repeat: "Cast remains exactly [FEMALE PHRASE] and [MALE
-PHRASE], with no other people." Omit a zero-count gender phrase and preserve
-grammatical English.
+End every Frame with exactly these three audit sentences in this order. First:
 
-Use a frontal, eye-level, or mildly elevated normal-lens composition that keeps
-every person fully visible from the top of the head through both feet and keeps
-all faces, hands, distortions, contact, and copy readable. The frame edge must
-not crop hair, head, shoulders, elbows, hands, hips, knees, shins, ankles, or
-feet. Avoid extreme wide angle, fisheye, severe foreshortening, shallow focus,
-body-crossing foregrounds, dramatic location depth, or any crop through a
+    Caricature changes scale only: every adult retains exactly one head, one
+    continuous torso, two attached arms, two hands, two attached legs, and two
+    feet; all joints and limbs are traceable, solid forms do not intersect,
+    and every load has a visible support path consistent with gravity.
+
+Second: "Cast remains exactly [FEMALE PHRASE] and [MALE PHRASE], with no
+other people." Omit a zero-count gender phrase and preserve grammatical
+English. Third, reproduce the mandatory final English-copy sentence exactly;
+no text follows it.
+
+Choose a frontal, true-profile, controlled three-quarter, mildly elevated,
+mildly low, or near-overhead full-body composition with a normal or short
+telephoto lens. Keep every person fully visible from the top of the hair
+through both feet and keep all faces, hands, distortions, contact, support
+points, and copy readable. The frame edge must not crop hair, head, shoulders,
+elbows, hands, hips, knees, shins, ankles, or feet. Avoid extreme wide angle,
+fisheye, severe foreshortening, shallow focus, body-crossing foregrounds,
+dramatic location depth, steep angles that hide contact, or any crop through a
 person.
 
 Render real adult skin, pores, hair, eyes, fabric weave, object texture, and
@@ -556,61 +831,46 @@ FINAL REJECTION GATE
 
 Reject and rewrite any Theme or Frame containing:
 
-- the wrong number or gender composition;
-- a missing, duplicated, hidden, cropped, reflected, or extra person;
-- a person disconnected from the shared interaction;
-- a generic expression without named altered facial features;
-- a body distortion without an exact scale and causal role;
-- a Frame whose second sentence is not the complete "Body exaggerations:"
-  serialization;
-- a Theme premise or Frame whose third sentence is not the complete "Contact
-  map:" serialization accounting for every requested adult;
-- a Theme premise or Frame whose fourth sentence is not the matching
-  "Content-level proof:" serialization;
-- a body change described later that was not declared in that person's body
-  entry;
-- an extra, missing, duplicated, detached, fused, replaced, or untraceable
-  head, torso, arm, hand, leg, foot, joint, or finger;
-- an interrupted shoulder-elbow-wrist-hand or hip-knee-ankle-foot chain;
-- a requested person's second leg or foot hidden so completely that the body
-  appears anatomically incomplete;
-- more than one primary metaphor mechanism or more than one supporting object;
-- diagrams, formulas, charts, handwriting, icons, fake fine print, or any
-  unlocked marking on any visible surface;
-- a normally text-bearing object described as dense, formatted, filled,
-  written, scheduled, diagrammed, marked, or detailed beyond the two locked
-  phrases;
-- a cluttered room, busy background, signage, or decorative prop collection;
-- a phrase shown as a floating caption, subtitle, speech balloon, interface
-  overlay, detached placard, or other non-diegetic addition;
-- lettering whose perspective, curvature, material, lighting, shadow, wear, or
-  palette conflicts with its carrier or environment;
-- a new prop introduced only to carry text;
-- weak interaction that could be replaced by people merely posing;
-- hovering, pointing, presenting, raised arms, or another noncontact gesture
-  substituted for sustained physical contact;
-- satire aimed at identity rather than conduct;
-- aesthetic output containing sexualized contact or exposure;
-- erotic output lacking unmistakable intentional sensual contact appropriate
-  to the cast, exceeding into an explicit sexual act, or using sensuality only
-  as decoration;
-- hardcore output that is implicit, preparatory, euphemistic, after-the-fact,
-  missing a requested adult from the current consensual act, or spatially
-  unclear;
-- a hardcore contact map that records only support or pose contacts and omits
-  the defining current sexual contact for any requested adult;
-- a hardcore Frame that claims an explicit act in its proof but does not
-  visibly redescribe the defining contact within the next 80 words;
-- erotic or hardcore satire that remains unchanged when its intimate action,
-  position, effort, or contact is removed;
-- a sexual position or consensual preference treated as inherently superior,
-  inferior, masculine, feminine, selfish, or submissive;
-- coercion, incapacity, restricted breathing, injury, unsafe support, or a
-  sexual bargain tied to work, money, housing, care, or safety;
-- copy longer than four words or 18 characters;
-- missing, altered, translated, misspelled, obstructed, or unreadable copy;
-- a phrase longer than four words or 18 total characters;
-- a camera crop that hides any part of a requested person's head-to-foot body;
-- Chinese characters, pinyin, bilingual text, random letters, numbers,
-  unplanned writing, logos, or watermarks; or
-- an image whose social truth requires an external explanation.
+- any wrong, extra, missing, hidden, cropped, reflected, duplicated, merged, or
+  disconnected person, or any requested adult absent from the contact chain;
+- generic or understated styling; missing named facial alterations, hairstyle,
+  vivid dominant hue, contrasting accent, or material; neutral-major aesthetic
+  clothing; or hair, garments, and accessories hiding required evidence;
+- a childlike, de-aged, injured, diseased, pregnant, mutilated, nonhuman, or
+  body-horror caricature, or satire aimed at identity rather than conduct;
+- a body change without exact scale and causal role, introduced outside its
+  body entry, or outside this brief's limits;
+- any extra, missing, detached, fused, replaced, hidden, or untraceable organ,
+  paired feature, limb, joint, or finger; broken limb chains; ambiguous
+  ownership; impossible joints; intersecting solids; or an altered region not
+  continuously attached to its owner;
+- aesthetic anatomical exposure of chest, breasts, buttocks, groin, or
+  genitals; explicit genital alteration below hardcore; or hardcore genital
+  scale outside 0.7 to 1.5 times normal or unrelated to the consensual act and
+  relationship metaphor;
+- impossible balance, support, reach, force, contact, compression, object
+  response, gravity, hair, garment, or shadow behavior;
+- missing or malformed cast, body, contact, content-level, or style
+  serialization; an incomplete person/style/copy entry; or a Frame missing
+  any exact closing audit sentence;
+- weak posing instead of sustained contact, more than one primary metaphor or
+  one supporting object, clutter, incidental people, or repetitive art
+  direction beyond the variation rules;
+- aesthetic sexualization; erotic contact that is absent, merely decorative,
+  or explicit; or hardcore contact that is implied, unclear, future, past,
+  omitted from the contact map, excludes a participant, or is not redescribed
+  within 80 words after the opening serializations;
+- erotic or hardcore satire that survives removal of its intimate action, or
+  any claim that a consensual position, anatomy, preference, gender, or
+  identity is inherently superior, inferior, selfish, or submissive;
+- coercion, incapacity, intoxication, restricted breathing, unsafe support,
+  injury, or sex tied to authority, work, money, housing, care, or safety;
+- any third text, unlocked mark, diagram, icon, logo, number, random glyph,
+  Chinese character, pinyin, bilingual copy, fine print, or watermark;
+- copy that is altered, misspelled, obstructed, low-contrast, off-palette,
+  longer than four words or 18 characters, placed on separate carriers, or
+  detached from its carrier's perspective, surface, lighting, and material;
+- floating captions, balloons, overlays, placards, unsupported carriers, a
+  new prop used only for copy, or a named title or contents beyond the locked
+  phrases; or
+- a social truth that is not readable from the image itself.
