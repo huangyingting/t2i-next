@@ -57,18 +57,11 @@ granularity remain the dominant surface reality.
 
 BORDERLESS FULL-BLEED SILK GATE
 
-Use a borderless full-bleed composition. The aged prepared-silk painting
-extends continuously to every canvas edge, with painted architecture, reserved
-silk, garment shapes, foliage, or cropped objects naturally reaching and
-leaving the image boundaries. Show no visible mounting margin, mat, frame,
-border, or rectangular edge band.
-
-Keep age visible without outlining the picture. Edge patina must break, vary,
-and dissolve inward irregularly: one corner may show rubbed silk fibers, part
-of one side may carry tea-brown oxidation, and another edge may retain cleaner
-warm-ivory silk. Never connect these traces into a continuous rectangle, inner
-picture outline, evenly colored edge enclosure, decorative rule, or blank
-paper surround.
+Use a borderless full-bleed composition. Painted architecture, reserved silk,
+garments, or foliage may leave the canvas edges. Show no mat, frame, mounting
+margin, inner rectangle, or even edge band. Age traces must break and dissolve
+inward separately: a rubbed corner, a tea-brown patch on one side, cleaner
+ivory elsewhere.
 
 ADULT CAST, CONSENT, AND CONTENT LEVEL
 
@@ -632,30 +625,13 @@ poses.
 
 HUMANIZED FIGURE DETAIL
 
-Human specificity comes from line drawing and bounded washes, never optical
-realism. Give each adult an individualized mature portrait with specific
-facial bone structure, subtle facial asymmetry, unequal eyelid folds, distinct
-brows, nose wings, lip shape, jaw, hairline, ears, fingers, nail beds, and
-age-appropriate expression. The result is convincingly human but
-unmistakably painted.
-
-Within each contour-enclosed skin shape, use exactly three restrained skin
-tones: shell-white or pale ochre base, one transparent warm flesh wash at
-cheeks, joints, palms, and contact areas, and one narrow deeper line-wash
-beneath the jaw or overlapping limb. Keep transitions visibly brushed and
-bounded, never glossy, airbrushed, continuously shaded, or cool-highlighted.
-
-Use plausible adult shoulder, ribcage, abdomen, pelvis, knee, hand, and foot
-proportions, biased toward Tang fullness rather than later slenderness.
-Convey support through contour overlap, bent-joint geometry, cushion
-deformation, garment tension, and hand placement rather than realistic skin
-indentation, muscle rendering, or sculpted volume. Preserve small drawn
-asymmetries instead of smoothing every figure into an idealized diagram.
-
-Expressions carry adult attention and reciprocal response through focused
-inked eyes, asymmetric mouth contours, a light rouge cheek wash, and
-deliberate hand placement. Keep every humanizing detail subordinate to the
-continuous silk surface, flat silhouette, and fine 工笔 line.
+Specificity comes from line and bounded washes, never optical realism. Give
+each adult a mature portrait with bone structure, slight asymmetry, distinct
+brows, lids, nose wings, lips, jaw, hairline, ears, fingers, and expression.
+Use exactly three skin tones inside each contour: pale base, one warm flesh
+wash at cheeks and joints, one narrow darker wash under the jaw or overlap.
+Support reads through contour overlap, bent joints, cushion deformation, and
+garment tension, not sculpted muscle or glossy skin.
 
 SPATIAL AND CONTACT GEOMETRY
 
@@ -687,127 +663,39 @@ decorative furniture.
 
 LINE DISCIPLINE
 
-Render the painting through controlled Tang 工笔 line. Use fine, continuous,
-pressure-sensitive ink contours with 游丝描 gossamer-line delicacy for skin
-and facial features, 铁线描 iron-wire steadiness for garments, 披帛, and
-furniture, and hair-thin repeated strokes for brows, lashes, bun coils, textile
-edges, plant veins, and carved detail.
-
-Keep contour weight varied but restrained. Faces, fingers, toes, garment
-openings, and the defining contact must remain precise at close inspection.
-Use ruled-line architectural discipline for platforms, columns, screens,
-tables, lattice, and floor edges. Curves and straight edges must meet cleanly
-without vector-like sterility.
-
-Do not use ukiyo-e keyblock outlines, comic inking, calligraphic splash
-marks, dry-brush expressionism, boneless flower painting as the dominant
-method, freehand 写意, ink-wash abstraction, Western hatching, airbrushed
-edges, or digital line-art uniformity. Do not imitate Wu-Daozi-like flying
-drapery as a splashy brush performance; keep court-figure drapery ordered.
+Use 游丝描 for skin and faces, 铁线描 for garments, 披帛, and furniture, and
+hair-thin repeated strokes for brows, bun coils, and textile edges. Ruled
+lines hold platforms, columns, screens, and floor edges. Do not use ukiyo-e
+keyblock, comic inking, 写意 splash, Western hatching, airbrush, or digital
+line-art uniformity. Keep court drapery ordered, not splashy flying-ribbon
+performance.
 
 LAYERED MINERAL COLOR
 
-Use Tang 绢本重彩 logic: opaque mineral fields over a silk ground, with
-limited transparent washes for flesh, gauze, and blush. Combine precise
-local-color fills with thin successive glazes. Keep faces and bodies inside
-narrow value ranges with minimal tonal modeling: exactly three restrained
-skin tones plus fine contour detail. Use a pale base, one transparent warm
-flesh wash, and one narrow overlap line-wash. Do not round forms with
-continuous gradients, cool counter-light, cast shadows, chiaroscuro, glossy
-highlights, or Western volumetric rendering.
-
-Preserve mineral-pigment materiality. 石青 and 石绿 may appear slightly
-granular and opaque in protected details; 朱砂 and 胭脂 remain warm but
-controlled; 赭石, 藤黄, soot ink, and pale 蛤粉 or lead-white complete the
-hierarchy. 泥金 may appear only as a small luxury accent on jewelry,
-textile edges, furniture fittings, or 花钿.
-
-Every Theme and Frame must explicitly name a Tang mineral-color palette of
-five to seven principal color families:
-
-- an aged warm-ivory or pale-tea prepared-silk ground;
-- soot ink, charred ink, or dark blue-black as the linear anchor;
-- one or two warm colors such as 胭脂, 朱砂, 赭石, pomegranate, or 藤黄;
-- one or two cool colors such as 石青, 石绿, or muted blue-green;
-- one quiet textile neutral such as moon white, lotus-root pink, apricot,
-  sandalwood brown, or muted indigo; and
-- at most one restrained shell-white or 泥金 accent.
-
-Let the warm silk ground occupy the largest continuous area. Concentrate
-rouge, cinnabar, and ochre in garments, lips, cheeks, 披帛, and selected
-objects; use 石青 or 石绿 to balance the warm field in 半臂, garden leaves,
-or a screen panel. Keep natural skin inside the palette rather than turning
-it into a separate beauty color system. Avoid rainbow color, neon saturation,
-teal-orange grading, uniform beige, muddy brown monochrome, and Japanese
-nishiki-e color-block logic.
+Use 绢本重彩: opaque mineral fields, thin washes only for flesh, gauze, and
+blush. Name a five-to-seven-family palette: warm-tea silk ground; soot ink;
+one or two warms such as 胭脂, 朱砂, 赭石, or 藤黄; one or two cools such as
+石青 or 石绿; one textile neutral such as moon white, apricot, or indigo; at
+most one 泥金 or shell-white accent. Skin stays inside that palette with
+exactly three bounded tones. No gradients, cast shadows, chiaroscuro, neon,
+or nishiki-e color-block logic.
 
 FLAT PICTURE-PLANE GATE
 
-The flat picture plane must dominate the first read, including at thumbnail
-size. Arrange adults, furniture, curtains, and architecture as two to four
-shallow, stacked, overlapping bands parallel to the silk surface. Bodies
-remain anatomically coherent, but their silhouettes, garment contours, and
-enclosed local-color shapes carry the form; they must not look sculpted,
-cinematic, or three-dimensional.
-
-Use contour-enclosed color fields and minimal tonal modeling. Keep each skin,
-garment, wall, floor, and furniture area within a narrow tonal span. Garments
-and architecture use two or three closely related values; skin uses exactly
-three bounded tones for mature human specificity. Let a thin blush wash, a
-narrow garment-edge wash, or a restrained under-chin line-wash suggest turning
-without creating rounded volume. Use no volumetric light-and-shadow modeling,
-cast shadows, spotlight falloff, glossy skin highlights, deep recessive
-darkness, atmospheric perspective, or realistic light wrapping around bodies.
-
-Keep torsos and major limbs mostly parallel or gently oblique to the picture
-plane. Avoid aggressive foreshortening, extreme low or high views, dramatic
-depth recession, and objects projecting toward the viewer. Architectural
-platforms, screens, 榻 rails, and floor edges establish shallow spatial order
-without converging into a Western vanishing point.
-
-The prepared-silk surface must remain visibly continuous through reserved
-areas and thin washes. Blank wall, sky, floor, and curtain zones should read
-as aged silk carrying painted shapes, not as a physically deep room. Reject
-any Frame whose first impression is a realistic interior populated by
-volumetric people rather than a flat Tang silk painting.
-
-CHINESE PAINTING SPACE
-
-Use scattered perspective, an oblique or gently elevated viewing position,
-and ordered shallow overlapping planes. Build only enough depth to clarify
-placement through stacking, architectural frames, textile overlap, and
-reserved silk. Do not use scale recession or a single Western vanishing point
-to create an illusionistic room. Let platforms and screens stabilize the
-adults' curving forms while remaining visibly parallel to the painted surface.
-
-Prefer a horizontal handscroll segment or a near-square panel, with occasional
-vertical panels or a round 纨扇 format when suited to the Theme. Compose a
-foreground clue, dominant middle-ground adult interaction, and sparse
-architectural or garden background. Reserve meaningful blank silk or a quiet
-wall plane so ornament does not overwhelm the figures.
-
-Use no lens terminology, technical capture specification, cinematic lighting,
-depth of field, bokeh, photographic realism, dramatic rim light, volumetric
-light, or modern color grading. Do not describe illumination as physically
-realistic. Represent time through bounded local color, pale silk reserves,
-and restrained wash zones: a lamp, candle, moon, or lattice appears as a
-painted motif without directional cast shadows, glow falloff, reflected
-light, or atmospheric depth.
+The first read, including thumbnail size, must be a flat painting: two to four
+shallow stacked bands parallel to the silk, contour-enclosed color fields, and
+dominant silhouettes. Torsos stay mostly parallel or gently oblique. Use
+scattered perspective and a gently elevated view, never a Western vanishing
+point, lens language, depth of field, cinematic light, or a deep room of
+volumetric people. Prefer a horizontal handscroll segment or near-square
+panel; occasional vertical or 纨扇 formats are allowed. Reserve blank silk.
+A lamp or moon is a painted motif without glow falloff or cast shadows.
 
 SYMBOLISM AND OBJECT RESTRAINT
 
-Use at most one or two symbolic motifs in a Frame. Appropriate choices
-include peonies, lotus, willow, crabapple, mandarin ducks, paired
-butterflies, pomegranate, grapes, a parrot, a 铜镜, a half-open curtain, a
-leaning flower branch, or fallen hair ornaments. Symbols enrich mood and
-composition but never replace visible human action.
-
-Select only a few functional objects: grape-vine bronze mirror, incense
-burner, candle stand, round fan, 三彩 or plain ceramic vessel, lacquer box,
-tea bowl, wine ewer, 琵琶, 琴, 箜篌, music score, scroll, comb, hairpin,
-embroidered shoe, 披帛, garment rack, or embroidery hoop. Every object must
-have a plausible scale, support, location, and narrative role. Avoid turning
-the Frame into an antique inventory.
+Use at most two symbolic motifs, such as peony, lotus, willow, ducks, a
+parrot, or a fallen pin. Symbols never replace action. Functional objects
+come from the object pool, each with scale, support, and a present job.
 
 TEXT AND ATTRIBUTION GATE
 
@@ -824,48 +712,11 @@ Tang-dynasty silk figure-painting panel.
 
 AGED SILK AND PIGMENT PATINA
 
-Age must be visible at first glance and thumbnail size. Make the work read as
-a carefully preserved but unmistakably old silk painting, with painting
-technique contributing roughly two-thirds of the impression and one-third
-from visible material age. The figures and line work remain legible, but the
-warm silk field, pigment condition, edge wear, and handling history must
-register before close inspection.
-
-Give every Frame one field-scale age structure: visibly uneven warm-tea silk
-across reserved walls, floor, sky, and blank areas; one broken patch of
-darker tea-brown edge oxidation dissolving inward from part of an image edge;
-one gently rubbed corner; and one shallow age crease crossing only blank silk
-or architecture. Keep protected mineral color noticeably richer than exposed
-outer pigment. This structure belongs to the full-bleed silk picture surface,
-not a separate frame, mounting border, tabletop, gallery display, or
-photographic overlay.
-
-Every Theme and Frame must include three to five localized, physically
-plausible age cues in addition to that field-scale structure:
-
-- visible silk warp and weft, paper fiber, or a restrained fold clearly
-  visible in reserved areas;
-- 石青 or 石绿 remaining jewel-like in protected recesses while exposed
-  grains show visible powdering or small losses;
-- 胭脂, 藤黄, or light organic dye naturally fading more than soot ink,
-  朱砂, mineral green, or protected textile color;
-- a few softened outer ink contours, pigment flakes, abraded silk fibers, or
-  faint handling polish away from faces and defining contact; and
-- one muted collector-seal shape or blank title slip touching a lower image
-  edge without creating a surrounding margin.
-
-Age must follow exposure, handling, folding, pigment chemistry, and mounting
-construction. Protect faces, hands, anatomy, eye lines, garment structure,
-hair ornaments, makeup, and the defining interaction from major damage.
-Preserve crisp ink in important contours and stronger mineral color in
-sheltered areas.
-
-Do not apply a global sepia filter, yellow veil, gray desaturation,
-photographic grain, scratches across the entire image, vignette, faded-film
-effect, burned edges, heavy foxing, mold, broad water stains, dense
-wormholes, dramatic tears, fake craquelure over skin, artificial ink bleed,
-or generalized dirt. Do not make the painting look abandoned, excavated,
-scorched, or digitally distressed.
+Age is visible at thumbnail size without hiding faces or the action: uneven
+warm-tea silk; one broken tea-brown edge patch dissolving inward; one rubbed
+corner; one crease on blank silk or architecture; three localized cues such as
+visible weave, powdered 石青, faded 胭脂, or a mute seal touching a lower
+edge. No global sepia, film grain, burned edges, mold, or fake craquelure.
 
 THEME CONTRACT
 

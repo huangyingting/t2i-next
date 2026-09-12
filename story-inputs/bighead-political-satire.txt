@@ -32,11 +32,59 @@ mask: bold, readable, still a real adult face with two eyes, one nose, one
 mouth, and two ears. Features may be swollen, pinched, or skewed, but they
 stay attached to that one head.
 
-Give every huge head a theatrical expression. Combine two or three visibly
-altered features: popped or slit eyes, hooked or flying brows, a megaphone
-mouth, a compressed line, inflated cheeks, or flared nostrils. Name the
-expression and those features. Adjacent people must contrast. A mild smile,
-calm composure, vacant politeness, or generic seriousness is not enough.
+Give every huge head a specific expression chosen for this instant, not a
+default mask. The lists below are pools. Pick whatever combination best fits
+the person, the force, and the content level. Do not cycle through the pool
+in order, and do not put the same combination on two people.
+
+Feature pool — mix families as needed:
+
+- eyes: one popped and one slit, both circular and staring, both reduced to
+  dashes, heavy lowered lids, no visible iris, or a severe side-eye
+- brows: one hooked and one flying, a single fused bar, knotted inner peaks,
+  or brows that climb into the hairline
+- mouth: a diamond shout, a down-hook grimace, a tiny chewed O, a rectangular
+  grimace showing upper teeth only, a lopsided smirk with one canine, lips
+  sucked inward, a tongue licking the upper lip, a tongue touching a canine,
+  a lower lip caught in teeth, or a slow parted breath
+- cheeks and jaw: one cheek ballooned, the other hollow; a shifted jaw; a
+  chin tucked into the neck; or a jaw so wide it crowds the ears
+- nose and ears: a pinched bridge, a bulb pushed aside, nostrils flared on
+  one side only, or one ear larger because it is doing the listening
+- surface signs of the current effort: a tear track, a sweat bead, a temple
+  vein, or spit at the lip — never semen
+
+Name the emotion and the features actually used. Adjacent adults must differ.
+Across Themes, do not reuse the last Theme's eye-and-mouth pairing. A mild
+smile, calm composure, vacant politeness, or the same face on everyone is not
+enough. Keep exactly two eyes, one nose, one mouth, and two ears on one head.
+
+Match the pool to the content level. Stay inside the level; do not empty the
+pool onto every face.
+
+Aesthetic pool — social and civic only: irritation, fake cheer, smug duty,
+panic, boredom, theatrical pity. No bedroom look, no orgasm.
+
+Erotic pool — suggestive, not climax. Choose what the moment needs, for
+example: licking the upper lip or cupid's bow; catching the lower lip in
+teeth; the tip of the tongue behind teeth; a blown breath toward a throat;
+a finger at the corner of one's own mouth; looking over one lowered lid;
+looking at a mouth or throat then flicking away; a smirk that knows it is
+watched; a swallowed swallow; a held breath; a shiver under the eye. Pair
+tease with caught, or hunger with pretending not to care. Do not require
+every face to lick a lip. Do not use rolled-back eyes, a hanging tongue of
+orgasm, or identical open-mouth lust. A tongue on one's own lip is an
+expression, not oral sex, and does not touch another person's chest, nipple,
+or genitals.
+
+Hardcore pool — climax, near-climax, strain, control, or aftershock caused
+by the current act. Choose what the moment needs, for example: clenched
+teeth and wet lashes; a silent square mouth; a broken moan held in the
+throat; a sobbing open cry from effort; a laughing grimace; one eye rolled
+and one focused; a bitten upper lip that failed; brows crushed while the
+mouth falls open; slack-jaw aftershock. One adult may come undone while the
+other stays concentrated or smug. Do not copy the same ahegao onto every
+head. Do not use childlike climax faces. Semen is not an expression.
 
 The huge head must remain fully visible. Hair, hats, medals, and microphones
 may decorate it; they may not replace it or hide the face that carries the
@@ -98,7 +146,8 @@ office. At erotic and hardcore levels, do not use doctor and patient, teacher
 and pupil, boss and subordinate, senior and junior, minister and secretary,
 owner and staff, or any pair where refusal could cost care, work, money, or
 housing. Do not give anyone bound feet,
-injured anatomy, or a childlike face.
+injured anatomy, a childlike face, a baby or child role, or a baby bottle,
+pacifier, crib, or other infant prop.
 
 Clothing must read as that nationality's dress, cut to the body kit and to
 the situation: Zhongshan suit, qipao, embroidered robe, or mandarin-collar
@@ -268,8 +317,9 @@ Frame is made:
 
 Give the Theme a short natural title. The Theme premise is exactly two
 sentences. Sentence one names every requested adult, their nationality,
-role, oversize head, exaggerated expression, nationality-coded clothing,
-and full body kit, including genital scale at hardcore level. Sentence two names the invented place, the
+role, oversize head, chosen expression and its named features,
+nationality-coded clothing, and full body kit, including genital
+scale at hardcore level. Sentence two names the invented place, the
 content-level action, the emblem, and the social fact that action makes
 visible. The Theme style is one sentence that only names the room, its
 surfaces, and the light source as objects in the scene. It must not name a
@@ -317,7 +367,12 @@ Redraw any Theme or Frame that:
 - repeats one body kit on two people in the same Theme
 - adds, drops, detaches, or fuses a limb or joint
 - hides a foot, hand, or the huge head
-- gives anyone a mild, generic, or unexaggerated expression
+- gives anyone a mild, generic, or unexaggerated expression, or repeats the
+  previous Theme's eye-and-mouth pairing
+- gives two people in one Frame the same expression
+- uses a suggestive or climax face at aesthetic level
+- uses a climax face at erotic level, or a civic-only face at erotic level
+- uses identical orgasm faces on every adult at hardcore level
 - makes anyone not Chinese, Japanese, or Korean, or dresses them against
   that nationality
 - portraits a living public figure, a real sitting government, or a real
@@ -340,8 +395,8 @@ Redraw any Theme or Frame that:
   weight has no obvious path to the floor
 - uses doctor and patient, boss and subordinate, senior and junior, or sex
   traded for care, work, or money
-- mismatches a name to its nationality, or uses bound feet, injury, or a
-  childlike face
+- mismatches a name to its nationality, or uses bound feet, injury, a
+  childlike face, a baby or child role, or infant props
 - changes a locked figure between Frames
 - invents writing that was not locked, or drops a locked label
 - shows any non-English writing, including Chinese characters, kana, kanji,
