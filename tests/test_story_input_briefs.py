@@ -1305,3 +1305,48 @@ def test_magazine_cover_brief_builds_a_finished_newsstand_cover() -> None:
     )
     assert "At hardcore level" in normalized
     assert "the result is one flat portrait 3:4 magazine front cover" in normalized
+
+
+def test_extreme_absurdity_requires_visible_human_prop_contact_chain() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "extreme-absurdity.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "HUMAN-TO-PROP CONTACT CHAIN" in normalized
+    assert (
+        "name the exact participant, exact body part, exact prop surface, "
+        "contact direction, and sustained force"
+        in normalized
+    )
+    assert "A nearby, implied, automatic, or untouched prop is invalid" in normalized
+    assert (
+        "trace one unbroken visible force path from the human contact point "
+        "to the prop's present state"
+        in normalized.lower()
+    )
+    assert (
+        "Within the first two sentences, state the human-to-prop contact point"
+        in normalized
+    )
+    assert "HUMAN-PROP SCALE AND FIT" in normalized
+    assert "Give every adult a visible height and build" in normalized
+    assert "the area carrying body weight, the free space around joints" in normalized
+    assert "Keep one scale throughout the Frame" in normalized
+    assert "EYEWITNESS STATIC DESCRIPTION" in normalized
+    assert (
+        "Write as if a photographer is looking at one finished still" in normalized
+    )
+    assert (
+        "state face direction, gaze target, visible expression through brows, "
+        "eyelids, mouth, jaw, and cheek tension"
+        in normalized
+    )
+    assert "Describe the final effect as present visible geometry" in normalized
+    assert "Do not substitute abstract causal verbs" in normalized
+    assert "BRIGHT EXAGGERATED STYLING" in normalized
+    assert "Give every participant a distinct, stable, photographable styling package" in normalized
+    assert "no participant appears as an unstyled generic nude" in normalized
+    assert "an exaggerated but physically plausible hairstyle" in normalized
+    assert "Specify visible makeup for every participant" in normalized
+    assert "assign complementary colors and different silhouettes" in normalized
