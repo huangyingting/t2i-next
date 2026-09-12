@@ -120,8 +120,8 @@ function, and adult social context.
 
 Prefer outdoor outing ground: Qujiang, Wei river willows, polo fields,
 suburban riding paths, carriage halts, mountain terraces, and garden dikes.
-Indoor galleries, music rooms, and chambers are the minority. Do not turn
-every setting into a brothel, battlefield, or temple mural.
+Do not use indoor galleries, music rooms, or chambers as the setting. Do not
+turn every setting into a brothel, battlefield, or temple mural.
 
 Use coherent Tang architecture and furnishings: rammed-earth or brick
 platforms, vermilion columns, white plaster walls, bracket sets, lattice
@@ -470,10 +470,8 @@ the Frame, but do not change the designed pieces.
 SCENE AND ACTIVITY POOL
 
 Choose one adult situation per Theme and stage it with original blocking. Do
-not reconstruct a named famous painting. Do not default to an indoor 榻
-chamber. In any run of three or more Themes, at least half must be outdoor or
-in transit. When the run has one or two Themes, every Theme must be outdoor
-or in transit unless the Story Description itself names a closed room.
+not reconstruct a named famous painting. Every Theme must be outdoor or in
+transit. An indoor 榻, bedchamber, music room, or closed gallery is invalid.
 
 Outdoor and outing families, preferred:
 
@@ -490,8 +488,8 @@ Outdoor and outing families, preferred:
 - 柳堤并行: two adults walking a dike, skirt or robe hems in motion, water
   and willow as 画 washes behind 平面 garment panels.
 
-Indoor families remain allowed only as the minority: 对镜梳妆, 宫乐, 烹茶,
-对弈, 听琴, 捣练, 刺绣, 夜宴, 展卷, 浴后理衣.
+Grooming, music, or tea may occur only as an outdoor halt: a mirror held
+beside a saddle, a 琵琶 on a picnic mat, tea on a 胡床 under willows.
 
 Keep horses, oxen, and parrots out of sexual contact and out of the human
 cast. Hardcore outing scenes stay on a picnic mat, carriage floor, pavilion
@@ -723,8 +721,8 @@ Each Theme must establish:
 - one near-square, horizontal, vertical, 纨扇, or handscroll-segment
   composition;
 - one 游丝描 and 铁线描 line hierarchy plus named 平面/画 mix;
-- outdoor outing, riding, polo, or carriage halt as the default setting
-  family unless a minority indoor Theme is being used;
+- an outdoor outing, riding, polo, willow bank, or carriage-halt setting,
+  never an indoor chamber;
 - one five-to-seven-family mineral-color palette with layered-wash behavior;
 - one restrained present-tense narrative trace and at most two symbolic
   motifs;
