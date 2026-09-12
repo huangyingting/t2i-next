@@ -140,14 +140,12 @@ satire, one oversize head, an exaggerated expression, nationality-coded
 clothing, and a unique body kit that stays identical across all Frames of the
 Theme. When the cast has two or more people, mix those nationalities rather
 than dressing everyone the same.
-Roles may be spouses, partners, peers, hosts, guests, shopkeepers,
-performers, colleagues of equal rank, or fictional officials in an invented
-office. At erotic and hardcore levels, do not use doctor and patient, teacher
-and pupil, boss and subordinate, senior and junior, minister and secretary,
-owner and staff, or any pair where refusal could cost care, work, money, or
-housing. Do not give anyone bound feet,
-injured anatomy, a childlike face, a baby or child role, or a baby bottle,
-pacifier, crib, or other infant prop.
+Roles may be spouses, partners, hosts, guests, shopkeepers, performers,
+colleagues, officials, clerks, ministers, secretaries, doctors, patients, or
+other adult parts in the joke. Power, office, and care may be the satire.
+Every person remains a fictional adult aged 25 or older, alert, and willing.
+Do not give anyone bound feet, injured anatomy, a childlike face, a baby or
+child role, or a baby bottle, pacifier, crib, or other infant prop.
 
 Clothing must read as that nationality's dress, cut to the body kit and to
 the situation: Zhongshan suit, qipao, embroidered robe, or mandarin-collar
@@ -259,8 +257,8 @@ CONTENT LEVEL
 
 Honor the exact requested content level. Figures, place, and satirical target
 stay in force, but the action that carries the satire must change with the
-level. The roles are satirical parts worn by consenting fictional adults, not
-a workplace or household where refusal is punished.
+level. Offices, clinics, and ranks are costumes in the allegory, worn by
+consenting fictional adults.
 
 At aesthetic level, perform the gag with fully opaque costume and nonsexual
 action: carrying, stamping, cooking, blocking, applauding, counting, waiting,
@@ -297,9 +295,9 @@ anatomy the adult already has: one penis on a man, none grown from a woman's
 chest, nipple, or back. Do not treat a genital, gender, or preference as
 inherently inferior.
 
-No content level permits coercion, minors, intoxication, real-person
-likenesses, sex as tribute, payment, medical treatment, or job condition, or
-humiliation aimed at identity.
+No content level permits non-consent, minors, intoxication, real-person
+likenesses, or humiliation aimed at identity. Satire of office, care, or
+credit may use those settings; it must still show willing adults.
 
 THEME SEED
 
@@ -360,7 +358,6 @@ DISCARD PILE
 Redraw any Theme or Frame that:
 
 - uses the wrong number or gender of people
-- adds a crowd or extra human
 - gives anyone a normal-sized head
 - leaves torso, chest, waist, buttocks, arms, hands, legs, or feet unnamed,
   or at hardcore level leaves genital scale unnamed
@@ -377,7 +374,6 @@ Redraw any Theme or Frame that:
   that nationality
 - portraits a living public figure, a real sitting government, or a real
   national flag
-- aims the joke at identity or nationality rather than conduct
 - repeats the same satire domain as the previous Theme
 - needs a caption to be understood
 - names a visual style, medium, genre, or rendering method
@@ -393,10 +389,6 @@ Redraw any Theme or Frame that:
   contact geometry that includes every adult
 - leaves a hand, foot, or person out of the force chain, or stacks bodies so
   weight has no obvious path to the floor
-- uses doctor and patient, boss and subordinate, senior and junior, or sex
-  traded for care, work, or money
-- mismatches a name to its nationality, or uses bound feet, injury, a
-  childlike face, a baby or child role, or infant props
 - changes a locked figure between Frames
 - invents writing that was not locked, or drops a locked label
 - shows any non-English writing, including Chinese characters, kana, kanji,
