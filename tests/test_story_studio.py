@@ -14,6 +14,7 @@ from t2i_story_pipeline.errors import (
     StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
+    OutputLanguage,
     StoryStage,
     TokenUsage,
 )
@@ -364,6 +365,100 @@ async def test_studio_normalizes_frame_ids_by_response_order(tmp_path) -> None:
         "F01",
         "F02",
     ]
+
+
+@pytest.mark.asyncio
+async def test_studio_retries_explicit_ascii_contract_violations(tmp_path) -> None:
+    rejected_theme_batch = make_theme_batch()
+    rejected_theme_batch.themes[0].title = "Lost luggage"
+    rejected_theme_batch.themes[0].premise = "An em dash — violates ASCII."
+    rejected_theme_batch.themes[0].style = "Rainy station photography."
+    accepted_theme_batch = make_theme_batch()
+    accepted_theme_batch.themes[0].title = "Lost luggage"
+    accepted_theme_batch.themes[0].premise = "Two adults locate their luggage."
+    accepted_theme_batch.themes[0].style = "Rainy station photography."
+    accepted_sequence = make_frame_sequence()
+    for frame in accepted_sequence.frames:
+        frame.prose = "Two adults inspect a worn suitcase at a rainy station."
+    request = make_story_request(output_language=OutputLanguage.ENGLISH).model_copy(
+        update={
+            "story": (
+                "When the requested language is English, use only ASCII code "
+                "points U+0020\nthrough U+007E."
+            )
+        }
+    )
+    model = FakeStoryModel(
+        [
+            rejected_theme_batch,
+            accepted_theme_batch,
+            accepted_sequence,
+        ]
+    )
+
+    completed = await make_studio(model, tmp_path, concurrency=1).run(request)
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
+
+    assert model.stages[:2] == [StoryStage.THEMES, StoryStage.THEMES]
+    assert "contains non-ASCII character U+2014" in model.messages[1][-1].content
+    assert attempts[0].outcome == StoryAttemptOutcome.REJECTED
+
+
+@pytest.mark.asyncio
+async def test_studio_ascii_contract_does_not_reject_chinese_output(tmp_path) -> None:
+    request = make_story_request().model_copy(
+        update={
+            "story": (
+                "When the requested language is English, use only ASCII code "
+                "points U+0020\nthrough U+007E."
+            )
+        }
+    )
+    model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
+
+    completed = await make_studio(model, tmp_path, concurrency=1).run(request)
+
+    assert completed.result.themes[0].theme.title.startswith("遗失行李")
+    assert model.stages == [StoryStage.THEMES, StoryStage.FRAMES]
+
+
+@pytest.mark.asyncio
+async def test_studio_retries_explicit_independent_frame_violations(
+    tmp_path,
+) -> None:
+    rejected_sequence = make_frame_sequence()
+    rejected_sequence.frames[1].prose = (
+        "At Beijing station in autumn,\nthe same wet platform remains visible."
+    )
+    request = make_story_request().model_copy(
+        update={
+            "story": (
+                "Write the opening as a complete first presentation of the "
+                "setting with no backward pointer or reference to another Frame."
+            )
+        }
+    )
+    model = FakeStoryModel(
+        [
+            make_theme_batch(),
+            rejected_sequence,
+            make_frame_sequence(),
+        ]
+    )
+
+    completed = await make_studio(model, tmp_path, concurrency=1).run(request)
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
+
+    assert model.stages == [
+        StoryStage.THEMES,
+        StoryStage.FRAMES,
+        StoryStage.FRAMES,
+    ]
+    assert (
+        "Frame F02 contains backward-pointing language"
+        in model.messages[2][-1].content
+    )
+    assert attempts[1].outcome == StoryAttemptOutcome.REJECTED
 
 
 @pytest.mark.asyncio

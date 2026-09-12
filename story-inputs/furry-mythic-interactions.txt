@@ -1,0 +1,444 @@
+BRIEF
+
+Create varied live-action fantasy photography Themes in which exactly one
+adult human protagonist interacts with one or more intelligent,
+anthropomorphic furry beings drawn from public-domain mythology or an
+original fantasy archetype. The protagonist is always a real-looking adult
+man or adult woman. The furry beings are tangible living characters, never
+mascot suits, cartoons, game renders, pets, or background decoration.
+
+Every Theme must present an original encounter with a clear shared action,
+conflict, bargain, test, rescue, ritual, investigation, performance, journey,
+or reversal. The human protagonist must make the decision that starts,
+redirects, refuses, or resolves the interaction.
+
+EXAMPLES ARE OPEN-ENDED
+
+Lists of species, myths, roles, settings, garments, objects, interactions, and
+visual treatments are inspiration rather than menus, presets, or Theme-ID
+assignments. Combine compatible examples, transform them, or invent an
+equivalent. Only statements using "must," "every," "exact," or "do not" are
+mandatory.
+
+DECISION ORDER
+
+Resolve every Theme and Frame in this order: one exact adult human
+protagonist; allowed source material and original design; unmistakably adult
+and sapient furry cast; selected content level; protagonist agency; one
+shared interaction; live-action creature realism; readable body and contact
+physics; setting and cultural register; wardrobe, props, camera, and light.
+A later choice must never weaken an earlier one.
+
+ORIGINALITY AND SOURCE-MATERIAL GATE
+
+Use only:
+
+- public-domain mythological, religious, folkloric, or literary figures;
+- traditional archetypes with no single modern owner;
+- completely original high-fantasy characters;
+- completely original heroic, vigilante, cosmic, or superhuman archetypes.
+
+Journey to the West figures such as Sun Wukong, Zhu Bajie, the Bull Demon
+King, Princess Iron Fan, and traditional celestial or underworld officials
+may be interpreted from the public-domain novel and older folklore. The
+Eight Immortals may be interpreted from traditional legends. Traditional
+angels, demons, djinn, oni, tengu, naga, yaksha, fauns, satyrs, sphinxes,
+garudas, kitsune, werewolves, animal-headed deities, and comparable beings
+may be used from their public-domain cultural sources.
+
+Do not reproduce a character, costume, emblem, weapon, catchphrase, location,
+actor likeness, silhouette, color scheme, or story event from Warcraft,
+Marvel, DC, a modern game, a modern comic, a film, a television series, or
+another copyrighted franchise. Do not disguise a protected character by
+changing only the name, species, color, or one costume detail.
+
+Do not name, imitate, evoke, combine, or transpose the style of any real
+director, photographer, cinematographer, production designer, artist, actor,
+studio, film, television series, comic, or game. Define every visual style
+only through visible choices in composition, lens behavior, set construction,
+material, palette, atmosphere, and motivated light.
+
+When a Theme uses an original high-fantasy or heroic archetype, build it from
+independent traits. For example, invent a crane archivist who stores broken
+oaths in porcelain feathers, a snow-leopard bridge marshal who taxes
+memories, a rhinoceros rescue engineer whose armor unfolds into scaffolding,
+or a raven night courier who delivers sealed dreams. Never describe an
+original figure as a substitute, counterpart, version, parody, or lookalike
+of an existing franchise character.
+
+When a public-domain figure has famous modern adaptations, return to the
+older textual or folkloric attributes and invent a new garment, material,
+palette, body design, and dramatic situation. Do not imitate a modern
+adaptation or a living actor.
+
+HUMAN PROTAGONIST CONTRACT
+
+Use exactly one human protagonist and no other human figure. The request must
+specify either one woman and zero men or zero women and one man. Do not run
+this brief with any other human cast.
+
+The protagonist must be an unmistakably mature adult aged twenty-five or
+older. State the protagonist's age, gender, nationality, facial structure,
+skin, build, hair, complete wardrobe state, and one stable identifying
+detail. Preserve those anchors throughout the Theme and every Frame.
+
+Give the protagonist a plausible fictional name in ASCII Latin letters. Do
+not use the name, title, alias, face, biography, or identifying combination
+of a public figure, religious leader, historical celebrity, actor, or other
+real person.
+
+The protagonist remains fully human. Do not add animal ears, muzzle, fur,
+tail, paws, hooves, wings, scales, horns, or a transformation state to the
+human body. Animal-inspired clothing does not change this rule.
+
+The protagonist must visibly initiate, choose, refuse, negotiate, guide,
+rescue, challenge, trick, protect, release, or complete the shared action.
+Never reduce the protagonist to a spectator, trophy, captive, passive
+recipient, anonymous camera viewpoint, or interchangeable adventurer.
+
+Do not add a human companion, crowd, guard, worshipper, servant, victim,
+portrait, statue, reflection, screen figure, corpse, or human-shaped
+background silhouette. A public-domain mythic figure who is traditionally
+fully human may not appear as an additional human; either omit that figure or
+create an original, clearly nonhuman furry interpretation grounded in an
+appropriate animal symbol.
+
+FURRY CAST CONTRACT
+
+Include one to three furry beings. Every furry being must be an alert,
+intelligent, speaking or clearly reasoning adult with a mature social role,
+individual name, species, face, body build, wardrobe, motivation, and active
+part in the encounter.
+
+Furry beings do not count as additional human women or men. Describe them as
+adult anthropomorphic beings rather than human people. They may have a
+clearly adult masculine, feminine, or ungendered presentation, but never use
+them to evade or contradict the exact one-human cast.
+
+Every furry being must be predominantly bipedal and humanoid in stance, with
+an upright adult torso, two attached arms, two attached legs, articulate
+hands or species-appropriate grasping forepaws, and a clearly animal head.
+Wings, tails, horns, antlers, or a second pair of mythic arms may appear only
+when traditional source material makes them essential and every attachment
+remains anatomically traceable.
+
+Do not depict an ordinary animal, feral quadruped, pet, livestock animal,
+mount, zoo animal, animal-headed human mask, mascot performer, plush toy,
+fursuit, taxidermy body, or human wearing glued-on ears and a tail. Do not
+use cub, pup, kitten, hatchling, childlike proportions, juvenile behavior,
+school-age coding, or age ambiguity.
+
+Give each furry being one coherent species anatomy. Preserve muzzle length,
+ear shape, eye color, fur pattern, tail, hands, feet, height, build, scars,
+horns, and other anchors in every Frame. Do not mix random species parts or
+change species between Frames.
+
+LIVE-ACTION FURRY REALISM
+
+Render the human as a photographed adult performer and every furry being as a
+physically present cinematic creature sharing the same set, lens, light,
+gravity, and contact shadows.
+
+Use individually visible fur strands with directional growth, denser guard
+hair over a softer undercoat, natural clumping at joints, subtle variation in
+length and color, dampness or dust only when the setting causes it, wet
+reflective eyes, translucent ear edges, textured nose leather, believable
+whisker roots, and species-appropriate teeth and tongue.
+
+Build faces through plausible skull, muzzle, cheek, brow, eyelid, and jaw
+structures. Expressions must remain readable through ear angle, eyelids,
+brows, muzzle tension, lips, nostrils, whiskers, and head posture without
+turning the face into a human face covered in fur.
+
+Wardrobe must sit on the actual creature anatomy. Collars accommodate neck
+fur; sleeves account for wrist and forepaw structure; trousers, robes, and
+armor accommodate digitigrade or plantigrade legs and a tail opening; hats
+and helmets accommodate ears, horns, or antlers. Show compression, displaced
+fur, seams, buckles, weight, abrasion, and contact rather than floating
+costume pieces.
+
+Favor practical creature effects, prosthetic facial construction,
+animatronic subtlety, real textiles, weathered metal, carved wood, leather,
+ceramic, feathers, and on-set atmosphere. Digital enhancement may refine
+eyes, mouth articulation, tail balance, or wings, but must remain subordinate
+to photographed material reality.
+
+Do not use anime, manga, cel shading, illustration, comic panels, concept
+art, painterly rendering, mascot styling, plush softness, toy anatomy,
+plastic skin, glossy game CGI, weightless digital fur, generic fantasy
+wallpaper, or a screenshot interface.
+
+PUBLIC-DOMAIN MYTHIC LANES
+
+Vary among public-domain lanes while respecting each culture's source
+material and avoiding a costume collage:
+
+- Journey to the West encounters: a real human mediator bargains with Sun
+  Wukong at a celestial checkpoint, catches Zhu Bajie falsifying a feast
+  inventory, helps the Bull Demon King repair a cracked oath furnace, or
+  refuses an underworld official's impossible travel permit.
+- Eight Immortals encounters: reinterpret one Immortal through an original
+  furry embodiment linked to a traditional attribute, such as a crane,
+  deer, fox, tiger, carp, bat, or tortoise, while retaining the legendary
+  object or moral tension without copying a modern depiction.
+- Chinese myth and folklore: animal spirits, dragon-court envoys, moon
+  rabbits, fox spirits, qilin magistrates, guardian lions, ox-headed
+  underworld clerks, bird messengers, or mountain demons.
+- Angels and demons: original lion, ram, raven, owl, serpent, or stag beings
+  negotiating judgment, temptation, confession, mercy, memory, or a broken
+  covenant. Avoid modern franchise cosmology and generic red-devil parody.
+- Greek and Roman myth: satyrs, fauns, sphinxes, harpies, animal-aspected
+  messengers, underworld guides, or invented temple guardians.
+- Egyptian and Mesopotamian myth: animal-headed divine envoys, sphinxes,
+  lamassu-derived guardians, jackal archivists, ibis judges, lioness
+  protectors, or bull gatekeepers, interpreted respectfully and originally.
+- Norse and Northern European folklore: raven seers, wolf oath-keepers,
+  bear berserker spirits, fox tricksters, goat bridge wardens, or original
+  winter court beings without modern superhero styling.
+- Japanese, Korean, South Asian, Southeast Asian, African, Oceanic, and
+  Indigenous American traditions when the Theme can identify a specific
+  public-domain source and avoid flattening distinct cultures into generic
+  exotic fantasy.
+
+Do not combine unrelated sacred objects, garments, scripts, architecture, and
+species merely for spectacle. One Theme must use one coherent cultural or
+original-world register.
+
+When these Theme IDs exist, use the following mandatory lanes while inventing
+all story, character, setting, and visual specifics:
+
+- T001: one public-domain Journey to the West figure in a new live-action
+  furry interpretation grounded in the original novel or older folklore;
+- T002: one of the Eight Immortals reinterpreted as an original furry adult
+  through one traditional attribute, object, or moral tension;
+- T003: one completely original high-fantasy furry adult;
+- T004: one traditional angel, demon, underworld envoy, or celestial judge
+  in an original furry embodiment;
+- T005: one public-domain mythological furry figure from a tradition not used
+  by T001 through T004;
+- T006: one completely original heroic, vigilante, rescue, or cosmic furry
+  adult with no modern comic or game analogue.
+
+For T007 and above, rotate unused public-domain and original lanes. Do not
+repeat a source tradition, species, occupation, central object, or encounter
+family until the available range has been substantially explored.
+
+ORIGINAL FANTASY AND HEROIC LANES
+
+Original high-fantasy lanes may include a wolf border marshal, fox court
+advocate, bear siege medic, hyena debt collector, otter canal engineer,
+raven astronomer, tiger monastery cook, hare smuggler, crocodile harbor
+judge, moth oracle, snow-leopard cartographer, or an equally specific role.
+
+Original heroic lanes may include a rhinoceros disaster rescuer, cheetah
+transit guardian, bat evidence hunter, owl rooftop negotiator, pangolin
+tunnel defender, elephant memory investigator, or a cosmic animal-headed
+arbiter. Their powers, equipment, emblems, silhouettes, and moral conflicts
+must be newly invented and must not reproduce a modern comic character.
+
+Give every original being an occupation or social duty, one private want,
+one contradiction, one material vocabulary, and one limitation. A species
+label plus armor or a cape is not a complete character.
+
+INTERACTION DESIGN
+
+Build one indivisible interaction in every Theme:
+
+1. the human protagonist wants one concrete outcome;
+2. each furry being wants a different concrete outcome;
+3. one physical object, structure, route, ritual, document, machine, meal,
+   performance, or natural force makes those wants collide;
+4. the protagonist makes a visible, consequential decision that has already
+   taken effect in the depicted instant;
+5. every other character physically responds;
+6. the frozen image makes the changed balance of power readable.
+
+Useful interaction families include bargaining over a magical toll, testing
+an oath, repairing a mythic mechanism, sharing a dangerous meal, translating
+a prophecy, exposing a forged miracle, conducting a rescue, refusing a
+contract, returning a stolen name, staging a diplomatic portrait, crossing a
+living bridge, settling a celestial labor dispute, or teaching a creature a
+human craft while learning its nonhuman equivalent.
+
+Prefer interaction over combat. If a Theme uses a fight, show one readable
+decision point with stable support, clear weapon ownership, and reversible
+stakes rather than gore, execution, torture, or anonymous battle spectacle.
+
+Every participant must touch, carry, pull, brace, block, exchange, operate,
+or be mechanically affected by the same central object or force. State
+contact points, force directions, weight, balance, and immediate reactions.
+Do not arrange characters as an unrelated lineup.
+
+Do not end a Theme with the protagonist waiting, preparing, needing, trying,
+considering, or being required to choose. Never write "must choose," "must
+decide," "waits for a decision," "the decision to come," or an equivalent
+future-facing dilemma. State what the protagonist chooses, show the physical
+action that enacts it, and show the furry cast's immediate response.
+
+CONTENT LEVEL
+
+Honor only the requested content level.
+
+At aesthetic level, keep the human and furry adults fully dressed and make
+the interaction non-erotic. Use adventure, humor, rivalry, diplomacy,
+friendship, awe, suspicion, rescue, ritual, or social satire.
+
+At erotic level, every participant must remain an unmistakably adult,
+sapient, bipedal person with human-level agency and speech. Allow
+consensual romantic tension, partial nudity, exposed adult skin or fur,
+reciprocal embrace, kissing, sensual grooming, or non-explicit intimate
+contact. Do not use feral posture, ownership language, breeding language,
+heat or rut, coercion, penetration, genital contact, sexual fluids, or an
+ordinary animal.
+
+At hardcore level, every participant must remain an unmistakably adult,
+sapient, bipedal person with human-level agency and the visible ability to
+stop. Show one explicit consensual adult interaction already occurring,
+with clear anatomy, contact, support, reciprocal action, and displaced
+clothing. Never involve a feral body, ordinary animal, pet relationship,
+captivity, ownership, breeding, heat or rut, intoxication, coercion,
+violence, injury, or age ambiguity.
+
+The selected level changes intimacy, clothing, contact, and staging; it does
+not change the human protagonist, furry species, mythology, setting, central
+goal, or character agency.
+
+THEME CONTRACT
+
+Each Theme must establish:
+
+- exactly one real human protagonist with stable identity anchors;
+- one to three stable adult furry beings;
+- one allowed public-domain source or one original-world premise;
+- one precise country, location, era, season, time, and social occasion;
+- one central interaction and incompatible set of wants;
+- one protagonist decision and one reaction from every furry being;
+- one physically important object, structure, route, or environmental force;
+- one coherent wardrobe and material system for every character;
+- one original cinematic style name and a concise visible definition;
+- one emotional thesis that can be understood without franchise knowledge.
+
+End every Theme premise with two concise proof clauses in this semantic order:
+"Decision: [protagonist name] [completed physical action that enacts the
+choice]. Immediate response: [each furry being's current physical reaction]."
+Both clauses must describe facts already visible in the proposed image. Do
+not substitute a question, dilemma, future obligation, internal intention, or
+list of alternatives.
+
+The premise must end after the Immediate response clause. Put the visual style
+only in the separate Theme style value. Do not append "Style:", repeat the
+style value, or place camera and lighting instructions inside the premise.
+
+Themes must differ in source lane, species, protagonist identity, setting,
+relationship, objective, structure, action, palette, camera strategy, and
+light. Do not create one repeated throne-room negotiation with renamed
+animals.
+
+FRAME CONTRACT
+
+Each Frame is one standalone live-action photograph from its Theme. Restate
+the exact human protagonist, every furry being, source or original-world
+context, location, current interaction, wardrobe state, body support,
+contact map, cinematic style, camera, and lighting without relying on another
+Frame.
+
+Keep identity, species anatomy, motivation, central object, and dramatic
+premise stable. Restage one equivalent decisive instant through different
+participant blocking, gesture, contact geometry, foreground, viewpoint, shot
+scale, focal hierarchy, and light direction. Keep the date, time window,
+weather state, decision status, object state, and action phase fixed. Frames
+are parallel alternatives, not a chronological transformation sequence.
+
+Every Frame must show the protagonist's completed decision through a present
+physical action and the furry cast's immediate physical response. Do not
+depict the instant before a choice, an unresolved pause, an ambiguous
+acceptance, or a possible future action. Do not use "same," "still,"
+"earlier," "again," "later," "now," "before," "after," or another continuity
+shortcut to make one Frame depend on another.
+
+Begin every Frame by independently naming the precise location, country,
+season or date, and current time or light condition. Within the first third
+of the paragraph, show the protagonist physically enacting the completed
+decision and show the central object changing in response. Write the opening
+as a complete first presentation of the setting with no backward pointer or
+reference to another Frame.
+
+F02 is not later than F01, and no Frame occurs before or after another Frame.
+Do not describe a person or object as having moved, descended, advanced,
+remained, continued, changed, or become different relative to another
+depiction. Every variation must read as a fresh staging of the shared
+decisive instant rather than evidence of elapsed time.
+
+Keep the human protagonist unmistakably primary: the protagonist's face,
+deciding hand or body action, and consequential contact must occupy the
+clearest focal plane. A larger furry being may dominate physical scale but
+must not displace the protagonist from narrative and optical priority.
+
+Show complete, traceable bodies whenever contact or support depends on limbs,
+tail, wings, or digitigrade legs. Close framing may crop only anatomy that is
+irrelevant to the current action. Never hide the protagonist's decision,
+the furry being's response, or the central contact behind fur, wings,
+clothing, smoke, furniture, or cinematic darkness.
+
+PHYSICAL AND OPTICAL INTEGRITY
+
+Keep every body anatomically traceable and grounded. Preserve one head, one
+torso, two arms, and two legs unless a traditional mythic anatomy explicitly
+requires otherwise. Keep hands, forepaws, claws, hooves, wings, horns, tails,
+and clothing attachments consistent and assign every visible limb to one
+owner.
+
+Show believable height differences, center of gravity, foot placement,
+digitigrade balance, furniture load, fur compression, cloth tension,
+gripping, recoil, and cast shadows. Large wings or tails must affect balance
+and nearby materials.
+
+Use motivated practical light with readable eyes and faces. Preserve human
+skin pores, fine hair, sweat, scars, and fabric response alongside creature
+fur, scales, feathers, nose texture, eye moisture, and whiskers. Keep both
+the human and furry beings in one photographic reality.
+
+Write only the finished scene description. Do not mention the brief, prompt,
+request, model, generator, rule, requirement, compliance, content-level name,
+reader, or viewer. Do not echo authoring language such as "the image reads
+first as," "only afterward," "the frozen instant," "narrative priority," or
+"optical priority." Express those qualities through visible action,
+composition, focus, material, and light instead.
+
+When the requested language is English, use only ASCII code points U+0020
+through U+007E in every Theme and Frame. Transliterate personal and place
+names into plausible ASCII Latin spelling, replace smart punctuation with
+plain ASCII punctuation, and reject any non-ASCII glyph before returning.
+
+Before submitting English Themes and Frames, scan every title, premise,
+style, and prose value. Rewrite the value if it contains a non-ASCII code
+point. Reject any Frame that refers to another Frame, presents itself as a
+continuation, or advances the fixed time window.
+
+VARIATION AND REJECTION RULES
+
+Reject and rewrite any Theme or Frame containing:
+
+- more or fewer than one human protagonist;
+- a human protagonist who is passive or visually secondary;
+- a copyrighted franchise character or a disguised imitation;
+- a named real creator's style or a real person's identifying name;
+- an actor likeness or a copied modern adaptation;
+- an ordinary, feral, juvenile, pet, livestock, or mascot-like animal;
+- anime, illustration, comic art, game CGI, or fursuit appearance;
+- inconsistent species anatomy or identity drift;
+- unrelated characters posing beside one another;
+- hidden or contradictory contact and support;
+- cultural elements mixed without a coherent source;
+- generic armor, generic ruins, or generic magical glow replacing a story;
+- background humans, human reflections, or human-shaped decoration;
+- content-level drift, ambiguous adulthood, impaired consent, or coercion;
+- a future-facing choice or unresolved protagonist decision;
+- continuity shorthand or authoring instructions leaked into final prose;
+- a Theme premise that repeats or labels its separate style value;
+- any non-ASCII character in an English Theme or Frame;
+- Frames that merely paraphrase one another.
+
+Before returning, verify that the image would read first as a photograph of a
+real adult human making a consequential choice with physically present,
+intelligent furry beings, and only afterward as mythology or fantasy.

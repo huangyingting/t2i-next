@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import Callable
 from time import perf_counter
 
@@ -23,6 +24,7 @@ from t2i_story_pipeline.models import (
     NarrativeTheme,
     NarrativeThemeBatch,
     NarrativeThemeResult,
+    OutputLanguage,
     StoryRequest,
     StoryResult,
     StoryRuleSet,
@@ -43,6 +45,59 @@ from t2i_story_pipeline.run_store import (
 )
 
 ProgressCallback = Callable[[str], None]
+
+_ASCII_CONTRACT = "use only ASCII code points U+0020"
+_INDEPENDENT_OPENING_CONTRACT = "no backward pointer"
+_BACKWARD_POINTING_LANGUAGE = re.compile(
+    r"\b(?:the same|identical|different angle|continues)\b",
+    re.IGNORECASE,
+)
+_ELAPSED_TIME_REFERENCE = re.compile(
+    r"\b(?:minutes?|hours?|days?)\s+(?:advanced|earlier|later)\b",
+    re.IGNORECASE,
+)
+
+
+def _validate_ascii_contract(
+    request: StoryRequest,
+    fields: tuple[tuple[str, str], ...],
+) -> None:
+    if (
+        request.output_language != OutputLanguage.ENGLISH
+        or _ASCII_CONTRACT not in request.story
+    ):
+        return
+    for label, text in fields:
+        invalid = next(
+            (
+                character
+                for character in text
+                if not 0x20 <= ord(character) <= 0x7E
+            ),
+            None,
+        )
+        if invalid is not None:
+            raise StoryContractError(
+                f"{label} contains non-ASCII character U+{ord(invalid):04X}"
+            )
+
+
+def _validate_frame_independence_contract(
+    request: StoryRequest,
+    sequence: NarrativeFrameSequence,
+) -> None:
+    if _INDEPENDENT_OPENING_CONTRACT not in request.story:
+        return
+    for frame in sequence.frames:
+        prose = frame.prose.lstrip()
+        if _BACKWARD_POINTING_LANGUAGE.search(prose):
+            raise StoryContractError(
+                f"Frame {frame.frame_id} contains backward-pointing language"
+            )
+        if _ELAPSED_TIME_REFERENCE.search(prose):
+            raise StoryContractError(
+                f"Frame {frame.frame_id} advances the fixed time window"
+            )
 
 
 class StoryStudio:
@@ -228,6 +283,24 @@ class StoryStudio:
                     strict=True,
                 ):
                     theme.theme_id = theme_id
+                _validate_ascii_contract(
+                    request,
+                    (
+                        ("semantic_name", value.semantic_name),
+                        *(
+                            (f"Theme {theme.theme_id} title", theme.title)
+                            for theme in value.themes
+                        ),
+                        *(
+                            (f"Theme {theme.theme_id} premise", theme.premise)
+                            for theme in value.themes
+                        ),
+                        *(
+                            (f"Theme {theme.theme_id} style", theme.style)
+                            for theme in value.themes
+                        ),
+                    ),
+                )
 
             operation_id = f"themes-T{start_index:03d}-T{start_index + count - 1:03d}"
             requested_ids = tuple(
@@ -284,6 +357,14 @@ class StoryStudio:
                 strict=True,
             ):
                 frame.frame_id = frame_id
+            _validate_ascii_contract(
+                request,
+                tuple(
+                    (f"Frame {frame.frame_id} prose", frame.prose)
+                    for frame in value.frames
+                ),
+            )
+            _validate_frame_independence_contract(request, value)
 
         value, _ = await self._generate_validated(
             run_id=run_id,

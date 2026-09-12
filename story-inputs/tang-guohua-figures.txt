@@ -164,102 +164,74 @@ flower-crowned court lady.
 
 WOMEN'S CLOTHING
 
-Dress each adult woman as a designed Tang ensemble, named layer by layer from
-the body outward. Keep the garments historically specific even when loosened
-or removed. Describe fiber, weave, motif, color family, closure, and how
-weight hangs from shoulders, chest-band, or waist.
+Dress each adult woman as one named wardrobe archetype, then layer by layer
+from the body outward. Color changes do not create a new archetype. Keep
+pieces historically specific even when loosened or removed.
 
-Typical inner-to-outer order for a court or household woman:
+Assign each woman exactly one archetype. Two women in one Theme must use two
+different archetypes. Across Themes, do not repeat an archetype until these
+have all been used at least once:
 
-- 诃子 or 抹胸 as the chest wrap, usually plain silk or light brocade, tied
-  at the back or side;
-- an inner 襦 or 中单 with a close collar or a softly open neck;
-- a 齐胸襦裙 or high-tied 裙 whose waistband sits at or just below the
-  bust, with a long trailing skirt and visible 裙带 ends;
-- a short 襦, 半袖襦, or 半臂 of brocade or damask, often with a low
-  neckline in High Tang court dress;
-- for noble or ceremonial scenes, a sheer 大袖衫 of gauze with wide hanging
-  sleeves;
-- a 披帛, a long narrow silk shawl looping the shoulders and arms, with
-  ends that respond to gesture;
-- 罗袜 on natural adult feet;
-- 高头履, 云头履, 凤头履, or patterned 锦靴, with upturned toes when the
-  feet are visible.
+1. 齐胸襦裙 plus 半臂: 诃子, high-tied 裙, elbow-length contrasting 锦 半臂,
+   披帛, 高头履. The High Tang court default, not the only look.
+2. 齐胸襦裙 plus 大袖衫, no 半臂: sheer wide-sleeved 纱 大袖衫 over the skirt
+   band, 披帛 optional, 凤头履.
+3. 短襦 plus 间色裙: close or open 交领 襦, vertical paneled skirt, no 半臂,
+   shorter 披帛 or none, quieter household outing.
+4. 石榴裙 plus 坦胸: generous neckline above the chest band, 披帛 looping
+   the arms, no 半臂, 云头履. Still a complete aesthetic costume, not lingerie.
+5. 胡服骑装: lapel or round-collar 窄袖袍, striped or plain trousers, 蹀躞带,
+   锦靴; optional 帷帽. One rider may wear this; her companion need not.
+6. 女着男装: women's 圆领缺骻袍, 革带, 幞头 or bound hair, 乌皮靴. A Tang
+   fashion, not a disguise joke.
+7. 袴褶: riding trousers with a short 缺骻 outer robe, different from full
+   胡服, good for polo.
+8. 幂篱或帷帽出行: a 襦裙 or 胡服 base plus a traveling veil-hat; the veil
+   is a designed object with a brim and hanging gauze.
+9. 裲裆: sleeveless brocade vest over 襦 and skirt, no 半臂.
 
-Name the skirt more precisely when it is the graphic center: a 石榴裙 in
-pomegranate red, a 间色裙 of vertical color panels, or a damask skirt with
-宝相花. Long 裙带 hang from the high band and may end in 同心结; they are
-separate ribbons, not a modern belt.
+Outing does not mean every adult wears 胡服. Pair unlike silhouettes: a
+mounted 胡服 rider beside a 大袖衫 passenger at a 犊车; 袴褶 polo beside
+襦裙 on a picnic mat; 女着男装 beside 坦胸 披帛.
 
-A 半臂 is a short, elbow-length jacket of contrasting 锦, worn over the 襦
-and shorter than the skirt band is high. It closes at the chest, not with
-later frogs or zippers. A 披帛 is typically more than body-length: one common
-drape passes behind the neck, loops each forearm, and lets both ends fall;
-another knots loosely at the chest and trails. Paint it as a flying but
-weighty silk strip with continuous edges, never as opera 水袖 attached to
-the garment.
+Name weave and motif: 锦, 绫, 罗, 纱, 縠; 宝相花, 联珠纹, 卷草, 晕繝.
+A 披帛 is a separate silk length, never opera 水袖. Skirt volume falls in
+long folds, not jersey cling.
 
-High Tang court dress may show a generous neckline and bare upper chest above
-the skirt band while remaining fully dressed at aesthetic level: the 齐胸裙
-and 披帛 still complete the costume. Do not turn this historical neckline
-into modern lingerie, a corset, or an off-the-shoulder evening gown.
-
-Hu-style riding or outing dress is permitted when the scene needs it: women
-as well as men may wear a round-collar or lapel 窄袖袍, striped or plain
-trousers, a 蹀躞带 with hanging plaques and small useful fittings, and high
-锦靴. Travel veils such as 帷帽 or 幂篱 may appear outdoors. These are Tang
-fashions worn by Han adults, not an excuse to import later Central-Asian
-fantasy armor.
-
-Skirt and robe motifs should stay inside Tang textile language: 宝相花,
-peony sprays, 卷草, 联珠纹 roundels, paired birds or animals inside roundels,
-grapevine, small clustered flowers, and 晕繝 graded color bands at sleeve or
-skirt borders. Name the weave: 锦, 绫, 罗, 纱, 縠, or embroidered silk.
-Summer favors 纱 and 罗; winter favors 锦 and lined damask. Gold-wrapped
-thread may appear as a narrow luxury edge, not as a metallic costume.
-
-Keep layer logic visible. A 半臂 is shorter than the 襦 beneath it. A 披帛
-is a separate length of silk, not a glued-on scarf. Skirt volume falls from
-the high band in long vertical folds; it does not cling like jersey. Gauze
-reveals the color of the layer below as a painted transparency, not as
-photographic see-through skin.
-
-Do not dress women in Song 褙子, Ming 比甲 as the main coat, Qing 旗装,
-凤冠霞帔, opera 水袖, modern revival hanfu with elastic chest-high tubes or
-incorrect overlapping collars, Japanese furisode, Western bodices, zippers,
-lace bras, or stiletto shoes.
+Do not dress women in Song 褙子, Ming 比甲, Qing 旗装, 凤冠霞帔, opera
+水袖, elastic modern 齐胸 tubes, Japanese furisode, zippers, or stilettos.
 
 MEN'S CLOTHING
 
-Dress each adult man in a complete Tang official, scholar, or household
-ensemble with stable rank color and headgear.
+Dress each adult man as one named wardrobe archetype, then layer by layer.
+Rank color (purple, scarlet, green, cyan, or plain silk) is not an archetype.
+Two men in one Theme must use two different archetypes. A man and a woman in
+the same outing must not wear matching 胡服 clones; pair unlike cuts. Across
+Themes, rotate these nine before repeating:
 
-Typical inner-to-outer order:
+1. 展脚幞头朝服: 中单, 圆领缺骻袍 with hip slits, 革带 with 銙, optional
+   鱼袋, spreading-legged court 幞头, 乌皮靴.
+2. 软脚幞头常服: quieter 圆领袍, soft-legged 幞头, simpler belt, indoor-cut
+   boots or 锦靴 on the road.
+3. 襕衫: scholar's robe with a horizontal hem band, restrained damask, 幞头
+   or cloth 巾, cloth shoes or plain boots.
+4. 翻领胡服: lapel 窄袖袍, striped or plain trousers, 蹀躞带 with hanging
+   plaques, 锦靴.
+5. 袴褶: pleated riding trousers and a short 缺骻 outer robe, distinct from
+   full lapel 胡服, good for polo.
+6. 圆领加半臂: 圆领袍 plus a contrasting elbow-length 锦 半臂.
+7. 席帽行旅: 圆领袍 plus a wide 席帽 or 大帽, optional 行縢.
+8. 猎装: narrow-sleeved robe, 鞶囊, bow case or hawk perch as a painted
+   object, 络缝靴.
+9. 顶髻无幞头: mature topknot pinned, 圆领 loosened at an outdoor halt,
+   no women's 步摇.
 
-- trousers and an inner 中单;
-- a 圆领缺骻袍, the round-collar robe with side slits from the hip down for
-  stride or riding, or a 襕衫 for a scholar;
-- a leather 革带 with 銙 plaques sitting at the true waist; officials may
-  add a 鱼袋 hung from the belt;
-- 幞头 in a shape that fits the role: soft-legged, stiff-legged, or
-  spreading-legged court 幞头, wrapped so the cloth covers a bound hair knot
-  and the two 脚 hang or project as designed, not as a modern hat perched on
-  loose hair;
-- 乌皮靴 or patterned boots; indoor scenes may show cloth shoes once boots
-  are removed beside the 榻.
+Describe the 幞头 as wrapped structure with two 脚, not a modern hat on
+loose hair. Facial hair, if any, is fine painted whiskers or a short beard,
+not a contemporary fade.
 
-Robe color should follow a plausible Tang hierarchy without turning the
-picture into a rank chart: purple or deep crimson for high office, scarlet
-or pomegranate for mid officials, green or cyan for lower office, and quieter
-plain silk for private scholars. Motifs stay restrained compared with women's
-brocade: small roundels, dark damask, or unpatterned silk. A private indoor
-man may loosen the collar and set the 幞头 aside, revealing a mature topknot
-secured by one pin.
-
-Do not give men Qing queues, Song square official hats as the default, Ming
-winged 乌纱帽, Japanese topknots, or modern suit collars. Facial hair, when
-present, must look like a mature Tang beard or whiskers painted with fine
-strokes, not a contemporary fade.
+Do not give men Qing queues, Song square hats as the default, Ming 乌纱帽,
+Japanese topknots, or modern suit collars.
 
 HAIRSTYLES
 
@@ -289,10 +261,9 @@ Do not use 双丫髻, 垂髫, 总角, or any other child's or very young unmarri
 girl's hair. Double side-buns are allowed only when they are mature 双鬟
 worn high by an adult, with adult facial structure and adult clothing.
 
-Men's hair is bound under the 幞头 or, in private, drawn into a mature top
-knot. Do not show loose contemporary long hair on men unless a private
-unwrapping of the 幞头 is the scene, and even then keep the hair long enough
-only to tie, not a fantasy mane.
+Men's hair is bound under the 幞头, under a 席帽, or in a mature topknot
+when the archetype is 顶髻无幞头. Do not show a fantasy mane. Match hair
+to the named male archetype; do not put 展脚幞头 on a 猎装 hunter.
 
 HAIR ORNAMENTS
 
@@ -457,15 +428,15 @@ For each adult lock all of the following:
 - hair: bun family, 义髻 or own hair, coil direction, 蝉鬓;
 - each ornament with material and placement;
 - body: fullness, shoulder, waist, bust or chest, hands, natural feet;
-- clothing from the body outward, each layer with weave, color family, motif,
-  and how it hangs;
+- named wardrobe archetype plus clothing from the body outward, each layer
+  with weave, color family, motif, and hang;
 - jewelry and handheld object;
 - footwear.
 
 Do not leave a woman described as "in Tang dress" or a man as "in a robe."
-If two women share a Theme, their buns, 花钿 shapes, 披帛 colors, and skirt
-families must differ. Restate garment state for the selected content level in
-the Frame, but do not change the designed pieces.
+If two women share a Theme, they must differ in wardrobe archetype, not only
+in bun, 花钿, 披帛 color, or skirt hue. Restate garment state for the
+selected content level, but do not change the designed pieces.
 
 SCENE AND ACTIVITY POOL
 
@@ -791,16 +762,16 @@ and is exempt from the sixty-word limit. Follow this grammar closely:
 image-right] in the [foreground, middle ground, or background]: [face shape,
 开额, eyes, brow family, mouth, and makeup stack]; [bun family, 义髻, 蝉鬓,
 and each ornament with placement]; [body fullness, shoulders, waist, hands,
-and natural feet]; [clothing from the body outward with weave, color, motif,
-and hang]; [臂钏 or other jewelry]; [named support and pose]; left hand
+and natural feet]; [named wardrobe archetype, then clothing from the body outward with weave,
+color, motif, and hang]; [臂钏 or other jewelry]; [named support and pose]; left hand
 [task], right hand [task]; [content-level garment state]; gaze toward
 [target]."
 
 Do not skip a layer, an ornament, or a hand. If the Theme minted the card,
-the Frame must still spell it. For a man, replace bun, 花钿, and 臂钏 clauses
-with 幞头 or topknot, beard if any, 圆领袍 or 襕衫 stack, 革带, and boots or
-indoor shoes. Then use exactly four descriptive sentences followed by the
-final medium lock:
+the Frame must still spell it. For a man, replace bun, 花钿, and 臂钏 clauses with the named male
+archetype, 幞头 or 席帽 or topknot, beard if any, full layer stack, belt, and
+boots. Then use exactly four descriptive sentences followed by the final
+medium lock:
 
 1. one sentence combining exact date, place, season, hour, private situation,
    and the adults' expressions and eye lines without repeating the
@@ -868,6 +839,11 @@ Reject any Theme or Frame that:
   layers, hairstyle, ornaments, body fullness, or makeup system for any adult
   woman, or specific robe, 幞头, and belt for any adult man;
 - describes anyone only as wearing Tang dress, a robe, or period costume;
+- puts two adults in the same wardrobe archetype, or repeats one women's or
+  men's archetype across Themes before that gender's nine types have been
+  rotated;
+- dresses an entire outing cast in identical 胡服, identical 圆领幞头, or
+  identical 齐胸襦裙 plus 披帛;
 - uses a generic modern palette instead of the required five-to-seven-family
   Tang mineral palette;
 - lets antique damage obscure faces, hands, anatomy, eye lines, clothing

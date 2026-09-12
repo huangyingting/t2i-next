@@ -60,6 +60,64 @@ def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> Non
     assert "Keep intimate actions non-graphic" not in zero_gravity
 
 
+def test_furry_mythic_interactions_uses_original_live_action_characters() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "furry-mythic-interactions.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert "Use exactly one human protagonist and no other human figure." in brief
+    assert "either one woman and zero men or zero women and one man" in normalized
+    assert "The protagonist remains fully human." in brief
+    assert "Include one to three furry beings." in brief
+    assert "alert, intelligent, speaking or clearly reasoning adult" in normalized
+    assert "photographed adult performer" in normalized
+    assert "physically present cinematic creature" in normalized
+    assert "public-domain mythological" in normalized
+    assert "Journey to the West figures" in normalized
+    assert "The Eight Immortals" in normalized
+    assert "completely original high-fantasy characters" in normalized
+    assert "completely original heroic" in normalized
+    assert "Do not reproduce a character" in brief
+    assert "Warcraft" in brief
+    assert "Marvel" in brief
+    assert "Do not name, imitate, evoke, combine, or transpose the style" in normalized
+    assert "Do not use the name, title, alias, face, biography" in normalized
+    assert "T001: one public-domain Journey to the West figure" in normalized
+    assert "T002: one of the Eight Immortals" in normalized
+    assert "T003: one completely original high-fantasy furry adult" in normalized
+    assert "T004: one traditional angel, demon" in normalized
+    assert "T006: one completely original heroic" in normalized
+    assert "visible, consequential decision that has already taken effect" in normalized
+    assert 'Never write "must choose," "must decide,"' in normalized
+    assert "End every Theme premise with two concise proof clauses" in normalized
+    assert '"Decision: [protagonist name]' in normalized
+    assert "The premise must end after the Immediate response clause." in brief
+    assert "Put the visual style only in the separate Theme style value." in normalized
+    assert "Begin every Frame by independently naming the precise location" in normalized
+    assert "with no backward pointer" in normalized
+    assert "Restage one equivalent decisive instant" in normalized
+    assert "F02 is not later than F01" in normalized
+    assert "Every variation must read as a fresh staging" in normalized
+    assert "the protagonist's completed decision" in normalized
+    assert "must not displace the protagonist from narrative and optical priority" in (
+        normalized
+    )
+    assert "Do not mention the brief, prompt, request, model, generator" in normalized
+    assert '"the image reads first as," "only afterward,"' in normalized
+    assert "use only ASCII code points U+0020 through U+007E" in normalized
+    assert "Transliterate personal and place names" in normalized
+    assert "scan every title, premise," in normalized
+    assert "advances the fixed time window" in normalized
+    assert "Do not use anime" in brief
+    assert "At aesthetic level" in brief
+    assert "At erotic level" in brief
+    assert "At hardcore level" in brief
+    assert "THEME CONTRACT" in brief
+    assert "FRAME CONTRACT" in brief
+    assert "VARIATION AND REJECTION RULES" in brief
+
+
 def test_dress_board_region_names_are_layout_only() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "dress.txt").read_text(encoding="utf-8")
     normalized = " ".join(brief.split())

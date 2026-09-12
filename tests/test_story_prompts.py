@@ -182,6 +182,10 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "rope art" not in prompt
     assert "do not mix in untranslated foreign prose" in prompt
     assert "parallel visual alternatives" in prompt
+    assert "share stable Theme facts" in prompt
+    assert "All alternatives depict an equivalent point" in prompt
+    assert "variation must not imply elapsed time" in prompt
+    assert "Never refer to another Frame or use backward-pointing" in prompt
     assert "Let length follow the Story Description's exact contract" in prompt
     assert "follow exactly six sections" not in prompt
     assert "must begin exactly with" not in prompt
