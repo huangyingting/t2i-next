@@ -5,9 +5,9 @@ Themes in the visual language of anonymous High-to-Middle Tang silk 人物画:
 court ladies, officials, scholars, musicians, and private household adults
 rendered as 绢本重彩, not as photography, live action, mural facsimile,
 Dunhuang cave art, later-dynasty painting, or modern illustration. Combine
-mature adult presence, iron-wire and gossamer line, heavy mineral color,
-plausible Tang dress, hair, ornaments, body, and makeup, ordered palace or
-household space, and the material presence of an old silk painting. Every
+mature adult presence, iron-wire line, mineral 平涂, painterly 渲染, plausible
+Tang dress, hair, ornaments, body, and makeup, outing and household space,
+and the material presence of an old silk painting. Every
 result must be an original anonymous-workshop composition, not a copy,
 variation, signature style, or attributed work by an identifiable artist.
 
@@ -29,31 +29,24 @@ DECISION ORDER
 
 Resolve every Theme and Frame in this order: exact adult cast and consent;
 selected content level; Tang date, place, and social setting; one scene family
-and its objects; a complete identity card for each adult; silk figure-painting
-medium and flat picture plane; spatial map and present action; palette and
-age. A later choice must never weaken an earlier one.
+and its objects; a complete identity card for each adult; hybrid 平面-and-画
+silk medium; spatial map and present action; palette and age. A later choice
+must never weaken an earlier one.
 
 ARCHIVAL FACSIMILE MEDIUM LOCK
 
-Define the generated image positively as a flat archival facsimile of a
-hand-painted antique Tang silk figure-painting panel. The aged prepared-silk
-painting extends continuously to every canvas edge as one uninterrupted
-picture surface. There is no surrounding table, wall, glass, frame, museum
-case, book mockup, or three-dimensional presentation of the artifact.
+Define the generated image positively as an archival facsimile of a
+hand-painted antique Tang silk figure-painting panel that mixes graphic 平面
+with painterly 画. The aged prepared-silk painting extends continuously to
+every canvas edge as one uninterrupted picture surface. There is no
+surrounding table, wall, glass, frame, museum case, or photograph of an
+artifact.
 
-Every person, garment, object, and architectural plane exists only as ink
-contour and mineral pigment on silk. The same visible silk weave, age tone,
-and shallow surface irregularity continue beneath reserved areas and thin
-color washes, binding figures and setting to one physical picture plane.
-Adults are individualized 工笔 portraits with mature facial line differences,
-plausible adult proportions, clear joint structure, and supported poses, while
-every mark remains visibly ink or mineral color on silk.
-
-Describe plants, furniture, fabric, skin, hair, and contact as drawn contours
-and painted color shapes. Do not request pores, specular highlights, realistic
-reflections, naturalistic illumination, cinematic atmosphere, optical focus,
-or physically rendered materials. The artifact's silk weave and pigment
-granularity remain the dominant surface reality.
+Every person, garment, horse, and landscape exists as ink, mineral 平涂, and
+brush 渲染 on silk. Adults are individualized 工笔 portraits with mature
+facial lines, plausible proportions, and supported poses. Do not request
+pores, specular highlights, cinematic atmosphere, optical focus, or
+photographed materials. Silk weave and pigment remain the surface reality.
 
 BORDERLESS FULL-BLEED SILK GATE
 
@@ -125,11 +118,10 @@ Kaiyuan, Tianbao, Dali, or Zhenyuan reigns are welcome when they fit the
 scene. Name a precise year, season, time of day, city or ward, room or garden
 function, and adult social context.
 
-Rotate among palace terraces, inner-court galleries, official residences,
-scholar courtyards, music rooms, embroidery chambers, peony gardens, covered
-corridors, private baths adjoining a chamber, guest pavilions, and canal-side
-upper rooms. Do not turn every setting into a brothel, battlefield, or
-temple mural.
+Prefer outdoor outing ground: Qujiang, Wei river willows, polo fields,
+suburban riding paths, carriage halts, mountain terraces, and garden dikes.
+Indoor galleries, music rooms, and chambers are the minority. Do not turn
+every setting into a brothel, battlefield, or temple mural.
 
 Use coherent Tang architecture and furnishings: rammed-earth or brick
 platforms, vermilion columns, white plaster walls, bracket sets, lattice
@@ -478,45 +470,32 @@ the Frame, but do not change the designed pieces.
 SCENE AND ACTIVITY POOL
 
 Choose one adult situation per Theme and stage it with original blocking. Do
-not reconstruct a named famous painting. Invent equivalents freely; the
-following families show the intended specificity.
+not reconstruct a named famous painting. Do not default to an indoor 榻
+chamber. In any run of three or more Themes, at least half must be outdoor or
+in transit. When the run has one or two Themes, every Theme must be outdoor
+or in transit unless the Story Description itself names a closed room.
 
-- 对镜梳妆: a grape-vine 铜镜 on a low stand or held in one hand; comb,
-  powder box, and a pin dish on a 案; one woman inserts a 钗 while another
-  steadies the 义髻 or holds the mirror.
-- 庭中簪花: peony, lotus, or crabapple stems being set into a bun; fallen
-  petals on a brick platform; a flower basket on the 榻 edge.
-- 捣练熨帛: a long white silk length over a pounding stone or low board;
-  wooden mallets; an iron pan of coals for smoothing; adults leaning, pulling,
-  or folding the cloth.
-- 宫乐: 琵琶 held across the body, 箜篌, 筝, 拍板, or 笙; a low 案 with
-  a wine ewer; listeners seated on 坐墩 with 披帛 still.
-- 烹茶: tea 鍑, 碾, 罗, and spoons on a 几; steam as a pale wash, not as
-  photographic vapor; two adults sharing the mill or passing a bowl.
-- 对弈: 围棋 or 双陆 with a readable board geometry and a small number of
-  pieces; one hand hovering a piece, the other adult watching the board.
-- 听琴: a 琴 across the 榻; one adult's hands on the strings, the other
-  turned toward the sound, 纨扇 resting.
-- 凭栏游春: vermilion rail, willow or lotus water beyond as a flat band;
-  披帛 lifted by a painted breeze; 高头履 on the platform.
-- 牡丹花下: tree peonies as large mineral-color blooms, not Western oil
-  roses; one adult pointing or pinning a bloom, another holding a basket.
-- 刺绣: a hoop, stand, and colored silk threads; needle in one hand, fabric
-  taut in the other.
-- 夜宴灯下: 连枝灯 or bronze lamp as a painted motif without cast glow;
-  fruit, wine, and a 琵琶 set aside.
-- 调鹦鹉: a parrot on a perch or wrist; no animal in intimate contact.
-- 胡服试骑 or 马球准备: 窄袖袍, 蹀躞带, 锦靴, a horse as a painted
-  object if needed; polo mallets optional; keep the horse out of sexual
-  contact and out of the requested human cast.
-- 乞巧 or 玩月: needle, thread, or a moon disc as a pale reserved-silk
-  circle; rooftop or garden platform.
-- 展卷: a blank or faintly ruled scroll with no readable characters; hands
-  holding the rollers.
-- 投壶: a slender pot and arrows; one adult aiming, another counting.
-- 浴后理衣: a basin, towel, and garments on a rack; coverage follows the
-  selected content level; everyone remains alert and standing or seated, never
-  asleep.
+Outdoor and outing families, preferred:
+
+- 曲江或渭水游春: willow embankment, lotus water as a washed band, picnic
+  mat or 胡床, 披帛 lifted; adults walking, sitting, or leaning on a rail.
+- 骑马出游: each rider in 胡服 窄袖袍, 蹀躞带, 锦靴; a Tang painted horse
+  with thick neck, small head, decorative saddle and bridle; one adult
+  mounted, another mounted or holding the reins at the horse's shoulder.
+- 打马球: polo ground, mallets, galloping or turning horses, dust as pale
+  pigment not photography; 胡服 required.
+- 犊车或牛车停驻: an ox-drawn carriage halt under willows; one adult at
+  the carriage opening, another on the ground or on horseback beside it.
+- 骊山或郊亭: mountain path, terrace pavilion, travel 帷帽 or 幂篱.
+- 柳堤并行: two adults walking a dike, skirt or robe hems in motion, water
+  and willow as 画 washes behind 平面 garment panels.
+
+Indoor families remain allowed only as the minority: 对镜梳妆, 宫乐, 烹茶,
+对弈, 听琴, 捣练, 刺绣, 夜宴, 展卷, 浴后理衣.
+
+Keep horses, oxen, and parrots out of sexual contact and out of the human
+cast. Hardcore outing scenes stay on a picnic mat, carriage floor, pavilion
+bench, or against a rail; never on or with an animal.
 
 Keep every human in the scene inside the requested cast. If the family
 normally implies a servant, either assign that role to a requested adult or
@@ -545,8 +524,8 @@ Music: pear-shaped 琵琶, 箜篌, 阮咸, 筝, 拍板, 笙, 琴.
 
 Play: 围棋 board, 双陆, 投壶 pot, 纨扇, round or folding fan.
 
-Garden: peony, willow, lotus, crabapple, plantain, taihu-like rock used
-sparingly and not in Ming garden density.
+Garden and outing: peony, willow, lotus, crabapple, plantain; saddle, bridle,
+polo mallet, 犊车, picnic mat, 胡床 on grass.
 
 Every object needs a support, a scale relative to a hand or 榻, and a job in
 the present action. Do not fill the silk with an antique shop.
@@ -556,7 +535,10 @@ POSE AND GESTURE POOL
 Choose poses that Tang figure painting can hold in shallow space:
 
 - standing, weight on one foot, 披帛 hanging, 笼袖 or one hand on the rail;
-- walking with a small step, skirt folds trailing, 高头履 visible;
+- walking a path or dike, skirt or 胡服 hems trailing, 锦靴 or 高头履 visible;
+- astride a horse, one hand on reins, one hand on the saddle bow;
+- standing at a horse's shoulder, holding the bridle;
+- sitting in or at a 犊车 opening;
 - sitting on a 榻 with both legs folded to one side, skirt pooling;
 - sitting on a 坐墩, feet together or slightly apart, toes of the shoes
   showing;
@@ -568,18 +550,17 @@ Choose poses that Tang figure painting can hold in shallow space:
 - both hands on a 琴 or tea mill;
 - one adult adjusting the other adult's 披帛, pin, or skirt band.
 
-Keep torsos mostly parallel to the silk. Hands have five fingers and a named
-task. Do not use fashion contraposto, hand-on-hip pin-up, yoga, modern chair
-sitting at a ninety-degree knee as the default, or a toothy laugh.
+Hands have five fingers and a named task. Do not use fashion contraposto,
+hand-on-hip pin-up, yoga, or a toothy laugh. Riding poses may turn the torso
+more than indoor sitting poses.
 
 PRIVATE NARRATIVE AND AGENCY
 
 Make the emotional tone intimate, composed, and observant rather than
-slapstick. Build each Theme around a precise adult situation: a music gathering
-after guests leave, two women comparing peony hairpins, an official and his
-wife closing a gallery against spring wind, companions sharing tea beside a
-lotus channel, or a scholar setting down a 琴. These are examples, not fixed
-templates.
+slapstick. Build each Theme around a precise adult situation: a spring ride along
+willows, two women comparing peony hairpins before mounting, companions
+sharing tea at a Qujiang halt, or a polo pause. These are examples, not
+fixed templates.
 
 Give every adult an independent intention and a visible contribution. Avoid
 one active person paired with a passive decorative body. Make each woman's
@@ -588,9 +569,8 @@ posture, garment control, and response. Never infer dominance, profession, or
 status from gender, and never use unequal status as a substitute for consent.
 
 Use one small present-tense narrative trace to make the image lived-in: a
-fallen 步摇, cooling incense, a half-rolled scroll, a displaced screen,
-spilled tea, an unfinished embroidery frame, a 披帛 slipped from one
-shoulder, a 铜镜 still in the hand, or shoes left at the 榻 edge. The trace
+fallen 步摇, a dropped polo mallet, a horse cropping willow, a 披帛 caught
+on a saddle, cooling incense, or shoes left at a picnic mat. The trace
 must support the adults' action without becoming a comic spectacle or
 introducing an unrequested onlooker.
 
@@ -677,19 +657,28 @@ blush. Name a five-to-seven-family palette: warm-tea silk ground; soot ink;
 one or two warms such as 胭脂, 朱砂, 赭石, or 藤黄; one or two cools such as
 石青 or 石绿; one textile neutral such as moon white, apricot, or indigo; at
 most one 泥金 or shell-white accent. Skin stays inside that palette with
-exactly three bounded tones. No gradients, cast shadows, chiaroscuro, neon,
-or nishiki-e color-block logic.
+exactly three bounded tones plus visible 渲染 on faces and horse flesh. No
+photographic gradients, cinematic cast shadows, neon, or nishiki-e logic.
 
-FLAT PICTURE-PLANE GATE
+HYBRID PLANE AND PAINTING
 
-The first read, including thumbnail size, must be a flat painting: two to four
-shallow stacked bands parallel to the silk, contour-enclosed color fields, and
-dominant silhouettes. Torsos stay mostly parallel or gently oblique. Use
-scattered perspective and a gently elevated view, never a Western vanishing
-point, lens language, depth of field, cinematic light, or a deep room of
-volumetric people. Prefer a horizontal handscroll segment or near-square
-panel; occasional vertical or 纨扇 formats are allowed. Reserve blank silk.
-A lamp or moon is a painted motif without glow falloff or cast shadows.
+The picture must mix 平面 and 画 in the same silk surface. Neither layer may
+disappear.
+
+平面: garment 锦 panels, 半臂, architecture, saddle leather, and some ground
+bands as contour-enclosed mineral 平涂 with readable silhouettes and 铁线描.
+
+画: faces, hands, 披帛 turns, horse bodies, willow, water, and distant hills
+as wet 渲染, ink soak, and slight wash modeling of turn. Brushwork must be
+visible. Foliage may go toward 没骨. Flesh may turn with extra warm and cool
+washes beyond the three-tone base, still as pigment on silk.
+
+Each Theme names its mix ratio. Vary across Themes: some lean 平面, some lean
+画. Reject a 100% poster-flat color-block with no 渲染, and reject Western
+oil volume, photography, CGI, lens flare, or a deep illusionistic landscape.
+
+Use scattered perspective and a gently elevated view. Prefer a horizontal
+handscroll segment. A lamp or moon is a painted motif, not a light source.
 
 SYMBOLISM AND OBJECT RESTRAINT
 
@@ -733,9 +722,9 @@ Each Theme must establish:
   contact geometry, reach, occlusion, and limb ownership;
 - one near-square, horizontal, vertical, 纨扇, or handscroll-segment
   composition;
-- one 游丝描 and 铁线描 line hierarchy and one architectural structure;
-- one first-read flat picture-plane plan using two to four shallow stacked
-  bands and contour-enclosed color fields;
+- one 游丝描 and 铁线描 line hierarchy plus named 平面/画 mix;
+- outdoor outing, riding, polo, or carriage halt as the default setting
+  family unless a minority indoor Theme is being used;
 - one five-to-seven-family mineral-color palette with layered-wash behavior;
 - one restrained present-tense narrative trace and at most two symbolic
   motifs;
@@ -743,14 +732,13 @@ Each Theme must establish:
 - one field-scale borderless aged-silk structure plus three to five localized
   pigment, ink, fiber, or handling cues.
 
-Vary class setting, city, room function, scene family, season, relationship,
+Vary outing versus minority indoor, city, scene family, season, relationship,
 pose, garment state, textile motif, furniture, period register, hairstyle
 family, 义髻 height, 蝉鬓, ornament set, 臂钏 and other accessories, makeup
 family, body fullness, skirt type, 披帛 drape, foreground clue, symbolic
 motif, image format, viewing height, dominant diagonal, palette anchor, cool
-accent, blank-space shape, and age pattern. Do not repeat one bedchamber,
-couch pose, spilled-tea device, peony symbol, color hierarchy, or furniture
-arrangement across Themes. Do not restage a famous surviving Tang composition.
+accent, blank-space shape, and age pattern. Do not repeat one bedchamber, 榻 pose, or indoor tea service across Themes.
+Do not restage a famous surviving Tang composition.
 
 FRAME CONTRACT
 
@@ -759,18 +747,18 @@ Theme, not a storyboard, sequence, collage, split screen, contact sheet,
 multi-panel comic, framed museum object, or photograph of a painting. Begin
 every Frame with exactly these five sentences:
 
-"Full-canvas continuous-silk flat archival facsimile of a hand-painted antique
-Tang-dynasty 绢本重彩 figure-painting panel. The aged prepared-silk painting
-extends continuously to every canvas edge as an uninterrupted uneven warm-tea
-field. Every person, garment, object, and architectural plane exists only as
-ink contour and pigment on silk; adult figures use individualized mature
-facial lines, ample Tang proportions, clear joints, and exactly three bounded
-skin tones in the same silk plane. Flat 工笔 picture plane with shallow
-stacked spaces, contour-enclosed color fields, dominant flat silhouettes, no
-volumetric light-and-shadow modeling or cast shadows.
-Fine 游丝描 and 铁线描 contours, thin layered mineral-color washes, ruled
-platforms and screens, visible silk weave, softened outer pigments, rubbed
-silk fibers at one isolated edge, and small age creases."
+"Full-canvas continuous-silk archival facsimile of a hand-painted antique
+Tang-dynasty 绢本重彩 figure-painting panel mixing graphic 平面 color fields
+with painterly 渲染. The aged prepared-silk painting extends continuously to
+every canvas edge as an uninterrupted uneven warm-tea field. Every person,
+garment, horse, and landscape exists as ink, mineral 平涂, and brush 渲染 on
+silk; adult figures use individualized mature facial lines, ample Tang
+proportions, clear joints, three bounded skin tones plus visible flesh 渲染.
+Hybrid picture surface: flat 锦 and architectural silhouettes combined with
+painterly washes on faces, 披帛, foliage, and animals; no photography, no
+CGI, no cinematic lighting. Fine 游丝描 and 铁线描, mineral 平涂 on garment
+panels, wet 渲染 on flesh and landscape, visible silk weave, rubbed fibers at
+one isolated edge, and small age creases."
 
 Immediately follow with one compact spatial-map sentence placing every adult
 at image-left, center, or image-right and in the foreground, middle ground,
@@ -790,12 +778,12 @@ name the act directly rather than substituting symbolic flowers, generic
 closeness, aligned pelvises alone, preparation, implication, or aftermath.
 
 Repeat this compact medium lock immediately after the present-action
-sentence: "Every person, garment, object, and architectural plane exists only
-as ink contour and pigment on visibly aged silk; adults remain
-contour-defined 工笔 figures with mature facial specificity, Tang hairstyle,
-ornaments, makeup, and plausible ample proportions." Then describe all
-remaining details as drawn lines, bounded washes, reserved silk, or
-mineral-pigment shapes rather than as physically realistic materials.
+sentence: "Every person, garment, horse, and landscape exists as ink, 平涂,
+and 渲染 on visibly aged silk; adults remain 工笔 figures with mature facial
+specificity, Tang hairstyle, ornaments, makeup, and plausible ample
+proportions, garments as 平面 panels, flesh and foliage as 画." Then describe
+remaining details as line, 平涂, or 渲染 on silk, not as photographed
+materials.
 
 After the repeated lock, write exactly one person-block per adult in
 image-left to image-right order. Each person-block is one or two sentences
@@ -819,21 +807,19 @@ final medium lock:
 1. one sentence combining exact date, place, season, hour, private situation,
    and the adults' expressions and eye lines without repeating the
    person-blocks;
-2. one sentence combining furniture, architecture, at most two symbolic
-   motifs, reserved silk, ruled platforms, and the literal phrase "three
-   shallow stacked bands";
-3. one sentence combining the five-to-seven-family palette, contour-enclosed
-   color fields, exactly three bounded skin tones, line hierarchy, and
-   layered washes;
+2. one sentence combining outing landscape or minority interior, horses or
+   carriage if present, at most two symbolic motifs, reserved silk, and the
+   named 平面 versus 画 division;
+3. one sentence combining the five-to-seven-family palette, 平涂 garment
+   fields, flesh 渲染, line hierarchy, and landscape washes;
 4. one sentence combining the uneven warm-tea field, full-bleed silk reaching
    every canvas edge, one broken asymmetrical edge-oxidation patch, one
    rubbed corner, one age crease, and exactly three localized pigment, ink,
    or fiber changes whose isolated edge traces dissolve inward separately;
    and
-5. this exact final medium lock: "The entire image remains a visibly aged,
-   flat, hand-painted Tang silk figure painting made from ink contours and
-   mineral pigment, with individualized mature adult faces defined by fine
-   line."
+5. this exact final medium lock: "The entire image remains a visibly aged
+   hand-painted Tang silk figure painting mixing 平面 mineral panels with 画
+   渲染, with individualized mature adult faces defined by fine line."
 
 Except for the person-blocks, no sentence after the fixed five-sentence
 opening may exceed 60 English words; semicolon-separated clauses still count
@@ -871,14 +857,15 @@ Reject any Theme or Frame that:
   shoes, opera 水袖, or 凤冠霞帔;
 - mixes Early, High, and Late Tang body-and-makeup canons inside one Theme;
 - resembles photography, live action, Western oil painting, ukiyo-e, Dunhuang
-  mural photography, modern guochao illustration, anime, CGI, game art, 写意
-  ink wash, or digital line art;
+  mural photography, modern guochao illustration, anime, CGI, game art, or
+  digital line art;
+- is 100% poster-flat with no 渲染, or 100% splash 写意 with no 铁线描
+  structure;
 - describes people as performers or gives skin, hair, fabric, furniture, or
   windows photographic texture, optical focus, realistic reflection, or
   naturalistic illumination instead of painted line and pigment;
-- omits fine 工笔 contour work, layered mineral washes, prepared-silk ground,
-  first-read flat picture plane, shallow stacked bands, scattered
-  perspective, or reserved blank space;
+- omits fine 工笔 contour work, mineral 平涂, painterly 渲染, prepared-silk
+  ground, or the named 平面/画 mix;
 - omits a person-block, a name, an age, a class, specific Tang clothing
   layers, hairstyle, ornaments, body fullness, or makeup system for any adult
   woman, or specific robe, 幞头, and belt for any adult man;
@@ -890,9 +877,10 @@ Reject any Theme or Frame that:
 - adds a visible mounting margin, mat, frame, blank paper surround, inner
   rectangle, continuous dark edge enclosure, decorative border, or evenly
   aged edge band;
-- uses rounded volumetric bodies, continuous shading gradients, cast shadows,
-  dramatic depth, realistic light falloff, or illusionistic interior
-  recession;
+- uses photographic volume, cinematic cast shadows, realistic light falloff,
+  or illusionistic interior recession;
+- defaults a multi-Theme run to indoor 榻 chambers with no outing, riding,
+  polo, or carriage halt;
 - substitutes global sepia, gray desaturation, fake paper damage, film wear,
   or generalized dirt for localized material aging;
 - includes readable or pseudo-Chinese writing, artist attribution, a copied
