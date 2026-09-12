@@ -55,10 +55,13 @@ independently choose a scale and thickness for each of these regions:
 - hands
 - legs
 - feet
+- at hardcore level only, existing external genitals: penis and testicles
+  on a man, vulva on a woman
 
 Each region may be huge, tiny, very long, stubby, thick, or spindly. Name every
 region for every adult; do not leave chest, waist, buttocks, hands, or feet
-implied by a generic torso. Mix the choices so no two people in the same Theme
+implied by a generic torso. At hardcore level, also name genital scale the
+same way; do not leave genitals at an undescribed default. Mix the choices so no two people in the same Theme
 share one recipe. Productive clashes include a cathedral head on thread legs, a
 puffed chest over a missing waist, log arms ending in coin hands, a vast rear
 occupying the only chair, or pillar feet that refuse to leave a balcony.
@@ -234,10 +237,16 @@ bodies so a viewer can place every pelvis, mouth, hand, and support. Position,
 weight, and who does the labor are the satirical metaphor. Every requested
 adult takes part. Do not write "receiving him," "a standing position," or
 "the act occurs" without the contact geometry. Do not leave the main garments
-fully on if they hide the act. Use only the existing genitals of each adult:
-a man may have one penis, a woman does not grow one from the chest or
-elsewhere. Satirize the conduct and the situation, never a body, gender, or
-preference as inferior.
+fully on if they hide the act.
+
+At hardcore level, exaggerate existing genitals as part of the body kit.
+A penis may be huge, tiny, very long, stubby, thick, or spindly; testicles
+and vulva may be enlarged, reduced, or reshaped the same way. The scale must
+do joke work: a tiny penis under a cathedral head of authority, a huge organ
+that still performs no labor, a swollen vulva used as the only seat. Use only
+anatomy the adult already has: one penis on a man, none grown from a woman's
+chest, nipple, or back. Do not treat a genital, gender, or preference as
+inherently inferior.
 
 No content level permits coercion, minors, intoxication, real-person
 likenesses, sex as tribute, payment, medical treatment, or job condition, or
@@ -260,7 +269,7 @@ Frame is made:
 Give the Theme a short natural title. The Theme premise is exactly two
 sentences. Sentence one names every requested adult, their nationality,
 role, oversize head, exaggerated expression, nationality-coded clothing,
-and full body kit. Sentence two names the invented place, the
+and full body kit, including genital scale at hardcore level. Sentence two names the invented place, the
 content-level action, the emblem, and the social fact that action makes
 visible. The Theme style is one sentence that only names the room, its
 surfaces, and the light source as objects in the scene. It must not name a
@@ -279,8 +288,9 @@ Write every Frame as one unbroken natural-language paragraph. Near the start,
 name the invented place and moment. Then describe every adult in visual
 order: invented name, age of at least 25, Chinese or Japanese or Korean
 nationality, role, oversize head, exaggerated expression with named
-features, complete body kit, nationality-coded clothing or remaining
-garments, and current held pose. Then the shared content-level action and
+features, complete body kit including hardcore genital scale when that level is
+requested, nationality-coded clothing or remaining garments, and current
+held pose. Then the shared content-level action and
 the emblem. Name the room and its light only as things in the scene. Do not
 name a visual style. The social fact must be readable from that action, not
 from a leftover prop. If a label was locked, reproduce it verbatim in
@@ -302,7 +312,8 @@ Redraw any Theme or Frame that:
 - uses the wrong number or gender of people
 - adds a crowd or extra human
 - gives anyone a normal-sized head
-- leaves torso, chest, waist, buttocks, arms, hands, legs, or feet unnamed
+- leaves torso, chest, waist, buttocks, arms, hands, legs, or feet unnamed,
+  or at hardcore level leaves genital scale unnamed
 - repeats one body kit on two people in the same Theme
 - adds, drops, detaches, or fuses a limb or joint
 - hides a foot, hand, or the huge head
