@@ -1,0 +1,414 @@
+BRIEF
+
+Create a complete visual alphabet of varied, polished, hyper-realistic adult
+photographs. Each Theme centers on one uppercase English letter from A through
+Z, formed entirely by the minimum letter-specific adult cast using complete
+bodies, coordinated poses, body-to-body spacing, and negative space.
+
+This is human-pose typography, not word spelling and not conventional text.
+Every Frame contains one letter only. The human bodies themselves must make
+that letter unmistakably readable at thumbnail size.
+
+ALPHABET COVERAGE
+
+A complete alphabet edition contains one Theme for each of the 26 uppercase
+letters A through Z. Plan the whole batch before writing any Theme.
+
+- When the batch contains 26 Themes, return the Themes in strict alphabetical
+  order: first A, then B, then C, continuing without gaps through final Z.
+  Every letter must appear exactly once. Use this exact assignment:
+  T001=A, T002=B, T003=C, T004=D, T005=E, T006=F, T007=G, T008=H,
+  T009=I, T010=J, T011=K, T012=L, T013=M, T014=N, T015=O, T016=P,
+  T017=Q, T018=R, T019=S, T020=T, T021=U, T022=V, T023=W, T024=X,
+  T025=Y, T026=Z.
+- When the batch contains fewer than 26 Themes, use distinct letters without
+  repetition and maximize structural variety across straight, diagonal,
+  branched, curved, enclosed, and open letters.
+- When the batch contains more than 26 Themes, exhaust all 26 letters before
+  repeating one, then give repeated letters substantially different pose,
+  mood, wardrobe, lighting, and environment systems.
+
+Do not mention Theme IDs or alphabet indices in titles, premises, styles, or
+Frames. Privately track the ordered coverage and reject accidental duplicates,
+missing letters, or out-of-order letters before returning the batch.
+
+TYPOGRAPHY-FIRST PRIORITY
+
+The priorities for every Theme and Frame are, in this exact order:
+
+1. the single intended uppercase letter is readable at thumbnail size;
+2. every selected adult is visibly indispensable to that letter;
+3. torso, arms, legs, contact, and negative space match the letter topology;
+4. the number of complete adults matches the letter-specific stroke budget;
+5. anatomy, support, adulthood, and physical safety remain clear;
+6. expression, fashion, light, and atmosphere give the letter an original
+   campaign identity.
+
+If styling weakens recognition, simplify the styling. A beautiful group
+portrait that does not read as the assigned letter is invalid.
+
+CAST CONTRACT
+
+This brief requires the female and male totals to remain unspecified for the
+whole batch. Determine the cast independently for each letter from the
+letter-specific body-count table below. Do not impose one shared cast size or
+gender ratio across A through Z.
+
+Every selected person must be an unmistakably mature adult aged 25 or older
+with an original identity. When a letter uses two or more people, include at
+least one woman and at least one man. Across three- and four-person letters,
+vary between woman-majority, man-majority, and balanced groups so the alphabet
+does not repeat one gender arrangement.
+
+Use exactly the table's adult total for each letter, with no additional
+humans, duplicates, reflections, portraits, screens, silhouettes, or
+background figures. Every person appears exactly once at full body length and
+supplies exactly one indispensable major stem, bar, diagonal, smooth arc, or
+tail. Arms and legs may refine that person's assigned stroke but must not
+create a second spatially separate stroke.
+
+Never use a participant as an observer or decorative extra. No person may be
+duplicated, occupy two incompatible locations, become a detached body part, or
+disappear behind another participant.
+
+LETTER-SPECIFIC BODY COUNTS
+
+Use these exact minimum totals:
+
+- A: 3 adults — left diagonal, right diagonal, crossbar.
+- B: 3 adults — vertical stem, upper bowl arc, lower bowl arc.
+- C: 2 adults — upper arc and lower arc.
+- D: 3 adults — vertical stem, upper outer arc, lower outer arc.
+- E: 4 adults — vertical stem and three horizontal bars.
+- F: 3 adults — vertical stem, upper bar, middle bar.
+- G: 3 adults — upper arc, lower arc, inward terminal.
+- H: 3 adults — two vertical stems and center crossbar.
+- I: 1 adult — one vertical stem.
+- J: 2 adults — upper bar and hooked descending stroke.
+- K: 3 adults — vertical stem and two diagonals.
+- L: 2 adults — vertical stem and lower bar.
+- M: 4 adults — four connected long strokes.
+- N: 3 adults — two vertical stems and one diagonal.
+- O: 2 adults — left continuous arc and right continuous arc.
+- P: 2 adults — vertical stem and one continuous bowl arc.
+- Q: 3 adults — two oval arcs and one short diagonal tail.
+- R: 3 adults — vertical stem, upper bowl arc, diagonal leg.
+- S: 2 adults — upper opposing arc and lower opposing arc.
+- T: 2 adults — upper bar and vertical stem.
+- U: 3 adults — left stem, lower rounded arc, right stem.
+- V: 2 adults — left diagonal and right diagonal.
+- W: 4 adults — four connected diagonals.
+- X: 4 adults — four half-diagonals meeting around one empty center.
+- Y: 3 adults — two upper diagonals and one lower stem.
+- Z: 3 adults — upper bar, descending diagonal, lower bar.
+
+Do not reduce a count by asking one adult to occupy two strokes. Do not
+increase a count to make the pose easier. The exact count and one-body-per-
+major-stroke mapping are part of the letter's identity.
+
+LETTER TOPOLOGY — A THROUGH Z
+
+Use the following topology as the non-negotiable visual skeleton. Human poses
+may soften the geometry, but every named stroke, curve, junction, aperture,
+counter, and terminal must remain visible.
+
+A — two rising outer diagonals meet at one apex, with one clear horizontal
+crossbar and one open triangular counter.
+
+B — one straight vertical stem supports two distinct right-facing bowls,
+smaller above and larger below, with two readable counters.
+
+C — one broad open curve faces right, with clearly separated upper and lower
+terminals and no closing stroke.
+
+D — one straight vertical stem joins a single large right-facing outer curve,
+creating one open interior counter.
+
+E — one vertical stem carries three right-facing horizontal bars: long upper,
+shorter middle, and long lower.
+
+F — one vertical stem carries a long upper bar and shorter middle bar, with no
+lower bar.
+
+G — one broad right-open curve includes a short inward horizontal terminal at
+the lower-right opening.
+
+H — two parallel vertical stems connect through one centered horizontal
+crossbar.
+
+I — one narrow central vertical stem, with optional short aligned head and foot
+terminals only when bodies can create them without ambiguity.
+
+J — one long descending stem bends into a lower-left hook, with a short upper
+horizontal terminal.
+
+K — one vertical stem meets two right-facing diagonals at one clear center
+junction.
+
+L — one vertical stem meets one lower horizontal bar at a clean 90-degree
+corner.
+
+M — two outer verticals connect through two inward diagonals meeting at a
+center valley near mid-height.
+
+N — two parallel vertical stems connect through one diagonal running from
+upper left to lower right.
+
+O — one continuous closed oval with one large central counter and no opening.
+
+P — one vertical stem supports one closed upper-right bowl, leaving the lower
+half open.
+
+Q — one closed oval plus one short diagonal tail exiting at the lower right.
+
+R — one vertical stem, one closed upper-right bowl, and one diagonal leg
+departing from the bowl junction toward the lower right.
+
+S — one continuous opposing double curve, with an upper-right bulge and
+lower-left bulge connected through a narrow center.
+
+T — one long upper horizontal bar meets one centered vertical stem.
+
+U — two parallel vertical sides connect through one broad rounded lower curve,
+with an open top.
+
+V — two long diagonals descend to one narrow lower point. Each of the two
+complete straight bodies is one diagonal: the left adult's head is the
+upper-left endpoint and their joined feet end at the lower-center vertex; the
+right adult's head is the upper-right endpoint and their joined feet end at
+the same lower-center vertex. The two pairs of feet nearly touch with a small
+visible gap. Both adults keep both straight arms pressed alongside their
+torsos and both legs joined. No hand, finger, elbow, shoulder, or head may form
+the lower vertex. Do not extend arms overhead or outward, spread legs, cross
+bodies, touch torsos, or create an X or star pose.
+
+W — four diagonals create two lower points and one central upper junction.
+
+X — four half-diagonals converge around one small empty center diamond. Use
+exactly four complete straight adults, one for each ray. The upper-left
+adult's head is the outer upper-left endpoint and their joined feet stop just
+before center; the upper-right adult mirrors that path. The lower-left and
+lower-right adults place their heads at the two outer lower endpoints and
+their joined feet stop just before center. All four pairs of feet surround,
+but do not enter, one small diamond of empty floor. Every adult keeps both arms
+pressed alongside the torso and both legs joined. No body crosses the center,
+overlaps another body, spreads its legs, extends its arms outward, or forms a
+star pose.
+
+Y — two upper diagonals meet at one center junction and continue as one lower
+vertical stem.
+
+Z — one upper horizontal, one descending diagonal, and one lower horizontal
+connect through two clean corners. Use exactly three complete straight adults,
+one per stroke. The first lies horizontally with head at the upper-left
+endpoint and joined feet at the upper-right corner. The second lies diagonally
+with head beside the first person's feet and joined feet at the lower-left
+corner. The third lies horizontally with head beside the second person's feet
+and joined feet at the lower-right endpoint. Every person keeps both arms
+pressed alongside their torso and both legs joined. Use small visible gaps at
+both corners. Never bend one person across two strokes, detach a limb, create a
+partial fourth body, or place an isolated pair of legs or arms along an edge.
+
+HUMAN POSE CONSTRUCTION
+
+Translate each topology into anatomically credible adult poses. Use torso and
+joined legs for strong stems; straight arms for bars and diagonals; bent
+elbows, bent knees, side curls, arched arm pairs, and coordinated body arcs for
+bowls and curves; deliberate body-to-body gaps for counters and apertures.
+
+Identify the one major stroke or smooth arc supplied by each participant. Keep
+every limb traceable from shoulder or hip to hand or foot. Arms and legs must
+remain visually subordinate to, and continuous with, that one assigned stroke.
+
+Every participant's contribution must form one spatially continuous anatomical
+path through physically adjoining body parts. Never assign one person to two
+major strokes, even when they meet at a shoulder, elbow, hip, or knee. Never
+assign one person's torso to an upper or left stroke and then reuse one of
+their limbs as a remote lower or right stroke separated from that torso. Never
+describe a hand, arm, foot, leg, pelvis, or partial torso at a location the
+complete owner cannot physically occupy.
+
+At junctions, hands, feet, shoulders, or safe outer limbs may nearly meet or
+make light intentional contact. No participant may stand, kneel, sit, or place
+hard pressure on another person's head, neck, spine, chest, abdomen, pelvis,
+or unsupported joint. No body may lie on top of another.
+
+Curved letters may use several coordinated bodies arranged as a smooth arc,
+but the curve must have a clear opening or counter matching the topology.
+Never replace a difficult curve with a printed outline, rope, ribbon, prop,
+shadow, smoke trail, or caption.
+
+Reject vague prose such as "suggests," "evokes," "resembles," "hints at," or
+"approximately forms." Name the exact torso axis, arm direction, leg
+direction, bend, junction, endpoint, and negative space that completes the
+letter.
+
+CAMERA AND READING FIELD
+
+Use a true 90-degree orthographic overhead camera for floor-based letters. The
+optical axis must be exactly perpendicular to the floor and centered on the
+glyph. Upright wall-based silhouettes may instead use a perfectly centered
+frontal camera with parallel verticals. Do not use oblique, three-quarter,
+fisheye, or strongly perspective-distorted views.
+
+Use a normal or moderate telephoto lens from sufficient distance. Keep the
+entire letter and every complete head, hand, and foot inside the frame with
+even breathing room. Align the image top with the top of the letter so it does
+not read sideways, mirrored, or backward.
+
+Use one seamless matte reading field with a solid base color or extremely
+smooth tonal gradient. Do not place yoga mats, rugs, floorboards, tiles,
+furniture, platforms, architectural lines, text, logos, or props beneath the
+bodies. No rectangular object may outline an individual person.
+
+Create strong figure-ground contrast with coordinated opaque close-fitting
+full-body fashion. Gloves and socks must match each garment so hands and feet
+remain connected to the silhouette. Keep hair controlled within the intended
+letter boundary.
+
+SEMANTIC ART DIRECTION
+
+Give every letter one original emotional and visual interpretation. The
+letter's phonetic associations, familiar symbolism, topology, or kinetic
+character may inspire the concept, but visible conventional words and captions
+remain forbidden.
+
+Vary emotional direction across the alphabet: assertive, buoyant, curious,
+dramatic, electric, fierce, graceful, harmonious, iconic, jubilant, kinetic,
+luminous, monumental, nocturnal, open, playful, questioning, rebellious,
+sensual, theatrical, uplifting, victorious, wild, confrontational, yearning,
+or another concrete tone. Do not mechanically bind these examples to matching
+initial letters.
+
+Give each adult a distinct but coordinated expression and gaze: restrained
+smile, lifted brow, calm concentration, defiant direct gaze, delighted open
+gaze, inward focus, or another precise performance. Preserve the head position
+required by the glyph.
+
+Vary wardrobe material by Theme: lacquered stretch fabric, velvet, metallic
+knit, satin, matte neoprene, fine sequins, translucent overlay above an opaque
+base, or another silhouette-safe textile. Choose one coherent hue family for
+the cast and maintain strong contrast with the reading field.
+
+Build lighting from soft frontal fill plus one complementary colored rim or
+edge accent. Possibilities include crimson with cyan edges, cobalt with amber,
+emerald with gold, violet with acid green, or another deliberate contrast.
+Keep shadows compact and never let a shadow become a missing letter stroke.
+
+PERIPHERAL ATMOSPHERE AND MICRO-DYNAMIC
+
+Decorative atmosphere is permitted only outside the letter's outer bounding
+box, in perimeter and corner negative space. Suitable elements include sparse
+metallic confetti, flower petals, feathers, leaves, colored haze, tiny
+reflective flakes, or a soft projected color glow without lines or text.
+
+Add exactly one restrained micro-dynamic that reinforces the Theme without
+changing the letter geometry: synchronized pointed toes, tensed fingers,
+visible garment tension from a shared breath, contained hair tips moved by a
+controlled breeze, or perimeter particles drifting along one clear vector.
+
+Do not add anatomical motion blur, casual limb movement, large fabric trails,
+powder, water, smoke, ropes, ribbons, or props through the letter. Remove any
+effect that enters a counter, closes an aperture, creates a false stroke, or
+weakens the silhouette.
+
+THEME CONTRACT
+
+Every Theme defines one complete human-letter system:
+
+- one exact uppercase letter;
+- the exact letter-specific adult total from the body-count table, with every
+  participant assigned one indispensable major stroke or arc;
+- the complete letter topology and body-to-stroke mapping;
+- one safe support and contact system;
+- one seamless high-contrast reading field;
+- one coordinated fashion material and palette;
+- one orthographic overhead or perfectly frontal camera;
+- one expression and gaze choreography;
+- one fill and complementary rim-light system;
+- one perimeter-only atmospheric treatment; and
+- one restrained micro-dynamic.
+
+Give the Theme a concise original title that is not merely the letter and does
+not appear in the image. In no more than two premise sentences, name the
+letter, exact adult total, gender composition, body geometry, junctions,
+counters, and support. The style must define emotional direction, wardrobe
+material, palette, camera, light, perimeter atmosphere, and micro-dynamic.
+
+Frames within one Theme are parallel alternatives of the same letter, not
+steps in drawing it. Preserve the letter and recurring adult identities while
+varying pose distribution, expression, wardrobe treatment, light direction,
+peripheral material, or crop without weakening topology.
+
+FRAME CONTRACT
+
+Every Frame is one standalone full-frame photograph containing one uppercase
+letter only. Write one unbroken natural-language paragraph in the requested
+language.
+
+Begin every final Frame with this structural declaration, translated only when
+the requested output language is not English:
+
+    A true orthographic photograph shows exactly [TOTAL] complete adult bodies
+    collectively forming the single uppercase letter [LETTER] on a seamless
+    high-contrast field; each adult supplies exactly one indispensable major
+    stroke or smooth arc of the glyph.
+
+Replace both bracketed fields with exact values. Immediately describe the
+letter topology, then map each participant's torso, left arm, right arm, left
+leg, right leg, support, contact, and negative-space role. Complete all
+geometry before describing identity, expression, wardrobe, floor, lighting,
+atmosphere, lens, and finish.
+
+Do not render the target as ordinary typography anywhere in the image. Do not
+include an alphabet label, caption, cell border, diagram, guide line, arrow,
+logo, watermark, Theme title, or visible written character. The only readable
+letter must be the human formation.
+
+End every Frame by stating that the seamless field contains no printed,
+painted, projected, illuminated, glowing, architectural, shadow, outline, or
+prop version of the target letter; only the complete human bodies define the
+glyph. This exclusion must remain explicit in final prose rather than being
+left as an internal instruction.
+
+FRAME ACCEPTANCE GATE
+
+Before accepting a Frame, verify all of the following:
+
+1. exactly one uppercase letter is present;
+2. its topology matches the corresponding A-through-Z definition;
+3. the complete adult total exactly matches the letter-specific body-count
+   table;
+4. every participant is necessary to a named stroke, curve, junction, counter,
+   terminal, or negative-space boundary;
+5. every participant supplies exactly one major stroke or smooth arc;
+6. every limb is connected, traceable, and assigned one compatible task;
+7. all support and contact are anatomically credible and safe;
+8. the camera is orthographic overhead or perfectly centered frontal;
+9. the reading field contains no mats, patterns, props, or conventional text;
+10. fashion and light preserve strong figure-ground contrast;
+11. decoration remains outside the letter bounding box;
+12. exactly one micro-dynamic is present without altering the glyph; and
+13. the letter remains recognizable as a flat silhouette at thumbnail size.
+
+For a two-adult V, additionally verify that both heads are the two upper
+endpoints, both pairs of joined feet nearly meet at the sole lower vertex, all
+four arms remain pressed against the two torsos, and no fingertips, hands,
+heads, or crossed bodies create the vertex.
+
+For a three-adult Z, additionally verify that three different complete straight
+bodies form the upper bar, diagonal, and lower bar respectively. Reject the
+Frame if one person spans two strokes, any limb is detached, or a partial
+fourth body is implied.
+
+For a four-adult X, additionally verify that four different complete straight
+bodies form the four half-diagonals around one empty central diamond. Reject
+the Frame if any torso crosses the center, any two bodies overlap, any arms or
+legs spread outward, or fewer than four complete people are shown.
+
+Reject and rewrite any Theme or Frame containing the wrong letter, more than
+one letter, an extra or missing person, decorative observer, incomplete stroke,
+missing counter, closed aperture, ordinary yoga pose without typographic
+function, vague limb placement, unsafe overlap, detached anatomy, oblique
+camera, yoga mat, patterned floor, prop-built stroke, shadow-built stroke,
+printed letter, or unsupported claim of readability.
