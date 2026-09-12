@@ -1,0 +1,616 @@
+BRIEF
+
+Create original, hyper-realistic editorial social-caricature Themes about
+ordinary adult relationships. Expose a recognizable contradiction in romantic
+relationships, marriage, workplace hierarchy, friendship, shared domestic
+labor, family expectations, status, attention, credit, care, or petty daily
+friction.
+
+Distort faces, expressions, gestures, and body proportions to enlarge the
+participants' performed flaws, defenses, desires, or emotional reactions. The
+result must be funny at first glance and uncomfortably truthful on reflection.
+Satirize conduct and relationship patterns, never gender, nationality,
+ethnicity, age, disability, body type, or identity itself.
+
+Every image uses a clean, minimal stage, one dominant interaction, and a small
+amount of exact English copy that states the central opposition. Do not build a
+cluttered naturalistic room or scatter many symbolic props.
+
+CAST AUTHORITY
+
+Use exactly the requested number of adult women and exactly the requested
+number of adult men. Never infer, default, hard-code, add, omit, merge, clone,
+or replace a person. Add no child, bystander, assistant, crowd, portrait,
+reflection, screen figure, statue, mannequin, shadow person, or detached body
+fragment resembling another human.
+
+Before inventing the relationship, derive one immutable cast declaration from
+cast_constraints. Begin every Theme premise and every Frame with this exact
+dynamic sentence:
+
+    Exactly [TOTAL IN WORDS] Chinese [ADULT/ADULTS] fill the image:
+    [FEMALE PHRASE], [MALE PHRASE], and no other human figures.
+
+Replace each field from the request. Use "one adult woman", "two adult women",
+"one adult man", and "two adult men" with correct grammar; omit a gender
+phrase when its requested count is zero. Never copy a cast declaration from an
+example or another Theme. When the requested male count is zero, the Theme and
+Frame must contain no man, male role, husband, boyfriend, father, male pronoun,
+or masculine name. When the requested female count is zero, apply the
+equivalent exclusion to women. Restate the same total and gender composition
+near the end of every Frame.
+
+Every participant must be a fictional, unmistakably mature adult aged 25 or
+older. Unless the Story Description explicitly states otherwise, make every
+person Chinese and set the Theme in China. Give each adult a distinct original
+face, age, build, hairstyle, content-level-appropriate body-coverage state,
+social role, current action, exaggeration, and response.
+
+Show every requested person prominently from head to foot. Every person has
+exactly one head, one continuous torso, two attached arms, two hands, two
+attached legs, and two feet. Keep limbs traceable, ownership unambiguous,
+contacts reachable, and support physically coherent despite deliberate
+caricatural scale changes.
+
+CAST-TO-RELATIONSHIP SELECTION
+
+Choose a relationship premise compatible with the actual requested cast. The
+following are priorities, not fixed plots:
+
+- one adult: the person's relationship with domestic labor, self-image,
+  social performance, attention, consumption, perfectionism, procrastination,
+  or the pressure to handle everything alone;
+- two women and no men: supervisor and subordinate, colleagues dividing labor
+  and credit, sisters, friends, roommates, neighbors, mentor and protege, or
+  two women refusing an externally imposed rivalry;
+- one woman and one man: spouses, long-term partners, dates, colleagues,
+  neighbors, siblings, or friends caught in unequal care, selective listening,
+  weaponized incompetence, emotional scorekeeping, status performance, or a
+  petty dispute that conceals a deeper need;
+- two women and one man: manufactured romantic competition, workplace
+  triangulation, alliance against manipulation, unequal credit, family
+  mediation, friendship under pressure, or one participant using the other two
+  to validate status;
+- one woman and two men: emotional labor, workplace hierarchy, competitive
+  posturing, family expectations, alliance, gatekeeping, or two participants
+  transferring responsibility to the third;
+- all-woman or all-man groups of other sizes: friendship, family, household,
+  peer, workplace, status, care, and credit dynamics suited to the exact cast;
+  and
+- larger mixed groups: one coherent relationship network with a single
+  readable division of labor, attention, access, responsibility, or credit.
+
+When the Story Description explicitly names a relationship or situation,
+honor it instead of selecting another when it is compatible with the requested
+content level and the safety rules below. At erotic and hardcore levels, use
+solo self-relationship or consenting adult spouses, established partners,
+dates, lovers, or peer-status intimate partners. Never sexualize relatives,
+workplace authority, mentorship, caregiving dependency, financial dependency,
+housing dependency, or another power relationship in which refusal could carry
+a penalty. Do not default to jealousy, romance, gender conflict, or women
+competing for a man. Give women and men agency, flaws, strategies, and
+reactions according to the specific behavior being satirized rather than a
+gender stereotype.
+
+CORE SATIRICAL EQUATION
+
+Build every Theme from one indivisible visual equation:
+
+    one ordinary relationship friction
+    + one unequal desire or false performance
+    + one content-level-specific shared physical struggle
+    + one dominant metaphor mechanism made from an object or body arrangement
+    + one opposed pair of English text phrases
+    = one instantly readable social truth
+
+The contradiction must be visible without explanation. Examples include work
+moving downward while credit moves upward, one partner demanding care while
+pretending not to need it, a tiny domestic object carrying an enormous
+emotional argument, a self-important person manufacturing rivalry, everybody
+waiting for somebody else to act, or generosity performed only when observed.
+Invent original equivalents rather than copying these examples by default.
+
+Privately complete this sentence before accepting a concept:
+
+    Because [person] wants [unequal desire], they [content-level-specific
+    physical action], causing [shared object or body arrangement] to [visible
+    mechanical change], which forces every other person to [specific
+    exaggerated response] and reveals [social truth].
+
+Do not print that planning sentence. Reject a concept if removing any person,
+the shared object, or the physical action leaves the same joke intact.
+
+ONE CLOSED INTERACTION
+
+Every requested adult must participate in one closed action-and-reaction
+circuit. Favor one strong verb opposition such as pull/resist, give/take,
+push/block, speak/listen, claim/carry, inflate/deflate, display/conceal,
+delegate/complete, approach/withdraw, or accuse/defend.
+
+Show the action at its most revealing instant. State:
+
+- what the initiating person is doing;
+- the exact hand, foot, torso, or gaze involved;
+- the direction of force;
+- what another participant does in response;
+- how the selected object or body-position system visibly bends, stretches,
+  tilts, compresses, inflates, deflates, slides, redirects weight, or changes
+  state; and
+- how that change returns pressure or consequence to the initiator.
+
+Every participant must touch, pull, push, brace, carry, block, redirect, or
+visibly react to the same interaction. A gaze, facial reaction, recoil,
+observation, or symbolic presence alone is insufficient: every adult must make
+direct hand, foot, or supported torso contact with the selected metaphor object
+or with another participant who is transmitting force through the body-position
+system. Do not call a disconnected observer "integral." Do not pose disconnected
+people beside separate symbols. Expressions must correspond to the current
+force and must not look like generic smiling, surprise, or anger.
+
+At erotic and hardcore levels, intimate body contact and sexual positioning
+may transmit the force directly, so the bodies themselves can be the primary
+metaphor mechanism. In that case, do not add an unrelated symbolic object to
+explain what the body arrangement already makes visible.
+
+EXTREME FACIAL PERFORMANCE
+
+Give every adult one coherent facial-caricature cluster that combines two or
+three visibly altered features. Suitable changes include:
+
+- enlarged or narrowed eyes with an exact gaze target;
+- asymmetrically raised, sharply lowered, or hook-shaped brows;
+- a widened megaphone mouth, compressed line mouth, triangular shout, smug
+  crescent, or tiny guilty O-shaped mouth;
+- inflated cheeks, tightened cheek muscles, or a widened jaw;
+- a raised or compressed nose with visibly flared nostrils; and
+- hair volume or direction that reinforces the reaction.
+
+Make the emotional contrast unmistakable. Productive pairings include smug
+versus furious, performatively cheerful versus exhausted, dismissive versus
+wounded, triumphant versus trapped, self-important versus unconvinced, or
+manipulative versus newly allied.
+
+Name the altered features and their relationship to the action. Do not write
+only "an exaggerated expression." Preserve one coherent face with two eyes,
+one nose, and one mouth. Do not add facial organs, detach features, melt skin,
+create a mask, or make an adult look childlike.
+
+BODY-SILHOUETTE CARICATURE
+
+Give every adult one or more coordinated nonfacial proportion changes that
+expose their role in the relationship. Choose one or combine compatible
+changes:
+
+- one attached arm elongated to two or three times normal length;
+- both attached hands enlarged to two or three times normal size;
+- the complete head and hair enlarged to one and a half times normal size;
+- the continuous upper torso widened to twice normal width;
+- the complete torso compressed to one-half normal width;
+- the whole body stretched to one and a half times normal height;
+- the whole body compressed to three-fifths normal height; or
+- one garment volume inflated to three times normal width around an otherwise
+  complete body.
+
+Each altered part must actively perform the satire by gripping, pulling,
+pointing, carrying, blocking, claiming, shielding, inflating, or redirecting
+the central interaction. State the numeric scale explicitly in every Frame.
+Keep adjacent joints attached and readable. Never enlarge breasts, buttocks,
+genitals, a pregnant abdomen, or another sexual characteristic for humor.
+
+Layered changes are allowed: for example, one existing arm may be elongated
+while its attached hand is enlarged, or an enlarged head may accompany a
+widened torso. Every change must affect existing anatomy only. Never add,
+remove, duplicate, detach, fuse, or replace a head, torso, arm, hand, leg,
+foot, joint, or finger. Preserve a continuous shoulder-elbow-wrist-hand chain
+for each arm and a continuous hip-knee-ankle-foot chain for each leg. Keep both
+legs and both feet visible, anatomically attached, and physically supported;
+they need not bear weight when a support or another consenting adult safely
+carries that weight. Avoid broken joints, melted anatomy, accidental body
+horror, or a change that exists only because of lens perspective.
+
+In every Theme premise and Frame, serialize the body changes once in this exact
+dynamic form:
+
+    Body exaggerations: [PERSON] - [FEATURE] at [NUMERIC SCALE], [OPTIONAL
+    ADDITIONAL FEATURE] at [NUMERIC SCALE]; [PERSON] - [FEATURE] at [NUMERIC
+    SCALE]; all unlisted body parts remain at normal scale.
+
+Include every requested adult exactly once and list every changed feature for
+that person in the same entry. Coordinated layered changes may share one entry.
+After this sentence, never introduce a body change that was not declared in
+the person's entry.
+
+In every Frame this must be the second sentence, immediately after the dynamic
+cast declaration and before wardrobe, face, action, or setting. If later prose
+uses a size word for a body feature - including enlarged, elongated, widened,
+compressed, stretched, reduced, giant, tiny, massive, or oversized - that
+feature and scale must already appear in the person's body entry. Ordinary
+action words such as grips, braces, points, or pulls must not imply extra,
+missing, detached, or anatomically discontinuous limbs.
+
+In every Theme premise and Frame, serialize physical participation once,
+immediately after the body sentence. Use the one form matching the requested
+content level:
+
+    Contact map: force chain - [EACH ADULT'S BODY PART, TARGET, AND FORCE].
+
+    Contact map: sensual contact - [CURRENT NON-EXPLICIT SELF-CONTACT OR
+    RECIPROCAL CONTACT]; force and support - [EACH ADULT'S BODY PART, TARGET,
+    AND FORCE].
+
+    Contact map: defining sexual contact - [CURRENT EXPLICIT ANATOMICAL
+    CONTACT]; force and support - [EACH ADULT'S BODY PART, TARGET, AND FORCE].
+
+Use the first form for aesthetic, the second for erotic, and the third for
+hardcore. Account for every requested adult at least once; an identifier may
+repeat when that person has both defining and support contacts. Every contact
+must be sustained in the depicted instant and must transmit, resist, or
+redirect force in the one shared interaction. Hovering near, gesturing toward,
+pointing at, presenting, watching, recoiling, celebrating, or holding raised
+arms does not count as contact. Later action prose must preserve the contact
+map exactly.
+
+The contact map must prove the requested content level rather than merely claim
+it later. At aesthetic level, map the nonsexual force chain. At erotic level,
+map at least one sustained sensual self-contact for a single adult or
+reciprocal sensual contact for every adult in a group. At hardcore level, map
+the defining current genital, oral, or manual sexual contact for every adult,
+plus any hand, foot, limb, or support contact needed to make the geometry safe
+and readable. A hardcore contact map containing only hands, feet, posing,
+bracing, or nearby body placement is invalid.
+
+CLEAN BACKGROUND AND METAPHOR BUDGET
+
+Use a constructed editorial stage rather than a furnished room. The background
+must contain:
+
+- one broad matte color field or very smooth two-color gradient;
+- zero environmental depth and no visible wall-floor corner;
+- at most two simple geometric location cues;
+- exactly one primary metaphor mechanism shared by the whole cast, built from
+  either one object or the cast's own body-position and force system; and
+- at most one small supporting object from the same situation.
+
+When an object carries the primary metaphor, it occupies roughly 25 to 45
+percent of the canvas and participates mechanically in the action. Suitable
+object families include one document, rope, scale, chair, sofa, table, door,
+balloon, phone, toothpaste cap, alarm clock, paper stack, umbrella, conveyor,
+trophy, mirror, or another ordinary object specific to the chosen
+contradiction. When the cast's body arrangement carries the primary metaphor,
+use no separate symbolic object; one simple support such as a bed, sofa, chair,
+or platform may establish safe contact and must not compete as a second
+metaphor.
+
+Do not include room inventory, scattered household objects, shelves, plants,
+wall art, windows, screens, incidental furniture, distant architecture,
+debris, decorative signage, crowds, or multiple competing metaphors. Preserve
+at least 25 percent clean negative space around the central interaction.
+
+Every visible surface must be blank except for the two locked English phrases.
+Do not decorate paper, books, reports, boards, screens, clothing, walls, or
+props with diagrams, formulas, handwriting, charts, icons, interface marks,
+fake fine print, or ornamental lettering.
+
+If a selected object normally contains information - including a schedule,
+report, chart, clipboard, phone, book, control panel, calendar, form, or
+packaging - render its entire surface blank except for the two locked phrases.
+Do not mention dense formatting, lines of copy, list entries, data, controls,
+page contents, or marks that the image model could interpret as additional
+writing.
+
+ENGLISH-ONLY IMAGE COPY
+
+Every Theme must invent exactly two short opposed English phrases that clarify
+the behavior already visible in the image. The phrases are not explanations
+of an invisible joke; they label the two forces, claims, excuses, or truths in
+the current interaction.
+
+Each phrase must:
+
+- contain one to four words;
+- use only uppercase ASCII letters A through Z, spaces, apostrophes, question
+  marks, or exclamation marks;
+- contain no more than 18 characters including spaces and punctuation;
+- be correctly spelled, grammatical, concrete, and immediately readable;
+- differ meaningfully from the other phrase; and
+- avoid names, brands, hashtags, numbers, abbreviations, fine print, and
+  generic words such as GOOD, BAD, YES, or NO by themselves.
+
+Examples of productive opposition include "MY SUCCESS" versus "HER WORK",
+"YOU NEVER CARE!" versus "JUST A CAP?", "FIGHT FOR ME" versus "WE OPT OUT",
+"NOT DONE YET?" versus "I'LL DO IT", "EASY LIFE" versus "ONE MORE THING",
+or "I'M LISTENING" versus "LET ME SPEAK".
+These examples show brevity and parallel conflict; invent new phrases suited to
+each Theme instead of repeatedly copying them.
+
+Integrate each phrase into a diegetic carrier that already belongs naturally
+to the action and environment. Prefer lettering stamped, painted, engraved,
+embossed, woven, stitched, printed, or projected onto the broad face of the
+primary object, two existing regions of one support, garment panels, bedding,
+upholstery, or one simple geometric stage cue. Do not introduce separate props
+solely to hold the words. Do not use floating editorial caption blocks,
+speech balloons, subtitles, interface overlays, detached placards, or text
+hovering in empty space.
+
+The lettering must inherit the carrier's perspective, curvature, folds,
+surface texture, material response, lighting direction, shadow, and degree of
+wear while remaining fully readable. Its type treatment and color must belong
+to the scene's palette rather than looking pasted on afterward. Keep both
+phrases in the central 80 percent of the image, away from faces, hands, body
+contours, and each other. Use large bold horizontal lettering with enough
+material contrast for immediate legibility.
+
+Lock the pair in every Theme premise with this exact English syntax:
+
+    Locked image copy: "FIRST PHRASE" | "SECOND PHRASE".
+
+Every Frame must name each carrier and reproduce both locked phrases verbatim
+inside straight double quotation marks. End every Frame with this exact
+sentence, replacing only the two bracketed phrases:
+
+    The only visible writing is the exact English copy "[FIRST PHRASE]" and
+    "[SECOND PHRASE]"; both phrases are large, correctly spelled, complete,
+    horizontal, unobstructed, and clearly legible, with no Chinese characters,
+    pinyin, bilingual text, gibberish, random letters, numbers, logos, fine
+    print, or watermark.
+
+Do not translate, paraphrase, punctuate differently, pluralize, or restyle the
+locked copy between Theme and Frame. Do not place other writing on documents,
+phones, clocks, clothing, walls, signs, or props.
+
+CONTENT-LEVEL SATIRE COUPLING
+
+Honor the exact requested content level in the Theme and every Frame. Content
+intensity must determine the central action, contact geometry, metaphor
+mechanism, expressions, copy, and social contradiction. Never create a generic
+relationship satire and add nudity or sex afterward. Conversely, never create
+an unrelated erotic tableau beside a symbolic prop. Removing the
+content-level-defining interaction must break the visual joke.
+
+At aesthetic level, every adult wears a complete opaque outfit and the shared
+interaction is nonsexual. Make ordinary actions such as carrying, cleaning,
+waiting, listening, interrupting, claiming, spending, delegating, comforting,
+or refusing physically expose unequal labor, attention, responsibility,
+credit, access, or emotional effort.
+
+At erotic level, use unmistakably adult but non-explicit sensual contact,
+intentional exposure or concealment, reciprocal proximity, gaze, touch,
+support, approach, withdrawal, or body orientation as the active metaphor
+mechanism. The sensual configuration must reveal who seeks attention, who
+withholds it, who performs desirability, who bears physical or emotional
+effort, or whether apparent competition becomes alliance. Do not show explicit
+sexual acts or pornographic anatomical contact. For one adult, require
+intentional sensual self-contact whose effort or presentation carries the
+satire; for multiple adults, require reciprocal sensual contact that accounts
+for everyone. A glamorous outfit, passive nudity, ordinary embrace, or romantic
+mood alone does not satisfy this level.
+
+At hardcore level, show one clearly visible consensual adult sexual interaction
+already occurring in every Theme and Frame. Name the current act, participating
+anatomy needed for spatial clarity, each person's active role, and the exact
+supported contact geometry; do not substitute preparation, implication,
+aftermath, or euphemism. For a single adult, a solo act may satirize
+self-performance, perfectionism, productivity pressure, consumption, or the
+need to appear desirable. For two or more adults, every requested person must
+actively give, receive, support, guide, or redirect contact within the same
+consensual act.
+
+The explicit act cannot exist only in the content-level proof sentence. Within
+the first 80 words after the four mandatory opening sentences, redescribe its
+defining current contact and unobstructed spatial relationship as visible image
+content. Do not replace this with a nearby kneel, embrace, suggestive pose,
+almost-contact, strategically hidden anatomy, or support gesture.
+
+At hardcore level, use position, orientation, rhythm, weight support, reach,
+initiative, attention, visible effort, control, reciprocity, or distribution
+of pleasure to carry the social metaphor. For example, an above/below
+configuration may expose unequal labor or performative dominance only when the
+current actions and reactions visibly establish that inequality. Being above,
+below, standing, seated, kneeling, penetrating, or receiving is never
+inherently superior, inferior, masculine, feminine, selfish, or submissive.
+Satirize the participants' specific behavior and negotiated relationship
+pattern, never a sexual position, consensual preference, anatomy, gender, or
+identity.
+
+Vary the intimacy-based metaphor rather than defaulting to above/below:
+
+- who safely supports another person's weight can expose invisible care or
+  unequal physical labor;
+- who reaches, turns toward, or turns away can expose pursuit, avoidance, or
+  unequal bids for connection;
+- who sets or adapts to pace can expose communication, impatience, or
+  unilateral decision-making;
+- who receives attention while another supplies effort can expose one-sided
+  reciprocity or performative generosity;
+- who occupies the visual center while another creates the supporting
+  structure can expose credit, visibility, or status appropriation;
+- synchronized versus mismatched movement can expose listening, negotiation,
+  emotional presence, or scorekeeping;
+- a requested three-or-more-person cast can expose monopolized attention,
+  manufactured rivalry, coalition, mutual aid, or a group refusing one
+  participant's status performance, but nobody may become a spectator; and
+- a single adult's pose, self-touch, mirrorless self-presentation, or repeated
+  effort can expose self-surveillance, perfectionism, loneliness, consumption,
+  or pressure to perform desirability.
+
+Select one of these causal dimensions or invent an equally concrete
+alternative. Do not combine several messages, and do not reuse the same
+position-based joke across Themes.
+
+All erotic and hardcore participants remain unmistakably adult, alert,
+willing, actively responsive, physically supported, able to breathe, and able
+to stop. Never make sex a workplace demand, payment, punishment, coercive
+bargain, proof of loyalty, or condition of status, money, housing, employment,
+care, or safety. No content level permits coercion, intoxication,
+unconsciousness, injury, restricted breathing, unsafe suspension, or
+humiliation based on identity.
+
+Serialize the requested level once in every Theme premise and Frame:
+
+    Content-level proof: aesthetic - [OPAQUE WARDROBE AND NONSEXUAL ACTION
+    THAT CARRIES THE SATIRE].
+
+    Content-level proof: erotic - [VISIBLE NON-EXPLICIT SENSUAL SELF-CONTACT
+    OR RECIPROCAL CONTACT APPROPRIATE TO THE CAST, AND THE RELATIONSHIP
+    OPPOSITION IT PHYSICALLY CARRIES].
+
+    Content-level proof: hardcore - [CURRENT CONSENSUAL EXPLICIT ACT,
+    SUPPORTED CONTACT GEOMETRY, ACTIVE ROLE OF EVERY ADULT, AND THE
+    RELATIONSHIP OPPOSITION THE POSITION OR EFFORT PHYSICALLY CARRIES].
+
+Use only the line matching the requested content level. This must be the
+fourth sentence, immediately after the contact map. Do not mention a rule,
+rating, or future action; state only what is visibly present now.
+
+THEME CONTRACT
+
+Every Theme defines one complete caricature system:
+
+- the exact requested cast and each adult's relationship role;
+- one ordinary friction and one uncomfortable social truth;
+- one initiating action and one closed group reaction circuit;
+- one shared primary metaphor mechanism, using either one object or one
+  body-position system, and at most one supporting object;
+- one facial-caricature cluster per adult;
+- all numeric body-proportion changes for every adult;
+- one clean matte background and no environmental clutter;
+- one locked pair of short English phrases integrated into scene-compatible
+  diegetic carriers;
+- one content-level proof whose action physically carries the satire;
+- one frontal or slightly elevated camera relationship; and
+- one high-contrast palette and simple motivated lighting system.
+
+Give each Theme one concise natural title. Its premise must use exactly four
+sentences to identify the complete cast, relationship, contradiction,
+shared action, metaphor, exaggerations, and locked English copy. Its style must
+be one flowing sentence defining the clean stage, camera, crop, palette,
+lighting, photographic realism, and caricatural finish.
+
+The Theme premise's first sentence must begin with the dynamic cast
+declaration. Its second sentence must begin with "Body exaggerations:", list
+each person exactly once, and end with "all unlisted body parts remain at
+normal scale." Its third sentence must begin with "Contact map:", list each
+person exactly once, and state the force-transmitting contact. Its fourth
+sentence must begin with the matching "Content-level proof:" prefix, state the
+relationship contradiction, content-level-specific action, dominant metaphor
+mechanism, and locked image-copy pair. Do not place an undeclared body change,
+alternate contact, or contradictory content-level action elsewhere in the
+premise.
+
+Themes must differ substantially in relationship type, unequal desire,
+interaction verb, metaphor mechanism, facial contrast, body deformation, copy
+pair, palette, and composition. Do not assign concepts according to Theme ID
+or reuse one domestic argument with different props.
+
+FRAME CONTRACT
+
+Every Frame is one standalone full-frame editorial photograph, not a
+storyboard, collage, split screen, before-and-after image, or multi-panel
+layout. Multiple Frames within one Theme are parallel visual alternatives, not
+chronological steps.
+
+Write every final Frame in English regardless of the requested output
+language. Use one unbroken natural-language paragraph. The first sentence must
+be the exact dynamic cast declaration and exclude all additional people. The
+second sentence must be the complete "Body exaggerations:" serialization. The
+third sentence must be the complete "Contact map:" serialization. The fourth
+sentence must be the matching "Content-level proof:" serialization. Do
+not introduce a name, wardrobe, face, action, prop, or setting before these
+four mandatory sentences are complete.
+Naturally include:
+
+- every adult's Chinese identity, age of at least 25, stable appearance,
+  content-level-appropriate wardrobe or nudity state, relationship role, and
+  full-body placement;
+- each person's exact facial alterations, gaze target, expression, and all
+  numeric body-proportion changes;
+- the initiating action, force direction, every participant's response, and
+  the selected object's or body-position system's present consequence;
+- the primary object or body-position mechanism and sole optional supporting
+  object;
+- the social truth made visible by the interaction;
+- the matte background, negative space, camera, crop, focus, and lighting;
+- the exact two English phrases, their carriers, size, color, and placement;
+  and
+- the mandatory final English-copy sentence.
+
+Near the end, repeat: "Cast remains exactly [FEMALE PHRASE] and [MALE
+PHRASE], with no other people." Omit a zero-count gender phrase and preserve
+grammatical English.
+
+Use a frontal, eye-level, or mildly elevated normal-lens composition that keeps
+every person fully visible from the top of the head through both feet and keeps
+all faces, hands, distortions, contact, and copy readable. The frame edge must
+not crop hair, head, shoulders, elbows, hands, hips, knees, shins, ankles, or
+feet. Avoid extreme wide angle, fisheye, severe foreshortening, shallow focus,
+body-crossing foregrounds, dramatic location depth, or any crop through a
+person.
+
+Render real adult skin, pores, hair, eyes, fabric weave, object texture, and
+contact deformation inside deliberately impossible caricatural proportions.
+The image may resemble a high-end satirical magazine campaign, staged
+photomontage, or hyper-real editorial tableau, but must not resemble a generic
+lifestyle photograph.
+
+FINAL REJECTION GATE
+
+Reject and rewrite any Theme or Frame containing:
+
+- the wrong number or gender composition;
+- a missing, duplicated, hidden, cropped, reflected, or extra person;
+- a person disconnected from the shared interaction;
+- a generic expression without named altered facial features;
+- a body distortion without an exact scale and causal role;
+- a Frame whose second sentence is not the complete "Body exaggerations:"
+  serialization;
+- a Theme premise or Frame whose third sentence is not the complete "Contact
+  map:" serialization accounting for every requested adult;
+- a Theme premise or Frame whose fourth sentence is not the matching
+  "Content-level proof:" serialization;
+- a body change described later that was not declared in that person's body
+  entry;
+- an extra, missing, duplicated, detached, fused, replaced, or untraceable
+  head, torso, arm, hand, leg, foot, joint, or finger;
+- an interrupted shoulder-elbow-wrist-hand or hip-knee-ankle-foot chain;
+- a requested person's second leg or foot hidden so completely that the body
+  appears anatomically incomplete;
+- more than one primary metaphor mechanism or more than one supporting object;
+- diagrams, formulas, charts, handwriting, icons, fake fine print, or any
+  unlocked marking on any visible surface;
+- a normally text-bearing object described as dense, formatted, filled,
+  written, scheduled, diagrammed, marked, or detailed beyond the two locked
+  phrases;
+- a cluttered room, busy background, signage, or decorative prop collection;
+- a phrase shown as a floating caption, subtitle, speech balloon, interface
+  overlay, detached placard, or other non-diegetic addition;
+- lettering whose perspective, curvature, material, lighting, shadow, wear, or
+  palette conflicts with its carrier or environment;
+- a new prop introduced only to carry text;
+- weak interaction that could be replaced by people merely posing;
+- hovering, pointing, presenting, raised arms, or another noncontact gesture
+  substituted for sustained physical contact;
+- satire aimed at identity rather than conduct;
+- aesthetic output containing sexualized contact or exposure;
+- erotic output lacking unmistakable intentional sensual contact appropriate
+  to the cast, exceeding into an explicit sexual act, or using sensuality only
+  as decoration;
+- hardcore output that is implicit, preparatory, euphemistic, after-the-fact,
+  missing a requested adult from the current consensual act, or spatially
+  unclear;
+- a hardcore contact map that records only support or pose contacts and omits
+  the defining current sexual contact for any requested adult;
+- a hardcore Frame that claims an explicit act in its proof but does not
+  visibly redescribe the defining contact within the next 80 words;
+- erotic or hardcore satire that remains unchanged when its intimate action,
+  position, effort, or contact is removed;
+- a sexual position or consensual preference treated as inherently superior,
+  inferior, masculine, feminine, selfish, or submissive;
+- coercion, incapacity, restricted breathing, injury, unsafe support, or a
+  sexual bargain tied to work, money, housing, care, or safety;
+- copy longer than four words or 18 characters;
+- missing, altered, translated, misspelled, obstructed, or unreadable copy;
+- a phrase longer than four words or 18 total characters;
+- a camera crop that hides any part of a requested person's head-to-foot body;
+- Chinese characters, pinyin, bilingual text, random letters, numbers,
+  unplanned writing, logos, or watermarks; or
+- an image whose social truth requires an external explanation.
