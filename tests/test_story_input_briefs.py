@@ -60,6 +60,244 @@ def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> Non
     assert "Keep intimate actions non-graphic" not in zero_gravity
 
 
+def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "miniature-fantasy-v2.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert len(brief) < 8_000
+    assert "仅用于 Erotic 和 Hardcore" in normalized
+    assert "female_count 和 male_count 只约束微型人物" in normalized
+    assert "每帧画面总人数严格等于 1 + female_count + male_count" in normalized
+    assert "不得出现额外脸、头、躯干、肢体或局部人物" in normalized
+    assert "系统为唯一巨大人物自动选择成年男人或成年女人" in normalized
+    assert "该 Theme 全部 Frame 固定此选择" in normalized
+    assert "所有人物均为自愿互动的多元东亚成年人" in normalized
+    assert "巨大人物是环境尺度主体" in normalized
+    assert "双方均可发起、回应或引导" in normalized
+    assert "Theme 锁定发起方" in normalized
+    assert "专为掌心成年居民建造的室内小人国" in normalized
+    assert "真实成年原住民" in normalized
+    assert "正常人类世界的成年访客" in normalized
+    assert "身体与器官保持普通成人尺寸" in normalized
+    assert "除总人数和镜头焦距外，不得输出比例" in normalized
+    assert "人物或物体尺寸、长度单位" in normalized
+    assert "每个 Frame 分开描述" in normalized
+    assert "living miniature adult woman/man native" in normalized
+    assert "normal-human-sized giant visitor" in normalized
+    assert "不得把双方简称为同尺寸普通人物" in normalized
+    assert "完全相同的头身比、肩宽尺度和四肢长度" in normalized
+    assert "不得用高矮、娇小、修长或不同骨架区分" in normalized
+    assert "不得让其中一人单独靠近镜头" in normalized
+    assert "用身体锚点强制可见比例" in normalized
+    assert "完整身高短于巨大人物手腕至中指尖" in normalized
+    assert "能站在其掌心" in normalized
+    assert "头部小于其拇指末节" in normalized
+    assert "与巨大手、脚或脸无遮挡并排" in normalized
+    assert "绝不能因镜头距离呈现为普通成人大小" in normalized
+    assert "小人国门框匹配居民身高" in normalized
+    assert "巨大访客手大于门洞" in normalized
+    assert "身体跨越多个房间" in normalized
+    assert "单件小人国家具不能承托访客全身" in normalized
+    assert "须由地面、墙体或多组结构支撑" in normalized
+    assert "仅保留参与动作的容器或工具" in normalized
+    assert "铅笔" not in normalized
+    assert "不得添加任何不参与主动作的松散小物" in normalized
+    assert "不得添加独立装饰小物" in normalized
+    assert "所有微型人物投影身高相等" in normalized
+    assert "只允许一具解剖连续的巨大成人身体" in normalized
+    assert "只允许一个目标性器官可见" in normalized
+    assert "目标器官在一个专门句子中只命名一次" in normalized
+    assert "相对微型人物的巨大尺度、朝向、自然表面" in normalized
+    assert "当前接触造成的可见压力或形变" in normalized
+    assert "目标器官保持普通成年人自然尺寸" in normalized
+    assert "不得放大成洞穴、房间或建筑" in normalized
+    assert "penis 保持自然 shaft、glans 与根部" in normalized
+    assert "vaginal opening 保持连续外部褶皱与入口" in normalized
+    assert "anus 保持自然放射褶皱与入口" in normalized
+    assert "微型人物从头到脚始终完整位于巨大访客体外" in normalized
+    assert "任何头、躯干、骨盆、手臂、腿或脚都不得进入体内" in normalized
+    assert "独立闭合的头—颈—躯干—骨盆—四肢链" in normalized
+    assert "人物轮廓不重叠、不融合、不共享肢体" in normalized
+    assert "多个微型人物的头和躯干之间保留可见背景空隙" in normalized
+    assert "不同空间槽位和支撑面" in normalized
+    assert "微型人物性器官被服装遮住或位于画外" in normalized
+    assert "显示目标部位到所属胸廓或骨盆" in normalized
+    assert "巨大人物可以完整出现，也可以只出现" in normalized
+    assert "与主要互动相关的局部身体" in normalized
+    assert "至少一段相连的躯干、臀部或大腿" in normalized
+    assert "裁切只能发生在画框边缘的自然身体延伸处" in normalized
+    assert "全部性行为或性活动只发生在一名或多名微型人物" in normalized
+    assert "与唯一巨大人物之间" in normalized
+    assert "禁止微型人物彼此、巨大人物独自或第三方性活动" in normalized
+    assert "每名微型人物须直接接触巨大人物" in normalized
+    assert "或操作由工具、支撑或体液轨迹连接巨大人物的同一动作链" in normalized
+    assert "不得旁观或另开动作" in normalized
+    assert "每帧只有一个连续主要行为、目标器官和接触中心" in normalized
+    assert "微型人物、巨大人物或双方均可发起" in normalized
+    assert "须明确发起与回应" in normalized
+    assert "除唯一接触点外，每个 Frame 只用一只手或一件工具" in normalized
+    assert "让唯一接触点主动贴近微型人物" in normalized
+    assert "巨大手指不得遮住微型人物头部" in normalized
+    assert "非常规活动必须把巨大体型反差转化为一个可见" in normalized
+    assert "每个 Frame 只选一个主要行为" in normalized
+    assert "围绕同一接触中心形成一条动作链" in normalized
+    assert "成人之间明确自愿的暴露、窥视角色扮演" in normalized
+    assert "每个人仍须表现出可辨认的发起、同意或回应" in normalized
+    assert "仍须遵守非微距、完整空间和单一身体规则" in normalized
+    assert "微型身体或工具压住唯一接触点并造成可见形变" in normalized
+    assert "approaching、within reach、alignment、readiness" in normalized
+    assert "waiting、traverse toward、approach" in normalized
+    assert "画外行为、纯观看、纯展示或姿势暗示" in normalized
+    assert "Hardcore 标志性机制" in normalized
+    assert "先锁定一个 Signature Mechanism" in normalized
+    assert "互动若可概括为拥抱、依偎、坐在腿上" in normalized
+    assert "空中探险" in normalized
+    assert "已把一人悬吊在接触点并持续摩擦" in normalized
+    assert "流体工程" in normalized
+    assert "重型机械" in normalized
+    assert "巨人发起" in normalized
+    assert "前三个分别使用重型机械、流体工程和空中探险" in normalized
+    assert "新 Theme 不得重复机制家族、装置、房间或支撑面" in normalized
+    assert "装置必须占据清楚画面空间" in normalized
+    assert "体液必须来自唯一可见接触点" in normalized
+    assert "机械必须完整接地" in normalized
+    assert "微型人物采用夸张、舞台化、从头到脚完整设计" in normalized
+    assert "每人固定一个强烈轮廓特征" in normalized
+    assert "再固定一个醒目发型、头饰或超大配饰" in normalized
+    assert "在同一 Theme 的全部 Frame 保持一致" in normalized
+    assert "Erotic 和 Hardcore 中，巨大人物每个 Theme 可选择裸体或部分穿着" in (
+        normalized
+    )
+    assert "并在全部 Frame 保持一致" in normalized
+    assert "部分穿着可保留一至两件衣物及一件配饰" in normalized
+    assert "骨盆、目标部位及其与胸腹、臀部或大腿的连续关系" in normalized
+    assert "衣物不得覆盖接触点、伪装成肢体或制造额外身体轮廓" in normalized
+    assert "夸张造型不能改变人物身高、头身比、肩宽" in normalized
+    assert "微型服装按小人国居民的共同尺寸裁制" in normalized
+    assert "每名微型人物的造型描述使用 25–40 个英文单词" in normalized
+    assert "两种颜色、两种主材质、一个轮廓特征和一个配饰" in normalized
+    assert "transparent organza" in normalized
+    assert "硬纱" not in normalized
+    assert "巨大人物只用 15–25 词按 Theme 选择描述裸体或部分服装" in normalized
+    assert "不得复制成额外肢体" in normalized
+    assert "人物表情必须生动、具体并与发起或回应角色一致" in normalized
+    assert "每个 Frame 分别为发起者和回应者指定一个简短表情" in normalized
+    assert "不得让所有人共享相同的空洞、微笑或惊讶表情" in normalized
+    assert "至少一个环境中景或全景必须显示发起者和回应者的脸" in normalized
+    assert "Hardcore 可表现极度性兴奋" in normalized
+    assert "潮红面颊、张开的嘴唇、急促呼吸" in normalized
+    assert "表情必须保留自然面部结构" in normalized
+    assert "表情描述使用 15–25 个英文单词" in normalized
+    assert "不得为了显示表情而放大微型人物" in normalized
+    assert "不写导演姓名或模仿在世创作者" in normalized
+    assert "采用原创形式主义电影美术" in normalized
+    assert "正面中心构图、精确轴线" in normalized
+    assert "受控色板选自灰粉、芥末黄、湖蓝、薄荷绿、奶油白与酒红" in normalized
+    assert "每场三种主色与一种强调色" in normalized
+    assert "家具、门框、壁纸和灯具采用整齐网格" in normalized
+    assert "和小道具采用" not in normalized
+    assert "对称只用于建筑、家具、灯光和道具" in normalized
+    assert "不得镜像、复制或成对增加人物" in normalized
+    assert "人物和唯一接触点可以轻微偏离中轴" in normalized
+    assert "不能让形式化构图压平成无空间感的平面" in normalized
+    assert "最多描述两个建筑特征和三个场景颜色" in normalized
+    assert "采用哑光、不反射、不透明表面" in normalized
+    assert "禁止微距摄影、微距镜头、极端特写" in normalized
+    assert "强制使用 20–32 mm 等效广角" in normalized
+    assert "明显但可信的近大远小、汇聚线和前后景拉伸" in normalized
+    assert "不得消除透视变形" in normalized
+    assert "禁止鱼眼、正交感、平视平拍" in normalized
+    assert "room-scale wide establishing shot" in normalized
+    assert "只有一个 Frame 时必须使用该景别" in normalized
+    assert "巨大人物完整身体或大段连续身体" in normalized
+    assert "贴近微型人物支撑面的低机位仰拍" in normalized
+    assert "从巨大访客肩部以上向下的高机位俯拍" in normalized
+    assert "不得使用平直眼平视角" in normalized
+    assert "low-angle wide full shot" in normalized
+    assert "high-angle oblique full shot" in normalized
+    assert "partial-body wide environmental shot" in normalized
+    assert "局部身体镜头可以让巨大人物超出画框" in normalized
+    assert "两个以上 Theme 必须同时覆盖一次仰拍和一次俯拍" in normalized
+    assert "前景空间锚点、中景互动和背景房间边界三层深度" in normalized
+    assert "至少两条强烈汇聚的房间深度线" in normalized
+    assert "中等至较深景深" in normalized
+    assert "正常人类访客性别" in normalized
+    assert "发起方与回应方" in normalized
+    assert "多个 Frame 是同一个已经发生的主要行为" in normalized
+    assert "不是前后发展的连续故事" in normalized
+    assert "禁止接近、准备、开始攀爬、驶向、下降前往、等待" in normalized
+    assert "每个 Frame 硬性至少 700 个英文单词" in normalized
+    assert "返回前实际计算词数" in normalized
+    assert "不足 700 词时继续补充可见细节" in normalized
+    assert "用准确英文解剖名词命名唯一目标一次" in normalized
+    assert "用 100–130 词描述模板尺寸" in normalized
+    assert "草稿完成后逐词扫描" in normalized
+    assert "所选目标名只在第二句出现一次" in normalized
+    assert "删除第二句外的 penis、vaginal opening、anus" in normalized
+    assert (
+        "Exactly [total] separate adult bodies are visible in total inside a "
+        "miniature kingdom built for palm-sized adult inhabitants"
+    ) in normalized
+    assert "total = 1 + female_count + male_count" in normalized
+    assert "且用阿拉伯数字" in normalized
+    assert "写明微型人物与访客身份" in normalized
+    assert (
+        "each miniature adult's entire body is shorter than the giant visitor's hand "
+        "from wrist to fingertip, and visible background space separates every miniature "
+        "head and torso"
+    ) in normalized
+    assert "the unmistakable cross-scale spectacle is [initiator] using [named mechanism]" in (
+        normalized
+    )
+    assert "[current action] 只写 the contact point，不写器官名" in normalized
+    assert "不得提前结束首句" in normalized
+    assert "第二句必须独立以“The single penis...”" in normalized
+    assert "每名微型人物分别使用 90–120 词" in normalized
+    assert "用 120–150 词说明一条闭合动作链" in normalized
+    assert "为巨大人物写 15–25 词并按 Theme 选择裸体或部分服装" in normalized
+    assert "镜头句必须以“The camera uses a room-scale wide establishing shot”开头" in (
+        normalized
+    )
+    assert "不得为达到 700 词而重复人数、身高、器官名" in normalized
+    assert "禁止“previous frame”“as before”" in normalized
+    assert "“same”和“identical”仅说明共同尺度" in normalized
+    assert "只用自然英文和简单现在时" in normalized
+    assert "每个分句只写画面中存在的肯定事实" in normalized
+    assert "第三句起把 penis、vaginal opening、anus 替换为 the contact point" in normalized
+    assert "翻译中文" in normalized
+    assert "删除 no、not、without、unseen、uninvolved 片段" in normalized
+    assert "centimeter、inch、twentieth、pencil" in normalized
+    assert "首句逐字保留英文锚点" in normalized
+    assert "不附自检报告" in normalized
+    assert "总人数不等于 1 + female_count + male_count" in normalized
+    assert "出现额外脸、头、躯干、肢体或不止一名巨大人物" in normalized
+    assert "人物轮廓在接触点外重叠、融合或共享肢体" in normalized
+    assert "出现第二个性器官、第二具骨盆、断开的器官" in normalized
+    assert "性活动没有排他地发生在微型—巨大之间" in normalized
+    assert "缺少标志性装置" in normalized
+    assert "互动只是拥抱、依偎、摆姿与无装置触碰" in normalized
+    assert "多个微型人物的实际或投影身高不一致" in normalized
+    assert "场景不是小人国" in normalized
+    assert "输出焦距外的尺寸单位" in normalized
+    assert "Frame 少于 700 个英文单词、夹杂中文" in normalized
+    assert "镜头句未按指定英文开头" in normalized
+    assert "人物缺少夸张造型、造型跨 Frame 改变" in normalized
+    assert "发起者或回应者没有可辨认表情" in normalized
+    assert "微型身体或工具未压住接触点" in normalized
+    assert "Frame 停在准备状态" in normalized
+    assert "输出否定、自检与禁止句" in normalized
+    assert "目标器官超出正常成人尺寸、名称出现超过一次" in normalized
+    assert "没有显示微型人物完整独立轮廓" in normalized
+    assert "把双方简称为同尺寸普通人物" in normalized
+    assert "任何微型肢体进入巨大访客体内" in normalized
+    assert "1:12" not in normalized
+    assert "1:15" not in normalized
+    assert "11-centimeter" not in normalized
+    assert "14-centimeter" not in normalized
+
+
 def test_furry_mythic_interactions_uses_original_live_action_characters() -> None:
     brief = (
         REPOSITORY_ROOT / "story-inputs" / "furry-mythic-interactions.txt"

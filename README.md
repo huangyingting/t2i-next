@@ -1,5 +1,17 @@
 # t2i-prompt-pipeline
 
+## 原地润色文本文件
+
+`scripts/refine-text-file.py` 使用 `.env` 中的 `STORY_OPENAI_*` 模型配置，把
+`--instruction` 原样作为 system prompt，并把指定 UTF-8 文件的完整内容作为 user
+消息。模型成功返回非空结果后，脚本会原子替换原文件；调用失败时原文件保持不变。
+
+```bash
+uv run python scripts/refine-text-file.py \
+  --instruction "Improve clarity while preserving all requirements and structure." \
+  story-inputs/miniature-fantasy-v2.txt
+```
+
 ## 独立故事生成器
 
 `t2i_story_pipeline` 是完全独立的极简叙事生成器。它不复用下文旧管线的

@@ -101,7 +101,9 @@ def test_prompts_compile_exact_cast_constraints() -> None:
             "male_count": 1,
         }
         assert "Use cast_constraints from the request exactly" in prompt
-        assert "Do not add, omit, merge, or replace people" in prompt
+        assert "By default they count every depicted person" in prompt
+        assert "explicitly scopes cast_constraints" in prompt
+        assert "beyond the resulting combined cast contract" in prompt
 
 
 def test_prompts_preserve_unspecified_cast_from_story() -> None:
