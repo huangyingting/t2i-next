@@ -97,6 +97,14 @@ def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
     assert "双肩、胸腹和骨盆必须清楚可见" in normalized
     assert "头部不是距离视点最近的物体" in normalized
     assert "头宽达到或超过肩宽、头遮挡身体、头大身小" in normalized
+    assert "年龄按 Theme 编号使用确定性四段循环" in normalized
+    assert "余 1 时选择 25–34 岁的年轻成年人" in normalized
+    assert "余 2 时选择 35–49 岁的成熟成年人" in normalized
+    assert "余 3 时选择 50–64 岁的年长成年人" in normalized
+    assert "余 0 时选择 65–79 岁的老年成年人" in normalized
+    assert "每个 Theme 必须在对应范围内给出一个明确整数年龄" in normalized
+    assert "50 岁以上人物必须显示与具体年龄相符的面部细纹" in normalized
+    assert "不得让整批年龄集中在 25–39 岁" in normalized
 
 
 def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
@@ -166,6 +174,147 @@ def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
     assert "余 0 时，Frame 1 使用 front three-quarter view" in normalized
     assert "必须读取当前 Theme 编号决定视角对" in normalized
     assert "最后一句必须正面描述可见的蹲便器陶瓷、脚踏纹、地砖、顶灯" in normalized
+
+
+def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "confined-exhibition-fantasy.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+    scenes = [
+        line
+        for line in brief.splitlines()
+        if len(line) > 5 and line[:3].isdigit() and line[3:5] == ". "
+    ]
+
+    assert len(scenes) == 100
+    assert len(set(scenes)) == 100
+    assert [int(scene[:3]) for scene in scenes] == list(range(1, 101))
+    assert all("围观者" in scene for scene in scenes)
+    assert all(
+        any(
+            pose in scene
+            for pose in (
+                "折叠",
+                "对折",
+                "卷曲",
+                "收膝",
+                "折膝",
+                "前倾",
+                "翘臀",
+                "抬臀",
+                "臀部",
+                "大字型",
+                "四点支撑",
+                "四角支撑",
+                "四肢撑向",
+                "四角伸展",
+                "四肢伸展",
+            )
+        )
+        for scene in scenes
+    )
+    assert "female_count = 4 与 male_count = 4" in normalized
+    assert "TOTAL PEOPLE = 8" in normalized
+    assert "SPECTATORS = 7" in normalized
+    assert "围观者固定为恰好三名成年女性和四名成年男性" in normalized
+    assert "不能把七名围观者写成全女性、全男性或其他配比" in normalized
+    assert "Exactly eight East Asian adults are visible" in normalized
+    assert "one featured adult woman performer and exactly seven adult spectators" in normalized
+    assert "comprising exactly three women and four men" in normalized
+    assert "不得增加第九个人、背景脸、身体、手脚、镜中人物" in normalized
+    assert "站在空间开口、门框、舱口或安全边界之外观看" in normalized
+    assert "静止、通风、照明充分且出口保持开启" in normalized
+    assert "车辆必须停稳、熄火、钥匙移除" in normalized
+    assert "任何箱体、柜体、舱室或隔间都不得上锁" in normalized
+    assert "身体折叠、翘臀和大字型三大类" in normalized
+    assert "四肢接触的承重点" in normalized
+    assert "围观必须成为远景可见构图关系而不是贴近身体的人墙" in normalized
+    assert "围观者不得进入前景或中景，不得触碰、抓握、倚靠或环抱任何其他人物" in normalized
+    assert "WARDROBE, COLOR, ACCESSORIES, AND EXPRESSION" in brief
+    assert "逐项写出：上身单品、下身单品或其明确缺席" in normalized
+    assert "主色、辅色、材质、鞋履以及一至四件配件" in normalized
+    assert "不得连续使用同一件黑色蕾丝内衣" in normalized
+    assert "材质轮换哑光棉、丝绸、缎面、雪纺、薄纱、网眼、蕾丝" in normalized
+    assert "相邻 Theme 的主色、辅色、材质和服装类别均不得重复" in normalized
+    assert "细框眼镜、粗框眼镜、无度数彩色镜片、窄丝巾、长丝巾" in normalized
+    assert "丝巾只能松系在颈部、头发、手腕或腰侧" in normalized
+    assert "至少包含五项同时可见的线索" in normalized
+    assert "极度性兴奋、风格化啊嘿颜" in normalized
+    assert "半闭或轻微上翻但仍对称的双眼" in normalized
+    assert "正常眼球数量、正常舌头、清醒和主动姿势" in normalized
+    assert "衣服数量较少但保持关键部位完全不透明遮盖" in normalized
+    assert "不得使用啊嘿颜、上翻眼睛、失焦瞳孔、吐舌或唾液" in normalized
+    assert "一件贴身连体衣，或两至三件组成的极简性感造型" in normalized
+    assert "必须保留一至两件透明、半透明、湿贴、敞开或半褪下" in normalized
+    assert "表情必须由 EROTIC EXPRESSION LOCK 完整定义" in normalized
+    assert "moist parted lips with no free saliva strand or droplet" in normalized
+    assert "绝不能再写 saliva、strand、thread、droplet、drip、string、fluid" in normalized
+    assert "必须清楚写出衣物停留位置" in normalized
+    assert "每个独立 Frame 都必须逐字输出 HARDCORE LOWER-BODY LOCK" in normalized
+    assert "表情必须由 HARDCORE EXPRESSION LOCK 完整定义" in normalized
+    assert "one thin continuous saliva strand attached only from the tongue to the lower lip" in normalized
+    assert "with no skirt, trousers, shorts, underwear, or opaque garment covering the pelvis" in normalized
+    assert "OPENING COMPOSITION LOCK:" in normalized
+    assert "AUDIENCE HIERARCHY LOCK:" in normalized
+    assert "AUDIENCE REACTION LOCK:" in normalized
+    assert "All seven adult spectators show unmistakable astonishment" in normalized
+    assert "high raised brows, wide focused eyes, and open commenting mouths" in normalized
+    assert "exactly four spectators point one extended index finger" in normalized
+    assert "exactly three spectators cup one hand beside their own mouths" in normalized
+    assert "FOLDED-BODY LOCK:" in normalized
+    assert "RAISED-HIPS LOCK:" in normalized
+    assert "SPREAD-EAGLE LOCK:" in normalized
+    assert "AESTHETIC EXPRESSION LOCK:" in normalized
+    assert "EROTIC EXPRESSION LOCK:" in normalized
+    assert "HARDCORE EXPRESSION LOCK:" in normalized
+    assert "HARDCORE LOWER-BODY LOCK:" in normalized
+    assert "Aesthetic 与 Erotic Frame 不得输出" in normalized
+    assert "后文不得改变、否定或增加表情锁规定的嘴唇、舌头、唾液、眼睑和瞳孔状态" in normalized
+    assert "不得添加第二条液体、滴落、飞溅或不同连接轨迹" in normalized
+    assert "both knees lifted beside the ribcage near shoulder level" in normalized
+    assert "pelvis at least one torso-thickness above the shoulders" in normalized
+    assert "four maximally separated corner contacts" in normalized
+    assert "a taut X-shaped silhouette" in normalized
+    assert "三条姿势锁之一且只能输出一条" in normalized
+    assert "当前返回 Theme 列表中的顺序使用确定性三项循环" in normalized
+    assert "title 必须以 `FOLDED - ` 开头" in normalized
+    assert "title 必须以 `RAISED HIPS - ` 开头" in normalized
+    assert "title 必须以 `SPREAD EAGLE - ` 开头" in normalized
+    assert "必须读取当前 Theme title 的前缀选择唯一姿势锁" in normalized
+    assert "3 米无人空白缓冲区" in normalized
+    assert "固定排成 2+3+2 三层远景" in normalized
+    assert "第一排两人距离主表演者 3 米" in normalized
+    assert "第二排三人距离 4 米" in normalized
+    assert "第三排两人距离 5 米" in normalized
+    assert "七人各自的双手必须清楚放在自己的身体" in normalized
+    assert "主表演者占画面高度或宽度的 55–75%" in normalized
+    assert "七名围观者整体只占远景上方或后方的 15–30%" in normalized
+    assert "七名围观者固定为三名成年女性和四名成年男性，并使用 2+3+2 三层远景" in normalized
+    assert "第一排固定一女一男" in normalized
+    assert "第二排固定一女两男" in normalized
+    assert "第三排固定一女一男" in normalized
+    assert "七人全部必须同时呈现高扬眉毛、睁大的聚焦双眼和正在议论的张口" in normalized
+    assert "不能出现微笑、平静、冷漠、欣赏、专注或无表情" in normalized
+    assert "固定四人各用一只手伸出食指指向主表演者" in normalized
+    assert "固定三人各用一只手拢在自己的嘴边作震惊低声议论状" in normalized
+    assert "四名指点者和三名议论者必须逐人枚举" in normalized
+    assert "每名围观者拥有不同的脸、发型、服装辅色、站位" in normalized
+    assert "英文 Frame 的人物视线只能落在某一名可见 adult spectator" in normalized
+    assert "发布前逐字删除 camera、lens、photographer、operator、tripod、rig" in normalized
+    assert "不得写 look toward the camera、face the lens 或 no camera" in normalized
+    assert "观察方向只用 viewpoint、composition 或 view 表达" in normalized
+    assert "BODY, MATERIAL, AND SPACE CONTACT" in brief
+    assert "每个 Frame 至少描写三项材质—身体—空间接触证据" in normalized
+    assert "臀部使汽车座垫或床垫产生可信形变" in normalized
+    assert "OUTPUT PREFLIGHT" in brief
+    assert "根据 Theme title 前缀逐字输出唯一正确姿势锁" in normalized
+    assert "最终 Frame 只能保留可渲染画面正文" in normalized
+    assert "SCENE CATALOG" in brief
+    assert "CONTENT LEVEL" in brief
+    assert "VARIATION AND REJECTION RULES" in brief
 
 
 def test_rebuilt_legacy_inputs_are_complete_story_descriptions() -> None:
