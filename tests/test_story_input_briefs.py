@@ -66,7 +66,7 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     ).read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
-    assert len(brief) < 8_000
+    assert len(brief) < 9_500
     assert "仅用于 Erotic 和 Hardcore" in normalized
     assert "female_count 和 male_count 只约束微型人物" in normalized
     assert "每帧画面总人数严格等于 1 + female_count + male_count" in normalized
@@ -74,6 +74,16 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "系统为唯一巨大人物自动选择成年男人或成年女人" in normalized
     assert "该 Theme 全部 Frame 固定此选择" in normalized
     assert "所有人物均为自愿互动的多元东亚成年人" in normalized
+    assert "真实成人身体多样性" in normalized
+    assert "不是默认年轻、纤瘦、健美、对称、光滑和无瑕" in normalized
+    assert "年轻成年、中年或老年年龄层" in normalized
+    assert "肥胖厚重、柔软丰满、精瘦、宽壮或肌肉型体态" in normalized
+    assert "巨大人物优先轮换明显不同的年龄和体型" in normalized
+    assert "皱纹、松弛皮肤、腹部与腰侧脂肪褶皱" in normalized
+    assert "下垂胸部、妊娠纹、橘皮组织" in normalized
+    assert "静脉、疤痕、痣、色素差异或不对称" in normalized
+    assert "年龄与肥胖是正常且可具吸引力的成人特征" in normalized
+    assert "不得写成疾病、怪物化、羞辱理由" in normalized
     assert "巨大人物是环境尺度主体" in normalized
     assert "双方均可发起、回应或引导" in normalized
     assert "Theme 锁定发起方" in normalized
@@ -116,7 +126,9 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "penis 保持自然 shaft、glans 与根部" in normalized
     assert "vaginal opening 保持连续外部褶皱与入口" in normalized
     assert "anus 保持自然放射褶皱与入口" in normalized
-    assert "微型人物从头到脚始终完整位于巨大访客体外" in normalized
+    assert "每名微型人物必须从头顶到双脚全身可见" in normalized
+    assert "始终完整位于巨大访客体外" in normalized
+    assert "道具、衣物和液体不得遮断其头—躯干—四肢轮廓" in normalized
     assert "任何头、躯干、骨盆、手臂、腿或脚都不得进入体内" in normalized
     assert "独立闭合的头—颈—躯干—骨盆—四肢链" in normalized
     assert "人物轮廓不重叠、不融合、不共享肢体" in normalized
@@ -179,7 +191,22 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "世界系统 + 物理原理 + 装置 + 发起方 + 房间 + 支撑面" in normalized
     assert "主动发起者可为巨大人物或微型人物" in normalized
     assert "机制必须占据清楚画面空间" in normalized
-    assert "体液必须来自唯一可见接触点" in normalized
+    assert "体液必须来自唯一可见的身体来源" in normalized
+    assert "大量且清晰可见的精液、尿液喷射、阴道液体或灌肠喷射" in normalized
+    assert "每帧只选一种主要体液效果" in normalized
+    assert "Hardcore 可使用远大于微型人物体量的强烈喷流" in normalized
+    assert "喷口、方向、受力表面、汇流路径" in normalized
+    assert "束缚架、滑轮悬吊、束带、项圈、夹具、震动器、泵、扩张器" in normalized
+    assert "自愿 BDSM 系统" in normalized
+    assert "不得只作装饰、制造伤害、遮住微型完整身体或形成第二性行为" in (
+        normalized
+    )
+    assert "巨大身体也可成为游乐设施地形" in normalized
+    assert "环绕胸廓与肩背的安全束带在胸部前搭建秋千" in normalized
+    assert "完整微型人物荡过一侧乳房、乳沟上方或躯干" in normalized
+    assert "胸前摩天轮、乳沟上方索道或胸骨弹射台" in normalized
+    assert "不得把乳头或柔软组织作为唯一锚点" in normalized
+    assert "秋千座椅不得遮住微型人物头、躯干和四肢" in normalized
     assert "机械必须完整接地" in normalized
     assert "微型人物采用夸张、舞台化、从头到脚完整设计" in normalized
     assert "每人固定一个强烈轮廓特征" in normalized
@@ -191,7 +218,16 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "并在全部 Frame 保持一致" in normalized
     assert "部分穿着可保留一至两件衣物及一件配饰" in normalized
     assert "骨盆、目标部位及其与胸腹、臀部或大腿的连续关系" in normalized
-    assert "衣物不得覆盖接触点、伪装成肢体或制造额外身体轮廓" in normalized
+    assert "显示自然可见的阴毛及其与皮肤、骨盆的连续边界" in normalized
+    assert "衣物不得覆盖阴毛或接触点" in normalized
+    assert "阴毛造型可作为创意和尺度证据" in normalized
+    assert "局部修剪成几何边界、分区或渐变" in normalized
+    assert "编成短辫，加入轻质环、珠、丝带或金属线" in normalized
+    assert "体液形成湿润聚束和导流纹路" in normalized
+    assert "每个 Theme 只选一种主造型并在全部 Frame 固定" in normalized
+    assert "不得完全剃除、延伸成触手或额外肢体" in normalized
+    assert "不得作为微型人物唯一承重支撑" in normalized
+    assert "伪装成肢体或制造额外身体轮廓" in normalized
     assert "夸张造型不能改变人物身高、头身比、肩宽" in normalized
     assert "微型服装按小人国居民的共同尺寸裁制" in normalized
     assert "每名微型人物造型使用 20–30 个英文单词" in normalized
@@ -318,6 +354,186 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "把双方简称为同尺寸普通人物" in normalized
     assert "任何微型肢体进入巨大访客体内" in normalized
     assert "1:12" not in normalized
+
+
+def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "giant-country-fantasy.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "female_count 和 male_count 只约束从正常人类世界来到巨人国的成年访客" in normalized
+    assert "每帧画面总人数严格等于 1 + female_count + male_count" in normalized
+    assert "加一名巨人国原住民" in normalized
+    assert "normal-human-sized adult woman/man visitor" in normalized
+    assert "giant-country native giant woman/man" in normalized
+    assert "不得写成天生微型种族、玩偶、模型、克隆人或儿童" in normalized
+    assert "巨人不得拥有年轻、健美、无瑕或模特化的完美身材" in normalized
+    assert "肥胖并有自然腹部与皮肤褶皱" in normalized
+    assert "苍老并有皱纹、松弛皮肤与老年斑" in normalized
+    assert "瘦削并有突出的锁骨、肋骨与关节" in normalized
+    assert "疤痕、静脉、妊娠纹、色斑和左右轻微不对称" in normalized
+    assert "同一 Theme 全部 Frame 固定年龄层、体型和皮肤特征" in normalized
+    assert "身体层" in normalized
+    assert "物件层" in normalized
+    assert "所有属于巨人国原住民、巨人国建筑或当地环境的可见物件都必须远大于正常人类" in normalized
+    assert "英文名称前必须明确写“giant-scale”或“colossal giant-country”" in normalized
+    assert "禁止只写普通 cup、chair、door、rope、lever、bucket 或 platform" in normalized
+    assert "必须明确写“visitor-scale”" in normalized
+    assert "不得把巨人国原生物件误写成 visitor-scale" in normalized
+    assert "环境层" in normalized
+    assert "具体奇幻室内、奇幻户外或半开放混合场景" in normalized
+    assert "不得连续两个 Theme 使用同一场景类型" in normalized
+    assert "玄武岩海岛链、生物发光古林、晶体峡谷、巨莲沼泽" in normalized
+    assert "天然晶体宫殿、高山云海浴场、月相机械观测塔" in normalized
+    assert "fantasy 只表示非日常的宏伟建筑、罕见地质、巨型生态、天文景观和大胆工程" in normalized
+    assert "绝不包含魔法或超自然力量" in normalized
+    assert "例子只用于打开想象，不得照抄为固定清单" in normalized
+    assert "占幅层" in normalized
+    assert "同一清晰焦平面同时出现四层证据" in normalized
+    assert "至少一件巨人国日用品" in normalized
+    assert "至少一个巨人国环境参照" in normalized
+    assert "巨人从骨盆到胸腹或大腿的连续身体必须跨越多个巨人国功能区" in normalized
+    assert "完整访客仍只占巨大手掌附近的小区域" in normalized
+    assert "each complete visitor is visibly shorter than one of the giant's fingers" in normalized
+    assert "不得把这条尺度关系延迟到第二句或后文" in normalized
+    assert "完整身高短于巨人一根手指" in normalized
+    assert "整名访客可平躺在巨人拇指指腹上而不超过第一指节" in normalized
+    assert "访客头部小于巨人拇指甲" in normalized
+    assert "巨人的一只眼睛或嘴唇单独所占画面面积大于每名访客的完整身体" in normalized
+    assert "访客面部不得以近景尺寸接近巨人面部" in normalized
+    assert "张开的巨大手掌" in normalized
+    assert "不能用一方贴近镜头制造假差距" in normalized
+    assert "张开的巨大手掌只作为接触点旁的同焦平面尺寸参照" in normalized
+    assert "访客继续站、跪、坐或躺在唯一动作支撑面上" in normalized
+    assert "不得同时写访客站在手掌、装置平台和接触点" in normalized
+    assert "禁止用 three times、twice、several times 等偏弱数字倍率" in normalized
+    assert "不能只靠巨人与访客并排证明渺小" in normalized
+    assert "每名访客必须从头顶到双脚全身可见" in normalized
+    assert "完整位于巨人身体外部" in normalized
+    assert "访客的头部、胸廓、腹部和骨盆四周" in normalized
+    assert "可见空气、背景空隙或刚性平台边界" in normalized
+    assert "除一个明确命名的局部接触面外" in normalized
+    assert "禁止整名访客横跨、趴伏或贴伏在巨人的胸部、腹部、阴阜、骨盆或大腿表面" in normalized
+    assert "访客只能从与巨人皮肤分离的刚性平台操作装置" in normalized
+    assert "只有装置末端或访客的一只手或一只脚可以到达接触点" in normalized
+    assert "访客的头、脸、颈、胸部、腹部和骨盆绝不接触巨人身体" in normalized
+    assert "a visible air gap separates the visitor's head, torso, abdomen, and pelvis from the giant's skin" in normalized
+    assert "禁止 visitor against giant torso" in normalized
+    assert "禁止 full-body direct contact、body-weight contact" in normalized
+    assert "penis 的根部固定在下腹之下的 pubic arch" in normalized
+    assert "shaft 从根部到 glans 的连续轴线" in normalized
+    assert "vaginal opening 位于 lower pelvis 正中" in normalized
+    assert "pubic mound 下方和 perineum 前方" in normalized
+    assert "anus 必须写位于臀沟正中、骶骨下方" in normalized
+    assert "目标上方的下腹、左右两侧的 upper inner thighs" in normalized
+    assert "the lower abdomen is visibly above the target" in normalized
+    assert "both thighs continue toward the knees" in normalized
+    assert "目标不得出现在胸部、上腹、肚脐或平坦躯干表面" in normalized
+    assert "只写“continuous with the pelvis”不算定位完成" in normalized
+    assert "禁止用 lower surface、one side、lower rim" in normalized
+    assert "必须以巨人的耻骨、下腹、会阴、臀沟或大腿为参照" in normalized
+    assert "全部性行为只发生在一个或多个正常人类访客" in normalized
+    assert "与唯一巨人国原住民之间" in normalized
+    assert "大量且清晰可见的精液、尿液喷射、阴道液体或灌肠喷射" in normalized
+    assert "自愿 BDSM 系统" in normalized
+    assert "把胸部与胸廓安全束带改成秋千、摩天轮、索道或弹射台" in normalized
+    assert "不得把乳头、阴毛或柔软组织作为唯一锚点" in normalized
+    assert "显示自然阴毛及其与皮肤、骨盆的连续边界" in normalized
+    assert "所有人物都必须穿衣或半裸露，不得全身裸体" in normalized
+    assert "巨人国原住民穿着两至四件符合场景的正常衣物及一件配饰" in normalized
+    assert "只局部打开、卷起、移开或解开当前动作所需区域" in normalized
+    assert "正常人类访客保持从头到脚的完整服装设计" in normalized
+    assert "必须真实可穿、与维护良好的环境一致" in normalized
+    assert "衣物不得遮住接触点、身体定位地标、完整访客" in normalized
+    assert "所有人物都要有可辨认且完整的人物造型" in normalized
+    assert "每人固定发型、妆容、服装轮廓、两种主色、两种真实材质" in normalized
+    assert "鞋履及一件配饰" in normalized
+    assert "妆容须像真人摄影可见的实际化妆" in normalized
+    assert "肤色处理、眼妆、唇色或指甲中的两项" in normalized
+    assert "每人拥有与角色一致且彼此不同的表情和神情" in normalized
+    assert "明确视线目标、眉眼、嘴唇、面颊潮红或肌肉张力" in normalized
+    assert "不得所有人共享同一微笑、呆滞脸、闭眼" in normalized
+    assert "每人的动作必须是一个稳定、可拍摄的当前动作" in normalized
+    assert "躯干朝向、重心、主要支撑面、双手唯一任务" in normalized
+    assert "固定每人的造型、妆容、表情角色、动作、支撑与四肢位置" in normalized
+    assert "巨人必须具有与年龄和体型一致的自然体毛" in normalized
+    assert "胸毛、腹毛、腋毛、手臂毛、腿毛或背毛中的至少两处" in normalized
+    assert "灰白变化和皮肤连接" in normalized
+    assert "At [specific fantasy giant-country setting]" in normalized
+    assert "exactly [total] separate adult bodies are visible in total:" in normalized
+    assert "不能只写 generic interior、field、forest、mountain、outdoors 或 giant country" in normalized
+    assert "plus one giant-country native giant [woman/man]" in normalized
+    assert "使用真实相机拍摄的真人写实 fantasy 摄影" in normalized
+    assert "live-action photorealistic photography" in normalized
+    assert "真实成年演员、真实皮肤毛孔与体毛" in normalized
+    assert "可信镜头光学、自然曝光、物理景深和一致阴影" in normalized
+    assert "高预算实拍特效、实体布景、外景摄影与无缝比例合成" in normalized
+    assert "最终画面仍像真人在真实地点拍摄，不像概念图" in normalized
+    assert "禁止 illustration、painting、anime、comic、CGI look、3D render" in normalized
+    assert "塑料皮肤、蜡像人物和过度磨皮" in normalized
+    assert "室内外环境必须具有使用、风化和维护痕迹" in normalized
+    assert "不得像空布景或刚搭建的主题乐园" in normalized
+    assert "不得默认哥特、腐朽、毒性、恐怖" in normalized
+    assert "照明必须清楚显示完整访客、唯一接触点、体毛及全部尺度参照" in normalized
+    assert "同一 Theme 的全部 Frame 锁定巨人的支撑姿势、骨盆旋转" in normalized
+    assert "不能把站、坐、跪、躺互换" in normalized
+    assert "不可变的 S2–S5 subject block" in normalized
+    assert "把该 block 逐字复制到两个 Frame" in normalized
+    assert "不得为第二个机位重新生成同义词、左右侧、尺度物件" in normalized
+    assert "严格按以下物理句序写，任何顺序变化都重写" in normalized
+    assert "S1 CAST + EARLY SCALE + MECHANISM + CAMERA" in normalized
+    assert "必须逐字套用以下单句骨架" in normalized
+    assert "while the separated visitor operates [colossal giant-country Signature Mechanism]" in normalized
+    assert "from [visitor-scale rigid support]" in normalized
+    assert "在 perspective 之前不得出现句号或分号" in normalized
+    assert "年龄、体型、背景空隙和造型全部后移" in normalized
+    assert "S2 TARGET MAP" in normalized
+    assert "S3 FOUR SCALE PROOFS" in normalized
+    assert "Four simultaneous scale proofs share one clear focal plane:" in normalized
+    assert "the visitor's complete body is shorter than one giant finger" in normalized
+    assert "the visitor's entire body fits on the giant's thumb pad" in normalized
+    assert "the visitor's head is smaller than the giant's thumbnail" in normalized
+    assert "逐字粘贴“the giant's open palm”" in normalized
+    assert "不得在 open 与 palm 之间插入 left、right 或其他词" in normalized
+    assert "S4 CHARACTER DESIGN" in normalized
+    assert "包含所有人物造型的一整个物理句子" in normalized
+    assert "在最后一人写完前不得出现句号" in normalized
+    assert "S5 POSE AND ACTION" in normalized
+    assert "包含所有人物姿势的一整个物理句子" in normalized
+    assert "该手只能保持张开作尺度参照" in normalized
+    assert "物理第一句必须点名具体 fantasy setting" in normalized
+    assert "第一句不得提前结束" in normalized
+    assert "不得插入年龄、体型、背景空隙、人物造型、妆容或详细姿势" in normalized
+    assert "紧接句号后的物理第二句必须以" in normalized
+    assert "任何人物介绍、服装、妆容、机制解释或环境句都不得出现在它之前" in normalized
+    assert "live-action photorealistic photography captured with a real 20–32 mm wide-angle camera" in normalized
+    assert "不得凭记忆改写为 20-32mm、20–32mm、wide-angle lens" in normalized
+    assert "previous frame, same, identical, unchanged, still, again, now, remains" in normalized
+    assert "输出前按句号切分并确认 S2 以 The single 开头" in normalized
+    assert "S3 以 Four simultaneous scale proofs 开头" in normalized
+    assert "NEVER OUTPUT THESE TOKENS IN ANY CONTEXT" in normalized
+    assert "最终逐词扫描并替换：same 改为 shared 或直接删除" in normalized
+    assert "S4 包含所有人物造型、S5 包含所有人物姿势" in normalized
+    assert "只允许英文 ASCII 字母、阿拉伯数字和英文标点" in normalized
+    assert "逐字符删除中文、日文、韩文及孤立 CJK 字符" in normalized
+    assert "The camera uses an environment-scale wide establishing shot" in normalized
+    assert "live-action photorealistic fantasy photography" in normalized
+    assert "fantasy 只改变环境设计，不改变人体解剖、材质重量、重力、接触、尺度和真实摄影规律" in normalized
+    assert "真实材料的接缝、磨损、灰尘、湿气和受力" in normalized
+    assert "可信地质层理、植物结构、天气方向" in normalized
+    assert "风对头发和衣物的影响，以及自然大气透视" in normalized
+    assert "允许由现实物理解释的生物发光植物、矿物晶体、海蚀岛链、潮汐瀑布" in normalized
+    assert "必须有自然、天文、生态或工程来源" in normalized
+    assert "对皮肤与环境产生一致反光、投影、风力、流体、温度或颗粒影响" in normalized
+    assert "绝对禁止 magic、spell、sorcery、enchantment、rune power、portal" in normalized
+    assert "teleportation、levitation、floating island、无支撑悬浮" in normalized
+    assert "禁止满画面霓虹、自发光轮廓、无来源光、过饱和糖果色" in normalized
+    assert "必须保留中性色、真实肤色、材料反射差异和自然曝光" in normalized
+    assert "THEME CONTRACT" in brief
+    assert "FRAME CONTRACT" in brief
+    assert "VARIATION AND REJECTION RULES" in brief
     assert "1:15" not in normalized
     assert "11-centimeter" not in normalized
     assert "14-centimeter" not in normalized
