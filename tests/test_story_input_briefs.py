@@ -60,6 +60,200 @@ def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> Non
     assert "Keep intimate actions non-graphic" not in zero_gravity
 
 
+def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "intimate-lifestyle-portrait.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert "Every Frame is one finished full-bleed photograph" in normalized
+    assert "Aspect ratio and canvas dimensions are controlled outside this brief" in normalized
+    assert "Do not declare, request, prefer, or reject any aspect ratio" in normalized
+    assert "bright, polished East Asian social-media lifestyle-glamour aesthetic" in normalized
+    assert "fresh, gentle, sunlit, colorful" in normalized
+    assert (
+        "bright high-key East Asian lifestyle beauty portrait, soft feminine "
+        "social-media glamour, luminous ivory skin, clear large almond eyes, "
+        "clean modern digital-camera realism"
+    ) in normalized
+    assert "Use exactly `female_count` adult women and exactly `male_count` adult men" in normalized
+    assert "these run parameters are the sole authority for visible human count" in normalized
+    assert "Never infer, add, remove, replace, or duplicate a person" in normalized
+    assert "Every requested person is unmistakably 25 or older" in normalized
+    assert "designate one requested woman as the primary beauty-portrait subject" in normalized
+    assert "the requested companion is equally complete, identifiable, active" in normalized
+    assert "Never copy, name, or closely resemble a real person" in normalized
+    assert "coherent anatomy; the primary woman may have a curvy figure and naturally full bust" in normalized
+    assert "minute visible pores, soft facial peach fuzz" in normalized
+    assert "MAKEUP AND GROOMING" in normalized
+    assert "Describe every woman's complete visible makeup design" in normalized
+    assert "exact blush hue, placement, diffusion, and finish" in normalized
+    assert "peach cream blush high on the cheekbones" in normalized
+    assert "Rotate makeup families across Themes before repeating" in normalized
+    assert "give each a visibly distinct but harmonious makeup design" in normalized
+    assert "describe polished grooming" in normalized
+    assert "ACCESSORIES AND HEADWEAR" in normalized
+    assert "at least three coordinated accessories from different categories" in normalized
+    assert "wide-brim straw hat, structured beret, silk headscarf" in normalized
+    assert "cat-eye, slim oval, softly rectangular, rimless" in normalized
+    assert "fine pendant, pearl strand, velvet choker, layered chain" in normalized
+    assert "charm bracelet, slim bangle stack, cuff, polished watch" in normalized
+    assert "Never hide the eyes behind dark opaque lenses" in normalized
+    assert "build distinct accessory sets with different centerpiece categories" in normalized
+    assert "For a requested man, specify two or more coherent accessories" in normalized
+    assert "remain in the same position in both Frames of one Theme" in normalized
+    assert "distinct location family" in normalized
+    assert "bright neighborhood gym entrance" in normalized
+    assert "sunlit independent cafe or bakery" in normalized
+    assert "bright apartment art corner" in normalized
+    assert "outdoor market lounge" in normalized
+    assert "vintage tea room" in normalized
+    assert "brick-walled garage" in normalized
+    assert "Use original, unbranded designs" in normalized
+    assert "At aesthetic level" in normalized
+    assert "Wardrobe is a major visual attraction, not ordinary daywear" in normalized
+    assert "at least three luxurious fashion materials or treatments" in normalized
+    assert "Use at least three coordinated accessories" in normalized
+    assert "ordinary plain sportswear or a basic top-and-shorts combination is insufficient" in normalized
+    assert "embellished corset top, embroidered bustier, jeweled bodysuit" in normalized
+    assert "Deep cleavage, side cutouts, open backs, bare shoulders" in normalized
+    assert "opaque over nipples and genitals" in normalized
+    assert "At erotic level" in normalized
+    assert "At hardcore level" in normalized
+    assert "Partial toplessness, bare breasts, and visible nipples are permitted" in normalized
+    assert "an unmistakable, currently visible consensual adult sexual act" in normalized
+    assert "A one-woman cast uses an explicit solo act" in normalized
+    assert "a woman-and-man or two-woman cast uses an explicit mutually participatory act" in normalized
+    assert "Do not add an unrequested partner, body part, hidden participant" in normalized
+    assert "The run's requested content level is the sole authority" in normalized
+    assert "Aesthetic has no visible nipples, genitals, or sex act" in normalized
+    assert "one natural, visually legible activity tied to the selected place" in normalized
+    assert "The activity supports the portrait instead of dominating it" in normalized
+    assert "below roughly twenty percent of the frame" in normalized
+    assert "FACE, BODY, AND POSE DIRECTION" in normalized
+    assert "Treat face direction, torso direction, pelvis direction, and camera position as four separate choices" in normalized
+    assert "clean left or right profile" in normalized
+    assert "face turned back over one shoulder" in normalized
+    assert "back mostly toward camera with the face looking over one shoulder" in normalized
+    assert "shoulders and pelvis deliberately counter-rotated" in normalized
+    assert "relaxed standing contrapposto" in normalized
+    assert "floor sitting with one knee raised" in normalized
+    assert "upright kneeling with grounded shins" in normalized
+    assert "reclining diagonally on a sofa or chaise" in normalized
+    assert "use at least four face directions, five body directions" in normalized
+    assert "The eyes are the first focal priority in every Frame" in normalized
+    assert "iris direction, degree of eye convergence" in normalized
+    assert "natural wet lower-lid line, separated eyelashes, detailed irises" in normalized
+    assert "wide, clear, softly attentive eyes" in normalized
+    assert "never predatory, confrontational, or brooding" in normalized
+    assert "Narrowed or half-lidded eyes are valid only when" in normalized
+    assert "focused, luminous half-lidded gaze" in normalized
+    assert "EXPRESSION AND EMOTION VARIATION POOL" in normalized
+    assert "playful coquetry or 撒娇" in normalized
+    assert "teasing invitation" in normalized
+    assert "languid ease" in normalized
+    assert "sensual contentment" in normalized
+    assert "dreamy reverie" in normalized
+    assert "private pride" in normalized
+    assert "romantic anticipation" in normalized
+    assert "self-aware glamour" in normalized
+    assert "wistful tenderness" in normalized
+    assert "At aesthetic level, favor approachable, playful, coy" in normalized
+    assert "At erotic level, allow stronger teasing invitation" in normalized
+    assert "Plan expression coverage across the whole batch" in normalized
+    assert "COY AND COQUETTISH" in normalized
+    assert "LANGUID AND SENSORY" in normalized
+    assert "TEASING AND CONFIDENT" in normalized
+    assert "WARM AND OPEN" in normalized
+    assert "DREAMY AND TENDER" in normalized
+    assert "FOCUSED AND PROUD" in normalized
+    assert "Assign these lanes in a varied order rather than by Theme ID" in normalized
+    assert "vary direct lens contact, phone-screen attention, mirror-eye contact" in normalized
+    assert "at least four mutually consistent signals" in normalized
+    assert "Replace vague words such as beautiful, sexy, seductive" in normalized
+    assert "one primary emotion, one quieter secondary emotion" in normalized
+    assert "one concrete trigger in the current scene" in normalized
+    assert "Make the emotional chain visually causal" in normalized
+    assert "A viewer should infer both emotions without a caption" in normalized
+    assert "preserve the exact emotional baseline, trigger, appraisal" in normalized
+    assert "Every Frame captures the identical emotional instant" in normalized
+    assert "PAIR CONTINUITY — HIGHEST PRIORITY" in normalized
+    assert "privately build one immutable subject block" in normalized
+    assert "Copy that immutable subject block" in normalized
+    assert "Pair variation is camera variation only" in normalized
+    assert "Framing family and shooting method never change within a Theme" in normalized
+    assert "Do not put down, raise, transfer, add, or remove a phone or camera" in normalized
+    assert "Continuity outranks novelty" in normalized
+    assert "Every Frame must stand alone" in normalized
+    assert "Restate every stable fact as a present visible fact" in normalized
+    assert "compare paired Frames field by field" in normalized
+    assert "scan out every cross-Frame comparison word above" in normalized
+    assert "Never echo instructions or state absences" in normalized
+    assert "delete negative checklist phrases before publishing" in normalized
+    assert "do not emit Chinese characters" in normalized
+    assert "Capture an action at its most informative fraction of a second" in normalized
+    assert "one immediate physical consequence" in normalized
+    assert "Every Frame must include a coherent micro-detail hierarchy" in normalized
+    assert "Keep the eyes and action-driving hand as the sharpest details" in normalized
+    assert "live-action photorealistic location portrait photography" in normalized
+    assert "Do not prescribe a focal length" in normalized
+    assert "do not use wide-angle, ultra-wide, fisheye" in normalized
+    assert "Never write wide-angle, ultra-wide, fisheye, 0.5x" in normalized
+    assert "A selfie must use a natural-perspective phone camera mode" in normalized
+    assert "Variation comes from camera position, height, side, distance" in normalized
+    assert "live-action photorealistic location portrait with natural undistorted perspective" in normalized
+    assert "FULL BODY" in normalized
+    assert "show every requested person completely from the top of the hair through both feet and footwear" in normalized
+    assert "LARGE HALF BODY" in normalized
+    assert "hips, and at least the upper thighs or knees" in normalized
+    assert "alternate them across a batch before repeating" in normalized
+    assert "Independently choose one distinct shooting method for every Theme" in normalized
+    assert "arm's-length front-camera selfie" in normalized
+    assert "always using LARGE HALF BODY framing" in normalized
+    assert "mirror selfie showing the exact requested cast and only their corresponding reflections" in normalized
+    assert "a timer photograph from a shelf, counter, windowsill" in normalized
+    assert "Treat selfie, mirror selfie, friend-held camera, timer camera" in normalized
+    assert "physically truthful gaze behavior" in normalized
+    assert "front-camera selfie must never claim full-body framing" in normalized
+    assert "For a batch of three or more Themes" in normalized
+    assert "at least one front-camera selfie or mirror selfie" in normalized
+    assert "at least one nearby-friend portrait" in normalized
+    assert "at least one timer or fixed-camera portrait" in normalized
+    assert "Every Theme premise must explicitly name its framing family and shooting method" in normalized
+    assert "one framing family and one shooting method not yet used" in normalized
+    assert "one expression family, gaze pattern, brow pattern" in normalized
+    assert "one face direction, body direction, and pose family" in normalized
+    assert "Compose three physical depth planes" in normalized
+    assert "Keep the face high-key and readable" in normalized
+    assert "Avoid low-key lighting, heavy chiaroscuro" in normalized
+    assert "one dreamy but physically photographable atmosphere" in normalized
+    assert "soft golden-hour backlight" in normalized
+    assert "small prism refractions" in normalized
+    assert "bright rain droplets, condensation, or misted glass" in normalized
+    assert "candlelight or warm table lamps balanced by cool blue-hour window fill" in normalized
+    assert "sunlit pollen, steam, or fine dust" in normalized
+    assert "delicate practical fairy lights, cafe bulbs, or city lights" in normalized
+    assert "The dreamy atmosphere must remain real-location photography" in normalized
+    assert "Do not use magical particles, supernatural auras" in normalized
+    assert "four consecutive information blocks" in normalized
+    assert "Completeness and image-defining detail matter more than an arbitrary word count" in normalized
+    assert "IDENTITY AND LOOK" in normalized
+    assert "EYES AND EMOTION" in normalized
+    assert "POSE AND ACTION" in normalized
+    assert "CAMERA AND LIGHT" in normalized
+    assert "write one explicit `MAKEUP —` sentence for each woman" in normalized
+    assert "Write one `GROOMING —` sentence for each man" in normalized
+    assert "mandatory in every Frame, never implied by adjectives" in normalized
+    assert "Spend most of the budget on the face, eyes, micro-expression" in normalized
+    assert "THEME CONTRACT" in normalized
+    assert "exactly `female_count` original adult women and `male_count` original adult men" in normalized
+    assert "primary woman's exact blush hue and placement" in normalized
+    assert "the exact parameter-controlled cast" in normalized
+    assert "Do not add, remove, substitute, merge, or crop away a requested person" in normalized
+    assert "FRAME CONTRACT" in normalized
+    assert "VARIATION AND REJECTION RULES" in normalized
+
+
 def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     brief = (
         REPOSITORY_ROOT / "story-inputs" / "miniature-fantasy-v2.txt"
@@ -383,12 +577,19 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "必须明确写“visitor-scale”" in normalized
     assert "不得把巨人国原生物件误写成 visitor-scale" in normalized
     assert "环境层" in normalized
-    assert "具体奇幻室内、奇幻户外或半开放混合场景" in normalized
+    assert "具体、普通、可实地拍摄的巨人国城市生活场景" in normalized
     assert "不得连续两个 Theme 使用同一场景类型" in normalized
-    assert "玄武岩海岛链、生物发光古林、晶体峡谷、巨莲沼泽" in normalized
-    assert "天然晶体宫殿、高山云海浴场、月相机械观测塔" in normalized
-    assert "fantasy 只表示非日常的宏伟建筑、罕见地质、巨型生态、天文景观和大胆工程" in normalized
-    assert "绝不包含魔法或超自然力量" in normalized
+    assert "人行道、后巷、十字路口、公交维修场、市场街、建筑工地" in normalized
+    assert "城市公寓、社区洗衣店、健身房、办公室、诊所、便利店或超市后场" in normalized
+    assert "画面的唯一异常是巨人国居民、建筑与物件相对正常人类访客的极端尺度" in normalized
+    assert "环境本身必须像现实城市" in normalized
+    assert "混凝土、沥青、瓷砖、排水沟、斑马线、交通灯、路牌、广告牌" in normalized
+    assert "至少四种" in normalized
+    assert "除指定访客与唯一巨人外不得出现路人、司机、乘客、店员" in normalized
+    assert "互不重复的城市生活类别" in normalized
+    assert "住宅与家务、零售与餐饮、办公室与医疗、交通与停车" in normalized
+    assert "市政与公共休闲、建筑与工业、街道与社区服务" in normalized
+    assert "即使只有两个 Theme，也必须来自两个不同类别" in normalized
     assert "例子只用于打开想象，不得照抄为固定清单" in normalized
     assert "占幅层" in normalized
     assert "同一清晰焦平面同时出现四层证据" in normalized
@@ -396,12 +597,14 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "至少一个巨人国环境参照" in normalized
     assert "巨人从骨盆到胸腹或大腿的连续身体必须跨越多个巨人国功能区" in normalized
     assert "完整访客仍只占巨大手掌附近的小区域" in normalized
-    assert "each complete visitor is visibly shorter than one of the giant's fingers" in normalized
+    assert "each complete visitor is visibly smaller than the giant's thumbnail" in normalized
     assert "不得把这条尺度关系延迟到第二句或后文" in normalized
-    assert "完整身高短于巨人一根手指" in normalized
-    assert "整名访客可平躺在巨人拇指指腹上而不超过第一指节" in normalized
-    assert "访客头部小于巨人拇指甲" in normalized
-    assert "巨人的一只眼睛或嘴唇单独所占画面面积大于每名访客的完整身体" in normalized
+    assert "完整身高小于巨人的一枚拇指甲" in normalized
+    assert "整名访客可直立在巨人拇指甲表面且头脚四周仍留出清楚可见的甲面边框" in normalized
+    assert "访客头部小于巨人拇指甲根部的半月痕" in normalized
+    assert "禁止退回一根手指高、掌心大小、玩偶大小、膝高或腰高" in normalized
+    assert "巨人的一只眼睛、鼻孔或嘴唇单独所占画面面积远大于每名访客的完整身体" in normalized
+    assert "不得把访客放在前景单独放大" in normalized
     assert "访客面部不得以近景尺寸接近巨人面部" in normalized
     assert "张开的巨大手掌" in normalized
     assert "不能用一方贴近镜头制造假差距" in normalized
@@ -461,16 +664,16 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "巨人必须具有与年龄和体型一致的自然体毛" in normalized
     assert "胸毛、腹毛、腋毛、手臂毛、腿毛或背毛中的至少两处" in normalized
     assert "灰白变化和皮肤连接" in normalized
-    assert "At [specific fantasy giant-country setting]" in normalized
+    assert "At [specific real-world urban giant-country setting]" in normalized
     assert "exactly [total] separate adult bodies are visible in total:" in normalized
-    assert "不能只写 generic interior、field、forest、mountain、outdoors 或 giant country" in normalized
+    assert "不能只写 generic interior、street、city、outdoors 或 giant country" in normalized
     assert "plus one giant-country native giant [woman/man]" in normalized
-    assert "使用真实相机拍摄的真人写实 fantasy 摄影" in normalized
-    assert "live-action photorealistic photography" in normalized
+    assert "像普通摄影师在真实地点使用真实相机完成的真人外景或室内拍摄" in normalized
+    assert "live-action photorealistic location photography" in normalized
     assert "真实成年演员、真实皮肤毛孔与体毛" in normalized
     assert "可信镜头光学、自然曝光、物理景深和一致阴影" in normalized
-    assert "高预算实拍特效、实体布景、外景摄影与无缝比例合成" in normalized
-    assert "最终画面仍像真人在真实地点拍摄，不像概念图" in normalized
+    assert "高预算实拍比例特效、实体布景、外景摄影与无缝合成" in normalized
+    assert "最终画面仍像未经夸张美术化的现场照片" in normalized
     assert "禁止 illustration、painting、anime、comic、CGI look、3D render" in normalized
     assert "塑料皮肤、蜡像人物和过度磨皮" in normalized
     assert "室内外环境必须具有使用、风化和维护痕迹" in normalized
@@ -485,16 +688,16 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "严格按以下物理句序写，任何顺序变化都重写" in normalized
     assert "S1 CAST + EARLY SCALE + MECHANISM + CAMERA" in normalized
     assert "必须逐字套用以下单句骨架" in normalized
-    assert "while the separated visitor operates [colossal giant-country Signature Mechanism]" in normalized
+    assert "while the separated visitor operates [colossal giant-country urban Signature Mechanism]" in normalized
     assert "from [visitor-scale rigid support]" in normalized
     assert "在 perspective 之前不得出现句号或分号" in normalized
     assert "年龄、体型、背景空隙和造型全部后移" in normalized
     assert "S2 TARGET MAP" in normalized
     assert "S3 FOUR SCALE PROOFS" in normalized
     assert "Four simultaneous scale proofs share one clear focal plane:" in normalized
-    assert "the visitor's complete body is shorter than one giant finger" in normalized
-    assert "the visitor's entire body fits on the giant's thumb pad" in normalized
-    assert "the visitor's head is smaller than the giant's thumbnail" in normalized
+    assert "the visitor's complete body is smaller than the giant's thumbnail" in normalized
+    assert "the visitor stands entirely inside the thumbnail with a visible nail border on every side" in normalized
+    assert "the visitor's head is smaller than the thumbnail crescent" in normalized
     assert "逐字粘贴“the giant's open palm”" in normalized
     assert "不得在 open 与 palm 之间插入 left、right 或其他词" in normalized
     assert "S4 CHARACTER DESIGN" in normalized
@@ -503,13 +706,13 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "S5 POSE AND ACTION" in normalized
     assert "包含所有人物姿势的一整个物理句子" in normalized
     assert "该手只能保持张开作尺度参照" in normalized
-    assert "物理第一句必须点名具体 fantasy setting" in normalized
+    assert "物理第一句必须点名具体 real-world urban setting" in normalized
     assert "第一句不得提前结束" in normalized
     assert "不得插入年龄、体型、背景空隙、人物造型、妆容或详细姿势" in normalized
     assert "紧接句号后的物理第二句必须以" in normalized
     assert "任何人物介绍、服装、妆容、机制解释或环境句都不得出现在它之前" in normalized
-    assert "live-action photorealistic photography captured with a real 20–32 mm wide-angle camera" in normalized
-    assert "不得凭记忆改写为 20-32mm、20–32mm、wide-angle lens" in normalized
+    assert "live-action photorealistic location photography captured with a real 20–32 mm wide-angle camera" in normalized
+    assert "不得凭记忆改写为 photorealistic fantasy、20-32mm、20–32mm、wide-angle lens" in normalized
     assert "previous frame, same, identical, unchanged, still, again, now, remains" in normalized
     assert "输出前按句号切分并确认 S2 以 The single 开头" in normalized
     assert "S3 以 Four simultaneous scale proofs 开头" in normalized
@@ -519,18 +722,20 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "只允许英文 ASCII 字母、阿拉伯数字和英文标点" in normalized
     assert "逐字符删除中文、日文、韩文及孤立 CJK 字符" in normalized
     assert "The camera uses an environment-scale wide establishing shot" in normalized
-    assert "live-action photorealistic fantasy photography" in normalized
-    assert "fantasy 只改变环境设计，不改变人体解剖、材质重量、重力、接触、尺度和真实摄影规律" in normalized
+    assert "live-action photorealistic location photography" in normalized
+    assert "纪实摄影、生活方式摄影或克制的商业外景摄影观感" in normalized
+    assert "不使用 fantasy、epic、mythic、enchanted、otherworldly" in normalized
     assert "真实材料的接缝、磨损、灰尘、湿气和受力" in normalized
-    assert "可信地质层理、植物结构、天气方向" in normalized
+    assert "可信地质、普通植物、天气方向" in normalized
     assert "风对头发和衣物的影响，以及自然大气透视" in normalized
-    assert "允许由现实物理解释的生物发光植物、矿物晶体、海蚀岛链、潮汐瀑布" in normalized
-    assert "必须有自然、天文、生态或工程来源" in normalized
-    assert "对皮肤与环境产生一致反光、投影、风力、流体、温度或颗粒影响" in normalized
     assert "绝对禁止 magic、spell、sorcery、enchantment、rune power、portal" in normalized
-    assert "teleportation、levitation、floating island、无支撑悬浮" in normalized
+    assert "teleportation、levitation、floating island" in normalized
+    assert "无支撑悬浮" in normalized
     assert "禁止满画面霓虹、自发光轮廓、无来源光、过饱和糖果色" in normalized
-    assert "必须保留中性色、真实肤色、材料反射差异和自然曝光" in normalized
+    assert "调色保持中性、自然、略微克制" in normalized
+    assert "普通公寓墙面、街道路灯、停车楼梁架、地铁立柱、脚手架或港口设施" in normalized
+    assert "urban indoor、urban outdoor 或 semi-open urban location" in normalized
+    assert "不得包含乡村、荒野、魔法、天文奇观、发光森林、晶体宫殿或史诗化环境" in normalized
     assert "THEME CONTRACT" in brief
     assert "FRAME CONTRACT" in brief
     assert "VARIATION AND REJECTION RULES" in brief

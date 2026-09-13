@@ -7,20 +7,23 @@ female_count 和 male_count 只约束从正常人类世界来到巨人国的成�
 
 GIANT-COUNTRY WORLD
 
-每个 Theme 位于巨人国独有的具体奇幻室内、奇幻户外或半开放混合场景。这里的 fantasy 只表示非日常的宏伟建筑、罕见地质、巨型生态、天文景观和大胆工程，绝不包含魔法或超自然力量。批量 Theme 在三类场景间轮换，不得连续两个 Theme 使用同一场景类型，也不得退化为普通卧室、浴室、厨房或空泛森林。室内可以是天然晶体宫殿、高山云海浴场、月相机械观测塔、巨型菌类温室、天文玻璃穹顶或崖壁运河车站；户外可以是玄武岩海岛链、生物发光古林、晶体峡谷、巨莲沼泽、月照瀑布梯田、黑曜石花园、极光码头或巨人遗迹荒野；半开放场景让建筑、天空、地貌和天气共同参与机制。例子只用于打开想象，不得照抄为固定清单。唯一巨人是当地真实成年原住民，拥有自然成人比例、皮肤、五官、身体与器官；指定人物是身体和器官保持普通成人尺寸的异世界访客，不得写成天生微型种族、玩偶、模型、克隆人或儿童。
+每个 Theme 位于具体、普通、可实地拍摄的巨人国城市生活场景，分为室内、户外或半开放城市空间。画面的唯一异常是巨人国居民、建筑与物件相对正常人类访客的极端尺度；环境本身必须像现实城市，不使用 fantasy、史诗、神话、荒野冒险或异世界美术。批量 Theme 在三类城市空间间轮换，不得连续两个 Theme 使用同一场景类型。室内优先使用有人居住的城市公寓、社区洗衣店、健身房、办公室、诊所、便利店或超市后场、地铁站厅、停车楼、酒店客房、仓库和工业洗衣房；户外优先使用人行道、后巷、十字路口、公交维修场、市场街、建筑工地、河滨步道、停车场、地铁出入口、屋顶和集装箱码头；半开放场景优先使用站台、骑楼商业街、加油站雨棚、菜市场、体育场外廊、屋顶温室、装卸月台和公交总站。禁止农场、海滩、森林、峡谷、荒野、遗迹和空泛自然风景。例子只用于打开想象，不得照抄为固定清单。
+城市必须显示真实日常基础设施和使用痕迹：混凝土、沥青、瓷砖、排水沟、斑马线、交通灯、路牌、广告牌、空调外机、消防管、监控摄像头、垃圾箱、停放车辆、脚手架、店铺卷帘门或公共交通设施中至少四种。所有城市设施均按巨人居民日常尺寸建造并明确标为 giant-scale。城市看起来有人居住和运作，但除指定访客与唯一巨人外不得出现路人、司机、乘客、店员、窗中人影、海报真人照片或远处人群。唯一巨人是当地普通城市成年居民、住户或工作人员，拥有自然成人比例、皮肤、五官、身体与器官；指定人物是身体和器官保持普通成人尺寸的异世界访客，不得写成天生微型种族、玩偶、模型、克隆人或儿童。
+批量生成前先为每个 Theme 分配一个互不重复的城市生活类别：住宅与家务、零售与餐饮、办公室与医疗、交通与停车、市政与公共休闲、建筑与工业、街道与社区服务。用完全部类别前不得重复；即使只有两个 Theme，也必须来自两个不同类别，不得都使用洗衣房、仓库、工厂或相同城市装置。
 巨人不得拥有年轻、健美、无瑕或模特化的完美身材。每个 Theme 明确选择一种非理想化成人身体：肥胖并有自然腹部与皮肤褶皱，苍老并有皱纹、松弛皮肤与老年斑，瘦削并有突出的锁骨、肋骨与关节，或兼具粗壮、下垂、疤痕、静脉、妊娠纹、色斑和左右轻微不对称。所有特征保持写实、尊重且不影响自愿能力；同一 Theme 全部 Frame 固定年龄层、体型和皮肤特征。
 每个 Frame 分开描述：先写正常人类访客人数、性别和身份，再写巨人国原住民性别及压倒访客的体量。始终使用“normal-human-sized adult woman/man visitor”与“giant-country native giant woman/man”，不得把双方简称为同尺寸普通人物。
 所有访客使用完全相同的头身比、肩宽尺度和四肢长度，只用脸、发型、服装和颜色区分身份；不得用不同身高或骨架制造假尺度。需要比较访客时，将他们置于相同或相近的相机距离。
 
 尺度是每帧最高优先级，必须在同一清晰焦平面同时出现四层证据：
-1. 身体层：使用极端身高差。每名访客从头到脚的完整身高短于巨人一根手指，整名访客可平躺在巨人拇指指腹上而不超过第一指节，访客头部小于巨人拇指甲，并与巨大手、脚或脸无遮挡并排。禁止退回“访客只比手掌短”这种较弱尺度。
+1. 身体层：使用昆虫般渺小但仍为真实成年人的极端视觉尺度。每名访客从头到脚的完整身高小于巨人的一枚拇指甲，整名访客可直立在巨人拇指甲表面且头脚四周仍留出清楚可见的甲面边框，访客头部小于巨人拇指甲根部的半月痕，并与巨大手、脚或脸处于同一焦平面。禁止退回一根手指高、掌心大小、玩偶大小、膝高或腰高。
 2. 物件层：除巨人身体外，必须清楚显示至少一件巨人国日用品；巨人国的杯、梳子、枕头、餐具、衣扣、床沿、鞋或控制器对访客呈大型建筑或工业设施尺度，连一个指环、纽扣孔、杯柄空隙或鞋带孔都能容纳完整访客，同一物件对巨人原住民仍是正常日用品。
 所有属于巨人国原住民、巨人国建筑或当地环境的可见物件都必须远大于正常人类。每次命名原生家具、工具、容器、服装配件、门、楼梯、栏杆、绳索、桥、车辆、机械、植物构件或日用品时，英文名称前必须明确写“giant-scale”或“colossal giant-country”，例如 giant-scale cup、giant-scale door hinge、colossal giant-country pulley；禁止只写普通 cup、chair、door、rope、lever、bucket 或 platform 而不标示巨大尺度。只有访客自带的衣物、手持工具、安全装备及为访客临时搭建的支撑可以保持正常人类尺寸，并必须明确写“visitor-scale”；不得把巨人国原生物件误写成 visitor-scale。
 3. 环境层：必须同时显示至少一个巨人国环境参照。室内使用门框、楼梯、家具、拱顶或巨型装置；户外使用巨人尺度的桥、遗迹门、崖阶、古树根、巨花、瀑布设施或崖壁码头；半开放场景同时使用建筑边界与远景地貌。参照匹配巨人原住民的普通成人身体，最低一级台阶、门槛、桥板厚度或栏杆底座也高过访客完整身高，访客需要升降机、索道或安全框架移动。
 4. 占幅层：巨人从骨盆到胸腹或大腿的连续身体必须跨越多个巨人国功能区或户外地貌区并占据画面大部，完整访客仍只占巨大手掌附近的小区域；巨人身体由巨人国地面、岩台、桥面、床面或多组结构承托，访客平台只承托访客和装置。
-尺度关系必须在每个 Frame 的开头首先成立：身份之后立即逐字写“each complete visitor is visibly shorter than one of the giant's fingers”，不得把这条尺度关系延迟到第二句或后文。巨人的一只眼睛或嘴唇单独所占画面面积大于每名访客的完整身体，访客面部不得以近景尺寸接近巨人面部。
+尺度关系必须在每个 Frame 的开头首先成立：身份之后立即逐字写“each complete visitor is visibly smaller than the giant's thumbnail”，不得把这条尺度关系延迟到第二句或后文。巨人的一只眼睛、鼻孔或嘴唇单独所占画面面积远大于每名访客的完整身体，访客面部不得以近景尺寸接近巨人面部。
 广角透视只能强化、不能单独证明尺度。接触处必须同时看见巨人连续身体、全部完整访客、张开的巨大手掌、至少一件巨人国日用品和一个巨人国环境参照；这些参照处于相近景深，不能用一方贴近镜头制造假差距，也不能只靠巨人与访客并排证明渺小。
-张开的巨大手掌只作为接触点旁的同焦平面尺寸参照；访客继续站、跪、坐或躺在唯一动作支撑面上。除非手掌本身就是连接接触点的唯一支撑，否则不得同时写访客站在手掌、装置平台和接触点。禁止用 three times、twice、several times 等偏弱数字倍率；直接写完整访客短于一根手指、整个人能放入拇指指腹、头小于拇指甲、日用品的局部孔隙可容纳整名访客、最低台阶高过访客全身。
+张开的巨大手掌只作为接触点旁的同焦平面尺寸参照；访客继续站、跪、坐或躺在唯一动作支撑面上。除非手掌本身就是连接接触点的唯一支撑，否则不得同时写访客站在手掌、装置平台和接触点。禁止用 three times、twice、several times 等偏弱数字倍率；直接写完整访客小于一枚拇指甲、整个人直立在甲面仍有宽阔边框、头小于甲根半月痕、巨人皮肤褶皱像壕沟、衣物单根纤维粗于访客手臂、日用品局部孔隙可容纳多名完整访客、最低台阶像悬崖般高过访客全身。
+不得把访客放在前景单独放大。访客、巨人拇指甲和接触点必须处于相近相机距离与同一焦平面，访客只形成极小但完整可辨的成人剪影；画面中的巨人手指宽度、皮肤纹理和衣物纤维必须同时证明访客并非普通人尺寸。
 
 BODY AND TARGET CONTRACT
 
@@ -56,8 +59,8 @@ Hardcore 鼓励大量且清晰可见的精液、尿液喷射、阴道液体或�
 SIGNATURE MECHANISM AND IMAGINATION
 
 每个 Theme 先锁定一个 Signature Mechanism：有名称的 colossal giant-country 装置或空间系统、一个物理原理、发起者、目标及正在发生的可见因果。巨人国主装置对巨人是正常可用尺寸，对访客是建筑或工业设施尺寸；访客只能通过 visitor-scale 控制器、脚手架、吊篮或转接器操作。在内部先构思至少三个候选，将一种巨人国日常系统与一种物理原理组合，再加入只能由访客—巨人尺度差成立的角色反转，选择轮廓最鲜明、因果最清楚且最意外的一种，不输出候选过程。
-灵感仅供扩展，不是清单或模板：访客把巨人的梳齿当吊桥，把高山云雾集水门、月引潮汐泵、晶体配重升降台、巨花花粉风箱、崖壁悬索锚链、巨型钟摆、化石温室轨道或极光观测塔风机改成接触机制；把衣扣、鞋带、珠宝或阴毛造型改成轻型导向系统，把胸部与胸廓安全束带改成秋千、摩天轮、索道或弹射台。每个 fantasy-scale 自然或工程元素都必须改变光线、空间、受力或流体因果，不能只是背景装饰。
-巨大身体可成为可拍摄的视觉地形，但真正载荷必须由巨人国岩台、桥面、地面、家具框架、胸廓束带或机械结构承受。不得把乳头、阴毛或柔软组织作为唯一锚点。座椅、绳索和装置不得遮住访客完整身体。
+灵感仅供扩展，不是清单或模板：访客把巨人的梳齿当吊桥，把社区洗衣机滚筒、公寓电梯、商场扶梯、自动洗车机、楼宇 HVAC 风道、暴雨排水泵、停车升降台、地铁维修吊机、自动售货机、公交举升机、施工吊篮或屋顶水箱改成接触机制；把衣扣、鞋带、珠宝或阴毛造型改成轻型导向系统，把胸部与胸廓安全束带改成秋千、摩天轮、索道或弹射台。每个城市生活或市政工程元素都必须改变空间、受力或流体因果，不能只是背景装饰。
+巨大身体可成为可拍摄的视觉地形，但真正载荷必须由巨人国公寓地板、街道路面、屋顶平台、停车楼结构、家具框架、胸廓束带或城市机械结构承受。不得把乳头、阴毛或柔软组织作为唯一锚点。座椅、绳索和装置不得遮住访客完整身体。
 机制必须已经运转，把所有人连接到同一接触点。若正常尺寸人物之间也能原样成立，或只是拥抱、坐腿、手抱和无装置触碰，必须重写。批量生成不得重复“巨人国系统 + 物理、机械或生态原理 + 装置 + 发起方 + 场景类型 + 支撑面”的组合。
 
 BODY HAIR AND WARDROBE
@@ -72,14 +75,14 @@ BODY HAIR AND WARDROBE
 CAMERA AND ART DIRECTION
 
 强制使用 20–32 mm 等效广角，保留可信的近大远小、汇聚线和前后景拉伸。禁止微距、极端特写、鱼眼、正交感、平视平拍和奶油散景。
-每个 Theme 至少一个 Frame 使用 environment-scale wide establishing shot。镜头二选一：贴近访客支撑面的低机位仰拍，让巨人身体与室内拱顶、户外崖壁、巨树、遗迹或天空结构共同向上压迫画面；或从巨人肩部以上向下俯拍，让完整访客、装置、巨人国物件和室内外环境层级缩入巨人身体周围。多 Frame 不得连续使用相同高度、方向和景别。
-所有景别保持前景巨人身体或物件、中景互动、背景室内边界或户外地平线与地貌三层深度。访客完整身体、唯一接触点、巨人身体归属和至少两条强烈汇聚线必须同时可辨；户外可使用桥索、崖层、河道、树干、日光束或云带形成汇聚。使用中等至较深景深，不得用虚化、雾幕或强光效隐藏空间。
-整体必须是使用真实相机拍摄的真人写实 fantasy 摄影：live-action photorealistic fantasy photography，真实成年演员、真实皮肤毛孔与体毛、真实布料、实景地貌和实景道具，具有可信镜头光学、自然曝光、物理景深和一致阴影。fantasy 只改变环境设计，不改变人体解剖、材质重量、重力、接触、尺度和真实摄影规律。室内必须显示石材、木材、金属、玻璃、织物等真实材料的接缝、磨损、灰尘、湿气和受力；户外必须显示可信地质层理、植物结构、天气方向、风对头发和衣物的影响，以及自然大气透视。室内外环境必须具有使用、风化和维护痕迹，不得像空布景或刚搭建的主题乐园。巨人、壮观地质与巨型工程表现为高预算实拍特效、实体布景、外景摄影与无缝比例合成，最终画面仍像真人在真实地点拍摄，不像概念图。
-允许由现实物理解释的生物发光植物、矿物晶体、海蚀岛链、潮汐瀑布、行星与卫星造成的异色天空、极光、沙暴、雷暴和罕见云层；每种现象必须有自然、天文、生态或工程来源，并对皮肤与环境产生一致反光、投影、风力、流体、温度或颗粒影响。绝对禁止 magic、spell、sorcery、enchantment、rune power、portal、teleportation、levitation、floating island、无支撑悬浮、违反重力的水流和任何超自然力量。禁止 illustration、painting、anime、comic、CGI look、3D render、game art、digital art、塑料皮肤、蜡像人物和过度磨皮；禁止满画面霓虹、自发光轮廓、无来源光、过饱和糖果色、主题公园布景、舞台背景布和所有表面同时发光。色彩可明亮、瑰丽、梦幻、异色或月夜高反差，但必须保留中性色、真实肤色、材料反射差异和自然曝光，不得默认哥特、腐朽、毒性、恐怖、烟尘、病态配色或压迫性暗黑氛围。构图保持可信纵深和巨人国尺度感；照明必须清楚显示完整访客、唯一接触点、体毛及全部尺度参照。对称只用于建筑、地貌、灯光和道具，不得镜像或复制人物、骨盆、肢体或性器官。
+每个 Theme 至少一个 Frame 使用 environment-scale wide establishing shot。镜头二选一：贴近访客支撑面的低机位仰拍，让巨人身体与普通公寓墙面、街道路灯、停车楼梁架、地铁立柱、脚手架或港口设施共同建立尺度；或从巨人肩部以上向下俯拍，让完整访客、装置、巨人国物件和普通城市环境缩入巨人身体周围。多 Frame 不得连续使用相同高度、方向和景别。
+所有景别保持前景巨人身体或物件、中景互动、背景普通城市室内边界或街道纵深三层深度。访客完整身体、唯一接触点、巨人身体归属和至少两条自然汇聚线必须同时可辨；户外可使用道路标线、栏杆、楼面边缘、停车位、站台、轨道或建筑立面形成汇聚。使用中等至较深景深，不得用虚化、雾幕或强光效隐藏空间。
+整体必须像普通摄影师在真实地点使用真实相机完成的真人外景或室内拍摄：live-action photorealistic location photography，真实成年演员、真实皮肤毛孔与体毛、真实布料、普通实景和真实道具，具有可信镜头光学、自然曝光、物理景深和一致阴影。使用纪实摄影、生活方式摄影或克制的商业外景摄影观感，不使用 fantasy、epic、mythic、enchanted、otherworldly 或 cinematic concept art 风格词。室内优先使用窗光、顶灯、台灯、日光灯或普通工作灯；户外优先使用阴天、上午、下午、黄金时刻或真实路灯。室内必须显示石材、木材、金属、玻璃、织物等真实材料的接缝、磨损、灰尘、湿气和受力；户外必须显示可信地质、普通植物、天气方向、风对头发和衣物的影响，以及自然大气透视。室内外环境必须具有使用、风化和维护痕迹，不得像空布景或刚搭建的主题乐园。巨人效果表现为高预算实拍比例特效、实体布景、外景摄影与无缝合成，最终画面仍像未经夸张美术化的现场照片。
+绝对禁止 magic、spell、sorcery、enchantment、rune power、portal、teleportation、levitation、floating island、bioluminescent fantasy forest、crystal palace、alien sky、aurora spectacle、无支撑悬浮、违反重力的水流和任何超自然力量。禁止 illustration、painting、anime、comic、CGI look、3D render、game art、digital art、塑料皮肤、蜡像人物和过度磨皮；禁止满画面霓虹、自发光轮廓、无来源光、过饱和糖果色、舞台背景布和所有表面同时发光，不得默认哥特、腐朽、毒性、恐怖或压迫性暗黑风格。调色保持中性、自然、略微克制，保留真实肤色、白平衡、材料反射差异和曝光宽容度。构图保持可信纵深和巨人国尺度感；照明必须清楚显示完整访客、唯一接触点、体毛及全部尺度参照。对称只用于建筑、地貌、灯光和道具，不得镜像或复制人物、骨盆、肢体或性器官。
 
 THEME CONTRACT
 
-Theme premise 简短写明：fantasy indoor、fantasy outdoor 或 hybrid 场景类型及具体巨人国地点；正常人类访客人数和性别；巨人原住民性别、年龄层、非理想化体型及体毛；发起方与回应方；唯一目标；Signature Mechanism 的装置、操作者和可见效果；一个真正参与因果的 fantasy-scale natural or engineered phenomenon，不得包含魔法。
+Theme premise 简短写明：urban indoor、urban outdoor 或 semi-open urban location 场景类型及具体巨人国城市地点；正常人类访客人数和性别；巨人原住民性别、年龄层、城市身份、非理想化体型及体毛；发起方与回应方；唯一目标；Signature Mechanism 的城市装置、操作者和可见效果。不得包含乡村、荒野、魔法、天文奇观、发光森林、晶体宫殿或史诗化环境。
 同一 Theme 的多个 Frame 是同一个已发生主要行为在不同机位下的独立重演，不是前后发展的故事。每帧开场直接处于接触之中。
 同一 Theme 的全部 Frame 锁定巨人的支撑姿势、骨盆旋转、双腿位置、目标器官轴向、访客姿势、装置位置和接触方向；只能改变摄像机高度、方位和构图，不能把站、坐、跪、躺互换。
 先为每个 Theme 写一次不可变的 S2–S5 subject block，再把该 block 逐字复制到两个 Frame；不得为第二个机位重新生成同义词、左右侧、尺度物件、建筑参照、手部任务、支撑面或接触侧。配对 Frame 只允许 S1 末尾的 low/high camera direction 和最终 camera-composition sentence 不同。
@@ -87,19 +90,19 @@ Theme premise 简短写明：fantasy indoor、fantasy outdoor 或 hybrid 场景�
 FRAME CONTRACT
 
 严格按以下物理句序写，任何顺序变化都重写：
-S1 CAST + EARLY SCALE + MECHANISM + CAMERA：一个句号内只写具体 setting、阿拉伯数字总人数、访客身份、紧接身份逐字写“each complete visitor is visibly shorter than one of the giant's fingers”、巨人身份、正在发生的机制及 low/high 20–32 mm 机位；年龄、体型、背景空隙和造型全部后移，避免 S1 过载拆句。
-S1 必须逐字套用以下单句骨架：“At [specific fantasy giant-country setting], exactly [total] separate adult bodies are visible in total: [visitor count and identities], each complete visitor is visibly shorter than one of the giant's fingers, plus one giant-country native giant [woman/man], while the separated visitor operates [colossal giant-country Signature Mechanism] from [visitor-scale rigid support], viewed from a [low-angle upward/high-angle downward] 20–32 mm wide-angle perspective.”在 perspective 之前不得出现句号或分号。
+S1 CAST + EARLY SCALE + MECHANISM + CAMERA：一个句号内只写具体 setting、阿拉伯数字总人数、访客身份、紧接身份逐字写“each complete visitor is visibly smaller than the giant's thumbnail”、巨人身份、正在发生的机制及 low/high 20–32 mm 机位；年龄、体型、背景空隙和造型全部后移，避免 S1 过载拆句。
+S1 必须逐字套用以下单句骨架：“At [specific real-world urban giant-country setting], exactly [total] separate adult bodies are visible in total: [visitor count and identities], each complete visitor is visibly smaller than the giant's thumbnail, plus one giant-country native giant [woman/man], while the separated visitor operates [colossal giant-country urban Signature Mechanism] from [visitor-scale rigid support], viewed from a [low-angle upward/high-angle downward] 20–32 mm wide-angle perspective.”在 perspective 之前不得出现句号或分号。
 S2 TARGET MAP：必须是目标器官句，不得被其他句隔开。
-S3 FOUR SCALE PROOFS：以“Four simultaneous scale proofs share one clear focal plane:”开头，并逐字粘贴“the giant's open palm”，不得在 open 与 palm 之间插入 left、right 或其他词；手掌侧别写在该短语之后。同句必须逐字写“the visitor's complete body is shorter than one giant finger, the visitor's entire body fits on the giant's thumb pad, and the visitor's head is smaller than the giant's thumbnail”，再写可容纳完整访客的 giant-scale 日用品局部孔隙、高过访客全身的 giant-scale 最低台阶或门槛，以及跨越多个功能区的巨人连续身体。
+S3 FOUR SCALE PROOFS：以“Four simultaneous scale proofs share one clear focal plane:”开头，并逐字粘贴“the giant's open palm”，不得在 open 与 palm 之间插入 left、right 或其他词；手掌侧别写在该短语之后。同句必须逐字写“the visitor's complete body is smaller than the giant's thumbnail, the visitor stands entirely inside the thumbnail with a visible nail border on every side, and the visitor's head is smaller than the thumbnail crescent”，再写粗于访客手臂的巨人衣物单根纤维、可容纳多名完整访客的 giant-scale 日用品局部孔隙、高过访客全身的 giant-scale 最低台阶或门槛，以及跨越多个功能区的巨人连续身体。
 S4 CHARACTER DESIGN：必须是包含所有人物造型的一整个物理句子，用分号分隔人物，在最后一人写完前不得出现句号；同句写巨人年龄与非理想化体型，并为每个人写发型、真人妆容、服装、鞋履、配饰及不同神情。
 S5 POSE AND ACTION：必须是包含所有人物姿势的一整个物理句子，用分号分隔人物，在最后一人写完前不得出现句号；同句锁定每个人的躯干朝向、支撑面、双手任务、双腿位置、接触和装置承重。S3 选定左手或右手作为 open palm 后，该手只能保持张开作尺度参照，所有抓握和操作由另一只手完成。
 S5 必须逐字包含“a visible air gap separates the visitor's head, torso, abdomen, and pelvis from the giant's skin”，并只让装置末端或一只访客手脚跨过该空隙。禁止 visitor against giant torso、visitor against giant pelvis、visitor body against、pressed body 和 body weight on the contact point。
 后续句只补体毛、流体、环境与因果，最后以指定真人实拍镜头句结束。
 
-每个 Frame 组成一个英文段落。物理第一句必须点名具体 fantasy setting，并以“At [specific fantasy giant-country setting], exactly [total] separate adult bodies are visible in total:”开头；不能只写 generic interior、field、forest、mountain、outdoors 或 giant country。total = 1 + female_count + male_count。随后逐字写访客人数和性别，立即写“each complete visitor is visibly shorter than one of the giant's fingers”，再写“plus one giant-country native giant [woman/man]”和正在发生的 Signature Mechanism，并以 low-angle upward 或 high-angle downward 20–32 mm wide-angle perspective 结尾。第一句不得提前结束，也不得插入年龄、体型、背景空隙、人物造型、妆容或详细姿势。
+每个 Frame 组成一个英文段落。物理第一句必须点名具体 real-world urban setting，并以“At [specific real-world urban giant-country setting], exactly [total] separate adult bodies are visible in total:”开头；不能只写 generic interior、street、city、outdoors 或 giant country。total = 1 + female_count + male_count。随后逐字写访客人数和性别，立即写“each complete visitor is visibly smaller than the giant's thumbnail”，再写“plus one giant-country native giant [woman/man]”和正在发生的 Signature Mechanism，并以 low-angle upward 或 high-angle downward 20–32 mm wide-angle perspective 结尾。第一句不得提前结束，也不得插入年龄、体型、背景空隙、人物造型、妆容或详细姿势。
 紧接句号后的物理第二句必须以“The single penis...”“The single vaginal opening...”或“The single anus...”开头，只命名目标一次并完成全部身体定位；任何人物介绍、服装、妆容、机制解释或环境句都不得出现在它之前。第三句起只称“the contact point”。
 主要篇幅用于四层尺度证据、连续身体、固定空间槽位、单一任务、承重和闭合因果链。最后镜头句以“The camera uses an environment-scale wide establishing shot”开头，包含高低机位、20–32 mm 广角变形、汇聚线、三层深度、遮挡和一个主光方向。
-最后镜头句还必须从本 brief 逐字复制粘贴“live-action photorealistic photography captured with a real 20–32 mm wide-angle camera”，不得凭记忆改写为 20-32mm、20–32mm、wide-angle lens 或其他变体，并写真实演员、皮肤毛孔、布料、实景道具、自然曝光与一致阴影中的至少三项。
+最后镜头句还必须从本 brief 逐字复制粘贴“live-action photorealistic location photography captured with a real 20–32 mm wide-angle camera”，不得凭记忆改写为 photorealistic fantasy、20-32mm、20–32mm、wide-angle lens 或其他变体，并写真实演员、皮肤毛孔、布料、实景道具、自然曝光与一致阴影中的至少三项。
 只用自然英文简单现在时。NEVER OUTPUT THESE TOKENS IN ANY CONTEXT: previous frame, same, identical, unchanged, still, again, now, remains. 每帧独立重述锁定事实。最终逐词扫描并替换：same 改为 shared 或直接删除，remains 改为 stands、lies、occupies 或直接删除，still、again、now、unchanged、identical 全部直接删除。除 S1 的阿拉伯人数与镜头焦距外，禁止数字、倍率和尺寸单位。输出前按句号切分并确认 S2 以 The single 开头、S3 以 Four simultaneous scale proofs 开头、S4 包含所有人物造型、S5 包含所有人物姿势；除固定短语中的“–”外，只允许英文 ASCII 字母、阿拉伯数字和英文标点，逐字符删除中文、日文、韩文及孤立 CJK 字符。禁止否定式自检、重复器官名及准备状态。结尾停在主光方向，不附自检报告。
 
 VARIATION AND REJECTION RULES
@@ -124,12 +127,15 @@ VARIATION AND REJECTION RULES
 10. 巨人裸露骨盆缺少阴毛、画面没有至少两处其他自然体毛、体毛跨 Frame 改变，或被误写成假毛皮、承重绳索和额外肢体。
 10A. 任一人物全身裸体、巨人没有两至四件可辨认衣物、暴露超过当前动作所需区域，或服装遮住身体定位、完整访客、承重点和尺度参照。
 10B. 任一人物缺少发型、真人妆容、服装轮廓、鞋履、配饰、明确神情或稳定动作；所有人表情相同；妆容像面具；或同一 Theme 两帧改变造型、妆容、表情角色、支撑和四肢位置。
-11. 首句没有点名具体 fantasy giant-country setting，镜头是微距、平视、极端特写，缺少广角变形、室内边界或户外地平线与地貌，或缺少配对机位变化。
-11A. 场景退化为普通日常房间或空泛户外，fantasy-scale 自然或工程现象只是背景装饰、没有参与光线与因果，或画面呈现 CGI、插画和游戏美术质感。
+11. 首句没有点名具体 real-world urban giant-country setting，镜头是微距、平视、极端特写，缺少广角变形、普通城市室内边界或街道纵深，或缺少配对机位变化。
+11A. 场景出现 fantasy、epic、mythic、enchanted、otherworldly、晶体宫殿、生物发光森林、极光奇观、异色天空或史诗化环境，或画面呈现 CGI、插画和游戏美术质感。
+11C. 场景是农场、海滩、森林、峡谷、荒野、遗迹或空泛自然风景，缺少至少四种城市基础设施，或出现任何额外路人、司机、乘客、店员、窗中人影、海报真人和远处人群。
+11D. 不同 Theme 重复同一城市生活类别、地点或主装置，两个 Theme 都使用洗衣房/仓库/工厂，或未用完七类城市生活类别就提前重复。
 11B. 出现魔法、法术、符文能量、传送门、瞬移、悬浮、浮空岛、逆重力水流或任何没有自然与工程来源的超自然现象。
 12. Theme 重复既有“系统 + 物理、机械或生态原理 + 装置 + 发起方 + 场景类型 + 支撑面”组合，或创意在正常尺寸人物间也可原样成立。
 13. 四层尺度证据未处于同一清晰画面、缺少张开手掌直接比较、访客占幅过大、巨人连续身体未跨越多个功能区，或同一 Theme 两帧改变巨人姿势、骨盆旋转、腿位、器官轴向和接触方向。
-13A. 首句没有在访客身份后立即写明完整访客短于巨人一根手指，访客整个人不能放在拇指指腹上，访客头部不小于巨人拇指甲，或巨人的单眼/嘴唇在画面中不大于访客完整身体。
+13A. 首句没有在访客身份后立即写明完整访客小于巨人拇指甲，访客不能完整站在甲面并露出四周甲面边框，访客头部不小于甲根半月痕，或巨人的单眼/鼻孔/嘴唇在画面中没有远大于访客完整身体。
+13B. 访客被画成一根手指高、掌心大小、玩偶大小、膝高或腰高，访客在前景被放大，或画面缺少与访客同焦的指甲、皮肤褶皱和衣物纤维证据。
 14. 访客同时被写在巨大手掌、装置平台和接触点，弱倍率数字替代手掌—头部—物件—建筑四层证据，或最后镜头句缺少指定真人实拍摄影短语。
 15. 未按 S1–S5 句序、S2 不是目标地图、S3 没有集中写完四层尺度、缺少精确“the giant's open palm”、出现 CJK、数字倍率或跨 Frame 回指词。
 16. 最后镜头句没有逐字复制指定真人实拍短语，或将 20–32 mm 改写成缺空格、普通连字符或 lens 变体。
