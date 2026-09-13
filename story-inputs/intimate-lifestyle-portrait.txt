@@ -11,6 +11,18 @@ dimensions are controlled outside this brief. Do not declare, request, prefer,
 or reject any aspect ratio. Do not create a multi-panel board, contact sheet,
 split screen, border, caption, logo, watermark, or readable brand name.
 
+HIGHEST PRIORITY OUTPUT CHECK
+
+Use English only. Write only positive visible image content. Never echo
+instructions or state absences with "no," "without," or "not"; silently omit
+forbidden elements and negative checklist phrases.
+
+Within IDENTITY AND LOOK, write one explicit `MAKEUP —` sentence for each
+woman covering base, exact blush hue and placement, brow, eyeshadow, eyeliner,
+lashes, highlight, and lips. Write one `GROOMING —` sentence for each man.
+These sentences and every person's accessories are mandatory in every Frame,
+never implied by adjectives.
+
 VISUAL STYLE TARGET
 
 Use a bright, polished East Asian social-media lifestyle-glamour aesthetic:
@@ -455,7 +467,7 @@ not repeat one construction while unused families remain:
 warm recognition (soft eyes, beginning smile); affectionate attention (steady
 eyes, relaxed brows); gentle curiosity (widened irises, raised brow, parted
 lips); bashful pleasure (downward glance, warm cheeks); adult coyness
-(sideways-upward glance, lowered chin); playful coquetry or 撒娇 (luminous eyes,
+(sideways-upward glance, lowered chin); adult playful coquetry (luminous eyes,
 soft pout, slight cheek puff, adult agency); mock sulking (level brows,
 controlled pout); teasing invitation (direct gaze, lifted mouth corner, paused
 hand); mischievous challenge (bright eye-smile, arched brow); secret amusement
@@ -493,7 +505,7 @@ Plan expression coverage across the whole batch before writing Themes. A batch
 of four or more Themes must include at least one expression from each of these
 four lanes:
 
-- COY AND COQUETTISH — adult coyness, playful coquetry or 撒娇, mock sulking,
+- COY AND COQUETTISH — adult coyness, adult playful coquetry, mock sulking,
   bashful pleasure;
 - LANGUID AND SENSORY — languid ease, post-nap softness, sensual contentment,
   sensory anticipation or satisfied savoring;
@@ -764,11 +776,6 @@ four consecutive information blocks:
    depth planes, high-key motivated light, restrained palette, and the few
    most important skin, hair, garment, prop, and location details.
 
-Within IDENTITY AND LOOK, write one explicit `MAKEUP —` sentence for each
-woman covering base, exact blush hue and placement, brow, eyeshadow, eyeliner,
-lashes, highlight, and lips. Write one `GROOMING —` sentence for each man.
-These sentences are mandatory in every Frame, never implied by adjectives.
-
 Spend most of the budget on the face, eyes, micro-expression, hairstyle,
 upper-body gesture, wardrobe, action contact, and flattering light. Keep
 setting construction, backstory, numerical eye measurements, clinical muscle
@@ -795,9 +802,7 @@ Before publishing, compare paired Frames field by field and rewrite any
 identity, count, makeup, accessory position, clothing, framing, shooting
 method, pose, hand, gaze, contact, action, consequence, location, time, or
 light difference. Then scan out every cross-Frame comparison word above.
-Write only positive visible image content. Never echo instructions or state
-absences with "no," "without," or "not"; silently omit forbidden elements and
-delete negative checklist phrases before publishing.
+Delete negative checklist phrases before publishing.
 
 Honor the requested output language exclusively. When the requested language
 is English, do not emit Chinese characters, untranslated fragments, or mixed

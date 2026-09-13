@@ -26,6 +26,148 @@ def test_story_inputs_use_only_the_current_authoring_contract() -> None:
         )
 
 
+def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "piss.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "骨盆居中、双腿紧凑且趋于并拢但不互相接触的低位蹲姿" in normalized
+    assert "双膝内缘和双鞋内缘之间形成等宽、狭窄、连续的竖直空隙" in normalized
+    assert "躯干从髋关节整体向前折叠到胸腹近乎平行地面" in normalized
+    assert "胸腹自然压在大腿上方" in normalized
+    assert "肩膀在三维位置中越过膝盖" in normalized
+    assert "不能仅低头、弯颈、把头伸向视点或单独伸出手机来假装前倾" in normalized
+    assert "禁止抬高臀部变成站立俯身" in normalized
+    assert "人物上身直立、后仰或只弯颈低头" in normalized
+    assert "GROUND-LEVEL VIEWPOINT LOCK:" in normalized
+    assert "SQUAT-TOILET LOCK:" in normalized
+    assert "just outside the corresponding rim of a Chinese porcelain squat toilet" in normalized
+    assert "aimed upward through a rectilinear 35mm perspective" in normalized
+    assert "anatomically correct adult proportions" in normalized
+    assert "physically plausible low-angle foreshortening" in normalized
+    assert "a head visibly smaller than the shoulder span and torso" in normalized
+    assert "FORWARD-FOLDED SQUAT LOCK:" in normalized
+    assert "STYLE CONTINUITY LOCK:" in normalized
+    assert "torso nearly horizontal to the floor" in normalized
+    assert "the pelvis centered over the midpoint between the feet" in normalized
+    assert "both upper thighs anatomically distinct and closely paired" in normalized
+    assert "the thighs descending almost parallel with only a slight medial taper" in normalized
+    assert "the inner knee gap and inner shoe gap equal" in normalized
+    assert "no wider than one forefoot width" in normalized
+    assert "each forward-facing kneecap centered directly above the second toe" in normalized
+    assert "both shins forming close vertical parallel columns" in normalized
+    assert "with a narrow straight gap between them" in normalized
+    assert "both shoe centerlines aimed straight forward and parallel to one another" in normalized
+    assert "to the toilet's front-to-rear axis" in normalized
+    assert "toe spacing exactly equal to heel spacing" in normalized
+    assert "neutral anatomical rotation from hips through ankles" in normalized
+    assert "shoulders ahead of the knees" in normalized
+    assert "head aligned naturally with the folded spine" in normalized
+    assert "without thrusting toward it" in normalized
+    assert "the viewpoint is visually absent and leaves the composition unobstructed" in normalized
+    assert "禁止写 unseen camera、hidden camera、floor camera" in normalized
+    assert "the same adult keeps the exact age, body build, hairstyle, makeup" in normalized
+    assert "upper garments, fully lowered lower garments, accessories" in normalized
+    assert "matching pair of shoes" in normalized
+    assert "and squat-toilet design" in normalized
+    assert "胸腹近乎平行地面" in normalized
+    assert "骨盆中心位于双脚中点正上方" in normalized
+    assert "双腿紧凑、趋于并拢但不互相接触" in normalized
+    assert "两条大腿从髋部向下几乎平行" in normalized
+    assert "双膝内缘之间与双鞋内缘之间保留同一条狭窄空隙" in normalized
+    assert "两条小腿形成彼此靠近的垂直平行柱及窄直缝" in normalized
+    assert "每侧髌骨中心必须位于对应鞋第二脚趾正上方" in normalized
+    assert "两只鞋的纵向中心线笔直朝前、彼此平行并平行于蹲便器长轴" in normalized
+    assert "脚尖间距等于脚跟间距" in normalized
+    assert "髋关节、膝关节和踝关节保持中立旋转" in normalized
+    assert "英文 Frame 不得复述这些错误姿势名称" in normalized
+    assert "删除 M-shaped legs、frog squat、diamond-shaped legs、wide squat" in normalized
+    assert "pigeon-toed、inward-pointing toes、turned-in feet 与 toe-in stance" in normalized
+    assert "头发、项链、上衣下摆和松散布料受重力垂向地面视点" in normalized
+    assert "正常成人头身比、肩宽、躯干长度及四肢比例" in normalized
+    assert "使用 35 mm 等效直线投影，保持自然低角度透视" in normalized
+    assert "鞋脚和小腿比臀胯、大腿适度显大" in normalized
+    assert "肩膀和胸腹或背部保持主体体量" in normalized
+    assert "透视只改变各部位的合理投影大小" in normalized
+    assert "正确的视觉层级是下方鞋脚略大" in normalized
+    assert "鞋脚占据大半画面、腿异常粗长、躯干塌成短块" in normalized
+    assert "真实头高约为完整身高的七分之一至八分之一" in normalized
+    assert "投影宽度必须小于可见肩宽和躯干宽度" in normalized
+    assert "双肩、胸腹和骨盆必须清楚可见" in normalized
+    assert "头部不是距离视点最近的物体" in normalized
+    assert "头宽达到或超过肩宽、头遮挡身体、头大身小" in normalized
+
+
+def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "piss.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert "手机不是必需品" in normalized
+    assert "已经褪下的裤子、内裤或裙子是静止衣物" in normalized
+    assert "低头并用一只手撩起上衣" in normalized
+    assert "从卷筒抽取厕纸" in normalized
+    assert "进行明确擦拭" in normalized
+    assert "整理、梳开或轻拉阴毛" in normalized
+    assert "一至两根清楚归属同一只手的手指" in normalized
+    assert "进行可见外部自慰" in normalized
+    assert "视点位于中国式蹲便器对应外缘的地面高度" in normalized
+    assert "从地面向上倾斜 35–55 度" in normalized
+    assert "画面底缘必须出现紧邻视点的陶瓷蹲便器边缘" in normalized
+    assert "禁止手持、自拍、腰部高度、膝盖高度、眼平、俯拍" in (
+        normalized
+    )
+    assert "画面任何位置都不得出现相机机身、镜头、手机拍摄设备" in normalized
+    assert "摄影机遥控器、三脚架或任何会暗示拍摄设备进入画面的道具" in normalized
+    assert "所有裤子、短裤、内裤和裙子都必须已经完全离开腰部" in normalized
+    assert "统一褪到膝盖以下、小腿或脚踝处并清楚可见" in normalized
+    assert "不得只解开、掀起或停留在大腿中段" in normalized
+    assert "这些下装保持静止并与双手分离" in normalized
+    assert "不得被手提回膝盖或大腿" in normalized
+    assert "季节至少轮换盛夏、春秋和寒冬" in normalized
+    assert "场合至少轮换都市日常、办公室通勤、正式晚宴、夜店派对" in normalized
+    assert "服装颜色不得默认黑色或连续重复单色" in normalized
+    assert "每个 Theme 写清主色、辅色和材质" in normalized
+    assert "发型至少轮换精灵短发、齐耳短发、直长发、自然卷" in normalized
+    assert "妆容至少轮换素颜、透明自然妆、办公室柔和妆、复古红唇" in normalized
+    assert "表情至少轮换专注、从容、自信、调皮、轻笑、惊喜" in normalized
+    assert "鞋履至少轮换平底凉鞋、细带高跟凉鞋、经典尖头高跟鞋" in normalized
+    assert "配饰每人选择一至三件" in normalized
+    assert "相邻 Theme 不得重复相同视角方向、季节、场合、服装类别、主色" in normalized
+    assert "不得在 Frame 末尾追加以 No、Without、Neither 或 Absent 开头" in normalized
+    assert "发布每个英文 Frame 前逐字扫描" in normalized
+    assert "确认成对鞋履均穿在双脚上" in normalized
+    assert "嵌入地面的中国式陶瓷蹲便器" in normalized
+    assert "中央椭圆便池与排污口清楚可见" in normalized
+    assert "左右各有带防滑纹的承重脚踏区" in normalized
+    assert "不得替换成西式坐便器、独立地漏或长排水沟" in normalized
+    assert "左右脚或鞋分别完整踩在中国式蹲便器左右防滑脚踏区" in normalized
+    assert "落入正下方中国式蹲便器的中央陶瓷便池和排污口" in normalized
+    assert "central oval bowl, visible waste outlet, rear flush channel" in normalized
+    assert "two anti-slip foot platforms supporting the complete matching left and right shoes" in normalized
+    assert "蹲便器相关内容只使用以下英文词汇" in normalized
+    assert "正面、左侧、右侧、背面或三分之四方向中明确选择一个" in normalized
+    assert "左侧或右侧视角位于蹲便器对应侧缘 80–100 度" in normalized
+    assert "背面视角位于蹲便器后缘和脚跟后方 160–180 度" in normalized
+    assert "不得在同一 Frame 混合正面、侧面和背面" in normalized
+    assert "整批必须均衡覆盖 front view、left side view、right side view" in normalized
+    assert "rear view、front three-quarter view 和 rear three-quarter view" in normalized
+    assert "VIEW DIRECTION LOCK: front view from the squat toilet's front rim" in normalized
+    assert "VIEW DIRECTION LOCK: left side view from the squat toilet's left rim" in normalized
+    assert "VIEW DIRECTION LOCK: right side view from the squat toilet's right rim" in normalized
+    assert "VIEW DIRECTION LOCK: rear view from the squat toilet's rear rim" in normalized
+    assert "VIEW DIRECTION LOCK: front three-quarter view" in normalized
+    assert "VIEW DIRECTION LOCK: rear three-quarter view" in normalized
+    assert "生成两帧 Theme 时按 Theme 编号使用确定性视角对" in normalized
+    assert "Theme 编号除以 3 余 1 时" in normalized
+    assert "余 2 时，Frame 1 使用 right side view、Frame 2 使用 rear view" in normalized
+    assert "余 0 时，Frame 1 使用 front three-quarter view" in normalized
+    assert "必须读取当前 Theme 编号决定视角对" in normalized
+    assert "最后一句必须正面描述可见的蹲便器陶瓷、脚踏纹、地砖、顶灯" in normalized
+
+
 def test_rebuilt_legacy_inputs_are_complete_story_descriptions() -> None:
     required_sections = (
         "BRIEF",
@@ -149,7 +291,7 @@ def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
     assert "Narrowed or half-lidded eyes are valid only when" in normalized
     assert "focused, luminous half-lidded gaze" in normalized
     assert "EXPRESSION AND EMOTION VARIATION POOL" in normalized
-    assert "playful coquetry or 撒娇" in normalized
+    assert "adult playful coquetry" in normalized
     assert "teasing invitation" in normalized
     assert "languid ease" in normalized
     assert "sensual contentment" in normalized
@@ -189,7 +331,7 @@ def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
     assert "compare paired Frames field by field" in normalized
     assert "scan out every cross-Frame comparison word above" in normalized
     assert "Never echo instructions or state absences" in normalized
-    assert "delete negative checklist phrases before publishing" in normalized
+    assert "Delete negative checklist phrases before publishing" in normalized
     assert "do not emit Chinese characters" in normalized
     assert "Capture an action at its most informative fraction of a second" in normalized
     assert "one immediate physical consequence" in normalized
@@ -243,7 +385,7 @@ def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
     assert "CAMERA AND LIGHT" in normalized
     assert "write one explicit `MAKEUP —` sentence for each woman" in normalized
     assert "Write one `GROOMING —` sentence for each man" in normalized
-    assert "mandatory in every Frame, never implied by adjectives" in normalized
+    assert "These sentences and every person's accessories are mandatory in every Frame" in normalized
     assert "Spend most of the budget on the face, eyes, micro-expression" in normalized
     assert "THEME CONTRACT" in normalized
     assert "exactly `female_count` original adult women and `male_count` original adult men" in normalized
