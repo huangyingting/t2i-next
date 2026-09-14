@@ -26,6 +26,61 @@ def test_story_inputs_use_only_the_current_authoring_contract() -> None:
         )
 
 
+def test_lifestyle_story_is_social_photography_not_ui() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "lifestyle-story.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "Instagram and Xiaohongshu" in normalized
+    assert "not a literal screen capture of either application" in normalized
+    assert "INSTAGRAM EDITORIAL" in brief
+    assert "XIAOHONGSHU LIFESTYLE" in brief
+    assert "HYBRID SOCIAL EDITORIAL" in brief
+    assert "outfit-of-the-day" in normalized
+    assert "cafe visit, city walk, weekend trip" in normalized
+    assert "Use exactly the requested number of adult women and adult men" in normalized
+    assert "Every person is unmistakably twenty-five or older" in normalized
+    assert "every woman is Chinese" in normalized
+    assert "every Frame must identify her naturally as a Chinese woman" in normalized
+    assert "Apply the same Chinese nationality default independently to every man" in normalized
+    assert "Never infer another nationality from a foreign-inspired outfit" in normalized
+    assert "set every Theme in China" in normalized
+    assert "without changing the cast's default Chinese nationality" in normalized
+    assert "one concrete occasion per Theme" in normalized
+    assert "The location and activity must provide concrete evidence" in normalized
+    assert "FASHION, BEAUTY, AND GROOMING" in brief
+    assert "nearby-friend handheld portrait" in normalized
+    assert "mirror selfie with one physically coherent reflection" in normalized
+    assert "timer or fixed-camera full-body outfit portrait" in normalized
+    assert "credible modern phone-camera or compact-camera optics" in normalized
+    assert "small signs of lived reality" in normalized
+    assert "CONTENT LEVEL" in brief
+    assert "Aesthetic:" in brief
+    assert "Erotic:" in brief
+    assert "Hardcore:" in brief
+    assert "parallel finished alternatives rather than chronological steps" in normalized
+    assert "The words Instagram and Xiaohongshu are invisible art direction only" in normalized
+    assert "Never write the words Instagram or Xiaohongshu in a Theme title" in normalized
+    assert "Translate the selected direction into visible photography" in normalized
+    for forbidden in (
+        "app interface",
+        "profile page",
+        "username",
+        "hashtag",
+        "like count",
+        "comment",
+        "carousel dot",
+        "platform logo",
+        "watermark",
+        "QR code",
+    ):
+        assert forbidden in normalized
+
+
 def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     brief = (
         REPOSITORY_ROOT
