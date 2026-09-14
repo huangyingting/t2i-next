@@ -38,7 +38,9 @@ uv run python experiments/spatial-plan-poc/catalog_generator.py
 The materialized catalogs and coverage manifest are written under `catalogs/`.
 Catalog schema 2.0 models controlled handheld vibrators and pelvis-mounted
 strap-ons explicitly, including prop ownership, occupied hands, attachment
-points, contact axes, and segmented visibility.
+points, contact axes, and segmented visibility. Compiled scenes also include a
+complete continuous-body ledger for every named actor, bilateral limb chains
+for supported lifts, and pelvis ownership for anatomical contact endpoints.
 
 Run the deterministic catalog and compiled-prompt validation matrix:
 

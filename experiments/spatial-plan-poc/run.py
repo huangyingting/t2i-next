@@ -46,7 +46,7 @@ RegionRef = Annotated[
         pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*\.[a-z0-9]+(?:_[a-z0-9]+)*$",
     ),
 ]
-ALLOWED_ACTOR_IDS = {"li_na", "zhang_wei"}
+ALLOWED_ACTOR_IDS = {"f1", "m1"}
 ALLOWED_SCREEN_POSITIONS = {"center", "center_left", "center_right"}
 ALLOWED_DEPTH_PLANES = {"foreground", "midground", "background"}
 ALLOWED_POSES = {"kneeling_forward", "kneeling_upright"}
@@ -59,22 +59,22 @@ ALLOWED_BODY_PARTS = {
     "right_hand",
 }
 ALLOWED_REGION_REFS = {
-    "li_na.head",
-    "li_na.mouth",
-    "li_na.torso",
-    "li_na.arms",
-    "li_na.legs",
-    "zhang_wei.pubic_region",
-    "zhang_wei.near_thigh",
-    "zhang_wei.torso",
-    "zhang_wei.arms",
-    "zhang_wei.legs",
+    "f1.head",
+    "f1.mouth",
+    "f1.torso",
+    "f1.arms",
+    "f1.legs",
+    "m1.pubic_region",
+    "m1.near_thigh",
+    "m1.torso",
+    "m1.arms",
+    "m1.legs",
 }
 ALLOWED_SUPPORT_IDS = {
-    "li_na_knee_support",
-    "li_na_hand_support",
-    "zhang_wei_knee_support",
-    "zhang_wei_hand_support",
+    "f1_knee_support",
+    "f1_hand_support",
+    "m1_knee_support",
+    "m1_hand_support",
 }
 ALLOWED_SUPPORT_REGIONS = {"both_knees", "both_hands", "mattress"}
 
@@ -247,9 +247,9 @@ class GeometrySnapshot(StrictModel):
         )
         if unknown_regions:
             raise ValueError(f"camera uses unknown regions: {unknown_regions}")
-        if occluded_regions != {"li_na.mouth", "zhang_wei.pubic_region"}:
+        if occluded_regions != {"f1.mouth", "m1.pubic_region"}:
             raise ValueError("camera occluded regions changed")
-        if not {"li_na.head", "zhang_wei.near_thigh"}.issubset(visible_regions):
+        if not {"f1.head", "m1.near_thigh"}.issubset(visible_regions):
             raise ValueError("contact occluders must remain camera-visible")
         if visible_regions & occluded_regions:
             raise ValueError("one actor region cannot be both visible and occluded")
@@ -262,10 +262,10 @@ class GeometrySnapshot(StrictModel):
                 or contact.activity != "fellatio"
                 or contact.state != ContactState.INSERTED
                 or contact.visibility != Visibility.OCCLUDED
-                or contact.occluders != ["li_na.head", "zhang_wei.near_thigh"]
-                or contact.actor_a != "li_na"
+                or contact.occluders != ["f1.head", "m1.near_thigh"]
+                or contact.actor_a != "f1"
                 or contact.region_a != "mouth"
-                or contact.actor_b != "zhang_wei"
+                or contact.actor_b != "m1"
                 or contact.region_b != "pubic_region"
                 or contact.screen_position != "center"
                 or contact.depth_plane != "midground"
@@ -286,9 +286,7 @@ class GeometrySnapshot(StrictModel):
             occupied_contact_regions.update(endpoints)
             self._validate_region_refs(set(contact.occluders), actor_id_set)
             classified_as_occluded = contact.contact_id in occluded_contacts
-            if classified_as_occluded != (
-                contact.visibility == Visibility.OCCLUDED
-            ):
+            if classified_as_occluded != (contact.visibility == Visibility.OCCLUDED):
                 raise ValueError(
                     f"{contact.contact_id} visibility conflicts with the camera"
                 )
@@ -302,10 +300,10 @@ class GeometrySnapshot(StrictModel):
             ):
                 raise ValueError(f"{support.support_id} uses an unknown support region")
             expected_actor, expected_region = {
-                "li_na_knee_support": ("li_na", "both_knees"),
-                "li_na_hand_support": ("li_na", "both_hands"),
-                "zhang_wei_knee_support": ("zhang_wei", "both_knees"),
-                "zhang_wei_hand_support": ("zhang_wei", "both_hands"),
+                "f1_knee_support": ("f1", "both_knees"),
+                "f1_hand_support": ("f1", "both_hands"),
+                "m1_knee_support": ("m1", "both_knees"),
+                "m1_hand_support": ("m1", "both_hands"),
             }[support.support_id]
             if (
                 support.supported_actor != expected_actor
@@ -325,14 +323,14 @@ class GeometrySnapshot(StrictModel):
 
         for actor in self.actors:
             expected_sex, expected_description, expected_pose = {
-                "li_na": (
+                "f1": (
                     Sex.FEMALE,
-                    "Li Na, a 29-year-old Chinese woman",
+                    "F1, woman 1, a 29-year-old Chinese woman",
                     "kneeling_forward",
                 ),
-                "zhang_wei": (
+                "m1": (
                     Sex.MALE,
-                    "Zhang Wei, a 32-year-old Chinese man",
+                    "M1, man 1, a 32-year-old Chinese man",
                     "kneeling_upright",
                 ),
             }[actor.actor_id]
@@ -618,9 +616,7 @@ def _audit_contract(plan: SpatialPlan) -> dict[str, object]:
             for assignment in actor.limb_assignments
             if assignment.purpose != AssignmentPurpose.CONTACT
         ],
-        "supports": [
-            support.model_dump(mode="json") for support in plan.supports
-        ],
+        "supports": [support.model_dump(mode="json") for support in plan.supports],
     }
 
 

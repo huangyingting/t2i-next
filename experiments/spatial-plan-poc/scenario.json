@@ -3,22 +3,22 @@
   "language": "English using ASCII characters only",
   "cast": [
     {
-      "actor_id": "li_na",
+      "actor_id": "f1",
       "sex": "female",
-      "description": "Li Na, a 29-year-old Chinese woman"
+      "description": "F1, woman 1, a 29-year-old Chinese woman"
     },
     {
-      "actor_id": "zhang_wei",
+      "actor_id": "m1",
       "sex": "male",
-      "description": "Zhang Wei, a 32-year-old Chinese man"
+      "description": "M1, man 1, a 32-year-old Chinese man"
     }
   ],
   "setting": "A modern Chinese bedroom with a low bed and soft morning window light.",
-  "activity": "Li Na performs fellatio on Zhang Wei in the inserted contact state while both remain fully supported on the bed.",
+  "activity": "F1 performs fellatio on M1 in the inserted contact state while both remain fully supported on the bed.",
   "camera": "Use one medium-wide side-rear camera that can contain both complete bodies.",
-  "visibility": "Only Li Na's local mouth region and Zhang Wei's local pubic region are occluded. Li Na's head and Zhang Wei's near thigh remain visible as the two occluders. Do not expose or describe either local contact surface.",
+  "visibility": "Only F1's local mouth region and M1's local pubic region are occluded. F1's head and M1's near thigh remain visible as the two occluders. Do not expose or describe either local contact surface.",
   "allowed_identifiers": {
-    "actor_ids": ["li_na", "zhang_wei"],
+    "actor_ids": ["f1", "m1"],
     "screen_positions": ["center", "center_left", "center_right"],
     "depth_planes": ["foreground", "midground", "background"],
     "poses": ["kneeling_forward", "kneeling_upright"],
@@ -31,24 +31,24 @@
       "right_hand"
     ],
     "region_references": [
-      "li_na.head",
-      "li_na.mouth",
-      "li_na.torso",
-      "li_na.arms",
-      "li_na.legs",
-      "zhang_wei.pubic_region",
-      "zhang_wei.near_thigh",
-      "zhang_wei.torso",
-      "zhang_wei.arms",
-      "zhang_wei.legs"
+      "f1.head",
+      "f1.mouth",
+      "f1.torso",
+      "f1.arms",
+      "f1.legs",
+      "m1.pubic_region",
+      "m1.near_thigh",
+      "m1.torso",
+      "m1.arms",
+      "m1.legs"
     ],
     "contact_ids": ["primary_contact"],
     "activities": ["fellatio"],
     "support_ids": [
-      "li_na_knee_support",
-      "li_na_hand_support",
-      "zhang_wei_knee_support",
-      "zhang_wei_hand_support"
+      "f1_knee_support",
+      "f1_hand_support",
+      "m1_knee_support",
+      "m1_hand_support"
     ],
     "environmental_surfaces": ["bed"],
     "support_regions": ["both_knees", "both_hands", "mattress"],
@@ -59,14 +59,14 @@
     "primary_contact_state": "inserted",
     "primary_contact_visibility": "occluded",
     "primary_contact_occluders": [
-      "li_na.head",
-      "zhang_wei.near_thigh"
+      "f1.head",
+      "m1.near_thigh"
     ],
     "camera_visible_contacts": [],
     "camera_occluded_contacts": ["primary_contact"],
     "camera_occluded_regions": [
-      "li_na.mouth",
-      "zhang_wei.pubic_region"
+      "f1.mouth",
+      "m1.pubic_region"
     ]
   }
 }

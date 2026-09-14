@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Annotated, NamedTuple
 
 from catalog_generator import (
+    CASTS,
     ActivityTemplate,
     ContactEdge,
     HandheldProp,
@@ -94,6 +95,20 @@ class DemoSpec(NamedTuple):
     style_direction: str
 
 
+class ActorIdentity(NamedTuple):
+    code: str
+    role_label: str
+    age: int
+    nationality: str
+    sex: str
+
+    def description(self) -> str:
+        return (
+            f"{self.code}, {self.role_label}, a {self.age}-year-old "
+            f"{self.nationality} {self.sex}"
+        )
+
+
 SPECS = (
     DemoSpec(
         "D01",
@@ -157,25 +172,25 @@ SPECS = (
     ),
 )
 
-CAST_DESCRIPTIONS = {
-    "one_woman": ("Li Na, a 29-year-old Chinese woman",),
+CAST_IDENTITIES = {
+    "one_woman": (ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),),
     "one_woman_one_man": (
-        "Li Na, a 29-year-old Chinese woman",
-        "Zhang Wei, a 32-year-old Chinese man",
+        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
+        ActorIdentity("M1", "man 1", 32, "Chinese", "man"),
     ),
     "one_woman_two_men": (
-        "Li Na, a 29-year-old Chinese woman",
-        "Zhang Wei, a 32-year-old Chinese man",
-        "Chen Hao, a 30-year-old Chinese man",
+        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
+        ActorIdentity("M1", "man 1", 32, "Chinese", "man"),
+        ActorIdentity("M2", "man 2", 30, "Chinese", "man"),
     ),
     "two_women": (
-        "Li Na, a 29-year-old Chinese woman",
-        "Chen Mei, a 30-year-old Chinese woman",
+        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
+        ActorIdentity("F2", "woman 2", 30, "Chinese", "woman"),
     ),
     "three_women": (
-        "Li Na, a 29-year-old Chinese woman",
-        "Chen Mei, a 30-year-old Chinese woman",
-        "Zhao Yue, a 31-year-old Chinese woman",
+        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
+        ActorIdentity("F2", "woman 2", 30, "Chinese", "woman"),
+        ActorIdentity("F3", "woman 3", 31, "Chinese", "woman"),
     ),
 }
 
@@ -197,16 +212,18 @@ visual impact, cast clarity, contact clarity, and style integration from 1 to
 are credible, whether every actor has one coherent role, whether visible and
 occluded contacts remain consistent, whether every wearable prop is visibly
 anchored to its owner, whether limb tasks conflict with support points, and
-whether lighting strengthens the silhouette. Use pass only when no material
-correction is required. Return exactly D01 through D06 in order and only schema
-data. A pass verdict MUST use an empty issues array. Never put a pass rationale,
-summary, minor observation, or praise in issues. Any non-empty issues array MUST
-use revise or reject. Report an issue only for a deterministic contradiction,
-an anatomically impossible 2D relationship, a disconnected ownership/contact
-chain, or a limb assigned to incompatible simultaneous tasks. Do not report
-speculative rendering difficulty, reduced prominence, possible overlap, or a
-contact being fully hidden when its plan explicitly requires occluded local
-endpoints.
+whether lighting strengthens the silhouette. Verify that the body ledger has
+exactly one continuous body per coded actor and that upper-body, lower-body,
+support, and contact tasks do not split one actor into duplicate bodies. Use
+pass only when no material correction is required. Return exactly D01 through
+D06 in order and only schema data. A pass verdict MUST use an empty issues
+array. Never put a pass rationale, summary, minor observation, or praise in
+issues. Any non-empty issues array MUST use revise or reject. Report an issue
+only for a deterministic contradiction, an anatomically impossible 2D
+relationship, a disconnected ownership/contact chain, or a limb assigned to
+incompatible simultaneous tasks. Do not report speculative rendering
+difficulty, reduced prominence, possible overlap, or a contact being fully
+hidden when its plan explicitly requires occluded local endpoints.
 """.strip()
 
 
@@ -273,6 +290,28 @@ def joined(values: list[str]) -> str:
     return ", ".join(values[:-1]) + f" and {values[-1]}"
 
 
+def body_ledger(cast_key: str) -> str:
+    identities = CAST_IDENTITIES[cast_key]
+    bodies = [
+        (
+            f"one continuous {identity.sex} body identified as "
+            f"{identity.code} ({identity.role_label})"
+        )
+        for identity in identities
+    ]
+    noun = "body" if len(bodies) == 1 else "bodies"
+    return (
+        f"The complete body ledger contains exactly {len(bodies)} continuous "
+        f"{noun}: {joined(bodies)}. Each coded body has one head, one torso, "
+        "two arms ending in two hands, and two legs ending in two feet. Every "
+        "visible face and limb belongs to exactly one coded body."
+    )
+
+
+def cast_descriptions(cast_key: str) -> tuple[str, ...]:
+    return tuple(identity.description() for identity in CAST_IDENTITIES[cast_key])
+
+
 def support_clause(entry: PoseEntry) -> str:
     pose = entry.central_pose
     points = [
@@ -287,10 +326,11 @@ def support_clause(entry: PoseEntry) -> str:
     ]
     if pose.primary_surface == "partner_support":
         return (
-            "supported with her pelvis seated on the standing partner's interlocked "
-            "forearms and his elbows tucked against his torso; the partner's "
-            "own back and shoulders brace against the wall while both feet "
-            "remain planted"
+            "supported by two continuous bilateral cradles: the standing "
+            "partner's left forearm supports her left thigh and his left hand "
+            "cups her left buttock, while his right forearm supports her right "
+            "thigh and his right hand cups her right buttock; his back and "
+            "shoulders brace against the wall while both feet remain planted"
         )
     if pose.primary_surface == "support_sling":
         return "supported by the sling with secondary support against the wall"
@@ -303,6 +343,29 @@ def support_clause(entry: PoseEntry) -> str:
         "sofa": "the sofa",
     }.get(pose.primary_surface, f"the {phrase(pose.primary_surface)}")
     return f"supported at {joined(points)} on {surface}"
+
+
+def lifted_bilateral_chain(
+    entry: PoseEntry,
+    central_name: str,
+    partner_name: str,
+) -> str | None:
+    pose = entry.central_pose
+    if (
+        pose.family != "lifted_supported"
+        or pose.leg_configuration != "legs_wrapped"
+        or pose.arm_configuration != "arms_shoulders"
+    ):
+        return None
+    return (
+        f"{central_name}'s single torso faces {partner_name}; her left arm "
+        f"circles {partner_name}'s left shoulder and her right arm circles his "
+        "right shoulder. Her left thigh wraps around his left side and her "
+        "right thigh wraps around his right side, with both knees bent behind "
+        f"his hips. {partner_name}'s left forearm supports her left thigh and "
+        "his left hand cups her left buttock; his right forearm supports her "
+        "right thigh and his right hand cups her right buttock."
+    )
 
 
 def active_regions(activity: ActivityTemplate, slot_id: str) -> set[str]:
@@ -319,8 +382,9 @@ def actor_is_pelvic_penetrator(
     slot_id: str,
 ) -> bool:
     prop = wearable_prop_for_owner(activity, slot_id)
+    central_slot = activity.required_slots[0]
     return any(
-        edge.target.entity_id == "central"
+        edge.target.entity_id == central_slot
         and edge.target.region in {"vagina", "anus"}
         and (
             (edge.source.entity_id == slot_id and edge.source.region == "penis")
@@ -331,17 +395,19 @@ def actor_is_pelvic_penetrator(
 
 
 def actor_gives_oral(activity: ActivityTemplate, slot_id: str) -> bool:
+    central_slot = activity.required_slots[0]
     return any(
         edge.source.entity_id == slot_id
         and edge.source.region == "mouth"
-        and edge.target.entity_id == "central"
+        and edge.target.entity_id == central_slot
         for edge in activity.contact_edges
     )
 
 
 def actor_receives_oral(activity: ActivityTemplate, slot_id: str) -> bool:
+    central_slot = activity.required_slots[0]
     return any(
-        edge.source.entity_id == "central"
+        edge.source.entity_id == central_slot
         and edge.source.region == "mouth"
         and edge.target.entity_id == slot_id
         for edge in activity.contact_edges
@@ -352,13 +418,14 @@ def actor_manual_contact(
     activity: ActivityTemplate,
     slot_id: str,
 ) -> ContactEdge | None:
+    central_slot = activity.required_slots[0]
     return next(
         (
             edge
             for edge in activity.contact_edges
             if edge.source.entity_id == slot_id
             and edge.source.region in {"hand", "left_hand", "right_hand"}
-            and edge.target.entity_id == "central"
+            and edge.target.entity_id == central_slot
         ),
         None,
     )
@@ -430,6 +497,7 @@ def partner_relationship(
     central_name: str,
 ) -> str:
     slot_id = actor_plan.slot_id
+    central_slot = activity.required_slots[0]
     prop = wearable_prop_for_owner(activity, slot_id)
     if prop:
         stance = "stands" if "both_feet" in actor_plan.support_points else "kneels"
@@ -454,7 +522,7 @@ def partner_relationship(
         )
     relation: str | None = None
     for edge in activity.contact_edges:
-        if edge.source.entity_id == slot_id and edge.target.entity_id == "central":
+        if edge.source.entity_id == slot_id and edge.target.entity_id == central_slot:
             if edge.source.region == "penis":
                 relation = (
                     f"kneels between {central_name}'s raised thighs with his "
@@ -471,7 +539,7 @@ def partner_relationship(
             if edge.source.region in {"hand", "left_hand", "right_hand"}:
                 relation = f"aligns beside {central_name}'s upper body"
                 break
-        if edge.target.entity_id == slot_id and edge.source.entity_id == "central":
+        if edge.target.entity_id == slot_id and edge.source.entity_id == central_slot:
             if edge.target.region in {"penis", "vulva"}:
                 relation = (
                     f"holds a high half-kneel beside {central_name}'s head, "
@@ -484,8 +552,8 @@ def partner_relationship(
             return (
                 "stands with his back and shoulders against the wall, facing "
                 f"{central_name} with feet shoulder-width apart, and supports "
-                "her on interlocked forearms while keeping his elbows tucked "
-                "and their pelvises aligned"
+                "her through a left-side forearm-and-hand cradle and a matching "
+                "right-side cradle while keeping their pelvises aligned"
             )
         supporting_relation = (
             relation.replace("aligns", "aligning", 1)
@@ -602,23 +670,46 @@ def plan_fingerprint(
 
 
 def actor_name(entity_id: str, cast_key: str) -> str:
-    slots = ["central", "partner_a", "partner_b"]
+    slots = [slot[0] for slot in CASTS[cast_key]]
     if entity_id in slots:
         index = slots.index(entity_id)
-        descriptions = CAST_DESCRIPTIONS[cast_key]
-        if index < len(descriptions):
-            return descriptions[index].split(",", 1)[0]
+        identities = CAST_IDENTITIES[cast_key]
+        if index < len(identities):
+            return identities[index].code
     if entity_id.startswith("prop_"):
         return "the selected toy or wearable prop"
     return entity_id
 
 
 def occluders_for(edge_regions: set[str]) -> str:
+    if {"mouth", "penis"}.issubset(edge_regions):
+        return "the receiving actor's single head silhouette"
     if "mouth" in edge_regions:
-        return "the head silhouette and the near thigh"
+        return "the head silhouette"
     if {"vagina", "anus"}.intersection(edge_regions):
         return "the near thigh and overlapping pelvises"
     return "the overlapping body contours"
+
+
+def anatomical_endpoint_ownership(
+    edge: ContactEdge,
+    cast_key: str,
+) -> str | None:
+    endpoint = next(
+        (
+            endpoint
+            for endpoint in (edge.source, edge.target)
+            if endpoint.region == "penis"
+        ),
+        None,
+    )
+    if endpoint is None:
+        return None
+    owner = actor_name(endpoint.entity_id, cast_key)
+    return (
+        f"The {phrase(edge.edge_id)} anatomical endpoint is rooted at "
+        f"{owner}'s pelvis and remains part of {owner}'s single continuous body."
+    )
 
 
 def compile_wearable_prop(
@@ -704,7 +795,8 @@ def compile_geometry(
     entry: PoseEntry,
     activity: ActivityTemplate,
 ) -> str:
-    descriptions = CAST_DESCRIPTIONS[spec.cast_key]
+    descriptions = cast_descriptions(spec.cast_key)
+    central_name = actor_name(entry.central_slot, spec.cast_key)
     cast_text = "; ".join(descriptions)
     adult_noun = "adult" if len(descriptions) == 1 else "adults"
     pose = entry.central_pose
@@ -714,33 +806,33 @@ def compile_geometry(
         f"Exactly {len(descriptions)} {adult_noun} occupies the image: {cast_text}."
         if len(descriptions) == 1
         else f"Exactly {len(descriptions)} {adult_noun} occupy the image: {cast_text}.",
+        body_ledger(spec.cast_key),
         (
             f"The camera uses a {phrase(spec.viewpoint)} viewpoint and a "
             f"{phrase(spec.shot_scale)} composition."
         ),
         (
-            f"{descriptions[0].split(',', 1)[0]} holds {article} "
+            f"{central_name} holds {article} "
             f"{pose_name} pose at image center with "
             f"{natural_component(pose.leg_configuration)} and "
             f"{natural_component(pose.arm_configuration)}; "
             f"she is {support_clause(entry)}."
         ),
     ]
-    if len(descriptions) == 1:
-        sentences.append(
-            "The complete visible limb set belongs to Li Na alone: two arms "
-            "ending in two hands and two legs ending in two feet."
+    if len(descriptions) > 1:
+        chain = lifted_bilateral_chain(
+            entry,
+            central_name,
+            actor_name(entry.actor_plans[1].slot_id, spec.cast_key),
         )
-    for actor_plan, description in zip(
-        entry.actor_plans[1:],
-        descriptions[1:],
-        strict=True,
-    ):
-        actor_name_value = description.split(",", 1)[0]
+        if chain:
+            sentences.append(chain)
+    for actor_plan in entry.actor_plans[1:]:
+        actor_name_value = actor_name(actor_plan.slot_id, spec.cast_key)
         relationship = partner_relationship(
             actor_plan,
             activity,
-            descriptions[0].split(",", 1)[0],
+            central_name,
         )
         supports = resolved_partner_supports(
             actor_plan,
@@ -749,7 +841,7 @@ def compile_geometry(
         limb_clause = partner_limb_clause(
             actor_plan,
             activity,
-            descriptions[0].split(",", 1)[0],
+            central_name,
             pose.primary_surface,
         )
         sentences.append(
@@ -763,7 +855,7 @@ def compile_geometry(
         ):
             sentences.append(
                 "The front-to-back order is the wall, "
-                f"{actor_name_value}, {descriptions[0].split(',', 1)[0]}, "
+                f"{actor_name_value}, {central_name}, "
                 "then the viewer."
             )
     sentences.append(
@@ -790,6 +882,9 @@ def compile_geometry(
         if edge.edge_id in handled_prop_edges:
             continue
         regions = {edge.source.region, edge.target.region}
+        ownership = anatomical_endpoint_ownership(edge, spec.cast_key)
+        if ownership:
+            sentences.append(ownership)
         if edge.preferred_visibility == "occluded":
             sentences.append(
                 f"The {phrase(edge.edge_id)} {phrase(edge.state)} contact "
@@ -822,7 +917,7 @@ def compile_geometry(
         ] and activity.restraint.body_regions == ["ankles"]:
             sentences.extend(
                 (
-                    "A padded spreader bar spans directly between Li Na's "
+                    f"A padded spreader bar spans directly between {central_name}'s "
                     "ankles; its left end is visibly secured to her left ankle "
                     "and its right end to her right ankle by padded cuffs.",
                     "Both cuff release tabs remain visible, and an established "
@@ -913,7 +1008,8 @@ def prompt_issues(
     prompt: str,
 ) -> list[str]:
     issues: list[str] = []
-    descriptions = CAST_DESCRIPTIONS[spec.cast_key]
+    descriptions = cast_descriptions(spec.cast_key)
+    central_name = actor_name(entry.central_slot, spec.cast_key)
     if not prompt.isascii() or "\n" in prompt or "\r" in prompt:
         issues.append("prompt is not one ASCII paragraph")
     if len(re.findall(r"\bcamera\b", prompt, re.I)) != 1:
@@ -921,11 +1017,8 @@ def prompt_issues(
     for description in descriptions:
         if prompt.count(description) != 1:
             issues.append(f"cast description changed: {description}")
-    if len(descriptions) == 1 and (
-        "complete visible limb set belongs to Li Na alone" not in prompt
-        or "two arms ending in two hands and two legs ending in two feet" not in prompt
-    ):
-        issues.append("solo scene lacks exact visible-limb ownership")
+    if body_ledger(spec.cast_key) not in prompt:
+        issues.append("scene lacks the exact continuous-body ledger")
     required = (
         spec.viewpoint,
         spec.shot_scale,
@@ -959,6 +1052,23 @@ def prompt_issues(
             )
             if any(phrase(term) in geometry_contact for term in local_terms):
                 issues.append(f"{edge.edge_id} exposes an occluded endpoint")
+        expected_ownership = anatomical_endpoint_ownership(
+            edge,
+            spec.cast_key,
+        )
+        if expected_ownership and expected_ownership not in prompt:
+            issues.append(f"{edge.edge_id} lacks anatomical endpoint ownership")
+    expected_lift_chain = (
+        lifted_bilateral_chain(
+            entry,
+            central_name,
+            actor_name(entry.actor_plans[1].slot_id, spec.cast_key),
+        )
+        if len(descriptions) > 1
+        else None
+    )
+    if expected_lift_chain and expected_lift_chain not in prompt:
+        issues.append("lifted pose lacks a bilateral limb chain")
     for prop in activity.wearable_props:
         owner = actor_name(prop.owner_slot, spec.cast_key)
         required_prop_phrases = (
@@ -974,7 +1084,11 @@ def prompt_issues(
         if edge.source.entity_id != prop.prop_id or edge.source.region != "shaft":
             issues.append("wearable prop is not the contact source")
         owner_sentence = next(
-            (sentence for sentence in prompt.split(". ") if sentence.startswith(owner)),
+            (
+                sentence
+                for sentence in prompt.split(". ")
+                if sentence.startswith(owner) and "positioned at" in sentence
+            ),
             "",
         )
         owner_plan = next(
@@ -1016,7 +1130,7 @@ def prompt_issues(
         "padded_spreader_bar"
     ] and activity.restraint.body_regions == ["ankles"]:
         restraint_chain = (
-            "spreader bar spans directly between Li Na's ankles",
+            f"spreader bar spans directly between {central_name}'s ankles",
             "left end is visibly secured to her left ankle",
             "right end to her right ankle by padded cuffs",
             "Both cuff release tabs remain visible",
@@ -1026,7 +1140,11 @@ def prompt_issues(
     for actor_plan in entry.actor_plans[1:]:
         name = actor_name(actor_plan.slot_id, spec.cast_key)
         actor_sentence = next(
-            (sentence for sentence in prompt.split(". ") if sentence.startswith(name)),
+            (
+                sentence
+                for sentence in prompt.split(". ")
+                if sentence.startswith(name) and "positioned at" in sentence
+            ),
             "",
         )
         if actor_gives_oral(activity, actor_plan.slot_id):
@@ -1088,7 +1206,7 @@ def evaluation_contract_issues(
     issues: dict[str, list[str]] = {}
     speculative = re.compile(
         r"\b(?:may|might|could|potential|possibly|depending|risk|plausible|"
-        r"unlikely|challenge|not definitive|not impossible)\b",
+        r"likely|unlikely|challenge|not definitive|not impossible)\b",
         re.I,
     )
     for evaluation in evaluations.evaluations:

@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "check": "cast",
+      "passed": true,
+      "evidence": "Prose includes the exact required actor descriptions for F1 and M1."
+    },
+    {
+      "check": "camera",
+      "passed": true,
+      "evidence": "Prose correctly states the side-rear-three-quarter viewpoint and medium-wide shot scale."
+    },
+    {
+      "check": "contact",
+      "passed": false,
+      "evidence": "Prose fails to state the contact's physical state is 'inserted', contradicting the plan."
+    },
+    {
+      "check": "visibility",
+      "passed": true,
+      "evidence": "Prose correctly lists all visible and occluded regions, occluders, and omits hidden endpoints."
+    },
+    {
+      "check": "limb_assignments",
+      "passed": true,
+      "evidence": "Prose correctly accounts for all four non-contact support limb assignments and the contact assignments for each actor."
+    },
+    {
+      "check": "supports",
+      "passed": true,
+      "evidence": "Prose correctly describes all four supports with their details, including surface, region, and positions."
+    }
+  ],
+  "contradictions": [
+    "The prose describes the contact's activity and occlusion but omits the required physical state 'inserted'."
+  ]
+}

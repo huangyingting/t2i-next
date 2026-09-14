@@ -1,0 +1,160 @@
+{
+  "frame_id": "F01",
+  "camera": {
+    "viewpoint": "side_rear_three_quarter",
+    "shot_scale": "medium_wide",
+    "visible_regions": [
+      "f1.head",
+      "f1.torso",
+      "f1.arms",
+      "f1.legs",
+      "m1.near_thigh",
+      "m1.torso",
+      "m1.arms",
+      "m1.legs"
+    ],
+    "occluded_regions": [
+      "f1.mouth",
+      "m1.pubic_region"
+    ],
+    "visible_contacts": [],
+    "occluded_contacts": [
+      "primary_contact"
+    ]
+  },
+  "actors": [
+    {
+      "actor_id": "f1",
+      "sex": "female",
+      "description": "F1, woman 1, a 29-year-old Chinese woman",
+      "screen_position": "center_right",
+      "depth_plane": "midground",
+      "pose": "kneeling_forward",
+      "limb_assignments": [
+        {
+          "body_part": "left_knee",
+          "purpose": "support",
+          "target_id": "f1_knee_support"
+        },
+        {
+          "body_part": "right_knee",
+          "purpose": "support",
+          "target_id": "f1_knee_support"
+        },
+        {
+          "body_part": "left_hand",
+          "purpose": "support",
+          "target_id": "f1_hand_support"
+        },
+        {
+          "body_part": "right_hand",
+          "purpose": "support",
+          "target_id": "f1_hand_support"
+        },
+        {
+          "body_part": "head",
+          "purpose": "contact",
+          "target_id": "primary_contact"
+        }
+      ]
+    },
+    {
+      "actor_id": "m1",
+      "sex": "male",
+      "description": "M1, man 1, a 32-year-old Chinese man",
+      "screen_position": "center_left",
+      "depth_plane": "foreground",
+      "pose": "kneeling_upright",
+      "limb_assignments": [
+        {
+          "body_part": "left_knee",
+          "purpose": "support",
+          "target_id": "m1_knee_support"
+        },
+        {
+          "body_part": "right_knee",
+          "purpose": "support",
+          "target_id": "m1_knee_support"
+        },
+        {
+          "body_part": "left_hand",
+          "purpose": "support",
+          "target_id": "m1_hand_support"
+        },
+        {
+          "body_part": "right_hand",
+          "purpose": "support",
+          "target_id": "m1_hand_support"
+        },
+        {
+          "body_part": "pubic_region",
+          "purpose": "contact",
+          "target_id": "primary_contact"
+        }
+      ]
+    }
+  ],
+  "contacts": [
+    {
+      "contact_id": "primary_contact",
+      "activity": "fellatio",
+      "state": "inserted",
+      "actor_a": "f1",
+      "region_a": "mouth",
+      "actor_b": "m1",
+      "region_b": "pubic_region",
+      "screen_position": "center",
+      "depth_plane": "midground",
+      "visibility": "occluded",
+      "occluders": [
+        "f1.head",
+        "m1.near_thigh"
+      ]
+    }
+  ],
+  "supports": [
+    {
+      "support_id": "f1_knee_support",
+      "supported_actor": "f1",
+      "supported_region": "both_knees",
+      "supporter_actor": null,
+      "supporter_region": "mattress",
+      "environmental_surface": "bed",
+      "screen_position": "center_right",
+      "depth_plane": "midground"
+    },
+    {
+      "support_id": "f1_hand_support",
+      "supported_actor": "f1",
+      "supported_region": "both_hands",
+      "supporter_actor": null,
+      "supporter_region": "mattress",
+      "environmental_surface": "bed",
+      "screen_position": "center_right",
+      "depth_plane": "midground"
+    },
+    {
+      "support_id": "m1_knee_support",
+      "supported_actor": "m1",
+      "supported_region": "both_knees",
+      "supporter_actor": null,
+      "supporter_region": "mattress",
+      "environmental_surface": "bed",
+      "screen_position": "center_left",
+      "depth_plane": "foreground"
+    },
+    {
+      "support_id": "m1_hand_support",
+      "supported_actor": "m1",
+      "supported_region": "both_hands",
+      "supporter_actor": null,
+      "supporter_region": "mattress",
+      "environmental_surface": "bed",
+      "screen_position": "center_left",
+      "depth_plane": "foreground"
+    }
+  ],
+  "setting": "A modern Chinese bedroom with a low bed and soft morning window light.",
+  "lighting": "soft morning window light.",
+  "style": "realistic."
+}

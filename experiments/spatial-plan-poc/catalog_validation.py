@@ -10,6 +10,7 @@ from catalog_scene_demo import (
     SPECS,
     DemoSpec,
     EvaluationBatch,
+    body_ledger,
     compile_geometry,
     evaluation_contract_issues,
     prompt_issues,
@@ -24,6 +25,15 @@ CAST_KEYS = (
     "two_women",
     "three_women",
 )
+EXPECTED_CAST_IDS = {
+    "one_woman": ["f1"],
+    "one_woman_one_man": ["f1", "m1"],
+    "one_woman_two_men": ["f1", "m1", "m2"],
+    "two_women": ["f1", "f2"],
+    "three_women": ["f1", "f2", "f3"],
+}
+LEGACY_ACTOR_IDS = {"central", "partner_a", "partner_b"}
+LEGACY_NAMES = {"Li Na", "Zhang Wei", "Chen Hao", "Chen Mei", "Zhao Yue"}
 
 
 def rejected_activity(payload: dict[str, object], expected: str) -> None:
@@ -79,10 +89,23 @@ def main() -> None:
             raise AssertionError(f"{cast_key} did not use schema 2.0")
         if len(catalog.entries) != 256 or len(catalog.activities) != 32:
             raise AssertionError(f"{cast_key} coverage changed")
+        cast_ids = [slot.slot_id for slot in catalog.cast_slots]
+        if cast_ids != EXPECTED_CAST_IDS[cast_key]:
+            raise AssertionError(f"{cast_key} actor codes changed: {cast_ids}")
         activity_map = {
             activity.activity_id: activity for activity in catalog.activities
         }
         for activity in catalog.activities:
+            endpoint_entities = {
+                endpoint.entity_id
+                for edge in activity.contact_edges
+                for endpoint in (edge.source, edge.target)
+            }
+            restraint_entities = set(activity.restraint.controller_slots) | set(
+                activity.restraint.restrained_slots
+            )
+            if LEGACY_ACTOR_IDS.intersection(endpoint_entities | restraint_entities):
+                raise AssertionError("logical actor role leaked into catalog entities")
             if any(
                 endpoint.region == "strap_on"
                 for edge in activity.contact_edges
@@ -116,6 +139,8 @@ def main() -> None:
                     "",
                 )
                 prompt = compile_geometry(spec, entry, activity)
+                if any(name in prompt for name in LEGACY_NAMES):
+                    raise AssertionError("legacy personal name leaked into prompt")
                 issues = prompt_issues(spec, entry, activity, prompt)
                 if issues:
                     raise AssertionError(f"{entry.pose_id}/{activity_id}: {issues}")
@@ -123,10 +148,12 @@ def main() -> None:
 
     d01_spec, d01_entry, d01_activity, d01_prompt = selected_plan("D01")
     d01_required = (
-        "complete visible limb set belongs to Li Na alone",
-        "Li Na's right hand grips the vibrator body",
+        "complete body ledger contains exactly 1 continuous body",
+        "one continuous woman body identified as F1 (woman 1)",
+        "Every visible face and limb belongs to exactly one coded body",
+        "F1's right hand grips the vibrator body",
         "left hand remains visibly on her inner thigh",
-        "lies transversely across Li Na's external clitoral surface",
+        "lies transversely across F1's external clitoral surface",
         "entirely outside the vaginal opening",
     )
     if any(value not in d01_prompt for value in d01_required):
@@ -139,7 +166,7 @@ def main() -> None:
     ) not in d02_prompt:
         raise AssertionError("D02 conflates restraint equipment with stimulation")
     d02_restraint_required = (
-        "spreader bar spans directly between Li Na's ankles",
+        "spreader bar spans directly between F1's ankles",
         "left end is visibly secured to her left ankle",
         "right end to her right ankle by padded cuffs",
         "Both cuff release tabs remain visible",
@@ -147,38 +174,54 @@ def main() -> None:
     if any(value not in d02_prompt for value in d02_restraint_required):
         raise AssertionError("D02 has a disconnected restraint chain")
 
-    _, _, _, d03_prompt = selected_plan("D03")
+    d03_spec, d03_entry, d03_activity, d03_prompt = selected_plan("D03")
     d03_required = (
-        "pelvis seated on the standing partner's interlocked forearms",
-        "elbows tucked against his torso",
-        "partner's own back and shoulders brace against the wall",
+        "two continuous bilateral cradles",
+        "left arm circles M1's left shoulder",
+        "right arm circles his right shoulder",
+        "left thigh wraps around his left side",
+        "right thigh wraps around his right side",
+        "left forearm supports her left thigh",
+        "left hand cups her left buttock",
+        "right forearm supports her right thigh",
+        "right hand cups her right buttock",
+        "his back and shoulders brace against the wall",
         "both feet remain planted",
         "stands with his back and shoulders against the wall",
         "feet shoulder-width apart",
-        "keeping his elbows tucked and their pelvises aligned",
-        "front-to-back order is the wall, Zhang Wei, Li Na",
+        "left-side forearm-and-hand cradle",
+        "matching right-side cradle",
+        "their pelvises aligned",
+        "front-to-back order is the wall, M1, F1",
         "then the viewer",
     )
     if any(value not in d03_prompt for value in d03_required):
         raise AssertionError("D03 lacks an explicit wall support contact")
 
-    _, _, _, d04_prompt = selected_plan("D04")
+    d04_spec, d04_entry, d04_activity, d04_prompt = selected_plan("D04")
     d04_required = (
-        "kneels between Li Na's raised thighs",
-        "one hand braced on the bed and the other stabilizing Li Na's thigh",
+        "exactly 3 continuous bodies",
+        "one continuous woman body identified as F1 (woman 1)",
+        "one continuous man body identified as M1 (man 1)",
+        "one continuous man body identified as M2 (man 2)",
+        "kneels between F1's raised thighs",
+        "one hand braced on the bed and the other stabilizing F1's thigh",
         "supported by both knees and one braced hand",
-        "holds a high half-kneel beside Li Na's head",
+        "holds a high half-kneel beside F1's head",
         "opposite foot planted so the pelvis rises to her mouth level",
         "with both hands resting on the thighs",
         "supported by one knee and opposite foot",
+        "primary anatomical endpoint is rooted at M1's pelvis",
+        "secondary anatomical endpoint is rooted at M2's pelvis",
+        "receiving actor's single head silhouette",
     )
     if any(value not in d04_prompt for value in d04_required):
         raise AssertionError("D04 has unresolved partner limbs or alignment")
 
     d05_spec, d05_entry, d05_activity, d05_prompt = selected_plan("D05")
     d05_required = (
-        "one hand braced on the bed and the other holding Li Na's hip",
-        "strap-on harness is visibly secured around Chen Mei's hips",
+        "one hand braced on the bed and the other holding F1's hip",
+        "strap-on harness is visibly secured around F2's hips",
         "base fixed to the front of her pelvis",
         "aligned to her pelvic axis",
         "anatomically separate from the anus above",
@@ -190,10 +233,10 @@ def main() -> None:
 
     d06_spec, d06_entry, d06_activity, d06_prompt = selected_plan("D06")
     d06_required = (
-        "kneels between Li Na's knees and lowers the torso between her thighs",
+        "kneels between F1's knees and lowers the torso between her thighs",
         "until the mouth reaches her pelvis",
-        "both palms braced on the sofa beside Li Na's hips",
-        "contacting hand maintained at Li Na's breast",
+        "both palms braced on the sofa beside F1's hips",
+        "contacting hand maintained at F1's breast",
         "other hand braced on the sofa",
         "supported by both knees and one braced hand",
     )
@@ -209,8 +252,7 @@ def main() -> None:
     rejected_mutations += 1
 
     d01_missing_limb_ownership = d01_prompt.replace(
-        "The complete visible limb set belongs to Li Na alone: two arms "
-        "ending in two hands and two legs ending in two feet. ",
+        f"{body_ledger('one_woman')} ",
         "",
     )
     rejected_prompt(
@@ -218,7 +260,7 @@ def main() -> None:
         d01_entry,
         d01_activity,
         d01_missing_limb_ownership,
-        "solo scene lacks exact visible-limb ownership",
+        "scene lacks the exact continuous-body ledger",
     )
 
     d02_disconnected_restraint = d02_prompt.replace(
@@ -257,6 +299,42 @@ def main() -> None:
         "conflicting manual-contact hand tasks",
     )
 
+    d03_missing_bilateral_chain = d03_prompt.replace(
+        (
+            "F1's single torso faces M1; her left arm circles "
+            "M1's left shoulder and her right arm circles his right "
+            "shoulder. Her left thigh wraps around his left side and her "
+            "right thigh wraps around his right side, with both knees bent "
+            "behind his hips. M1's left forearm supports her left "
+            "thigh and his left hand cups her left buttock; his right forearm "
+            "supports her right thigh and his right hand cups her right "
+            "buttock. "
+        ),
+        "",
+    )
+    rejected_prompt(
+        d03_spec,
+        d03_entry,
+        d03_activity,
+        d03_missing_bilateral_chain,
+        "lifted pose lacks a bilateral limb chain",
+    )
+
+    d04_missing_endpoint_owner = d04_prompt.replace(
+        (
+            "The secondary anatomical endpoint is rooted at M2's pelvis "
+            "and remains part of M2's single continuous body. "
+        ),
+        "",
+    )
+    rejected_prompt(
+        d04_spec,
+        d04_entry,
+        d04_activity,
+        d04_missing_endpoint_owner,
+        "secondary lacks anatomical endpoint ownership",
+    )
+
     d01_inserted = deepcopy(d01_activity.model_dump(mode="json"))
     d01_inserted["contact_edges"][0]["state"] = "inserted"
     rejected_activity(
@@ -285,7 +363,9 @@ def main() -> None:
     rejected_mutations += 1
 
     d05_self_targeted = deepcopy(d05_activity.model_dump(mode="json"))
-    d05_self_targeted["wearable_props"][0]["owner_slot"] = "central"
+    d05_self_targeted["wearable_props"][0]["owner_slot"] = d05_activity.required_slots[
+        0
+    ]
     rejected_activity(
         d05_self_targeted,
         "wearable prop owner cannot also be its target",
@@ -324,6 +404,8 @@ def main() -> None:
         "passed": True,
         "catalogs_validated": len(CAST_KEYS),
         "entries_validated": len(CAST_KEYS) * 256,
+        "coded_actor_ids_validated": EXPECTED_CAST_IDS,
+        "legacy_personal_names_in_compiled_prompts": 0,
         "compiled_pose_activity_combinations": compiled_combinations,
         "strap_on_activities_validated": strap_on_activities,
         "exact_scene_assertions": [
@@ -335,7 +417,7 @@ def main() -> None:
             "D06",
         ],
         "rejected_mutations": rejected_mutations,
-        "rejected_prompt_mutations": 4,
+        "rejected_prompt_mutations": 6,
         "evaluation_contract_fixtures": 2,
     }
     OUTPUT.mkdir(parents=True, exist_ok=True)

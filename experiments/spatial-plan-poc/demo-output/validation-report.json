@@ -2,6 +2,30 @@
   "passed": true,
   "catalogs_validated": 5,
   "entries_validated": 1280,
+  "coded_actor_ids_validated": {
+    "one_woman": [
+      "f1"
+    ],
+    "one_woman_one_man": [
+      "f1",
+      "m1"
+    ],
+    "one_woman_two_men": [
+      "f1",
+      "m1",
+      "m2"
+    ],
+    "two_women": [
+      "f1",
+      "f2"
+    ],
+    "three_women": [
+      "f1",
+      "f2",
+      "f3"
+    ]
+  },
+  "legacy_personal_names_in_compiled_prompts": 0,
   "compiled_pose_activity_combinations": 31460,
   "strap_on_activities_validated": 16,
   "exact_scene_assertions": [
@@ -13,6 +37,6 @@
     "D06"
   ],
   "rejected_mutations": 5,
-  "rejected_prompt_mutations": 4,
+  "rejected_prompt_mutations": 6,
   "evaluation_contract_fixtures": 2
 }

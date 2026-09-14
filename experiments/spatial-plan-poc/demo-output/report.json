@@ -13,20 +13,19 @@
   "style_validation_issues": {},
   "style_structured_rejections": [],
   "hard_geometry_issues": {},
-  "average_visual_impact": 10.0,
+  "average_visual_impact": 9.333333333333334,
   "evaluations": [
     {
       "scene_id": "D01",
       "geometry_coherence": 10,
-      "visual_impact": 10,
+      "visual_impact": 9,
       "cast_clarity": 10,
       "contact_clarity": 10,
-      "style_integration": 10,
+      "style_integration": 9,
       "strengths": [
-        "Pose is anatomically sound and coherently described.",
-        "Camera viewpoint and composition logically show the described pose and contacts.",
-        "All props (vibrator) are anchored and their use is clear.",
-        "Lighting plan supports the silhouette and desired atmosphere."
+        "Pose is fully coherent and anatomically plausible for the camera angle.",
+        "All contacts and prop usage are clearly defined and anchored.",
+        "Lighting and atmosphere directives strongly support the silhouette and mood."
       ],
       "issues": [],
       "verdict": "pass"
@@ -34,31 +33,29 @@
     {
       "scene_id": "D02",
       "geometry_coherence": 10,
-      "visual_impact": 10,
+      "visual_impact": 9,
       "cast_clarity": 10,
       "contact_clarity": 10,
-      "style_integration": 10,
+      "style_integration": 9,
       "strengths": [
-        "Pose and supports are credible and fit the camera view.",
-        "All props (spreader bar, cuffs) are explicitly anchored and their function is clear.",
-        "The consensual context is established within the description.",
-        "Lighting and atmosphere are cohesively integrated."
+        "Pose is stable and credible with clear support points.",
+        "The spreader bar is explicitly anchored to both ankles, ensuring prop clarity.",
+        "Lighting and palette reinforce the intended fine-art atmosphere."
       ],
       "issues": [],
       "verdict": "pass"
     },
     {
       "scene_id": "D03",
-      "geometry_coherence": 10,
+      "geometry_coherence": 9,
       "visual_impact": 10,
       "cast_clarity": 10,
-      "contact_clarity": 10,
+      "contact_clarity": 9,
       "style_integration": 10,
       "strengths": [
-        "Complex lifted pose is mechanically plausible with described supports.",
-        "Camera viewpoint allows visualization of the wall support and limb positions.",
-        "Contact occlusion is explicitly and correctly described.",
-        "Atmosphere and lighting are consistent with the setting."
+        "The complex lifted pose is meticulously described with credible, bilateral support.",
+        "Body ledger and actor roles are perfectly clear and coherent.",
+        "Lighting and atmosphere enhance the dramatic silhouette."
       ],
       "issues": [],
       "verdict": "pass"
@@ -66,15 +63,14 @@
     {
       "scene_id": "D04",
       "geometry_coherence": 10,
-      "visual_impact": 10,
+      "visual_impact": 9,
       "cast_clarity": 10,
       "contact_clarity": 10,
-      "style_integration": 10,
+      "style_integration": 9,
       "strengths": [
-        "Three-person arrangement is geometrically coherent and all supports are credible.",
-        "Camera composition allows clear visibility of all actors and their roles.",
-        "Both inserted contacts are correctly described, one visible, one occluded.",
-        "Lighting and palette create the intended luxurious, focused atmosphere."
+        "Pose geometry for all three actors is coherent and spatially plausible.",
+        "Support points for kneeling and half-kneeling poses are clearly defined and credible.",
+        "Occluded contacts are correctly noted as hidden per the plan."
       ],
       "issues": [],
       "verdict": "pass"
@@ -82,15 +78,14 @@
     {
       "scene_id": "D05",
       "geometry_coherence": 10,
-      "visual_impact": 10,
+      "visual_impact": 9,
       "cast_clarity": 10,
       "contact_clarity": 10,
-      "style_integration": 10,
+      "style_integration": 9,
       "strengths": [
-        "All-fours and kneeling poses are stable and supports are clear.",
-        "Strap-on harness is explicitly anchored and its path described.",
-        "Camera viewpoint logically shows the rear-entry setup and occluded contact.",
-        "Lighting and palette perfectly support the quiet, editorial atmosphere."
+        "The all-fours and kneeling poses are stable and geometrically sound.",
+        "The strap-on harness is explicitly anchored to F2, ensuring clear prop ownership.",
+        "Lighting and palette support the intended quiet, editorial tone."
       ],
       "issues": [],
       "verdict": "pass"
@@ -103,10 +98,9 @@
       "contact_clarity": 10,
       "style_integration": 10,
       "strengths": [
-        "Triadic pose is stable and all supports (sofa, knees, hands) are credible.",
-        "All three actors have distinct, non-conflicting roles and contacts.",
-        "Both primary external contacts are visible and clearly described.",
-        "Theatrical lighting and contemporary palette are well-integrated."
+        "The reclined, kneeling, and supportive poses form a clear, stable composition.",
+        "All contacts (oral, manual) are explicitly defined and anchored to the correct actors.",
+        "Stylistic directives for lighting and palette strongly reinforce the graphic, sculptural mood."
       ],
       "issues": [],
       "verdict": "pass"

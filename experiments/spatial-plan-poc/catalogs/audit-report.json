@@ -25,7 +25,7 @@
       "handheld_props": 1,
       "cast_slots": [
         {
-          "slot_id": "central",
+          "slot_id": "f1",
           "sex": "female",
           "role": "central",
           "adult_only": true
@@ -55,13 +55,13 @@
       "handheld_props": 0,
       "cast_slots": [
         {
-          "slot_id": "central",
+          "slot_id": "f1",
           "sex": "female",
           "role": "central",
           "adult_only": true
         },
         {
-          "slot_id": "partner_a",
+          "slot_id": "m1",
           "sex": "male",
           "role": "partner",
           "adult_only": true
@@ -91,19 +91,19 @@
       "handheld_props": 0,
       "cast_slots": [
         {
-          "slot_id": "central",
+          "slot_id": "f1",
           "sex": "female",
           "role": "central",
           "adult_only": true
         },
         {
-          "slot_id": "partner_a",
+          "slot_id": "m1",
           "sex": "male",
           "role": "partner",
           "adult_only": true
         },
         {
-          "slot_id": "partner_b",
+          "slot_id": "m2",
           "sex": "male",
           "role": "partner",
           "adult_only": true
@@ -133,13 +133,13 @@
       "handheld_props": 0,
       "cast_slots": [
         {
-          "slot_id": "central",
+          "slot_id": "f1",
           "sex": "female",
           "role": "central",
           "adult_only": true
         },
         {
-          "slot_id": "partner_a",
+          "slot_id": "f2",
           "sex": "female",
           "role": "partner",
           "adult_only": true
@@ -169,19 +169,19 @@
       "handheld_props": 0,
       "cast_slots": [
         {
-          "slot_id": "central",
+          "slot_id": "f1",
           "sex": "female",
           "role": "central",
           "adult_only": true
         },
         {
-          "slot_id": "partner_a",
+          "slot_id": "f2",
           "sex": "female",
           "role": "partner",
           "adult_only": true
         },
         {
-          "slot_id": "partner_b",
+          "slot_id": "f3",
           "sex": "female",
           "role": "partner",
           "adult_only": true

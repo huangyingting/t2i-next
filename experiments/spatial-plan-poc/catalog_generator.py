@@ -784,26 +784,38 @@ BDSM_EQUIPMENT = (
 
 
 CASTS = {
-    "one_woman": (("central", "female", "central"),),
+    "one_woman": (("f1", "female", "central"),),
     "one_woman_one_man": (
-        ("central", "female", "central"),
-        ("partner_a", "male", "partner"),
+        ("f1", "female", "central"),
+        ("m1", "male", "partner"),
     ),
     "one_woman_two_men": (
-        ("central", "female", "central"),
-        ("partner_a", "male", "partner"),
-        ("partner_b", "male", "partner"),
+        ("f1", "female", "central"),
+        ("m1", "male", "partner"),
+        ("m2", "male", "partner"),
     ),
     "two_women": (
-        ("central", "female", "central"),
-        ("partner_a", "female", "partner"),
+        ("f1", "female", "central"),
+        ("f2", "female", "partner"),
     ),
     "three_women": (
-        ("central", "female", "central"),
-        ("partner_a", "female", "partner"),
-        ("partner_b", "female", "partner"),
+        ("f1", "female", "central"),
+        ("f2", "female", "partner"),
+        ("f3", "female", "partner"),
     ),
 }
+
+LOGICAL_ACTOR_ROLES = ("central", "partner_a", "partner_b")
+
+
+def resolve_actor_role(cast_key: str, entity_id: str) -> str:
+    if entity_id not in LOGICAL_ACTOR_ROLES:
+        return entity_id
+    index = LOGICAL_ACTOR_ROLES.index(entity_id)
+    cast = CASTS[cast_key]
+    if index >= len(cast):
+        raise ValueError(f"{cast_key} has no actor for {entity_id}")
+    return cast[index][0]
 
 
 def activity_ids(cast_key: str) -> tuple[str, ...]:
@@ -1523,8 +1535,8 @@ def restraint_plan(
     return RestraintPlan(
         enabled=True,
         category=activity_id,
-        controller_slots=slots[1:] or ["central"],
-        restrained_slots=["central"],
+        controller_slots=slots[1:] or [slots[0]],
+        restrained_slots=[slots[0]],
         body_regions=(
             ["wrists"]
             if has_tag(activity_id, "wrist")
@@ -1543,9 +1555,10 @@ def actor_plans(
     cast_key: str,
     family: PoseFamily,
 ) -> list[ActorPlan]:
+    central_slot = CASTS[cast_key][0][0]
     plans = [
         ActorPlan(
-            slot_id="central",
+            slot_id=central_slot,
             pose_role="central_pose",
             screen_position="center",
             depth_plane="midground",
@@ -1603,11 +1616,11 @@ def make_contact_edges(
             ContactEdge(
                 edge_id=edge_id,
                 source=ContactEndpoint(
-                    entity_id=source_entity,
+                    entity_id=resolve_actor_role(cast_key, source_entity),
                     region=source_region,
                 ),
                 target=ContactEndpoint(
-                    entity_id=target_entity,
+                    entity_id=resolve_actor_role(cast_key, target_entity),
                     region=target_region,
                 ),
                 state=state,
@@ -1629,7 +1642,7 @@ def wearable_props(cast_key: str, activity_id: str) -> list[WearableProp]:
     return [
         WearableProp(
             prop_id="prop_a",
-            owner_slot="partner_a",
+            owner_slot=CASTS[cast_key][1][0],
             category="strap_on",
             mount_region="pelvis",
             attachment="pelvic_harness",
@@ -1649,7 +1662,7 @@ def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
     return [
         HandheldProp(
             prop_id="prop_a",
-            controller_slot="central",
+            controller_slot=CASTS[cast_key][0][0],
             category="vibrator",
             grip_region="right_hand",
             deployment="external_surface_contact",
@@ -1714,11 +1727,8 @@ def activity_compatible_with_pose(
 ) -> bool:
     if pose.family not in activity.compatible_pose_families:
         return False
-    if (
-        pose.family == "lifted_supported"
-        and pose.primary_surface == "partner_support"
-    ):
-        occupied_lift_slots = {"central", "partner_a"}
+    if pose.family == "lifted_supported" and pose.primary_surface == "partner_support":
+        occupied_lift_slots = set(activity.required_slots[:2])
         if any(
             edge.source.entity_id in occupied_lift_slots
             and edge.source.region in {"hand", "left_hand", "right_hand", "mouth"}
@@ -1815,7 +1825,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
                 PoseEntry(
                     pose_id=f"{cast_key}_p{entry_index + 1:03d}",
                     cast_key=cast_key,
-                    central_slot="central",
+                    central_slot=slots[0].slot_id,
                     central_pose=central_pose,
                     actor_plans=plans,
                     compatible_activity_ids=compatible_activities,

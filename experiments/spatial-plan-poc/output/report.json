@@ -1,0 +1,79 @@
+{
+  "model": "DeepSeek-V3.2",
+  "plan_valid": true,
+  "invalid_visibility_fixture_rejected": true,
+  "tampered_prose_rejected": true,
+  "tampered_prose_issues": [
+    "camera is not stated exactly once",
+    "primary_contact exposes forbidden local anatomy while occluded",
+    "f1 description changed or is incomplete",
+    "m1 description changed or is incomplete"
+  ],
+  "prose_valid": false,
+  "prose_issues": [
+    "primary_contact exposes forbidden local anatomy while occluded",
+    "f1 description changed or is incomplete",
+    "m1 description changed or is incomplete"
+  ],
+  "semantic_audit_passed": false,
+  "semantic_audit": {
+    "checks": [
+      {
+        "check": "cast",
+        "passed": true,
+        "evidence": "Prose includes the exact required actor descriptions for F1 and M1."
+      },
+      {
+        "check": "camera",
+        "passed": true,
+        "evidence": "Prose correctly states the side-rear-three-quarter viewpoint and medium-wide shot scale."
+      },
+      {
+        "check": "contact",
+        "passed": false,
+        "evidence": "Prose fails to state the contact's physical state is 'inserted', contradicting the plan."
+      },
+      {
+        "check": "visibility",
+        "passed": true,
+        "evidence": "Prose correctly lists all visible and occluded regions, occluders, and omits hidden endpoints."
+      },
+      {
+        "check": "limb_assignments",
+        "passed": true,
+        "evidence": "Prose correctly accounts for all four non-contact support limb assignments and the contact assignments for each actor."
+      },
+      {
+        "check": "supports",
+        "passed": true,
+        "evidence": "Prose correctly describes all four supports with their details, including surface, region, and positions."
+      }
+    ],
+    "contradictions": [
+      "The prose describes the contact's activity and occlusion but omits the required physical state 'inserted'."
+    ]
+  },
+  "passed": false,
+  "structured_rejections": {
+    "plan": [],
+    "prose": [],
+    "audit": []
+  },
+  "usage": {
+    "plan": {
+      "prompt_tokens": 872,
+      "completion_tokens": 1145,
+      "total_tokens": 2017
+    },
+    "prose": {
+      "prompt_tokens": 1042,
+      "completion_tokens": 411,
+      "total_tokens": 1453
+    },
+    "audit": {
+      "prompt_tokens": 2023,
+      "completion_tokens": 289,
+      "total_tokens": 2312
+    }
+  }
+}

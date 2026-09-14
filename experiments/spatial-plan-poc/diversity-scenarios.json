@@ -1,7 +1,7 @@
 {
   "actors": [
-    "Li Na, a 29-year-old Chinese woman",
-    "Zhang Wei, a 32-year-old Chinese man"
+    "F1, woman 1, a 29-year-old Chinese woman",
+    "M1, man 1, a 32-year-old Chinese man"
   ],
   "cases": [
     {
@@ -29,7 +29,7 @@
       "shot_scale": "full_body",
       "central_pose": "standing_bent_forward",
       "partner_pose": "standing_upright",
-      "support_topology": "woman_hands_windowsill_both_feet_floor_man_both_feet_floor",
+      "support_topology": "f1_hands_windowsill_both_feet_floor_m1_both_feet_floor",
       "central_screen_position": "center_right",
       "partner_screen_position": "center_left",
       "depth_plane": "midground",
@@ -45,7 +45,7 @@
       "shot_scale": "medium",
       "central_pose": "lying_supine",
       "partner_pose": "kneeling_forward",
-      "support_topology": "woman_supine_on_bed_man_kneeling_on_bed",
+      "support_topology": "f1_supine_on_bed_m1_kneeling_on_bed",
       "central_screen_position": "center",
       "partner_screen_position": "center_right",
       "depth_plane": "midground",
@@ -77,7 +77,7 @@
       "shot_scale": "medium",
       "central_pose": "reclining_supine",
       "partner_pose": "kneeling_sideways",
-      "support_topology": "woman_reclined_on_bed_man_kneeling_on_bed",
+      "support_topology": "f1_reclined_on_bed_m1_kneeling_on_bed",
       "central_screen_position": "center_left",
       "partner_screen_position": "center_right",
       "depth_plane": "foreground",
@@ -109,7 +109,7 @@
       "shot_scale": "full_body",
       "central_pose": "lifted_upright",
       "partner_pose": "standing_upright",
-      "support_topology": "man_feet_floor_hands_support_woman_wall_secondary",
+      "support_topology": "m1_feet_floor_hands_support_f1_wall_secondary",
       "central_screen_position": "center",
       "partner_screen_position": "center_right",
       "depth_plane": "midground",
