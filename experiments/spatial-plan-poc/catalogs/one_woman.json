@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "cast_key": "one_woman",
   "cast_slots": [
     {
@@ -37,6 +37,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -94,6 +96,8 @@
           "preferred_visibility": "occluded"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -151,6 +155,8 @@
           "preferred_visibility": "occluded"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -222,6 +228,8 @@
           "preferred_visibility": "occluded"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -278,6 +286,17 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [
+        {
+          "prop_id": "prop_a",
+          "controller_slot": "central",
+          "category": "vibrator",
+          "grip_region": "right_hand",
+          "deployment": "external_surface_contact",
+          "orientation": "transverse_over_clitoral_surface"
+        }
+      ],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -334,6 +353,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -391,6 +412,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -448,6 +471,8 @@
           "preferred_visibility": "occluded"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -520,6 +545,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -592,6 +619,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -663,6 +692,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -719,6 +750,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -775,6 +808,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -831,6 +866,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -874,6 +911,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -917,6 +956,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -961,6 +1002,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1003,6 +1046,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1060,6 +1105,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1117,6 +1164,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1173,6 +1222,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1229,6 +1280,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1285,6 +1338,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1341,6 +1396,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1398,6 +1455,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "blindfolded_manual",
@@ -1462,6 +1521,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "wrist_cuffs_quick_release",
@@ -1526,6 +1587,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "ankle_cuffs_quick_release",
@@ -1591,6 +1654,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "spreader_bar_self_play",
@@ -1643,6 +1708,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "collar_leash_self_pose",
@@ -1708,6 +1775,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "rope_harness_self_touch",
@@ -1772,6 +1841,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "low_temp_wax_sensory",
@@ -1836,6 +1907,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "ice_sensory",

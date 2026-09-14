@@ -52,6 +52,39 @@ class ContactEdge(StrictModel):
     ]
 
 
+class WearableProp(StrictModel):
+    prop_id: Identifier
+    owner_slot: Identifier
+    category: Annotated[str, StringConstraints(pattern=r"^strap_on$")]
+    mount_region: Annotated[str, StringConstraints(pattern=r"^pelvis$")]
+    attachment: Annotated[str, StringConstraints(pattern=r"^pelvic_harness$")]
+    orientation: Annotated[
+        str,
+        StringConstraints(pattern=r"^forward_from_owner_pelvis$"),
+    ]
+    harness_visibility: Annotated[str, StringConstraints(pattern=r"^visible$")]
+    base_visibility: Annotated[str, StringConstraints(pattern=r"^visible$")]
+    shaft_visibility: Annotated[
+        str,
+        StringConstraints(pattern=r"^partially_visible$"),
+    ]
+
+
+class HandheldProp(StrictModel):
+    prop_id: Identifier
+    controller_slot: Identifier
+    category: Annotated[str, StringConstraints(pattern=r"^vibrator$")]
+    grip_region: Annotated[str, StringConstraints(pattern=r"^right_hand$")]
+    deployment: Annotated[
+        str,
+        StringConstraints(pattern=r"^external_surface_contact$"),
+    ]
+    orientation: Annotated[
+        str,
+        StringConstraints(pattern=r"^transverse_over_clitoral_surface$"),
+    ]
+
+
 class RestraintPlan(StrictModel):
     enabled: bool
     category: Identifier | None
@@ -70,6 +103,8 @@ class ActivityTemplate(StrictModel):
     coverage_tags: list[Identifier] = Field(min_length=1, max_length=8)
     required_slots: list[Identifier] = Field(min_length=1, max_length=8)
     contact_edges: list[ContactEdge] = Field(min_length=1, max_length=6)
+    handheld_props: list[HandheldProp] = Field(max_length=2)
+    wearable_props: list[WearableProp] = Field(max_length=2)
     restraint: RestraintPlan
     compatible_pose_families: list[Identifier] = Field(min_length=1, max_length=16)
 
@@ -82,6 +117,58 @@ class ActivityTemplate(StrictModel):
                 if key in occupied_endpoints:
                     raise ValueError(f"contact endpoint assigned twice: {key}")
                 occupied_endpoints.add(key)
+        wearable_ids = [prop.prop_id for prop in self.wearable_props]
+        if len(wearable_ids) != len(set(wearable_ids)):
+            raise ValueError("wearable prop IDs must be unique")
+        handheld_ids = [prop.prop_id for prop in self.handheld_props]
+        if len(handheld_ids) != len(set(handheld_ids)):
+            raise ValueError("handheld prop IDs must be unique")
+        if set(wearable_ids).intersection(handheld_ids):
+            raise ValueError("a prop cannot be both handheld and wearable")
+        for prop in self.handheld_props:
+            if prop.controller_slot not in self.required_slots:
+                raise ValueError("handheld prop controller is not in required cast")
+            matching_edges = [
+                edge
+                for edge in self.contact_edges
+                if edge.source.entity_id == prop.prop_id
+            ]
+            if len(matching_edges) != 1:
+                raise ValueError("handheld prop requires exactly one contact edge")
+            edge = matching_edges[0]
+            if (
+                edge.source.region != "contact_surface"
+                or edge.target.region != "clitoris"
+                or edge.state != "external_contact"
+            ):
+                raise ValueError(
+                    "clitoral vibrator must remain an external surface contact"
+                )
+        has_strap_on_tag = has_tag(self.activity_id, "strap_on")
+        if has_strap_on_tag != bool(self.wearable_props):
+            raise ValueError(
+                "strap-on activities require exactly one explicit wearable prop"
+            )
+        for prop in self.wearable_props:
+            if prop.owner_slot not in self.required_slots:
+                raise ValueError("wearable prop owner is not in required cast")
+            matching_edges = [
+                edge
+                for edge in self.contact_edges
+                if edge.source.entity_id == prop.prop_id
+            ]
+            if not matching_edges or any(
+                edge.source.region != "shaft" for edge in matching_edges
+            ):
+                raise ValueError(
+                    "wearable prop must connect through its shaft endpoint"
+                )
+        if any(
+            endpoint.region == "strap_on"
+            for edge in self.contact_edges
+            for endpoint in (edge.source, edge.target)
+        ):
+            raise ValueError("strap-on is a wearable prop, not a body region")
         if self.restraint.enabled:
             if (
                 not self.restraint.category
@@ -154,7 +241,7 @@ class PoseEntry(StrictModel):
 
 
 class PoseCatalog(StrictModel):
-    schema_version: Annotated[str, StringConstraints(pattern=r"^1\.0$")]
+    schema_version: Annotated[str, StringConstraints(pattern=r"^2\.0$")]
     cast_key: Identifier
     cast_slots: list[ActorSlot] = Field(min_length=1, max_length=8)
     requested_entry_count: int
@@ -198,9 +285,7 @@ class PoseCatalog(StrictModel):
             raise ValueError("catalog activity IDs must be unique")
         if sum(activity.restraint.enabled for activity in self.activities) != 8:
             raise ValueError("catalog requires exactly eight BDSM activity templates")
-        activity_map = {
-            activity.activity_id: activity for activity in self.activities
-        }
+        activity_map = {activity.activity_id: activity for activity in self.activities}
         used_activities: set[str] = set()
         for entry in self.entries:
             compatible = set(entry.compatible_activity_ids)
@@ -239,9 +324,7 @@ class PoseCatalog(StrictModel):
                         "vagina",
                         "vulva",
                     }:
-                        raise ValueError(
-                            f"male actor cannot own {endpoint.region}"
-                        )
+                        raise ValueError(f"male actor cannot own {endpoint.region}")
             regions = {
                 endpoint.region
                 for edge in activity.contact_edges
@@ -255,9 +338,7 @@ class PoseCatalog(StrictModel):
             if "penetration" in activity.coverage_tags and not any(
                 edge.state == "inserted" for edge in activity.contact_edges
             ):
-                raise ValueError(
-                    f"{activity.activity_id} lacks an inserted contact"
-                )
+                raise ValueError(f"{activity.activity_id} lacks an inserted contact")
             if "oral" in activity.coverage_tags and "mouth" not in regions:
                 raise ValueError(f"{activity.activity_id} lacks an oral endpoint")
             if "toy" in activity.coverage_tags and not {
@@ -270,15 +351,27 @@ class PoseCatalog(StrictModel):
                 "anal": "anus",
                 "fellatio": "penis",
                 "cunnilingus": "vulva",
-                "strap_on": "strap_on",
             }
             for token, required_region in semantic_regions.items():
                 if (
                     has_tag(activity.activity_id, token)
                     and required_region not in regions
                 ):
+                    raise ValueError(f"{activity.activity_id} lacks {required_region}")
+            if has_tag(activity.activity_id, "strap_on"):
+                if len(activity.wearable_props) != 1:
                     raise ValueError(
-                        f"{activity.activity_id} lacks {required_region}"
+                        f"{activity.activity_id} lacks one wearable strap-on"
+                    )
+                prop = activity.wearable_props[0]
+                if prop.prop_id not in entities or "shaft" not in regions:
+                    raise ValueError(
+                        f"{activity.activity_id} lacks a mounted shaft contact"
+                    )
+            if activity.activity_id == "vibrator_clitoral":
+                if len(activity.handheld_props) != 1:
+                    raise ValueError(
+                        "vibrator_clitoral requires one controlled handheld prop"
                     )
         catalog_tags = {
             tag for activity in self.activities for tag in activity.coverage_tags
@@ -774,24 +867,24 @@ def activity_tags(activity_id: str) -> list[str]:
         tags.add("oral")
     if has_tag(
         activity_id,
-            "manual",
-            "masturbation",
-            "edging",
-            "self_touch",
-            "self_play",
-            "grinding",
-            "squeeze",
+        "manual",
+        "masturbation",
+        "edging",
+        "self_touch",
+        "self_play",
+        "grinding",
+        "squeeze",
     ):
         tags.add("masturbation")
     if has_tag(
         activity_id,
-            "toy",
-            "dildo",
-            "plug",
-            "vibrator",
-            "wand",
-            "suction",
-            "remote",
+        "toy",
+        "dildo",
+        "plug",
+        "vibrator",
+        "wand",
+        "suction",
+        "remote",
     ):
         tags.add("toy")
     if activity_family(activity_id) == "bdsm":
@@ -909,9 +1002,7 @@ def contact_specs(
         )
         source_region = "contact_surface" if source_entity == "prop_a" else "hand"
         state = (
-            "inserted"
-            if target_region in {"vagina", "anus"}
-            else "external_contact"
+            "inserted" if target_region in {"vagina", "anus"} else "external_contact"
         )
         return [
             edge(
@@ -925,7 +1016,8 @@ def contact_specs(
         ]
 
     partner_is_male = CASTS[cast_key][1][1] == "male"
-    partner_region = "penis" if partner_is_male else "strap_on"
+    penetration_source = "partner_a" if partner_is_male else "prop_a"
+    penetration_region = "penis" if partner_is_male else "shaft"
     if len(CASTS[cast_key]) == 2:
         if has_tag(activity_id, "cunnilingus"):
             if activity_id.endswith("giving"):
@@ -956,7 +1048,7 @@ def contact_specs(
                     "central",
                     "mouth",
                     "partner_a",
-                    partner_region,
+                    penetration_region,
                     "inserted",
                 )
             ]
@@ -1076,8 +1168,8 @@ def contact_specs(
             return [
                 edge(
                     "primary",
-                    "partner_a",
-                    partner_region,
+                    penetration_source,
+                    penetration_region,
                     "central",
                     "anus",
                     "inserted",
@@ -1092,8 +1184,8 @@ def contact_specs(
             return [
                 edge(
                     "primary",
-                    "partner_a",
-                    partner_region,
+                    penetration_source,
+                    penetration_region,
                     "central",
                     "vagina",
                     "inserted",
@@ -1133,7 +1225,7 @@ def contact_specs(
                 )
             ]
         if has_tag(activity_id, "tribadism", "grinding"):
-            target = "vulva" if partner_region == "strap_on" else "pubic_region"
+            target = "vulva" if not partner_is_male else "pubic_region"
             return [
                 edge(
                     "primary",
@@ -1184,10 +1276,10 @@ def contact_specs(
             )
         ]
 
-    partner_a_region = "penis" if cast_key == "one_woman_two_men" else "strap_on"
+    partner_a_region = "penis" if cast_key == "one_woman_two_men" else "shaft"
     partner_b_region = partner_a_region
-    source_a = "partner_a"
-    source_b = "partner_b"
+    source_a = "partner_a" if cast_key == "one_woman_two_men" else "prop_a"
+    source_b = "partner_b" if cast_key == "one_woman_two_men" else "prop_b"
     if has_tag(activity_id, "double") and has_tag(
         activity_id,
         "penetration",
@@ -1237,9 +1329,8 @@ def contact_specs(
             ),
         ]
     if has_tag(activity_id, "anal"):
-        secondary_is_oral = (
-            has_tag(activity_id, "fellatio")
-            or has_tag(activity_id, "plus_oral")
+        secondary_is_oral = has_tag(activity_id, "fellatio") or has_tag(
+            activity_id, "plus_oral"
         )
         if secondary_is_oral and cast_key == "one_woman_two_men":
             secondary_source = "central"
@@ -1249,9 +1340,7 @@ def contact_specs(
         else:
             secondary_source = "partner_b"
             secondary_target = "central"
-            secondary_target_region = (
-                "clitoris" if secondary_is_oral else "breast"
-            )
+            secondary_target_region = "clitoris" if secondary_is_oral else "breast"
             secondary_state = "external_contact"
         return [
             edge("primary", source_a, partner_a_region, "central", "anus", "inserted"),
@@ -1283,9 +1372,7 @@ def contact_specs(
         else:
             secondary_source = "partner_b"
             secondary_target = "central"
-            secondary_target_region = (
-                "clitoris" if secondary_is_oral else "breast"
-            )
+            secondary_target_region = "clitoris" if secondary_is_oral else "breast"
             secondary_state = "external_contact"
         return [
             edge(
@@ -1325,9 +1412,7 @@ def contact_specs(
             ),
         ]
     if has_tag(activity_id, "oral_one_manual_other"):
-        target_region = (
-            "penis" if cast_key == "one_woman_two_men" else "vulva"
-        )
+        target_region = "penis" if cast_key == "one_woman_two_men" else "vulva"
         return [
             edge(
                 "primary",
@@ -1335,9 +1420,7 @@ def contact_specs(
                 "mouth",
                 "partner_a",
                 target_region,
-                "inserted"
-                if cast_key == "one_woman_two_men"
-                else "external_contact",
+                "inserted" if cast_key == "one_woman_two_men" else "external_contact",
             ),
             edge(
                 "secondary",
@@ -1349,9 +1432,7 @@ def contact_specs(
             ),
         ]
     if has_tag(activity_id, "manual_both"):
-        target_region = (
-            "penis" if cast_key == "one_woman_two_men" else "clitoris"
-        )
+        target_region = "penis" if cast_key == "one_woman_two_men" else "clitoris"
         return [
             edge(
                 "primary",
@@ -1530,6 +1611,45 @@ def make_contact_edges(
     return edges
 
 
+def wearable_props(cast_key: str, activity_id: str) -> list[WearableProp]:
+    if not has_tag(activity_id, "strap_on"):
+        return []
+    if cast_key not in {"two_women", "three_women"}:
+        raise ValueError(
+            f"{activity_id} has no eligible wearable prop owner in {cast_key}"
+        )
+    return [
+        WearableProp(
+            prop_id="prop_a",
+            owner_slot="partner_a",
+            category="strap_on",
+            mount_region="pelvis",
+            attachment="pelvic_harness",
+            orientation="forward_from_owner_pelvis",
+            harness_visibility="visible",
+            base_visibility="visible",
+            shaft_visibility="partially_visible",
+        )
+    ]
+
+
+def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
+    if activity_id != "vibrator_clitoral":
+        return []
+    if cast_key != "one_woman":
+        raise ValueError(f"{activity_id} has no unambiguous controller in {cast_key}")
+    return [
+        HandheldProp(
+            prop_id="prop_a",
+            controller_slot="central",
+            category="vibrator",
+            grip_region="right_hand",
+            deployment="external_surface_contact",
+            orientation="transverse_over_clitoral_surface",
+        )
+    ]
+
+
 def compatible_pose_families(activity_id: str) -> list[str]:
     all_families = set(POSE_FAMILIES)
     if has_tag(activity_id, "lifted", "partial_suspension"):
@@ -1587,6 +1707,8 @@ def build_activity_templates(cast_key: str) -> list[ActivityTemplate]:
                 activity_id,
                 activity_index,
             ),
+            handheld_props=handheld_props(cast_key, activity_id),
+            wearable_props=wearable_props(cast_key, activity_id),
             restraint=restraint_plan(cast_key, activity_id),
             compatible_pose_families=compatible_pose_families(activity_id),
         )
@@ -1674,8 +1796,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
         "activity_families": dict(
             sorted(
                 Counter(
-                    activity.activity_family
-                    for activity in activity_templates
+                    activity.activity_family for activity in activity_templates
                 ).items()
             )
         ),
@@ -1706,7 +1827,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
         ),
     }
     return PoseCatalog(
-        schema_version="1.0",
+        schema_version="2.0",
         cast_key=cast_key,
         cast_slots=slots,
         requested_entry_count=256,
@@ -1729,13 +1850,9 @@ def main() -> None:
         restored = PoseCatalog.model_validate_json(path.read_text(encoding="utf-8"))
         if restored != catalog:
             raise ValueError(f"{cast_key} changed during persistence")
-        family_counts = Counter(
-            entry.central_pose.family for entry in catalog.entries
-        )
+        family_counts = Counter(entry.central_pose.family for entry in catalog.entries)
         tag_counts = Counter(
-            tag
-            for activity in catalog.activities
-            for tag in activity.coverage_tags
+            tag for activity in catalog.activities for tag in activity.coverage_tags
         )
         audit_catalogs[cast_key] = {
             "entries": len(catalog.entries),
@@ -1753,21 +1870,22 @@ def main() -> None:
             "poses_per_family_max": max(family_counts.values()),
             "activity_templates": len(catalog.activities),
             "bdsm_activity_templates": sum(
-                activity.restraint.enabled
-                for activity in catalog.activities
+                activity.restraint.enabled for activity in catalog.activities
             ),
             "coverage_tag_counts": dict(sorted(tag_counts.items())),
             "compatibility_links": sum(
-                len(entry.compatible_activity_ids)
-                for entry in catalog.entries
+                len(entry.compatible_activity_ids) for entry in catalog.entries
             ),
             "contact_edges": sum(
-                len(activity.contact_edges)
-                for activity in catalog.activities
+                len(activity.contact_edges) for activity in catalog.activities
             ),
-            "cast_slots": [
-                slot.model_dump(mode="json") for slot in catalog.cast_slots
-            ],
+            "wearable_props": sum(
+                len(activity.wearable_props) for activity in catalog.activities
+            ),
+            "handheld_props": sum(
+                len(activity.handheld_props) for activity in catalog.activities
+            ),
+            "cast_slots": [slot.model_dump(mode="json") for slot in catalog.cast_slots],
             "readback_validated": True,
         }
     audit_report = {
@@ -1784,7 +1902,7 @@ def main() -> None:
         encoding="utf-8",
     )
     manifest = {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "requested_configurations": [
             "one_woman",
             "one_woman_one_man",
@@ -1800,9 +1918,7 @@ def main() -> None:
         "total_unique_entries": sum(
             len(catalog.entries) for catalog in catalogs.values()
         ),
-        "files": {
-            cast_key: f"{cast_key}.json" for cast_key in catalogs
-        },
+        "files": {cast_key: f"{cast_key}.json" for cast_key in catalogs},
         "audit_file": "audit-report.json",
     }
     (OUTPUT / "manifest.json").write_text(

@@ -21,6 +21,8 @@
       },
       "compatibility_links": 7136,
       "contact_edges": 36,
+      "wearable_props": 0,
+      "handheld_props": 1,
       "cast_slots": [
         {
           "slot_id": "central",
@@ -49,6 +51,8 @@
       },
       "compatibility_links": 6064,
       "contact_edges": 37,
+      "wearable_props": 0,
+      "handheld_props": 0,
       "cast_slots": [
         {
           "slot_id": "central",
@@ -83,6 +87,8 @@
       },
       "compatibility_links": 6720,
       "contact_edges": 64,
+      "wearable_props": 0,
+      "handheld_props": 0,
       "cast_slots": [
         {
           "slot_id": "central",
@@ -123,6 +129,8 @@
       },
       "compatibility_links": 6064,
       "contact_edges": 37,
+      "wearable_props": 9,
+      "handheld_props": 0,
       "cast_slots": [
         {
           "slot_id": "central",
@@ -157,6 +165,8 @@
       },
       "compatibility_links": 6720,
       "contact_edges": 64,
+      "wearable_props": 7,
+      "handheld_props": 0,
       "cast_slots": [
         {
           "slot_id": "central",

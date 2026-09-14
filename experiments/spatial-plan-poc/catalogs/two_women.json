@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "cast_key": "two_women",
   "cast_slots": [
     {
@@ -31,8 +31,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -42,6 +42,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "visible"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -88,8 +102,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -99,6 +113,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "occluded"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -133,8 +161,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -144,6 +172,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "occluded"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -176,8 +218,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -187,6 +229,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "visible"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -220,8 +276,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -231,6 +287,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "occluded"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -264,8 +334,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -275,6 +345,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "occluded"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -306,8 +390,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -317,6 +401,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "visible"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -351,8 +449,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -362,6 +460,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "occluded"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -407,6 +519,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -464,6 +578,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -536,6 +652,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -593,6 +711,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -650,6 +770,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -722,6 +844,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -780,6 +904,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -837,6 +963,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -894,6 +1022,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -952,6 +1082,8 @@
           "preferred_visibility": "occluded"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1010,6 +1142,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1082,6 +1216,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1139,6 +1275,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1211,6 +1349,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1283,6 +1423,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1340,6 +1482,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": false,
         "category": null,
@@ -1385,6 +1529,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "wrist_bondage_oral",
@@ -1438,8 +1584,8 @@
         {
           "edge_id": "primary",
           "source": {
-            "entity_id": "partner_a",
-            "region": "strap_on"
+            "entity_id": "prop_a",
+            "region": "shaft"
           },
           "target": {
             "entity_id": "central",
@@ -1449,6 +1595,20 @@
           "screen_position": "center",
           "depth_plane": "midground",
           "preferred_visibility": "occluded"
+        }
+      ],
+      "handheld_props": [],
+      "wearable_props": [
+        {
+          "prop_id": "prop_a",
+          "owner_slot": "partner_a",
+          "category": "strap_on",
+          "mount_region": "pelvis",
+          "attachment": "pelvic_harness",
+          "orientation": "forward_from_owner_pelvis",
+          "harness_visibility": "visible",
+          "base_visibility": "visible",
+          "shaft_visibility": "partially_visible"
         }
       ],
       "restraint": {
@@ -1517,6 +1677,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "spreader_bar_manual",
@@ -1570,6 +1732,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "blindfold_sensory",
@@ -1635,6 +1799,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "collar_guided_kneeling",
@@ -1700,6 +1866,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "impact_over_furniture",
@@ -1765,6 +1933,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "rope_harness_partial_suspension",
@@ -1815,6 +1985,8 @@
           "preferred_visibility": "visible"
         }
       ],
+      "handheld_props": [],
+      "wearable_props": [],
       "restraint": {
         "enabled": true,
         "category": "low_temp_wax_sensory",
