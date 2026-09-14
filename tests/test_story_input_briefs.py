@@ -50,22 +50,73 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
     assert "Never infer another nationality from a foreign-inspired outfit" in normalized
     assert "set every Theme in China" in normalized
     assert "without changing the cast's default Chinese nationality" in normalized
+    assert "When the requested cast is one woman and zero men" in normalized
+    assert "Use an arm's-length selfie, mirror selfie, timer, tripod, or fixed camera" in normalized
+    assert "Do not invent a nearby friend, companion, photographer, lover" in normalized
     assert "one concrete occasion per Theme" in normalized
     assert "The location and activity must provide concrete evidence" in normalized
     assert "FASHION, BEAUTY, AND GROOMING" in brief
     assert "nearby-friend handheld portrait" in normalized
+    assert "only when that friend is part of the requested visible cast" in normalized
+    assert "only when that companion is part of the requested visible cast" in normalized
     assert "mirror selfie with one physically coherent reflection" in normalized
     assert "timer or fixed-camera full-body outfit portrait" in normalized
+    assert "For one woman and zero men, choose only an arm's-length selfie" in normalized
+    assert "Never call the view nearby-friend, companion-taken" in normalized
     assert "credible modern phone-camera or compact-camera optics" in normalized
+    assert "ANATOMY AND BODY CONTINUITY" in brief
+    assert (
+        "Every visible arm or leg must trace continuously from its shoulder or hip"
+        in normalized
+    )
+    assert (
+        "Never create a detached, source-less, repeated, fused, or extra limb"
+        in normalized
+    )
+    assert "describe the left and right legs separately" in normalized
+    assert 'a collective phrase such as "her legs are parted" is not enough' in normalized
+    assert (
+        "Do not combine raised knees, crossed legs, a projecting foreground leg"
+        in normalized
+    )
+    assert (
+        "never hide the connecting joint while showing an isolated lower limb or foot"
+        in normalized
+    )
+    assert (
+        "Avoid body-crossing foreground limbs, extreme low foot-side angles"
+        in normalized
+    )
+    assert "simplify the pose or move the camera" in normalized
     assert "small signs of lived reality" in normalized
     assert "CONTENT LEVEL" in brief
     assert "Aesthetic:" in brief
     assert "Erotic:" in brief
     assert "Hardcore:" in brief
+    assert "Hardcore must contain an unmistakable explicit adult act already in progress" in normalized
+    assert "touching an inner thigh" in normalized
+    assert "For one woman and zero men, show solitary masturbation already in progress" in normalized
+    assert "directly stimulates her external genitals" in normalized
+    assert "Add no partner, assisting hand, mouth, reflected person" in normalized
+    assert "never add a participant to intensify the action" in normalized
+    assert "Every Hardcore Frame must directly name the active hand or toy" in normalized
+    assert "the contacted genital structure such as the clitoris, vulva" in normalized
+    assert "Wet fingers, arousal, parted legs, pubic hair" in normalized
     assert "parallel finished alternatives rather than chronological steps" in normalized
+    assert "silently reject and rewrite it if any visible limb" in normalized
+    assert "separate left-leg and right-leg descriptions establish exactly two" in normalized
+    assert 'literal phrases "left leg" and "right leg"' in normalized
+    assert "naming only the feet, knees, thighs, or collective legs" in normalized
+    assert "if the camera method contradicts itself" in normalized
+    assert "When English is requested, use English-only ASCII prose" in normalized
+    assert "replacement glyphs, non-English script, and translated fragments" in normalized
     assert "The words Instagram and Xiaohongshu are invisible art direction only" in normalized
     assert "Never write the words Instagram or Xiaohongshu in a Theme title" in normalized
     assert "Translate the selected direction into visible photography" in normalized
+    assert "without platform names in generated fields" in normalized
+    assert "Target 220-300 words for every English Frame" in normalized
+    assert "between 180 and 360 words, with 360 as an absolute hard ceiling" in normalized
+    assert "count its words and rewrite it if the total falls outside the hard range" in normalized
     for forbidden in (
         "app interface",
         "profile page",

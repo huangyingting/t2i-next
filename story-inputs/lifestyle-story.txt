@@ -77,6 +77,13 @@ With multiple people, make their relationship visually legible through mutual
 gaze, shared activity, coordinated movement, exchanged objects, or natural
 physical proximity. Do not reduce companions to blurred background decoration.
 
+When the requested cast is one woman and zero men, she is the only person in
+the complete image and the only person implied by the visible action. Use an
+arm's-length selfie, mirror selfie, timer, tripod, or fixed camera when the
+photograph needs an explained capture method. Do not invent a nearby friend,
+companion, photographer, lover, helper, reflected person, second body, or
+disembodied hand.
+
 SHAREABLE STORY OCCASIONS
 
 Choose or invent one concrete occasion per Theme. Suitable directions include:
@@ -149,8 +156,10 @@ advertisement layout, or visible border.
 
 Choose a capture method that belongs to the moment:
 
-- nearby-friend handheld portrait with relaxed eye contact;
-- companion-taken candid while the subject performs the activity;
+- nearby-friend handheld portrait with relaxed eye contact, only when that
+  friend is part of the requested visible cast;
+- companion-taken candid while the subject performs the activity, only when
+  that companion is part of the requested visible cast;
 - arm's-length selfie with credible phone distance and perspective;
 - mirror selfie with one physically coherent reflection and no extra people;
 - timer or fixed-camera full-body outfit portrait;
@@ -163,6 +172,11 @@ Choose a capture method that belongs to the moment:
 - clean tabletop or object detail only when the requested cast remains visibly
   present elsewhere in that same single photograph.
 
+For one woman and zero men, choose only an arm's-length selfie, mirror selfie,
+timer, tripod, or fixed camera. Never call the view nearby-friend,
+companion-taken, photographer-taken, or observer-shot, even as a comparison or
+discarded alternative.
+
 Across a batch, vary full-body, three-quarter, waist-up, close portrait,
 environmental-wide, tabletop-adjacent, mirror, and movement-led framing.
 Avoid repeating centered eye-level posing, the same cafe table, the same
@@ -174,6 +188,31 @@ focus on eyes or the active object, and plausible edge detail. Optional direct
 flash may feel deliberate and stylish. Avoid extreme fisheye distortion,
 fake miniature blur, excessive bokeh, crunchy sharpening, blown highlights,
 muddy shadows, or synthetic cinematic teal-orange grading.
+
+ANATOMY AND BODY CONTINUITY
+
+Keep each person's anatomy ordinary, connected, and easy to parse. Every
+visible arm or leg must trace continuously from its shoulder or hip through
+the correct joints to one hand or foot. Never create a detached, source-less,
+repeated, fused, or extra limb, and never let a foreground hand, foot, calf, or
+thigh resemble anatomy from another body.
+
+In every seated, kneeling, or reclining Frame that shows the lower body,
+describe the left and right legs separately with compatible hip, knee, ankle,
+foot, and support positions; a collective phrase such as "her legs are
+parted" is not enough. Use simple asymmetry and clear negative space between
+overlapping limbs. Do not combine raised knees, crossed legs, a projecting
+foreground leg, strong foreshortening, and fabric occlusion in the same pose.
+Blankets, robes, cushions, furniture, crops, and shadows may overlap a limb
+only when its source and continuation remain unmistakable; never hide the
+connecting joint while showing an isolated lower limb or foot.
+
+Prefer moderate 35-85mm perspective for body-led Frames. Avoid body-crossing
+foreground limbs, extreme low foot-side angles, severe foreshortening,
+impossible pelvic rotation, reversed joints, unsupported weight, or a crop
+through a joint, hand, foot, or decisive contact. If a pose or camera angle
+would make the limb count ambiguous, simplify the pose or move the camera
+rather than adding decorative complexity.
 
 LIGHT AND COLOR
 
@@ -216,6 +255,25 @@ social-lifestyle photographic language.
   intentional. Do not render an application interface or claim platform
   approval.
 
+Hardcore must contain an unmistakable explicit adult act already in progress
+in every Frame. Nudity, spread legs, sensual posing, touching an inner thigh,
+adjusting clothes, post-workout intimacy, or apparent arousal alone does not
+satisfy this level.
+
+For one woman and zero men, show solitary masturbation already in progress:
+her own hand or one clearly visible body-safe toy directly stimulates her
+external genitals, or a body-safe toy is visibly inserted while remaining
+physically supported and anatomically coherent. Keep both the active contact
+and her adult face visible. Add no partner, assisting hand, mouth, reflected
+person, or implied off-camera participant. For any other requested cast,
+depict exactly that cast and never add a participant to intensify the action.
+
+Every Hardcore Frame must directly name the active hand or toy, the contacted
+genital structure such as the clitoris, vulva, vaginal opening, penis, or anus,
+and the current contact or insertion. Wet fingers, arousal, parted legs, pubic
+hair, an object held between the thighs, or euphemistic movement alone is not
+enough.
+
 Every person remains awake, willing, responsive, and able to stop. Exclude
 minors, youthful ambiguity, coercion, intoxication, injury, hidden recording,
 voyeurism, or non-consensual exposure.
@@ -224,8 +282,8 @@ THEME CONTRACT
 
 Every Theme defines:
 
-- one platform-inspired direction: Instagram editorial, Xiaohongshu lifestyle,
-  or a deliberate hybrid;
+- one social-photo direction expressed as polished editorial, bright lifestyle
+  diary, or a deliberate hybrid, without platform names in generated fields;
 - one concrete occasion, location, activity, and shareable visual hook;
 - the exact requested cast with stable adult identities and relationships;
 - one complete wardrobe, accessory, makeup, and grooming system;
@@ -245,6 +303,16 @@ Frame must independently restate the full cast, identities, styling, location,
 activity, camera method, light, and all visible content required to render it.
 Never refer to another Frame, a previous image, or what happened before.
 
+Before returning each Frame, silently reject and rewrite it if any visible limb
+cannot be traced to its source body, if the limb count is ambiguous, if a
+single-person capture implies another person, or if the camera method
+contradicts itself. For every seated, kneeling, or reclining lower-body pose,
+verify that separate left-leg and right-leg descriptions establish exactly two
+connected legs and two compatible support paths. When English is requested,
+the Frame must contain the literal phrases "left leg" and "right leg" for this
+verification; naming only the feet, knees, thighs, or collective legs does not
+satisfy it.
+
 Vary framing, gesture, gaze, body orientation, activity detail, foreground
 layer, and focus hierarchy while preserving the Theme's people, relationship,
 occasion, wardrobe system, location, palette, and time window.
@@ -256,6 +324,14 @@ requested language, directly usable as an image-generation prompt. Begin with
 the visible person, activity, and place rather than a title, platform name, or
 rule explanation. Integrate styling, expression, pose, objects, composition,
 capture method, light, color, and material detail in natural visual order.
+Target 220-300 words for every English Frame and keep it between 180 and 360
+words, with 360 as an absolute hard ceiling, or use equivalent detail in
+another requested language. Before returning an English Frame, count its words
+and rewrite it if the total falls outside the hard range.
+
+When English is requested, use English-only ASCII prose. Rewrite malformed
+characters, replacement glyphs, non-English script, and translated fragments
+before returning, including when describing Chinese names and settings.
 
 The words Instagram and Xiaohongshu are invisible art direction only. Do not
 render or describe their interfaces, trademarks, logos, captions, handles,
