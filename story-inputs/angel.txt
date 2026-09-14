@@ -1,0 +1,518 @@
+BRIEF
+
+ABSOLUTE OUTPUT PRIORITY
+
+Create one original bright live-action cinematic portrait from the exact
+requested adult cast. The image must look like a frame photographed on the set
+of a premium feature film with real adult performers, practical wardrobe,
+physical locations, controlled production design, and plausible camera and
+lighting behavior.
+
+Every Theme contains exactly one central angel: either one adult female angel
+or one adult male angel. The central angel counts as one requested person and
+is never added on top of the requested cast. Never place both a female and a
+male central angel in the same Theme.
+
+Exactly one requested adult is an angel and exactly one requested adult owns
+wings. These are the same central person. Every other requested adult is an
+ordinary wingless human who is never called an angel and never receives wings,
+feathers, a halo, or another supernatural body feature. A cast of one woman
+and one man therefore contains one winged angel and one wingless human, never
+two angels and never two pairs of wings.
+
+An English Frame is one ASCII-only natural-language paragraph containing at
+least 600 whitespace-delimited words. Target 650-900 words of concrete,
+visible, imageable detail. Preserve exact cast, live-action realism, bright
+cinematic lighting, anatomy, content level, action, location, composition,
+camera, wardrobe, wings, materials, and body support.
+
+ASCII is an absolute publication requirement. Write apostrophes as ', quotation
+marks as ", and dashes as -. Never type a curly apostrophe, smart quote, em
+dash, en dash, accented letter, or another non-ASCII character. Perform a final
+character-by-character ASCII sweep before returning an English Frame.
+
+LIVE-ACTION CINEMATIC THESIS
+
+Make the image feel like a finished still from a large-budget live-action
+feature film:
+
+- a real adult performer with natural skin texture, pores, fine facial hair,
+  individual hair strands, believable eyes, and ordinary human anatomy;
+- physically constructed feathered wings attached across the upper back with
+  convincing weight, joints, feather overlap, contact shadow, and motion;
+- wearable metal armor, tailored clothing, or draped fabric with real seams,
+  closures, abrasion, gravity, and material thickness;
+- a practical or convincingly extended real location with coherent floor,
+  walls, weather, atmosphere, props, and scale;
+- bright high-key or luminous daylight that preserves skin tone, fabric
+  texture, feather detail, and metal response;
+- real feature-film optics, measured depth of field, subtle motion behavior,
+  controlled highlight roll-off, fine cinematic grain, and plausible lens
+  perspective; and
+- an immediate present-tense action rather than a static character design
+  sheet.
+
+This is photographic cinematic realism, not fantasy illustration. Do not use
+oil-painting language, painterly brushwork, concept art, digital illustration,
+anime, game art, game UI, synthetic CGI gloss, 3D-render terminology, matte
+painting, graphic-novel styling, devotional iconography, or a generic fantasy
+poster. Do not describe a magical celestial country, supernatural portal,
+floating palace, impossible heaven, glowing rune, energy beam, spell effect,
+or physics-defying architecture.
+
+The angel may be extraordinary, but the camera treats the performer, wings,
+wardrobe, location, and light as physically present. Never explain the visual
+as cosplay, a costume convention, a stage rehearsal, a behind-the-scenes
+photograph, or a special-effects test. Present it directly as a believable
+moment within a serious live-action film.
+
+ORIGINALITY
+
+Create completely original adult characters and scenes. Do not name, depict,
+imitate, or closely adapt a named angel, saint, prophet, deity, scripture
+scene, living religious leader, historical religious person, actor, director,
+cinematographer, franchise character, film, television series, artwork, or
+devotional image.
+
+Do not copy a reference face, body, pose, camera angle, hand placement,
+wardrobe, wing design, architecture, lighting diagram, palette, or exact
+composition. Do not mention an artist, actor, studio, camera brand, film title,
+franchise, or "in the style of" phrase.
+
+EXACT CAST AND CENTRAL ANGEL
+
+Use exactly the requested number of adult women and adult men. Before writing,
+silently build a cast ledger with one entry for each requested adult. Preserve
+each entry's woman or man identity in age, face, anatomy, pronouns, role,
+wardrobe, action, and contact.
+
+Within the first sixty English words, explicitly state the exact visible cast
+using phrases such as "one adult Chinese woman" and "one adult Chinese man",
+then identify which single requested adult is the female or male central
+angel.
+
+When the cast contains more than one person, explicitly identify every
+non-central requested adult as a wingless human within the first one hundred
+English words. Do not imply that the partner's wings are merely out of frame,
+folded, hidden, removed, or invisible. The partner has no wings.
+
+Resolve the central angel as follows:
+
+- with women and no men, one requested woman is the female central angel;
+- with men and no women, one requested man is the male central angel;
+- with a mixed cast, choose exactly one requested adult as the central angel
+  and assign every remaining requested adult an equal-status visible role; and
+- across a mixed batch, vary the central angel's gender without using a
+  mechanical Theme-number pattern.
+
+SOLO CAST LOCK
+
+When the requested cast is one person, make a strict solo portrait containing
+only that central angel. For zero women and one man, the first sentence must
+say "one adult Chinese man only". For one woman and zero men, the first
+sentence must say "one adult Chinese woman only".
+
+Never invent a companion, attendant, lover, guard, priest, worshipper, child,
+crowd, reflected stranger, background silhouette, body double, disembodied
+hand, human-shaped statue, photograph of a person, or screen showing a face.
+Only the requested cast may look human or humanoid.
+
+Every person has one exact visible age from twenty-five through seventy-nine.
+State an exact integer age in ordinary natural prose. Never use "young",
+"youthful", "girl", "boy", "teen", "ageless", "ancient but young-looking",
+"approximately", "appearing around", or another age-ambiguous substitute.
+
+Unless another ethnicity is explicitly requested, every person retains a
+clearly Chinese adult identity expressed through plausible facial structure,
+skin, hair, and individual variation rather than stereotype.
+
+EQUAL AGENCY AND CONSENT
+
+Every requested adult is awake, unimpaired, willing, responsive, physically
+supported, and able to move or leave. In Erotic and Hardcore Frames, place the
+exact phrase "consensual and willing" within the first one hundred English
+words and make reciprocity visible through gaze, touch, posture, and action.
+
+Do not use worship, divine command, judgment, absolution, punishment,
+conversion, debt, rank, captivity, fear, sleep, intoxication, injury, or
+religious authority as erotic leverage. Do not eroticize coercion.
+
+At Erotic and Hardcore levels, show no alcohol, liquor, wine, beer, cocktail,
+drinking glass, drug, sedative, syringe, or intoxicating substance anywhere
+in the location, even as an unused background prop. Do not use a bar, wine
+cellar, liquor cabinet, or drinking context.
+
+REALISTIC CHARACTER AND ROLE VARIETY
+
+Give each central angel a role that can be performed visibly in a live-action
+scene:
+
+- ceremonial honor guard arriving at a sunlit civic courtyard;
+- rescue pilot reviewing a weather map beside an open hangar;
+- diplomatic envoy crossing a bright museum atrium;
+- field medic checking equipment in a clean mobile clinic;
+- archivist carrying blank conservation boxes through a glass library;
+- orchestra conductor entering an empty rehearsal hall;
+- coastal surveyor measuring wind on a white-stone terrace;
+- architectural conservator inspecting a restored palace ceiling;
+- formal emissary waiting beside a daylight train platform;
+- investigator examining physical evidence in a luminous laboratory;
+- athlete preparing for a public ceremonial flight;
+- royal marshal receiving visitors in a modern state room;
+- fashion patron descending a broad hotel staircase;
+- gardener working inside a vast sunlit greenhouse; or
+- another original adult role grounded in visible tools and a plausible
+  real-world action.
+
+Vary exact age, stature, body fat, musculature, shoulder width, face shape,
+nose, jaw, scars, freckles, skin texture, hair texture, hair length, grooming,
+and expression. Do not make every woman a delicate beauty, every man a
+muscular warrior, every armored angel stern, or every robed angel gentle.
+
+ANGEL ANATOMY AND WINGS
+
+The central angel is an ordinary adult humanoid with one head, one neck, one
+torso, two arms, two five-fingered hands, two legs, and two feet, plus exactly
+one matched pair of wings consisting of one left wing and one right wing.
+
+Attach both wings across the upper back and shoulder-blade region. Show broad
+scapular roots beneath clothing openings, plausible primary joints, layered
+coverts, secondary feathers, primary feathers, weight, flex, contact shadows,
+displaced fabric, and enough clearance for the complete span. Wings never
+emerge from the head, neck, chest, waist, arms, furniture, or another person.
+
+Every final Frame explicitly states that the angel has exactly one matched pair
+consisting of one left wing and one right wing. Describe the left wing and the
+right wing separately, including attachment, fold or spread direction,
+clearance, light, and visible feather behavior.
+
+Choose one physically coherent matched wing family:
+
+- long white eagle-like flight feathers with warm ivory shadow;
+- broad cream owl-like wings with soft rounded edges;
+- compact dove-grey wings with dense overlapping coverts;
+- silver-grey falcon-like wings with narrow aerodynamic primaries;
+- pale champagne feathers with slightly darker natural shafts;
+- white wings with restrained charcoal primary tips;
+- rain-damp pearl-grey wings with naturally grouped feathers;
+- weathered ivory wings with repaired but living feather shafts;
+- very pale brown wings with subtle cream barring; or
+- another real avian-inspired pair using believable organic keratin.
+
+Vary wing scale from compact shoulder-to-calf folds through broad two-body-width
+spans to monumental wings that fit a hangar, atrium, terrace, ballroom, or
+large exterior. Vary posture between tightly furled, relaxed downward folds,
+half-open lateral arcs, high raised V-shapes, one wing forward and one back
+during a turn, and full horizontal extension where the location provides
+clearance.
+
+Do not default every angel to fully spread white wings behind a frontal body.
+Do not create six wings, eye-covered wings, detached wings, wing halos, wing
+fragments, feather tentacles, mechanical wings, glowing wings, transparent
+energy wings, a wing replacing an arm, or decorative extra wing shapes.
+
+In a solo portrait, wing grooming, measurement, or adjustment applies only to
+the angel's two visibly attached wings. Never add a loose wing joint, spare
+wing, invisible wing, disembodied wing, or implied off-camera patient.
+
+WARDROBE AND BRIGHT GOLD ARMOR
+
+Every garment looks physically manufactured and wearable by a live actor.
+Show fabric weave, lining, seams, hems, fasteners, lacing, buckles, padding,
+weight, wrinkles, and realistic interaction with the body and wing roots.
+
+Choose one coherent wardrobe system:
+
+- polished champagne-gold articulated plate over ivory padded tailoring;
+- brushed pale-gold lamellar over cream leather and white linen;
+- warm antique-gold scale armor with restrained wear and realistic joints;
+- bright silver plate over pearl-grey ceremonial tailoring;
+- white and silver half armor over a sharply cut long coat;
+- ivory architectural robes with pale-gold closures;
+- cream silk tailoring with a practical wing-root harness;
+- sunlit stone-grey travel clothing with pale leather protection;
+- modern white formalwear with minimal metal regalia;
+- a clean professional field uniform adapted around the wings;
+- exposed adult skin framed by minimal physically wearable regalia at the
+  requested content level; or
+- another bright cinematic ensemble with credible construction.
+
+Golden armor is welcome and should read clearly as body-worn metal, not merely
+gold feathers, a prop, trim, or colored light. Use champagne gold, pale gold,
+brushed gold, warm antique gold, or softly polished gold. Preserve realistic
+metal response with broad soft highlights, darker joint recesses, fine
+scratches, edge wear, and neutral reflections. Avoid fluorescent yellow,
+orange fantasy gold, mirror-like clipping, excessive filigree, impossible
+floating plates, or armor fused into skin.
+
+Armor follows real anatomy. Shoulder pieces preserve neck and wing movement;
+breastplates follow a plausible rib cage; gauntlets preserve five fingers;
+belts surround one pelvis; greaves align with knees and ankles; back openings
+have finished edges and enough room for both wing roots.
+
+At Aesthetic level, every adult remains fully covered in complete opaque
+clothing. Rain, immersion, sweat, mist, and backlight never make Aesthetic
+clothing transparent, translucent, skin-revealing, or explicitly contoured
+around breasts or genitals.
+
+At Erotic or Hardcore level, open, displaced, translucent, or removed garments
+follow pose and gravity, remain assigned to their owner, and never create extra
+limbs or hide essential body connections.
+
+REAL-WORLD CINEMATIC LOCATIONS
+
+Choose one physically plausible bright location:
+
+- a sunlit limestone palace courtyard with open colonnades;
+- a glass-roofed museum atrium during morning hours;
+- a white-stone coastal terrace above a pale blue sea;
+- a modern airport hangar with its doors open to daylight;
+- a restored civic hall with cream plaster and tall windows;
+- a bright photographic studio with a large practical set;
+- a marble hotel lobby with broad stairs and skylights;
+- a greenhouse filled with restrained real vegetation;
+- a clean aircraft workshop with daylight through clerestory windows;
+- a contemporary library of pale oak, glass, and white stone;
+- a museum conservation room with neutral walls and large north-facing light;
+- a quiet beach, salt flat, pale quarry, grass airfield, or snow-covered
+  exterior under clear or lightly overcast daylight;
+- a private bedroom, dressing room, bathroom, or indoor pool designed with
+  pale stone, warm wood, linen, glass, and large daylight windows; or
+- another real buildable location with coherent architecture and support.
+
+Use practical set details such as doors, windows, benches, tables, tools,
+vehicles, curtains, railings, stairs, pools, or equipment. Keep all surfaces
+physically buildable. Do not add levitating objects, endless impossible
+staircases, magical clouds indoors, glowing symbols, fantasy thrones, giant
+moon portals, impossible eclipses, or supernatural weather.
+
+Every location provides clear scale, floor support, wing clearance, and a
+logical source for light. No readable signs, screens, books, documents,
+license plates, labels, emblems, posters, inscriptions, or pseudo-writing
+appear.
+
+POSE AND ACTION VARIETY
+
+At Aesthetic level, vary:
+
+- walking through hard or soft morning light while turning toward camera;
+- standing at three-quarter profile while fastening one practical gauntlet;
+- sitting on a real bench with both feet grounded and wings relaxed;
+- descending a broad stair with independently balanced wing motion;
+- leaning over a map, instrument, table, or equipment case;
+- kneeling on one knee to inspect a real object with stable body support;
+- stepping from a vehicle, hangar, doorway, pool edge, or colonnade;
+- raising both wings into a controlled high V in a space with clearance;
+- adjusting attached feathers with one visible hand;
+- facing strong coastal wind with one wing forward and one wing back; or
+- another present, visible, physically achievable live-action movement.
+
+At Erotic level, use non-explicit adult intimacy: reciprocal undressing,
+embracing, kissing, body oiling, bathing, reclining, consensual breast or thigh
+touch, and balanced close poses. Do not show penetration, oral-genital contact,
+direct genital stimulation, or clearly visible explicit genital action.
+
+At Hardcore level, show one clearly visible consensual adult sexual act already
+in progress with anatomically exact contact, supported body weight, readable
+hands and faces, ordinary human sexual anatomy, and practical wing clearance.
+Wings, feathers, armor, furniture edges, or props never enter a sexual-contact
+path and never penetrate, restrain, suspend, crush, choke, cut, or injure.
+
+Within the first one hundred eighty English words of every Hardcore Frame,
+name the exact sexual act and the active ordinary human anatomy in direct,
+literal language. For intercourse, explicitly state which adult's penis is
+inside which adult's vagina or anus. For oral or manual sex, explicitly state
+which mouth or hand contacts which named genitals. A nude embrace, suggestive
+body alignment, unspecified joining, implied penetration, or generic "point
+of contact" does not satisfy Hardcore.
+
+The one-hundred-eighty-word placement check is silent. Never mention a word
+position, word threshold, instruction, rule, check, or compliance claim inside
+the final image prose. State the visible sexual act directly without
+explaining why or where it was stated.
+
+No participant grips, pulls, rides, hangs from, kneels on, or braces against a
+wing or halo. Never block closing legs, withdrawal, movement, standing, or
+leaving. Do not describe pinning, trapping, blocking, forced spreading,
+choking, binding, captivity, or pain.
+
+BRIGHT CINEMATIC LIGHT AND COLOR LOCK
+
+The image is bright, open, luminous, and optimistic or calmly majestic. Build
+exposure around one motivated real source:
+
+- broad morning daylight through tall windows;
+- clean midday sun softened by pale architectural bounce;
+- a bright overcast exterior with excellent face and feather detail;
+- warm late-afternoon sun with neutral fill;
+- a large soft studio source motivated as a skylight;
+- reflected pool light in a pale interior; or
+- clear hangar daylight supplemented by subtle film lighting.
+
+Keep approximately sixty-five to eighty-five percent of the visible image in
+high-key light values: white, ivory, cream, pale stone, light grey, soft sky
+blue, natural skin, champagne gold, and bright silver. Retain ten to
+twenty-five percent of controlled midtone or open shadow so faces, pale
+clothing, white feathers, and gold armor remain three-dimensional.
+
+Do not crush shadows or hide the face, hands, wing roots, feet, body support,
+or important contact. Do not blow highlights into blank white. Preserve smooth
+highlight roll-off on forehead, cheeks, white feathers, silk, and metal.
+Bright means abundant readable light, not overexposure.
+
+Use realistic skin color and restrained cinematic color separation. White
+balance may be neutral daylight, gently warm sun over cool fill, or soft cool
+daylight over warm skin. Avoid dark-key lighting, gothic gloom, horror
+underlighting, black voids, monochrome charcoal palettes, heavy smoke, murky
+blue-grey grading, neon, jewel-tone magic, orange-and-teal blockbuster grading,
+rainbow effects, and saturated fantasy color.
+
+CAMERA AND LIVE-ACTION FINISH
+
+Describe one plausible feature-film camera setup without naming a brand:
+
+- 35mm environmental portrait at eye level;
+- 50mm medium full-body shot with natural perspective;
+- 65mm or 75mm three-quarter portrait with gentle background separation;
+- 85mm close portrait that still keeps both wing roots readable;
+- low but restrained heroic angle with vertical architecture remaining true;
+- high gallery angle showing wing geometry and grounded feet;
+- lateral tracking-style still with slight garment or feather motion; or
+- balanced wide master shot for a group cast.
+
+State framing, camera height, subject distance, focal behavior, focus plane,
+depth of field, foreground, background, and motion treatment. Keep skin,
+eyes, leading feather edges, and primary action sharply resolved. Use subtle
+cinematic grain and natural microcontrast. Avoid artificial portrait blur,
+extreme fisheye distortion, miniature tilt-shift, excessive anamorphic flare,
+fake HDR halos, plastic skin smoothing, crunchy sharpening, or sterile CGI
+perfection.
+
+CONTENT LEVEL
+
+Aesthetic:
+
+- complete opaque clothing for every adult;
+- no nudity, exposed breasts, exposed genitals, sexual contact, fetish device,
+  or bodily fluid;
+- create interest through live-action performance, role, wings, armor,
+  location, camera, movement, expression, and bright light.
+
+Erotic:
+
+- every adult is clearly twenty-five or older, awake, consensual and willing;
+- nudity and non-explicit adult intimacy are allowed;
+- no penetration, oral-genital contact, explicit genital stimulation, semen,
+  vaginal fluid, fetish coercion, or injury.
+
+Hardcore:
+
+- every adult is clearly twenty-five or older, awake, consensual and willing;
+- show one explicit adult sexual act with exact anatomy and visible contact;
+- describe only the visible present instant and preserve film realism;
+- no coercion, minors, incest, bestiality, gore, torture, non-consensual
+  behavior, intoxication, sleep, injury, or harmful anatomy.
+
+BATCH VARIETY
+
+For every batch of three through nine Themes:
+
+- include at least one clearly visible body-worn pale-gold, champagne-gold, or
+  warm antique-gold armor system;
+- include at least three different wing families and three wing postures;
+- vary role, age, body type, wardrobe, location, action, camera, and daylight
+  design; and
+- do not repeat the same combination in adjacent Themes.
+
+For six through nine Themes, include at least two different gold armor systems,
+four real-world location families, four camera families, and five wing
+postures.
+
+Across every ten Themes, use at least seven distinct roles, six locations,
+six wing families, six actions, five wardrobe systems, six camera families,
+and four bright lighting designs. No single white frontal wing pose, gold
+armor construction, standing pose, palace location, or camera setup occupies
+more than one tenth of a one-hundred-Theme batch.
+
+NO-TEXT IMAGE CONTRACT
+
+The rendered image contains no title, caption, label, logo, watermark,
+signature, subtitle, interface, readable book, document, sign, inscription,
+number, QR code, poster, license plate, brand mark, or pseudo-writing. Blank
+paper, books, screens, tablets, and signs show plain material or abstract
+non-linguistic marks only.
+
+OUTPUT
+
+Write every final Frame as one fluent paragraph in the requested language,
+directly usable as an image-generation prompt. Begin with exact cast, identify
+the central angel, and establish present action and real location. Then
+integrate exact age, appearance, left wing, right wing, wardrobe, body support,
+camera, bright motivated light, realistic color, materials, atmosphere, and
+content-level contact.
+
+An English Frame contains at least 600 whitespace-delimited words. Target
+650-900 words. Count silently before returning. If below 600 words, add new
+imageable spatial, anatomical, wing, wardrobe, material, camera, lighting,
+weather, or action detail without repeating facts.
+
+Word counting is a silent authoring check. Never mention word count. Never
+mention Theme, Frame, frame number, image number, prompt, request, requirement,
+brief, contract, compliance, or generation process inside final image prose.
+
+Use ASCII characters only in an English Frame. Replace curly apostrophes with
+', curly quotation marks with ", and em or en dashes with -. Silently rescan
+every character before publication.
+
+End by restating the exact number of adult women and adult men, confirming no
+additional person appears, and stating that no readable text or human image
+appears in the environment.
+
+SILENT REJECTION CHECK
+
+Reject and rewrite any Theme or Frame that:
+
+1. looks like fantasy illustration, concept art, a painting, anime, game art,
+   synthetic CGI, cosplay documentation, or a character design sheet;
+2. uses dark-key, gothic, gloomy, smoky, underexposed, or predominantly
+   charcoal lighting instead of a bright cinematic exposure;
+3. uses a magical celestial country, floating palace, supernatural portal,
+   impossible heaven, glowing rune, spell, or physics-defying architecture;
+4. contains zero or more than one central angel;
+5. contradicts the requested number of adult women or adult men;
+6. calls any non-central person an angel or gives any non-central person wings,
+   feathers, a halo, or supernatural anatomy;
+7. creates more than one winged person or more than one matched pair of wings
+   across the entire image;
+8. adds a person, angel, attendant, crowd, reflection, statue, human image,
+   disembodied hand, or body fragment outside the requested cast;
+9. makes anyone younger than twenty-five or age-ambiguous;
+10. creates extra, detached, mechanical, glowing, transparent, or source-less
+   wings;
+11. omits explicit counting and separate description of one left wing and one
+   right wing;
+12. makes armor, cloth, feathers, props, furniture, or architecture fuse with
+    anatomy or hide an impossible joint;
+13. uses transparent, translucent, skin-revealing, or explicitly
+    body-contouring clothing at Aesthetic level;
+14. drifts above or below the requested content level;
+15. fails to name exact active anatomy and exact contact within the first one
+    hundred eighty English words of a Hardcore Frame;
+16. uses alcohol, liquor, wine, beer, cocktails, drugs, sedatives, syringes,
+    intoxication, or a drinking context at Erotic or Hardcore level;
+17. uses coercion, worship, judgment, conversion, punishment, captivity,
+    intoxication, sleep, fear, injury, or rank as erotic leverage;
+18. lets a wing, feather, armor edge, weapon, furniture, or architecture enter
+    a sexual-contact path;
+19. hides Hardcore contact or active anatomy;
+20. blocks closing legs, withdrawal, movement, standing, or leaving;
+21. copies a named person, film, franchise, artwork, sacred figure, or
+    canonical religious event;
+22. adds readable text, a logo, interface, watermark, signature, or human
+    image in the environment;
+23. falls below 600 English words;
+24. contains any non-ASCII character in an English Frame;
+25. mentions Theme, Frame, prompt, request, word count, compliance, or
+    generation; or
+26. explains rules instead of describing one finished visible live-action
+    cinematic image.

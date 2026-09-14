@@ -2907,6 +2907,12 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "single couple remains the only human silhouette group" in normalized
     assert "a 38-year-old Chinese woman named Mei" in normalized
     assert "Always write the words woman or man beside each name" in normalized
+    assert "GENDER COMPOSITION LOCK" in brief
+    assert "female_count and male_count as immutable gender slots" in normalized
+    assert "still uses the word woman or man matching that requested slot" in normalized
+    assert "two women and one man: one NN-year-old woman named A" in normalized
+    assert "one woman and two men: one NN-year-old woman named A" in normalized
+    assert "Repeat the complete requested gender structure independently in every Frame" in normalized
     assert "Show one visible body and face per requested person" in normalized
     assert "woman has one vulva and the man has one penis" in normalized
     assert "pubic regions touch directly" in normalized
@@ -3050,6 +3056,8 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "a phallic toy is mounted to a man's pelvis" in normalized
     assert "resembles a second penis" in normalized
     assert "a single-adult request contains a second body" in normalized
+    assert "changes female_count or male_count" in normalized
+    assert "turns a requested gender slot into an unspecified" in normalized
     assert "Selected-action geometry within the first 120 words" in normalized
     assert "bunched around a thigh, knee, or ankle" in normalized
     assert "transport window contains a human reflection" in normalized
@@ -3100,6 +3108,8 @@ def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() ->
     assert "ABSOLUTE OUTPUT PRIORITY" in brief
     assert "at least 600 whitespace-delimited words" in normalized
     assert "Target 650-900 words" in normalized
+    assert "ASCII is an absolute publication requirement" in normalized
+    assert "final character-by-character ASCII sweep" in normalized
     assert "This minimum overrides every later request for brevity" in normalized
     assert "museum-caliber surreal conceptual portraits" in normalized
     assert "one impossible but visually coherent metaphor" in normalized
@@ -3306,3 +3316,106 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "adds any second person, name, owner, gaze partner" in normalized
     assert "falls below 600 English words" in normalized
     assert "uses vivid, neon, jewel-tone, high-saturation" in normalized
+
+
+def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "angel.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert brief.isascii()
+    assert "bright live-action cinematic portrait" in normalized
+    assert "premium feature film with real adult performers" in normalized
+    assert "exactly one central angel" in normalized
+    assert "adult female angel or one adult male angel" in normalized
+    assert "Never place both a female and a male central angel" in normalized
+    assert "Exactly one requested adult is an angel" in normalized
+    assert "Every other requested adult is an ordinary wingless human" in normalized
+    assert "one winged angel and one wingless human" in normalized
+    assert "at least 600 whitespace-delimited words" in normalized
+    assert "Target 650-900 words" in normalized
+    assert "ASCII is an absolute publication requirement" in normalized
+    assert "final character-by-character ASCII sweep" in normalized
+    assert "LIVE-ACTION CINEMATIC THESIS" in brief
+    assert "real adult performer with natural skin texture" in normalized
+    assert "physical locations, controlled production design" in normalized
+    assert "real feature-film optics" in normalized
+    assert "photographic cinematic realism, not fantasy illustration" in normalized
+    assert "Do not use oil-painting language" in normalized
+    assert "synthetic CGI gloss" in normalized
+    assert "Do not describe a magical celestial country" in normalized
+    assert "Create completely original adult characters and scenes" in normalized
+    assert "Do not copy a reference face, body, pose" in normalized
+    assert "Use exactly the requested number of adult women and adult men" in normalized
+    assert "silently build a cast ledger" in normalized
+    assert "Within the first sixty English words" in normalized
+    assert "identify every non-central requested adult as a wingless human" in (
+        normalized
+    )
+    assert "SOLO CAST LOCK" in brief
+    assert "strict solo portrait containing only that central angel" in normalized
+    assert 'first sentence must say "one adult Chinese man only"' in normalized
+    assert 'first sentence must say "one adult Chinese woman only"' in normalized
+    assert "exact visible age from twenty-five through seventy-nine" in normalized
+    assert "State an exact integer age" in normalized
+    assert "retains a clearly Chinese adult identity" in normalized
+    assert "EQUAL AGENCY AND CONSENT" in brief
+    assert "awake, unimpaired, willing, responsive" in normalized
+    assert 'exact phrase "consensual and willing"' in normalized
+    assert "show no alcohol, liquor, wine, beer, cocktail" in normalized
+    assert "REALISTIC CHARACTER AND ROLE VARIETY" in brief
+    assert "ceremonial honor guard arriving at a sunlit civic courtyard" in normalized
+    assert "rescue pilot reviewing a weather map beside an open hangar" in normalized
+    assert "gardener working inside a vast sunlit greenhouse" in normalized
+    assert "ANGEL ANATOMY AND WINGS" in brief
+    assert "plus exactly one matched pair of wings" in normalized
+    assert "Attach both wings across the upper back and shoulder-blade region" in (
+        normalized
+    )
+    assert "exactly one matched pair consisting of one left wing and one right wing" in (
+        normalized
+    )
+    assert "long white eagle-like flight feathers" in normalized
+    assert "silver-grey falcon-like wings" in normalized
+    assert "Do not create six wings, eye-covered wings, detached wings" in normalized
+    assert "WARDROBE AND BRIGHT GOLD ARMOR" in brief
+    assert "polished champagne-gold articulated plate" in normalized
+    assert "brushed pale-gold lamellar" in normalized
+    assert "Golden armor is welcome" in normalized
+    assert "broad soft highlights, darker joint recesses" in normalized
+    assert "REAL-WORLD CINEMATIC LOCATIONS" in brief
+    assert "sunlit limestone palace courtyard" in normalized
+    assert "glass-roofed museum atrium" in normalized
+    assert "modern airport hangar with its doors open to daylight" in normalized
+    assert "Do not add levitating objects" in normalized
+    assert "POSE AND ACTION VARIETY" in brief
+    assert "walking through hard or soft morning light" in normalized
+    assert "At Erotic level, use non-explicit adult intimacy" in normalized
+    assert "one clearly visible consensual adult sexual act already in progress" in (
+        normalized
+    )
+    assert "Within the first one hundred eighty English words" in normalized
+    assert "which adult's penis is inside which adult's vagina or anus" in normalized
+    assert "generic \"point of contact\" does not satisfy Hardcore" in normalized
+    assert "one-hundred-eighty-word placement check is silent" in normalized
+    assert "Never mention a word position, word threshold" in normalized
+    assert "BRIGHT CINEMATIC LIGHT AND COLOR LOCK" in brief
+    assert "sixty-five to eighty-five percent of the visible image" in normalized
+    assert "Bright means abundant readable light, not overexposure" in normalized
+    assert "Avoid dark-key lighting, gothic gloom" in normalized
+    assert "CAMERA AND LIVE-ACTION FINISH" in brief
+    assert "35mm environmental portrait at eye level" in normalized
+    assert "50mm medium full-body shot" in normalized
+    assert "subtle cinematic grain and natural microcontrast" in normalized
+    assert "For every batch of three through nine Themes" in normalized
+    assert "For six through nine Themes" in normalized
+    assert "NO-TEXT IMAGE CONTRACT" in brief
+    assert "Word counting is a silent authoring check" in normalized
+    assert "Use ASCII characters only in an English Frame" in normalized
+    assert "falls below 600 English words" in normalized
+    assert "calls any non-central person an angel" in normalized
+    assert "more than one winged person or more than one matched pair" in normalized
+    assert "uses alcohol, liquor, wine, beer, cocktails" in normalized
+    assert "finished visible live-action cinematic image" in normalized

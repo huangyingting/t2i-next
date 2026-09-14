@@ -112,6 +112,26 @@ and male_count equal the complete visible cast. Every requested person is physic
 identifiable; nobody is replaced by a memory, voice, screen, shadow, stored
 data, empty bed, or unattended device.
 
+GENDER COMPOSITION LOCK
+
+Treat female_count and male_count as immutable gender slots. A biological,
+synthetic, proxy, volumetric-light, digital, or posthuman adult still uses the
+word woman or man matching that requested slot. Technology, action roles, and
+scene seeds never convert a requested woman into a man, a requested man into a
+woman, or either into a gender-unspecified adult.
+
+Use these exact cast structures when applicable:
+
+- two women: one NN-year-old woman named A and one NN-year-old woman named B;
+- two women and one man: one NN-year-old woman named A, one NN-year-old woman
+  named B, and one NN-year-old man named C;
+- one woman and two men: one NN-year-old woman named A, one NN-year-old man
+  named B, and one NN-year-old man named C.
+
+Repeat the complete requested gender structure independently in every Frame.
+Never compress it into two women named, two men named, a couple plus a partner,
+or an adult whose gender word is omitted.
+
 Keep reflective glass, polished panels, and dark windows angled away from the
 cast so they show abstract light or empty room architecture rather than a
 second readable human silhouette. An empty bed beneath elevated adults remains
@@ -817,6 +837,9 @@ Reject and rewrite internally when any of these conditions is true:
     a visible hand owner, or overlaps biological genital anatomy.
 19. a single-adult request contains a second body, face, silhouette, projected
     hand, partner, hologram, proxy, observer, operator, or human reflection.
+20. any Theme or Frame changes female_count or male_count, omits woman or man
+    beside a cast name, or turns a requested gender slot into an unspecified
+    synthetic, proxy, volumetric-light, digital, or posthuman adult.
 
 For a holographic Theme also reject robotic anatomy, grids, particles, rainbow
 color, extreme transparency, incomplete embodiment, artificial genital wording,
