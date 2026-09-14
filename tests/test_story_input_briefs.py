@@ -1875,11 +1875,11 @@ def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
     assert "Frames are parallel campaign variants" in normalized
     assert "ADULTS 25+" in normalized
     assert "one exact invented 13-digit barcode number" in normalized
-    assert "Target 500-600 words" in normalized
-    assert "absolute range of 450-700 words" in normalized
-    assert "each inset description under 25 words" in normalized
+    assert "Target 700-1000 words" in normalized
+    assert "absolute range of 500-1300 words" in normalized
+    assert "each inset description under 40 words" in normalized
     assert "State shared lighting, identity, borders, and print behavior once" in normalized
-    assert "Reject and rewrite any Frame below 450 words or above 700 words" in normalized
+    assert "Reject and rewrite any Frame below 500 words or above 1300 words" in normalized
     assert "final dedicated image-text passage is missing" in normalized
     assert "one complete flat sleeve" in normalized
 
@@ -2852,101 +2852,124 @@ def test_extreme_absurdity_requires_visible_human_prop_contact_chain() -> None:
     assert "assign complementary colors and different silhouettes" in normalized
 
 
-def test_near_future_intimacy_uses_cold_lived_in_realism() -> None:
+def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     brief = (
         REPOSITORY_ROOT / "story-inputs" / "near-future-intimacy-realism.txt"
     ).read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
+    headings = (
+        "PRIORITY AND OUTPUT CONTRACT",
+        "CAST, CONSENT, AND ANATOMY",
+        "CONTENT AND ACTION",
+        "FUTURE VISUAL SYSTEM",
+        "PHOTOGRAPHIC SYSTEM",
+        "CONDITIONAL TECHNOLOGY MODULES",
+        "POSITION ARCHITECTURES",
+        "TECHNOLOGY FAMILIES",
+        "SCENE SEED LIBRARY",
+        "SILENT REJECTION CHECK",
+        "FINAL FRAME",
+    )
+
     assert brief.startswith("BRIEF\n\n")
+    assert brief.isascii()
+    assert len(brief) < 40_000
+    for heading in headings:
+        assert f"\n{heading}\n" in brief
+
     assert "cold lived-in realism" in normalized
-    assert "HIGHEST PRIORITY CAST AND CAMERA LOCK" in normalized
-    assert "Every requested person must be physically visible" in normalized
-    assert "Do not place a requested partner off-screen" in normalized
-    assert "first sentence of every Theme premise and every Frame" in normalized
-    assert "one invented name, gender, and exact integer age" in normalized
-    assert "Never use twenties, thirties, forties, early, mid, late" in normalized
-    assert "proxy visibly embodies one requested adult" in normalized
-    assert "never remove a requested adult from the image" in normalized
-    assert "Show exactly one visible body for each requested person" in normalized
-    assert "never show the original and proxy simultaneously" in normalized
-    assert "total number of visible faces and bodies must equal" in normalized
-    assert "complete physical structure needed for the described sexual action" in normalized
+    assert "Write only positive visible instructions" in normalized
+    assert "Never copy a rule, rejection, warning" in normalized
+    assert "Silently use those checks before returning" in normalized
+    assert "Target 220-280 words and five to seven sentences per Frame" in normalized
+    assert "absolute limits are 320 words and 2100 ASCII characters" in normalized
+    assert "Count silently" in normalized
+    assert "Put cast, action, anatomy, and technology in the first half" in normalized
+    assert "image contains no captions, subtitles, logos" in normalized
+
+    assert "complete requested cast" in normalized
+    assert "ASCII Arabic numerals, such as 38-year-old" in normalized
+    assert "Show one visible body and face per requested person" in normalized
+    assert "woman has one vulva and the man has one penis" in normalized
+    assert "pubic regions touch directly" in normalized
+    assert "only the attached base remains externally visible" in normalized
     assert "torso-only proxy" in normalized
-    assert "cannot perform vaginal or anal intercourse" in normalized
-    assert "Every Frame must use a rectilinear 35-85 mm equivalent lens" in normalized
-    assert "Never use a lens wider than 35 mm or longer than 85 mm" in normalized
-    assert "ONE SPECULATIVE LEAP" in normalized
+    assert "All activity is voluntary" in normalized
+    assert "Keep professional service separate from sex" in normalized
+
+    assert "Aesthetic:" in brief
+    assert "Erotic:" in brief
+    assert "Hardcore:" in brief
+    assert "one explicit sexual action visibly underway" in normalized
+    assert "technology is powered, worn, connected" in normalized
+    assert "Frames under one Theme are alternative photographs" in normalized
+
     assert "exactly one primary speculative development" in normalized
-    assert "at least five mundane anchors in every Frame" in normalized
-    assert "SEXUAL-INTIMACY READABILITY LOCK" in normalized
-    assert "A viewer who sees only the image" in normalized
-    assert "participants are sexual partners" in normalized
-    assert "content-level intimate action is the foreground story" in normalized
-    assert "Do not make wiping a dock, inspecting a screen" in normalized
-    assert "Do not pose the participants as parallel observers" in normalized
-    assert "technology-to-intimacy connection visually literal" in normalized
-    assert "Never rely on prose stating that a detached device" in normalized
-    assert "At erotic and hardcore levels, the sexual encounter must be visibly underway" in normalized
-    assert "cannot replace or pause that action" in normalized
-    assert "Show exactly how the selected technology changes sensation" in normalized
-    assert "Sexually engaged bodies and their reciprocal contact must dominate" in normalized
-    assert "rather than readable paperwork, barcodes, or product labels" in normalized
-    assert "Describe visible sexual geometry" in normalized
-    assert "name the active adult body parts" in normalized
-    assert "never claim intercourse through intact trousers" in normalized
-    assert "The selected technology must be powered, worn, connected" in normalized
-    assert "must visibly operate on or between the participants" in normalized
-    assert "ANTI-SCI-FI VISUAL GATE" in normalized
-    assert "Do not use cyberpunk, neon skylines, glowing circuitry" in normalized
-    assert "Use the exact requested human cast and no additional people" in normalized
-    assert "Use no real animals in sexual or intimate situations" in normalized
-    assert "language-capable extraterrestrial adult" in normalized
-    assert "At aesthetic level" in normalized
-    assert "unmistakable but non-explicit sexual anticipation" in normalized
-    assert "must not replace the couple's sexual relationship" in normalized
-    assert "At erotic level" in normalized
-    assert "at least one active erotic action in progress" in normalized
-    assert "At hardcore level" in normalized
-    assert "one explicit primary sexual action visibly underway" in normalized
-    assert "Do not substitute setup, maintenance, observation" in normalized
-    assert "Domestic synthetic partner" in normalized
-    assert "Robot wear and adaptation" in normalized
-    assert "Never continue sex through leaking fluid, overheating" in normalized
-    assert "Long-distance telepresence" in normalized
-    assert "Asynchronous embodied intimacy" in normalized
-    assert "physically present full-body proxy" in normalized
-    assert "Never represent the remote partner as electrodes" in normalized
-    assert "Neural sensory link" in normalized
-    assert "Orbital microgravity" in normalized
-    assert "Lunar settlement" in normalized
-    assert "Martian settlement" in normalized
-    assert "Sapient cross-species or posthuman intimacy" in normalized
-    assert "Intimacy constrained by labor" in normalized
-    assert "Never turn a maintenance worker, cleaner, clinician" in normalized
-    assert "COLD LIVED-IN REALISM" in normalized
-    assert "Cold realism is not merely blue color grading" in normalized
-    assert "one sign of cost or scarcity" in normalized
-    assert "one sign of maintenance" in normalized
-    assert "one sign of privacy limitation" in normalized
-    assert "one bodily consequence" in normalized
-    assert "mentioning each device, anchor, expression" in normalized
-    assert "QR codes, barcodes" in normalized
-    assert "A Frame with a relative age, more visible bodies than" in normalized
-    assert "can be mistaken for friendship, repair work, calibration" in normalized
-    assert "unmistakable image-legible sexual partnership" in normalized
-    assert "describes penetration by a torso-only, pelvis-free" in normalized
-    assert "continues sexual activity through leaking machinery" in normalized
-    assert "sexualizes a worker, cleaner, clinician" in normalized
-    assert "pauses, suspends, interrupts, or replaces" in normalized
-    assert "detached replay device in place of a requested remote partner" in normalized
-    assert "claims intercourse without describing physically compatible" in normalized
-    assert "adds a synthetic partner, neural link, alien biology" in normalized
-    assert "adds a detached spare body, hand, limb" in normalized
-    assert "approximately 400-650 words" not in normalized
-    assert "preferred target" not in normalized
-    assert "hard maximum" not in normalized
-    assert "Count words before returning" not in normalized
-    assert "sentence budget" not in normalized
-    assert "English-only printable ASCII" in normalized
-    assert "no readable text inside the image" in normalized
+    assert "room scale:" in normalized
+    assert "body scale:" in normalized
+    assert "contact scale:" in normalized
+    assert "at least six coherent future signals" in normalized
+    assert "Retrofitted megacity domestic" in normalized
+    assert "Brutalist habitat utility" in normalized
+    assert "Climate-adapted interior" in normalized
+    assert "Spectral telepresence room" in normalized
+
+    assert "rectilinear 35-50 mm" in normalized
+    assert "f/5.6-f/11" in normalized
+    assert "foreground, middle ground, and background" in normalized
+    assert "5200K-6500K" in normalized
+    assert "palette is cool dominant" in normalized
+    assert "Choose six concise reality anchors" in normalized
+
+    assert "MODULE: SYNTHETIC OR PROXY ADULT" in brief
+    assert "MODULE: HAPTIC VOLUMETRIC ADULT" in brief
+    assert "55-70 percent optical density" in normalized
+    assert "smooth light density" in normalized
+    assert "semi-transparent monochromatic volumetric-light adult" in normalized
+    assert "Use semi-transparent rather than solid or opaque" in normalized
+    assert "MODULE: HAPTIC OR NEURAL SYSTEM" in brief
+    assert "MODULE: ACTIVE SUSPENSION" in brief
+    assert "MODULE: COOLING SUSPENSION" in brief
+    assert "four physically separated flexible support wings" in normalized
+    assert "30-40 centimeter oval contact opening" in normalized
+    assert "50-80 centimeters above" in normalized
+    assert "Pale-cyan coolant" in brief
+    assert "front partner on one side with their spine facing" in normalized
+    assert "rear partner parallel on the same side" in normalized
+    assert "rear three-quarter side camera at pelvic height" in normalized
+    assert "MODULE: ORBITAL GANTRY" in brief
+    assert "two independent counterweighted body axes" in normalized
+    assert "30-40-degree backward incline" in normalized
+    assert "35-50-degree forward incline" in normalized
+    assert "two visible ceiling carriages" in normalized
+    assert "safety webbing a muted violet or graphite color" in normalized
+    assert "MODULE: ORBITAL MICROGRAVITY" in brief
+    assert "MODULE: SAPIENT POSTHUMAN PARTNER" in brief
+
+    family_section = brief.split("TECHNOLOGY FAMILIES\n\n", 1)[1].split(
+        "\n\nSCENE SEED LIBRARY", 1
+    )[0]
+    seed_section = brief.split("SCENE SEED LIBRARY\n\n", 1)[1].split(
+        "\n\nSILENT REJECTION CHECK", 1
+    )[0]
+    for number in range(1, 24):
+        assert f"\n{number}. " in f"\n{family_section}"
+    for number in range(1, 31):
+        assert f"\n{number}. " in f"\n{seed_section}"
+
+    assert "Rain-Lag Hologram Motel" in normalized
+    assert "Heat-Ration Cooling Suspension" in normalized
+    assert "Recycled-Air Hotel Suspension" in normalized
+    assert "Use these checks silently" in normalized
+    assert "Their vocabulary never appears in the returned Frame" in normalized
+    assert "Return only the single positive English ASCII paragraph" in normalized
+    assert "confirm five to seven sentences and at most 320 words" in normalized
+    assert "confirm at most 2100 characters" in normalized
+    assert "straight ASCII equivalent" in normalized
+
+    assert "HIGHEST PRIORITY CAST AND CAMERA LOCK" not in brief
+    assert "VISIBLE FUTURE-TECHNOLOGY SIGNATURE" not in brief
+    assert "FUTURE VISUAL WORLD LOCK" not in brief
+    assert "HIGH FUTURE VISUAL INTENSITY LOCK" not in brief
+    assert "ANTI-SCI-FI VISUAL GATE" not in brief

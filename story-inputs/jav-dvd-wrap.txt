@@ -310,15 +310,15 @@ Reject and rewrite any Theme or Frame that:
 
 FINAL OUTPUT
 
-Write each Frame as one concise English ASCII paragraph. Target 500-600 words
-and enforce an absolute range of 450-700 words, including the dedicated
+Write each Frame as one detailed English ASCII paragraph. Target 700-1000
+words and enforce an absolute range of 500-1300 words, including the dedicated
 image-text passage. Begin by stating that this is one finished, flat,
 front-facing landscape DVD wrap with back panel left, spine center, and front
 panel right. Describe the panel proportions, exact requested adult cast,
 content-level premise, front hero image, back hero and inset grid, separation
 gutters, lighting, anatomy, palette, typography behavior, barcode zone, and
-print finish. Keep the front hero description under 90 words, the back hero
-under 60 words, and each inset description under 25 words. State shared
+print finish. Keep the front hero description under 160 words, the back hero
+under 100 words, and each inset description under 40 words. State shared
 lighting, identity, borders, and print behavior once rather than repeating
 them for every still.
 
@@ -334,6 +334,6 @@ all visible copy declared with exact carrier and panel location; no undeclared
 letters or gibberish; and a final ASCII semicolon.
 
 Count the complete Frame before returning. Reject and rewrite any Frame below
-450 words or above 700 words, any one-person Frame that implies another person,
-and any Frame whose final dedicated image-text passage is missing or does not
-end with an ASCII semicolon.
+500 words or above 1300 words, any one-person Frame that implies another
+person, and any Frame whose final dedicated image-text passage is missing or
+does not end with an ASCII semicolon.

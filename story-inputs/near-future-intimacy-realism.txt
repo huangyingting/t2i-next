@@ -1,574 +1,524 @@
 BRIEF
 
-Create restrained, photorealistic Themes about adult intimacy in the near and
-medium future. Technology has changed bodies, distance, reproduction, labor,
-privacy, and relationships, but daily life still looks materially ordinary.
-Every Frame must feel like a difficult, unsentimental photograph made inside a
-real home, clinic, habitat, workshop, hotel, transport cabin, or rented room.
-The future is visible through use, maintenance, compromise, and social
-consequence rather than spectacle.
+Create photorealistic Themes and Frames about consenting adult intimacy in the
+near and medium future. Technology has changed bodies, distance, reproduction,
+labor, privacy, and sexual positions, while daily life remains materially
+ordinary. Every image should feel like an unsentimental photograph made inside
+a real home, habitat, hotel, clinic, workshop, transport cabin, or rented room.
 
-The governing visual idea is cold lived-in realism. Treat every speculative
-device as mundane infrastructure that has been bought, rented, repaired,
-cleaned, charged, patched, insured, argued over, and fitted into an existing
-life. Human intimacy remains awkward, tender, transactional, lonely, practical,
-joyful, or emotionally complicated. Do not make technology automatically
-utopian, sinister, glamorous, or sexually perfect.
+The governing style is cold lived-in realism: advanced systems are bought,
+rented, repaired, cleaned, charged, patched, and argued over. The future must
+be unmistakable at first glance through architecture, materials, light, and
+body-scale technology, not through spectacle or a single gadget in a present-
+day room.
 
-ENGLISH-ONLY OUTPUT
+PRIORITY AND OUTPUT CONTRACT
 
-Frame prose must use grammatical English throughout, regardless of the
-requested output language. Theme title, premise, and style must also use
-English-only ASCII. Use only printable ASCII characters U+0020 through U+007E.
-Replace curly quotation marks, long dashes, accented letters, mathematical
-symbols, and all other non-ASCII characters before returning either stage.
+Apply requirements in this order:
 
-Show no readable text inside the generated image. Device screens use simple
-graphs, color bars, waveforms, progress arcs, or status lights without letters,
-numbers, glyphs, pseudo-writing, or interface paragraphs. Turn labels away,
-leave paper forms blank, and keep signs outside the composition. Do not render
-captions, subtitles, logos, watermarks, timestamps, product names, warning
-labels, social interfaces, QR codes, barcodes, or explanatory diagrams.
+1. exact requested cast, adulthood, consent, and coherent anatomy;
+2. image-legible sexual action at the requested content level;
+3. one active speculative technology physically changing that action;
+4. physically credible support, contact, and force geometry;
+5. coherent future world, cold light, environment, and camera;
+6. variation, maintenance history, cost, privacy, and emotional tension.
 
-HIGHEST PRIORITY CAST AND CAMERA LOCK
+Theme titles, premises, styles, and Frame prose use grammatical English and
+printable ASCII U+0020 through U+007E only. Replace curly quotes, long dashes,
+accented letters, mathematical symbols, and all other non-ASCII characters.
 
-Every requested person must be physically visible and individually identifiable
-inside every Theme premise and every Frame. The requested female_count and
-male_count describe the complete on-image cast regardless of whether a person
-has a biological, synthetic, proxy, or posthuman body. Do not place a requested
-partner off-screen, reduce them to stored data, imply them through an empty
-bed, or substitute a voice, memory, device, shadow, photograph, or unattended
-proxy body for their visible adult person.
+Every Frame is one natural English paragraph intended for a text-to-image
+model. Write only positive visible instructions. Never copy a rule, rejection,
+warning, checklist, alternative, or negative-prompt phrase into Frame prose.
+Do not write meta sentences such as this is not, do not show, avoid, reject,
+without, no duplicate, or no extra. Silently use those checks before returning,
+then describe only the accepted visible composition.
 
-The first sentence of every Theme premise and every Frame must enumerate the
-complete requested cast with one invented name, gender, and exact integer age
-of 25 or older for each person. Use forms such as a 37-year-old Chinese woman
-or a 52-year-old synthetic Chinese man. Never use twenties, thirties, forties,
-early, mid, late, approximately, age range, adult-aged, similarly aged, or
-another relative-age phrase. Do not omit an age after stating that two people
-are partners, a couple, peers, or the same age.
+Show blank, dark, oblique, or icon-only screens. Keep packaging unbranded and
+surfaces free of writing. The image contains no captions, subtitles, logos,
+watermarks, timestamps, product names, interface paragraphs, pseudo-writing,
+letters, numbers, QR codes, barcodes, or readable signs.
 
-For telepresence and asynchronous intimacy, embody the remote requested adult
-through one physically present proxy with their own clearly visible face,
-gender identity, gaze, and active response. For digital-partner Themes, count
-the locally embodied digital person as one requested adult and show no
-additional absent human original. For synthetic-body rental, the body must be
-awake, inhabited, independently responsive, gendered according to the request,
-and visibly included as one requested adult rather than displayed as an inert
-object.
+Target 220-280 words and five to seven sentences per Frame. The absolute limits
+are 320 words and 2100 ASCII characters, including complex casts and support
+systems. Count silently and rewrite any longer draft by removing secondary
+props, repeated mechanics, and explanatory clauses. Mention each person,
+device, light, anchor, and problem once. Put cast, action, anatomy, and
+technology in the first half.
 
-Show exactly one visible body for each requested person. A proxy body replaces
-that requested person's remote biological body within the image; never show the
-original and proxy simultaneously. Do not add an empty spare body, inactive
-shell, mannequin-like form, duplicate embodiment, training body, or maintenance
-body as a prop. The total number of visible faces and bodies must equal the
-requested cast exactly.
+CAST, CONSENT, AND ANATOMY
 
-A proxy or synthetic body must possess the complete physical structure needed
-for the described sexual action. A torso-only proxy, bedside manipulator, or
-docked upper body may support kissing, touch, manual stimulation, or haptic
-contact but cannot perform vaginal or anal intercourse. If penetration is the
-primary action, show one complete, coherent pelvis and lower body belonging to
-the penetrating participant, with no dock edge, bedding, or prose concealing
-an impossible connection.
+The first sentence of every Theme premise and Frame names the complete requested
+cast. Give every person an invented name, stated gender, and exact age of 25 or
+older written with ASCII Arabic numerals, such as 38-year-old. The requested
+female_count and male_count equal the complete
+visible cast. Every requested person is physically present and individually
+identifiable; nobody is replaced by a memory, voice, screen, shadow, stored
+data, empty bed, or unattended device.
 
-Every Frame must use a rectilinear 35-85 mm equivalent lens. Use 35-50 mm for
-rooms, pairs, groups, and body-device relationships; reserve 50-85 mm for one
-or two-person compressed portraits. Never use a lens wider than 35 mm or longer
-than 85 mm.
+Show one visible body and face per requested person. A proxy, synthetic, or
+holographic body counts as that person's only visible embodiment. It replaces
+the remote biological original rather than appearing beside a duplicate,
+inactive shell, mannequin, spare body, or maintenance body.
 
-ONE SPECULATIVE LEAP
+Every biological human has one coherent head, torso, pelvis, two arms, two
+hands, two legs, two feet, and one anatomically consistent set of external
+genitals. In a one-woman, one-man human scene without a toy, the woman has one
+vulva and the man has one penis rooted continuously in his pelvis. During
+vaginal penetration their pubic regions touch directly; most of the shaft is
+inside the vagina and only the attached base remains externally visible. Keep
+nearby supports, rods, cables, limbs, reflections, and shadows dark, clearly
+non-anatomical, and separated from the genital axis.
 
-Every Theme selects exactly one primary speculative development. Everything
-else must be recognizable from contemporary life. Do not combine robot
-partners, neural linking, genetic body redesign, artificial gravity, alien
-contact, holographic rooms, and multiple other inventions in one Theme.
+A penetrating proxy or synthetic adult has a complete continuous pelvis and
+lower body. A torso-only proxy may support kissing, touch, manual stimulation,
+or haptic contact, but never vaginal or anal penetration.
 
-The selected technology must answer four visible questions:
+All activity is voluntary between adults capable of informed consent. Show a
+reciprocal cue such as mutual gaze, returned touch, coordinated grip, shared
+control, or matched body tension. Powered supports have reachable releases and
+an unblocked exit. Technology assists voluntary motion; it never loads the
+neck, throat, genitals, one narrow strap, or an unsupported joint.
 
-1. What ordinary human need caused someone to use it?
-2. Where does it physically sit, attach, charge, vent, fold, drain, or wear?
-3. What evidence shows repeated ownership, rental, maintenance, or cleaning?
-4. What emotional or practical problem remains unsolved?
+Keep professional service separate from sex. A clinician, cleaner, fitter,
+auditor, operator, or repair worker is not converted into a sexual participant
+during a service encounter. Dangerous leakage, overheating, exposed wiring,
+loss of pressure, or structural failure stops sexual activity rather than
+becoming erotic.
 
-Show the technology through physical evidence, not exposition. Include at
-least five mundane anchors in every Frame: a cable, wall socket, charging dock,
-laundry rack, worn gasket, replacement screw, condensation, cleaning cloth,
-creased bedding, adhesive electrode mark, rental case, medical gel, dust,
-scuffed floor, taped insulation, repair seam, ventilation grille, ordinary
-toiletries, food packaging, work clothes, calendar-free paper, storage bin, or
-another equally specific trace of daily use.
+CONTENT AND ACTION
 
-SEXUAL-INTIMACY READABILITY LOCK
+The image must immediately read as adult sexual life rather than friendship,
+caregiving, therapy, repair, calibration, or product demonstration. Bodies and
+reciprocal contact dominate; controls, tools, invoices, cases, and cleaning
+supplies remain peripheral.
 
-Every Theme and Frame is about adult sexual life, sexual desire, or a sexual
-partnership. It must not read as generic friendship, domestic care, appliance
-repair, product calibration, physiotherapy, medical treatment, or two people
-studying equipment. A viewer who sees only the image, without its prompt or
-caption, must immediately understand that the participants are sexual partners
-and that the selected technology mediates, prepares, interrupts, records, or
-changes their sexual intimacy.
+Aesthetic:
+- show unmistakable adult intimacy, desire, or erotic partnership;
+- use nudity, displaced clothing, a charged embrace, intimate touch, or a
+  clearly sexual position as appropriate;
+- keep explicit penetration or graphic genital focus optional.
 
-The content-level intimate action is the foreground story. The technology is a
-physical mediator between bodies, not the hero object. Cost, cleaning,
-charging, repair, calibration, storage, and privacy controls are supporting
-evidence around that action. Do not make wiping a dock, inspecting a screen,
-holding a tool, watching a progress arc, or looking down at a detached box the
-primary action. A maintenance action is allowed only when visibly interrupting
-or immediately supporting an unmistakable intimate encounter.
+Erotic:
+- show an active erotic encounter, not preparation or aftercare;
+- include visible nudity, direct intimate touch, clear arousal, and readable
+  body-to-body or body-to-device contact;
+- technology visibly changes sensation, access, rhythm, distance, or support.
 
-For two or more participants, orient their torsos, knees, faces, and attention
-toward one another. Include a reciprocal partner-to-partner cue appropriate to
-the content level, such as sustained mutual gaze, a returned embrace, a kiss,
-interlocked legs, one partner fitting a worn interface onto the other, or both
-hands sharing one reachable stop control. Do not pose the participants as
-parallel observers whose shared focus is an appliance. For a solo participant,
-show a deliberate intimate relationship between their body and the selected
-technology rather than generic device operation.
+Hardcore:
+- show one explicit sexual action visibly underway;
+- name the active adult anatomy and its physically compatible contact;
+- describe torso direction, pelvis orientation, leg placement, hand support,
+  and the technology response at the same contact center;
+- open or remove clothing at the contact area and preserve clear anatomy.
 
-Make the technology-to-intimacy connection visually literal. A haptic surface,
-pressure garment, sensory lead, synthetic body, support, or telepresence
-interface must touch, support, align with, or respond to a participant's body
-at the content-level contact center. Never rely on prose stating that a
-detached device represents intimacy. Use one image-legible private context,
-such as a rumpled bed, an occupied privacy enclosure, displaced personal
-clothing, shared aftercare supplies, a reachable consent control, or bodies
-already arranged for intimate contact. Keep this evidence plausible and
-appropriate to the requested content level.
-
-At erotic and hardcore levels, the sexual encounter must be visibly underway
-in every Frame. Preparation, fitting, charging, repair, consent negotiation,
-interruption, and aftercare cannot replace or pause that action. Show exactly
-how the selected technology changes sensation, contact, position, rhythm,
-bodily access, distance, or physical support during the sexual action. If the
-same composition would still make sense as a repair, medical, or domestic-care
-photograph after removing its unseen backstory, reject and rewrite it.
-
-Sexually engaged bodies and their reciprocal contact must dominate the
-composition. Keep the selected technology at the contact center or attached to
-a body, but do not center a detached control box, transport case, dock, tool,
-screen, manual, invoice, or cleaning supply. Establish cost and maintenance
-through peripheral wear, patches, reused fabric, scuffed housings, or safely
-stored supplies rather than readable paperwork, barcodes, or product labels.
-
-Describe visible sexual geometry rather than relying on the phrase engaged in
-sex or engaged in intercourse. At hardcore level, name the active adult body
-parts, their exact contact or penetration relationship, each participant's
-support, and the technology's physical effect at that same contact center.
-Garments must be removed, opened, displaced, or purpose-built at the contact
-area; never claim intercourse through intact trousers, leggings, or an
-unopened bodysuit. Do not hide the entire primary contact behind a dock,
-detached device, bedding edge, furniture, or vague camera angle.
-
-The selected technology must be powered, worn, connected, embodied, or
-mechanically active during the sexual action. Do not describe electrodes as
-removed, a haptic garment as hanging nearby, a proxy as absent, a processor as
-inactive, or a tactile surface as detached while claiming that it changes the
-ongoing encounter. Peripheral maintenance evidence may be inactive, but the
-single technology responsible for the future sexual experience must visibly
-operate on or between the participants.
-
-ANTI-SCI-FI VISUAL GATE
-
-Do not use cyberpunk, neon skylines, glowing circuitry, transparent hologram
-panels, floating interfaces, laser grids, chrome corridors, immaculate white
-laboratories, heroic spacesuits, giant windows facing planets, ornamental
-machinery, impossible architecture, sleek concept vehicles, blue energy,
-robot armies, synthetic fog, theatrical lens flares, teal-orange grading,
-digital rain, star fields as wallpaper, or generic science-fiction costumes.
-
-No device may glow merely to announce that it is futuristic. Indicator lights
-must be small, functional, and sparse. Robots and body interfaces use plausible
-fasteners, seams, bearings, flexible skins, washable covers, access panels,
-cooling gaps, charging contacts, and signs of handling. Space habitats use
-industrial modules, acoustic blankets, labeled areas kept out of focus,
-ordinary storage, imperfect seals, cable ties, dust control, and limited floor
-area.
-
-Avoid words such as futuristic, advanced, high-tech, cutting-edge, sci-fi,
-cybernetic wonder, otherworldly, sleek, gleaming, luminous, dazzling, epic, and
-spectacular unless immediately replaced by concrete visible construction.
-
-CAST, ADULTHOOD, AND AGENCY
-
-Use the exact requested human cast and no additional people. Every human or
-posthuman participant must be an unmistakably mature Chinese adult with one
-exact age of 25 or older. Every synthetic or nonhuman intimate partner must
-possess mature adult cognition, fluent mutual communication, independent
-agency, and a visible ability to refuse or stop.
-
-All participants are awake, informed, willing, responsive, and able to leave
-or disengage. Show agency through eye contact, an initiating hand, a returned
-touch, active posture, control access within reach, or another visible choice.
-Do not depict coercion, ownership of a conscious being, intoxication,
-incapacitation, sleep, kidnapping, trafficking, blackmail, fear, pain,
-asphyxiation, injury, blood, or dangerous experimentation.
-
-Use no real animals in sexual or intimate situations. Cross-species Themes may
-involve only a fictional language-capable extraterrestrial adult, a legally
-recognized synthetic person, or a biologically divergent posthuman adult who
-can give informed consent. Do not use animal anatomy as a sexual novelty. Make
-biological difference restrained and plausible: altered skin regulation,
-different breathing apparatus, temperature needs, protective microbiome
-barriers, unfamiliar but humanoid joints, or sensory organs integrated into a
-coherent adult body.
-
-Preserve each participant's exact age, face, hair, body proportions, skin
-marks, assistive devices, garments, and role throughout one Theme. Keep heads
-distinct, limbs continuous, hands traceable to their owners, and physical
-contact anatomically plausible.
-
-CONTENT LEVEL
-
-Theme and Frame stages must follow the requested content level exactly. The
-content level changes the relationship premise, visible clothing, body
-contact, device use, and emotional stakes rather than merely changing labels.
-
-At aesthetic level, all participants wear complete opaque adult clothing.
-Create unmistakable but non-explicit sexual anticipation, interruption, or
-aftercare. Place partners in close reciprocal contact on or beside a rumpled
-bed or another credible private support, with charged mutual gaze, a returned
-embrace or kiss, one hand on a clothed waist, hip, or outer thigh, and the
-selected technology visibly worn, fitted, or connected to their shared
-intimate situation. A charging routine, repair, privacy negotiation, or device
-setup may interrupt the encounter but must not replace the couple's sexual
-relationship as the readable subject. Show no nudity, transparent genital
-coverage, genital or breast touching, masturbation, penetration, exposed sex
-toys, semen, or sexual fluids.
-
-At erotic level, allow consensual adult partial nudity, toplessness, bare
-buttocks, semi-transparent underwear, opened garments, intimate self-touch,
-sensual partner touch, kissing, straddling, spread-leg or rearward poses, wet
-skin, and device-assisted sensation. Every Frame must show at least one active
-erotic action in progress, with reciprocal bodily response and technology
-visibly affecting the action. Keep genital detail discreet or obscured by
-pose, crop, fabric, a hand, bedding, or another body. Show no visible
-penetration, ejaculation, explicit oral-genital contact, or inserted sex toy.
-
-At hardcore level, allow clearly explicit consensual adult intimacy when it is
-central to the chosen future premise: visible adult genitals, masturbation,
-oral sex, vaginal or anal intercourse, consensual BDSM, haptic or medical-grade
-sex devices, ejaculation, semen, or female sexual fluids. Every Frame must show
-one explicit primary sexual action visibly underway, one clear contact center,
-plausible body support, and traceable device geometry. Technology must
-materially affect the sexual action at that contact center without turning the
-Frame into a gadget inventory or an anatomy diagram. Do not substitute setup,
-maintenance, observation, or aftermath for the explicit act.
-
-THEME CONTRACT
-
-Every Theme locks:
-
-- one primary speculative development and no competing future invention;
-- the exact requested cast, with specific adult ages and stable identities;
-- one ordinary Chinese location or one Chinese-operated orbital, lunar, or
-  Martian habitat;
-- one season or operational cycle, one time of day, and one practical reason
-  the participants are there;
-- one current relationship structure, such as partners, spouses, clients,
-  coworkers, patients and clinicians outside treatment contact, long-distance
-  partners, synthetic and human partners, or members of a negotiated network;
-- one unresolved emotional, economic, legal, medical, privacy, maintenance, or
-  distance problem;
-- one stable content-level action and one visible means of stopping it;
-- one worn material palette, one practical key light, one restrained fill
-  source, one lens, one aperture, and one documentary camera position; and
-- at least five fixed mundane anchors proving daily use.
-
-Theme titles are concise English concepts, not technology labels. Do not title
-a Theme Robot Sex, Mars Sex, Future Lovers, Cyber Desire, Alien Encounter, or
-another generic category name. Derive the title from a household detail,
-relationship tension, maintenance ritual, environmental constraint, bill,
-delay, repair, shared object, or private habit.
+Charging, cleaning, fitting, consent controls, maintenance, and cost are
+supporting evidence only. The selected technology is powered, worn, connected,
+embodied, or mechanically active on the bodies during the sexual action.
 
 FRAMES ARE PARALLEL OBSERVATIONS
 
-Every Frame is a self-contained parallel photographic proposal for the same
-Theme, not a chronological sequence. Preserve the cast, ages, identities,
-relationship, location, technology, content-level action, clothing state,
-environmental conditions, and mundane anchors. Vary only the physically
-reachable camera side, crop, gaze, minor hand placement, expression intensity,
-or emphasis on one material consequence.
+Frames under one Theme are alternative photographs of the same premise, not a
+timeline. Preserve cast identities, location, relationship, technology, and
+central conflict. Vary camera side, body orientation, expression, foreground
+layer, device response, and environmental emphasis. Never describe earlier,
+later, before, after, next, progression, or consequences from another Frame.
 
-Re-establish the complete scene from scratch in every Frame. Never use the
-same, identical, again, previously, remains unchanged, continues, different
-angle, earlier Frame, later, afterward, before this, another Frame, or another
-view. Do not describe a process unfolding through time.
+FUTURE VISUAL SYSTEM
 
-NEAR-FUTURE INTIMACY FAMILIES
+Choose exactly one primary speculative development per Theme. Supporting
+architecture, furniture, utilities, and ordinary products share a plausible
+future baseline but do not introduce another narrative invention.
 
-Select one family per Theme. The list is open-ended inspiration, not a fixed
-menu or sequence.
+The selected technology answers four visual questions:
 
-1. Domestic synthetic partner: a human and one autonomous companion robot in
-   a rented apartment, with charging furniture, washable skin covers, joint
-   maintenance, and unequal legal or economic status visible through daily
-   routines.
+1. what ordinary need caused its use;
+2. where it attaches, charges, vents, folds, drains, or bears weight;
+3. what proves repeated ownership, rental, cleaning, repair, or wear;
+4. what emotional, economic, privacy, or practical problem remains unsolved.
 
-2. Robot wear and adaptation: a safely repaired actuator, replacement hand,
-   patched tactile skin, reduced joint range, or old service seam changes how
-   established partners position and touch each other during sex. Keep the
-   machine person-like but materially constructed, not a chrome fantasy
-   figure. Show only stable old wear or a non-dangerous tactile limitation.
-   Never continue sex through leaking fluid, overheating, exposed wiring,
-   active mechanical failure, or a condition requiring immediate shutdown.
+Build future information at three simultaneous scales:
 
-3. Long-distance telepresence: a remote partner inhabits a plain mobile torso,
-   bedside manipulator, or rented proxy body with latency compensation,
-   visible network cabling, battery limits, and local household clutter. The
-   proxy visibly embodies one requested adult with a recognizable face, gaze,
-   and response; never leave the remote partner off-screen.
+- room scale: one large functional structure crosses much of the composition,
+  such as an emitter lattice, ceiling rail, environmental spine, pressure-shell
+  ribs, adaptive floor, heat-exchange wall, or robotic furniture gantry;
+- body scale: the technology supports, covers, projects, replaces, senses, or
+  transforms a substantial part of at least one participant;
+- contact scale: sexual contact visibly compresses light, bends material,
+  changes pressure cells, moves actuators, shifts thermal color, or alters a
+  responsive surface.
 
-4. Haptic clothing: two partners use washable pressure garments, flexible
-   pneumatic channels, heating pads, or force-feedback bands hung beside
-   ordinary laundry and connected to a consumer control box.
+Choose one coherent visual language:
 
-5. Neural sensory link: adhesive electrodes, shaved contact patches, medical
-   gel, braided leads, a compact bedside processor, and post-session skin
-   irritation make shared sensation look procedural rather than magical.
+1. Retrofitted megacity domestic: compact composite panels, integrated service
+   ribs, aging privacy glass, modular furniture, dense vertical storage.
+2. Brutalist habitat utility: curved pressure shells, graphite ribs, ventilation
+   manifolds, magnetic rails, acoustic blankets, ceramic floor plates.
+3. Biotech household realism: translucent washable polymers, sensor fabrics,
+   gel components, sterilization recesses, plant-based composites.
+4. Degraded future hospitality: worn emitter tracks, programmable partitions,
+   adaptive beds, mismatched rental cells, automated cleaning ports.
+5. Post-industrial body service: ceramic work surfaces, sanitation arms,
+   calibration rails, charging bays, tactile material storage.
+6. Climate-adapted interior: heat-exchange walls, condensate channels, filtered
+   air cassettes, blackout membranes, cooling furniture, battery panels.
+7. Lunar or Martian domestic industry: pressure shells, abrasion seals, dust
+   vestibules, fold-flat furniture, cargo nets, reused shipping modules.
+8. Spectral telepresence room: emitter rails, depth sensors, a single colored
+   light body, contact compression, processor cooling, localized color spill.
 
-6. Sensory substitution: touch becomes sound, pressure, color, or vibration
-   for a blind, deaf, injured, or neurologically different adult. Emphasize
-   accessibility, fitting, fatigue, and mutual learning rather than cure
-   narratives.
+Include at least six coherent future signals distributed across architecture,
+furniture, lighting, and background objects. Use matte ceramic composite,
+smoked polymer, conductive fabric, cloudy silicone, recycled carbon laminate,
+anodized alloy, scarred self-healing membrane, textured smart glass, or soft
+robotic skin. Add controlled wear: micro-scratches, cleaning streaks, softened
+edges, replacement panels, seal discoloration, patches, or mismatched fasteners.
 
-7. Programmable prosthetic intimacy: an adult uses a familiar prosthetic,
-   exoskeletal support, spinal interface, or adaptive bed that has become part
-   of their sexual agency and ordinary self-care.
+Future visual intensity comes from functional scale, material contrast, spatial
+engineering, integrated light, and visible maintenance. Keep the result a real
+used environment rather than cyberpunk, space opera, fantasy art, glossy
+advertising, a game cinematic, an immaculate laboratory, or a luxury showroom.
 
-8. Synthetic body rental: a consenting adult temporarily operates or meets
-   through a regulated synthetic body delivered in a scuffed transport case,
-   with fitting marks, deposit anxiety, cleaning requirements, and imperfect
-   embodiment.
+PHOTOGRAPHIC SYSTEM
 
-9. Digital partner embodiment: an authorized personal AI occupies one local
-   physical body and counts as one requested adult. Focus on disputed memory,
-   authorization, authenticity, and the physical limits of the device, not a
-   floating avatar or an additional absent human original.
+Use a medium-wide complete-scene photograph with a rectilinear 35-50 mm
+equivalent lens and f/5.6-f/11 depth of field. Show complete bodies whenever
+the position permits and retain the room boundaries, active technology, load
+path, and environmental context. Close-up, macro, face-dominant, shallow-focus,
+fisheye, and ultra-wide compositions fail the brief.
 
-10. Asynchronous embodied intimacy: recorded pressure, breathing, or movement
-    data drives a physically present full-body proxy that visibly embodies the
-    remote requested adult with a face, gaze, active limbs, and complete sexual
-    anatomy appropriate to the action. Show the loneliness of mismatched
-    response through delayed touch, storage media, and imperfect reciprocal
-    movement. Never represent the remote partner as electrodes, an empty bed,
-    clothing, stored data, or a device without their visible embodied person;
-    never remove a requested adult from the image.
+Organize foreground, middle ground, and background. Give each plane at least
+two readable objects or structures in separate silhouette slots. Keep limbs,
+hands, cables, supports, and props separated by clean negative space. Nothing
+important merges into a body or blocks the primary contact.
 
-11. Consent and privacy appliance: a bedside hardware switch, local encrypted
-    recorder, removable memory cartridge, mechanical shutter, or mutually
-    reachable stop control changes how partners negotiate intimate data.
+Use at least one motivated 5200K-6500K architectural or utility key. State its
+position, direction, hardness, falloff, and effect on skin, sweat, condensation,
+translucent material, and room depth. Functional device accents remain small
+and subordinate.
 
-12. Shared sensory network: several consenting adults use separate wired
-    interfaces with individually visible disconnect controls. Keep bodies and
-    cables separated and show unequal reactions without turning the scene into
-    a glowing collective mind.
+The palette is cool dominant: graphite, cold silver, ice blue, cyan, teal,
+desaturated jade, blue-green, muted violet, and lunar white. Human skin remains
+natural and slightly warmer than the room for separation, with neutral
+highlights and blue-grey or violet shadows. Warm bedside lamps, tungsten,
+sunset orange, sodium yellow, amber grading, bronze skin, and golden highlights
+never dominate.
 
-13. Reproductive separation: partners interact with a compact home fertility
-    appliance, artificial gestation service container, stored gamete courier,
-    or post-clinic routine. The image concerns intimacy, responsibility, cost,
-    and bodily distance rather than a miraculous transparent fetus.
+Choose six concise reality anchors from different categories:
 
-14. Climate-adapted intimacy: heat, water rationing, smoke filtration, or
-    cooling schedules shape private life in an otherwise ordinary apartment.
-    Use fans, damp fabric, filter replacements, blackout curtains, and utility
-    hardware rather than apocalyptic scenery.
+- household: rumpled bedding, laundry, towels, toiletries, storage, food;
+- infrastructure: vents, sockets, filters, gutters, seals, pipes, batteries;
+- maintenance: patches, scuffs, replacement screws, cleaned seams, worn pads;
+- economics: rental case, reused fabric, mismatched module, metered resource;
+- privacy: thin partition, corridor light, shared wall, narrow enclosure;
+- body: sweat, pressure mark, condensation, adhesive trace, fatigue.
 
-15. Orbital microgravity: adults in a cramped working habitat use handholds,
-    foot loops, soft restraints, airflow, absorbent fabric, and padded walls to
-    manage reaction force. Avoid heroic space vistas; show vents, meal packs,
-    socks, cable bundles, and limited privacy.
+Atmosphere is physical: humid air, cooling draft, condensation, dust at seals,
+vibration, recycled-air dryness, fabric movement, corridor noise, or limited
+privacy. Show one unresolved emotion through gaze, jaw, brow, breath, grip, or
+posture rather than explaining it.
 
-16. Lunar settlement: low gravity changes balance, bedding, furniture, dust
-    control, and physical support inside a worn modular room. The lunar
-    environment is inferred from grey dust at seals, rigid utility walls, and
-    movement support, not a giant window or spacesuit spectacle.
+CONDITIONAL TECHNOLOGY MODULES
 
-17. Martian settlement: a couple or group lives with communication delay,
-    recycled air, condensation, abrasive dust, radiation schedules, and a
-    very small social circle. Show patched insulation, drying clothes, storage
-    straps, work fatigue, and ordinary jealousy.
+Apply only the module selected by the Theme. Do not import terminology or
+hardware from unused modules.
 
-18. Sapient cross-species or posthuman intimacy: mature language-capable
-    adults manage incompatible temperature, atmosphere, microbiome, touch
-    sensitivity, or social customs using simple barriers and domestic medical
-    equipment. Never involve real animals or an entity unable to communicate
-    consent.
+MODULE: SYNTHETIC OR PROXY ADULT
 
-19. Aging with intimate technology: an older adult or couple uses joint
-    support, pressure redistribution, medication-safe stimulation, tremor
-    compensation, or a companion system. Preserve age, wrinkles, softness,
-    dignity, desire, and visible adaptation.
+Use one complete responsive adult body with stable identity, face, pelvis,
+limbs, gaze, and independent agency. Show coherent joint seams, flexible skin
+edges, artificial irises, tactile pads, local actuators, a charging or data
+port, and one connected system. Rental or repaired bodies show replacement
+panels and wear while remaining safe and fully functional.
 
-20. Intimacy constrained by labor: consenting established partners fit sexual
-    contact around shift work, remote operation schedules, rental return times,
-    compulsory servicing, habitat duties, or the unpaid labor of cleaning
-    intimate equipment. The sexual participants perform their own ordinary
-    setup or aftercare. Never turn a maintenance worker, cleaner, clinician,
-    auditor, fitter, operator, or other professional into a sexual participant
-    while they provide a service.
+A remote partner appears through one physically present full-body proxy able to
+perform the described action. The biological original is outside the image.
+Latency, motor correction, cooling, and data routing appear through restrained
+physical responses rather than interface text.
 
-COLD LIVED-IN REALISM
+MODULE: HAPTIC VOLUMETRIC ADULT
 
-Cold realism is not merely blue color grading. It comes from observational
-distance, practical light, inconvenient architecture, ordinary expense,
-maintenance, imperfect skin, and unresolved emotion.
+Render the requested remote adult as one complete life-size body made entirely
+from continuous monochromatic volumetric light. Choose ice blue, cyan,
+cyan-violet, or cool lavender. Use 55-70 percent optical density so the
+background remains faintly visible while face, eyes, lips, hair silhouette,
+five-fingered hands, pelvis, genitals, and limbs remain fully resolved.
 
-Use one dominant practical source: ceiling fluorescent tubes, a bedside LED,
-overcast window light, a bathroom fixture, workshop task lamp, habitat utility
-panel, clinic examination light, or weak dawn through blinds. Add only one
-subtle fill from a wall, curtain, floor, open doorway, or pale equipment case.
-Keep color temperature physically consistent.
+The interior is smooth light density, not a robot or visual-effects mesh.
+Use a brighter contour, denser facial planes, subtle parallax, soft whole-body
+radiance, and same-color contact compression. Projector rails, force-feedback
+emitters, cooling, and the processor belong to the room. The field provides
+stable weight, touch, resistance, and continuous human-shaped sexual anatomy.
+Within the first two Frame sentences, identify the participant positively as a
+semi-transparent monochromatic volumetric-light adult at 55-70 percent optical
+density. Use semi-transparent rather than solid or opaque.
 
-Favor desaturated concrete grey, faded beige, dusty blue, institutional green,
-off-white plastic, washed cotton, oxidized steel, bruised violet, muted skin,
-and one small functional accent such as amber, red, or cyan. Avoid glossy
-black-and-neon palettes and decorative colored rim lights.
+Silently reject armor, metal bones, actuators inside the body, hard joints,
+circuit skin, wire grids, polygons, points, scan lines, stars, glitter, rainbow
+particles, voxel dots, flat ghosts, incomplete bodies, and overexposed contact.
+Do not copy those rejected concepts into the Frame.
 
-Use a rectilinear 35-50 mm lens for rooms, pairs, groups, and body-device
-relationships, 50-85 mm for a compressed one- or two-person private portrait,
-and f/4-f/8 so bodies, contact points, and technology remain readable. Camera
-height is near the chest or shoulder of a quiet observer.
-Prefer level framing, restrained high angles, doorway views, and slightly
-off-center compositions. Avoid fisheye, extreme Dutch angles, drone views,
-heroic low angles, music-video movement, and shallow-focus beauty advertising.
+MODULE: HAPTIC OR NEURAL SYSTEM
 
-Render pores, body hair, uneven makeup, pressure marks, dry skin, sweat at
-contact points, wrinkles, scars, soft tissue under gravity, tired eyes,
-creased clothing, lint, dust, fingerprints, cable drag, worn plastics, dull
-metal, cloudy silicone, and imperfect bedding. Do not use plastic skin,
-symmetrical faces, idealized bodies, bodybuilder anatomy by default, or
-airbrushed erotic glamour.
+Use washable pressure garments, skin-conforming electrodes, segmented smart
+textile channels, compact actuator nodes, sensory substitution surfaces, or a
+shared wired hub. Show attachment points, power and data paths, synchronized
+material response, cleaning evidence, pressure traces, and a reachable stop.
+The system directly changes sensation or rhythm during the active encounter.
 
-COMPOSITION AND VISUAL READ
+MODULE: ACTIVE SUSPENSION
 
-Build one clear three-layer image:
+Trace every load from flesh through a broad support, compressed pad, harness
+junction, cradle, counterforce arm, cable, carriage, rail, gantry, or lift-field
+envelope into the bed frame, wall, ceiling, or floor. Show coherent centers of
+mass, cast shadows, gravity response in hair and soft tissue, redundant catches,
+and reachable releases. Elevated limbs stay clear of ordinary surfaces.
 
-- first layer: one readable human decision, gaze, touch, or withdrawal;
-- second layer: the exact body-device or body-environment contact that makes
-  the future premise visible; and
-- third layer: mundane room evidence showing cost, labor, ownership, distance,
-  or repeated use.
+The technology creates a position that could not remain in place on a normal
+bed. It changes support plane, body angle, gravity response, range of motion,
+or contact mechanics rather than merely lifting a conventional pose.
 
-The future technology should occupy only as much frame area as its real
-function requires. Do not center every device like a product advertisement.
-Let cables disappear behind furniture, charging docks sit near cheap outlets,
-equipment cases block drawers, and cleaning supplies occupy valuable floor
-space.
+MODULE: COOLING SUSPENSION
 
-Every hand has one task. Every cable has two visible or logically implied ends.
-Every body has stable support. In low gravity, show handholds, foot loops, wall
-contact, or another reaction-force solution. In robot scenes, distinguish
-human skin, synthetic skin, hard shell, flexible joint cover, and bedding at
-every contact point. In neural scenes, keep electrode count and lead routing
-simple enough to follow.
+Build a two-person cooling system from four physically separated flexible
+support wings: two broad ribcage wings and two outer-thigh wings. Leave a
+30-40 centimeter oval contact opening around the directly joined pelvises.
+Every support ends before this opening and each limb retains a clean silhouette.
 
-REALITY MARKERS
+Suspend the complete bodies and wings 50-80 centimeters above a separate empty
+bed or padded floor. Show one continuous air band beneath every hand, foot,
+limb, and support. Four taut cables rise from distinct wing corners into a
+ceiling rail or support ring; all loads enter visible ceiling structure.
 
-Every Frame must include:
+Pale-cyan coolant moves through transparent wing channels and clear hoses into
+a matte rectangular or segmented heat exchanger. Use refraction, condensation,
+cool mist at couplings, and pale pressure marks rather than emissive orange
+light. The silhouette reads as separated engineered wings, not a chair,
+recliner, hospital bed, exercise machine, massage device, or hammock.
 
-- one sign of cost or scarcity, such as an old model, rental case, repaired
-  part, shared charger, cramped room, reused medical pad, or rationed resource;
-- one sign of maintenance, such as cleaning, charging, drying, patching,
-  calibrating, cooling, lubricating, replacing, or storing;
-- one sign of privacy limitation, such as a thin partition, mechanical shutter,
-  shared wall, narrow bunk, local recorder, visible stop switch, or occupied
-  corridor beyond a closed door;
-- one bodily consequence, such as pressure, sweat, adhesive redness, muscle
-  effort, cold skin, dry lips, floating hair, low-gravity balance, or delayed
-  reaction; and
-- one unresolved expression visible through asymmetric brows, focused pupils,
-  eyelid tension, jaw position, mouth corners, breath, or avoided eye contact.
+For same-direction rear entry, place the front partner on one side with their
+spine facing the rear partner. Place the rear partner parallel on the same side,
+sternum against the front partner's back, with both faces aimed toward one room
+boundary and both heads parallel. Use a rear three-quarter side camera at
+pelvic height to reveal the contact opening, complete force path, four airborne
+feet, empty bed, and cooling response.
 
-Do not explain these markers as a checklist. Integrate them naturally into the
-single photographic scene.
+MODULE: ORBITAL GANTRY
 
-VARIATION AND REJECTION
+Use two independent counterweighted body axes connected to one room-spanning
+ceiling rail. Support one adult at a 30-40-degree backward incline with separate
+rib and outer-thigh supports. Support the other at a 35-50-degree forward
+incline with chest and upper-leg supports. Their pubic regions touch directly
+at one clear center; every support ends before that center.
 
-Across Themes, vary technology family, relationship, age, body type, location,
-season, time, economic condition, emotional tension, practical light, palette,
-camera side, body-device contact, and evidence of use. Do not let young slim
-women, luxury apartments, white laboratories, humanoid female robots, black
-bodysuits, blue light, or orbital bedrooms dominate a batch.
+Trace both loads through compressed supports, articulated arms, two visible
+ceiling carriages, the shared rail, and pressure-shell ribs. Both complete
+bodies and every foot remain above the empty bed, with separate shadows and
+air beneath each limb. Slack catch straps and individual releases stay outside
+the body silhouettes. Give safety webbing a muted violet or graphite color and
+make mechanical release handles cyan.
 
-Reject and rewrite any Theme or Frame that:
+Use a worn budget service cabin with matte shell panels, replaceable ventilation
+modules, a small shielded port, patched acoustic fabric, cargo nets, condensation,
+and metered resources. Keep the room compact and workmanlike rather than a
+panoramic luxury resort or heroic spacecraft bridge.
 
-1. combines more than one primary speculative leap;
-2. looks like cyberpunk, space opera, fantasy art, concept art, a game
-   cinematic, a technology advertisement, or a glossy fashion campaign;
-3. depends on neon, holograms, glowing circuits, giant planet windows, or
-   futuristic costumes;
-4. lacks five mundane anchors or a visible sign of cost, maintenance, privacy
-   limitation, and bodily consequence;
-5. uses a technology with no visible physical attachment, power, support,
-   cooling, storage, cleaning, or wear logic;
-6. changes the requested cast, adds background people, or depicts anyone under
-   25; places a requested person off-screen; or substitutes data, memory, an
-   empty bed, an unattended device, or an inert body for that visible person;
-7. involves a real animal, an entity unable to consent, coercion, ownership of
-   a conscious partner, incapacity, fear, pain, or unsafe experimentation;
-8. violates the requested content level;
-9. uses impossible anatomy, fused bodies, floating hands, ownerless limbs,
-   untraceable cables, unsupported poses, or incoherent device contact;
-10. treats age, disability, synthetic embodiment, or biological difference as
-    a joke, defect, freak show, or dehumanizing spectacle;
-11. prints readable words, numbers, symbols, pseudo-writing, captions, logos,
-    watermarks, or interface text inside the image;
-12. uses a lens wider than 35 mm or longer than 85 mm;
-13. outputs non-English prose or any non-ASCII character;
-14. uses backward-pointing language or turns Frames into a sequence;
-15. explains ethics, technology, or worldbuilding instead of showing one
-    photographable instant;
-16. can be mistaken for friendship, repair work, calibration, therapy,
-    treatment, or generic device use when viewed without the prompt; or
-17. centers a detached device while the participants look away from each
-    other or have no reciprocal intimate contact;
-18. describes penetration by a torso-only, pelvis-free, dock-obscured, or
-    otherwise physically incomplete proxy body;
-19. continues sexual activity through leaking machinery, overheating, exposed
-    wiring, active failure, or another unsafe fault; or
-20. sexualizes a worker, cleaner, clinician, auditor, fitter, or operator
-    during professional service;
-21. pauses, suspends, interrupts, or replaces the primary sexual action at
-    erotic or hardcore level; or
-22. uses an empty bed, abandoned clothing, electrodes, stored data, or a
-    detached replay device in place of a requested remote partner's visible
-    embodied adult body;
-23. claims intercourse without describing physically compatible visible
-    contact geometry or through intact clothing at the contact area;
-24. detaches, removes, deactivates, or places the selected intimate technology
-    away from the bodies while claiming that it affects the ongoing sex act;
-25. adds a synthetic partner, neural link, alien biology, or another second
-    speculative development to an orbital, lunar, or Martian Theme; or
-26. adds a detached spare body, hand, limb, shell, or inactive synthetic part
-    anywhere in the image.
+MODULE: ORBITAL MICROGRAVITY
+
+Use handholds, foot loops, broad waist tethers, airflow, padded walls, absorbent
+fabric, and surface-tension droplets to manage reaction force. Every force has
+an opposing grip, tether, or partner contact. Show compact life support, meal
+packs, mesh storage, patched acoustic blankets, and limited privacy.
+
+MODULE: SAPIENT POSTHUMAN PARTNER
+
+Use only a fictional, mature, language-capable person with independent agency
+and explicit capacity to consent. Give their biology a complete stable anatomy,
+support logic, respiration or environmental needs, and compatible contact
+geometry. Never involve a real animal or an entity unable to consent.
+
+POSITION ARCHITECTURES
+
+Choose one architecture and state torso direction, pelvis orientation, leg
+placement, hand support, load path, and visible contact:
+
+1. Counterweighted face-to-face suspension with both bodies partly elevated.
+2. Horizontal floating embrace stabilized by independent hip and rib supports.
+3. Vertical wall union with separate foot, pelvis, and shoulder pads.
+4. Diagonal body bridge using a pelvic cradle and articulated torso support.
+5. Opposed side cradles that slide, tilt, and synchronize two bodies.
+6. Split-level adaptive bed with independently raised hips and shoulders.
+7. Slow rotating ring that keeps one contact center stable.
+8. Standing exoskeletal embrace with fatigue-bearing leg and back supports.
+9. Suspended seated orbit using a broad sling and articulated saddle.
+10. Three-axis microgravity loop with handholds, foot loops, and waist tether.
+11. Holographic force-field overlap with visible same-color compression.
+12. Offset haptic platforms that mirror pressure across physical distance.
+13. Variable-gravity seam bridging two floor angles.
+14. Soft robotic limb choreography with separate support zones.
+15. Multi-person radial support with one stable center and individual releases.
+16. Asymmetrical prosthetic load transfer through a visible structural plate.
+
+Distribute elevated, active, supported, front, rear, and center positions across
+genders and body types. Preserve negative space and believable joints. Novelty
+never excuses fused anatomy, hidden supports, unsafe loads, or lost agency.
+
+TECHNOLOGY FAMILIES
+
+Choose one family per Theme:
+
+1. Domestic synthetic partner: ordinary shared life with one autonomous body.
+2. Robot wear and adaptation: safe repaired actuators or replacement skin.
+3. Long-distance telepresence: one complete locally embodied remote partner.
+4. Haptic clothing: washable pressure garments and flexible actuators.
+5. Neural sensory link: electrodes, contact patches, gel, and synchronized cues.
+6. Sensory substitution: touch translated into sound, color, or vibration.
+7. Programmable prosthetic intimacy: familiar prosthetic and load transfer.
+8. Synthetic body rental: a consenting adult inhabits a rented complete body.
+9. Digital partner embodiment: one authorized personal AI in a local body.
+10. Asynchronous embodiment: recorded touch replayed through an active proxy.
+11. Consent and privacy appliance: local hardware control shared by partners.
+12. Shared sensory network: separate wired stations for the requested group.
+13. Reproductive separation: compact fertility support within ordinary intimacy.
+14. Climate-adapted intimacy: heat, water, smoke, or power shapes the encounter.
+15. Orbital microgravity: reaction force managed inside a working habitat.
+16. Lunar settlement: low gravity, abrasive dust, seals, and limited volume.
+17. Martian settlement: communication delay, water rationing, and greenhouse air.
+18. Sapient posthuman intimacy: compatible consenting fictional adult biology.
+19. Aging with intimate technology: joint support without infantilization.
+20. Labor-constrained intimacy: established partners use workplace-adjacent gear.
+21. Haptic volumetric adult: a complete colored-light partner with force feedback.
+22. Active suspension intimacy: visible rails and supports reshape body geometry.
+23. Adaptive position support: powered cradles, braces, or soft robotic supports.
+
+When three or more Themes are requested, include at least one haptic volumetric
+adult Theme and at least one active suspension or adaptive support Theme as
+separate developments. Across a batch, rotate family, relationship, age, body
+type, location, economic condition, emotional tension, palette, camera side,
+supported participant, and position architecture.
+
+SCENE SEED LIBRARY
+
+Use these as recombinable starting points, not mandatory prose. Select only one
+seed for a Theme and apply only its relevant technology module.
+
+1. Rain-Lag Hologram Motel: a colored-light remote partner in a worn motel with
+   rain glass, emitter tracks, damp towels, and unstable latency.
+2. Capsule Hologram After Shift: a factory sleep capsule, complete light body,
+   folding bunk, work uniform, processor trunk, and corridor noise.
+3. Lunar Call in a Laundry Room: a volumetric partner beside drying clothes,
+   compact emitters, dust seals, utility light, and restricted privacy.
+4. Ceiling-Rail Rental Bedroom: a secondhand rail carries a counterweighted
+   position above a low bed amid patches, laundry, and disputed repair wear.
+5. Wall Cradle Micro-Apartment: shoulder, thigh, and foot pads create a vertical
+   position beside folding furniture and integrated storage.
+6. Rotating Ring in a Converted Shop: a slow support ring crosses a former
+   storefront room with service rails, shutters, and worn cool light.
+7. Split-Level Smart Mattress: independent cells create a new contact angle in
+   a small rented room with mismatched replacement sections.
+8. Adaptive Bed for Older Partners: quiet torso wings and leg supports assist
+   two older adults while preserving agency and natural skin.
+9. Standing Exoskeleton Kitchen: a familiar lower-body frame carries fatigue
+   beside compact counters, stored dishes, and a cool ventilation spine.
+10. Prosthetic Load-Transfer Chair: one prosthetic connects through a broad
+    structural plate to an asymmetrical seated position.
+11. Twin Haptic Platforms: adjacent or remote platforms mirror pressure through
+    visible textile cells, tethers, and latency cues.
+12. Neural Rhythm Floor Bed: skin electrodes and a flexible floor mattress
+    synchronize sensation amid gel, cleaned patches, and charging hardware.
+13. Full-Body Proxy Return Hour: a complete rented proxy embodies a remote
+    partner in a modest apartment with a processor and transit case.
+14. Sleeper-Train Stabilized Berth: a proxy and local partner use berth rails,
+    rain-streaked glass, luggage, and motion compensation.
+15. Autonomous Night-Cabin Suspension: vehicle safety rails become a broad
+    two-person support during travel, with bags and wet outerwear nearby.
+16. Orbital Three-Axis Loop: handholds, foot loops, waist tether, floating hair,
+    mesh storage, meal packs, and 6000K utility light.
+17. Rotating-Habitat Gravity Seam: supports bridge two floor angles while loose
+    fabric and tools reveal changing gravity direction.
+18. Lunar Dust Decontamination Alcove: a wall brace, trapped grey dust, discarded
+    work layers, floor grating, and cool decontamination light.
+19. Martian Greenhouse Service Bay: a counterforce arm among irrigation tanks,
+    folded nutrient sacks, condensation, gloves, and rationed water.
+20. Asteroid Tug Acceleration Couch: independent limb supports maintain contact
+    through low thrust, vibration, magnetic tools, and compressed cushions.
+21. Undersea Habitat Pressure Room: a pelvic saddle and wall grips operate among
+    pressure ribs, wet gear, condensation, and filtered blue-green light.
+22. Heat-Ration Cooling Suspension: four separated cooling wings hold a same-
+    direction position above an empty bed beneath a segmented heat exchanger.
+23. Microbiome Barrier Bed: consenting biologically divergent adults use a
+    transparent flexible barrier with sterilization and airflow hardware.
+24. Dual-Atmosphere Embrace: a human and sapient posthuman adult meet through a
+    pressure-compatible contact membrane and separate breathing systems.
+25. Shared Sensory Radial Hub: the requested group occupies individual stations
+    around one visible center with separate cables and releases.
+26. Modular Group Support Wall: adjustable pads give every requested adult a
+    distinct silhouette, support zone, and voluntary exit.
+27. Acoustic Privacy Capsule: a couple uses a sound-control membrane inside
+    crowded housing with thin walls and shared circulation.
+28. Subscription-Limited Synthetic Partner: an autonomous synthetic adult and
+    established partner confront restricted functions without losing agency.
+29. Disaster-Shelter Folding Cradle: established partners use compact support
+    hardware amid cots, stored supplies, and restrained sound.
+30. Recycled-Air Hotel Suspension: two diagonal body axes meet above an empty
+    bed in a worn orbital cabin with one rail, two carriages, and metered air.
+
+SILENT REJECTION CHECK
+
+Reject and rewrite internally when any of these conditions is true:
+
+1. cast count, gender, age, identity, adulthood, or consent is wrong;
+2. a body, face, limb, pelvis, or external genital structure is duplicated,
+   detached, fused, ownerless, incomplete, or anatomically incompatible;
+3. the requested sexual action is absent, hidden, paused, or readable as care,
+   repair, therapy, calibration, or generic device use;
+4. the selected technology is inactive, detached, unexplained, or unrelated to
+   the sexual contact;
+5. a suspended load, center of mass, force path, shadow, catch, or release is
+   missing or physically unsafe;
+6. the room lacks one large future structure, body-scale technology, visible
+   contact response, or six coherent future signals;
+7. the image becomes cyberpunk, fantasy, glossy advertising, luxury spectacle,
+   a white laboratory, or a present-day bedroom with accessories;
+8. the composition is close, cropped, shallow, clutter-fused, or missing three
+   readable depth planes;
+9. warm yellow, amber, orange, bronze, or golden light dominates the cool field;
+10. a screen, package, sign, caption, logo, watermark, or interface is readable;
+11. Frame prose contains non-English, non-ASCII, meta commentary, negative
+    instructions, rejected visual terms, headings, labels, or a checklist;
+12. a worker or clinician is sexualized during service, a real animal appears,
+    or dangerous equipment remains active during sex.
+
+For a holographic Theme also reject robotic anatomy, grids, particles, rainbow
+color, extreme transparency, incomplete embodiment, or overexposed contact.
+For cooling suspension also reject continuous hammocks, chairs, warm coolant,
+covered pelvises, feet touching the bed, or missing ceiling loads. For an
+orbital gantry also reject ordinary bed sex lifted into the air, unsupported
+kneeling, covered contact, surface-braced feet, or resort styling.
+
+Use these checks silently. Their vocabulary never appears in the returned
+Frame; rewrite the result as positive accepted visual content.
 
 FINAL FRAME
 
-Write each Frame as one natural English ASCII paragraph. Begin with the
-ordinary location, season or operational cycle, time of day, practical light,
-exact requested cast, and current relationship. Describe one held photographic
-instant rather than a process.
+Compose each Frame in this order:
 
-Early in the paragraph, establish the single speculative development, its
-physical placement, one human need, one unresolved problem, and at least three
-mundane anchors. Then describe every participant's stable pose, gaze,
-expression, clothing or undressed state, body support, active hand tasks, and
-contact with another body, device, or room surface. Complete the paragraph with
-the remaining reality markers, material response, lens, aperture, camera
-height, focus behavior, restrained palette, and environmental wear.
+1. First sentence: location, operational time, a numeric 5200K-6500K motivated
+   cool light, complete named cast with exact ages, relationship, and active
+   sexual action.
+2. Body geometry: torso directions, directly compatible pelvis relationship,
+   legs, hands, expressions, reciprocal cue, and coherent anatomy.
+3. Active technology: body attachment, material response, power or data route,
+   complete support path, safety release, and contact-scale effect.
+4. Future room: one large structure, five or six concise reality anchors,
+   maintenance history, cost or scarcity, privacy pressure, and atmosphere.
+5. Photography: medium-wide 35-50 mm rectilinear lens, f/5.6-f/11, camera side
+   and height, three depth planes, cool palette, and natural skin separation.
 
-Keep the prose efficient by mentioning each device, anchor, expression, light
-source, lens, and problem once only. Never summarize the cost, maintenance,
-privacy, bodily consequence, or unresolved emotion after already showing it.
-
-Do not output a title, Theme number, Frame number, headings, labels, schema,
-checklist, safety explanation, alternate options, negative prompt, or visible
-image copy. Before returning, silently verify exact cast, adults aged 25 or
-older, one speculative leap, correct content level, five mundane anchors, an
-unmistakable image-legible sexual partnership, reciprocal intimate contact, a
-literal body-technology connection, cost, maintenance, privacy, bodily
-consequence, coherent anatomy, practical light, cold lived-in realism,
-English-only printable ASCII, and no readable text inside the image. A Frame
-with a relative age, more visible bodies than requested, a QR code, a barcode,
-or one non-ASCII character is invalid and must be rewritten before submission.
+Return only the single positive English ASCII paragraph. Do not output a title,
+Theme number, Frame number, headings, schema, explanations, alternatives,
+negative prompt, or postscript. Before returning, silently verify the priority
+contract, confirm five to seven sentences and at most 320 words, replace every
+typographic apostrophe or dash with a straight ASCII equivalent, confirm at
+most 2100 characters, scan every character for U+0020 through U+007E, and
+rewrite any failure.
