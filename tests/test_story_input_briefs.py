@@ -1863,13 +1863,24 @@ def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
     )
     assert "Use the exact requested human cast and no additional people" in normalized
     assert "unmistakably mature Chinese adult" in normalized
+    assert "When the requested cast is one woman and zero men" in normalized
+    assert "every front, back, and inset photograph is strictly solitary" in normalized
+    assert "off-camera participant, second body, extra hand, partial head" in normalized
+    assert "premise must describe solo agency" in normalized
     assert "At aesthetic level" in normalized
     assert "At erotic level" in normalized
     assert "At hardcore level" in normalized
+    assert "Every inserted object must be a body-safe sex toy" in normalized
+    assert "Never insert a bottle, food, household object" in normalized
     assert "Frames are parallel campaign variants" in normalized
     assert "ADULTS 25+" in normalized
     assert "one exact invented 13-digit barcode number" in normalized
-    assert "approximately 450-700 words" in normalized
+    assert "Target 500-600 words" in normalized
+    assert "absolute range of 450-700 words" in normalized
+    assert "each inset description under 25 words" in normalized
+    assert "State shared lighting, identity, borders, and print behavior once" in normalized
+    assert "Reject and rewrite any Frame below 450 words or above 700 words" in normalized
+    assert "final dedicated image-text passage is missing" in normalized
     assert "one complete flat sleeve" in normalized
 
 

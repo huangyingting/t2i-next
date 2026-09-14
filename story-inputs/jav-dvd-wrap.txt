@@ -138,6 +138,15 @@ and reaction. In multi-person compositions, keep heads separated, hands
 traceable to their owners, limbs anatomically continuous, and contact points
 physically plausible.
 
+When the requested cast is one woman and zero men, every front, back, and inset
+photograph is strictly solitary. Show only her own self-touch, masturbation,
+or use of one body-safe sex toy designed for the depicted contact. Do not
+mention, imply, crop out, or show any partner, lover, guest, observer,
+photographer, off-camera participant, second body, extra hand, partial head,
+mouth, penis, strap-on aimed at another person, or interaction with someone
+outside a still. Titles, taglines, synopsis copy, feature labels, and premise
+must describe solo agency without plural lovers or partnered action.
+
 Do not use school settings, uniforms associated with minors, youth-coded
 language, family-role sexualization, coercion, hidden-camera framing,
 incapacitation, trafficking, humiliation without explicit enthusiasm,
@@ -171,6 +180,9 @@ ejaculation, semen, or female sexual fluids. Use one clearly readable primary
 sexual action per still, physically plausible contact geometry, traceable
 limbs, and expressions of active adult participation. Do not stack unrelated
 acts into one body cluster or obscure the active anatomy with decorative type.
+Every inserted object must be a body-safe sex toy explicitly designed for
+genital or anal use. Never insert a bottle, food, household object, studio
+tool, weapon, or improvised prop.
 
 THEME CONTRACT
 
@@ -298,12 +310,17 @@ Reject and rewrite any Theme or Frame that:
 
 FINAL OUTPUT
 
-Write each Frame as one concise English ASCII paragraph of approximately
-450-700 words. Begin by stating that this is one finished, flat, front-facing
-landscape DVD wrap with back panel left, spine center, and front panel right.
-Describe the panel proportions, exact requested adult cast, content-level
-premise, front hero image, back hero and inset grid, separation gutters,
-lighting, anatomy, palette, typography behavior, barcode zone, and print finish.
+Write each Frame as one concise English ASCII paragraph. Target 500-600 words
+and enforce an absolute range of 450-700 words, including the dedicated
+image-text passage. Begin by stating that this is one finished, flat,
+front-facing landscape DVD wrap with back panel left, spine center, and front
+panel right. Describe the panel proportions, exact requested adult cast,
+content-level premise, front hero image, back hero and inset grid, separation
+gutters, lighting, anatomy, palette, typography behavior, barcode zone, and
+print finish. Keep the front hero description under 90 words, the back hero
+under 60 words, and each inset description under 25 words. State shared
+lighting, identity, borders, and print behavior once rather than repeating
+them for every still.
 
 End with the dedicated image-text passage. Declare every exact readable string
 once for each physical occurrence, including repeated title and product code
@@ -315,3 +332,8 @@ adult aged 25 or older; correct content level; coherent anatomy; separated
 insets; stable identities; original product identity; English-only ASCII prose;
 all visible copy declared with exact carrier and panel location; no undeclared
 letters or gibberish; and a final ASCII semicolon.
+
+Count the complete Frame before returning. Reject and rewrite any Frame below
+450 words or above 700 words, any one-person Frame that implies another person,
+and any Frame whose final dedicated image-text passage is missing or does not
+end with an ASCII semicolon.
