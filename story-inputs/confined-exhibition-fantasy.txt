@@ -1,10 +1,22 @@
 BRIEF
 
-创作发生在真实狭小空间中的成年人自愿展示幻想。画面以一名明确年满 25 岁的东亚成年主表演者为中心；主表演者主动进入预先检查、静止、通风、照明充分且出口保持开启的狭小空间，以身体折叠、翘臀、四肢向四角伸展的大字型、跪姿前倾、侧卧卷曲、俯卧抬臀或坐姿折叠形成大胆诱惑姿势。其余请求人物全部是明确年满 25 岁、知情同意的成年围观参与者，站在空间开口、门框、舱口或安全边界之外观看并作出清楚可见的自愿回应。
+创作发生在真实狭小空间中的成年人自愿展示幻想。画面以一名明确年满 25 岁的东亚成年主表演者为中心；主表演者主动进入预先检查、静止、通风、照明充分且出口保持开启的狭小空间，以身体折叠、抬高骨盆、受空间限制的对角伸展、跪姿前倾、侧卧卷曲、俯卧抬臀或坐姿折叠形成大胆诱惑姿势。其余请求人物全部是明确年满 25 岁、知情同意的成年围观参与者，站在空间开口或安全边界之外，以彼此不同但自然可信的表情和身体反应观看。
+
+最终图像必须像真实摄影师在可控私人场地中拍到的一次高预算编辑摄影：主体第一眼醒目，空间尺度可信，皮肤、织物、金属、木材和软垫各有真实质感，光线拥有明确来源，人体与承重点符合重力。视觉冲击来自紧凑空间、清晰轮廓、色彩对比和人物之间的注意力，而不是不可能的关节、复制粘贴式表情、过度锐化、塑料皮肤或堆砌提示词。
+
+HIGHEST PRIORITY OUTPUT
+
+每个 Frame 必须控制在 400–680 个英文单词；四人场景优先控制在 420–540 个单词，每增加一人最多增加 30 个单词。若细节要求发生竞争，优先保留准确人数、主表演者完整姿势、真实空间、主光源、一个色彩钩子和每名围观者的一项独特反应，删除重复服装形容词、重复安全解释、第二次摄影参数和同义改写。
+
+每个 Frame 的前 180 个英文单词内必须用一句具体构图句明确：完整开口内只出现主表演者、承重垫和内部表面；开口框架与占画面高度 8–15% 的连续外部地面带构成可见边界；每名围观者分别站在开口左右两侧或更远处的独立外部轮廓槽位，外部背景包围其轮廓三侧；开口中央、主表演者正后方和四肢间负空间保持为清楚可见的空内部背景。不得只写 spectators are outside、safe distance 或 visible gaps 来代替这句二维构图说明。
+
+每个 Frame 都从空白状态独立写成一张完整平行摄影方案，第一句直接写具体季节、时刻、地点和当前光线。不得使用 the same、identical、again、remains unchanged、previously、has shifted、different angle、continues、earlier Frame 或 another view 等后向连续性短语；不得描述前一刻动作、反应演变或视角从上一帧移动。提交前逐词扫描这些禁用短语，发现任一个就重写相关句子。每个围观者最多使用一个简洁句子，摄影参数集中在一个句子中，整段最多保留三个竞争视觉钩子。
+
+Write the opening as a complete first presentation of the setting with no backward pointer or reference to another Frame.
 
 所有人都知道这是预先安排的成人展示与拍摄，能够随时叫停和离开。不得出现陌生路人、 unsuspecting bystander、偷拍、胁迫、囚禁、绑架、醉酒、失去意识、羞辱性强迫或封闭窒息。车辆必须停稳、熄火、钥匙移除并保持车门或尾门完全开启；船只必须系泊；轨道车辆、飞机、升降机、冷库、机械和工业设备必须停用并挂牌；任何箱体、柜体、舱室或隔间都不得上锁。不得把危险、缺氧、极端温度、运动机械、道路交通、坠落边缘或无法退出作为刺激来源。
 
-人数使用当前运行请求的 female_count 与 male_count。只接受 TOTAL PEOPLE = female_count + male_count 为 4–8、female_count 至少为 2、male_count 至少为 1 的运行。恰好一名女性是主表演者；SPECTATORS = TOTAL PEOPLE - 1，因此围观者为 3–7 人。WOMEN SPECTATORS = female_count - 1，MEN SPECTATORS = male_count，二者都至少为 1，保证围观群众同时有女性和男性。POINTING SPECTATORS = ceil(SPECTATORS / 2)，GOSSIPING SPECTATORS = floor(SPECTATORS / 2)。不得增加请求之外的人物、背景脸、身体、手脚、镜中人物、屏幕人物、海报人物、工作人员或路人，也不得用镜像、照片、假人、影子或身体碎片伪造人群。
+人数使用当前运行请求的 female_count 与 male_count。只接受 TOTAL PEOPLE = female_count + male_count 为 4–8、female_count 至少为 2、male_count 至少为 1 的运行。恰好一名女性是主表演者；SPECTATORS = TOTAL PEOPLE - 1，因此围观者为 3–7 人。WOMEN SPECTATORS = female_count - 1，MEN SPECTATORS = male_count，二者都至少为 1，保证围观群众同时有女性和男性。不得增加请求之外的人物、背景脸、身体、手脚、镜中人物、屏幕人物、海报人物、工作人员或路人，也不得用镜像、照片、假人、影子或身体碎片伪造人群。
 
 THEME CONTRACT
 
@@ -13,54 +25,51 @@ THEME CONTRACT
 2. 真实地点、狭小空间的长宽高关系、开启的出口、通风、静止状态、软垫或稳定承重点。
 3. 主表演者唯一姿势：身体折叠、翘臀、受空间限制的大字型、跪姿前倾、俯卧抬臀、侧卧卷曲或坐姿折叠中只选一个。
 4. 头—颈—胸廓—脊柱—骨盆—四肢的连续关系，每只手和脚的明确支撑点，以及正常成人比例。
-5. 每名围观者在开口外的固定站位、完整脸部、汇聚视线、惊讶表情和指点或议论动作；不得改变人数或交换身份。
+5. 每名围观者在开口外的固定站位、独特面孔、主要视线和彼此不同的自然反应；不得改变人数或交换身份。
 6. 季节、content level 对应的性感服装公式、具体单品、透明度、穿着位置、材质、主辅色、鞋履、发型、妆容、年龄段、体型及一至四件配件。
 7. content level 对应的衣着、裸露和唯一主要动作。
-8. 主表演者的固定情绪基调，以及眉眼、视线、嘴唇、脸颊、下巴与头部角度构成的详细可见表情。
+8. 主表演者的固定情绪基调，以及不对称眉眼、清晰视线、自然嘴唇张力、脸颊潮红、下巴与头部角度构成的详细可见表情。
 
 同一 Theme 的全部 Frame 保持地点、人物、年龄、体型、服装单品、透明度、主辅色、材质、鞋履、发型、妆容、配件、空间尺寸、出口状态、围观者站位和主要姿势不变。不同 Frame 只改变一个真实可达的观察方向、主表演者视线、一个轻微手部调整或同一情绪基调内的表情强弱，不写时间推进，不让人物进入或离开。
 
 FRAME CONTRACT
 
-每个 Frame 是一个可独立渲染的英文段落。第一句必须使用以下结构并把所有方括号替换为根据运行请求计算出的英文整数：“Exactly [TOTAL PEOPLE] East Asian adults are visible: one featured adult woman performer and exactly [SPECTATORS] adult spectators, comprising exactly [WOMEN SPECTATORS] additional women spectators and [MEN SPECTATORS] men spectators.”主表演者只占用一个请求女性名额，绝不能从男性名额中扣除主表演者：WOMEN SPECTATORS 必须等于 female_count - 1，MEN SPECTATORS 必须原样等于 male_count。例如 2 women + 2 men 请求必须写 exactly four adults、one woman performer、exactly three spectators、exactly one additional woman spectator and two men spectators；4 women + 4 men 请求必须写 exactly eight adults、exactly seven spectators、exactly three additional women spectators and four men spectators。随后逐人确认 woman/man, age 25 or older。不能写全女性观众、全男性观众、超出请求人数或模糊 crowd。
+每个 Frame 是一个 400–680 个英文单词的独立可渲染摄影段落。最终段落只写当前画面中可见的内容，不输出 `LOCK`、schema、公式、检查步骤、方括号占位符、否定合规清单或自我说明。把人数算术留在内部规划中，并在前两句自然写明准确总人数、一名女性主表演者，以及额外女性和男性围观者的准确人数；随后为每名人物指定明确成年年龄、独特外貌和可追踪站位。
 
-每个 Frame 必须逐字输出以下四条共同锁，不能改写、缩短或省略：
-“GENDER ARITHMETIC LOCK: The featured performer consumes exactly one requested woman slot; the spectator roster therefore contains exactly [WOMEN SPECTATORS] additional adult women and exactly [MEN SPECTATORS] adult men, totaling exactly [SPECTATORS] spectators.”
-“OPENING COMPOSITION LOCK: One real, fully open exit frames the featured adult woman performer inside the confined space while exactly [SPECTATORS] adult spectators, exactly [WOMEN SPECTATORS] women and [MEN SPECTATORS] men, remain beyond a clear 3-meter empty buffer outside the opening; the performer's complete head-to-pelvis-to-limbs chain, three enclosing surfaces, all requested spectator faces, and the unobstructed exit path are simultaneously visible through a rectilinear 35mm perspective.”
-“AUDIENCE HIERARCHY LOCK: The featured adult woman performer dominates the near and middle ground as the largest, brightest, and most sharply detailed figure, while exactly [SPECTATORS] smaller mixed-gender adult spectators occupy separate far-background slots in the required three-depth formation at 3, 4, and 5 meters, all with fully visible faces, gazes converging on the performer, and no overlap with the performer.”
-“AUDIENCE REACTION LOCK: All [SPECTATORS] adult spectators show unmistakable astonishment through high raised brows, wide focused eyes, and open commenting mouths; exactly [POINTING SPECTATORS] spectators point one extended index finger toward the featured performer while exactly [GOSSIPING SPECTATORS] spectators cup one hand beside their own mouths as if exchanging shocked gossip, and every free hand remains visibly on its owner's own body or a separate fixed distant surface.”
-方括号内容必须全部替换为英文整数，不能原样输出；三条锁中的人物数量和性别必须与第一句完全一致。
+每个 Frame 只呈现一个曝光瞬间、一个可建造空间和一个主要动作。先写真实地点、季节、时刻与可见光源，再写主表演者、狭小空间、围观者和摄影处理。所有句子服务于同一空间图，不重复完整约束，不把同一动作换词描述两遍。
 
-紧接共同锁后必须根据当前 Theme 的姿势类别逐字输出以下三条姿势锁之一且只能输出一条：
-“FOLDED-BODY LOCK: The featured adult performer forms an extreme compact fold with both hips and knees deeply flexed, the abdomen firmly compressed against the thighs, both knees lifted beside the ribcage near shoulder level, the lower legs folded back without crossing, the pelvis tipped upward toward the opening, the spine forming one continuous maximum natural curve, and the face visible between the separated knees while every limb remains anatomically distinct.”
-“RAISED-HIPS LOCK: The featured adult performer forms an extreme raised-hips silhouette with the pelvis at least one torso-thickness above the shoulders, the chest and one cheek close to a padded support, a continuous strongly arched spine from neck through pelvis, both hips level and thrust toward the opening, and body weight visibly distributed through two widely separated knees plus two forearms on fixed padded surfaces.”
-“SPREAD-EAGLE LOCK: The featured adult performer fills the confined opening with an extreme diagonal spread, the left hand fully reaching the upper-left support, the right hand fully reaching the upper-right support, the left foot fully reaching the lower-left support, and the right foot fully reaching the lower-right support, creating four maximally separated corner contacts, a taut X-shaped silhouette, and one continuous unobscured torso and pelvis.”
+空间必须真实可建、可进入且尺寸关系明确。至少显示三个狭小证据：身体与左右边界的近距离、头顶或背部与上方结构的距离、手掌或膝脚压住的承重点、完全开启的门或舱口、外部正常尺度参照。主表演者拥有一条连续可读的头—颈—胸廓—脊柱—骨盆—四肢链，正常成人头身比和一致肢体长度；每只手和脚只承担一个清楚任务。
 
-姿势锁之后必须根据当前 content level 逐字输出以下三条表情锁之一且只能输出一条：
-“AESTHETIC EXPRESSION LOCK: The alert featured adult performer shows theatrical ecstasy through high raised brows, bright focused symmetrical eyes, deeply flushed cheeks, an open surprised mouth, and a deliberate joyful smile, with no rolled eyes, unfocused pupils, visible tongue, or saliva.”
-“EROTIC EXPRESSION LOCK: The alert featured adult performer shows voluntary extreme arousal through high inner brows, symmetrical half-closed or slightly upturned eyes with partially visible pupils, deeply flushed cheeks, moist parted lips with no free saliva strand or droplet, a visible tongue tip, and a deliberate blissful smile.”
-“HARDCORE EXPRESSION LOCK: The alert featured adult performer shows voluntary stylized ahegao through high inner brows, symmetrical slightly upturned eyes with partially visible softly unfocused pupils, deeply flushed cheeks, a relaxed open mouth, a fully visible normal tongue tip, one thin continuous saliva strand attached only from the tongue to the lower lip, a tilted head, and a deliberate blissful smile.”
+三类核心姿势必须大胆但停留在可由健康成年人短时保持的范围内：
+- 身体折叠：髋膝深屈，胸腹贴近大腿，膝盖位于肋骨两侧但低于肩峰，脸在膝间或膝上方清楚可见，骨盆由软垫稳定支撑，脊柱保持连续自然曲线。
+- 抬高骨盆：两膝与两前臂形成宽而稳定的四点支撑，胸部接近软垫，骨盆明显高于肩线约半个躯干厚度，腰椎保持可见但不过度的生理弧度。
+- 对角伸展：双手和双脚分别接触四个不同支撑区，肘膝保留自然轻屈，躯干形成清楚对角或 X 形负空间，但不要求达到关节极限或同时触及最远角点。
 
-Hardcore Frame 必须紧接 HARDCORE EXPRESSION LOCK 逐字增加以下下身状态锁；Aesthetic 与 Erotic Frame 不得输出：
-“HARDCORE LOWER-BODY LOCK: The featured adult performer's lower body is bare, with no skirt, trousers, shorts, underwear, or opaque garment covering the pelvis, buttocks, or current action area; only permitted hosiery, footwear, or accessories may remain away from that area.”
+全部围观者位于完全开启的出口之外，最近者与主表演者之间保留一段由可见地板、走道或甲板证明的安全空隙；实际距离必须适合所选地点，不写固定米数。根据真实建筑纵深，把围观者安排为错位弧线、斜向队列、门框两侧或两至三层自然深度。每名围观者的脸、轮廓和手势归属清楚，但背景脸只需可辨识，不与主表演者争夺同等锐度。多数视线落在主表演者，一至两人可以短暂看向另一名围观者以形成真实群体互动。
 
-共同锁、姿势锁、表情锁和后续正文必须描述同一个姿势、空间、人物排列与脸部状态。后文不得改变、否定或增加表情锁规定的嘴唇、舌头、唾液、眼睑和瞳孔状态；允许用一个可渲染句子再次描写完全相同的状态，但不得添加第二条液体、滴落、飞溅或不同连接轨迹。不得在英文 Frame 中写错误姿势的否定清单；只保留正确关节、支撑点、方向和空间关系的正向描述。
+PORTAL AND SILHOUETTE SEPARATION
 
-空间必须真实可建、可进入且尺寸关系明确。至少显示三个狭小证据：主表演者身体与左右边界的近距离、头顶或背部与上方结构的距离、四肢接触的承重点、打开的门或舱口、外部正常尺度参照。身体可以被迫紧凑折叠，但不得穿过墙板、座椅、货架、门框或其他身体。主表演者必须拥有一条连续且可读的头—颈—躯干—骨盆—四肢链，正常头身比，四肢长度一致，关节朝向合理，手指和脚趾数量正确。
+把门框、舱口、尾门、柜门或检修口定义为一个清楚的二维开口平面。主表演者及其承重垫完整位于开口平面内侧；全部围观者的头、肩、躯干、手臂和双脚完整位于开口平面外侧。任何围观者都不能在投影上出现在黑暗舱体、柜体或箱体内部，不能从主表演者四肢之间探头，不能把手臂伸过门框，也不能与开口边缘、车辆、家具或主表演者共享轮廓。
 
-“身体折叠”必须接近个体自然活动范围的上限：髋膝深屈、胸腹压实大腿、双膝抬到肋骨两侧接近肩高、脸从分开的膝间清楚露出、骨盆向开口上翻，并显示强烈布料压缩、皮肤褶皱、头发下垂和软垫受压。“翘臀”必须形成一眼可读的夸张高低差：胸部和一侧脸颊接近软垫，骨盆至少比肩膀高出一个躯干厚度，臀部朝开口突出，双膝左右拉开稳定承重，脊柱保持连续的强弧线。“大字型”必须让双臂和双腿完全伸向四个不同角落，手掌或鞋底形成四个最大间距的稳定接触点，身体构成清晰 X 形负空间；仅在关节极限处允许轻微自然弯曲，不得把肢体融合、复制、折断或脱臼。
+画面中必须出现一条连续、无遮挡的外部地面或走道隔离带，从开口下缘延伸到最近围观者鞋尖；其投影高度约占画面高度的 8–15%。每名围观者占用一个独立轮廓槽位，头部与相邻头部之间至少保留一个可见头宽，肩线与相邻人物、开口边缘和道具之间保留清楚背景缝隙。每名围观者从头部至少显示到髋部，并有外部墙面、地面、天空或走道背景包围其轮廓三侧；双手保持在自己的躯干轮廓内或贴近自己的身体。
 
-围观必须成为远景可见构图关系而不是贴近身体的人墙。主表演者与最近围观者之间必须保留 3 米无人空白缓冲区，缓冲区由完整地板、走道、甲板或房间纵深清楚证明。全部 SPECTATORS 位于狭小空间开口之外，并根据人数平衡分配到三层远景：3 人使用 1+1+1；4 人使用 2+1+1 的任一排列；5 人使用 2+2+1 的任一排列；6 人使用 2+2+2；7 人使用 2+3+2 的任一排列。第一、第二、第三排分别距离主表演者 3、4、5 米，不得减少为一排或两排。每张脸、眼睛、双手和身体归属清楚，人物之间保留背景空隙，视线汇聚到主表演者。全部围观者必须同时呈现高扬眉毛、睁大的聚焦双眼和正在议论的张口，形成一致而明确的惊讶反应；不能出现微笑、平静、冷漠、欣赏、专注或无表情。POINTING SPECTATORS 人各用一只手伸出食指指向主表演者，GOSSIPING SPECTATORS 人各用一只手拢在自己的嘴边作震惊低声议论状；全部围观者的另一只手清楚放在自己的胸口、腰、髋或互不共享的固定远处表面。围观者不得进入前景或中景，不得触碰、抓握、倚靠或环抱任何其他人物，不得阻挡出口、控制主表演者身体或持有拍摄设备。
+车辆尾门、后备箱、船舱口和低矮柜格采用开口外侧 35–45 度的斜向视点。主表演者位于开口内的近景下方或侧方，围观者全部站在保险杠、门槛或舱口边界之外，并分配到开口左右两侧及更远的外部区域；开口框架和连续地面隔离带必须在二维图像中把主表演者与围观者完全分开。不得把任何围观者安排在主表演者正后方、开口中央或肢体形成的负空间内。
 
-摄影使用 35 mm 等效直线投影，形成强烈但自然的近大远小层级：主表演者占画面高度或宽度的 55–75%，全部围观者整体只占远景上方或后方的 15–30%，中间保留清楚的无人缓冲区和透视引导线。观察位置在开口外侧但紧邻主表演者所在结构，不得进入肢体路径。画面同时保留主表演者完整身体链、至少三个空间边界、全部围观者的脸、开启出口和 3–5 米纵深。禁止鱼眼、窥孔畸变、隐藏设备视角、监控画面、拼贴、镜面复制、夸张巨头、短躯干、异常长腿和塑料皮肤。
+若所选场景无法在 35–50 mm 视角中同时容纳请求人数、独立轮廓槽位、连续隔离带和完整出口，则在 Theme 阶段改选更宽的场景，不得通过缩小人物、堆叠头部、裁掉身体、让人物探入开口或使用超广角来强行容纳。
 
-英文 Frame 的人物视线只能落在某一名可见 adult spectator、全部 spectators、开放出口、主表演者自己的手或当前动作上。发布前逐字删除 camera、lens、photographer、operator、tripod、rig、recording device、capture device、filming equipment 与 photography equipment，即使这些词出现在否定句、视线描述或反射描述中也必须删除；不得写 look toward the camera、face the lens 或 no camera。观察方向只用 viewpoint、composition 或 view 表达，形成视点的设备与人员完全不进入英文正文。
+围观反应必须彼此不同且像抓拍：一人身体前倾并屏住呼吸，一人抬眉后轻声评论，一人手掌贴胸或握住自己的衣襟，一人侧头确认同伴反应，一人短暂伸出食指。每个 Frame 最多一人指点、最多一人手拢嘴边，其余人使用不同的自然手势。不得让所有人同时瞪眼、张嘴或摆出相同手势。
+
+主表演者的表情必须清醒、主动、自然且略带不对称。使用清晰聚焦瞳孔、一侧眉峰略高、真实眼睑受力、鼻翼与面颊轻微张力、呼吸造成的嘴唇开合与胸口或喉部细微张力、局部潮红，以及落在可见围观者、开启出口、自己的手或当前动作上的明确视线。只有环境温度低于 10°C 时才能写可见呼气。避免成套卡通表情、双眼完全上翻、僵硬圆形嘴、过长舌头和多条唾液。
+
+使用 35–50 mm 等效直线投影镜头，根据狭小空间选择能保持正常人体比例的最窄视角。主表演者占画面高度或宽度约 50–68%，围观者形成较小的中远景群组；允许离焦随距离自然增加，但每张脸仍可区分。焦点落在主表演者靠近视点的眼睛和关键承重点，景深自然过渡。观察位置在开口外侧、略偏离中心且不进入肢体路径，保留至少两个空间边界、完整出口和一条可辨识退出路径。
+
+允许在英文 Frame 中使用 camera、lens、aperture、shutter 和 depth of field 描述摄影方法，但设备本身不进入画面。不得使用鱼眼、窥孔、隐藏设备、监控画面、拼贴、镜面复制或会制造夸张头身比例的超广角视点。
 
 POSE, AUDIENCE, AND STYLE MATRICES
 
-Theme 规划阶段按当前返回 Theme 列表中的顺序使用确定性三项循环：列表第 1、4、7 项选择身体折叠类场景，英文 title 必须以 `FOLDED - ` 开头，并锁定 FOLDED-BODY LOCK；列表第 2、5、8 项选择翘臀或四点支撑类场景，title 必须以 `RAISED HIPS - ` 开头，并锁定 RAISED-HIPS LOCK；列表第 3、6、9 项选择四角伸展类场景，title 必须以 `SPREAD EAGLE - ` 开头，并锁定 SPREAD-EAGLE LOCK。若原场景文字使用同义词，仍须归入这三个姿势类别之一。Frame Sequence 每次独立生成，必须读取当前 Theme title 的前缀选择唯一姿势锁，不得重新选择姿势类别。
+Theme 规划阶段按当前返回 Theme 列表中的顺序使用确定性三项循环：列表第 1、4、7 项选择身体折叠类场景，英文 title 以 `FOLDED - ` 开头；列表第 2、5、8 项选择抬高骨盆或四点支撑类场景，title 以 `RAISED HIPS - ` 开头；列表第 3、6、9 项选择对角伸展类场景，title 以 `SPREAD EAGLE - ` 开头。若原场景文字使用同义词，仍须归入这三个姿势类别之一。Frame Sequence 每次独立生成，读取当前 Theme title 的前缀并保持对应姿势家族，不在正文输出前缀解释或姿势锁。
 
-围观者人数与三排阵型必须使用平衡对应关系：3→1+1+1，4→2+1+1 的任一排列，5→2+2+1 的任一排列，6→2+2+2，7→2+3+2 的任一排列。三排中至少两排显示男女混合，若单人排无法混合，则必须让相邻两排合计同时包含男女。允许改变三排人数的前后顺序、弧线、梯形或阶梯的横向形状和高度，但不得改变三排深度、当前人数对应的平衡拆分和中央出口。每名围观者拥有不同的脸、发型、服装辅色、站位和视线角度，但全部共享明确惊讶情绪。POINTING SPECTATORS 名指点者和 GOSSIPING SPECTATORS 名议论者必须逐人枚举，不能用 several、some、others 或 group 概括；指点手、拢嘴手与各自另一只手均独立归属且不碰任何其他人物，不得复制同一张脸或同一身体。
+围观者根据实际出口宽度和外部空间选择两至三层自然错位：3 人可用 2+1 或 1+2，4 人可用 2+2 或 1+2+1，5 人可用 2+2+1，6 人可用 2+2+2 或 3+2+1，7 人可用 3+2+2。至少两个深度层同时包含男女，人物之间保留可见负空间。每名围观者拥有不同的脸、发型、服装辅色、站位、视线角度和反应强度；逐人枚举时使用简洁名词短语或短句，避免重复完整表情模板。
 
 表情基调按实际 Theme 编号除以 10 的余数轮换主动挑逗、羞耻但享受、得意炫耀、从容自信、调皮邀请、紧张兴奋、惊讶后微笑、专注沉浸、慵懒满足和大胆直视。服装类别、主色、材质和配件分别使用不同长度的轮换，不得让相同编号总产生固定搭配；同一批次先比较已生成 Theme，发现相邻重复就改选未使用组合。
 
@@ -74,7 +83,7 @@ WARDROBE, COLOR, ACCESSORIES, AND EXPRESSION
 
 配件每个 Theme 选择一至四件并轮换：细框眼镜、粗框眼镜、无度数彩色镜片、窄丝巾、长丝巾、颈圈、项圈式项链、垂坠耳环、耳钉、手镯、腕表、戒指、腰链、身体链、臂环、腿环、吊袜带、发夹、发带和装饰手套。眼镜必须正确落在鼻梁与双耳，镜片不得复制眼睛；丝巾只能松系在颈部、头发、手腕或腰侧，不得遮住口鼻、勒颈、捆绑肢体或阻挡出口。配件不得替代衣物遮挡规则，也不得变成额外肢体、绳索或束缚装置。
 
-每个 Frame 用一个专门句子详细描写主表演者的夸张高强度表情，至少包含五项同时可见的线索：高扬或紧蹙眉毛、半闭或上翻眼睑、视线方向、聚焦或轻微失焦瞳孔、明显潮红脸颊、张开的鼻翼、湿润高光、张开的嘴唇、可见舌尖、咬下唇、上扬嘴角、抬起或内收的下巴以及回转头部。情绪按 Theme 轮换：极度性兴奋、风格化啊嘿颜、羞耻到满脸通红但主动享受、狂喜挑逗、得意炫耀、失控边缘的愉悦、喘息般期待、震惊后沉醉和大胆直视。极度性兴奋必须同时包含明显潮红、急促张口、湿润嘴唇、强烈眼神和面部肌肉张力。风格化啊嘿颜必须包含半闭或轻微上翻但仍对称的双眼、轻微失焦瞳孔、张开的嘴、可见舌尖、潮红脸颊与愉悦笑意，同时保持正常眼球数量、正常舌头、清醒和主动姿势；不得画成昏厥、癫痫、窒息、痛苦、恐惧或失去意识。
+每个 Frame 用一个专门句子描写主表演者的高强度但自然的表情，至少包含五项同时可见的线索：左右略不对称的眉形、真实眼睑开合、清晰瞳孔和视线目标、面颊潮红、鼻翼或鼻梁张力、唇部湿润高光、嘴角方向、可见呼吸、下巴位置和头部转角。情绪按 Theme 轮换：主动挑逗、羞涩但享受、得意炫耀、从容自信、调皮邀请、紧张兴奋、惊讶后微笑、专注沉浸、慵懒满足和大胆直视。高强度情绪通过局部肌肉张力和不对称微表情呈现，不使用风格化啊嘿颜、完全上翻眼睛、失焦瞳孔、夸张吐舌、僵硬圆形嘴或复制粘贴式狂喜。
 
 BODY, MATERIAL, AND SPACE CONTACT
 
@@ -82,17 +91,27 @@ BODY, MATERIAL, AND SPACE CONTACT
 
 每个 Frame 至少描写三项材质—身体—空间接触证据：丝绸在折叠处形成高光褶皱、薄纱被皮肤压平、网袜或吊袜带留下浅压痕、皮革沿臀胯绷紧、丝巾受重力下垂、身体链贴合腹部曲线、手掌压低软垫绒面、膝盖压出垫面凹陷、臀部使汽车座垫或床垫产生可信形变。硬质墙板和金属边缘不得切入皮肤；所有承重点必须有稳定平面或软垫。
 
+PHOTOGRAPHIC REALISM AND VISUAL IMPACT
+
+每个 Theme 必须锁定一种可信的高端编辑摄影方案：一个主导实景光源、一个克制补光或反射来源、35–50 mm 等效镜头、f/4–f/5.6 光圈、符合当前动作的快门速度、自然景深和短而具体的色彩处理。光线必须由场景中真实存在的窗、舱门、顶灯、壁灯、工作灯或反光表面产生，并在人物、服装、软垫和背景上保持同一方向、硬度与色温逻辑。
+
+画面必须有明确三层视觉层级：第一层是主表演者的脸、眼神和完整姿势轮廓；第二层是狭小空间边界、受压材质与开启出口；第三层是较小、稍柔但仍可辨识的围观者。选择一个主色和一个对比辅色，利用门框、舱口、走道、座椅线或货架边缘形成指向主表演者的引导线。避免把所有表面写得同样锐利、同样明亮或同样饱和。
+
+真实皮肤必须显示细小毛孔、柔软汗毛、轻微色差、局部潮红、自然褶皱和压痕；高光随皮肤曲面缓慢滚落，不能形成塑料或蜡质外观。保留真实环境的不完美，例如轻微磨损、接缝、螺钉、织物起伏、地面擦痕或不完全对称的摆放，但只选择两至四项服务于场景的细节，避免杂乱。
+
+构图采用略微偏心的编辑摄影瞬间，不把人物排成对称目录照。主表演者与出口形成清楚轮廓，围观者通过不同高度、肩线和视线形成节奏。每个 Frame 只保留一项最醒目的视觉钩子：强烈轮廓、明暗切割、互补色、门框套框、材质反差或前后景目光链中的一项，不同时争夺多个视觉中心。
+
 CONTENT LEVEL
 
-Aesthetic：衣服数量较少但保持关键部位完全不透明遮盖。每个 Theme 只选择一件贴身连体衣，或两至三件组成的极简性感造型，例如短款上衣加热裤、corset 加高腰内裤、抹胸加迷你裙、吊带加不透明丁字裤或短款西装加 bodysuit；允许露出肩背、腰腹、侧臀和大腿。服装可紧绷、开衩、低胸或露背，但乳头、外部生殖器、阴毛和肛门始终由不透明布料完整覆盖。以有限衣着、服装张力、身体折叠、翘臀轮廓、大字型支撑和围观者视线制造成人时尚张力；不得显示体液或性接触。表情使用强烈但非性露骨的戏剧性狂喜：高扬眉毛、明亮聚焦双眼、明显潮红、张口惊喜和主动笑意；不得使用啊嘿颜、上翻眼睛、失焦瞳孔、吐舌或唾液。
+Aesthetic：衣服数量较少但保持关键部位完全不透明遮盖。每个 Theme 只选择一件贴身连体衣，或两至三件组成的极简性感造型，例如短款上衣加热裤、corset 加高腰内裤、抹胸加迷你裙、吊带加不透明丁字裤或短款西装加 bodysuit；允许露出肩背、腰腹、侧臀和大腿。服装可紧绷、开衩、低胸或露背，但乳头、外部生殖器、阴毛和肛门始终由不透明布料完整覆盖。以有限衣着、服装张力、身体折叠、翘臀轮廓、对角伸展和围观者视线制造成人时尚张力；不得显示体液或性接触。表情使用强烈但自然的编辑摄影神态：聚焦双眼、轻微不对称眉形、局部潮红、可见呼吸和主动笑意。
 
-Erotic：必须保留一至两件透明、半透明、湿贴、敞开或半褪下的性感单品，不能直接省略全部服装。轮换透明薄纱 bodysuit、半透明网眼连体衣、敞开雪纺衬衫、滑至肘部的吊带裙、褪到大腿或膝部的蕾丝内裤、单侧滑落的开衩裙、松开的 corset、透明长袜与吊袜带。允许乳房、臀部、自然阴毛和一个外部生殖区域透过材质或衣物开口清楚可见；允许撩起上衣、半褪下装、分开臀部、展示骨盆或以一只手进行非插入式挑逗触碰。必须清楚写出衣物停留位置和半透明材质覆盖下仍可见的身体轮廓。围观者只观看和回应，不接触主表演者；不得出现插入、体液喷射或多重性行为。表情必须由 EROTIC EXPRESSION LOCK 完整定义，正文只描写其他脸部光影和头部朝向，绝不能再写 saliva、strand、thread、droplet、drip、string、fluid、wet tongue 或液体连接关系。
+Erotic：必须保留一至两件透明、半透明、湿贴、敞开或半褪下的性感单品，不能直接省略全部服装。轮换透明薄纱 bodysuit、半透明网眼连体衣、敞开雪纺衬衫、滑至肘部的吊带裙、褪到大腿或膝部的蕾丝内裤、单侧滑落的开衩裙、松开的 corset、透明长袜与吊袜带。允许乳房、臀部、自然阴毛和一个外部生殖区域透过材质或衣物开口清楚可见；允许撩起上衣、半褪下装、分开臀部、展示骨盆或以一只手进行非插入式挑逗触碰。必须清楚写出衣物停留位置和半透明材质覆盖下仍可见的身体轮廓。围观者只观看和回应，不接触主表演者；不得出现插入、体液喷射或多重性行为。表情保持清醒、主动、聚焦和解剖自然，通过局部潮红、细小眉眼不对称、唇部张力、可见呼吸和明确视线表现强烈愉悦。
 
-Hardcore：主表演者几乎不穿普通衣物，每个独立 Frame 都必须逐字输出 HARDCORE LOWER-BODY LOCK。造型只能保留一件极少量上身单品或一至四件配件，例如敞开的短款上衣、仅覆盖肩臂的短外套、透明胸衣、过膝袜、渔网袜、吊袜带、长手套、颈圈、身体链、腰链、腿环、眼镜、丝巾、高跟鞋或长靴；外阴、阴茎、阴囊、臀沟和肛门中与当前动作相关的区域不得被服装遮挡。允许主表演者进行一个清楚可见的单一露骨动作：外部自慰、一至两根手指的单一插入、使用一件成人玩具的单一插入，或一个解剖来源明确且轨迹连续的体液动作。只允许一个接触中心；另一只手负责支撑、撩衣或稳定身体。围观者仍只观看并作出非接触回应，不得加入第二性行为。所有接触必须属于主表演者自己的身体与手或单件道具。表情必须由 HARDCORE EXPRESSION LOCK 完整定义，正文只描写其他脸部光影和头部朝向，绝不能增加第二条唾液丝、滴落、飞溅、鼻液或其他面部液体。
+Hardcore：主表演者几乎不穿普通衣物。造型只能保留一件极少量上身单品或一至四件配件，例如敞开的短款上衣、仅覆盖肩臂的短外套、透明胸衣、过膝袜、渔网袜、吊袜带、长手套、颈圈、身体链、腰链、腿环、眼镜、丝巾、高跟鞋或长靴；当前动作相关区域不得被服装遮挡。允许主表演者进行一个清楚可见的单一露骨动作：外部自慰、一至两根手指的单一插入、使用一件成人玩具的单一插入，或一个解剖来源明确且轨迹连续的体液动作。只允许一个接触中心；另一只手负责支撑、撩衣或稳定身体。围观者仍只观看并作出非接触回应，不得加入第二性行为。所有接触必须属于主表演者自己的身体与手或单件道具。表情保持清醒、主动、聚焦和解剖自然，不使用风格化啊嘿颜、完全上翻眼睛、夸张舌头或多条面部液体。
 
 OUTPUT PREFLIGHT
 
-发布每个英文 Frame 前逐项检查并重写失败项：第一句精确写出 TOTAL PEOPLE、one featured adult woman performer、SPECTATORS、WOMEN SPECTATORS additional women spectators 和 MEN SPECTATORS men spectators；再次计算并确认 WOMEN SPECTATORS = female_count - 1，MEN SPECTATORS = male_count，不得从男性数量扣除主表演者；四条共同锁紧跟第一句并各出现一次，所有方括号替换为相同英文整数；根据 Theme title 前缀输出唯一正确姿势锁；再根据 content level 输出唯一正确表情锁；Hardcore 还必须紧接表情锁输出 HARDCORE LOWER-BODY LOCK；正文姿势达到姿势锁规定的极端幅度且关节可行；正文不得改变表情锁的嘴唇、舌头、唾液、眼睑和瞳孔状态，最多用一句再次描写相同状态且不得新增液体；至少三个狭小空间证据；根据 SPECTATORS 选择唯一三排人数公式并逐人写入 3、4、5 米远景；逐人确认全部脸均有高扬眉毛、睁大双眼和张口议论，POINTING SPECTATORS 人伸出食指指点，GOSSIPING SPECTATORS 人手拢嘴边低声议论，全部另一只手只在自己身体或独立固定表面上；主表演者占画面 55–75%，围观者只占远景 15–30%；出口和 3 米无人缓冲区完整可见；服装单品、穿着位置、透明度、主辅色、材质、鞋履与一至四件配件清楚；至少三项材质—身体—空间接触证据；content level 衣着和动作正确；逐字扫描确认 camera、lens、photographer、operator、tripod、rig、recording device、capture device、filming equipment 和 photography equipment 均为零；无额外人物、中文字符、否定合规清单或自检说明。最终 Frame 只能保留可渲染画面正文，不得输出检查过程。
+发布每个英文 Frame 前在内部逐项检查并重写失败项：TOTAL PEOPLE、SPECTATORS、WOMEN SPECTATORS 与 MEN SPECTATORS 算术准确；前两句自然写清精确人物构成；Theme title 前缀与唯一姿势家族一致；正文符合 HIGHEST PRIORITY OUTPUT 的动态字数预算且没有 `LOCK`、公式、schema、占位符、连续性快捷词或检查说明；姿势可由健康成年人短时保持，头身比例、脊柱、四肢和承重点连续；至少三个狭小空间证据；全部围观者位于开启出口外的两至三层自然错位中，拥有不同面孔、反应和手势；开口平面、8–15% 画面高度的连续外部地面隔离带、独立轮廓槽位、至少一个头宽的头部间隙及三侧背景包围全部成立；没有围观者投影进开口内部、主表演者正后方或肢体负空间；最多一人指点、最多一人手拢嘴边；主表演者占画面约 50–68%，围观者较小且景深更柔；服装单品、穿着位置、透明度、主辅色、材质、鞋履与一至四件配件清楚；至少三项材质—身体—空间接触证据；写明真实光源、35–50 mm 镜头、f/4–f/5.6、自然景深和色彩处理；视线目标可见且可达；可见呼气符合温度；content level 衣着和动作正确；无额外人物、中文字符、否定合规清单或自检说明。最终 Frame 只保留可渲染画面正文。
 
 SCENE CATALOG
 
@@ -209,21 +228,21 @@ VARIATION AND REJECTION RULES
 3. 主表演者或围观者不知情、不自愿、害怕、受胁迫、醉酒、失去意识、被锁住、无法退出或出口被堵。
 4. 车辆未停稳熄火、船未系泊、设备未断电、舱门关闭、空间上锁、温度危险、通风不足、靠近运行机械、道路、坠落边缘或其他真实危险。
 5. 狭小空间缺少三个尺度证据，空间尺寸与成人身体不匹配，身体穿透结构，或环境像抽象盒子、舞台布景和不真实洞穴。
-6. 身体折叠只弯颈或低头，胸腹没有压实大腿，膝盖没有抬到肋骨两侧接近肩高，脸没有从膝间露出，骨盆没有向开口上翻，或背部和骨盆连接断裂。
-7. 翘臀姿势没有真实膝部与前臂承重，骨盆没有比肩膀至少高出一个躯干厚度，臀部不朝开口，臀部与脊柱断裂，出现悬浮、反关节或不可能重心。
-8. 大字型没有形成最大间距的四角接触和清晰 X 形负空间，或出现融合、复制、缺失、脱臼和异常肢体长度。
+6. 身体折叠只弯颈或低头，胸腹没有贴近大腿，膝盖没有位于肋骨两侧，脸被完全遮住，骨盆缺少软垫支撑，脊柱曲线断裂，或关节明显超出健康成年人短时可保持的范围。
+7. 抬高骨盆姿势没有真实膝部与前臂四点承重，骨盆与肩线缺少清楚高低差，臀部不朝开口，臀部与脊柱断裂，腰椎过度反折，出现悬浮、反关节或不可能重心。
+8. 对角伸展没有四个独立支撑区和清楚 X 形或对角负空间，肘膝被强迫锁死，或出现融合、复制、缺失、脱臼和异常肢体长度。
 9. 主表演者头大身小、四肢比例异常、关节扭曲、手指脚趾错误、身体被空间或围观者遮断。
-10. 围观者位于狭小空间内部、触碰或控制主表演者、阻挡出口、持有拍摄设备、发生第二性行为，或视线没有汇聚到主表演者。
-11. 只在文字中说“被围观”，画面却看不到每名围观者完整归属的脸、眼睛、站位和回应。
-12. 任一围观者没有高扬眉毛、睁大双眼和张口议论的明确惊讶表情，出现微笑、平静、冷漠、欣赏、专注或无表情；指点者数量不等于 ceil(SPECTATORS / 2)，议论者数量不等于 floor(SPECTATORS / 2)，使用模糊群体概括，或手指没有明确指向主表演者。
+10. 围观者位于狭小空间内部，身体或手臂跨过开口平面，投影在舱体、柜体或箱体内部，触碰或控制主表演者，阻挡出口，持有拍摄设备，发生第二性行为，或视线没有形成清楚群体注意力。
+11. 只在文字中说“被围观”，画面却看不到每名围观者完整归属的脸、从头到髋部的独立轮廓、至少一个头宽的头部间隙、三侧背景缝隙、站位和回应。
+12. 围观者拥有重复面孔、相同眉眼、同步张嘴或复制手势，全部人物同时指点或手拢嘴边，反应与站位无法逐人归属，或没有形成自然的群体注意力。
 13. 使用偷拍、窥孔、监控、隐藏设备、鱼眼、镜面复制、拼贴、字幕、Logo、水印或自检报告。
 14. Aesthetic 的衣着超过三件、缺少性感剪裁、使用透明关键部位或出现乳头、生殖器、阴毛、肛门与性接触；Erotic 没有透明、半透明、敞开或半褪下单品，直接完全裸体，衣物停留位置不清，或出现插入、体液喷射和围观者接触；Hardcore 下身仍穿裙裤或内裤、普通衣物过多、当前动作区域被遮挡，或出现多个接触中心、多件玩具和围观者加入性行为。
 15. 同一 Theme 的 Frame 改变人物身份、人数、年龄、体型、衣着、空间、出口状态、围观者位置或主要姿势。
 16. 相邻 Theme 重复同一场景编号、空间类别、姿势、配色、服装或围观者排列，或整批缺少身体折叠、翘臀与大字型任一类别。
 17. 服装只写性感、内衣或裸体而没有具体单品、穿着位置、透明度、主辅色和材质，连续使用黑色蕾丝，或服装与皮肤、空间和肢体融合。
-18. 主表演者表情只有 shy、seductive、embarrassed、aroused 或 ahegao 等标签，没有至少五项眉眼、瞳孔、脸颊、鼻翼、湿润高光、嘴唇、舌尖、下巴或头部角度的可见线索，性兴奋不够强烈，啊嘿颜缺少规定组合，或表情呈现昏厥、癫痫、窒息、恐惧、痛苦、哭泣与求救。
+18. 主表演者表情只有 shy、seductive、embarrassed 或 aroused 等标签，没有至少五项不对称眉眼、清晰瞳孔、脸颊潮红、鼻翼张力、唇部高光、嘴角、呼吸、下巴或头部角度的可见线索，或出现风格化啊嘿颜、完全上翻眼睛、失焦瞳孔、夸张舌头、昏厥、癫痫、窒息、恐惧、痛苦、哭泣与求救。
 19. 眼镜漂浮、镜片复制眼睛，丝巾遮住口鼻、勒住颈部、捆绑肢体或阻挡出口，配件数量超过四件、遮住主要动作或变成额外肢体。
-20. Frame 缺少 GENDER ARITHMETIC LOCK、OPENING COMPOSITION LOCK、AUDIENCE HIERARCHY LOCK 或 AUDIENCE REACTION LOCK，没有根据 Theme title 的 FOLDED、RAISED HIPS 或 SPREAD EAGLE 前缀逐字使用唯一正确姿势锁，同时使用多个姿势锁，或正文姿势与锁句冲突。
-21. 主表演者不是最大最亮人物或不占画面 55–75%，不是整整七名围观者，围观者进入前景或中景、最近距离小于 3 米、没有分布在三层远景、整体超过画面 30%、脸部重复、尺寸超过主表演者、互相融合、遮挡身体、无人缓冲区或出口。
+20. Frame 输出 `LOCK`、schema、算术公式、占位符、检查步骤或自检说明，Theme title 的 FOLDED、RAISED HIPS 或 SPREAD EAGLE 前缀与正文姿势家族冲突，或正文重复描述多个互不相容的主要姿势。
+21. 主表演者不是最清晰醒目的视觉中心或不占画面约 50–68%，围观者进入前景压过主体、没有形成两至三层自然错位、脸部重复、尺寸超过主表演者、互相融合、与车辆或道具混成一个轮廓、遮挡关键身体链、出现在主表演者正后方或肢体负空间、缺少占画面高度 8–15% 的连续外部地面隔离带，或堵住出口。
 22. 缺少三项材质—身体—空间接触证据，软垫没有受压、服装不受重力与身体折叠影响，或年龄和体型只作为标签而不改变可见皮肤与受压形态。
-23. 英文 Frame 出现 camera、lens、photographer、operator、tripod、rig、recording device、capture device、filming equipment 或 photography equipment，人物看向不存在的设备，或用否定设备清单声明合规。
+23. 英文 Frame 不符合 HIGHEST PRIORITY OUTPUT 的动态字数预算，使用 the same、identical、again、remains unchanged、previously、has shifted、different angle、continues、earlier Frame 或 another view 等后向连续性短语，缺少明确实景光源、35–50 mm 镜头、f/4–f/5.6、自然景深和色彩处理，人物看向不可见目标，在温暖环境写出可见呼气，摄影器材进入画面，或用否定设备清单声明合规。

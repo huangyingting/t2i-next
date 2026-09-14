@@ -597,22 +597,25 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "WOMEN SPECTATORS = female_count - 1" in normalized
     assert "MEN SPECTATORS = male_count" in normalized
     assert "保证围观群众同时有女性和男性" in normalized
-    assert "POINTING SPECTATORS = ceil(SPECTATORS / 2)" in normalized
-    assert "GOSSIPING SPECTATORS = floor(SPECTATORS / 2)" in normalized
-    assert "Exactly [TOTAL PEOPLE] East Asian adults are visible" in normalized
-    assert "one featured adult woman performer and exactly [SPECTATORS] adult spectators" in normalized
-    assert "comprising exactly [WOMEN SPECTATORS] additional women spectators and [MEN SPECTATORS] men spectators" in normalized
-    assert "主表演者只占用一个请求女性名额" in normalized
-    assert "MEN SPECTATORS 必须原样等于 male_count" in normalized
     assert "不得增加请求之外的人物、背景脸、身体、手脚、镜中人物" in normalized
-    assert "站在空间开口、门框、舱口或安全边界之外观看" in normalized
+    assert "站在空间开口或安全边界之外" in normalized
     assert "静止、通风、照明充分且出口保持开启" in normalized
     assert "车辆必须停稳、熄火、钥匙移除" in normalized
     assert "任何箱体、柜体、舱室或隔间都不得上锁" in normalized
-    assert "身体折叠、翘臀和大字型三大类" in normalized
-    assert "四肢接触的承重点" in normalized
-    assert "围观必须成为远景可见构图关系而不是贴近身体的人墙" in normalized
-    assert "围观者不得进入前景或中景，不得触碰、抓握、倚靠或环抱任何其他人物" in normalized
+    assert "真实摄影师在可控私人场地中拍到的一次高预算编辑摄影" in normalized
+    assert "皮肤、织物、金属、木材和软垫各有真实质感" in normalized
+    assert "不是不可能的关节、复制粘贴式表情、过度锐化、塑料皮肤或堆砌提示词" in normalized
+    assert "HIGHEST PRIORITY OUTPUT" in brief
+    assert "400–680 个英文单词" in normalized
+    assert "四人场景优先控制在 420–540 个单词" in normalized
+    assert "每增加一人最多增加 30 个单词" in normalized
+    assert "不得使用 the same、identical、again、remains unchanged" in normalized
+    assert "提交前逐词扫描这些禁用短语" in normalized
+    assert "with no backward pointer or reference to another Frame" in normalized
+    assert "每个围观者最多使用一个简洁句子" in normalized
+    assert "不输出 `LOCK`、schema、公式、检查步骤" in normalized
+    assert "把人数算术留在内部规划中" in normalized
+    assert "前两句自然写明准确总人数" in normalized
     assert "WARDROBE, COLOR, ACCESSORIES, AND EXPRESSION" in brief
     assert "逐项写出：上身单品、下身单品或其明确缺席" in normalized
     assert "主色、辅色、材质、鞋履以及一至四件配件" in normalized
@@ -622,77 +625,68 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "细框眼镜、粗框眼镜、无度数彩色镜片、窄丝巾、长丝巾" in normalized
     assert "丝巾只能松系在颈部、头发、手腕或腰侧" in normalized
     assert "至少包含五项同时可见的线索" in normalized
-    assert "极度性兴奋、风格化啊嘿颜" in normalized
-    assert "半闭或轻微上翻但仍对称的双眼" in normalized
-    assert "正常眼球数量、正常舌头、清醒和主动姿势" in normalized
+    assert "左右略不对称的眉形" in normalized
+    assert "清晰瞳孔和视线目标" in normalized
+    assert "不使用风格化啊嘿颜、完全上翻眼睛、失焦瞳孔" in normalized
+    assert "只有环境温度低于 10°C 时才能写可见呼气" in normalized
     assert "衣服数量较少但保持关键部位完全不透明遮盖" in normalized
-    assert "不得使用啊嘿颜、上翻眼睛、失焦瞳孔、吐舌或唾液" in normalized
     assert "一件贴身连体衣，或两至三件组成的极简性感造型" in normalized
     assert "必须保留一至两件透明、半透明、湿贴、敞开或半褪下" in normalized
-    assert "表情必须由 EROTIC EXPRESSION LOCK 完整定义" in normalized
-    assert "moist parted lips with no free saliva strand or droplet" in normalized
-    assert "绝不能再写 saliva、strand、thread、droplet、drip、string、fluid" in normalized
     assert "必须清楚写出衣物停留位置" in normalized
-    assert "每个独立 Frame 都必须逐字输出 HARDCORE LOWER-BODY LOCK" in normalized
-    assert "表情必须由 HARDCORE EXPRESSION LOCK 完整定义" in normalized
-    assert "one thin continuous saliva strand attached only from the tongue to the lower lip" in normalized
-    assert "with no skirt, trousers, shorts, underwear, or opaque garment covering the pelvis" in normalized
-    assert "GENDER ARITHMETIC LOCK:" in normalized
-    assert "The featured performer consumes exactly one requested woman slot" in normalized
-    assert "OPENING COMPOSITION LOCK:" in normalized
-    assert "AUDIENCE HIERARCHY LOCK:" in normalized
-    assert "AUDIENCE REACTION LOCK:" in normalized
-    assert "All [SPECTATORS] adult spectators show unmistakable astonishment" in normalized
-    assert "high raised brows, wide focused eyes, and open commenting mouths" in normalized
-    assert "exactly [POINTING SPECTATORS] spectators point one extended index finger" in normalized
-    assert "exactly [GOSSIPING SPECTATORS] spectators cup one hand beside their own mouths" in normalized
-    assert "FOLDED-BODY LOCK:" in normalized
-    assert "RAISED-HIPS LOCK:" in normalized
-    assert "SPREAD-EAGLE LOCK:" in normalized
-    assert "AESTHETIC EXPRESSION LOCK:" in normalized
-    assert "EROTIC EXPRESSION LOCK:" in normalized
-    assert "HARDCORE EXPRESSION LOCK:" in normalized
-    assert "HARDCORE LOWER-BODY LOCK:" in normalized
-    assert "Aesthetic 与 Erotic Frame 不得输出" in normalized
-    assert "后文不得改变、否定或增加表情锁规定的嘴唇、舌头、唾液、眼睑和瞳孔状态" in normalized
-    assert "不得添加第二条液体、滴落、飞溅或不同连接轨迹" in normalized
-    assert "both knees lifted beside the ribcage near shoulder level" in normalized
-    assert "pelvis at least one torso-thickness above the shoulders" in normalized
-    assert "four maximally separated corner contacts" in normalized
-    assert "a taut X-shaped silhouette" in normalized
-    assert "三条姿势锁之一且只能输出一条" in normalized
+    assert "表情保持清醒、主动、聚焦和解剖自然" in normalized
+    assert "两膝与两前臂形成宽而稳定的四点支撑" in normalized
+    assert "骨盆明显高于肩线约半个躯干厚度" in normalized
+    assert "肘膝保留自然轻屈" in normalized
+    assert "不要求达到关节极限或同时触及最远角点" in normalized
     assert "当前返回 Theme 列表中的顺序使用确定性三项循环" in normalized
-    assert "title 必须以 `FOLDED - ` 开头" in normalized
-    assert "title 必须以 `RAISED HIPS - ` 开头" in normalized
-    assert "title 必须以 `SPREAD EAGLE - ` 开头" in normalized
-    assert "必须读取当前 Theme title 的前缀选择唯一姿势锁" in normalized
-    assert "3 米无人空白缓冲区" in normalized
-    assert "3 人使用 1+1+1" in normalized
-    assert "4 人使用 2+1+1 的任一排列" in normalized
-    assert "5 人使用 2+2+1 的任一排列" in normalized
-    assert "6 人使用 2+2+2" in normalized
-    assert "7 人使用 2+3+2 的任一排列" in normalized
-    assert "第一、第二、第三排分别距离主表演者 3、4、5 米" in normalized
-    assert "全部围观者的另一只手清楚放在自己的胸口、腰、髋或互不共享的固定远处表面" in normalized
-    assert "主表演者占画面高度或宽度的 55–75%" in normalized
-    assert "全部围观者整体只占远景上方或后方的 15–30%" in normalized
-    assert "围观者人数与三排阵型必须使用平衡对应关系" in normalized
-    assert "全部围观者必须同时呈现高扬眉毛、睁大的聚焦双眼和正在议论的张口" in normalized
-    assert "不能出现微笑、平静、冷漠、欣赏、专注或无表情" in normalized
-    assert "POINTING SPECTATORS 人各用一只手伸出食指指向主表演者" in normalized
-    assert "GOSSIPING SPECTATORS 人各用一只手拢在自己的嘴边作震惊低声议论状" in normalized
-    assert "POINTING SPECTATORS 名指点者和 GOSSIPING SPECTATORS 名议论者必须逐人枚举" in normalized
+    assert "英文 title 以 `FOLDED - ` 开头" in normalized
+    assert "title 以 `RAISED HIPS - ` 开头" in normalized
+    assert "title 以 `SPREAD EAGLE - ` 开头" in normalized
+    assert "不在正文输出前缀解释或姿势锁" in normalized
+    assert "实际距离必须适合所选地点，不写固定米数" in normalized
+    assert "3 人可用 2+1 或 1+2" in normalized
+    assert "4 人可用 2+2 或 1+2+1" in normalized
+    assert "5 人可用 2+2+1" in normalized
+    assert "6 人可用 2+2+2 或 3+2+1" in normalized
+    assert "7 人可用 3+2+2" in normalized
+    assert "PORTAL AND SILHOUETTE SEPARATION" in brief
+    assert "每个 Frame 的前 180 个英文单词内" in normalized
+    assert "完整开口内只出现主表演者、承重垫和内部表面" in normalized
+    assert "开口中央、主表演者正后方和四肢间负空间保持为清楚可见的空内部背景" in normalized
+    assert "不得只写 spectators are outside、safe distance 或 visible gaps" in normalized
+    assert "主表演者及其承重垫完整位于开口平面内侧" in normalized
+    assert "全部围观者的头、肩、躯干、手臂和双脚完整位于开口平面外侧" in normalized
+    assert "不能在投影上出现在黑暗舱体、柜体或箱体内部" in normalized
+    assert "一条连续、无遮挡的外部地面或走道隔离带" in normalized
+    assert "其投影高度约占画面高度的 8–15%" in normalized
+    assert "每名围观者占用一个独立轮廓槽位" in normalized
+    assert "头部与相邻头部之间至少保留一个可见头宽" in normalized
+    assert "背景包围其轮廓三侧" in normalized
+    assert "采用开口外侧 35–45 度的斜向视点" in normalized
+    assert "不得把任何围观者安排在主表演者正后方" in normalized
+    assert "若所选场景无法在 35–50 mm 视角中同时容纳请求人数" in normalized
+    assert "每个 Frame 最多一人指点、最多一人手拢嘴边" in normalized
+    assert "不得让所有人同时瞪眼、张嘴或摆出相同手势" in normalized
+    assert "主表演者占画面高度或宽度约 50–68%" in normalized
+    assert "允许离焦随距离自然增加" in normalized
     assert "每名围观者拥有不同的脸、发型、服装辅色、站位" in normalized
-    assert "英文 Frame 的人物视线只能落在某一名可见 adult spectator" in normalized
-    assert "发布前逐字删除 camera、lens、photographer、operator、tripod、rig" in normalized
-    assert "不得写 look toward the camera、face the lens 或 no camera" in normalized
-    assert "观察方向只用 viewpoint、composition 或 view 表达" in normalized
+    assert "多数视线落在主表演者" in normalized
+    assert "允许在英文 Frame 中使用 camera、lens、aperture、shutter" in normalized
+    assert "PHOTOGRAPHIC REALISM AND VISUAL IMPACT" in brief
+    assert "一个主导实景光源、一个克制补光或反射来源" in normalized
+    assert "35–50 mm 等效镜头、f/4–f/5.6 光圈" in normalized
+    assert "第一层是主表演者的脸、眼神和完整姿势轮廓" in normalized
+    assert "第二层是狭小空间边界、受压材质与开启出口" in normalized
+    assert "第三层是较小、稍柔但仍可辨识的围观者" in normalized
+    assert "细小毛孔、柔软汗毛、轻微色差、局部潮红" in normalized
+    assert "高光随皮肤曲面缓慢滚落" in normalized
+    assert "构图采用略微偏心的编辑摄影瞬间" in normalized
     assert "BODY, MATERIAL, AND SPACE CONTACT" in brief
     assert "每个 Frame 至少描写三项材质—身体—空间接触证据" in normalized
     assert "臀部使汽车座垫或床垫产生可信形变" in normalized
     assert "OUTPUT PREFLIGHT" in brief
-    assert "根据 Theme title 前缀输出唯一正确姿势锁" in normalized
-    assert "最终 Frame 只能保留可渲染画面正文" in normalized
+    assert "Theme title 前缀与唯一姿势家族一致" in normalized
+    assert "最终 Frame 只保留可渲染画面正文" in normalized
     assert "SCENE CATALOG" in brief
     assert "CONTENT LEVEL" in brief
     assert "VARIATION AND REJECTION RULES" in brief
