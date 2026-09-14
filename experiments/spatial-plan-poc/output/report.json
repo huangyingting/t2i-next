@@ -5,55 +5,48 @@
   "tampered_prose_rejected": true,
   "tampered_prose_issues": [
     "camera is not stated exactly once",
-    "primary_contact exposes forbidden local anatomy while occluded",
-    "f1 description changed or is incomplete",
-    "m1 description changed or is incomplete"
+    "primary_contact exposes forbidden local anatomy while occluded"
   ],
-  "prose_valid": false,
-  "prose_issues": [
-    "primary_contact exposes forbidden local anatomy while occluded",
-    "f1 description changed or is incomplete",
-    "m1 description changed or is incomplete"
-  ],
-  "semantic_audit_passed": false,
+  "prose_valid": true,
+  "prose_issues": [],
+  "prose_attempts": 1,
+  "semantic_audit_passed": true,
   "semantic_audit": {
     "checks": [
       {
         "check": "cast",
         "passed": true,
-        "evidence": "Prose includes the exact required actor descriptions for F1 and M1."
+        "evidence": "Prose contains both actor descriptions verbatim: 'F1, woman 1, a 29-year-old Chinese woman' and 'M1, man 1, a 32-year-old Chinese man'."
       },
       {
         "check": "camera",
         "passed": true,
-        "evidence": "Prose correctly states the side-rear-three-quarter viewpoint and medium-wide shot scale."
+        "evidence": "Prose states 'side rear three-quarter viewpoint' and 'medium-wide shot', matching the plan's viewpoint and shot scale."
       },
       {
         "check": "contact",
-        "passed": false,
-        "evidence": "Prose fails to state the contact's physical state is 'inserted', contradicting the plan."
+        "passed": true,
+        "evidence": "Prose states the 'activity of fellatio is occluded; the state is inserted' and names the occluders 'f1.head and m1.near_thigh', preserving activity, state, visibility, and occluders without naming hidden endpoints."
       },
       {
         "check": "visibility",
         "passed": true,
-        "evidence": "Prose correctly lists all visible and occluded regions, occluders, and omits hidden endpoints."
+        "evidence": "The plan's visible regions are implied by actor poses and positions, and the occluded contact is correctly noted; the prose does not add or remove visibility states."
       },
       {
         "check": "limb_assignments",
         "passed": true,
-        "evidence": "Prose correctly accounts for all four non-contact support limb assignments and the contact assignments for each actor."
+        "evidence": "Prose states each actor's left/right knees and left/right hands are providing support, covering all non-contact limb assignments, while contact limb roles are implicit."
       },
       {
         "check": "supports",
         "passed": true,
-        "evidence": "Prose correctly describes all four supports with their details, including surface, region, and positions."
+        "evidence": "Prose states F1 and M1 are each 'supported by the bed surface at both knees' and 'at both hands', matching all four environmental supports."
       }
     ],
-    "contradictions": [
-      "The prose describes the contact's activity and occlusion but omits the required physical state 'inserted'."
-    ]
+    "contradictions": []
   },
-  "passed": false,
+  "passed": true,
   "structured_rejections": {
     "plan": [],
     "prose": [],
@@ -61,19 +54,20 @@
   },
   "usage": {
     "plan": {
-      "prompt_tokens": 872,
-      "completion_tokens": 1145,
-      "total_tokens": 2017
+      "mode": "deterministic",
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
     },
     "prose": {
-      "prompt_tokens": 1042,
-      "completion_tokens": 411,
-      "total_tokens": 1453
+      "prompt_tokens": 1066,
+      "completion_tokens": 294,
+      "total_tokens": 1360
     },
     "audit": {
-      "prompt_tokens": 2023,
-      "completion_tokens": 289,
-      "total_tokens": 2312
+      "prompt_tokens": 1900,
+      "completion_tokens": 374,
+      "total_tokens": 2274
     }
   }
 }

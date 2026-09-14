@@ -2,11 +2,14 @@
 
 This isolated experiment does not modify or replace the story pipeline.
 
-It performs one three-call validation:
+It performs one deterministic-plan validation:
 
-1. Generate a typed spatial plan from `scenario.json`.
-2. Reject structural contradictions and generate prose from the valid plan.
+1. Compile and validate a typed spatial plan from `scenario.json`.
+2. Generate prose from the immutable valid plan.
 3. Independently audit cast, camera, contact, visibility, limbs, and supports.
+
+DeepSeek does not create or alter the spatial plan. It is limited to rendering
+validated geometry as prose and independently auditing that prose.
 
 Run it from the repository root:
 
@@ -36,10 +39,15 @@ uv run python experiments/spatial-plan-poc/catalog_generator.py
 ```
 
 The materialized catalogs and coverage manifest are written under `catalogs/`.
+Persisted actor entity IDs use lowercase codes (`f1`, `f2`, `f3`, `m1`, and
+`m2`). Prompt-facing identities use stable uppercase labels such as
+`F1, woman 1` and `M1, man 1`; personal names are not identity keys. Temporary
+logical roles used while assembling templates are resolved to actor codes
+before any contact, support, restraint, or prop record is persisted.
 Catalog schema 2.0 models controlled handheld vibrators and pelvis-mounted
 strap-ons explicitly, including prop ownership, occupied hands, attachment
 points, contact axes, and segmented visibility. Compiled scenes also include a
-complete continuous-body ledger for every named actor, bilateral limb chains
+complete continuous-body ledger for every coded actor, bilateral limb chains
 for supported lifts, and pelvis ownership for anatomical contact endpoints.
 
 Run the deterministic catalog and compiled-prompt validation matrix:

@@ -36,6 +36,24 @@ LEGACY_ACTOR_IDS = {"central", "partner_a", "partner_b"}
 LEGACY_NAMES = {"Li Na", "Zhang Wei", "Chen Hao", "Chen Mei", "Zhao Yue"}
 
 
+def legacy_actor_values(value: object, path: str = "$") -> list[str]:
+    if isinstance(value, dict):
+        return [
+            leaked
+            for key, item in value.items()
+            for leaked in legacy_actor_values(item, f"{path}.{key}")
+        ]
+    if isinstance(value, list):
+        return [
+            leaked
+            for index, item in enumerate(value)
+            for leaked in legacy_actor_values(item, f"{path}[{index}]")
+        ]
+    if isinstance(value, str) and value in LEGACY_ACTOR_IDS:
+        return [f"{path}={value}"]
+    return []
+
+
 def rejected_activity(payload: dict[str, object], expected: str) -> None:
     try:
         ActivityTemplate.model_validate(payload)
@@ -82,9 +100,15 @@ def main() -> None:
     strap_on_activities = 0
     rejected_mutations = 0
     for cast_key in CAST_KEYS:
-        catalog = PoseCatalog.model_validate_json(
+        catalog_payload = json.loads(
             (CATALOGS / f"{cast_key}.json").read_text(encoding="utf-8")
         )
+        leaked_actor_values = legacy_actor_values(catalog_payload)
+        if leaked_actor_values:
+            raise AssertionError(
+                f"{cast_key} persisted logical actor roles: {leaked_actor_values}"
+            )
+        catalog = PoseCatalog.model_validate(catalog_payload)
         if catalog.schema_version != "2.0":
             raise AssertionError(f"{cast_key} did not use schema 2.0")
         if len(catalog.entries) != 256 or len(catalog.activities) != 32:
@@ -405,6 +429,7 @@ def main() -> None:
         "catalogs_validated": len(CAST_KEYS),
         "entries_validated": len(CAST_KEYS) * 256,
         "coded_actor_ids_validated": EXPECTED_CAST_IDS,
+        "persisted_legacy_actor_id_values": 0,
         "legacy_personal_names_in_compiled_prompts": 0,
         "compiled_pose_activity_combinations": compiled_combinations,
         "strap_on_activities_validated": strap_on_activities,

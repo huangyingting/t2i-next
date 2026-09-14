@@ -27,7 +27,7 @@
       "actor_id": "f1",
       "sex": "female",
       "description": "F1, woman 1, a 29-year-old Chinese woman",
-      "screen_position": "center_right",
+      "screen_position": "center_left",
       "depth_plane": "midground",
       "pose": "kneeling_forward",
       "limb_assignments": [
@@ -62,8 +62,8 @@
       "actor_id": "m1",
       "sex": "male",
       "description": "M1, man 1, a 32-year-old Chinese man",
-      "screen_position": "center_left",
-      "depth_plane": "foreground",
+      "screen_position": "center_right",
+      "depth_plane": "midground",
       "pose": "kneeling_upright",
       "limb_assignments": [
         {
@@ -120,7 +120,7 @@
       "supporter_actor": null,
       "supporter_region": "mattress",
       "environmental_surface": "bed",
-      "screen_position": "center_right",
+      "screen_position": "center_left",
       "depth_plane": "midground"
     },
     {
@@ -130,7 +130,7 @@
       "supporter_actor": null,
       "supporter_region": "mattress",
       "environmental_surface": "bed",
-      "screen_position": "center_right",
+      "screen_position": "center_left",
       "depth_plane": "midground"
     },
     {
@@ -140,8 +140,8 @@
       "supporter_actor": null,
       "supporter_region": "mattress",
       "environmental_surface": "bed",
-      "screen_position": "center_left",
-      "depth_plane": "foreground"
+      "screen_position": "center_right",
+      "depth_plane": "midground"
     },
     {
       "support_id": "m1_hand_support",
@@ -150,11 +150,11 @@
       "supporter_actor": null,
       "supporter_region": "mattress",
       "environmental_surface": "bed",
-      "screen_position": "center_left",
-      "depth_plane": "foreground"
+      "screen_position": "center_right",
+      "depth_plane": "midground"
     }
   ],
   "setting": "A modern Chinese bedroom with a low bed and soft morning window light.",
-  "lighting": "soft morning window light.",
-  "style": "realistic."
+  "lighting": "soft morning window light",
+  "style": "realistic"
 }

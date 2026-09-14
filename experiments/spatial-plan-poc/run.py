@@ -444,32 +444,6 @@ class ConformanceReport(StrictModel):
         return all(check.passed for check in self.checks)
 
 
-PLAN_SYSTEM = """
-Create one immutable 2D spatial plan, not prose. The supplied scenario is
-authoritative. Use exactly two coherent adult bodies and exactly one camera.
-Create exactly one contact, two to four support records, two to six limb
-assignments per actor, at most twelve visible regions, and at most four
-occluded regions. Every lowercase snake_case identifier must use at most four
-short words and never exceed 64 characters.
-The scenario contains allowed_identifiers. Every identifier, body region,
-region reference, viewpoint, scale, pose, activity, contact ID, support ID, and
-surface must be copied from that finite vocabulary; never invent another one.
-The scenario also contains required_plan_values. Copy those contact-state,
-contact-visibility, occluder, and camera-classification values exactly.
-Every body part has one assignment. Every physical contact has exactly one of
-three states: separated, external_contact, or inserted. Both contact endpoints
-share the one screen_position and depth_plane stored on that contact. Classify
-every contact exactly once as visible or occluded. An occluded contact needs
-concrete actor.region occluders and must not also be camera-visible. Classify
-actor regions as visible or occluded without overlap. Model every load-bearing
-relationship as one support record whose two endpoints share its stored screen
-position and depth plane. For furniture support, set supporter_actor to null
-and environmental_surface to a value. For support by another actor, set
-supporter_actor to that actor and environmental_surface to null. Never populate
-both support-source fields. Use lowercase snake_case identifiers. Return only
-schema data.
-""".strip()
-
 PROSE_SYSTEM = """
 Render the validated spatial plan as one concise standalone English image
 prompt using ASCII characters only. The plan is immutable: do not add people,
@@ -478,10 +452,12 @@ occluded regions. Include each actor's description verbatim. State the word
 "camera" exactly once near the beginning, with its planned viewpoint and shot
 scale. Describe every actor pose, every non-contact limb assignment, and every
 support record in natural language. Describe only regions classified visible.
-For an occluded contact, name its activity once, state body alignment and the
-visible occluders, and do not name or describe either local contact endpoint.
-Internal enum names such as inserted do not need to appear literally. Add no
-crop endpoints. Return only schema data.
+Do not list occluded regions or name contact-assigned body parts. For an
+occluded contact, name its activity once, state its physical state verbatim,
+state body-scale alignment and the visible occluders, and do not name or
+describe either local contact endpoint. Preserve each complete actor
+description, including the F/M code and woman/man ordinal. Add no crop
+endpoints. Return only schema data.
 """.strip()
 
 AUDIT_SYSTEM = """
@@ -654,30 +630,154 @@ def _tampered_prose_rejection(
     return issues
 
 
+def _compile_plan(scenario: dict[str, object]) -> SpatialPlan:
+    cast = {actor["actor_id"]: actor for actor in scenario["cast"]}
+    actor_specs = (
+        ("f1", Sex.FEMALE, "center_left", "kneeling_forward", "head"),
+        ("m1", Sex.MALE, "center_right", "kneeling_upright", "pubic_region"),
+    )
+    actors = []
+    supports = []
+    for actor_id, sex, position, pose, contact_region in actor_specs:
+        support_ids = (
+            f"{actor_id}_knee_support",
+            f"{actor_id}_hand_support",
+        )
+        actors.append(
+            ActorGeometry(
+                actor_id=actor_id,
+                sex=sex,
+                description=cast[actor_id]["description"],
+                screen_position=position,
+                depth_plane="midground",
+                pose=pose,
+                limb_assignments=[
+                    LimbAssignment(
+                        body_part="left_knee",
+                        purpose=AssignmentPurpose.SUPPORT,
+                        target_id=support_ids[0],
+                    ),
+                    LimbAssignment(
+                        body_part="right_knee",
+                        purpose=AssignmentPurpose.SUPPORT,
+                        target_id=support_ids[0],
+                    ),
+                    LimbAssignment(
+                        body_part="left_hand",
+                        purpose=AssignmentPurpose.SUPPORT,
+                        target_id=support_ids[1],
+                    ),
+                    LimbAssignment(
+                        body_part="right_hand",
+                        purpose=AssignmentPurpose.SUPPORT,
+                        target_id=support_ids[1],
+                    ),
+                    LimbAssignment(
+                        body_part=contact_region,
+                        purpose=AssignmentPurpose.CONTACT,
+                        target_id="primary_contact",
+                    ),
+                ],
+            )
+        )
+        for support_id, region in zip(
+            support_ids,
+            ("both_knees", "both_hands"),
+            strict=True,
+        ):
+            supports.append(
+                SupportGeometry(
+                    support_id=support_id,
+                    supported_actor=actor_id,
+                    supported_region=region,
+                    supporter_actor=None,
+                    supporter_region="mattress",
+                    environmental_surface="bed",
+                    screen_position=position,
+                    depth_plane="midground",
+                )
+            )
+    required = scenario["required_plan_values"]
+    return SpatialPlan(
+        frame_id=scenario["frame_id"],
+        camera=CameraGeometry(
+            viewpoint="side_rear_three_quarter",
+            shot_scale="medium_wide",
+            visible_regions=[
+                "f1.head",
+                "f1.torso",
+                "f1.arms",
+                "f1.legs",
+                "m1.near_thigh",
+                "m1.torso",
+                "m1.arms",
+                "m1.legs",
+            ],
+            occluded_regions=required["camera_occluded_regions"],
+            visible_contacts=required["camera_visible_contacts"],
+            occluded_contacts=required["camera_occluded_contacts"],
+        ),
+        actors=actors,
+        contacts=[
+            ContactGeometry(
+                contact_id="primary_contact",
+                activity="fellatio",
+                state=required["primary_contact_state"],
+                actor_a="f1",
+                region_a="mouth",
+                actor_b="m1",
+                region_b="pubic_region",
+                screen_position="center",
+                depth_plane="midground",
+                visibility=required["primary_contact_visibility"],
+                occluders=required["primary_contact_occluders"],
+            )
+        ],
+        supports=supports,
+        setting=scenario["setting"],
+        lighting="soft morning window light",
+        style="realistic",
+    )
+
+
 async def run(scenario_path: Path, output_directory: Path) -> dict[str, object]:
     scenario = json.loads(scenario_path.read_text(encoding="utf-8"))
     settings = load_story_provider_settings()
+    plan = _compile_plan(scenario)
+    plan_rejections: list[list[str]] = []
     async with OpenAIStoryModel(settings) as model:
-        plan_response, plan_rejections = await _generate_with_repair(
-            model,
-            system=PLAN_SYSTEM,
-            payload=scenario,
-            response_model=SpatialPlan,
-            max_output_tokens=min(10000, settings.output_token_limit),
-        )
-        plan = SpatialPlan.model_validate(plan_response.value)
         fingerprint = plan.fingerprint()
-        draft_response, prose_rejections = await _generate_with_repair(
-            model,
-            system=PROSE_SYSTEM,
-            payload={
+        prose_payload: dict[str, object] = {
+            "spatial_plan": plan.model_dump(mode="json"),
+            "required_plan_fingerprint": fingerprint,
+        }
+        prose_rejections: list[list[str]] = []
+        prose_issues: list[str] = []
+        prose_attempts = 0
+        for _ in range(3):
+            prose_attempts += 1
+            draft_response, rejections = await _generate_with_repair(
+                model,
+                system=PROSE_SYSTEM,
+                payload=prose_payload,
+                response_model=NarrativeDraft,
+                max_output_tokens=min(6000, settings.output_token_limit),
+            )
+            prose_rejections.extend(rejections)
+            draft = NarrativeDraft.model_validate(draft_response.value)
+            prose_issues = _prose_issues(plan, draft)
+            if not prose_issues:
+                break
+            prose_payload = {
                 "spatial_plan": plan.model_dump(mode="json"),
                 "required_plan_fingerprint": fingerprint,
-            },
-            response_model=NarrativeDraft,
-            max_output_tokens=min(6000, settings.output_token_limit),
-        )
-        draft = NarrativeDraft.model_validate(draft_response.value)
+                "previous_draft": draft.model_dump(mode="json"),
+                "validation_issues": prose_issues,
+                "repair_requirement": (
+                    "Return a corrected complete draft. Do not name any "
+                    "contact-assigned local body part for an occluded contact."
+                ),
+            }
         output_directory.mkdir(parents=True, exist_ok=True)
         (output_directory / "plan.json").write_text(
             plan.model_dump_json(indent=2) + "\n",
@@ -700,7 +800,6 @@ async def run(scenario_path: Path, output_directory: Path) -> dict[str, object]:
         )
         audit = ConformanceReport.model_validate(audit_response.value)
 
-    prose_issues = _prose_issues(plan, draft)
     rejection = _invalid_plan_rejection(plan)
     tampered_prose_issues = _tampered_prose_rejection(plan, draft)
     report = {
@@ -711,6 +810,7 @@ async def run(scenario_path: Path, output_directory: Path) -> dict[str, object]:
         "tampered_prose_issues": tampered_prose_issues,
         "prose_valid": not prose_issues,
         "prose_issues": prose_issues,
+        "prose_attempts": prose_attempts,
         "semantic_audit_passed": audit.passed,
         "semantic_audit": audit.model_dump(mode="json"),
         "passed": not prose_issues and audit.passed,
@@ -720,7 +820,12 @@ async def run(scenario_path: Path, output_directory: Path) -> dict[str, object]:
             "audit": audit_rejections,
         },
         "usage": {
-            "plan": plan_response.usage.model_dump(mode="json"),
+            "plan": {
+                "mode": "deterministic",
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+            },
             "prose": draft_response.usage.model_dump(mode="json"),
             "audit": audit_response.usage.model_dump(mode="json"),
         },

@@ -3,35 +3,33 @@
     {
       "check": "cast",
       "passed": true,
-      "evidence": "Prose includes the exact required actor descriptions for F1 and M1."
+      "evidence": "Prose contains both actor descriptions verbatim: 'F1, woman 1, a 29-year-old Chinese woman' and 'M1, man 1, a 32-year-old Chinese man'."
     },
     {
       "check": "camera",
       "passed": true,
-      "evidence": "Prose correctly states the side-rear-three-quarter viewpoint and medium-wide shot scale."
+      "evidence": "Prose states 'side rear three-quarter viewpoint' and 'medium-wide shot', matching the plan's viewpoint and shot scale."
     },
     {
       "check": "contact",
-      "passed": false,
-      "evidence": "Prose fails to state the contact's physical state is 'inserted', contradicting the plan."
+      "passed": true,
+      "evidence": "Prose states the 'activity of fellatio is occluded; the state is inserted' and names the occluders 'f1.head and m1.near_thigh', preserving activity, state, visibility, and occluders without naming hidden endpoints."
     },
     {
       "check": "visibility",
       "passed": true,
-      "evidence": "Prose correctly lists all visible and occluded regions, occluders, and omits hidden endpoints."
+      "evidence": "The plan's visible regions are implied by actor poses and positions, and the occluded contact is correctly noted; the prose does not add or remove visibility states."
     },
     {
       "check": "limb_assignments",
       "passed": true,
-      "evidence": "Prose correctly accounts for all four non-contact support limb assignments and the contact assignments for each actor."
+      "evidence": "Prose states each actor's left/right knees and left/right hands are providing support, covering all non-contact limb assignments, while contact limb roles are implicit."
     },
     {
       "check": "supports",
       "passed": true,
-      "evidence": "Prose correctly describes all four supports with their details, including surface, region, and positions."
+      "evidence": "Prose states F1 and M1 are each 'supported by the bed surface at both knees' and 'at both hands', matching all four environmental supports."
     }
   ],
-  "contradictions": [
-    "The prose describes the contact's activity and occlusion but omits the required physical state 'inserted'."
-  ]
+  "contradictions": []
 }

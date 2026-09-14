@@ -1,0 +1,76 @@
+{
+  "model": "DeepSeek-V3.2",
+  "cases": 8,
+  "unique_geometry_signatures": 8,
+  "axis_cardinality": {
+    "activity": 8,
+    "contact_state": 2,
+    "visibility": 2,
+    "viewpoint": 8,
+    "shot_scale": 4,
+    "central_pose": 8,
+    "partner_pose": 7,
+    "support_topology": 8
+  },
+  "llm_prompts_valid": false,
+  "llm_prompt_issues": {
+    "C01": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center left",
+      "screen position changed: M1 -> center right"
+    ],
+    "C02": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man"
+    ],
+    "C03": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man"
+    ],
+    "C04": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center right",
+      "screen position changed: M1 -> center left"
+    ],
+    "C05": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "support topology omits semantic term: reclined"
+    ],
+    "C06": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center right",
+      "screen position changed: M1 -> center left"
+    ],
+    "C07": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man"
+    ],
+    "C08": [
+      "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center left",
+      "screen position changed: M1 -> center right"
+    ]
+  },
+  "compiled_prompts_valid": true,
+  "compiled_prompt_issues": {},
+  "semantic_attempts": 2,
+  "structured_rejections": [],
+  "usage_by_attempt": [
+    {
+      "prompt_tokens": 1655,
+      "completion_tokens": 1150,
+      "total_tokens": 2805
+    },
+    {
+      "prompt_tokens": 3582,
+      "completion_tokens": 1102,
+      "total_tokens": 4684
+    }
+  ],
+  "passed": true
+}
