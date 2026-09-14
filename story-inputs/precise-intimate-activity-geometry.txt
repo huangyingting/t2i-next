@@ -1,0 +1,385 @@
+BRIEF
+
+Create standalone photorealistic image prompts about explicit, consensual
+sexual activity between adults. Describe the visible action with exact,
+compact spatial language. The image must be understandable from body geometry
+rather than mood, euphemism, or decorative prose.
+
+OUTPUT CONTRACT
+
+Write one natural English paragraph per Frame using printable ASCII only.
+Target 280-450 words for two adults, then add 70-110 words for each additional
+adult. Use 8-14 short, direct sentences. Put cast, central person, sexual
+action, body positions, and contact geometry in the first half. Use the
+remaining sentences for appearance, environment, light, camera, and concise
+props. Return only positive visible description, with no headings, labels,
+lists, explanations, alternatives, or negative-prompt language.
+
+THEME SEED GATE
+
+Every Theme title and premise defines only cast, room, primary activity, base
+body arrangement, and essential support. A Theme never defines camera side,
+lens, framing, crop, foreground, visibility, occlusion, or whether a contact
+boundary can be seen. The Frame is the sole owner of camera and visibility.
+If a supplied Theme contains camera or visibility language, ignore that
+language and build one fresh camera graph in the Frame.
+
+Create immutable gender slots before writing each Theme: exactly female_count
+adult woman slots and exactly male_count adult man slots. Fill every slot once
+with one unique name and preserve those same people and genders in every Frame.
+For a one-woman, one-man request, every Theme premise and every Frame must name
+exactly one adult woman and exactly one adult man. Never replace a requested
+man with a woman, replace a requested woman with a man, or add an observer.
+
+EXACT CAST AND BODY OWNERSHIP
+
+Begin with: Exactly N adults belong to N coherent bodies in this image.
+Immediately enumerate every requested adult with numeric age of 25 or older,
+gender, nationality, and unique name. Preserve female_count and male_count
+exactly. Every visible face, head, torso, pelvis, arm, hand, leg, foot, breast,
+mouth, tongue, and genital structure belongs to one named adult.
+
+Each requested adult has one coherent body: one head, one torso, one pelvis,
+two arms, two hands, two legs, two feet, and one anatomically consistent
+genital set whether the whole body is visible or partly outside the Frame.
+Body completeness is topological, not a full-body framing requirement. State
+left and right when visible limbs approach the same area. Keep visible hands,
+mouths, toys, genitals, support hardware, and overlapping limbs separated by
+readable contours and small areas of negative space.
+
+Describe only visible limbs that perform an action, bear weight, or define the
+pose. Trace each such limb continuously from its visible body attachment to
+its visible hand, foot, or frame edge and give it one role. Hidden limbs and
+regions outside the frame require no inventory and receive no prose.
+
+CENTRAL PERSON LOCK
+
+Choose exactly one central person and name them in the first sentence. Describe
+that adult first and most fully in one actor block. State:
+
+1. screen location: image center, center-left, center-right, upper center, or
+   lower center;
+2. facing direction: toward camera, away from camera, profile left, profile
+   right, or three-quarter direction;
+3. body level and axis: standing, kneeling, seated, supine, prone, side-lying,
+   lifted, horizontal, vertical, or diagonal;
+4. every visible body chain and every named occluding volume;
+5. exact action, visible active anatomy, and visible support points;
+6. facial expression and gaze only when the face is visible.
+
+Write each visible limb position, support role, and active contact exactly once
+inside its named owner's actor block. Do not first assign a passive position
+and later move the same hand, foot, mouth, or limb into an action.
+
+Place a visible face in an unobstructed silhouette slot. Assign the action
+center the visible or occluded state selected by the camera graph. For an
+explicit genital action with a visible boundary, keep the pelvis in the middle
+or lower middle third of the frame. For visible oral breast contact, keep the
+chest and mouth in the middle third. For a lifted pose, keep the suspended
+pelvis, every load-bearing contact, and the lifter's braced torso visible.
+
+OTHER PERSON BLOCKS
+
+Describe every other adult in a separate sentence, proceeding from nearest to
+farthest or from left to right. For each adult, state screen location, facing
+direction, body level, torso axis, and pelvis position, then describe only the
+visible limb chains, visible support points, named occluding volumes, and exact
+action in that adult's single actor block. State head angle, gaze, and
+expression only if the face is visible.
+
+Make every support state internally exclusive. A flat foot has heel, ball, and
+toes on the surface. A raised heel leaves only the ball and toes on the
+surface. A lifted foot has no surface contact. A planted knee cannot also be
+raised, and an extended elbow cannot also be planted as a support. Name the
+support surface for every weight-bearing hand, knee, or foot.
+
+Then state the relationship to the central person in one direct sentence:
+beside, behind, in front of, above, below, between the legs, at the chest, at
+the pelvis, supporting the back, or lifting from underneath. Name both people;
+never rely on ambiguous he, she, they, partner, another person, or someone when
+two bodies overlap.
+
+2D PROJECTION AND SURFACE VISIBILITY
+
+Treat the Frame as one opaque two-dimensional projection from the stated
+camera position. Describe only anatomy and contacts reached by an unobstructed
+line of sight. Body volume, clothing, furniture, and the nearer adult occlude
+surfaces behind them; never describe anatomy as visible through another
+surface.
+
+Lock the camera in the second sentence, immediately after the exact cast. That
+sentence must state camera side, height, viewing direction, lens, framing
+scale, and near-side visible surfaces before any body pose is described. It
+must also name any volume that hides the primary contact. Never defer the
+camera until the paragraph's end or change the viewpoint later.
+
+This camera sentence creates the single visibility scene graph used by the
+entire paragraph. Include only anatomy, contact boundaries, support points, and
+props visible inside its bounds, plus the named nearer volume hiding any
+occluded primary contact. Regions outside the frame are absent from the graph.
+Pose, action, styling, lighting, and focus consume this graph without adding
+body regions later. Assign visibility to surface patches rather than whole
+body parts when only a profile edge remains visible.
+
+The camera sentence assigns the primary contact boundary one state: visible or
+occluded by a named near-side body volume. An inserted boundary may remain
+occluded when that is the physically correct projection; the action then stays
+readable from body alignment rather than invented interior anatomy. Visibility
+state is immutable: anatomy named occluded or outside the Frame cannot later
+be described, focused on, contacted in view, or called visible. After drafting,
+compare every use of visible, occluded, and hidden; rewrite if one body part or
+contact receives two different visibility states.
+
+- In a front view, the chest and front torso may be visible, while the full
+  buttocks and rear cleft are not; only a slight outer buttock contour may
+  appear at a turned edge.
+- In a rear view, the back and buttocks may be visible, while both breasts,
+  nipples, abdomen, and front genitals are not fully visible.
+- In a strict side view, show only profile contours and the near-side limbs;
+  do not claim complete simultaneous front and rear anatomy.
+- In a three-quarter view, show the near front or near rear surface plus only
+  the anatomically plausible far-edge contour. Never combine a full frontal
+  chest with a full rear view of both buttocks.
+- A head turn changes face visibility but does not rotate the torso, pelvis,
+  breasts, or buttocks toward the camera.
+
+Use explicit near-side and far-side occlusion order when bodies overlap. If
+the selected angle hides the primary contact behind a thigh, pelvis, torso,
+hand, garment, cushion, or furniture edge, move the camera or change the pose.
+Do not solve occlusion with transparent anatomy, impossible twisting, a second
+viewpoint, or an unstated mirror. A stated mirror may reveal an alternate
+surface only as one physically consistent reflection with its own clear
+location and reflection angle; the direct view and reflection must not merge
+into one body.
+
+When a contact boundary is visible, do not merely claim that its sightline is
+clear. Prove it by naming the viewing window: camera side, near-side body
+boundary, far-side body boundary, and the contact edge between them. Apply
+these action-specific projection rules:
+
+- For penile oral insertion, use a side-rear or rear three-quarter camera. The
+  active adult's head overlaps the genital owner's pelvis, and the head or near
+  thigh occludes the mouth-to-genital boundary. Name fellatio once to establish
+  the action, then omit local penis, shaft, glans, lip, tongue, and oral-cavity
+  geometry. For external genital licking, use a side view and show one external
+  tongue-to-surface boundary instead.
+- For mouth-to-breast contact, use a side or three-quarter-side angle that
+  shows the active mouth in profile and the contacted near breast. The mouth
+  occludes the central patch beneath the lips; describe only the visible lip,
+  tongue, nipple-edge, and surrounding breast response.
+- For penetration, use a lateral or three-quarter-lateral view through the
+  gap between the near thighs. Show only the external root, near edge of the
+  receiving opening, and external insertion junction. End the visible chain at
+  that junction and omit the internal segment. A direct front or direct rear
+  view cannot expose the complete junction through the nearer pelvis.
+- For lifted penetration, choose either a front-biased view of faces, chests,
+  and the external pelvic junction or a rear-biased view of buttocks and
+  lifting support. To show both the external pelvic junction and one buttock
+  support point, use a true side three-quarter angle; the far buttock and far
+  supporting contact remain occluded. Never claim that both buttocks, both
+  under-buttock contacts, a full frontal chest, and the insertion junction are
+  all clearly visible in one direct view.
+- For manual or toy contact, place the active hand or toy beside rather than
+  directly over the target. Keep at least one visible target edge outside the
+  contacting fingers or device.
+- When one adult stands, kneels, or sits directly behind another, a front
+  camera cannot see the rear adult's pelvis or any contact trapped between the
+  two torsos or pelvises. Offset the adults and use a lateral three-quarter
+  camera, or omit the hidden contact from the visible description.
+
+CONTACT STATE INVARIANT
+
+Assign every contact one and only one topological state before writing prose:
+
+1. separated: two structures have a visible gap;
+2. external contact: two exterior surfaces meet at one visible boundary;
+3. inserted: the receiving boundary encircles the active structure, whose
+   proximal external segment remains continuous with its named owner and ends
+   at that boundary.
+
+One contact cannot occupy two states in the same Frame. For an inserted state,
+describe the owner, continuous proximal segment, and receiving boundary only;
+omit every distal structure beyond that boundary. Do not name, locate, light,
+focus, or assign motion to anatomy inside a mouth or body opening.
+
+The two sides of every contact boundary share one screen location and one
+depth plane. Every supporting hand, foot, body surface, wall, and furniture
+point must be reachable from its connected joints without crossing another
+solid volume. If the two sides cannot occupy the same point under the stated
+pose, change the pose or support before writing prose.
+
+For penile oral activity, choose exactly one of two alternatives. External
+licking keeps the penis outside the mouth and shows the tongue meeting one
+exterior surface. Oral insertion names fellatio once, aligns the active head
+with the owner's pelvis, assigns their contact boundary to the occluded state,
+and omits its local anatomy. These alternatives never coexist. Any hand
+contact is a separate action chain and must not replace or interrupt body
+ownership continuity.
+
+ACTION-CONTACT CHAIN
+
+Choose one action-chain form from the contact boundary's camera-graph state.
+Write that chain once inside the active adult's actor block. The receiving
+adult's block may state a visible whole-body response but does not repeat the
+contact anatomy or reassign the active limb.
+For a visible boundary, use:
+
+actor -> owned body part or held object -> target adult -> exact target anatomy
+-> direction or motion -> visible physical response.
+
+For an occluded boundary, use:
+
+activity name -> actor and target body alignment -> named occluding volume ->
+visible whole-body response.
+
+The occluded form names the activity once but omits the hidden contact anatomy,
+contact motion, and interior state. Never combine the visible and occluded
+forms for one action.
+
+Use concrete present-tense verbs: licks, sucks, kisses, presses, strokes,
+circles, rubs, grips, spreads, holds, lifts, supports, penetrates, receives,
+rocks, thrusts, or vibrates. Use one primary verb per contact chain.
+
+Examples of required precision:
+
+- Breast licking: Mina kneels at lower center facing right; Mina's tongue
+  extends visibly from Mina's mouth and presses flat against Lian's left nipple,
+  moving upward while Lian arches her chest toward Mina.
+- Manual stimulation: Jun's right shoulder leads to his bent right elbow,
+  wrist, palm, and two visible fingers circling Mei's clitoris; Mei's thighs
+  remain open and her pelvis tilts toward his hand.
+- Occluded oral insertion: An kneels between Bo's parted thighs and performs
+  fellatio; a side-rear camera overlaps An's head silhouette with Bo's pubic
+  region, Bo's near thigh occludes their contact boundary, and both of An's
+  hands rest on Bo's thighs.
+- Penetration: the penetrating anatomy remains visibly continuous with its
+  owner's pelvis; its attached root emerges from that adult's pubic region,
+  the receiving adult's pubic region meets it in the same contact plane, and
+  the near edge of the receiving opening meets the shaft at the external
+  insertion junction. Name torso direction, pubic-to-pubic contact, leg
+  positions, rhythm, and support. End the visible description at the receiving
+  boundary and omit the internal portion. Never terminate penetrating anatomy
+  at an abdomen, thigh, garment, cushion, or empty space.
+- Toy action: name the adult holding or wearing the toy, the hand gripping it,
+  the toy shape and orientation, the contacted anatomy, cable or control
+  location, and visible material response.
+
+One limb performs one physical role across the entire paragraph. If a hand
+grips a wrist, it cannot also support a thigh. If an elbow or forearm bears its
+owner's weight, that arm cannot also hold, press, spread, stroke, or restrain
+the other adult. If a mouth contacts a breast, its tongue and lips remain at
+that breast. Describe simultaneous actions in separate short sentences.
+
+LIFTING AND SUPPORT GEOMETRY
+
+When another adult lifts the central person, state:
+
+- who lifts and from which screen position;
+- where each lifting forearm and hand contacts the central body;
+- which region bears weight: upper back, ribcage, waist, buttocks, outer thigh,
+  or knee;
+- the central person's body axis, bent joints, free limbs, hair direction, and
+  distance above the floor or furniture;
+- the lifter's stance, foot spacing, knee bend, spine angle, counterbalance,
+  and gaze;
+- any second supporter and that person's separate load point.
+
+Example: Tao stands at center-left with feet shoulder-width apart and knees
+bent; his right forearm passes under Rui's near buttock and his right hand
+supports her far buttock, while his left forearm spans her upper back. Rui is
+lifted upright on a slight diagonal facing Tao, her left arm around Tao's
+shoulder, right arm extended, both thighs around his hips, both knees bent, and
+both feet clear of the floor.
+
+For lifted penetration, use a mechanically compatible axis. The receiving
+adult remains vertical or diagonal facing the lifter, with thighs around the
+lifter's hips and both feet clear of the floor; the lifter's one forearm and
+hand support both buttocks while the other arm supports the upper back. Their
+pubic regions meet in one visible contact plane below both abdomens. Do not
+describe the lifted adult as horizontal or across the lifter while also
+wrapping both thighs around the lifter's waist.
+
+For restraints, suspension, furniture, or mechanical support, trace load from
+the named body region through the pad, cuff, arm, sling, or surface into a
+visible wall, bed, floor, or ceiling anchor. Show reachable releases and keep
+the neck and airway free.
+
+SEXUAL ACTION LIBRARY
+
+Vary actions across Themes. Select one clear primary activity and at most two
+secondary contacts:
+
+1. solo masturbation observed or guided by another consenting adult;
+2. partner-guided or mutual masturbation;
+3. breast kissing, licking, sucking, or manual stimulation;
+4. cunnilingus or fellatio;
+5. vaginal or anal penetration;
+6. hand-held external vibrator or dildo use with a visible owner;
+7. wearable stimulation controlled by another adult;
+8. face-to-face, rear-entry, side-lying, seated, standing, or lifted sex;
+9. padded wrist or ankle restraint with manual, oral, toy, or penetrative sex;
+10. consensual spanking, soft paddle, blindfold, edging, spread positioning,
+    kneeling submission, or body-safe rope.
+
+Every visible adult participates through an action, support role, control,
+reciprocal touch, or clear reaction. For three or more adults, assign each
+person a separate action and a separate silhouette slot. State who touches
+whom; do not describe a group as one combined mass.
+
+APPEARANCE AND SETTING
+
+After geometry is complete, give each adult one concise styling clause using
+only visible elements from the camera graph. Describe build and visible skin,
+then face, hairstyle, grooming, makeup, or expression only when those regions
+are visible; describe footwear only when a foot is visible. Clothing remains
+compatible with the action and displaced garments occupy a visible named
+location. Styling never reintroduces an occluded or off-frame region.
+
+Use a complete indoor environment. Name the room, floor, walls, ceiling,
+principal furniture, entrance, window or architectural opening, and 3-6
+located props. State a motivated light source, direction, softness, color
+character, highlights, and shadows on visible graph elements, then state three
+depth planes. Do not restate or change the camera established in sentence two.
+Choose framing for action readability. Keep every active contact and support
+chain inside the frame; omit all anatomy outside the selected framing.
+
+SILENT REJECTION CHECK
+
+Rewrite internally if the cast or gender count changes; the central person is
+unnamed or unplaced; a visible pose is ambiguous; a visible limb, mouth,
+tongue, toy, or genital structure has no named owner; a contact target or
+motion is ambiguous; a hand performs two incompatible roles; a tongue floats outside its
+mouth; a penis is detached from its pelvis; a support crosses the action
+center; a lifted body lacks a complete load path; bodies merge; limbs duplicate;
+the same limb changes role later; a foot, knee, or elbow has contradictory
+support states; penetrating pubic regions occupy different contact planes; a
+contact selected as visible lacks a real viewing window; a contact selected as
+occluded is later described as visible; penile oral insertion describes local
+mouth or genital anatomy after assigning the contact boundary as occluded; one
+contact occupies more than one topological state; prose names a distal
+structure beyond an insertion boundary; a secondary hand action interrupts
+body ownership continuity; a direct front or rear penetration view claims the
+complete junction; framing excludes an active contact or support chain;
+front-facing geometry exposes a full rear surface;
+rear-facing geometry exposes a full front surface; a head turn falsely rotates
+the torso or pelvis; one direct view combines incompatible surfaces; the
+camera sentence marks a contact occluded but later prose calls it visible; a
+front camera exposes contact trapped between front-to-back overlapping
+pelvises; prose describes anatomy outside the selected framing; pose,
+styling, light, or focus adds an element absent from the camera graph; a Theme
+or Frame changes a requested gender slot; a non-ASCII character remains; or
+decorative description is longer than the action geometry.
+
+FINAL ORDER
+
+1. Exact cast, central person, room, and primary activity.
+2. Camera side, height, direction, lens, scale, and visible surfaces.
+3. Central person's single actor block with visible pose, limb roles, active
+   contact chain, support, and response.
+4. Each other adult's single actor block with the same nonrepeating structure.
+5. Any remaining restraint, furniture, or device load path not already stated.
+6. Compact visible styling for every adult.
+7. Indoor environment, located props, light, depth planes, and focus without
+   changing the locked camera.
+
+Return one concise positive English ASCII paragraph.

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "requested_configurations": [
+    "one_woman",
+    "one_woman_one_man",
+    "one_woman_two_men",
+    "two_women",
+    "one_woman_two_men",
+    "three_women"
+  ],
+  "deduplicated_configurations": [
+    "one_woman",
+    "one_woman_one_man",
+    "one_woman_two_men",
+    "two_women",
+    "three_women"
+  ],
+  "duplicate_requests": {
+    "one_woman_two_men": 2
+  },
+  "catalog_count": 5,
+  "entries_per_catalog": 256,
+  "total_unique_entries": 1280,
+  "files": {
+    "one_woman": "one_woman.json",
+    "one_woman_one_man": "one_woman_one_man.json",
+    "one_woman_two_men": "one_woman_two_men.json",
+    "two_women": "two_women.json",
+    "three_women": "three_women.json"
+  },
+  "audit_file": "audit-report.json"
+}

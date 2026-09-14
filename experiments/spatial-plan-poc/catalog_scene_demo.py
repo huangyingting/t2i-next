@@ -1,0 +1,746 @@
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import json
+import re
+from pathlib import Path
+from typing import Annotated, NamedTuple
+
+from catalog_generator import ActivityTemplate, PoseCatalog, PoseEntry
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from run import _generate_with_repair
+
+from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.provider import OpenAIStoryModel
+
+ROOT = Path(__file__).resolve().parent
+CATALOGS = ROOT / "catalogs"
+OUTPUT = ROOT / "demo-output"
+SceneId = Annotated[str, StringConstraints(pattern=r"^D\d{2}$")]
+
+
+class StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class StyleLayer(StrictModel):
+    scene_id: SceneId
+    plan_fingerprint: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
+    setting: str = Field(min_length=20, max_length=220)
+    lighting: str = Field(min_length=20, max_length=180)
+    palette: str = Field(min_length=10, max_length=150)
+    atmosphere: str = Field(min_length=10, max_length=150)
+
+
+class StyleBatch(StrictModel):
+    styles: list[StyleLayer] = Field(min_length=6, max_length=6)
+
+
+class SceneEvaluation(StrictModel):
+    scene_id: SceneId
+    geometry_coherence: int = Field(ge=1, le=10)
+    visual_impact: int = Field(ge=1, le=10)
+    cast_clarity: int = Field(ge=1, le=10)
+    contact_clarity: int = Field(ge=1, le=10)
+    style_integration: int = Field(ge=1, le=10)
+    strengths: list[str] = Field(min_length=1, max_length=4)
+    issues: list[str] = Field(max_length=4)
+    verdict: Annotated[
+        str,
+        StringConstraints(pattern=r"^(pass|revise|reject)$"),
+    ]
+
+
+class EvaluationBatch(StrictModel):
+    evaluations: list[SceneEvaluation] = Field(min_length=6, max_length=6)
+
+    @model_validator(mode="after")
+    def scene_ids_are_complete(self) -> EvaluationBatch:
+        ids = [evaluation.scene_id for evaluation in self.evaluations]
+        if ids != [f"D{index:02d}" for index in range(1, 7)]:
+            raise ValueError("evaluation IDs must be D01 through D06")
+        return self
+
+
+class DemoSpec(NamedTuple):
+    scene_id: str
+    cast_key: str
+    family: str
+    variant: str
+    activity_id: str
+    viewpoint: str
+    shot_scale: str
+    style_direction: str
+
+
+SPECS = (
+    DemoSpec(
+        "D01",
+        "one_woman",
+        "supine",
+        "knees_bent_wide_arms_outward",
+        "vibrator_clitoral",
+        "high_three_quarter",
+        "medium",
+        "rainy neon apartment, reflective surfaces, magenta and cyan edge light",
+    ),
+    DemoSpec(
+        "D02",
+        "one_woman",
+        "seated_reclined",
+        "knees_wide_one_hand_thigh",
+        "spreader_bar_self_play",
+        "front_three_quarter",
+        "medium_wide",
+        "minimal amber studio, sculptural restraint shadows, fine-art mood",
+    ),
+    DemoSpec(
+        "D03",
+        "one_woman_one_man",
+        "lifted_supported",
+        "legs_wrapped_arms_shoulders",
+        "vaginal_lifted",
+        "low_three_quarter",
+        "full_body",
+        "modern corridor, hard side light, deep burgundy and warm skin palette",
+    ),
+    DemoSpec(
+        "D04",
+        "one_woman_two_men",
+        "supine",
+        "knees_to_chest_arms_outward",
+        "vaginal_plus_fellatio",
+        "high_three_quarter",
+        "medium_wide",
+        "luxury hotel suite, focused overhead pool of light, dark emerald accents",
+    ),
+    DemoSpec(
+        "D05",
+        "two_women",
+        "all_fours",
+        "knees_wide_one_hand_headboard",
+        "strap_on_vaginal_rear_entry",
+        "rear_three_quarter",
+        "medium",
+        "soft morning bedroom, pale linen, warm rim light and quiet editorial tone",
+    ),
+    DemoSpec(
+        "D06",
+        "three_women",
+        "seated_reclined",
+        "knees_wide_one_hand_thigh",
+        "oral_and_manual_on_central",
+        "front_three_quarter",
+        "medium_wide",
+        "contemporary loft, theatrical triangular light, black gold and ivory",
+    ),
+)
+
+CAST_DESCRIPTIONS = {
+    "one_woman": ("Li Na, a 29-year-old Chinese woman",),
+    "one_woman_one_man": (
+        "Li Na, a 29-year-old Chinese woman",
+        "Zhang Wei, a 32-year-old Chinese man",
+    ),
+    "one_woman_two_men": (
+        "Li Na, a 29-year-old Chinese woman",
+        "Zhang Wei, a 32-year-old Chinese man",
+        "Chen Hao, a 30-year-old Chinese man",
+    ),
+    "two_women": (
+        "Li Na, a 29-year-old Chinese woman",
+        "Chen Mei, a 30-year-old Chinese woman",
+    ),
+    "three_women": (
+        "Li Na, a 29-year-old Chinese woman",
+        "Chen Mei, a 30-year-old Chinese woman",
+        "Zhao Yue, a 31-year-old Chinese woman",
+    ),
+}
+
+STYLE_SYSTEM = """
+Generate only a non-geometric visual style layer for each supplied scene.
+Return exactly D01 through D06 in order and copy each plan fingerprint. Describe
+only the room, materials, motivated lighting, palette, and atmosphere. Do not
+mention any person, body, pose, activity, contact, camera, framing, viewpoint,
+screen position, or anatomy. Keep each field to one concise phrase without a
+trailing period. Do not put lighting, palette, or atmosphere content in the
+setting field. Use precise ASCII English and no line breaks. Return only schema
+data.
+""".strip()
+
+EVALUATION_SYSTEM = """
+Evaluate each complete image prompt independently. Score geometry coherence,
+visual impact, cast clarity, contact clarity, and style integration from 1 to
+10. Check whether the stated camera can show the planned pose, whether supports
+are credible, whether every actor has one coherent role, whether visible and
+occluded contacts remain consistent, and whether lighting strengthens the
+silhouette. Use pass only when no material correction is required. Return
+exactly D01 through D06 in order and only schema data.
+""".strip()
+
+
+def phrase(value: str) -> str:
+    return value.replace("_", " ")
+
+
+def natural_pose(value: str) -> str:
+    return {
+        "bridge_elevated": "elevated bridge",
+        "kneeling_upright": "upright kneeling",
+        "seated_reclined": "reclined seated",
+        "lifted_supported": "supported lifted",
+        "all_fours": "all-fours",
+    }.get(value, phrase(value))
+
+
+def natural_component(value: str) -> str:
+    return {
+        "frog_kneel": "knees spread in a frog kneel",
+        "arms_shoulders": "arms wrapped around the partner's shoulders",
+        "one_hand_headboard": "one hand gripping the headboard",
+        "one_hand_thigh": (
+            "one hand resting on a thigh and the other free near the pelvis"
+        ),
+    }.get(value, phrase(value))
+
+
+def natural_activity(value: str) -> str:
+    return {
+        "vibrator_clitoral": "clitoral stimulation with a vibrator",
+        "rope_harness_self_touch": "rope-harnessed self-stimulation",
+        "wrist_cuffs_quick_release": (
+            "self-stimulation with quick-release wrist cuffs"
+        ),
+        "spreader_bar_self_play": (
+            "self-stimulation with a padded spreader bar"
+        ),
+        "vaginal_lifted": "lifted vaginal intercourse",
+        "double_penetration_vaginal_anal": (
+            "simultaneous vaginal and anal double penetration"
+        ),
+        "vaginal_plus_fellatio": (
+            "simultaneous vaginal intercourse and fellatio"
+        ),
+        "strap_on_vaginal_rear_entry": (
+            "rear-entry vaginal intercourse with a strap-on"
+        ),
+        "dual_cunnilingus": "simultaneous cunnilingus by both partners",
+        "oral_and_manual_on_central": (
+            "oral stimulation with simultaneous manual breast contact"
+        ),
+    }.get(value, phrase(value))
+
+
+def joined(values: list[str]) -> str:
+    if len(values) == 1:
+        return values[0]
+    return ", ".join(values[:-1]) + f" and {values[-1]}"
+
+
+def support_clause(entry: PoseEntry) -> str:
+    pose = entry.central_pose
+    points = [
+        {
+            "partner_arms": "the partner's arms",
+            "both_feet": "both feet",
+            "both_knees": "both knees",
+            "both_hands": "both hands",
+            "both_shins": "both shins",
+        }.get(point, phrase(point))
+        for point in pose.support_points
+    ]
+    if pose.primary_surface == "partner_support":
+        return (
+            "supported by the partner's arms with secondary support "
+            "against the wall"
+        )
+    if pose.primary_surface == "support_sling":
+        return "supported by the sling with secondary support against the wall"
+    surface = {
+        "bed": "the bed",
+        "bed_edge": "the edge of the bed",
+        "floor": "the floor",
+        "wall": "the wall",
+        "chair": "the chair",
+        "sofa": "the sofa",
+    }.get(pose.primary_surface, f"the {phrase(pose.primary_surface)}")
+    return f"supported at {joined(points)} on {surface}"
+
+
+def active_regions(activity: ActivityTemplate, slot_id: str) -> set[str]:
+    return {
+        endpoint.region
+        for edge in activity.contact_edges
+        for endpoint in (edge.source, edge.target)
+        if endpoint.entity_id == slot_id
+    }
+
+
+def resolved_partner_supports(
+    actor_plan,
+    activity: ActivityTemplate,
+) -> list[str]:
+    supports = list(actor_plan.support_points)
+    regions = active_regions(activity, actor_plan.slot_id)
+    if {"hand", "left_hand", "right_hand"}.intersection(regions):
+        supports = [
+            "free_hand" if support == "both_hands" else support
+            for support in supports
+        ]
+    return supports
+
+
+def partner_relationship(
+    actor_plan,
+    activity: ActivityTemplate,
+    central_name: str,
+) -> str:
+    slot_id = actor_plan.slot_id
+    relation: str | None = None
+    for edge in activity.contact_edges:
+        if edge.source.entity_id == slot_id and edge.target.entity_id == "central":
+            if edge.source.region in {"penis", "strap_on"}:
+                relation = f"aligns at {central_name}'s pelvis"
+                break
+            if edge.source.region == "mouth":
+                relation = f"kneels at {central_name}'s pelvis"
+                break
+            if edge.source.region in {"hand", "left_hand", "right_hand"}:
+                relation = f"aligns beside {central_name}'s upper body"
+                break
+        if edge.target.entity_id == slot_id and edge.source.entity_id == "central":
+            if edge.target.region in {"penis", "strap_on", "vulva"}:
+                relation = f"stays near {central_name}'s head"
+                break
+    if actor_plan.pose_role == "supporting_central":
+        supporting_relation = (
+            relation.replace("aligns", "aligning", 1)
+            .replace("kneels", "kneeling", 1)
+            .replace("is positioned", "positioned", 1)
+            if relation
+            else ""
+        )
+        detail = f" while {supporting_relation}" if supporting_relation else ""
+        return f"supports {central_name} with both arms{detail}"
+    return relation or f"aligned with {central_name}"
+
+
+def load_catalog(cast_key: str) -> PoseCatalog:
+    return PoseCatalog.model_validate_json(
+        (CATALOGS / f"{cast_key}.json").read_text(encoding="utf-8")
+    )
+
+
+def select_plan(
+    catalog: PoseCatalog,
+    spec: DemoSpec,
+) -> tuple[PoseEntry, ActivityTemplate]:
+    entry = next(
+        (
+            candidate
+            for candidate in catalog.entries
+            if candidate.central_pose.family == spec.family
+            and candidate.central_pose.variant == spec.variant
+        ),
+        None,
+    )
+    if entry is None:
+        raise ValueError(f"{spec.scene_id} pose not found")
+    activity = next(
+        (
+            candidate
+            for candidate in catalog.activities
+            if candidate.activity_id == spec.activity_id
+        ),
+        None,
+    )
+    if activity is None:
+        raise ValueError(f"{spec.scene_id} activity not found")
+    if activity.activity_id not in entry.compatible_activity_ids:
+        raise ValueError(f"{spec.scene_id} pose and activity are incompatible")
+    if spec.viewpoint not in entry.central_pose.compatible_camera_views:
+        raise ValueError(f"{spec.scene_id} camera and pose are incompatible")
+    return entry, activity
+
+
+def plan_fingerprint(
+    spec: DemoSpec,
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+) -> str:
+    payload = {
+        "spec": spec._asdict(),
+        "pose_signature": entry.signature,
+        "activity": activity.model_dump(mode="json"),
+    }
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
+def actor_name(entity_id: str, cast_key: str) -> str:
+    slots = ["central", "partner_a", "partner_b"]
+    if entity_id in slots:
+        index = slots.index(entity_id)
+        descriptions = CAST_DESCRIPTIONS[cast_key]
+        if index < len(descriptions):
+            return descriptions[index].split(",", 1)[0]
+    if entity_id.startswith("prop_"):
+        return "the selected toy or wearable prop"
+    return entity_id
+
+
+def occluders_for(edge_regions: set[str]) -> str:
+    if "mouth" in edge_regions:
+        return "the head silhouette and the near thigh"
+    if {"vagina", "anus"}.intersection(edge_regions):
+        return "the near thigh and overlapping pelvises"
+    return "the overlapping body contours"
+
+
+def compile_geometry(
+    spec: DemoSpec,
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+) -> str:
+    descriptions = CAST_DESCRIPTIONS[spec.cast_key]
+    cast_text = "; ".join(descriptions)
+    adult_noun = "adult" if len(descriptions) == 1 else "adults"
+    pose = entry.central_pose
+    pose_name = natural_pose(pose.family)
+    article = "an" if pose_name[0].lower() in "aeiou" else "a"
+    sentences = [
+        f"Exactly {len(descriptions)} {adult_noun} occupies the image: {cast_text}."
+        if len(descriptions) == 1
+        else f"Exactly {len(descriptions)} {adult_noun} occupy the image: {cast_text}.",
+        (
+            f"The camera uses a {phrase(spec.viewpoint)} viewpoint and a "
+            f"{phrase(spec.shot_scale)} composition."
+        ),
+        (
+            f"{descriptions[0].split(',', 1)[0]} holds {article} "
+            f"{pose_name} pose at image center with "
+            f"{natural_component(pose.leg_configuration)} and "
+            f"{natural_component(pose.arm_configuration)}; "
+            f"she is {support_clause(entry)}."
+        ),
+    ]
+    for actor_plan, description in zip(
+        entry.actor_plans[1:],
+        descriptions[1:],
+        strict=True,
+    ):
+        actor_name_value = description.split(",", 1)[0]
+        relationship = partner_relationship(
+            actor_plan,
+            activity,
+            descriptions[0].split(",", 1)[0],
+        )
+        supports = resolved_partner_supports(
+            actor_plan,
+            activity,
+        )
+        sentences.append(
+            f"{actor_name_value} {relationship}, positioned at "
+            f"{phrase(actor_plan.screen_position)} in the "
+            f"{phrase(actor_plan.depth_plane)}, supported by "
+            f"{joined([phrase(point) for point in supports])}."
+        )
+    sentences.append(
+        f"The primary activity is {natural_activity(activity.activity_id)}."
+    )
+    for edge in activity.contact_edges:
+        regions = {edge.source.region, edge.target.region}
+        if edge.preferred_visibility == "occluded":
+            sentences.append(
+                f"The {phrase(edge.edge_id)} {phrase(edge.state)} contact "
+                f"at {phrase(edge.screen_position)} in the "
+                f"{phrase(edge.depth_plane)} remains occluded by "
+                f"{occluders_for(regions)}; its local endpoints are not shown."
+            )
+        else:
+            source = endpoint_phrase(
+                edge.source.entity_id,
+                edge.source.region,
+                spec.cast_key,
+            )
+            target = endpoint_phrase(
+                edge.target.entity_id,
+                edge.target.region,
+                spec.cast_key,
+            )
+            sentences.append(
+                f"The visible {phrase(edge.edge_id)} "
+                f"{phrase(edge.state)} edge joins "
+                f"{source} to {target} "
+                f"at "
+                f"{phrase(edge.screen_position)} in the "
+                f"{phrase(edge.depth_plane)}."
+            )
+    if activity.restraint.enabled:
+        sentences.append(
+            "The consensual BDSM arrangement uses "
+            f"{', '.join(phrase(item) for item in activity.restraint.equipment)} "
+            "with a visible quick release and an established safeword."
+        )
+    return " ".join(sentences)
+
+
+def endpoint_phrase(entity_id: str, region: str, cast_key: str) -> str:
+    if entity_id.startswith("prop_"):
+        return "the active surface of the selected toy or wearable prop"
+    name = actor_name(entity_id, cast_key)
+    natural_region = {
+        "contact_surface": "active contact surface",
+        "clitoris": "clitoral area",
+        "strap_on": "strap-on",
+    }.get(region, phrase(region))
+    return f"{name}'s {natural_region}"
+
+
+def style_issues(
+    expected: dict[str, str],
+    style: StyleLayer,
+) -> list[str]:
+    issues: list[str] = []
+    if style.scene_id != expected["scene_id"]:
+        issues.append("scene_id changed")
+    if style.plan_fingerprint != expected["plan_fingerprint"]:
+        issues.append("plan fingerprint changed")
+    text = " ".join(
+        (style.setting, style.lighting, style.palette, style.atmosphere)
+    )
+    if not text.isascii():
+        issues.append("style layer contains non-ASCII text")
+    forbidden = re.compile(
+        r"\b(?:camera|frame|framing|viewpoint|woman|man|person|body|skin|pose|"
+        r"contact|intercourse|fellatio|cunnilingus|masturbation|penis|vagina|"
+        r"vulva|anus|breast|clitoris)\b",
+        re.I,
+    )
+    matches = sorted({match.group(0).lower() for match in forbidden.finditer(text)})
+    if matches:
+        issues.append(f"style layer changed geometry vocabulary: {matches}")
+    if re.search(
+        r"\b(?:lighting|palette|atmosphere|motivated)\b",
+        style.setting,
+        re.I,
+    ):
+        issues.append("setting contains another style field")
+    for field_name, value in (
+        ("setting", style.setting),
+        ("lighting", style.lighting),
+        ("palette", style.palette),
+        ("atmosphere", style.atmosphere),
+    ):
+        if value.rstrip().endswith("."):
+            issues.append(f"{field_name} has a trailing period")
+        if re.search(r"\b[a-z]{1,2}\.?$", value.rstrip(), re.I):
+            issues.append(f"{field_name} ends with a truncated word")
+    return issues
+
+
+def combine_prompt(geometry: str, style: StyleLayer) -> str:
+    setting = style.setting.strip().rstrip(".")
+    lighting = style.lighting.strip().rstrip(".")
+    palette = style.palette.strip().rstrip(".")
+    atmosphere = style.atmosphere.strip().rstrip(".")
+    return " ".join(
+        (
+            geometry,
+            f"Setting: {setting}.",
+            f"Lighting: {lighting}.",
+            f"Palette: {palette}.",
+            f"Atmosphere: {atmosphere}.",
+        )
+    )
+
+
+def prompt_issues(
+    spec: DemoSpec,
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+    prompt: str,
+) -> list[str]:
+    issues: list[str] = []
+    descriptions = CAST_DESCRIPTIONS[spec.cast_key]
+    if not prompt.isascii() or "\n" in prompt or "\r" in prompt:
+        issues.append("prompt is not one ASCII paragraph")
+    if len(re.findall(r"\bcamera\b", prompt, re.I)) != 1:
+        issues.append("camera is not stated exactly once")
+    for description in descriptions:
+        if prompt.count(description) != 1:
+            issues.append(f"cast description changed: {description}")
+    required = (
+        spec.viewpoint,
+        spec.shot_scale,
+    )
+    lowered = prompt.lower()
+    for value in required:
+        if phrase(value) not in lowered:
+            issues.append(f"missing plan value: {value}")
+    natural_required = (
+        natural_pose(entry.central_pose.family),
+        natural_component(entry.central_pose.leg_configuration),
+        natural_component(entry.central_pose.arm_configuration),
+        natural_activity(activity.activity_id),
+    )
+    for value in natural_required:
+        if value.lower() not in lowered:
+            issues.append(f"missing naturalized plan value: {value}")
+    for edge in activity.contact_edges:
+        visibility = edge.preferred_visibility
+        if visibility not in lowered:
+            issues.append(f"missing contact visibility: {visibility}")
+        if visibility == "occluded":
+            local_terms = {edge.source.region, edge.target.region}
+            geometry_contact = next(
+                (
+                    sentence
+                    for sentence in prompt.split(". ")
+                    if phrase(edge.edge_id) in sentence
+                    and "contact" in sentence
+                ),
+                "",
+            )
+            if any(phrase(term) in geometry_contact for term in local_terms):
+                issues.append(f"{edge.edge_id} exposes an occluded endpoint")
+    return issues
+
+
+async def run() -> dict[str, object]:
+    selected = []
+    style_requests = []
+    for spec in SPECS:
+        catalog = load_catalog(spec.cast_key)
+        entry, activity = select_plan(catalog, spec)
+        fingerprint = plan_fingerprint(spec, entry, activity)
+        geometry = compile_geometry(spec, entry, activity)
+        selected.append((spec, entry, activity, fingerprint, geometry))
+        style_requests.append(
+            {
+                "scene_id": spec.scene_id,
+                "plan_fingerprint": fingerprint,
+                "style_direction": spec.style_direction,
+            }
+        )
+
+    settings = load_story_provider_settings()
+    style_attempts = 0
+    style_rejections: list[list[str]] = []
+    style_validation_issues: dict[str, list[str]] = {}
+    payload: dict[str, object] = {"scenes": style_requests}
+    async with OpenAIStoryModel(settings) as model:
+        for _ in range(2):
+            style_attempts += 1
+            style_response, rejections = await _generate_with_repair(
+                model,
+                system=STYLE_SYSTEM,
+                payload=payload,
+                response_model=StyleBatch,
+                max_output_tokens=min(8000, settings.output_token_limit),
+            )
+            style_rejections.extend(rejections)
+            style_batch = StyleBatch.model_validate(style_response.value)
+            style_validation_issues = {}
+            for request, style in zip(
+                style_requests,
+                style_batch.styles,
+                strict=True,
+            ):
+                issues = style_issues(request, style)
+                if issues:
+                    style_validation_issues[request["scene_id"]] = issues
+            if not style_validation_issues:
+                break
+            payload = {
+                "scenes": style_requests,
+                "previous_styles": style_batch.model_dump(mode="json"),
+                "validation_issues": style_validation_issues,
+                "repair_requirement": (
+                    "Return all six corrected style layers without geometry words."
+                ),
+            }
+
+        prompts = [
+            combine_prompt(geometry, style)
+            for (_, _, _, _, geometry), style in zip(
+                selected,
+                style_batch.styles,
+                strict=True,
+            )
+        ]
+        hard_issues: dict[str, list[str]] = {}
+        for (spec, entry, activity, _, _), prompt in zip(
+            selected,
+            prompts,
+            strict=True,
+        ):
+            issues = prompt_issues(spec, entry, activity, prompt)
+            if issues:
+                hard_issues[spec.scene_id] = issues
+        evaluation_response, evaluation_rejections = await _generate_with_repair(
+            model,
+            system=EVALUATION_SYSTEM,
+            payload={
+                "scenes": [
+                    {"scene_id": spec.scene_id, "prompt": prompt}
+                    for (spec, _, _, _, _), prompt in zip(
+                        selected,
+                        prompts,
+                        strict=True,
+                    )
+                ]
+            },
+            response_model=EvaluationBatch,
+            max_output_tokens=min(8000, settings.output_token_limit),
+        )
+        evaluations = EvaluationBatch.model_validate(evaluation_response.value)
+
+    average_impact = sum(
+        evaluation.visual_impact for evaluation in evaluations.evaluations
+    ) / len(evaluations.evaluations)
+    report = {
+        "model": settings.model,
+        "scene_count": len(prompts),
+        "cast_keys": [spec.cast_key for spec in SPECS],
+        "style_attempts": style_attempts,
+        "style_validation_issues": style_validation_issues,
+        "style_structured_rejections": style_rejections,
+        "hard_geometry_issues": hard_issues,
+        "average_visual_impact": average_impact,
+        "evaluations": evaluations.model_dump(mode="json")["evaluations"],
+        "evaluation_structured_rejections": evaluation_rejections,
+        "passed": not style_validation_issues and not hard_issues,
+    }
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    (OUTPUT / "prompts.txt").write_text(
+        "\n".join(prompts) + "\n",
+        encoding="utf-8",
+    )
+    (OUTPUT / "styles.json").write_text(
+        style_batch.model_dump_json(indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (OUTPUT / "evaluations.json").write_text(
+        evaluations.model_dump_json(indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (OUTPUT / "report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return report
+
+
+def main() -> None:
+    report = asyncio.run(run())
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if not report["passed"]:
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,183 @@
+{
+  "passed": true,
+  "catalog_count": 5,
+  "entries_per_catalog": 256,
+  "total_unique_entries": 1280,
+  "catalogs": {
+    "one_woman": {
+      "entries": 256,
+      "unique_central_pose_topologies": 256,
+      "pose_families": 16,
+      "poses_per_family_min": 16,
+      "poses_per_family_max": 16,
+      "activity_templates": 32,
+      "bdsm_activity_templates": 8,
+      "coverage_tag_counts": {
+        "bdsm": 8,
+        "body_contact": 4,
+        "masturbation": 16,
+        "penetration": 6,
+        "toy": 11
+      },
+      "compatibility_links": 7136,
+      "contact_edges": 36,
+      "cast_slots": [
+        {
+          "slot_id": "central",
+          "sex": "female",
+          "role": "central",
+          "adult_only": true
+        }
+      ],
+      "readback_validated": true
+    },
+    "one_woman_one_man": {
+      "entries": 256,
+      "unique_central_pose_topologies": 256,
+      "pose_families": 16,
+      "poses_per_family_min": 16,
+      "poses_per_family_max": 16,
+      "activity_templates": 32,
+      "bdsm_activity_templates": 8,
+      "coverage_tag_counts": {
+        "bdsm": 8,
+        "body_contact": 5,
+        "masturbation": 7,
+        "oral": 5,
+        "penetration": 11,
+        "toy": 3
+      },
+      "compatibility_links": 6064,
+      "contact_edges": 37,
+      "cast_slots": [
+        {
+          "slot_id": "central",
+          "sex": "female",
+          "role": "central",
+          "adult_only": true
+        },
+        {
+          "slot_id": "partner_a",
+          "sex": "male",
+          "role": "partner",
+          "adult_only": true
+        }
+      ],
+      "readback_validated": true
+    },
+    "one_woman_two_men": {
+      "entries": 256,
+      "unique_central_pose_topologies": 256,
+      "pose_families": 16,
+      "poses_per_family_min": 16,
+      "poses_per_family_max": 16,
+      "activity_templates": 32,
+      "bdsm_activity_templates": 8,
+      "coverage_tag_counts": {
+        "bdsm": 8,
+        "body_contact": 8,
+        "masturbation": 8,
+        "oral": 8,
+        "penetration": 9,
+        "toy": 2
+      },
+      "compatibility_links": 6720,
+      "contact_edges": 64,
+      "cast_slots": [
+        {
+          "slot_id": "central",
+          "sex": "female",
+          "role": "central",
+          "adult_only": true
+        },
+        {
+          "slot_id": "partner_a",
+          "sex": "male",
+          "role": "partner",
+          "adult_only": true
+        },
+        {
+          "slot_id": "partner_b",
+          "sex": "male",
+          "role": "partner",
+          "adult_only": true
+        }
+      ],
+      "readback_validated": true
+    },
+    "two_women": {
+      "entries": 256,
+      "unique_central_pose_topologies": 256,
+      "pose_families": 16,
+      "poses_per_family_min": 16,
+      "poses_per_family_max": 16,
+      "activity_templates": 32,
+      "bdsm_activity_templates": 8,
+      "coverage_tag_counts": {
+        "bdsm": 8,
+        "body_contact": 5,
+        "masturbation": 6,
+        "oral": 5,
+        "penetration": 11,
+        "toy": 3
+      },
+      "compatibility_links": 6064,
+      "contact_edges": 37,
+      "cast_slots": [
+        {
+          "slot_id": "central",
+          "sex": "female",
+          "role": "central",
+          "adult_only": true
+        },
+        {
+          "slot_id": "partner_a",
+          "sex": "female",
+          "role": "partner",
+          "adult_only": true
+        }
+      ],
+      "readback_validated": true
+    },
+    "three_women": {
+      "entries": 256,
+      "unique_central_pose_topologies": 256,
+      "pose_families": 16,
+      "poses_per_family_min": 16,
+      "poses_per_family_max": 16,
+      "activity_templates": 32,
+      "bdsm_activity_templates": 8,
+      "coverage_tag_counts": {
+        "bdsm": 8,
+        "body_contact": 11,
+        "masturbation": 8,
+        "oral": 8,
+        "penetration": 9,
+        "toy": 4
+      },
+      "compatibility_links": 6720,
+      "contact_edges": 64,
+      "cast_slots": [
+        {
+          "slot_id": "central",
+          "sex": "female",
+          "role": "central",
+          "adult_only": true
+        },
+        {
+          "slot_id": "partner_a",
+          "sex": "female",
+          "role": "partner",
+          "adult_only": true
+        },
+        {
+          "slot_id": "partner_b",
+          "sex": "female",
+          "role": "partner",
+          "adult_only": true
+        }
+      ],
+      "readback_validated": true
+    }
+  }
+}

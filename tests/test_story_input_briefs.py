@@ -3088,6 +3088,158 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "2000 ASCII characters" not in normalized
     assert "straight ASCII equivalent" in normalized
 
+
+def test_precise_intimate_activity_geometry_has_explicit_spatial_contract() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "precise-intimate-activity-geometry.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert brief.isascii()
+    assert "EXACT CAST AND BODY OWNERSHIP" in brief
+    assert "THEME SEED GATE" in brief
+    assert "CENTRAL PERSON LOCK" in brief
+    assert "OTHER PERSON BLOCKS" in brief
+    assert "2D PROJECTION AND SURFACE VISIBILITY" in brief
+    assert "ACTION-CONTACT CHAIN" in brief
+    assert "LIFTING AND SUPPORT GEOMETRY" in brief
+    assert "SEXUAL ACTION LIBRARY" in brief
+    assert "SILENT REJECTION CHECK" in brief
+    assert "Exactly N adults belong to N coherent bodies in this image" in normalized
+    assert "Every Theme title and premise defines only cast, room, primary activity" in normalized
+    assert "A Theme never defines camera side, lens, framing, crop" in normalized
+    assert "The Frame is the sole owner of camera and visibility" in normalized
+    assert "ignore that language and build one fresh camera graph in the Frame" in normalized
+    assert "Create immutable gender slots before writing each Theme" in normalized
+    assert "exactly female_count adult woman slots" in normalized
+    assert "exactly male_count adult man slots" in normalized
+    assert "every Theme premise and every Frame must name exactly one adult woman" in normalized
+    assert "Never replace a requested man with a woman" in normalized
+    assert "Every visible face, head, torso, pelvis, arm, hand, leg, foot" in normalized
+    assert "Body completeness is topological, not a full-body framing requirement" in normalized
+    assert "Describe only visible limbs that perform an action, bear weight, or define the pose" in normalized
+    assert "Trace each such limb continuously from its visible body attachment" in normalized
+    assert "Hidden limbs and regions outside the frame require no inventory" in normalized
+    assert "Choose exactly one central person" in normalized
+    assert "in one actor block" in normalized
+    assert "screen location: image center, center-left, center-right" in normalized
+    assert "every visible body chain and every named occluding volume" in normalized
+    assert "facial expression and gaze only when the face is visible" in normalized
+    assert "Write each visible limb position, support role, and active contact exactly once" in normalized
+    assert "Do not first assign a passive position" in normalized
+    assert "Describe every other adult in a separate sentence" in normalized
+    assert "describe only the visible limb chains, visible support points" in normalized
+    assert "State head angle, gaze, and expression only if the face is visible" in normalized
+    assert "A flat foot has heel, ball, and toes on the surface" in normalized
+    assert "A raised heel leaves only the ball and toes on the surface" in normalized
+    assert "an extended elbow cannot also be planted as a support" in normalized
+    assert "one opaque two-dimensional projection" in normalized
+    assert "Describe only anatomy and contacts reached by an unobstructed line of sight" in normalized
+    assert "Lock the camera in the second sentence" in normalized
+    assert "framing scale, and near-side visible surfaces" in normalized
+    assert "name any volume that hides the primary contact" in normalized
+    assert "Never defer the camera until the paragraph's end" in normalized
+    assert "single visibility scene graph used by the entire paragraph" in normalized
+    assert "Include only anatomy, contact boundaries, support points, and props visible inside its bounds" in normalized
+    assert "Regions outside the frame are absent from the graph" in normalized
+    assert "Pose, action, styling, lighting, and focus consume this graph" in normalized
+    assert "Assign visibility to surface patches rather than whole body parts" in normalized
+    assert "assigns the primary contact boundary one state: visible or occluded" in normalized
+    assert "An inserted boundary may remain occluded" in normalized
+    assert "action then stays readable from body alignment" in normalized
+    assert "Visibility state is immutable" in normalized
+    assert "cannot later be described, focused on, contacted in view, or called visible" in normalized
+    assert "compare every use of visible, occluded, and hidden" in normalized
+    assert "In a front view, the chest and front torso may be visible" in normalized
+    assert "the full buttocks and rear cleft are not" in normalized
+    assert "In a rear view, the back and buttocks may be visible" in normalized
+    assert "both breasts, nipples, abdomen, and front genitals are not fully visible" in normalized
+    assert "In a strict side view, show only profile contours" in normalized
+    assert "Never combine a full frontal chest with a full rear view of both buttocks" in normalized
+    assert "A head turn changes face visibility but does not rotate the torso" in normalized
+    assert "Use explicit near-side and far-side occlusion order" in normalized
+    assert "move the camera or change the pose" in normalized
+    assert "transparent anatomy, impossible twisting, a second viewpoint" in normalized
+    assert "one physically consistent reflection" in normalized
+    assert "When a contact boundary is visible" in normalized
+    assert "do not merely claim that its sightline is clear" in normalized
+    assert "Prove it by naming the viewing window" in normalized
+    assert "For penile oral insertion, use a side-rear or rear three-quarter camera" in normalized
+    assert "head or near thigh occludes the mouth-to-genital boundary" in normalized
+    assert "Name fellatio once to establish the action" in normalized
+    assert "omit local penis, shaft, glans, lip, tongue, and oral-cavity geometry" in normalized
+    assert "For external genital licking" in normalized
+    assert "CONTACT STATE INVARIANT" in brief
+    assert "Assign every contact one and only one topological state" in normalized
+    assert "separated: two structures have a visible gap" in normalized
+    assert "external contact: two exterior surfaces meet at one visible boundary" in normalized
+    assert "inserted: the receiving boundary encircles the active structure" in normalized
+    assert "One contact cannot occupy two states in the same Frame" in normalized
+    assert "omit every distal structure beyond that boundary" in normalized
+    assert "Do not name, locate, light, focus, or assign motion to anatomy inside" in normalized
+    assert "two sides of every contact boundary share one screen location and one depth plane" in normalized
+    assert "must be reachable from its connected joints" in normalized
+    assert "change the pose or support before writing prose" in normalized
+    assert "For penile oral activity, choose exactly one of two alternatives" in normalized
+    assert "Oral insertion names fellatio once" in normalized
+    assert "assigns their contact boundary to the occluded state" in normalized
+    assert "omits its local anatomy" in normalized
+    assert "These alternatives never coexist" in normalized
+    assert "Any hand contact is a separate action chain" in normalized
+    assert "For mouth-to-breast contact" in normalized
+    assert "The mouth occludes the central patch beneath the lips" in normalized
+    assert "For penetration, use a lateral or three-quarter-lateral view" in normalized
+    assert "End the visible chain at that junction and omit the internal segment" in normalized
+    assert "For lifted penetration, choose either a front-biased view" in normalized
+    assert "the far buttock and far supporting contact remain occluded" in normalized
+    assert "Never claim that both buttocks, both under-buttock contacts" in normalized
+    assert "For manual or toy contact" in normalized
+    assert "a front camera cannot see the rear adult's pelvis" in normalized
+    assert "contact trapped between the two torsos or pelvises" in normalized
+    assert "Offset the adults and use a lateral three-quarter camera" in normalized
+    assert "actor -> owned body part or held object -> target adult" in normalized
+    assert "Choose one action-chain form from the contact boundary's camera-graph state" in normalized
+    assert "Write that chain once inside the active adult's actor block" in normalized
+    assert "does not repeat the contact anatomy or reassign the active limb" in normalized
+    assert "For a visible boundary" in normalized
+    assert "For an occluded boundary" in normalized
+    assert "activity name -> actor and target body alignment" in normalized
+    assert "omits the hidden contact anatomy, contact motion, and interior state" in normalized
+    assert "Never combine the visible and occluded forms for one action" in normalized
+    assert "Mina's tongue extends visibly from Mina's mouth" in normalized
+    assert "Occluded oral insertion: An kneels between Bo's parted thighs" in normalized
+    assert "side-rear camera overlaps An's head silhouette with Bo's pubic region" in normalized
+    assert "Bo's near thigh occludes their contact boundary" in normalized
+    assert "Jun's right shoulder leads to his bent right elbow" in normalized
+    assert "the penetrating anatomy remains visibly continuous with its owner's pelvis" in normalized
+    assert "the receiving adult's pubic region meets it in the same contact plane" in normalized
+    assert "the external insertion junction" in normalized
+    assert "End the visible description at the receiving boundary" in normalized
+    assert "omit the internal portion" in normalized
+    assert "Never terminate penetrating anatomy at an abdomen" in normalized
+    assert "One limb performs one physical role" in normalized
+    assert "across the entire paragraph" in normalized
+    assert "When another adult lifts the central person" in normalized
+    assert "which region bears weight: upper back, ribcage, waist" in normalized
+    assert "both feet clear of the floor" in normalized
+    assert "For lifted penetration, use a mechanically compatible axis" in normalized
+    assert "Do not describe the lifted adult as horizontal or across the lifter" in normalized
+    assert "trace load from the named body region" in normalized
+    assert "Every visible adult participates through an action" in normalized
+    assert "one concise styling clause using only visible elements from the camera graph" in normalized
+    assert "describe footwear only when a foot is visible" in normalized
+    assert "Styling never reintroduces an occluded or off-frame region" in normalized
+    assert "Do not restate or change the camera established in sentence two" in normalized
+    assert "Choose framing for action readability" in normalized
+    assert "Keep every active contact and support chain inside the frame" in normalized
+    assert "omit all anatomy outside the selected framing" in normalized
+    assert "a non-ASCII character remains" in normalized
+    assert "without changing the locked camera" in normalized
+    assert "Return one concise positive English ASCII paragraph" in normalized
+
     assert "HIGHEST PRIORITY CAST AND CAMERA LOCK" not in brief
     assert "VISIBLE FUTURE-TECHNOLOGY SIGNATURE" not in brief
     assert "FUTURE VISUAL WORLD LOCK" not in brief
