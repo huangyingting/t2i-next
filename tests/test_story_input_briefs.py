@@ -2850,3 +2850,59 @@ def test_extreme_absurdity_requires_visible_human_prop_contact_chain() -> None:
     assert "an exaggerated but physically plausible hairstyle" in normalized
     assert "Specify visible makeup for every participant" in normalized
     assert "assign complementary colors and different silhouettes" in normalized
+
+
+def test_near_future_intimacy_uses_cold_lived_in_realism() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "near-future-intimacy-realism.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "cold lived-in realism" in normalized
+    assert "HIGHEST PRIORITY CAST AND CAMERA LOCK" in normalized
+    assert "Every requested person must be physically visible" in normalized
+    assert "Do not place a requested partner off-screen" in normalized
+    assert "first sentence of every Theme premise and every Frame" in normalized
+    assert "one invented name, gender, and exact integer age" in normalized
+    assert "Never use twenties, thirties, forties, early, mid, late" in normalized
+    assert "proxy visibly embodies one requested adult" in normalized
+    assert "never remove a requested adult from the image" in normalized
+    assert "Show exactly one visible body for each requested person" in normalized
+    assert "never show the original and proxy simultaneously" in normalized
+    assert "total number of visible faces and bodies must equal" in normalized
+    assert "Every Frame must use a rectilinear 35-85 mm equivalent lens" in normalized
+    assert "Never use a lens wider than 35 mm or longer than 85 mm" in normalized
+    assert "ONE SPECULATIVE LEAP" in normalized
+    assert "exactly one primary speculative development" in normalized
+    assert "at least five mundane anchors in every Frame" in normalized
+    assert "ANTI-SCI-FI VISUAL GATE" in normalized
+    assert "Do not use cyberpunk, neon skylines, glowing circuitry" in normalized
+    assert "Use the exact requested human cast and no additional people" in normalized
+    assert "Use no real animals in sexual or intimate situations" in normalized
+    assert "language-capable extraterrestrial adult" in normalized
+    assert "At aesthetic level" in normalized
+    assert "At erotic level" in normalized
+    assert "At hardcore level" in normalized
+    assert "Domestic synthetic partner" in normalized
+    assert "Long-distance telepresence" in normalized
+    assert "Neural sensory link" in normalized
+    assert "Orbital microgravity" in normalized
+    assert "Lunar settlement" in normalized
+    assert "Martian settlement" in normalized
+    assert "Sapient cross-species or posthuman intimacy" in normalized
+    assert "COLD LIVED-IN REALISM" in normalized
+    assert "Cold realism is not merely blue color grading" in normalized
+    assert "one sign of cost or scarcity" in normalized
+    assert "one sign of maintenance" in normalized
+    assert "one sign of privacy limitation" in normalized
+    assert "one bodily consequence" in normalized
+    assert "preferred target of 400-500 words" in normalized
+    assert "hard maximum of 650 words" in normalized
+    assert "Count words before returning" in normalized
+    assert "Use a strict sentence budget" in normalized
+    assert "Mention each device, anchor, expression" in normalized
+    assert "QR codes, barcodes" in normalized
+    assert "A Frame with a relative age, more than 650 words" in normalized
+    assert "English-only printable ASCII" in normalized
+    assert "no readable text inside the image" in normalized
