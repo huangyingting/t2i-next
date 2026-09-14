@@ -94,10 +94,10 @@ def test_story_request_defaults_to_aesthetic_content() -> None:
 
 
 def test_story_request_accepts_long_form_briefs_with_a_bounded_limit() -> None:
-    assert len(StoryRequest(story="a" * 30_000).story) == 30_000
+    assert len(StoryRequest(story="a" * 50_000).story) == 50_000
 
     with pytest.raises(ValidationError):
-        StoryRequest(story="a" * 50_001)
+        StoryRequest(story="a" * 55_001)
 
 
 def test_story_request_rejects_source_prompt_path_instead_of_stem() -> None:

@@ -53,7 +53,7 @@ PremiseText = Annotated[
 ]
 StoryText = Annotated[
     str,
-    StringConstraints(min_length=1, max_length=50000, strip_whitespace=True),
+    StringConstraints(min_length=1, max_length=55000, strip_whitespace=True),
 ]
 RuleText = Annotated[
     str,

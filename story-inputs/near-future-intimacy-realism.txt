@@ -232,7 +232,32 @@ masturbation, manual genital stimulation, oral sex, vaginal or anal
 penetration, wearable or handheld toy use, remote haptic stimulation, and
 consensual BDSM. Do not default every Theme to vaginal intercourse.
 
-For exactly ten Themes, bind these action slots to the scene buckets:
+SINGLE-ADULT OVERRIDE
+
+When the requested total cast is one adult, this rule overrides every scene
+seed, technology family, module, and partner action below. Show exactly one
+adult, one complete body, one face, and one silhouette. The sole adult performs
+solo masturbation; never add a partner, hologram, proxy, projected hand,
+observer, operator, or reflected person. A synthetic or volumetric-light adult
+may be the sole requested body, never a second embodiment beside a biological
+original.
+
+Across each ten single-adult Themes, rotate these solo actions once each:
+A. external finger stimulation with a continuous shoulder-to-fingertip path;
+B. internal fingers with the other hand providing external stimulation;
+C. a compact non-phallic external vibrator visibly held in one hand;
+D. a single handheld dildo with hand, base, shaft, and anatomy clearly separated;
+E. a wearable stimulator with visible controls and an unobstructed quick release;
+F. asynchronous haptic-touch replay through a body-worn pressure garment;
+G. blindfolded edging with one active hand and one free release hand;
+H. self-bondage using one padded wrist or ankle cuff while the other hand stays
+   free to operate both stimulation and release;
+I. body-safe nipple clamps combined with a handheld external vibrator;
+J. temperature, texture, or pressure-controlled masturbation on an adaptive
+   support surface.
+
+For ten Themes with two or more requested adults, bind these action slots to
+the scene buckets:
 
 A. partner-guided masturbation with the other adult actively controlling,
    touching, or embodying the responsive technology;
@@ -251,7 +276,7 @@ I. negotiated dominant and submissive posture with kneeling, spread positioning,
 J. consensual bondage using broad smart cuffs or body-safe rope together with
    one clearly visible sexual action.
 
-Use each action slot exactly once in a ten-Theme batch. For smaller batches,
+Use each applicable action slot exactly once in a ten-Theme batch. For smaller batches,
 choose different action families before repeating one. Across every ten Themes,
 include at least two masturbation scenes and four BDSM scenes, and use
 penetration in no more than three Themes. Styling, location, or camera changes
@@ -790,6 +815,8 @@ Reject and rewrite internally when any of these conditions is true:
     severe bruising, panic, or punitive violence outside an adult sexual context.
 18. a phallic toy is mounted to a man's pelvis, resembles a second penis, lacks
     a visible hand owner, or overlaps biological genital anatomy.
+19. a single-adult request contains a second body, face, silhouette, projected
+    hand, partner, hologram, proxy, observer, operator, or human reflection.
 
 For a holographic Theme also reject robotic anatomy, grids, particles, rainbow
 color, extreme transparency, incomplete embodiment, artificial genital wording,

@@ -2875,7 +2875,7 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
 
     assert brief.startswith("BRIEF\n\n")
     assert brief.isascii()
-    assert len(brief) < 49_750
+    assert len(brief) < 54_000
     for heading in headings:
         assert f"\n{heading}\n" in brief
 
@@ -2940,7 +2940,14 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "SEXUAL ACTION DIVERSITY" in brief
     assert "solo masturbation, partner-guided masturbation, mutual masturbation" in normalized
     assert "consensual BDSM" in normalized
-    assert "Use each action slot exactly once in a ten-Theme batch" in normalized
+    assert "SINGLE-ADULT OVERRIDE" in brief
+    assert "this rule overrides every scene seed, technology family, module" in normalized
+    assert "exactly one adult, one complete body, one face, and one silhouette" in normalized
+    assert "sole adult performs solo masturbation" in normalized
+    assert "Across each ten single-adult Themes" in normalized
+    assert "one free release hand" in normalized
+    assert "For ten Themes with two or more requested adults" in normalized
+    assert "Use each applicable action slot exactly once in a ten-Theme batch" in normalized
     assert "include at least two masturbation scenes and four BDSM scenes" in normalized
     assert "penetration in no more than three Themes" in normalized
     assert "compact non-phallic vibrator" in normalized
@@ -3042,6 +3049,7 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "BDSM loads the neck or airway" in normalized
     assert "a phallic toy is mounted to a man's pelvis" in normalized
     assert "resembles a second penis" in normalized
+    assert "a single-adult request contains a second body" in normalized
     assert "Selected-action geometry within the first 120 words" in normalized
     assert "bunched around a thigh, knee, or ankle" in normalized
     assert "transport window contains a human reflection" in normalized
@@ -3077,3 +3085,224 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "FUTURE VISUAL WORLD LOCK" not in brief
     assert "HIGH FUTURE VISUAL INTENSITY LOCK" not in brief
     assert "ANTI-SCI-FI VISUAL GATE" not in brief
+
+
+def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "surreal-conceptual-portrait.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert brief.isascii()
+    assert "ABSOLUTE OUTPUT PRIORITY" in brief
+    assert "at least 600 whitespace-delimited words" in normalized
+    assert "Target 650-900 words" in normalized
+    assert "This minimum overrides every later request for brevity" in normalized
+    assert "museum-caliber surreal conceptual portraits" in normalized
+    assert "one impossible but visually coherent metaphor" in normalized
+    assert "Do not copy any reference composition" in normalized
+    assert "one dominant metaphor" in normalized
+    assert (
+        "Use exactly the requested number of adult women and adult men"
+        in normalized
+    )
+    assert "this exact visible cast is alone in the scene" in normalized
+    assert "every person is Chinese" in normalized
+    assert (
+        "Give every requested person an indispensable compositional role"
+        in normalized
+    )
+    assert "SUSPENDED ASSEMBLIES" in brief
+    assert (
+        "credible support lines rising to an off-frame ceiling grid"
+        in normalized
+    )
+    assert "Every heavy object has its own plausible load path" in normalized
+    assert (
+        "Nothing hangs by a person's hair, skin, neck, genitals, or clothing"
+        in normalized
+    )
+    assert "visible hanger or flat non-human support" in normalized
+    assert "Wardrobe archives contain only adult-sized garments" in normalized
+    assert "no baby clothes, child-sized clothing, school uniforms" in normalized
+    assert "ultralight hollow theatrical replica" in normalized
+    assert "other rigid or heavy objects remain beside the cast" in normalized
+    assert "OBJECT-HEAD AND FACE CONCEALMENT" in brief
+    assert (
+        "wearable sculptural headpiece around one existing person's real head"
+        in normalized
+    )
+    assert (
+        "never a decapitation, floating replacement, second head"
+        in normalized
+    )
+    assert "Keep the nose and mouth physically uncompressed" in normalized
+    assert "Never use tight plastic, adhesive wrap, strangling cord" in normalized
+    assert "a balaclava, an enclosed hood, a sack" in normalized
+    assert "a generous lower-face breathing gap" in normalized
+    assert "an independent load path that bypasses the neck" in normalized
+    assert "lightweight shatterproof acrylic" in normalized
+    assert "Never place real glass, ceramic, brittle material" in normalized
+    assert "never reflect, repeat, fragment, or multiply a person's" in normalized
+    assert "Reserve approximately forty to seventy percent" in normalized
+    assert "no more than two dominant hues plus one accent" in normalized
+    assert "typically 40-105 mm equivalent" in normalized
+    assert (
+        "Each visible limb connects continuously to one person's torso"
+        in normalized
+    )
+    assert (
+        "Do not create extra, detached, repeated, fused, or source-less anatomy"
+        in normalized
+    )
+    assert "At Hardcore level, the installation may frame, echo, count" in normalized
+    assert "it may not penetrate, restrain, suspend, strike" in normalized
+    assert "shoulders, chest, pelvis, buttocks, and genitals fully covered" in normalized
+    assert "Frames within one Theme are parallel finished portraits" in normalized
+    assert "three suspended systems, two grounded object arrangements" in normalized
+    assert "NO-TEXT IMAGE CONTRACT" in brief
+    assert "Every final Frame explicitly restates" in normalized
+    assert "Never describe them as handwritten, printed, addressed" in normalized
+    assert "at least 600 words long" in normalized
+    assert "650-900 word working range" in normalized
+    assert "approximately twelve to sixteen sentences" in normalized
+    assert "Expand these six areas across the full sentence budget" in normalized
+    assert '"Only the specified cast is present"' in normalized
+    assert "Use ASCII characters only in an English Frame" in normalized
+    assert "scan every character in an English Frame" in normalized
+    assert "contains any non-ASCII character in an English Frame" in normalized
+    assert (
+        "Count whitespace-delimited words before returning each English Frame"
+        in normalized
+    )
+    assert "if the count is below 600" in normalized
+    assert "Do not append a material inventory, symbolic interpretation" in normalized
+
+
+def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None:
+    brief = (REPOSITORY_ROOT / "story-inputs" / "demon-lord.txt").read_text(
+        encoding="utf-8"
+    )
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert brief.isascii()
+    assert "exactly one central demon sovereign" in normalized
+    assert "adult female demon lord or one adult male demon lord" in normalized
+    assert "Never place both a female and a male demon sovereign" in normalized
+    assert "at least 600 whitespace-delimited words" in normalized
+    assert "Target 650-900 words" in normalized
+    assert "museum-scale dark-fantasy painting" in normalized
+    assert "intentionally low-saturation, dark-key, high-tonal-contrast" in (
+        normalized
+    )
+    assert "desaturated blue-grey and tarnished muted amber" in normalized
+    assert "Do not copy the reference's demon design" in normalized
+    assert "Use exactly the requested number of adult women and adult men" in normalized
+    assert "The demon sovereign counts as one requested woman or one requested man" in (
+        normalized
+    )
+    assert "silently build a cast ledger" in normalized
+    assert "Never convert a requested woman into a man" in normalized
+    assert "Within the first sixty English words" in normalized
+    assert "exactly one adult woman and exactly one adult man" in normalized
+    assert "SOLO CAST LOCK" in brief
+    assert "strict solo portrait containing only that one demon sovereign" in normalized
+    assert 'first sentence must say "one adult Chinese man only"' in normalized
+    assert 'first sentence must say "one adult Chinese woman only"' in normalized
+    assert "Never use plural people, paired objects implying another owner" in normalized
+    assert "with women and no men" in normalized
+    assert "with men and no women" in normalized
+    assert "with a mixed cast, choose exactly one requested adult" in normalized
+    assert "balance female and male sovereigns" in normalized
+    assert "visible human-equivalent age from twenty-five through seventy-nine" in (
+        normalized
+    )
+    assert "may never replace it" in normalized
+    assert "retain a clearly Chinese adult identity" in normalized
+    assert "EQUAL AGENCY AND CONSENT" in brief
+    assert "awake, unimpaired, willing, responsive" in normalized
+    assert "describes the interaction as consensual and willing" in normalized
+    assert "Within the first one hundred English words" in normalized
+    assert 'include the exact phrase "consensual and willing"' in normalized
+    assert "Never use a prisoner, slave, sacrifice, tribute" in normalized
+    assert "ROLE AND CHARACTER VARIETY" in brief
+    assert "infernal judge weighing an impossible dispute" in normalized
+    assert "court astronomers, alchemists, archivists" in normalized
+    assert "Only when the requested cast contains additional adults" in normalized
+    assert "Do not let every female sovereign become a seductive queen" in normalized
+    assert "one head, one neck, one torso, two arms" in normalized
+    assert "Horns are optional but usually desirable" in normalized
+    assert "exactly one matched pair attached across the upper back" in normalized
+    assert "optional tail emerges continuously from the sacrum" in normalized
+    assert "Do not add oversized fantasy genitals" in normalized
+    assert "All sexual anatomy remains adult humanoid anatomy" in normalized
+    assert "THRONE, COURT, AND WORLD" in brief
+    assert "Rotate among distinct scene families" in normalized
+    assert "vertical sacred spaces" in normalized
+    assert "intimate royal interiors" in normalized
+    assert "working seats of power" in normalized
+    assert "exterior domains" in normalized
+    assert "original transitional spaces" in normalized
+    assert "Do not default every scene to smoke, embers" in normalized
+    assert "Do not repeat the reference's close frontal lap arrangement" in normalized
+    assert "POSE AND INTERACTION VARIETY" in brief
+    assert "open-ended pose engines" in normalized
+    assert "At Aesthetic level, vary" in normalized
+    assert "At Erotic level, vary non-explicit adult arrangements" in normalized
+    assert "At Hardcore level, rotate physically credible explicit arrangements" in (
+        normalized
+    )
+    assert "face-to-face seated vaginal or anal intercourse" in normalized
+    assert "supported standing intercourse" in normalized
+    assert "side-lying intercourse" in normalized
+    assert "rear-entry vaginal or anal intercourse" in normalized
+    assert "mutual masturbation, reciprocal oral contact" in normalized
+    assert "one dominant body arrangement" in normalized
+    assert "typically 35-85mm equivalent" in normalized
+    assert "Rotate camera families among frontal eye-level symmetry" in normalized
+    assert "realistic oil-painted depth" in normalized
+    assert "LOW-SATURATION HIGH-CONTRAST COLOR LOCK" in brief
+    assert "Suppress color contrast while preserving strong luminance contrast" in (
+        normalized
+    )
+    assert "At least eighty-five percent of the visible frame" in normalized
+    assert "sixty to seventy-five percent of the frame remain in deep readable shadow" in (
+        normalized
+    )
+    assert "a small area of bone-white or metallic highlight" in normalized
+    assert "Preserve detail inside blacks" in normalized
+    assert "Any colored accent occupies at most five percent" in normalized
+    assert "two subdued hue families plus neutral materials" in normalized
+    assert "Do not use saturated turquoise, electric cyan" in normalized
+    assert "cinematic teal-and-orange grade" in normalized
+    assert "Avoid flat grey fog, muddy midtone-only rendering" in normalized
+    assert "Every visible limb connects continuously" in normalized
+    assert "At Aesthetic level, every person remains fully covered" in normalized
+    assert "show no penetration, explicit oral-genital contact" in normalized
+    assert "one clearly visible consensual adult sexual act already in progress" in (
+        normalized
+    )
+    assert "for a one-person cast, use visible adult masturbation" in normalized
+    assert "for multiple adults, keep the exact cast visible" in normalized
+    assert "ordinary adult humanoid sexual anatomy" in normalized
+    assert "Never use a horn, claw, tail, tentacle, weapon" in normalized
+    assert "use blunt horns swept away from all faces and bodies" in normalized
+    assert "No participant grips, pulls, rides, or braces against a horn" in normalized
+    assert "Do not use needle points, bladed tail tips" in normalized
+    assert "Frames within one Theme are parallel finished images" in normalized
+    assert "Within every rolling group of twelve Themes" in normalized
+    assert "Across a one-hundred-Theme run" in normalized
+    assert "may occupy more than one tenth of the Themes" in normalized
+    assert "NO-TEXT IMAGE CONTRACT" in brief
+    assert "Use ASCII characters only in an English Frame" in normalized
+    assert "End by restating the exact number of adult women and adult men" in normalized
+    assert "Word counting is a silent authoring check" in normalized
+    assert 'Do not write phrases such as "six hundred words"' in normalized
+    assert 'State zero as "zero adult women" or "zero adult men"' in normalized
+    assert "adds any second person, name, owner, gaze partner" in normalized
+    assert "falls below 600 English words" in normalized
+    assert "uses vivid, neon, jewel-tone, high-saturation" in normalized
