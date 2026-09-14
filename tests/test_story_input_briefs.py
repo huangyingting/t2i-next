@@ -401,6 +401,90 @@ def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
     assert "不输出标题、Theme 编号、Frame 编号、 姿势编号" in normalized
 
 
+def test_architectural_glitch_fashion_collage_preserves_reference_grammar() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "architectural-glitch-fashion-collage.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "architectural glitch fashion photomontages" in normalized
+    assert "The reference establishes only a visual grammar" in normalized
+    assert "Do not reproduce its people, exact landmarks" in normalized
+    assert "one dominant mature-adult fashion portrait" in normalized
+    assert "one coherent architectural subject" in normalized
+    assert "meaningful crossings where architecture, portrait, garment" in normalized
+    assert "a confident collage gesture supported by a small family" in normalized
+    assert "ARTISTIC DIRECTION AND INFLUENCE PALETTE" in brief
+    for artist in (
+        "Hannah Höch",
+        "El Lissitzky",
+        "Alexander Rodchenko",
+        "László Moholy-Nagy",
+        "Erwin Blumenfeld",
+        "Herbert Bayer",
+        "Robert Rauschenberg",
+        "Eduardo Paolozzi",
+        "Nam June Paik",
+        "Lebbeus Woods",
+        "Deborah Turbeville",
+        "Guy Bourdin",
+    ):
+        assert artist in brief
+    assert "combine two or three compatible visual lineages" in normalized
+    assert "do not reproduce a known artwork or recognizable composition" in normalized
+    assert "These are starting points, not fixed recipes" in normalized
+    assert "Let the selected lineage determine the main visual gesture" in normalized
+    assert "Do not translate every lineage into the same band across the eyes" in normalized
+    assert "Favor expressive visual conviction over counting effects" in normalized
+    assert "Avoid reducing the look to scrapbook strips" in normalized
+    assert "Each final Frame is one complete portrait-oriented artwork" in normalized
+    assert "coordinated triptych" in normalized
+    assert "PORTRAIT LEGIBILITY AND OCCLUSION" in brief
+    assert "should not obscure every defining feature at once" in normalized
+    assert "ARCHITECTURAL WORLDS" in brief
+    assert "CONTROLLED GLITCH AND COLLAGE SYSTEM" in brief
+    assert "horizontal scan displacement" in normalized
+    assert "RGB or CMYK registration offset" in normalized
+    assert "hard-edged translucent rectangles" in normalized
+    assert "checkerboard fragments" in normalized
+    assert "pixel sorting confined to hair, shadow, sky" in normalized
+    assert "GLITCH DISCIPLINE LOCK" in brief
+    assert "Let one expressive gesture lead" in normalized
+    assert "Never cover the whole image with uniform glitch" in normalized
+    assert "FASHION SUBJECT AND STYLING" in brief
+    assert "one exact age from 25 through 39" in normalized
+    assert "mature means unmistakably adult, not necessarily middle-aged" in normalized
+    assert "Do not default every Theme to a black turtleneck" in normalized
+    assert "COLOR AND MATERIAL PALETTES" in brief
+    assert "CONTENT LEVEL" in brief
+    assert "Aesthetic:" in brief
+    assert "Erotic:" in brief
+    assert "Hardcore:" in brief
+    assert "PROMPT CLEANROOM LOCK" in brief
+    assert "Apply this lock to both Theme generation and final Frame generation" in normalized
+    assert "must never quote, paraphrase, enumerate, audit, justify, or explain the brief" in normalized
+    assert "Never emit the planning terms macro-disruption" in normalized
+    assert "Never state what percentage of the image an effect occupies" in normalized
+    assert "Replace explanations with direct visible facts" in normalized
+    assert "Immediately before returning each Theme and Frame, silently rewrite" in normalized
+    assert "Do not count effects with phrases" in normalized
+    assert "use at least three distinct adult ancestry or cultural backgrounds" in normalized
+    assert "Across a batch, move freely among architecture families" in normalized
+    assert "Avoid falling into the same eye-covering band" in normalized
+    assert "Multiple Frames within one Theme are parallel finished alternatives" in normalized
+    assert "Write every final Frame as one natural, fluent paragraph" in normalized
+    assert "Keep it focused and evocative rather than exhaustive" in normalized
+    assert "do not begin with \"A complete artwork,\" \"A resolved composition,\" dimensions" in normalized
+    assert "Do not output headings, labels, bullet points" in normalized
+    assert "the collage is so timid that the result reads as an ordinary fashion" in normalized
+    assert "torn paper, body paint, tattoo-like ornament, an eye mask" in normalized
+    assert "Never expose internal planning or validation language" in normalized
+    assert "Do not state numeric coverage percentages" in normalized
+
+
 def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "piss.txt").read_text(
         encoding="utf-8"
