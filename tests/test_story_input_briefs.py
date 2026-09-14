@@ -2860,6 +2860,7 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
 
     headings = (
         "PRIORITY AND OUTPUT CONTRACT",
+        "NON-NEGOTIABLE CORE LOCKS",
         "CAST, CONSENT, AND ANATOMY",
         "CONTENT AND ACTION",
         "FUTURE VISUAL SYSTEM",
@@ -2874,34 +2875,85 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
 
     assert brief.startswith("BRIEF\n\n")
     assert brief.isascii()
-    assert len(brief) < 40_000
+    assert len(brief) < 49_750
     for heading in headings:
         assert f"\n{heading}\n" in brief
 
     assert "cold lived-in realism" in normalized
+    assert "following behavior is permanent" in normalized
+    assert "must never be removed, weakened" in normalized
+    assert "exact visible body count" in normalized
+    assert "distinct complete styling package for every adult" in normalized
+    assert "complete surrounding environment with at least eight compact reality anchors" in normalized
+    assert "at least six discrete props distributed across all depth planes" in normalized
+    assert "simultaneous room-scale, body-scale" in normalized
+    assert "complete force path, center of mass, cast shadow" in normalized
+    assert "approved holographic adult identity" in normalized
+    assert "approved cooling suspension identity" in normalized
+    assert "approved orbital gantry identity" in normalized
+    assert "exact batch routing with distinct scene worlds and sexual actions" in normalized
     assert "Write only positive visible instructions" in normalized
     assert "Never copy a rule, rejection, warning" in normalized
     assert "Silently use those checks before returning" in normalized
-    assert "Target 220-280 words and five to seven sentences per Frame" in normalized
-    assert "absolute limits are 320 words and 2100 ASCII characters" in normalized
-    assert "Count silently" in normalized
-    assert "Put cast, action, anatomy, and technology in the first half" in normalized
+    assert "at least 600 English words per Frame" in normalized
+    assert "no fixed maximum when concrete visual detail remains useful" in normalized
+    assert "600-word minimum is hard" in normalized
+    assert "put cast, action, anatomy, and technology in the first half" in normalized
     assert "image contains no captions, subtitles, logos" in normalized
 
     assert "complete requested cast" in normalized
-    assert "ASCII Arabic numerals, such as 38-year-old" in normalized
+    assert "Exactly N adults and N complete bodies occupy the entire image" in normalized
+    assert "Exactly two adults and two complete bodies" in normalized
+    assert "single couple remains the only human silhouette group" in normalized
+    assert "a 38-year-old Chinese woman named Mei" in normalized
+    assert "Always write the words woman or man beside each name" in normalized
     assert "Show one visible body and face per requested person" in normalized
     assert "woman has one vulva and the man has one penis" in normalized
     assert "pubic regions touch directly" in normalized
     assert "only the attached base remains externally visible" in normalized
+    assert "complete contact geometry within the first 120 words" in normalized
+    assert "both pubic regions are bare and directly pressed together" in normalized
+    assert "Every lower garment is fully removed from both legs" in normalized
+    assert "the man's single penis is rooted continuously in his fully unclothed pelvis" in normalized
+    assert "only its attached base remains visible at their touching pubic skin" in normalized
     assert "torso-only proxy" in normalized
+    assert "show abstract light or empty room architecture" in normalized
+    assert "visibly unoccupied from edge to edge" in normalized
     assert "All activity is voluntary" in normalized
     assert "Keep professional service separate from sex" in normalized
+    assert "INDIVIDUAL APPEARANCE AND STYLING" in brief
+    assert "Describe each person separately" in normalized
+    assert "body build, height impression, skin tone" in normalized
+    assert "face shape and visible facial features" in normalized
+    assert "hairstyle with color, length, texture, cut, parting" in normalized
+    assert "visible grooming or makeup treatment" in normalized
+    assert "current expression through gaze direction, eyelids, brows" in normalized
+    assert "every garment and footwear item" in normalized
+    assert "one to three personal accessories" in normalized
+    assert "Nudity does not remove the styling requirement" in normalized
+    assert "exact placement of their removed outfit" in normalized
 
     assert "Aesthetic:" in brief
     assert "Erotic:" in brief
     assert "Hardcore:" in brief
     assert "one explicit sexual action visibly underway" in normalized
+    assert "SEXUAL ACTION DIVERSITY" in brief
+    assert "solo masturbation, partner-guided masturbation, mutual masturbation" in normalized
+    assert "consensual BDSM" in normalized
+    assert "Use each action slot exactly once in a ten-Theme batch" in normalized
+    assert "include at least two masturbation scenes and four BDSM scenes" in normalized
+    assert "penetration in no more than three Themes" in normalized
+    assert "compact non-phallic vibrator" in normalized
+    assert "held visibly in one partner's hand" in normalized
+    assert "MASTURBATION AND BDSM GEOMETRY" in brief
+    assert "trace the active hand continuously from shoulder through elbow" in normalized
+    assert "give each adult a separate hand-to-body action" in normalized
+    assert "identify the voluntary roles and show reciprocal consent" in normalized
+    assert "Every restraint has a visible quick release" in normalized
+    assert "Impact lands only on fleshy buttocks or outer thighs" in normalized
+    assert "one bare, unobstructed contact center within the first 120 words" in normalized
+    assert "fully remove trousers, underwear, skirts, and other lower garments" in normalized
+    assert "keep support hardware completely outside both pubic regions" in normalized
     assert "technology is powered, worn, connected" in normalized
     assert "Frames under one Theme are alternative photographs" in normalized
 
@@ -2914,22 +2966,54 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "Brutalist habitat utility" in normalized
     assert "Climate-adapted interior" in normalized
     assert "Spectral telepresence room" in normalized
+    assert "BATCH DIVERSITY ROUTER" in brief
+    assert "ten visibly distinct scene-world buckets" in normalized
+    assert "For exactly ten requested Themes, bind identifiers to buckets" in normalized
+    assert "T001=A, T002=B, T003=C, T004=D, T005=E" in normalized
+    assert "T006=F, T007=G, T008=H, T009=I, and T010=J" in normalized
+    assert "never substitute another D or F scene for I or J" in normalized
+    assert "inside their assigned A-H buckets" in normalized
+    assert "For three to nine Themes, use that many different buckets" in normalized
+    assert "complete all ten buckets before reusing any bucket" in normalized
+    assert "use at most two conventional bedrooms, mattresses, bunks, or hotel rooms" in normalized
+    assert "never repeat a seed, location type, primary technology family" in normalized
+    assert "Make the scene silhouette visibly different before varying styling" in normalized
+    assert "safe service wear through micro-scratches" in normalized
+    assert "remain structurally clean and intact" in normalized
 
     assert "rectilinear 35-50 mm" in normalized
     assert "f/5.6-f/11" in normalized
     assert "foreground, middle ground, and background" in normalized
     assert "5200K-6500K" in normalized
     assert "palette is cool dominant" in normalized
-    assert "Choose six concise reality anchors" in normalized
+    assert "four active storytelling systems" in normalized
+    assert "at least eight compact reality anchors" in normalized
+    assert "complete occupied space rather than a generic backdrop" in normalized
+    assert "room type, floor, walls, ceiling, entrance" in normalized
+    assert "at least six discrete, visually readable props" in normalized
+    assert "specific object identity, material, color, size impression" in normalized
+    assert "Distribute them across foreground, middle ground, and background" in normalized
+    assert "semicolon-separated environmental sentence" in normalized
 
     assert "MODULE: SYNTHETIC OR PROXY ADULT" in brief
     assert "MODULE: HAPTIC VOLUMETRIC ADULT" in brief
     assert "55-70 percent optical density" in normalized
     assert "smooth light density" in normalized
     assert "semi-transparent monochromatic volumetric-light adult" in normalized
-    assert "Use semi-transparent rather than solid or opaque" in normalized
+    assert "external anatomy as continuous light formed from that same" in normalized
     assert "MODULE: HAPTIC OR NEURAL SYSTEM" in brief
     assert "MODULE: ACTIVE SUSPENSION" in brief
+    assert "broad graphite ribcage pads and outer-thigh wings" in normalized
+    assert "all cables and webbing outside the groin" in normalized
+    assert "wide, flat, dark, and visibly connected" in normalized
+    assert "complete empty bed surface stays visible" in normalized
+    assert "MODULE: ADAPTIVE BED OR TRANSPORT BERTH" in brief
+    assert "domestic furniture rather than a medical chair" in normalized
+    assert "both partners alert, mutually engaged, and physically contributing" in normalized
+    assert "side-lying rear-entry berth" in normalized
+    assert "bare hips flush to the receiving pelvis" in normalized
+    assert "completely clear of both legs" in normalized
+    assert "show rain, transit light, or empty architecture as abstract reflections" in normalized
     assert "MODULE: COOLING SUSPENSION" in brief
     assert "four physically separated flexible support wings" in normalized
     assert "30-40 centimeter oval contact opening" in normalized
@@ -2946,6 +3030,24 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "safety webbing a muted violet or graphite color" in normalized
     assert "MODULE: ORBITAL MICROGRAVITY" in brief
     assert "MODULE: SAPIENT POSTHUMAN PARTNER" in brief
+    assert "MODULE: POSITIVE CONTACT VOCABULARY" in brief
+    assert "directly joined pelvises and touching pubic skin" in normalized
+    assert "blank solid-color rental cases" in normalized
+    assert "Individual styling: for each adult separately" in normalized
+    assert "Future room and props: complete room boundaries" in normalized
+    assert "cyan, ice-blue, or muted-violet arcs" in normalized
+    assert "incorrect total of faces, heads, torsos, pelvises, bodies" in normalized
+    assert "penetrating anatomy appears through clothing, detached from its pelvis" in normalized
+    assert "masturbation contains an ownerless hand" in normalized
+    assert "BDSM loads the neck or airway" in normalized
+    assert "a phallic toy is mounted to a man's pelvis" in normalized
+    assert "resembles a second penis" in normalized
+    assert "Selected-action geometry within the first 120 words" in normalized
+    assert "bunched around a thigh, knee, or ankle" in normalized
+    assert "transport window contains a human reflection" in normalized
+    assert "panels are cracked, broken, or unsafe" in normalized
+    assert "flesh-colored support hardware" in normalized
+    assert "rust, corrosion, peeling plaster" in normalized
 
     family_section = brief.split("TECHNOLOGY FAMILIES\n\n", 1)[1].split(
         "\n\nSCENE SEED LIBRARY", 1
@@ -2964,8 +3066,10 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     assert "Use these checks silently" in normalized
     assert "Their vocabulary never appears in the returned Frame" in normalized
     assert "Return only the single positive English ASCII paragraph" in normalized
-    assert "confirm five to seven sentences and at most 320 words" in normalized
-    assert "confirm at most 2100 characters" in normalized
+    assert "confirm at least 600 English words" in normalized
+    assert "five to seven sentences" not in normalized
+    assert "at most 320 words" not in normalized
+    assert "2000 ASCII characters" not in normalized
     assert "straight ASCII equivalent" in normalized
 
     assert "HIGHEST PRIORITY CAST AND CAMERA LOCK" not in brief
