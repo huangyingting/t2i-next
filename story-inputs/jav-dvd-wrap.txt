@@ -1,0 +1,317 @@
+BRIEF
+
+Create original, production-ready adult-video DVD wraparound sleeve Themes and
+finished packaging Frames. Use the dense, colorful visual language of Japanese
+adult-video retail packaging as broad design inspiration without reproducing
+any real title, performer, studio, logo, product code, photograph, character,
+or existing package. Every Frame must show one complete flat landscape sleeve:
+the back panel on the left, a narrow spine in the center, and the front panel
+on the right.
+
+The result is the final print design itself, viewed perfectly front-on. It is
+not a DVD case mockup, product photograph, open booklet, standing box, tilted
+package, perspective render, contact sheet, storyboard, web page, or separate
+front and back images.
+
+ENGLISH-ONLY ASCII LOCK
+
+Frame prose must use grammatical English throughout, regardless of the
+requested output language. During Theme generation, write the title, premise,
+and style in English-only ASCII as well. Every character in the complete Frame
+must be ASCII code point 0 through 127.
+
+Every readable word printed anywhere on the sleeve must be exact grammatical
+English using only unaccented Latin letters, Arabic numerals, spaces, and
+standard ASCII punctuation. Show no Japanese kana or kanji, Chinese
+characters, Korean hangul, Cyrillic, accented letters, pseudo-letters, invented
+glyphs, lorem ipsum, placeholder copy, malformed words, random symbols, or
+gibberish.
+
+Before returning either stage, replace curly quotation marks with straight
+ASCII quotation marks, replace every en dash, em dash, and nonbreaking hyphen
+with a plain hyphen, replace nonbreaking spaces with normal spaces, and rewrite
+any remaining non-ASCII character.
+
+TEXT-LAYER ISOLATION LOCK
+
+Quarantine all exact visible copy until the Frame's final dedicated image-text
+passage. Earlier prose describes only generic roles such as the title, tagline,
+product code, synopsis, feature label, runtime, warning, credit, and barcode;
+it must not spell, quote, translate, or paraphrase their final wording.
+
+The final image-text passage is the sole source of readable sleeve copy. For
+every visible string, state its exact physical carrier, panel location, and
+typographic behavior, add the literal ASCII characters `: `, write the exact
+copy, and end with the literal ASCII character `;`. Never enclose copy in
+quotation marks and never write the words colon or semicolon. The Frame's final
+character must be `;`.
+
+Every text-bearing surface not declared in the final passage must remain blank
+and free of letter-like marks. Do not use illegible microtext as texture.
+Achieve visual density through borders, color blocks, halftone dots, rules,
+stars, hearts, arrows, geometric bursts, photographic panels, and print
+finishes rather than fake writing.
+
+FORMAT AND PANEL GEOMETRY
+
+Use one continuous landscape canvas with a width-to-height ratio between 1.9:1
+and 2.15:1. The complete trim edge must be visible on all four sides. Allocate
+approximately 43-46 percent of the width to the back panel, 6-8 percent to the
+spine, and 47-50 percent to the front panel. Two straight vertical fold lines
+separate the three zones. Keep all critical faces, anatomy, titles, product
+codes, and barcode quiet zones away from fold lines and trim edges.
+
+The back, spine, and front must share one product identity, title, cast,
+palette, type family, print finish, and content level. They must read as one
+coordinated retail sleeve while retaining clearly different jobs:
+
+- front panel: immediate hero image, dominant title, short tagline, performer
+  identification, and one compact product code;
+- spine: exact title, fictional studio imprint, product code, and one small
+  abstract brand mark, all aligned for shelf reading;
+- back panel: one secondary hero still, six to nine bordered inset stills, a
+  short synopsis, two or three feature labels, technical information, adult
+  notice, fictional credits, and one clean barcode zone.
+
+FRONT PANEL
+
+Give the front panel one dominant adult hero photograph occupying roughly
+55-72 percent of its area. The requested cast must be immediately readable,
+with distinct faces, coherent anatomy, and a deliberate relationship. Use
+strong direct eye contact, an inviting performance gesture, or a clear
+content-level action. Crop boldly but preserve every body part needed to
+understand the pose and interaction.
+
+Build the front title as a large integrated shape, not plain text floating over
+a photograph. It may use inflated display lettering, outlined condensed type,
+stacked words, curved baselines, glossy highlights, halftone shadows, color
+knockouts, hearts, stars, arrows, or energetic speed lines. Keep the title
+fully legible and do not cover eyes, mouths, hands, breasts, genitals, or the
+main physical interaction.
+
+Use one or two supporting type clusters only. Maintain a clear first read:
+hero face and body, then title, then tagline and product code. Do not fill
+every empty area with words.
+
+BACK PANEL AND INSET SEPARATION
+
+Create one larger secondary still and six to nine smaller stills selected from
+the same fictional production. Arrange them in a controlled two- or
+three-column grid with deliberate variation in size. Every still must have a
+complete visible rectangular, rounded, circular, or torn-paper border plus a
+solid gutter. No body, face, hand, limb, prop, fluid, or garment may cross from
+one still into another.
+
+Each inset is a separate photographic instant with its own coherent camera
+position, background, lighting, anatomy, and crop. Never blend two scenes
+inside one inset. Keep at least one visible gutter width between neighboring
+faces and bodies. Do not place a face partly under another panel, merge skin
+with a border, continue a limb across a gutter, duplicate an eye, create a
+shared torso, or let typography resemble an extra body part.
+
+The same requested adults may recur across separate stills, but their identity
+anchors must remain stable: exact age, face, hair, body proportions, skin
+marks, and role. Do not invent additional performers, spectators, staff,
+reflections, screen figures, printed portraits, silhouettes, or background
+people. A multi-person cast may appear together or in subsets within
+individual back-panel stills, but every requested adult must appear clearly on
+the front panel and at least twice across the back-panel stills.
+
+Reserve one clean rectangular barcode zone near a back-panel corner. Render a
+valid-looking black-and-white barcode with quiet margins and an exact invented
+13-digit number declared in the final text passage. Keep the barcode separate
+from faces, bodies, fold lines, and decorative patterns.
+
+CAST, ADULTHOOD, AND CONSENT
+
+Use the exact requested human cast and no additional people. Every performer
+must be an unmistakably mature Chinese adult with one exact age of 25 or older.
+All performers are alert, willing, mutually responsive, and able to stop.
+Their expressions and body language must communicate active participation,
+confidence, pleasure, playfulness, or deliberate performance rather than
+fear, pain, confusion, sleep, intoxication, restraint without agency, or
+distress.
+
+Preserve each performer's identity throughout one Theme. Give every person a
+distinct face, hairstyle, body type, wardrobe or undressed state, pose role,
+and reaction. In multi-person compositions, keep heads separated, hands
+traceable to their owners, limbs anatomically continuous, and contact points
+physically plausible.
+
+Do not use school settings, uniforms associated with minors, youth-coded
+language, family-role sexualization, coercion, hidden-camera framing,
+incapacitation, trafficking, humiliation without explicit enthusiasm,
+asphyxiation, injury, blood, weapons, or dangerous insertion.
+
+CONTENT LEVEL
+
+Theme and Frame stages must follow the requested content level exactly. The
+content level controls the fictional production premise, hero image, inset
+selection, wardrobe, pose, interaction, title tone, tagline, feature labels,
+and visual emphasis.
+
+At aesthetic level, create provocative adult fashion packaging with complete
+opaque clothing. Emphasize bold poses, body-conscious silhouettes, glossy
+wardrobe, teasing eye contact, colorful retail graphics, and suggestive but
+nonsexual interactions. Show no nudity, transparent genital coverage,
+masturbation, genital contact, oral sex, penetration, sex toys, semen, or
+sexual fluids.
+
+At erotic level, allow consensual adult toplessness, bare buttocks,
+semi-transparent lingerie, opened or partly removed garments, intimate
+self-touch, sensual partner touch, kissing, straddling, spread-leg or rearward
+poses, and wet skin. Keep genital detail discreet or obscured by pose, crop,
+fabric, hand placement, or another body. Show no visible penetration,
+ejaculation, explicit oral-genital contact, or inserted sex toy.
+
+At hardcore level, create clearly explicit consensual adult packaging. The
+front hero and selected back stills may show visible adult genitals,
+masturbation, oral sex, vaginal or anal intercourse, consensual BDSM, sex toys,
+ejaculation, semen, or female sexual fluids. Use one clearly readable primary
+sexual action per still, physically plausible contact geometry, traceable
+limbs, and expressions of active adult participation. Do not stack unrelated
+acts into one body cluster or obscure the active anatomy with decorative type.
+
+THEME CONTRACT
+
+Every Theme invents one original fictional adult release and locks:
+
+- one concise English product title and one short campaign promise;
+- the exact requested cast, with fixed adult ages, identities, body types, and
+  roles;
+- one content-level-specific premise, setting family, relationship dynamic,
+  and performance concept;
+- one front hero action and a compatible range of back-panel stills;
+- one distinctive retail palette using two dominant colors, one accent color,
+  black, and white;
+- one display-lettering strategy, one border and gutter system, and one print
+  finish;
+- one fictional English studio imprint, product-code pattern, runtime range,
+  feature vocabulary, and barcode number; and
+- one exact flat wrap geometry with back, spine, and front panel hierarchy.
+
+Invent all names, titles, labels, codes, companies, and credits. Do not use real
+performer names, studios, distributors, websites, social handles, trademarks,
+certification logos, copyrighted titles, or recognizable package layouts.
+
+FRAMES ARE PARALLEL PACKAGING DESIGNS
+
+Every Frame is a self-contained, complete wraparound sleeve for the current
+Theme. Frames are parallel campaign variants, not sequential story beats,
+alternate pages, front-only and back-only halves, or before-and-after views.
+Every Frame must restate all visual information needed to render the complete
+back-spine-front sleeve without referring to another Frame.
+
+Within one Theme, preserve the title, cast, adult ages, identities, premise,
+content level, fictional studio, product code, barcode number, and core palette.
+Vary the hero crop, back-panel grid, display lettering, supporting motifs,
+inset selection, color dominance, and print treatment enough that every Frame
+is a genuinely different package proposal.
+
+Never use the same, identical, again, previously, remains unchanged, continues,
+different angle, alternate version, earlier Frame, another Frame, or another
+view. Describe only the current finished sleeve.
+
+PHOTOGRAPHY, ANATOMY, AND PRINT REALISM
+
+Photographs must look captured in a real adult production environment rather
+than synthesized. Use motivated practical or studio light, realistic skin
+texture, pores, fine hair, fabric tension, pressure marks, material reflections,
+and believable depth. Keep faces recognizable across panels without making
+every expression identical.
+
+Use normal photographic perspective within each panel. Prefer 35-85 mm
+equivalent lenses for hero images and 35-50 mm for group stills. Avoid fisheye
+distortion, giant heads, tiny limbs, duplicated bodies, floating hands,
+impossible joints, fused anatomy, melted clothing, skin merging with furniture,
+and inconsistent genital placement.
+
+Render the sleeve as professional offset print on glossy coated stock. Allow
+controlled halftone dots, spot gloss, metallic foil, embossed title edges,
+slight ink gain, overprint, paper grain, and precise die-cut alignment. Do not
+add random damage, heavy creases, plastic-case glare, perspective warping, or
+mockup shadows.
+
+VISUAL DENSITY WITHOUT CLUTTER
+
+Capture the energetic retail density of the reference through hierarchy rather
+than uncontrolled collage. Use a bold limited palette, thick outlines, boxed
+photo captions, angular ribbons, bursts, dots, hearts, stars, diagonal rules,
+and alternating black, white, and saturated color fields. Keep one dominant
+front hero, one dominant back hero, and a readable path through the inset grid.
+
+Do not imitate a specific existing sleeve. Avoid a fixed red-white-black formula
+in every Theme. Rotate palettes such as magenta-cyan-yellow, coral-navy-cream,
+violet-lime-silver, scarlet-pink-black, cobalt-orange-white, emerald-gold-plum,
+and other high-contrast combinations appropriate to the premise.
+
+VISIBLE COPY PACKAGE
+
+Keep visible copy concise enough to render cleanly. Every Frame must include:
+
+- one exact title of two to six English words on the front and repeated on the
+  spine;
+- one front tagline of three to nine words;
+- one fictional performer stage name per requested adult, using English ASCII;
+- one invented product code of six to ten uppercase letters, digits, or
+  hyphens, repeated on front, spine, and back;
+- one back headline of three to eight words;
+- one English synopsis sentence of eight to sixteen words;
+- exactly two or three short feature labels;
+- one runtime line, one format line, and one adult notice reading `ADULTS 25+`;
+- one compact fictional studio and credit line; and
+- one exact invented 13-digit barcode number.
+
+Do not add review quotes, awards, real ratings, prices, URLs, QR codes, social
+media, phone numbers, legal boilerplate, or dense paragraphs. Type must remain
+inside its assigned panel and never cross a fold line.
+
+VARIATION AND REJECTION RULES
+
+Across Themes, vary premise, relationship, set, season, time of day, cast
+styling, body types, hero action, inset actions, palette, title construction,
+border shape, panel rhythm, product family, lighting, lens, and print finish.
+Do not let one hairstyle, black lingerie, white bed, red title, breast-centered
+crop, or identical thumbnail grid dominate a batch.
+
+Reject and rewrite any Theme or Frame that:
+
+1. omits the complete back, spine, or front panel;
+2. outputs separate images instead of one flat continuous sleeve;
+3. uses non-English text, non-ASCII characters, malformed words, placeholders,
+   pseudo-writing, or gibberish;
+4. copies a real performer, studio, logo, title, code, photo, or package;
+5. changes the requested cast or introduces an additional person;
+6. depicts anyone younger than 25 or uses youth-coded styling;
+7. violates the requested content level;
+8. merges separate inset scenes, lets anatomy cross a gutter, or fuses a person
+   with a panel border, prop, garment, or another body;
+9. crops away the primary action, creates incoherent anatomy, or makes hands
+   impossible to assign;
+10. allows title or decoration to cover a face, hand, genital, or key contact;
+11. omits the barcode quiet zone, product code repetition, adult notice, or
+    panel-specific hierarchy;
+12. renders a case mockup, tilted package, disc, booklet, web page, poster,
+    magazine, contact sheet, or storyboard;
+13. uses backward-pointing language or describes another Frame; or
+14. prints exact copy anywhere before the final dedicated image-text passage.
+
+FINAL OUTPUT
+
+Write each Frame as one concise English ASCII paragraph of approximately
+450-700 words. Begin by stating that this is one finished, flat, front-facing
+landscape DVD wrap with back panel left, spine center, and front panel right.
+Describe the panel proportions, exact requested adult cast, content-level
+premise, front hero image, back hero and inset grid, separation gutters,
+lighting, anatomy, palette, typography behavior, barcode zone, and print finish.
+
+End with the dedicated image-text passage. Declare every exact readable string
+once for each physical occurrence, including repeated title and product code
+placements. The final character of the complete Frame must be an ASCII
+semicolon.
+
+Before returning, silently verify: one complete flat sleeve; exact cast; every
+adult aged 25 or older; correct content level; coherent anatomy; separated
+insets; stable identities; original product identity; English-only ASCII prose;
+all visible copy declared with exact carrier and panel location; no undeclared
+letters or gibberish; and a final ASCII semicolon.

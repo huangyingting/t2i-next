@@ -1840,6 +1840,39 @@ def test_post_briefs_isolate_text_without_removing_poster_copy() -> None:
     )
 
 
+def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
+    brief = (
+        REPOSITORY_ROOT / "story-inputs" / "jav-dvd-wrap.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "back panel on the left, a narrow spine in the center" in normalized
+    assert "ENGLISH-ONLY ASCII LOCK" in normalized
+    assert "Every character in the complete Frame must be ASCII code point" in (
+        normalized
+    )
+    assert "TEXT-LAYER ISOLATION LOCK" in normalized
+    assert "The Frame's final character must be `;`" in normalized
+    assert "43-46 percent of the width to the back panel" in normalized
+    assert "6-8 percent to the spine" in normalized
+    assert "47-50 percent to the front panel" in normalized
+    assert "six to nine bordered inset stills" in normalized
+    assert "No body, face, hand, limb, prop, fluid, or garment may cross" in (
+        normalized
+    )
+    assert "Use the exact requested human cast and no additional people" in normalized
+    assert "unmistakably mature Chinese adult" in normalized
+    assert "At aesthetic level" in normalized
+    assert "At erotic level" in normalized
+    assert "At hardcore level" in normalized
+    assert "Frames are parallel campaign variants" in normalized
+    assert "ADULTS 25+" in normalized
+    assert "one exact invented 13-digit barcode number" in normalized
+    assert "approximately 450-700 words" in normalized
+    assert "one complete flat sleeve" in normalized
+
+
 def _legacy_everyday_social_caricature_contract() -> None:
     brief = (
         REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.txt"
