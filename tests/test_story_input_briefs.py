@@ -26,6 +26,381 @@ def test_story_inputs_use_only_the_current_authoring_contract() -> None:
         )
 
 
+def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "intimate-liquid-editorial.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert not (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "overhead-radial-splash-fashion.txt"
+    ).exists()
+    assert not (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "overhead-intimate-liquid-editorial.txt"
+    ).exists()
+    assert not (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "high-angle-intimate-liquid-editorial.txt"
+    ).exists()
+    assert "成人亲密液体动势时尚编辑摄影" in normalized
+    assert "多样且符合场景的拍摄视点" in normalized
+    assert "固定 high-angle 俯拍" in normalized
+    assert "EDITORIAL STYLE LOCK" in brief
+    assert "高预算、经过完整造型与美术指导的成人 时尚编辑摄影" in normalized
+    assert "露骨动作只是画面事件，不得取代时尚叙事" in normalized
+    assert "一件 hero garment 或一个 hero accessory" in normalized
+    assert "Hardcore 即使下身赤裸" in normalized
+    assert "不能只剩 裸体、性玩具和液体" in normalized
+    assert "高端成人时尚杂志、奢华美妆大片" in normalized
+    assert "amateur porn screenshot" in normalized
+    assert "不能使用 clinical、medical、forensic" in normalized
+    assert "时尚感必须在缩略图尺度仍然成立" in normalized
+    assert "一个强造型焦点、两个辅助 材质或色彩关系和一项精致美容细节" in normalized
+    assert "这是开放式生成语法，不是封闭场景清单" in normalized
+    assert "可扩展的创作种子，不是穷举" in normalized
+    assert "就可以自由发明未列出的 场景" in normalized
+    assert "不把作品限制在固定摄影棚、白色床垫" in normalized
+    assert "开放场景生成器" in brief
+    assert "可控摄影空间" in normalized
+    assert "建筑室内" in normalized
+    assert "文化与休闲空间" in normalized
+    assert "静止交通空间" in normalized
+    assert "户外受控场地" in normalized
+    assert "水边与浅水空间" in normalized
+    assert "物理搭建的幻想空间" in normalized
+    assert "场景—液体因果锁" in brief
+    assert "液体不是为了制造喷射效果而额外塞入画面的装饰" in normalized
+    assert "优先使用 场所原生且用途明确的来源" in normalized
+    assert "器具若不属于该地点的正常设施，就必须改用更合理的器具或更换 地点" in normalized
+    assert "不能在温室、街道、屋顶、住宅、雪地、交通工具或文化空间中凭空增加工业雨淋管" in normalized
+    assert "只有摄影棚、特效测试间、舞台后场或明确封闭拍摄的布景" in normalized
+    assert "储水、低压供水、固定支架、操作或触发方式、防滑承载面和排水路径" in normalized
+    assert "如果主要液体来自人物身体或储液式成人玩具，就不要再叠加无关的环境喷水" in normalized
+    assert "不要求每张图都有巨大喷射装置或爆炸水冠" in normalized
+    assert "自然呈现液体从出现到消失的完整流程" in normalized
+    assert "场所用途说明液体为何 存在" in normalized
+    assert "合理的私密性、清洁条件和可退出性" in normalized
+    assert "不能用“艺术装置”“时尚拍摄”或“定时释放” 作为万能借口" in normalized
+    assert "液体来源—地点适配矩阵" in brief
+    assert "默认只选择私人浴室、酒店浴室、独立湿房、私人 水疗套间" in normalized
+    assert "完整防水保护层和吸水护理垫的私人卧室床、酒店套房床" in normalized
+    assert "此处是严格地点白名单" in normalized
+    assert "不得放在中庭、温室、开放广场、街道、稻田或农地、普通屋顶" in normalized
+    assert "添加 private、locked、secluded、exclusive、closed" in normalized
+    assert "不能使其合规" in normalized
+    assert "只使用该地点正常存在的一套供水系统" in normalized
+    assert "不得让水枪、喷头、 水桶、倾倒板或实验器皿仅因造型新奇" in normalized
+    assert "不得在自然场景中加入水枪式成人道具来制造额外喷射" in normalized
+    assert "自然雨只能直接落在露天空间、无顶庭院、开启的天窗或明确敞开的屋面缺口下" in normalized
+    assert "完整 玻璃顶、封闭车顶、实体屋檐或密闭窗户外侧的雨水" in normalized
+    assert "不能同时穿过 屏障落到室内人物或地面" in normalized
+    assert "液体的实际落点必须连接到画面可见的地漏" in normalized
+    assert "只有普通洗手间而没有地漏时，不能让大量液体在地面聚集" in normalized
+    assert "床上人物体液场景必须直接显示一套普通且可信的床面保护" in normalized
+    assert "完整包住床垫的防水床笠或 医用级防水保护罩" in normalized
+    assert "一至两块大尺寸吸水护理垫、厚浴巾或可清洗防水毯" in normalized
+    assert "不得让未保护的床垫、 普通羽绒被、枕头或地毯承接大量液体" in normalized
+    assert "不能在床头、床垫或天花凭空安装地漏、喷头阵列" in normalized
+    assert "床上的精液只有 在运行请求包含至少一名可见成年男性时才能出现" in normalized
+    assert "零男性请求绝不生成精液、画外男性或无来源白色液体" in normalized
+    assert "可以在真实来源基础上形成夸张、醒目的弧线" in normalized
+    assert "可以跨过受保护床面的较大部分" in normalized
+    assert "不能射向天花、越过保护层落到 无关区域" in normalized
+    assert "床上可使用手指或一件常规成人玩具完成主要 动作，但不增加喷水器具" in normalized
+    assert "第一步固定一个不可更改的“来源—地点”配对" in normalized
+    assert "不得先选其他地点再写成 改造、租用、封闭、清空或临时布置后的湿景棚" in normalized
+    assert "不能由装卸区、仓库、中庭、温室、舞蹈室、屋顶、 交通工具或其他空间改名而来" in normalized
+    assert "任何不在白名单中的地点都必须改选场所原生环境水或 日常清水工具" in normalized
+    assert "身体液体允许现实基础上的编辑摄影夸张" in normalized
+    assert "更高但仍受重力控制的弧线、密集冻结液滴" in normalized
+    assert "dramatic、 forceful、high-arc、dense、radiating、burst" in normalized
+    assert "STYLIZED BODY-FLUID LOCK:" in normalized
+    assert "Heighten the arc, droplet density, frozen timing, radial shape" in normalized
+    assert "Never turn body fluid into pressurized plumbing" in normalized
+    assert "夸张重点放在喷射形态、液滴分离、姿势、表情、镜头角度、灯光" in normalized
+    assert "人体液体可以承担径向构图的主要视觉动势" in normalized
+    assert "不能穿过身体或物体、逆重力改变方向" in normalized
+    assert "不得解释自己如何满足 brief" in normalized
+    assert "不得输出 自检、幕后安排、拍摄后清理计划或规则术语" in normalized
+    assert "第一句必须直接从具体地点、人物或相机视点开始" in normalized
+    assert "不得先写衣着锁、Theme 编号、Frame 编号、标题、许可声明" in normalized
+    assert "衣着锁放在自然摄影描述之后" in normalized
+    assert "Hardcore 的主要动作与接触点必须直接可见" in normalized
+    assert "不能 被衣摆、身体、手掌、阴影、水花、道具或构图遮住" in normalized
+    assert "不得用手臂紧张、衣物下的动作、 水面波纹、表情或文字声明间接暗示" in normalized
+    assert "中央水冠、离体高弧、径向 burst 或明确 jet 只用于从两腿之间正确生殖器开口" in normalized
+    assert "人物不必躺在床上" in normalized
+    assert "构图、视点与镜头" in brief
+    assert "拍摄角度是开放变化轴" in normalized
+    assert "不把 high-angle、overhead 或正俯拍设为默认" in normalized
+    assert "垂直高度、俯仰角、绕人物方位、拍摄距离、焦段、裁切尺度和主体落点" in normalized
+    assert "70–90 度 overhead 或顶视" in normalized
+    assert "25–65 度 elevated oblique 高位斜拍" in normalized
+    assert "接近水平的 eye-level 平视" in normalized
+    assert "low-angle 低机位" in normalized
+    assert "profile 侧面、front three-quarter 前侧三分之四" in normalized
+    assert "近距离 beauty、material 或 action detail" in normalized
+    assert "场景—姿势—机位匹配矩阵" in brief
+    assert "受保护床面：轮换对角仰卧桥式" in normalized
+    assert "不能每次都仰卧张腿" in normalized
+    assert "浴缸与水疗床：轮换沿椭圆长轴半躺" in normalized
+    assert "必须避开高缸壁 对动作区域的遮挡" in normalized
+    assert "淋浴间与独立湿房：轮换墙面单手支撑的站立弓步" in normalized
+    assert "湿滑地面禁止无支撑单脚站立" in normalized
+    assert "私人泳池与浅水区：轮换仰漂星形" in normalized
+    assert "不得让水面反光遮没脸和动作起点" in normalized
+    assert "原生湿景棚与透明平台：轮换透明台上的非对称 X 形" in normalized
+    assert "不固定为 50mm 正俯拍" in normalized
+    assert "100 种高感官刺激姿势库" in normalized
+    pose_ids = [
+        token
+        for token in brief.split()
+        if len(token) == 4 and token.startswith("P") and token[1:].isdigit()
+    ]
+    assert pose_ids == [f"P{index:03d}" for index in range(1, 101)]
+    assert "P001 正面宽腿站姿" in normalized
+    assert "P050 侧卧镜面姿势" in normalized
+    assert "P081 背后环抱站姿" in normalized
+    assert "P100 床面非对称环抱构图" in normalized
+    assert "每个 Frame 只选择一个主姿势" in normalized
+    assert "跨 Theme 轮换六大姿势家族" in normalized
+    assert "相邻 Theme 不得重复同一姿势家族" in normalized
+    assert "不得连续生成深蹲、仰卧张腿、跪姿后仰或 站立后弯" in normalized
+    assert "机位在 overhead 顶视、elevated oblique 高位斜拍、eye-level 平视" in normalized
+    assert "low-angle 低机位、 profile 侧面" in normalized
+    assert "waterline 水面高度和近距离 detail" in normalized
+    assert "24–35mm 环境广景、40–55mm 全身中景、60–85mm 紧凑人像与动作研究" in normalized
+    assert "85–105mm beauty 或材质细节" in normalized
+    assert "不能隔着大腿、缸壁、床头、手臂、水花或反光拍摄" in normalized
+    assert "不强制双腿形成固定 V 形" in normalized
+    assert "不强制双臂水平展开" in normalized
+    assert "不强制人物仰卧" in normalized
+    assert "每个 Theme 只选择一个主要液体来源家族" in normalized
+    assert "环境清水：自然雨水、向下落水、瀑布薄幕" in normalized
+    assert "手持清水工具：只用于向下流动或倾倒的低压软水管" in normalized
+    assert "储液式成人玩具" in normalized
+    assert "女性排尿" in normalized
+    assert "从可见尿道口开始" in normalized
+    assert "不得把尿液写成来自阴道" in normalized
+    assert "女性阴道液体" in normalized
+    assert "从可见阴道口或外阴区域开始" in normalized
+    assert "主视觉喷射起点锁" in normalized
+    assert "喷射起点就必须在镜头中清楚位于该人物两腿之间 的生殖器部位" in normalized
+    assert "从可见的正确解剖开口连续连接到液柱或液滴" in normalized
+    assert "被闭合、 交叉双腿遮住的位置发出" in normalized
+    assert "相机、姿势、水花和道具都不得遮挡这个起点" in normalized
+    assert "环境清水、 手持清水工具和储液式成人玩具只能形成下落" in normalized
+    assert "不得形成主要 jet、spray、high arc 或 burst" in normalized
+    assert "任何人体液体喷射都从镜头中清楚可见、位于两腿之间的正确生殖器解剖开口开始" in normalized
+    assert "男性精液" in normalized
+    assert "运行请求包含至少一名可见成年男性" in normalized
+    assert "从该男性可见生殖器开始" in normalized
+    assert "液体形态在 Theme 和 Frame 间轮换" in normalized
+    assert "软水管或手持喷头可在 Erotic 或 Hardcore 中作为自愿外部自慰工具" in normalized
+    assert "不得把高压水流、硬质喷嘴或软管插入身体" in normalized
+    assert "性玩具设计、动作与场景适配" in brief
+    assert "性玩具是可选变化轴，不是每个 Theme 的强制道具" in normalized
+    assert "一件主要性玩具或由多个不可分离部件组成的一套单一系统" in normalized
+    assert "不能只写 generic sex toy" in normalized
+    assert "掌心 bullet vibrator、短柄 wand vibrator、指套 vibrator" in normalized
+    assert "直形或弯形 silicone dildo" in normalized
+    assert "带宽大限位底座的 anal plug" in normalized
+    assert "suction-base dildo" in normalized
+    assert "单件 strap-on" in normalized
+    assert "具有可见透明储液腔、挤压球、短导管和明确出液口" in normalized
+    assert "只在出液口附近流出或滴落" in normalized
+    assert "带可见拉环或回收绳的 vibrating egg" in normalized
+    assert "不得整批重复透明 dildo、银色 bullet 或黑色 wand" in normalized
+    assert "性玩具—场景匹配" in brief
+    assert "吸盘不能直接粘在柔软床垫、床单或枕头上" in normalized
+    assert "不得让市电电线、插线板、充电器或非防水 遥控器接触潮湿区域" in normalized
+    assert "浴缸、泳池和浅水区只使用整体防水" in normalized
+    assert "全部部件必须属于一个可追踪系统" in normalized
+    assert "性玩具—姿势—机位匹配" in brief
+    assert "持玩具的手、 玩具头和外部接触点三者必须同时可见" in normalized
+    assert "必须显示玩具底座、进入方向和解剖接触边界" in normalized
+    assert "同时显示 吸盘、刚性固定面、玩具轴线、身体承重点和单一接触位置" in normalized
+    assert "同时看见储液腔、导管或内部通路、出液口、手部触发和液体落点" in normalized
+    assert "不能只靠文字 声明体内藏有看不见的玩具" in normalized
+    assert "普通 vibrator、dildo、plug、wand 或 wearable toy 不会自行喷液" in normalized
+    assert "普通玩具表面的 润滑剂只能形成贴附薄层、拉丝或滴落" in normalized
+    assert "禁止尿道插入、宫颈穿透" in normalized
+    assert "肛门玩具必须有清楚可见且大于插入部分的限位底座" in normalized
+    assert "Aesthetic 不出现可识别性玩具" in normalized
+    assert "Erotic 最多使用一件仅作外部接触的玩具" in normalized
+    assert "Hardcore 可从外部刺激、单一阴道或肛门插入" in normalized
+    assert "连续十个包含 性玩具的 Theme 至少覆盖五个玩具家族" in normalized
+    assert "相邻玩具 Theme 不得重复玩具家族、材质、颜色、固定方式和姿势组合" in normalized
+    assert "灯光服从场景而不是固定 5500K" in normalized
+    assert "色温可在约 2800–7500K 范围内变化" in normalized
+    assert "CONTENT LEVEL" in brief
+    assert "Aesthetic：" in brief
+    assert "Erotic：" in brief
+    assert "Hardcore：" in brief
+    assert "AESTHETIC WARDROBE LOCK:" in normalized
+    assert "opaque fabric fully covers all nipples, external genitals, pubic hair, and anus" in normalized
+    assert "EROTIC WARDROBE LOCK:" in normalized
+    assert "visibly retains one or two sheer, translucent, open, wet-clinging, lifted, or partially lowered" in normalized
+    assert "HARDCORE WARDROBE LOCK:" in normalized
+    assert "The featured adult woman's lower body is bare" in normalized
+    assert "only one minimal upper garment plus zero to four accessories" in normalized
+    assert "主表演者必须实际保留一至两件透明、半透明、湿贴、敞开、撩起或 半褪下" in normalized
+    assert "主表演者下身必须完全赤裸" in normalized
+    assert "当前 content level 唯一正确且逐字输出的衣着锁" in normalized
+    assert "每个 Frame 必须表现明确成人裸露和一个清楚可见的主要露骨动作" in normalized
+    assert "裸体、湿衣或 挑逗姿势代替 Hardcore 动作" in normalized
+    assert "外部自慰、一至两根手指的单一插入" in normalized
+    assert "本身也可以独立作为该 Frame 唯一的主要 Hardcore 液体动作" in normalized
+    assert "环境清水、普通倾倒清水和其他安全舞台液本身绝不能替代 Hardcore 动作" in normalized
+    assert "必须同时清楚显示上述外部自慰、单一插入或单一成人接触之一" in normalized
+    assert "仅把玩具靠近身体、让液体流过裸体不算 Hardcore 动作" in normalized
+    assert "同一解剖中心可有与主要动作直接相关的辅助 手部接触" in normalized
+    assert "HARDCORE 液体严格单选" in normalized
+    assert "整张 Frame 只描述这一类别的流动" in normalized
+    assert "不得同时滴落、喷射、飞溅、形成涟漪或与主要液体混合" in normalized
+    assert "不得在 同一 Frame 同时出现尿流与阴道液体" in normalized
+    assert "不能用 private、 locked、secluded 或 closed 修饰温室" in normalized
+    assert "禁止冷冻舱、冷库、桑拿、高温房、干冰、液氮" in normalized
+    assert "各自唯一且前后一致的精确整数年龄" in normalized
+    assert "同一 Frame 出现两个不同年龄" in normalized
+    assert "人物年龄统一保持在 25–34 岁的年轻成年人范围" in normalized
+    assert "轮换 25–29 岁和 30–34 岁两个子段" in normalized
+    assert "连续十个 Theme 至少覆盖六个不同整数年龄" in normalized
+    assert "年轻不等于幼态" in normalized
+    assert "娇小纤细、修长瘦削、柔软丰满、圆润丰腴" in normalized
+    assert "不得默认所有成年人拥有平坦腹部、 细腰、长腿和年轻紧致皮肤" in normalized
+    assert "脸部设计轮换椭圆脸、圆脸、方脸、长脸、心形脸" in normalized
+    assert "发型必须同时轮换长度、纹理、结构和颜色" in normalized
+    assert "不得让每个 Theme 都使用黑色波波头" in normalized
+    assert "妆容按人物肤色、脸型、服装和地点独立设计" in normalized
+    assert "不能只生成 bodysuit、leotard 或泳装" in normalized
+    assert "每连续十个 Theme 至少覆盖六个不同整数年龄、六种体型" in normalized
+    assert "发现整套造型相似时，优先改换年龄段、体型、 脸型和发型" in normalized
+    assert "相邻 Theme 至少改变人物造型档案、地点家族、承载面" in normalized
+    assert "只有以场所原生环境水为主的 Aesthetic 或 Erotic 批次才要求覆盖五个广义地点家族" in normalized
+    assert "Hardcore 或任何人物身体液体、玩具储液批次" in normalized
+    assert "白名单内至少四种兼容空间子型" in normalized
+    assert "受保护私人卧室床和 受保护酒店套房床" in normalized
+    assert "允许多个 Theme 属于 同一广义湿区家族" in normalized
+    assert "人体液体不承担 六种水型配额" in normalized
+    assert "不得为 满足多样性配额牺牲地点功能" in normalized
+    assert "至少覆盖六种姿势家族、五种视点家族、五种绕人物方位、四档焦段" in normalized
+    assert "同一视点家族最多出现两次" in normalized
+    assert "规则优先级从高到低依次为：场景功能与物理逻辑" in normalized
+    assert "必须舍弃更奇怪的地点、器具、水型或构图" in normalized
+    assert "FINAL SCENE-LIQUID GATE" in brief
+    assert "只有一个活动液体来源，且地点本来就适合该来源" in normalized
+    assert "ONE-SOURCE LOCK: Exactly one visible jet, stream, spray, pour, or moving-fluid event" in normalized
+    assert "Never combine, cross, merge, unite, or synchronize liquid from two sources" in normalized
+    assert "every showerhead, hose, faucet, environmental spray, and reservoir toy is visibly off" in normalized
+    assert "完整防水床面和吸水层清楚可见时才属于白名单" in normalized
+    assert "人体液体可以有强烈、夸张、径向的编辑摄影表现" in normalized
+    assert "不变成管道级、工业级或房间级水量" in normalized
+    assert "环境水或储液玩具液体单独不能构成 Hardcore" in normalized
+    assert "仅让储液玩具向裸体流液、让液体落在身体上" in normalized
+    assert "必须重写" in normalized
+    assert "场景合理性高于地点、水型、器具和构图多样性" in normalized
+    assert "宁可重复兼容湿区，也不创造古怪组合" in normalized
+    assert "只在正文结尾逐字输出当前 content level 的一条衣着锁" in normalized
+    assert "CONTENT LOCK: Copy the runtime content level exactly" in normalized
+    assert "A Hardcore request must end with only the HARDCORE WARDROBE LOCK" in normalized
+    assert "never the AESTHETIC WARDROBE LOCK or EROTIC WARDROBE LOCK" in normalized
+    assert "相邻 Theme 不重复姿势 家族、双腿关系、支撑手和相机方位" in normalized
+    assert "轮换 overhead、elevated、eye-level、low-angle、profile、three-quarter" in normalized
+    assert "不把每张 图都拍成 high-angle、50mm、人物居中的俯拍全身照" in normalized
+    assert "只保留一件主要玩具或一套不可分离系统" in normalized
+    assert "普通玩具不主动喷液" in normalized
+    assert "湿区玩具防水且 无市电连接" in normalized
+    assert "任何玩具都不进行尿道插入" in normalized
+    assert "画面都保持高预算成人时尚编辑摄影" in normalized
+    assert "不输出临床、医疗、法证、 偷拍、webcam、CCTV、自拍或普通色情记录美学" in normalized
+    assert "CAST LOCK: Copy the requested female and male counts exactly" in normalized
+    assert "one woman and zero men means exactly one visible adult woman" in normalized
+    assert "no off-camera partner, no implied male, and no semen" in normalized
+    assert "Never add a partner to enable a toy, action, fluid source, pose, or camera composition" in normalized
+    assert "PRESENCE LOCK: Requested cast counts are exact required presences" in normalized
+    assert "Every requested adult must be physically visible in every Frame" in normalized
+    assert "one woman and one man means exactly one visible adult woman and exactly one visible adult man" in normalized
+    assert "never omit either person, move either person off-camera" in normalized
+    assert "多样性退化为同一白色平台上的换装" in normalized
+    assert "把喷嘴、软管、控制器、纸钞、粉色腕带、白色服装" in normalized
+    assert "每个 Theme 的必选物" in normalized
+
+
+def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "indoor-pure-desire-editorial.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "室内纯欲成人时尚摄影 Theme" in normalized
+    assert "纯欲不是幼态，也不是只使用白色内衣" in normalized
+    assert "所有场景必须位于真实、封闭、可进入且可安全退出的室内" in normalized
+    assert "服装、服饰、妆容、打扮和发型均为自由变化轴" in normalized
+    assert "不把纯欲固定为白色" in normalized
+    assert "建议姿势库" in brief
+
+    pose_ids = [
+        token
+        for token in brief.split()
+        if len(token) == 5
+        and token.startswith("PD")
+        and token[2:].isdigit()
+    ]
+    assert pose_ids == [f"PD{index:03d}" for index in range(1, 101)]
+    assert "PD001 Lying flat on the back with knees bent" in normalized
+    assert "PD050 Squatting in a deep position" in normalized
+    assert "PD100 Standing with the torso upright" in normalized
+    assert "每个 Frame 只选择一个主姿势" in normalized
+    assert "构图与视角锁" in brief
+    assert "front view 正面" in normalized
+    assert "side view 纯侧面" in normalized
+    assert "rear view 正后方" in normalized
+    assert "front three-quarter 前侧三分之四" in normalized
+    assert "rear three-quarter 后侧三分之四" in normalized
+    assert "overhead/top-down 顶视" in normalized
+    assert "elevated oblique 高位斜拍" in normalized
+    assert "eye-level 平视" in normalized
+    assert "low-angle 低机位" in normalized
+    assert "beauty/action detail 近景" in normalized
+    assert "Dutch angle/canted angle 荷兰角" in normalized
+    assert "相机绕镜头轴有意倾斜约 5–20 度" in normalized
+    assert "不得超过约 25 度" in normalized
+    assert "over-the-shoulder 肩后视角" in normalized
+    assert "head-side/foot-side axial 头侧或脚侧轴线视角" in normalized
+    assert "floor-reflection 地面反射构图" in normalized
+    assert "mirror-within-frame 镜中框构图" in normalized
+    assert "foreground veil 前景柔性遮幅" in normalized
+    assert "environmental wide portrait 室内环境广景" in normalized
+    assert "telephoto compression 长焦压缩" in normalized
+    assert "profile silhouette 侧面轮廓剪影" in normalized
+    assert "centered vanishing-point 中央消失点" in normalized
+    assert "high-low layered composition 高低层构图" in normalized
+    assert "cropped editorial tension 编辑式裁切" in normalized
+    assert "人物必须回头、转为可读侧脸或借可信镜面显示表情" in normalized
+    assert "十个 Theme 的批次必须至少各出现一次 front view、side view、rear view" in normalized
+    assert "任一视角家族最多出现 两次" in normalized
+    assert "十个 Theme 还必须至少包含一次 Dutch angle、over-the-shoulder" in normalized
+    assert "正中对称、偏心三分法、对角线、S 曲线、X 形、C 形" in normalized
+    assert "Aesthetic：" in brief
+    assert "Erotic：" in brief
+    assert "Hardcore：" in brief
+    assert "准确运行人数" in normalized
+    assert "运行请求的人数是精确人数，不是上限" in normalized
+    assert "每个最终 Frame 输出为请求语言的一段自然、连续" in normalized
+    assert "不输出标题、Theme 编号、Frame 编号、 姿势编号" in normalized
+
+
 def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "piss.txt").read_text(
         encoding="utf-8"
@@ -216,15 +591,20 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
         )
         for scene in scenes
     )
-    assert "female_count = 4 与 male_count = 4" in normalized
-    assert "TOTAL PEOPLE = 8" in normalized
-    assert "SPECTATORS = 7" in normalized
-    assert "围观者固定为恰好三名成年女性和四名成年男性" in normalized
-    assert "不能把七名围观者写成全女性、全男性或其他配比" in normalized
-    assert "Exactly eight East Asian adults are visible" in normalized
-    assert "one featured adult woman performer and exactly seven adult spectators" in normalized
-    assert "comprising exactly three women and four men" in normalized
-    assert "不得增加第九个人、背景脸、身体、手脚、镜中人物" in normalized
+    assert "TOTAL PEOPLE = female_count + male_count 为 4–8" in normalized
+    assert "female_count 至少为 2、male_count 至少为 1" in normalized
+    assert "SPECTATORS = TOTAL PEOPLE - 1，因此围观者为 3–7 人" in normalized
+    assert "WOMEN SPECTATORS = female_count - 1" in normalized
+    assert "MEN SPECTATORS = male_count" in normalized
+    assert "保证围观群众同时有女性和男性" in normalized
+    assert "POINTING SPECTATORS = ceil(SPECTATORS / 2)" in normalized
+    assert "GOSSIPING SPECTATORS = floor(SPECTATORS / 2)" in normalized
+    assert "Exactly [TOTAL PEOPLE] East Asian adults are visible" in normalized
+    assert "one featured adult woman performer and exactly [SPECTATORS] adult spectators" in normalized
+    assert "comprising exactly [WOMEN SPECTATORS] additional women spectators and [MEN SPECTATORS] men spectators" in normalized
+    assert "主表演者只占用一个请求女性名额" in normalized
+    assert "MEN SPECTATORS 必须原样等于 male_count" in normalized
+    assert "不得增加请求之外的人物、背景脸、身体、手脚、镜中人物" in normalized
     assert "站在空间开口、门框、舱口或安全边界之外观看" in normalized
     assert "静止、通风、照明充分且出口保持开启" in normalized
     assert "车辆必须停稳、熄火、钥匙移除" in normalized
@@ -257,13 +637,15 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "表情必须由 HARDCORE EXPRESSION LOCK 完整定义" in normalized
     assert "one thin continuous saliva strand attached only from the tongue to the lower lip" in normalized
     assert "with no skirt, trousers, shorts, underwear, or opaque garment covering the pelvis" in normalized
+    assert "GENDER ARITHMETIC LOCK:" in normalized
+    assert "The featured performer consumes exactly one requested woman slot" in normalized
     assert "OPENING COMPOSITION LOCK:" in normalized
     assert "AUDIENCE HIERARCHY LOCK:" in normalized
     assert "AUDIENCE REACTION LOCK:" in normalized
-    assert "All seven adult spectators show unmistakable astonishment" in normalized
+    assert "All [SPECTATORS] adult spectators show unmistakable astonishment" in normalized
     assert "high raised brows, wide focused eyes, and open commenting mouths" in normalized
-    assert "exactly four spectators point one extended index finger" in normalized
-    assert "exactly three spectators cup one hand beside their own mouths" in normalized
+    assert "exactly [POINTING SPECTATORS] spectators point one extended index finger" in normalized
+    assert "exactly [GOSSIPING SPECTATORS] spectators cup one hand beside their own mouths" in normalized
     assert "FOLDED-BODY LOCK:" in normalized
     assert "RAISED-HIPS LOCK:" in normalized
     assert "SPREAD-EAGLE LOCK:" in normalized
@@ -285,22 +667,21 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "title 必须以 `SPREAD EAGLE - ` 开头" in normalized
     assert "必须读取当前 Theme title 的前缀选择唯一姿势锁" in normalized
     assert "3 米无人空白缓冲区" in normalized
-    assert "固定排成 2+3+2 三层远景" in normalized
-    assert "第一排两人距离主表演者 3 米" in normalized
-    assert "第二排三人距离 4 米" in normalized
-    assert "第三排两人距离 5 米" in normalized
-    assert "七人各自的双手必须清楚放在自己的身体" in normalized
+    assert "3 人使用 1+1+1" in normalized
+    assert "4 人使用 2+1+1 的任一排列" in normalized
+    assert "5 人使用 2+2+1 的任一排列" in normalized
+    assert "6 人使用 2+2+2" in normalized
+    assert "7 人使用 2+3+2 的任一排列" in normalized
+    assert "第一、第二、第三排分别距离主表演者 3、4、5 米" in normalized
+    assert "全部围观者的另一只手清楚放在自己的胸口、腰、髋或互不共享的固定远处表面" in normalized
     assert "主表演者占画面高度或宽度的 55–75%" in normalized
-    assert "七名围观者整体只占远景上方或后方的 15–30%" in normalized
-    assert "七名围观者固定为三名成年女性和四名成年男性，并使用 2+3+2 三层远景" in normalized
-    assert "第一排固定一女一男" in normalized
-    assert "第二排固定一女两男" in normalized
-    assert "第三排固定一女一男" in normalized
-    assert "七人全部必须同时呈现高扬眉毛、睁大的聚焦双眼和正在议论的张口" in normalized
+    assert "全部围观者整体只占远景上方或后方的 15–30%" in normalized
+    assert "围观者人数与三排阵型必须使用平衡对应关系" in normalized
+    assert "全部围观者必须同时呈现高扬眉毛、睁大的聚焦双眼和正在议论的张口" in normalized
     assert "不能出现微笑、平静、冷漠、欣赏、专注或无表情" in normalized
-    assert "固定四人各用一只手伸出食指指向主表演者" in normalized
-    assert "固定三人各用一只手拢在自己的嘴边作震惊低声议论状" in normalized
-    assert "四名指点者和三名议论者必须逐人枚举" in normalized
+    assert "POINTING SPECTATORS 人各用一只手伸出食指指向主表演者" in normalized
+    assert "GOSSIPING SPECTATORS 人各用一只手拢在自己的嘴边作震惊低声议论状" in normalized
+    assert "POINTING SPECTATORS 名指点者和 GOSSIPING SPECTATORS 名议论者必须逐人枚举" in normalized
     assert "每名围观者拥有不同的脸、发型、服装辅色、站位" in normalized
     assert "英文 Frame 的人物视线只能落在某一名可见 adult spectator" in normalized
     assert "发布前逐字删除 camera、lens、photographer、operator、tripod、rig" in normalized
@@ -310,7 +691,7 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "每个 Frame 至少描写三项材质—身体—空间接触证据" in normalized
     assert "臀部使汽车座垫或床垫产生可信形变" in normalized
     assert "OUTPUT PREFLIGHT" in brief
-    assert "根据 Theme title 前缀逐字输出唯一正确姿势锁" in normalized
+    assert "根据 Theme title 前缀输出唯一正确姿势锁" in normalized
     assert "最终 Frame 只能保留可渲染画面正文" in normalized
     assert "SCENE CATALOG" in brief
     assert "CONTENT LEVEL" in brief
