@@ -1848,7 +1848,9 @@
         "injury_required": false
       },
       "compatible_pose_families": [
-        "lifted_supported"
+        "kneeling_upright",
+        "standing_wall_supported",
+        "deep_squat"
       ]
     },
     {
@@ -9055,6 +9057,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9143,6 +9146,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9231,6 +9235,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9319,6 +9324,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9407,6 +9413,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9495,6 +9502,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9583,6 +9591,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9671,6 +9680,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9759,6 +9769,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9847,6 +9858,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -9935,6 +9947,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -10023,6 +10036,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -10111,6 +10125,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -10199,6 +10214,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -10287,6 +10303,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -10375,6 +10392,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -18877,6 +18895,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -18963,6 +18982,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19049,6 +19069,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19135,6 +19156,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19221,6 +19243,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19307,6 +19330,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19393,6 +19417,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19479,6 +19504,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19565,6 +19591,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19651,6 +19678,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19737,6 +19765,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19823,6 +19852,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19909,6 +19939,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -19995,6 +20026,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20081,6 +20113,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20167,6 +20200,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20252,6 +20286,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20337,6 +20372,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20422,6 +20458,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20507,6 +20544,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20592,6 +20630,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20677,6 +20716,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20762,6 +20802,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20847,6 +20888,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -20932,6 +20974,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21017,6 +21060,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21102,6 +21146,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21187,6 +21232,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21272,6 +21318,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21357,6 +21404,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21442,6 +21490,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21527,6 +21576,7 @@
         "blindfold_sensory",
         "collar_guided_kneeling",
         "impact_over_furniture",
+        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21594,27 +21644,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21682,27 +21716,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21770,27 +21788,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21858,27 +21860,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -21946,27 +21932,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22034,27 +22004,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22122,27 +22076,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22210,27 +22148,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22298,27 +22220,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22386,27 +22292,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22474,27 +22364,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22562,27 +22436,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22650,27 +22508,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22738,27 +22580,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22826,27 +22652,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -22914,27 +22724,11 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
-        "cunnilingus",
-        "fellatio",
-        "mutual_oral",
-        "manual_clitoral",
-        "manual_penile",
-        "mutual_masturbation",
-        "breast_licking",
-        "nipple_manual",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
-        "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "wrist_bondage_oral",
         "ankle_bondage_penetration",
-        "blindfold_sensory",
-        "collar_guided_kneeling",
-        "impact_over_furniture",
-        "rope_harness_partial_suspension",
         "low_temp_wax_sensory"
       ],
       "exact_cast": [
@@ -24353,25 +24147,25 @@
       "anal_rear_entry": 64,
       "anal_side_lying": 32,
       "ankle_bondage_penetration": 256,
-      "blindfold_sensory": 256,
-      "breast_licking": 256,
+      "blindfold_sensory": 240,
+      "breast_licking": 240,
       "chair_mutual": 48,
-      "collar_guided_kneeling": 256,
-      "cunnilingus": 256,
+      "collar_guided_kneeling": 240,
+      "cunnilingus": 240,
       "dual_toy": 256,
-      "edging_manual": 256,
-      "fellatio": 256,
-      "impact_over_furniture": 256,
+      "edging_manual": 240,
+      "fellatio": 240,
+      "impact_over_furniture": 240,
       "low_temp_wax_sensory": 256,
-      "manual_clitoral": 256,
-      "manual_penile": 256,
-      "mirror_mutual": 256,
-      "mutual_masturbation": 256,
-      "mutual_oral": 256,
-      "nipple_manual": 256,
+      "manual_clitoral": 240,
+      "manual_penile": 240,
+      "mirror_mutual": 240,
+      "mutual_masturbation": 240,
+      "mutual_oral": 240,
+      "nipple_manual": 240,
       "pubic_grinding": 256,
-      "rope_harness_partial_suspension": 16,
-      "shower_mutual": 256,
+      "rope_harness_partial_suspension": 48,
+      "shower_mutual": 240,
       "spreader_bar_manual": 64,
       "toy_anal": 256,
       "toy_vaginal": 256,
@@ -24381,7 +24175,7 @@
       "vaginal_seated": 48,
       "vaginal_side_lying": 32,
       "vaginal_standing": 48,
-      "wrist_bondage_oral": 256
+      "wrist_bondage_oral": 240
     },
     "bdsm_activity_templates": 8,
     "visible_contacts": 28,

@@ -36,6 +36,20 @@ uv run python experiments/spatial-plan-poc/catalog_generator.py
 ```
 
 The materialized catalogs and coverage manifest are written under `catalogs/`.
+Catalog schema 2.0 models controlled handheld vibrators and pelvis-mounted
+strap-ons explicitly, including prop ownership, occupied hands, attachment
+points, contact axes, and segmented visibility.
+
+Run the deterministic catalog and compiled-prompt validation matrix:
+
+```bash
+uv run python experiments/spatial-plan-poc/catalog_validation.py
+```
+
+This validates all five catalogs and every compatible pose/activity pair,
+checks all six representative scenes, and verifies that malformed prop,
+contact, limb-ownership, restraint, and evaluation fixtures are rejected.
+Evidence is written to `demo-output/validation-report.json`.
 
 Generate six representative scenes through deterministic geometry compilation
 and a DeepSeek-generated non-geometric style layer:
@@ -44,4 +58,6 @@ and a DeepSeek-generated non-geometric style layer:
 STORY_OPENAI_MODEL=DeepSeek-V3.2 uv run python experiments/spatial-plan-poc/catalog_scene_demo.py
 ```
 
-The combined prompts and evaluation are written under `demo-output/`.
+The combined prompts and evaluation are written under `demo-output/`. A run
+passes only when style and deterministic geometry checks are clean and every
+independent scene evaluation returns `pass`.

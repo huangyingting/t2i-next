@@ -144,8 +144,19 @@ class ActivityTemplate(StrictModel):
                 raise ValueError(
                     "clitoral vibrator must remain an external surface contact"
                 )
+        if self.activity_id == "vibrator_clitoral":
+            if len(self.handheld_props) != 1:
+                raise ValueError(
+                    "vibrator_clitoral requires one controlled handheld prop"
+                )
+        elif self.handheld_props:
+            raise ValueError(
+                "handheld vibrator topology belongs only to vibrator_clitoral"
+            )
         has_strap_on_tag = has_tag(self.activity_id, "strap_on")
-        if has_strap_on_tag != bool(self.wearable_props):
+        if (has_strap_on_tag and len(self.wearable_props) != 1) or (
+            not has_strap_on_tag and self.wearable_props
+        ):
             raise ValueError(
                 "strap-on activities require exactly one explicit wearable prop"
             )
@@ -157,12 +168,14 @@ class ActivityTemplate(StrictModel):
                 for edge in self.contact_edges
                 if edge.source.entity_id == prop.prop_id
             ]
-            if not matching_edges or any(
+            if len(matching_edges) != 1 or any(
                 edge.source.region != "shaft" for edge in matching_edges
             ):
                 raise ValueError(
                     "wearable prop must connect through its shaft endpoint"
                 )
+            if matching_edges[0].target.entity_id == prop.owner_slot:
+                raise ValueError("wearable prop owner cannot also be its target")
         if any(
             endpoint.region == "strap_on"
             for edge in self.contact_edges
@@ -367,11 +380,6 @@ class PoseCatalog(StrictModel):
                 if prop.prop_id not in entities or "shaft" not in regions:
                     raise ValueError(
                         f"{activity.activity_id} lacks a mounted shaft contact"
-                    )
-            if activity.activity_id == "vibrator_clitoral":
-                if len(activity.handheld_props) != 1:
-                    raise ValueError(
-                        "vibrator_clitoral requires one controlled handheld prop"
                     )
         catalog_tags = {
             tag for activity in self.activities for tag in activity.coverage_tags
@@ -1652,8 +1660,14 @@ def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
 
 def compatible_pose_families(activity_id: str) -> list[str]:
     all_families = set(POSE_FAMILIES)
-    if has_tag(activity_id, "lifted", "partial_suspension"):
+    if has_tag(activity_id, "lifted"):
         allowed = {"lifted_supported"}
+    elif has_tag(activity_id, "partial_suspension"):
+        allowed = {
+            "kneeling_upright",
+            "standing_wall_supported",
+            "deep_squat",
+        }
     elif has_tag(activity_id, "side_lying"):
         allowed = {"side_lying_left", "side_lying_right"}
     elif has_tag(activity_id, "seated", "chair"):
@@ -1692,6 +1706,28 @@ def compatible_pose_families(activity_id: str) -> list[str]:
     else:
         allowed = all_families
     return [family for family in POSE_FAMILIES if family in allowed]
+
+
+def activity_compatible_with_pose(
+    activity: ActivityTemplate,
+    pose: CentralPose,
+) -> bool:
+    if pose.family not in activity.compatible_pose_families:
+        return False
+    if (
+        pose.family == "lifted_supported"
+        and pose.primary_surface == "partner_support"
+    ):
+        occupied_lift_slots = {"central", "partner_a"}
+        if any(
+            edge.source.entity_id in occupied_lift_slots
+            and edge.source.region in {"hand", "left_hand", "right_hand", "mouth"}
+            for edge in activity.contact_edges
+        ):
+            return False
+    if activity.handheld_props:
+        return pose.family == "supine" and pose.arm_configuration == "hands_on_thighs"
+    return True
 
 
 def build_activity_templates(cast_key: str) -> list[ActivityTemplate]:
@@ -1767,7 +1803,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
             compatible_activities = [
                 activity.activity_id
                 for activity in activity_templates
-                if family_id in activity.compatible_pose_families
+                if activity_compatible_with_pose(activity, central_pose)
             ]
             signature_payload = {
                 "cast_key": cast_key,

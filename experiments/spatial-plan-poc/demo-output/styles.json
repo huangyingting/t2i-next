@@ -1,0 +1,52 @@
+{
+  "styles": [
+    {
+      "scene_id": "D01",
+      "plan_fingerprint": "667bb5b871ec3e894630665b904de4f53ebc60e0c764d0c6ac62dbbfbf21c221",
+      "setting": "rainy neon apartment",
+      "lighting": "reflective surfaces and magenta and cyan edge light",
+      "palette": "magenta and cyan",
+      "atmosphere": "rainy neon"
+    },
+    {
+      "scene_id": "D02",
+      "plan_fingerprint": "b890f8360396a4fde7bfd863f958194e310360393cad10e3ed1c501c81f09252",
+      "setting": "minimal amber studio",
+      "lighting": "sculptural restraint shadows",
+      "palette": "amber and neutrals",
+      "atmosphere": "fine-art mood"
+    },
+    {
+      "scene_id": "D03",
+      "plan_fingerprint": "1f1b4f89e2ce689cc5ea862f515b58fc94dcfd2f7eb2b032f5a6060acd7c8764",
+      "setting": "modern corridor with burgundy",
+      "lighting": "hard side light accents",
+      "palette": "deep burgundy and warm palette",
+      "atmosphere": "modern graphic"
+    },
+    {
+      "scene_id": "D04",
+      "plan_fingerprint": "64e2ad182f93424c24aef2b650f8eb952d8a4134d357b82a76f5114998afbc16",
+      "setting": "luxury hotel suite with dark emerald accents",
+      "lighting": "focused overhead pool of light",
+      "palette": "dark emerald and neutrals",
+      "atmosphere": "luxury nocturnal"
+    },
+    {
+      "scene_id": "D05",
+      "plan_fingerprint": "ff12d8ccb84b7b0626fba3e554ac2481d5f6e8744bba4be8ef0896ef18c83a23",
+      "setting": "soft morning bedroom with pale linen",
+      "lighting": "warm rim light and soft diffusion",
+      "palette": "pale linen and warm neutrals",
+      "atmosphere": "quiet editorial tone"
+    },
+    {
+      "scene_id": "D06",
+      "plan_fingerprint": "1ef96b73831a673eed92c31aeb248fabd24d4b062071824d1d57a04f700f0238",
+      "setting": "contemporary loft with black gold and ivory elements",
+      "lighting": "theatrical triangular light",
+      "palette": "black gold and ivory",
+      "atmosphere": "theatrical contemporary"
+    }
+  ]
+}

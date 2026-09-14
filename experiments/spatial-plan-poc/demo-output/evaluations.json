@@ -1,0 +1,100 @@
+{
+  "evaluations": [
+    {
+      "scene_id": "D01",
+      "geometry_coherence": 10,
+      "visual_impact": 10,
+      "cast_clarity": 10,
+      "contact_clarity": 10,
+      "style_integration": 10,
+      "strengths": [
+        "Pose is anatomically sound and coherently described.",
+        "Camera viewpoint and composition logically show the described pose and contacts.",
+        "All props (vibrator) are anchored and their use is clear.",
+        "Lighting plan supports the silhouette and desired atmosphere."
+      ],
+      "issues": [],
+      "verdict": "pass"
+    },
+    {
+      "scene_id": "D02",
+      "geometry_coherence": 10,
+      "visual_impact": 10,
+      "cast_clarity": 10,
+      "contact_clarity": 10,
+      "style_integration": 10,
+      "strengths": [
+        "Pose and supports are credible and fit the camera view.",
+        "All props (spreader bar, cuffs) are explicitly anchored and their function is clear.",
+        "The consensual context is established within the description.",
+        "Lighting and atmosphere are cohesively integrated."
+      ],
+      "issues": [],
+      "verdict": "pass"
+    },
+    {
+      "scene_id": "D03",
+      "geometry_coherence": 10,
+      "visual_impact": 10,
+      "cast_clarity": 10,
+      "contact_clarity": 10,
+      "style_integration": 10,
+      "strengths": [
+        "Complex lifted pose is mechanically plausible with described supports.",
+        "Camera viewpoint allows visualization of the wall support and limb positions.",
+        "Contact occlusion is explicitly and correctly described.",
+        "Atmosphere and lighting are consistent with the setting."
+      ],
+      "issues": [],
+      "verdict": "pass"
+    },
+    {
+      "scene_id": "D04",
+      "geometry_coherence": 10,
+      "visual_impact": 10,
+      "cast_clarity": 10,
+      "contact_clarity": 10,
+      "style_integration": 10,
+      "strengths": [
+        "Three-person arrangement is geometrically coherent and all supports are credible.",
+        "Camera composition allows clear visibility of all actors and their roles.",
+        "Both inserted contacts are correctly described, one visible, one occluded.",
+        "Lighting and palette create the intended luxurious, focused atmosphere."
+      ],
+      "issues": [],
+      "verdict": "pass"
+    },
+    {
+      "scene_id": "D05",
+      "geometry_coherence": 10,
+      "visual_impact": 10,
+      "cast_clarity": 10,
+      "contact_clarity": 10,
+      "style_integration": 10,
+      "strengths": [
+        "All-fours and kneeling poses are stable and supports are clear.",
+        "Strap-on harness is explicitly anchored and its path described.",
+        "Camera viewpoint logically shows the rear-entry setup and occluded contact.",
+        "Lighting and palette perfectly support the quiet, editorial atmosphere."
+      ],
+      "issues": [],
+      "verdict": "pass"
+    },
+    {
+      "scene_id": "D06",
+      "geometry_coherence": 10,
+      "visual_impact": 10,
+      "cast_clarity": 10,
+      "contact_clarity": 10,
+      "style_integration": 10,
+      "strengths": [
+        "Triadic pose is stable and all supports (sofa, knees, hands) are credible.",
+        "All three actors have distinct, non-conflicting roles and contacts.",
+        "Both primary external contacts are visible and clearly described.",
+        "Theatrical lighting and contemporary palette are well-integrated."
+      ],
+      "issues": [],
+      "verdict": "pass"
+    }
+  ]
+}

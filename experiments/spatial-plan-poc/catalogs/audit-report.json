@@ -19,7 +19,7 @@
         "penetration": 6,
         "toy": 11
       },
-      "compatibility_links": 7136,
+      "compatibility_links": 6884,
       "contact_edges": 36,
       "wearable_props": 0,
       "handheld_props": 1,
@@ -49,7 +49,7 @@
         "penetration": 11,
         "toy": 3
       },
-      "compatibility_links": 6064,
+      "compatibility_links": 5856,
       "contact_edges": 37,
       "wearable_props": 0,
       "handheld_props": 0,
@@ -85,7 +85,7 @@
         "penetration": 9,
         "toy": 2
       },
-      "compatibility_links": 6720,
+      "compatibility_links": 6416,
       "contact_edges": 64,
       "wearable_props": 0,
       "handheld_props": 0,
@@ -127,7 +127,7 @@
         "penetration": 11,
         "toy": 3
       },
-      "compatibility_links": 6064,
+      "compatibility_links": 5856,
       "contact_edges": 37,
       "wearable_props": 9,
       "handheld_props": 0,
@@ -163,7 +163,7 @@
         "penetration": 9,
         "toy": 4
       },
-      "compatibility_links": 6720,
+      "compatibility_links": 6448,
       "contact_edges": 64,
       "wearable_props": 7,
       "handheld_props": 0,

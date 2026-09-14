@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "catalogs_validated": 5,
+  "entries_validated": 1280,
+  "compiled_pose_activity_combinations": 31460,
+  "strap_on_activities_validated": 16,
+  "exact_scene_assertions": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "D06"
+  ],
+  "rejected_mutations": 5,
+  "rejected_prompt_mutations": 4,
+  "evaluation_contract_fixtures": 2
+}
