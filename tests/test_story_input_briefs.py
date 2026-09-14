@@ -2871,38 +2871,82 @@ def test_near_future_intimacy_uses_cold_lived_in_realism() -> None:
     assert "Show exactly one visible body for each requested person" in normalized
     assert "never show the original and proxy simultaneously" in normalized
     assert "total number of visible faces and bodies must equal" in normalized
+    assert "complete physical structure needed for the described sexual action" in normalized
+    assert "torso-only proxy" in normalized
+    assert "cannot perform vaginal or anal intercourse" in normalized
     assert "Every Frame must use a rectilinear 35-85 mm equivalent lens" in normalized
     assert "Never use a lens wider than 35 mm or longer than 85 mm" in normalized
     assert "ONE SPECULATIVE LEAP" in normalized
     assert "exactly one primary speculative development" in normalized
     assert "at least five mundane anchors in every Frame" in normalized
+    assert "SEXUAL-INTIMACY READABILITY LOCK" in normalized
+    assert "A viewer who sees only the image" in normalized
+    assert "participants are sexual partners" in normalized
+    assert "content-level intimate action is the foreground story" in normalized
+    assert "Do not make wiping a dock, inspecting a screen" in normalized
+    assert "Do not pose the participants as parallel observers" in normalized
+    assert "technology-to-intimacy connection visually literal" in normalized
+    assert "Never rely on prose stating that a detached device" in normalized
+    assert "At erotic and hardcore levels, the sexual encounter must be visibly underway" in normalized
+    assert "cannot replace or pause that action" in normalized
+    assert "Show exactly how the selected technology changes sensation" in normalized
+    assert "Sexually engaged bodies and their reciprocal contact must dominate" in normalized
+    assert "rather than readable paperwork, barcodes, or product labels" in normalized
+    assert "Describe visible sexual geometry" in normalized
+    assert "name the active adult body parts" in normalized
+    assert "never claim intercourse through intact trousers" in normalized
+    assert "The selected technology must be powered, worn, connected" in normalized
+    assert "must visibly operate on or between the participants" in normalized
     assert "ANTI-SCI-FI VISUAL GATE" in normalized
     assert "Do not use cyberpunk, neon skylines, glowing circuitry" in normalized
     assert "Use the exact requested human cast and no additional people" in normalized
     assert "Use no real animals in sexual or intimate situations" in normalized
     assert "language-capable extraterrestrial adult" in normalized
     assert "At aesthetic level" in normalized
+    assert "unmistakable but non-explicit sexual anticipation" in normalized
+    assert "must not replace the couple's sexual relationship" in normalized
     assert "At erotic level" in normalized
+    assert "at least one active erotic action in progress" in normalized
     assert "At hardcore level" in normalized
+    assert "one explicit primary sexual action visibly underway" in normalized
+    assert "Do not substitute setup, maintenance, observation" in normalized
     assert "Domestic synthetic partner" in normalized
+    assert "Robot wear and adaptation" in normalized
+    assert "Never continue sex through leaking fluid, overheating" in normalized
     assert "Long-distance telepresence" in normalized
+    assert "Asynchronous embodied intimacy" in normalized
+    assert "physically present full-body proxy" in normalized
+    assert "Never represent the remote partner as electrodes" in normalized
     assert "Neural sensory link" in normalized
     assert "Orbital microgravity" in normalized
     assert "Lunar settlement" in normalized
     assert "Martian settlement" in normalized
     assert "Sapient cross-species or posthuman intimacy" in normalized
+    assert "Intimacy constrained by labor" in normalized
+    assert "Never turn a maintenance worker, cleaner, clinician" in normalized
     assert "COLD LIVED-IN REALISM" in normalized
     assert "Cold realism is not merely blue color grading" in normalized
     assert "one sign of cost or scarcity" in normalized
     assert "one sign of maintenance" in normalized
     assert "one sign of privacy limitation" in normalized
     assert "one bodily consequence" in normalized
-    assert "preferred target of 400-500 words" in normalized
-    assert "hard maximum of 650 words" in normalized
-    assert "Count words before returning" in normalized
-    assert "Use a strict sentence budget" in normalized
-    assert "Mention each device, anchor, expression" in normalized
+    assert "mentioning each device, anchor, expression" in normalized
     assert "QR codes, barcodes" in normalized
-    assert "A Frame with a relative age, more than 650 words" in normalized
+    assert "A Frame with a relative age, more visible bodies than" in normalized
+    assert "can be mistaken for friendship, repair work, calibration" in normalized
+    assert "unmistakable image-legible sexual partnership" in normalized
+    assert "describes penetration by a torso-only, pelvis-free" in normalized
+    assert "continues sexual activity through leaking machinery" in normalized
+    assert "sexualizes a worker, cleaner, clinician" in normalized
+    assert "pauses, suspends, interrupts, or replaces" in normalized
+    assert "detached replay device in place of a requested remote partner" in normalized
+    assert "claims intercourse without describing physically compatible" in normalized
+    assert "adds a synthetic partner, neural link, alien biology" in normalized
+    assert "adds a detached spare body, hand, limb" in normalized
+    assert "approximately 400-650 words" not in normalized
+    assert "preferred target" not in normalized
+    assert "hard maximum" not in normalized
+    assert "Count words before returning" not in normalized
+    assert "sentence budget" not in normalized
     assert "English-only printable ASCII" in normalized
     assert "no readable text inside the image" in normalized
