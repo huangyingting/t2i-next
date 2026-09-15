@@ -7,8 +7,9 @@ from itertools import combinations, product
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
-from run import _generate_with_repair
-from scene_layers import (
+
+from .config import SpatialProviderSettings, load_spatial_provider_settings
+from .layers import (
     PresentationPreset,
     SceneLayerInputs,
     SettingPreset,
@@ -16,9 +17,7 @@ from scene_layers import (
     SupportRealization,
     stable_hash,
 )
-
-from t2i_story_pipeline.config import load_story_provider_settings
-from t2i_story_pipeline.provider import OpenAIStoryModel
+from .provider import OpenAISpatialModel, generate_with_repair
 
 Identifier = Annotated[
     str,
@@ -45,11 +44,19 @@ SupportSurface = Literal[
     "support_sling",
     "wall",
 ]
+PROHIBITED_MINOR_PATTERN = (
+    r"child|children|minors?|teens?|teenage|teenaged|teenagers?|schoolgirls?|"
+    r"schoolboys?|juveniles?|high\s+school|middle\s+school|primary\s+school"
+)
+PROHIBITED_MINOR_CONCEPTS = re.compile(
+    rf"\b(?:{PROHIBITED_MINOR_PATTERN})\b",
+    re.I,
+)
 FORBIDDEN_CREATIVE_CONCEPTS = re.compile(
-    r"\b(?:woman|man|person|people|crowd|attendant|guard|servant|body|"
+    r"\b(?:woman|man|person|people|crowd|attendant|guard|servant|"
     r"anatomy|pose|contact|intercourse|fellatio|cunnilingus|masturbation|"
     r"penis|vagina|vulva|anus|breast|clitoris|camera|lens|framing|viewpoint|"
-    r"mirror|statue|mannequin)\b",
+    r"mirror|statue|mannequin|" + PROHIBITED_MINOR_PATTERN + r")\b",
     re.I,
 )
 
@@ -158,18 +165,82 @@ class StyleBlueprint(StrictModel):
         return self
 
 
+class PresentationRecipe(StrictModel):
+    presentation_id: Identifier
+    coverage_mode: Literal["selective_access", "styled_nude"]
+    wardrobe: str = Field(min_length=4, max_length=100)
+    footwear_type: Literal[
+        "boots",
+        "heels",
+        "sandals",
+        "shoes",
+        "slippers",
+        "pumps",
+        "mules",
+        "sneakers",
+        "loafers",
+        "platforms",
+    ]
+    footwear_details: str = Field(min_length=3, max_length=60)
+    accessories: list[str] = Field(min_length=2, max_length=4)
+    makeup: str = Field(min_length=3, max_length=80)
+    compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
+
+    @model_validator(mode="after")
+    def recipe_is_coherent(self) -> PresentationRecipe:
+        normalized = self.wardrobe.strip().lower()
+        if self.coverage_mode == "selective_access" and normalized == "none":
+            raise ValueError("selective-access recipe requires wearable garments")
+        if self.coverage_mode == "styled_nude" and normalized != "none":
+            raise ValueError("styled-nude recipe wardrobe must be none")
+        ensure_unique("presentation accessories", self.accessories)
+        ensure_unique("presentation moods", self.compatible_moods)
+        return self
+
+
 class PresentationBlueprint(StrictModel):
-    wardrobe_options: list[str] = Field(min_length=4, max_length=10)
-    accessory_options: list[str] = Field(min_length=3, max_length=10)
-    makeup_options: list[str] = Field(min_length=4, max_length=10)
+    recipes: list[PresentationRecipe] = Field(min_length=12, max_length=12)
     appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
 
     @model_validator(mode="after")
-    def options_are_unique(self) -> PresentationBlueprint:
-        ensure_unique("wardrobe options", self.wardrobe_options)
-        ensure_unique("accessory options", self.accessory_options)
-        ensure_unique("makeup options", self.makeup_options)
+    def recipes_are_varied(self) -> PresentationBlueprint:
+        ensure_unique(
+            "presentation IDs",
+            [recipe.presentation_id for recipe in self.recipes],
+        )
+        ensure_unique(
+            "presentation footwear",
+            [
+                f"{recipe.footwear_details} {recipe.footwear_type}"
+                for recipe in self.recipes
+            ],
+        )
+        ensure_unique(
+            "presentation recipes",
+            [
+                "|".join(
+                    (
+                        recipe.coverage_mode,
+                        recipe.wardrobe,
+                        recipe.footwear_type,
+                        recipe.footwear_details,
+                        *recipe.accessories,
+                        recipe.makeup,
+                        *recipe.compatible_moods,
+                    )
+                )
+                for recipe in self.recipes
+            ],
+        )
         ensure_unique("appearance biases", self.appearance_bias)
+        nude_count = sum(
+            recipe.coverage_mode == "styled_nude" for recipe in self.recipes
+        )
+        if not 1 <= nude_count <= max(1, len(self.recipes) // 4):
+            raise ValueError(
+                "presentation recipes need limited styled nudity between one "
+                "recipe and one quarter of the pool"
+            )
         return self
 
 
@@ -191,6 +262,16 @@ class CreativeBlueprint(StrictModel):
         if incompatible_styles:
             raise ValueError(
                 f"styles have no compatible world mood: {incompatible_styles}"
+            )
+        incompatible_presentations = [
+            recipe.presentation_id
+            for recipe in self.presentation.recipes
+            if not world_moods.intersection(recipe.compatible_moods)
+        ]
+        if incompatible_presentations:
+            raise ValueError(
+                "presentations have no compatible world mood: "
+                f"{incompatible_presentations}"
             )
         uncovered_locations = [
             location.location_id
@@ -224,6 +305,7 @@ class BlueprintInference(StrictModel):
     schema_version: int
     system_prompt_hash: Fingerprint
     brief_hash: Fingerprint
+    inference_config_hash: Fingerprint
     creative_seed: int
     model: str
     structured_rejections: list[list[str]]
@@ -246,17 +328,28 @@ contains coherent complete style recipes,
 not independently shuffled style adjectives. Each recipe controls medium,
 rendering language, surface texture, contrast, color treatment, lighting
 treatment, atmosphere, and compatible mood tags. PresentationBlueprint contains
-wardrobe, accessory, makeup, and soft appearance-bias option pools.
+exactly twelve coherent presentation recipes. Each recipe keeps coverage,
+named garments, named footwear, two to four accessories, makeup, and compatible
+mood tags together rather than independently shuffling them. Most recipes use
+selective_access and name wearable garments. Between one recipe and at most one
+quarter of the pool use styled_nude with wardrobe set to the literal none, while still
+naming footwear, accessories, and makeup. This permits occasional intentional
+nudity without making the batch visually monotonous. Choose footwear_type from
+the supplied footwear enum and use footwear_details only for its material,
+height, color, or decoration; bare feet and foot decoration are not footwear.
 
 Do not decide cast count, people, roles, names, age, bodies, anatomy, activity,
 pose, contact, actor support, screen position, lens, camera placement, viewpoint,
 or framing. Do not include mirrors, humanoid statues, crowds, attendants,
 guards, servants, or person-shaped objects. Keep every prose field to roughly
 two to seven words, use concise ASCII English, and make mood tags match between
-each location and at least one style recipe. Use the supplied creative seed as
-a diversity nonce. Return only schema data.
+each location and at least one style recipe. Never use child, minor, teen,
+schoolgirl, schoolboy, juvenile, primary-school, middle-school, or high-school
+concepts; any academic theme must be explicitly adult university or
+graduate-level. Use the supplied creative seed as a diversity nonce. Return
+only schema data.
 """.strip()
-BLUEPRINT_SCHEMA_VERSION = 4
+BLUEPRINT_SCHEMA_VERSION = 12
 BLUEPRINT_SYSTEM_HASH = hashlib.sha256(BLUEPRINT_SYSTEM.encode()).hexdigest()
 
 
@@ -290,16 +383,42 @@ def compact_phrase(value: str, max_words: int) -> str:
     return " ".join(natural.split()[:max_words]).rstrip(",;:")
 
 
+def presentation_footwear_phrase(recipe: PresentationRecipe) -> str:
+    details = compact_phrase(recipe.footwear_details, 6)
+    footwear_root = recipe.footwear_type.rstrip("s")
+    if re.search(rf"\b{re.escape(footwear_root)}s?\b", details, re.I):
+        return details
+    return f"{details} {recipe.footwear_type}"
+
+
+def blueprint_inference_config_hash(settings: SpatialProviderSettings) -> str:
+    payload = {
+        "base_url": settings.base_url.rstrip("/"),
+        "model": settings.model,
+        "thinking_mode": (
+            settings.thinking_mode.value if settings.thinking_mode is not None else None
+        ),
+        "reasoning_effort": (
+            settings.reasoning_effort.value
+            if settings.reasoning_effort is not None
+            else None
+        ),
+        "temperature": settings.temperature,
+        "max_output_tokens": min(20000, settings.output_token_limit),
+    }
+    return stable_hash(payload)
+
+
 async def infer_creative_blueprint(
     brief: str,
     creative_seed: int,
 ) -> BlueprintInference:
     if not brief.strip():
         raise ValueError("creative brief cannot be empty")
-    settings = load_story_provider_settings()
+    settings = load_spatial_provider_settings()
     brief_hash = hashlib.sha256(brief.strip().encode()).hexdigest()
-    async with OpenAIStoryModel(settings) as model:
-        response, rejections = await _generate_with_repair(
+    async with OpenAISpatialModel(settings) as model:
+        response, rejections = await generate_with_repair(
             model,
             system=BLUEPRINT_SYSTEM,
             payload={
@@ -307,13 +426,14 @@ async def infer_creative_blueprint(
                 "creative_seed": creative_seed,
             },
             response_model=CreativeBlueprint,
-            max_output_tokens=min(10000, settings.output_token_limit),
+            max_output_tokens=min(20000, settings.output_token_limit),
         )
     blueprint = CreativeBlueprint.model_validate(response.value)
     return BlueprintInference(
         schema_version=BLUEPRINT_SCHEMA_VERSION,
         system_prompt_hash=BLUEPRINT_SYSTEM_HASH,
         brief_hash=brief_hash,
+        inference_config_hash=blueprint_inference_config_hash(settings),
         creative_seed=creative_seed,
         model=settings.model,
         structured_rejections=rejections,
@@ -326,6 +446,97 @@ def semantic_hash(value: BaseModel, identity_field: str) -> str:
     payload = value.model_dump(mode="json")
     payload.pop(identity_field)
     return stable_hash(payload)
+
+
+def unused_setting_variant(
+    blueprint: CreativeBlueprint,
+    location: LocationCard,
+    *,
+    setting_id: str,
+    used_fingerprints: set[str],
+    rng: random.Random,
+) -> tuple[SettingPreset, str] | None:
+    material_variants = list(
+        combinations(
+            location.materials,
+            min(3, len(location.materials)),
+        )
+    )
+    prop_variants = [
+        variant
+        for size in range(1, min(2, len(location.environment_props)) + 1)
+        for variant in combinations(location.environment_props, size)
+    ]
+    setting_variants = list(
+        product(
+            blueprint.world.time_options,
+            blueprint.world.weather_options,
+            location.light_sources,
+            material_variants,
+            prop_variants,
+        )
+    )
+    rng.shuffle(setting_variants)
+    for time_of_day, weather, light, materials, props in setting_variants:
+        setting = SettingPreset(
+            setting_id=setting_id,
+            world_genre=blueprint.world.world_genre,
+            location=compact_phrase(location.location, 10),
+            era=blueprint.world.era,
+            time_of_day=time_of_day,
+            weather=weather,
+            architecture=compact_phrase(location.architecture, 8),
+            materials=[compact_phrase(value, 4) for value in materials],
+            environment_props=[compact_phrase(value, 5) for value in props],
+            motivated_light_sources=[compact_phrase(light, 9)],
+            support_realizations=[
+                SupportRealization(
+                    support=item.support,
+                    description=compact_phrase(item.description, 6),
+                )
+                for item in location.support_realizations
+            ],
+            mood_tags=list(location.mood_tags),
+        )
+        fingerprint = semantic_hash(setting, "setting_id")
+        if fingerprint not in used_fingerprints:
+            return setting, fingerprint
+    return None
+
+
+def maximum_location_assignment(
+    blueprint: CreativeBlueprint,
+    required_supports: list[set[str]],
+) -> dict[int, str]:
+    compatibility = {
+        location.location_id: [
+            scene_index
+            for scene_index, requirement in enumerate(required_supports)
+            if requirement.issubset(
+                {realization.support for realization in location.support_realizations}
+            )
+        ]
+        for location in blueprint.world.locations
+    }
+    scene_matches: dict[int, str] = {}
+
+    def assign(location_id: str, visited_scenes: set[int]) -> bool:
+        for scene_index in compatibility[location_id]:
+            if scene_index in visited_scenes:
+                continue
+            visited_scenes.add(scene_index)
+            previous_location = scene_matches.get(scene_index)
+            if previous_location is None or assign(
+                previous_location,
+                visited_scenes,
+            ):
+                scene_matches[scene_index] = location_id
+                return True
+        return False
+
+    for location_id in compatibility:
+        assign(location_id, set())
+    return scene_matches
 
 
 def sample_scene_layer_inputs(
@@ -342,23 +553,23 @@ def sample_scene_layer_inputs(
 
     rng = random.Random(seed)
     count = len(required_supports)
-    accessory_pairs = list(combinations(blueprint.presentation.accessory_options, 2))
-    presentation_variants = list(
-        product(
-            blueprint.presentation.wardrobe_options,
-            blueprint.presentation.makeup_options,
-            accessory_pairs,
-        )
-    )
-    rng.shuffle(presentation_variants)
-    if len(presentation_variants) < count:
-        raise ValueError("presentation blueprint cannot produce enough unique variants")
+    if len(blueprint.presentation.recipes) < count:
+        raise ValueError("presentation blueprint cannot cover every scene uniquely")
+    recipe_order = list(blueprint.presentation.recipes)
+    rng.shuffle(recipe_order)
+    matched_presentations = {
+        scene_index: recipe_order[scene_index] for scene_index in range(count)
+    }
     location_usage: dict[str, int] = {}
     style_usage: dict[str, int] = {}
     pair_usage: dict[tuple[str, str], int] = {}
     used_setting_fingerprints: set[str] = set()
     used_presentation_fingerprints: set[str] = set()
     selected_by_index: dict[int, SceneLayerInputs] = {}
+    reserved_locations = maximum_location_assignment(
+        blueprint,
+        required_supports,
+    )
     scene_order = sorted(
         range(count),
         key=lambda index: (
@@ -374,7 +585,10 @@ def sample_scene_layer_inputs(
 
     for index in scene_order:
         required = required_supports[index]
-        candidates: list[tuple[float, LocationCard, StyleRecipe]] = []
+        assigned_presentation = matched_presentations[index]
+        candidates: list[
+            tuple[float, LocationCard, StyleRecipe, PresentationRecipe]
+        ] = []
         for location in blueprint.world.locations:
             if not required.issubset(
                 {item.support for item in location.support_realizations}
@@ -384,21 +598,74 @@ def sample_scene_layer_inputs(
                 if not set(location.mood_tags).intersection(recipe.compatible_moods):
                     continue
                 pair = (location.location_id, recipe.style_id)
+                presentation_mood_match = bool(
+                    set(location.mood_tags).intersection(
+                        assigned_presentation.compatible_moods
+                    )
+                )
                 score = (
-                    (100 if location_usage.get(location.location_id, 0) == 0 else 0)
+                    (
+                        1000
+                        if reserved_locations.get(index) == location.location_id
+                        else 0
+                    )
+                    + (100 if location_usage.get(location.location_id, 0) == 0 else 0)
                     + (80 if style_usage.get(recipe.style_id, 0) == 0 else 0)
                     + (40 if pair_usage.get(pair, 0) == 0 else 0)
+                    + (60 if presentation_mood_match else 0)
                     - location_usage.get(location.location_id, 0) * 12
                     - style_usage.get(recipe.style_id, 0) * 9
                     - pair_usage.get(pair, 0) * 20
                     + rng.random()
                 )
-                candidates.append((score, location, recipe))
+                candidates.append((score, location, recipe, assigned_presentation))
         if not candidates:
             raise ValueError(
                 f"no compatible world/style candidate for supports {sorted(required)}"
             )
-        _, location, recipe = max(candidates, key=lambda item: item[0])
+        setting_id_prefix = f"{blueprint.world.family_id}_{index + 1:02d}"
+        setting = None
+        setting_fingerprint = ""
+        location = None
+        recipe = None
+        presentation_recipe = None
+        for (
+            _,
+            candidate_location,
+            candidate_recipe,
+            candidate_presentation,
+        ) in sorted(
+            candidates,
+            key=lambda item: item[0],
+            reverse=True,
+        ):
+            setting_id = (
+                f"{setting_id_prefix}_"
+                f"{slug(candidate_location.location_id)[:28].rstrip('_')}"
+            )
+            variant = unused_setting_variant(
+                blueprint,
+                candidate_location,
+                setting_id=setting_id,
+                used_fingerprints=used_setting_fingerprints,
+                rng=rng,
+            )
+            if variant is not None:
+                setting, setting_fingerprint = variant
+                location = candidate_location
+                recipe = candidate_recipe
+                presentation_recipe = candidate_presentation
+                break
+        if (
+            setting is None
+            or location is None
+            or recipe is None
+            or presentation_recipe is None
+        ):
+            raise ValueError(
+                f"all compatible locations exhausted for supports {sorted(required)}"
+            )
+        used_setting_fingerprints.add(setting_fingerprint)
         pair = (location.location_id, recipe.style_id)
         location_usage[location.location_id] = (
             location_usage.get(location.location_id, 0) + 1
@@ -406,74 +673,21 @@ def sample_scene_layer_inputs(
         style_usage[recipe.style_id] = style_usage.get(recipe.style_id, 0) + 1
         pair_usage[pair] = pair_usage.get(pair, 0) + 1
 
-        setting_id = (
+        presentation_id = (
             f"{blueprint.world.family_id}_{index + 1:02d}_"
-            f"{slug(location.location_id)[:28].rstrip('_')}"
+            f"{presentation_recipe.presentation_id}"
         )
-        presentation_id = f"{blueprint.world.family_id}_{index + 1:02d}_presentation"
-        material_variants = list(
-            combinations(
-                location.materials,
-                min(3, len(location.materials)),
-            )
-        )
-        prop_variants = [
-            variant
-            for size in range(1, min(2, len(location.environment_props)) + 1)
-            for variant in combinations(location.environment_props, size)
-        ]
-        setting_variants = list(
-            product(
-                blueprint.world.time_options,
-                blueprint.world.weather_options,
-                location.light_sources,
-                material_variants,
-                prop_variants,
-            )
-        )
-        rng.shuffle(setting_variants)
-        setting = None
-        for time_of_day, weather, light, materials, props in setting_variants:
-            candidate_setting = SettingPreset(
-                setting_id=setting_id,
-                world_genre=blueprint.world.world_genre,
-                location=compact_phrase(location.location, 10),
-                era=blueprint.world.era,
-                time_of_day=time_of_day,
-                weather=weather,
-                architecture=compact_phrase(location.architecture, 8),
-                materials=[compact_phrase(value, 4) for value in materials],
-                environment_props=[compact_phrase(value, 5) for value in props],
-                motivated_light_sources=[compact_phrase(light, 9)],
-                support_realizations=[
-                    SupportRealization(
-                        support=item.support,
-                        description=compact_phrase(item.description, 6),
-                    )
-                    for item in location.support_realizations
-                ],
-                mood_tags=list(location.mood_tags),
-            )
-            candidate_fingerprint = semantic_hash(
-                candidate_setting,
-                "setting_id",
-            )
-            if candidate_fingerprint not in used_setting_fingerprints:
-                setting = candidate_setting
-                used_setting_fingerprints.add(candidate_fingerprint)
-                break
-        if setting is None:
-            raise ValueError(
-                f"location {location.location_id} exhausted unique setting variants"
-            )
-
-        wardrobe, makeup, accessory_pair = presentation_variants[index]
         presentation = PresentationPreset(
             presentation_id=presentation_id,
-            wardrobe_theme=compact_phrase(wardrobe, 8),
-            accessory_theme=[compact_phrase(value, 4) for value in accessory_pair],
-            makeup_theme=compact_phrase(makeup, 7),
+            coverage_mode=presentation_recipe.coverage_mode,
+            wardrobe_theme=compact_phrase(presentation_recipe.wardrobe, 8),
+            footwear_theme=presentation_footwear_phrase(presentation_recipe),
+            accessory_theme=[
+                compact_phrase(value, 4) for value in presentation_recipe.accessories
+            ],
+            makeup_theme=compact_phrase(presentation_recipe.makeup, 7),
             appearance_bias=list(blueprint.presentation.appearance_bias),
+            compatible_moods=list(presentation_recipe.compatible_moods),
         )
         presentation_fingerprint = semantic_hash(
             presentation,

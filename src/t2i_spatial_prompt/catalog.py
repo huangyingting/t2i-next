@@ -3,13 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import Counter
-from pathlib import Path
 from typing import Annotated, NamedTuple
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
-ROOT = Path(__file__).resolve().parent
-OUTPUT = ROOT / "catalogs"
 Identifier = Annotated[
     str,
     StringConstraints(
@@ -350,7 +347,7 @@ class PoseCatalog(StrictModel):
                 edge.state == "inserted" for edge in activity.contact_edges
             ):
                 raise ValueError(f"{activity.activity_id} lacks an inserted contact")
-            if "oral" in tags and "mouth" not in regions:
+            if "oral" in tags and not {"mouth", "tongue"}.intersection(regions):
                 raise ValueError(f"{activity.activity_id} lacks an oral endpoint")
             if "toy" in tags and not {
                 "prop_a",
@@ -1599,6 +1596,12 @@ def make_contact_edges(
             target_region,
             state,
         ) = spec
+        if (
+            source_region == "mouth"
+            and target_region in {"breast", "clitoris", "vulva"}
+            and state == "external_contact"
+        ):
+            source_region = "tongue"
         visibility = (
             "occluded"
             if state == "inserted" and (activity_index + edge_index) % 3
@@ -1847,105 +1850,3 @@ def build_catalog(cast_key: str) -> PoseCatalog:
         activities=activity_templates,
         entries=entries,
     )
-
-
-def main() -> None:
-    OUTPUT.mkdir(parents=True, exist_ok=True)
-    catalogs = {cast_key: build_catalog(cast_key) for cast_key in CASTS}
-    audit_catalogs = {}
-    for cast_key, catalog in catalogs.items():
-        path = OUTPUT / f"{cast_key}.json"
-        path.write_text(
-            catalog.model_dump_json(
-                indent=2,
-                exclude_defaults=True,
-                exclude_none=True,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-        restored = PoseCatalog.model_validate_json(path.read_text(encoding="utf-8"))
-        if restored != catalog:
-            raise ValueError(f"{cast_key} changed during persistence")
-        family_counts = Counter(entry.central_pose.family for entry in catalog.entries)
-        tag_counts = Counter(
-            tag
-            for activity in catalog.activities
-            for tag in activity_tags(activity.activity_id)
-        )
-        audit_catalogs[cast_key] = {
-            "entries": len(catalog.entries),
-            "unique_central_pose_topologies": len(
-                {
-                    (
-                        entry.central_pose.family,
-                        entry.central_pose.variant,
-                    )
-                    for entry in catalog.entries
-                }
-            ),
-            "pose_families": len(family_counts),
-            "poses_per_family_min": min(family_counts.values()),
-            "poses_per_family_max": max(family_counts.values()),
-            "activity_templates": len(catalog.activities),
-            "bdsm_activity_templates": sum(
-                activity.restraint is not None for activity in catalog.activities
-            ),
-            "coverage_tag_counts": dict(sorted(tag_counts.items())),
-            "compatibility_links": sum(
-                len(entry.compatible_activity_ids) for entry in catalog.entries
-            ),
-            "contact_edges": sum(
-                len(activity.contact_edges) for activity in catalog.activities
-            ),
-            "wearable_props": sum(
-                len(activity.wearable_props) for activity in catalog.activities
-            ),
-            "handheld_props": sum(
-                len(activity.handheld_props) for activity in catalog.activities
-            ),
-            "cast_roles": catalog.cast_roles,
-            "readback_validated": True,
-        }
-    audit_report = {
-        "passed": True,
-        "catalog_count": len(catalogs),
-        "entries_per_catalog": 256,
-        "total_unique_entries": sum(
-            len(catalog.entries) for catalog in catalogs.values()
-        ),
-        "catalogs": audit_catalogs,
-    }
-    (OUTPUT / "audit-report.json").write_text(
-        json.dumps(audit_report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    manifest = {
-        "schema_version": "3.0",
-        "requested_configurations": [
-            "one_woman",
-            "one_woman_one_man",
-            "one_woman_two_men",
-            "two_women",
-            "one_woman_two_men",
-            "three_women",
-        ],
-        "deduplicated_configurations": list(CASTS),
-        "duplicate_requests": {"one_woman_two_men": 2},
-        "catalog_count": len(catalogs),
-        "entries_per_catalog": 256,
-        "total_unique_entries": sum(
-            len(catalog.entries) for catalog in catalogs.values()
-        ),
-        "files": {cast_key: f"{cast_key}.json" for cast_key in catalogs},
-        "audit_file": "audit-report.json",
-    }
-    (OUTPUT / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    print(json.dumps(manifest, ensure_ascii=False, indent=2))
-
-
-if __name__ == "__main__":
-    main()

@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 import re
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
@@ -21,6 +21,29 @@ INTIMATE_REGIONS = {
     "vagina",
     "vulva",
 }
+WARDROBE_ACCESS_REGIONS = INTIMATE_REGIONS | {
+    "breast",
+    "buttock",
+    "pubic_region",
+}
+RETAINED_COVERAGE_REGIONS = [
+    "shoulders",
+    "arms",
+    "upper_back",
+    "abdomen",
+    "outer_hips",
+    "outer_thighs",
+    "lower_legs",
+]
+FOOTWEAR_PATTERN_TEXT = (
+    r"(?i)^.*\b(?:boots?|heels?|sandals?|shoes?|slippers?|pumps?|mules?|"
+    r"sneakers?|loafers?|platforms?)\b.*$"
+)
+FOOTWEAR_PATTERN = re.compile(FOOTWEAR_PATTERN_TEXT)
+FootwearDescription = Annotated[
+    str,
+    StringConstraints(min_length=3, max_length=80, pattern=FOOTWEAR_PATTERN_TEXT),
+]
 EXTRA_CAST_HAZARDS = {
     "background_people",
     "humanoid_statues",
@@ -99,10 +122,24 @@ class StylePreset(StrictModel):
 
 class PresentationPreset(StrictModel):
     presentation_id: Identifier
-    wardrobe_theme: str = Field(min_length=5, max_length=100)
-    accessory_theme: list[str] = Field(default_factory=list, max_length=4)
+    coverage_mode: Literal["selective_access", "styled_nude"]
+    wardrobe_theme: str = Field(min_length=4, max_length=100)
+    footwear_theme: FootwearDescription
+    accessory_theme: list[str] = Field(min_length=2, max_length=4)
     makeup_theme: str = Field(min_length=3, max_length=80)
     appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
+    compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
+
+    @model_validator(mode="after")
+    def coverage_has_matching_wardrobe(self) -> PresentationPreset:
+        normalized = self.wardrobe_theme.strip().lower()
+        if self.coverage_mode == "selective_access" and normalized == "none":
+            raise ValueError("selective-access presentation requires a wardrobe")
+        if self.coverage_mode == "styled_nude" and normalized != "none":
+            raise ValueError("styled-nude presentation wardrobe must be none")
+        if not FOOTWEAR_PATTERN.search(self.footwear_theme):
+            raise ValueError("footwear theme must name an actual footwear type")
+        return self
 
 
 class SceneLayerInputs(StrictModel):
@@ -115,11 +152,24 @@ class RolePresentation(StrictModel):
     role: RoleCode
     wardrobe: str
     wardrobe_state: Identifier
+    exposed_regions: list[Identifier] = Field(default_factory=list, max_length=8)
+    covered_regions: list[Identifier] = Field(default_factory=list, max_length=10)
     footwear: str
     accessories: list[str] = Field(default_factory=list, max_length=4)
     makeup: str
     hair_styling: str
     surface_finish: str
+
+
+class RoleExpression(StrictModel):
+    role: RoleCode
+    intensity: Identifier
+    gaze_target: Identifier
+    eye_behavior: str
+    brow_behavior: str
+    mouth_behavior: str
+    facial_tension: str
+    interaction_response: str
 
 
 class PresentationPlan(StrictModel):
@@ -129,6 +179,7 @@ class PresentationPlan(StrictModel):
     style_id: Identifier
     presentation_id: Identifier
     roles: list[RolePresentation] = Field(min_length=1, max_length=5)
+    expressions: list[RoleExpression] = Field(min_length=1, max_length=5)
     motivated_light_source: str
     lighting_direction: Identifier
     lighting_quality: Identifier
@@ -323,9 +374,11 @@ def make_scene_layer_inputs(
     ),
     mood_tags: tuple[str, ...] = ("editorial",),
     wardrobe_theme: str = "editorial evening wear",
-    accessory_theme: tuple[str, ...] = ("minimal jewelry",),
+    footwear_theme: str = "coordinated dress shoes",
+    accessory_theme: tuple[str, ...] = ("minimal jewelry", "slim wrist cuff"),
     makeup_theme: str = "polished editorial makeup",
     appearance_bias: tuple[str, ...] = (),
+    coverage_mode: Literal["selective_access", "styled_nude"] = "selective_access",
     medium: str = "cinematic photography",
     rendering_language: str = "editorial realism",
     surface_texture: str = "tactile natural surfaces",
@@ -360,137 +413,17 @@ def make_scene_layer_inputs(
         ),
         presentation=PresentationPreset(
             presentation_id=f"{setting_id}_presentation",
-            wardrobe_theme=wardrobe_theme,
+            coverage_mode=coverage_mode,
+            wardrobe_theme=wardrobe_theme
+            if coverage_mode == "selective_access"
+            else "none",
+            footwear_theme=footwear_theme,
             accessory_theme=list(accessory_theme),
             makeup_theme=makeup_theme,
             appearance_bias=list(appearance_bias),
+            compatible_moods=list(mood_tags),
         ),
     )
-
-
-SCENE_LAYER_PRESETS = {
-    item.setting.setting_id: item
-    for item in (
-        make_scene_layer_inputs(
-            "rainy_neon_apartment",
-            "rain-darkened high-rise apartment",
-            "magenta and cyan neon through wet glass",
-            "slate, magenta and cyan",
-            "electric nocturnal tension",
-            weather="rain",
-            materials=("wet glass", "brushed steel", "dark linen"),
-            environment_props=("rain-streaked window", "low platform bed"),
-            support_realizations=(
-                ("bed", "low platform bed"),
-                ("bed_edge", "firm platform bed edge"),
-                ("floor", "finished apartment floor"),
-                ("wall", "structural apartment wall"),
-            ),
-            mood_tags=("electric", "nocturnal"),
-            wardrobe_theme="sleek black nightlife tailoring",
-            accessory_theme=("silver ear cuffs",),
-            makeup_theme="smoky eyes with a glossy finish",
-        ),
-        make_scene_layer_inputs(
-            "amber_restraint_studio",
-            "minimal amber performance studio",
-            "shielded amber ceiling source",
-            "amber, umber and cream",
-            "controlled sculptural ritual",
-            materials=("matte plaster", "pale timber", "padded leather"),
-            environment_props=("low platform",),
-            support_realizations=(
-                ("floor", "pale timber floor"),
-                ("wall", "matte plaster wall"),
-                ("furniture", "padded performance platform"),
-                ("sofa", "firm padded studio sofa"),
-            ),
-            mood_tags=("controlled", "sculptural"),
-            wardrobe_theme="minimalist performance styling",
-        ),
-        make_scene_layer_inputs(
-            "burgundy_modern_corridor",
-            "spacious modern corridor",
-            "hard architectural side light",
-            "burgundy, ochre and slate",
-            "dynamic cinematic intensity",
-            materials=("polished stone", "dark timber", "brushed brass"),
-            support_realizations=(
-                ("floor", "polished stone floor"),
-                ("wall", "structural corridor wall"),
-            ),
-            mood_tags=("dynamic", "cinematic"),
-            wardrobe_theme="structured evening tailoring",
-        ),
-        make_scene_layer_inputs(
-            "midnight_luxury_hotel",
-            "double-height luxury hotel suite at midnight",
-            "warm brass practicals and cool city window light",
-            "dark emerald, brass and ivory",
-            "opulent after-hours drama",
-            materials=("emerald velvet", "polished brass", "ivory linen"),
-            environment_props=("city window", "upholstered headboard"),
-            support_realizations=(
-                ("bed", "upholstered hotel bed"),
-                ("bed_edge", "firm upholstered bed edge"),
-                ("floor", "polished suite floor"),
-                ("wall", "structural suite wall"),
-                ("sofa", "deep hotel sofa"),
-            ),
-            mood_tags=("opulent", "dramatic"),
-            wardrobe_theme="luxury evening wear arranged for the scene",
-            accessory_theme=("fine gold jewelry", "gemstone choker"),
-            makeup_theme="precise evening makeup",
-            appearance_bias=("statuesque", "polished"),
-        ),
-        make_scene_layer_inputs(
-            "soft_morning_bedroom",
-            "quiet bedroom in early morning",
-            "broad window light with a warm rim",
-            "pale linen, cream and soft gold",
-            "quiet editorial warmth",
-            time_of_day="morning",
-            materials=("washed linen", "light oak", "sheer fabric"),
-            environment_props=("low bed", "sheer curtains"),
-            support_realizations=(
-                ("bed", "low linen bed"),
-                ("bed_edge", "firm low bed edge"),
-                ("floor", "light oak floor"),
-                ("wall", "structural bedroom wall"),
-            ),
-            mood_tags=("quiet", "warm"),
-            wardrobe_theme="soft silk sleepwear",
-            makeup_theme="natural luminous makeup",
-        ),
-        make_scene_layer_inputs(
-            "demon_sovereign_palace",
-            "obsidian throne chamber of a demon sovereign",
-            "crimson braziers and molten floor fissures",
-            "obsidian, crimson and antique gold",
-            "commanding infernal grandeur",
-            world_genre="dark_fantasy",
-            era="fantasy",
-            materials=("obsidian", "black iron", "crimson velvet"),
-            environment_props=("empty throne", "braziers", "ritual sigil"),
-            support_realizations=(
-                ("floor", "level obsidian floor"),
-                ("wall", "load-bearing obsidian wall"),
-                ("sofa", "firm crimson ceremonial divan"),
-                ("furniture", "solid black iron altar"),
-            ),
-            mood_tags=("commanding", "infernal", "regal"),
-            wardrobe_theme="dark fantasy regalia arranged for the scene",
-            accessory_theme=("horned crown", "black metal arm cuffs"),
-            makeup_theme="ritual smoky eyes and dark wine lips",
-            appearance_bias=("statuesque", "commanding", "supernatural_eyes"),
-            medium="dark fantasy cinematic photography",
-            rendering_language="high detail infernal realism",
-            surface_texture="polished obsidian and tactile velvet",
-            contrast="hard luminous contrast",
-            lighting_treatment="ritual fire with restrained bloom",
-        ),
-    )
-}
 
 
 def required_region_map(
@@ -506,6 +439,89 @@ def required_region_map(
     return {role: sorted(regions) for role, regions in result.items()}
 
 
+def resolve_role_expressions(
+    *,
+    scene_id: str,
+    cast_roles: list[str],
+    focus_role: str,
+    activity_id: str,
+    interaction_partners_by_role: dict[str, list[str]],
+) -> list[RoleExpression]:
+    focus_variants = (
+        (
+            "peak_orgasm",
+            "eyes squeezed shut",
+            "brows raised and drawn together",
+            "mouth open in an involuntary O shape",
+            "strong cheek, jaw, and neck tension at release",
+        ),
+        (
+            "intense_release",
+            "eyes rolled upward beneath half-lowered lids",
+            "inner brows lifted",
+            "lips parted on a sharp exhale",
+            "visible facial tremor and released jaw",
+        ),
+        (
+            "rising_arousal",
+            "heavy-lidded focused eyes",
+            "brows softly contracted",
+            "lips parted with controlled breathing",
+            "building tension through cheeks and jaw",
+        ),
+        (
+            "controlled_focus",
+            "steady alert eyes",
+            "brows level and intent",
+            "mouth slightly open",
+            "restrained concentration in the jaw",
+        ),
+    )
+    focus_variant = focus_variants[int(scene_id[1:]) % len(focus_variants)]
+    expressions = []
+    for role_index, role in enumerate(cast_roles):
+        partners = interaction_partners_by_role.get(role, [])
+        if not partners and len(cast_roles) > 1:
+            partners = [
+                cast_roles[(role_index + offset) % len(cast_roles)]
+                for offset in range(1, len(cast_roles))
+            ]
+        gaze_target = partners[0] if partners else "camera"
+        if role == focus_role:
+            intensity, eyes, brows, mouth, tension = focus_variant
+            if intensity == "peak_orgasm":
+                gaze_target = "inward"
+        else:
+            intensity = "responsive_arousal"
+            eyes = f"eyes directed toward {gaze_target.upper()}"
+            brows = "brows actively responding to the partner"
+            mouth = (
+                "lips parted with exertion"
+                if role_index % 2
+                else "mouth set in concentrated breathing"
+            )
+            tension = "focused cheek and jaw tension"
+        response = (
+            f"visibly responding to {gaze_target.upper()} during "
+            f"{activity_id.replace('_', ' ')}"
+            if gaze_target in cast_roles
+            else f"visibly responding to {activity_id.replace('_', ' ')}"
+        )
+        expressions.append(
+            RoleExpression(
+                role=role,
+                intensity=intensity,
+                gaze_target=gaze_target,
+                eye_behavior=eyes,
+                brow_behavior=brows,
+                mouth_behavior=mouth,
+                facial_tension=tension,
+                interaction_response=response,
+            )
+        )
+    return expressions
+
+
 def resolve_scene_layers(
     *,
     scene_id: str,
@@ -519,33 +535,48 @@ def resolve_scene_layers(
     required_environment_supports: list[str],
     required_regions_by_role: dict[str, list[str]],
     visible_regions_by_role: dict[str, list[str]],
+    activity_id: str = "unspecified_activity",
+    focus_role: str | None = None,
+    interaction_partners_by_role: dict[str, list[str]] | None = None,
 ) -> ResolvedSceneLayers:
     characters = [CHARACTER_PROFILES[role] for role in cast_roles]
+    expressions = resolve_role_expressions(
+        scene_id=scene_id,
+        cast_roles=cast_roles,
+        focus_role=focus_role or cast_roles[0],
+        activity_id=activity_id,
+        interaction_partners_by_role=interaction_partners_by_role or {},
+    )
     role_presentations = []
-    for profile in characters:
+    for role_index, profile in enumerate(characters):
         required = set(required_regions_by_role.get(profile.role, []))
-        intimate_required = bool(required.intersection(INTIMATE_REGIONS))
-        wardrobe_state = (
-            "clear_of_required_contacts" if intimate_required else "scene_appropriate"
+        styled_nude = presentation_source.coverage_mode == "styled_nude"
+        exposed_regions = (
+            ["whole_body"]
+            if styled_nude
+            else sorted(required.intersection(WARDROBE_ACCESS_REGIONS))
         )
-        wardrobe = presentation_source.wardrobe_theme
-        if intimate_required:
-            wardrobe = f"{wardrobe}, displaced only where contact requires"
+        wardrobe_state = (
+            "styled_nude"
+            if styled_nude
+            else "localized_exposure"
+            if exposed_regions
+            else "fully_dressed"
+        )
+        wardrobe = "no garments" if styled_nude else presentation_source.wardrobe_theme
         role_presentations.append(
             RolePresentation(
                 role=profile.role,
                 wardrobe=wardrobe,
                 wardrobe_state=wardrobe_state,
-                footwear=(
-                    "setting-matched footwear"
-                    if body_level == "high"
-                    else "footwear omitted for stable support"
-                ),
-                accessories=(
-                    presentation_source.accessory_theme
-                    if profile.role == cast_roles[0]
-                    else []
-                ),
+                exposed_regions=exposed_regions,
+                covered_regions=[] if styled_nude else RETAINED_COVERAGE_REGIONS,
+                footwear=presentation_source.footwear_theme,
+                accessories=[
+                    presentation_source.accessory_theme[
+                        role_index % len(presentation_source.accessory_theme)
+                    ]
+                ],
                 makeup=(
                     presentation_source.makeup_theme
                     if profile.role.startswith("f")
@@ -562,6 +593,7 @@ def resolve_scene_layers(
         style_id=style.style_id,
         presentation_id=presentation_source.presentation_id,
         roles=role_presentations,
+        expressions=expressions,
         motivated_light_source=setting.motivated_light_sources[0],
         lighting_direction="geometry_preserving",
         lighting_quality="subject_separating",
@@ -605,20 +637,45 @@ def resolve_scene_layers(
         )
         for profile in characters
     ]
-    contact_clearance_roles = [
-        role.role.upper()
-        for role in role_presentations
-        if role.wardrobe_state == "clear_of_required_contacts"
-    ]
-    accessory_phrases = [
-        f"{role.role.upper()} {', '.join(role.accessories)}"
-        for role in role_presentations
-        if role.accessories
-    ]
+    wardrobe_phrases = []
+    for role in role_presentations:
+        styling_extras = f"wearing {role.footwear} with {', '.join(role.accessories)}"
+        if role.wardrobe_state == "styled_nude":
+            wardrobe_phrases.append(
+                f"{role.role.upper()} is intentionally fully nude for this scene, "
+                f"but remains styled by {styling_extras}"
+            )
+            continue
+        exposed_region_phrase = ", ".join(
+            region.replace("_", " ") for region in role.exposed_regions
+        )
+        exposure = (
+            f"only {exposed_region_phrase} locally exposed for contact"
+            if role.exposed_regions
+            else "no body region exposed by the wardrobe"
+        )
+        coverage = ", ".join(
+            region.replace("_", " ") for region in role.covered_regions
+        )
+        wardrobe_phrases.append(
+            f"{role.role.upper()} remains visibly dressed in {role.wardrobe}, "
+            f"{exposure}; retained garments cover {coverage}; "
+            f"all unlisted body regions remain clothed; {styling_extras}"
+        )
     visible_detail_phrases = [
         f"{role.upper()} {', '.join(details)}"
         for role, details in emitted.items()
         if details
+    ]
+    expression_phrases = [
+        (
+            f"{expression.role.upper()} shows "
+            f"{expression.intensity.replace('_', ' ')}: "
+            f"{expression.eye_behavior}, {expression.brow_behavior}, "
+            f"{expression.mouth_behavior}, {expression.facial_tension}; "
+            f"{expression.interaction_response}"
+        )
+        for expression in expressions
     ]
     setting_props = (
         f"; {', '.join(setting.environment_props)}" if setting.environment_props else ""
@@ -635,17 +692,10 @@ def resolve_scene_layers(
         ),
         f"Look: {'; '.join(character_phrases)}",
         (
-            f"Wardrobe: {presentation_source.wardrobe_theme}; clear "
-            f"{', '.join(contact_clearance_roles)}; women "
-            f"{presentation_source.makeup_theme}; "
-            f"{'; '.join(accessory_phrases)}"
-            if contact_clearance_roles
-            else (
-                f"Wardrobe: {presentation_source.wardrobe_theme}; women "
-                f"{presentation_source.makeup_theme}; "
-                f"{'; '.join(accessory_phrases)}"
-            )
+            f"Wardrobe: {'; '.join(wardrobe_phrases)}. "
+            f"Women {presentation_source.makeup_theme}"
         ),
+        f"Expression: {'; '.join(expression_phrases)}",
     ]
     if visible_detail_phrases:
         suffix_parts.append(f"Visible detail: {'; '.join(visible_detail_phrases)}")
@@ -674,6 +724,10 @@ def resolve_scene_layers(
                 f"{presentation.lighting_treatment}; {presentation.atmosphere}"
             ),
             "No extra figures, statues, human shadows or reflections",
+            (
+                "Every pelvis connects to exactly two legs; no limb is duplicated, "
+                "fused, detached or assigned to two bodies"
+            ),
         )
     )
     compact_suffix = ". ".join(suffix_parts) + "."
@@ -737,8 +791,19 @@ def layer_issues(
     issues: list[str] = []
     roles = [profile.role for profile in layers.characters]
     presentation_roles = [item.role for item in layers.presentation.roles]
-    if roles != cast_roles or presentation_roles != cast_roles:
+    expression_roles = [item.role for item in layers.presentation.expressions]
+    if (
+        roles != cast_roles
+        or presentation_roles != cast_roles
+        or expression_roles != cast_roles
+    ):
         issues.append("layer roles changed exact cast or order")
+    if len(cast_roles) > 1 and not any(
+        expression.gaze_target in cast_roles
+        and expression.gaze_target != expression.role
+        for expression in layers.presentation.expressions
+    ):
+        issues.append("multi-actor expressions lack interpersonal interaction")
     if layers.presentation.spatial_fingerprint != layers.fingerprints.spatial:
         issues.append("presentation changed spatial fingerprint")
     if (
@@ -758,10 +823,22 @@ def layer_issues(
         presentation = next(
             item for item in layers.presentation.roles if item.role == role
         )
-        if set(required).intersection(INTIMATE_REGIONS) and (
-            presentation.wardrobe_state != "clear_of_required_contacts"
-        ):
+        required_exposure = set(required).intersection(WARDROBE_ACCESS_REGIONS)
+        actual_exposure = set(presentation.exposed_regions)
+        styled_nude = presentation.wardrobe_state == "styled_nude"
+        if not styled_nude and required_exposure != actual_exposure:
             issues.append(f"{role} wardrobe blocks a required contact")
+        expected_state = (
+            "styled_nude"
+            if layers.presentation_source.coverage_mode == "styled_nude"
+            else "localized_exposure"
+            if required_exposure
+            else "fully_dressed"
+        )
+        if presentation.wardrobe_state != expected_state:
+            issues.append(f"{role} wardrobe state contradicts its exposure ledger")
+        if actual_exposure.intersection(presentation.covered_regions):
+            issues.append(f"{role} wardrobe exposes and covers the same region")
     for role, emitted in layers.visibility.emitted_body_details_by_role.items():
         visible = set(layers.visibility.visible_regions_by_role.get(role, []))
         if emitted and not visible.intersection(INTIMATE_REGIONS):

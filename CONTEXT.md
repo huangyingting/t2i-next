@@ -135,3 +135,44 @@ The ordered one-to-six Narrative Frames belonging to one Narrative Theme.
 Together they form a micro-story while each frame remains independently
 understandable.
 _Avoid_: Review cycle, storyboard schema
+
+## Standalone Spatial Prompt Generation
+
+The `t2i_spatial_prompt` package is independent from both Prompt Generation
+and Standalone Story Generation. Do not reuse their stages, persistence, or
+provider configuration.
+
+**Creative Brief**:
+The user's natural-language direction for the spatial batch's world, era,
+atmosphere, and visual presentation. It does not prescribe catalog IDs.
+_Avoid_: Brief, Story Description
+
+**Creative Blueprint**:
+The single model-derived World, Style, and Presentation design space shared
+by a twelve-scene batch. It contains no cast, anatomy, pose, contact, or
+camera geometry; those remain deterministic local constraints.
+_Avoid_: Foundation, Narrative Theme
+
+**Scene Request**:
+One deterministic selection of cast configuration, pose family and variant,
+activity, viewpoint, and shot scale. The released design builds twelve Scene
+Requests from the packaged catalogs for a cast and seed.
+_Avoid_: Frame, Narrative Frame
+
+**Spatial Plan**:
+The validated catalog entry and compatible activity selected for one Scene
+Request. It owns body endpoints, support surfaces, contact edges, reachability,
+and restraint topology.
+_Avoid_: Creative Blueprint, prose prompt
+
+**Scene Layers**:
+The resolved character, setting, style, presentation, and expression facts
+combined with a Spatial Plan. Each layer has one owner and a stable
+fingerprint.
+_Avoid_: Story Theme, Foundation
+
+**Spatial Prompt**:
+One independently renderable final prompt compiled from geometry and Scene
+Layers. A batch passes only when every prompt and all batch diversity
+thresholds pass local validation.
+_Avoid_: Narrative Frame, test output

@@ -154,6 +154,50 @@ Story Description 未明确人物国籍时，该人物缺省为中国籍；未�
 或可确定国家的地点时，场景缺省位于中国。Theme premise 和每个最终 Frame 都会
 明确写出人物国籍与故事发生国家。
 
+## 独立空间提示词生成器
+
+`t2i_spatial_prompt` 是独立于 story 和旧 prompt pipeline 的约束求解模块。它先
+用一次模型调用把自然语言主题推导为 World、Style 和 Presentation 蓝图，再由
+本地 catalog 和几何编译器确定人物数量、姿势、接触、支撑面、肢体归属、表情与
+镜头。当前发布格式固定为每批 12 个相互不同的场景，并只使用二十一岁以上成年人。
+
+```bash
+uv run t2i-spatial \
+  "午夜魔王城中的奢华仪式空间，高对比暗色奇幻摄影" \
+  --cast one_woman_one_man \
+  --seed 42 \
+  --output spatial-output
+```
+
+`--cast` 支持 `one_woman`、`one_woman_one_man`、`one_woman_two_men`、
+`two_women` 和 `three_women`。相同主题和 seed 会复用内容寻址的 Creative
+Blueprint 缓存；使用 `--refresh-blueprint` 可以强制重新推导。
+
+Provider 使用独立的 `SPATIAL_OPENAI_*` 环境变量：
+
+```text
+SPATIAL_OPENAI_BASE_URL
+SPATIAL_OPENAI_API_KEY_ENV
+SPATIAL_OPENAI_AUTH_MODE
+SPATIAL_OPENAI_MODEL
+SPATIAL_OPENAI_THINKING_MODE
+SPATIAL_OPENAI_REASONING_EFFORT
+SPATIAL_OPENAI_TEMPERATURE
+SPATIAL_OPENAI_OUTPUT_TOKEN_LIMIT
+SPATIAL_OPENAI_TIMEOUT_SECONDS
+SPATIAL_OPENAI_TRANSPORT_RETRIES
+```
+
+至少需要配置 `SPATIAL_OPENAI_MODEL`，并在
+`SPATIAL_OPENAI_API_KEY_ENV` 指定的环境变量中提供密钥。输出目录包含：
+
+- `prompts.txt`：12 条可独立渲染的最终提示词。
+- `blueprint.json`：本次采用的 CreativeBlueprint 与 token usage。
+- `layers.json`：每个场景解析后的角色、环境、风格和呈现层。
+- `selections.json`：pose、activity、镜头及各层指纹。
+- `report.json`：多样性阈值、本地约束校验和发布结果。
+- `blueprint-cache/`：按主题、seed、模型配置和 schema 寻址的缓存。
+
 这个工具把文生图内容分成共享 Foundation 和两层具体画面事实：
 
 - `StyleConstraints`：保存 brief 明示且逐字复制的作品或虚构世界、导演、艺术家、

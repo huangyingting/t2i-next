@@ -166,7 +166,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "m1",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -204,7 +204,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "m1",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -306,7 +306,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "m1",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -18953,6 +18953,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19018,6 +19020,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19083,6 +19087,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19148,6 +19154,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19213,6 +19221,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19278,6 +19288,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19343,6 +19355,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19408,6 +19422,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19473,6 +19489,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19538,6 +19556,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19603,6 +19623,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19668,6 +19690,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19733,6 +19757,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19798,6 +19824,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19863,6 +19891,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",
@@ -19928,6 +19958,8 @@
       "compatible_activity_ids": [
         "vaginal_face_to_face",
         "vaginal_lifted",
+        "cunnilingus",
+        "breast_licking",
         "pubic_grinding",
         "toy_vaginal",
         "toy_anal",

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Annotated, NamedTuple
+from typing import NamedTuple
 
-from catalog_generator import (
+from .catalog import (
     CASTS,
     ActivityTemplate,
     ContactEdge,
@@ -16,72 +15,20 @@ from catalog_generator import (
     PoseEntry,
     WearableProp,
 )
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
-from run import _generate_with_repair
-from scene_layers import (
+from .layers import (
     CHARACTER_PROFILES,
-    SCENE_LAYER_PRESETS,
     PresentationPreset,
     ResolvedSceneLayers,
     SettingPreset,
     StylePreset,
-    layer_issues,
     resolve_scene_layers,
 )
 
-from t2i_story_pipeline.config import load_story_provider_settings
-from t2i_story_pipeline.provider import OpenAIStoryModel
-
 ROOT = Path(__file__).resolve().parent
 CATALOGS = ROOT / "catalogs"
-OUTPUT = ROOT / "demo-output"
-SceneId = Annotated[str, StringConstraints(pattern=r"^D\d{2}$")]
 
 
-class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-
-class SceneEvaluation(StrictModel):
-    scene_id: SceneId
-    geometry_coherence: int = Field(ge=1, le=10)
-    visual_impact: int = Field(ge=1, le=10)
-    cast_clarity: int = Field(ge=1, le=10)
-    contact_clarity: int = Field(ge=1, le=10)
-    style_integration: int = Field(ge=1, le=10)
-    strengths: list[str] = Field(min_length=1, max_length=4)
-    issues: list[str] = Field(
-        max_length=4,
-        description=(
-            "Actionable material defects only; must be [] when verdict is pass."
-        ),
-    )
-    verdict: Annotated[
-        str,
-        StringConstraints(pattern=r"^(pass|revise|reject)$"),
-    ]
-
-    @model_validator(mode="after")
-    def verdict_matches_issues(self) -> SceneEvaluation:
-        if self.verdict == "pass" and self.issues:
-            raise ValueError("passing evaluations cannot contain issues")
-        if self.verdict != "pass" and not self.issues:
-            raise ValueError("non-passing evaluations require an issue")
-        return self
-
-
-class EvaluationBatch(StrictModel):
-    evaluations: list[SceneEvaluation] = Field(min_length=6, max_length=6)
-
-    @model_validator(mode="after")
-    def scene_ids_are_complete(self) -> EvaluationBatch:
-        ids = [evaluation.scene_id for evaluation in self.evaluations]
-        if ids != [f"D{index:02d}" for index in range(1, 7)]:
-            raise ValueError("evaluation IDs must be D01 through D06")
-        return self
-
-
-class DemoSpec(NamedTuple):
+class SceneSpec(NamedTuple):
     scene_id: str
     cast_key: str
     family: str
@@ -92,95 +39,18 @@ class DemoSpec(NamedTuple):
     setting_id: str
 
 
-SPECS = (
-    DemoSpec(
-        "D01",
-        "one_woman",
-        "supine",
-        "knees_bent_wide_hands_on_thighs",
-        "vibrator_clitoral",
-        "high_three_quarter",
-        "medium",
-        "rainy_neon_apartment",
-    ),
-    DemoSpec(
-        "D02",
-        "one_woman",
-        "seated_reclined",
-        "knees_wide_one_hand_thigh",
-        "spreader_bar_self_play",
-        "front_three_quarter",
-        "medium_wide",
-        "amber_restraint_studio",
-    ),
-    DemoSpec(
-        "D03",
-        "one_woman_one_man",
-        "lifted_supported",
-        "legs_wrapped_arms_shoulders",
-        "vaginal_lifted",
-        "low_three_quarter",
-        "full_body",
-        "burgundy_modern_corridor",
-    ),
-    DemoSpec(
-        "D04",
-        "one_woman_two_men",
-        "supine",
-        "knees_bent_wide_arms_outward",
-        "vaginal_plus_fellatio",
-        "high_three_quarter",
-        "medium_wide",
-        "midnight_luxury_hotel",
-    ),
-    DemoSpec(
-        "D05",
-        "two_women",
-        "all_fours",
-        "knees_wide_hands_straight",
-        "strap_on_vaginal_rear_entry",
-        "rear_three_quarter",
-        "medium",
-        "soft_morning_bedroom",
-    ),
-    DemoSpec(
-        "D06",
-        "three_women",
-        "seated_reclined",
-        "knees_wide_one_hand_thigh",
-        "oral_and_manual_on_central",
-        "front_three_quarter",
-        "medium_wide",
-        "demon_sovereign_palace",
-    ),
-)
-
-EVALUATION_SYSTEM = """
-Evaluate each complete image prompt independently. Score geometry coherence,
-visual impact, cast clarity, contact clarity, and style integration from 1 to
-10. Check whether the stated camera can show the planned pose, whether supports
-are credible, whether every actor has one coherent role, whether visible and
-occluded contacts remain consistent, whether every wearable prop is visibly
-anchored to its owner, whether limb tasks conflict with support points, and
-whether lighting strengthens the silhouette. Verify that the body ledger has
-exactly one continuous body per coded actor and that upper-body, lower-body,
-support, and contact tasks do not split one actor into duplicate bodies. Use
-pass only when no material correction is required. Return exactly D01 through
-D06 in order and only schema data. A pass verdict MUST use an empty issues
-array. Never put a pass rationale, summary, minor observation, or praise in
-issues. Any non-empty issues array MUST use revise or reject. Report an issue
-only for a deterministic contradiction, an anatomically impossible 2D
-relationship, a disconnected ownership/contact chain, or a limb assigned to
-incompatible simultaneous tasks. Do not report speculative rendering
-difficulty, reduced prominence, possible overlap, or a contact being fully
-hidden when its plan explicitly requires occluded local endpoints.
-Distinct contiguous segments of one arm may perform compatible parts of one
-cradle: a forearm can support a thigh while its hand cups the adjacent hip.
-""".strip()
-
-
 def phrase(value: str) -> str:
     return value.replace("_", " ")
+
+
+def camera_distance(shot_scale: str) -> str:
+    return {
+        "medium_close": "at a near distance",
+        "medium": "at a near-medium distance",
+        "medium_wide": "at a medium-far distance",
+        "full_body": "at a far distance that retains every body",
+        "wide": "at a far environmental distance",
+    }.get(shot_scale, "at a geometry-appropriate distance")
 
 
 def natural_pose(value: str) -> str:
@@ -332,6 +202,13 @@ def lifted_bilateral_chain(
             f"left hand cups her adjacent outer left hip; {possessive} right "
             f"forearm supports the underside of her right thigh while the same "
             f"continuous right hand cups her adjacent outer right hip."
+            f" {central_name}'s two-leg chain is closed and complete: left hip "
+            "to left thigh, left knee, left lower leg and left foot; right hip "
+            "to right thigh, right knee, right lower leg and right foot. Both "
+            f"of {central_name}'s feet remain airborne behind {possessive} hips "
+            f"and neither touches the floor. {partner_name}'s own left and right "
+            "legs remain distinct below the pelvis with exactly two planted "
+            "feet. No additional leg emerges from either pelvis."
         )
     if (
         pose.leg_configuration == "thighs_supported"
@@ -343,7 +220,12 @@ def lifted_bilateral_chain(
             f"{partner_name} supports {central_name} through two continuous "
             f"bilateral cradles: {possessive} left forearm carries her right "
             f"thigh and {possessive} right forearm carries her left thigh, with "
-            "both hands securing the outer hips."
+            "both hands securing the outer hips. "
+            f"{central_name}'s two-leg chain is closed and complete from each "
+            "hip through one thigh, one knee, one lower leg and one foot; both "
+            f"feet remain airborne. {partner_name}'s own two legs remain distinct "
+            "below the pelvis with exactly two planted feet. No additional leg "
+            "emerges from either pelvis."
         )
     return None
 
@@ -378,7 +260,7 @@ def actor_gives_oral(activity: ActivityTemplate, role: str) -> bool:
     central_role = activity.focus_role
     return any(
         edge.source.entity_id == role
-        and edge.source.region == "mouth"
+        and edge.source.region in {"mouth", "tongue"}
         and edge.target.entity_id == central_role
         for edge in activity.contact_edges
     )
@@ -565,22 +447,24 @@ def partner_relationship(
                         f"pelvis centered on {central_name}'s pelvic contact axis"
                     )
                 break
-            if edge.source.region == "mouth":
+            if edge.source.region in {"mouth", "tongue"}:
                 side = (
                     "left" if actor_plan.screen_position == "center_left" else "right"
                 )
+                oral_endpoint = edge.source.region
                 if "both_feet" in actor_plan.support_points:
                     relation = (
                         f"holds a low standing crouch beside {central_name}'s "
                         f"{side} thigh and approaches her pelvis from the {side}, "
-                        "lowering the torso until the mouth reaches its assigned "
-                        "contact"
+                        f"lowering the torso until the {oral_endpoint} reaches "
+                        "its assigned contact"
                     )
                 else:
                     relation = (
                         f"kneels beside {central_name}'s {side} thigh and "
                         f"approaches her pelvis from the {side}, lowering the "
-                        "torso until the mouth reaches its assigned contact"
+                        f"torso until the {oral_endpoint} reaches its assigned "
+                        "contact"
                     )
                 break
             if edge.source.region in {"hand", "left_hand", "right_hand"}:
@@ -616,6 +500,7 @@ def partner_relationship(
         supporting_relation = (
             relation.replace("aligns", "aligning", 1)
             .replace("kneels", "kneeling", 1)
+            .replace("holds", "holding", 1)
             .replace("is positioned", "positioned", 1)
             if relation
             else ""
@@ -695,7 +580,7 @@ def load_catalog(cast_key: str) -> PoseCatalog:
 
 def select_plan(
     catalog: PoseCatalog,
-    spec: DemoSpec,
+    spec: SceneSpec,
 ) -> tuple[PoseEntry, ActivityTemplate]:
     entry = next(
         (
@@ -726,7 +611,7 @@ def select_plan(
 
 
 def plan_fingerprint(
-    spec: DemoSpec,
+    spec: SceneSpec,
     entry: PoseEntry,
     activity: ActivityTemplate,
 ) -> str:
@@ -796,7 +681,7 @@ def occluders_for(edge: ContactEdge, cast_key: str) -> str:
         return (
             f"{receiver_name}'s only head, visibly connected to {receiver_name}'s torso"
         )
-    if "mouth" in edge_regions:
+    if {"mouth", "tongue"}.intersection(edge_regions):
         return "the head silhouette"
     if {"vagina", "anus"}.intersection(edge_regions):
         return "the near thigh and overlapping pelvises"
@@ -821,6 +706,32 @@ def anatomical_endpoint_ownership(
     return (
         f"The {phrase(edge.edge_id)} anatomical endpoint is rooted at "
         f"{owner}'s pelvis and remains part of {owner}'s single continuous body."
+    )
+
+
+def tongue_continuity(
+    edge: ContactEdge,
+    cast_key: str,
+) -> str | None:
+    tongue = next(
+        (
+            endpoint
+            for endpoint in (edge.source, edge.target)
+            if endpoint.region == "tongue"
+        ),
+        None,
+    )
+    if tongue is None:
+        return None
+    other = edge.target if tongue is edge.source else edge.source
+    owner = actor_name(tongue.entity_id, cast_key)
+    target = endpoint_phrase(other.entity_id, other.region, cast_key)
+    return (
+        f"{owner} has exactly one natural human tongue extending continuously "
+        f"from inside their open mouth, with its base rooted behind the lower teeth; "
+        f"the tongue stays slender and flat with a natural pink dorsal surface "
+        f"and one tapered rounded tip touching {target}. It is not detached, "
+        "duplicated, swollen, or fused with the lips."
     )
 
 
@@ -988,7 +899,7 @@ def distributed_contact_axis_clause(
 
 
 def compile_geometry(
-    spec: DemoSpec,
+    spec: SceneSpec,
     entry: PoseEntry,
     activity: ActivityTemplate,
 ) -> str:
@@ -1006,7 +917,8 @@ def compile_geometry(
         body_ledger(spec.cast_key),
         (
             f"The camera uses a {phrase(spec.viewpoint)} viewpoint and a "
-            f"{phrase(spec.shot_scale)} composition."
+            f"{phrase(spec.shot_scale)} composition "
+            f"{camera_distance(spec.shot_scale)}."
         ),
         (
             f"{central_name} holds {article} "
@@ -1084,6 +996,9 @@ def compile_geometry(
         ownership = anatomical_endpoint_ownership(edge, spec.cast_key)
         if ownership:
             sentences.append(ownership)
+        tongue_clause = tongue_continuity(edge, spec.cast_key)
+        if tongue_clause and edge.preferred_visibility == "visible":
+            sentences.append(tongue_clause)
         if edge.preferred_visibility == "occluded":
             sentences.append(
                 f"The {phrase(edge.edge_id)} {phrase(edge.state)} contact "
@@ -1146,7 +1061,7 @@ def endpoint_phrase(entity_id: str, region: str, cast_key: str) -> str:
 
 
 def region_visibility_maps(
-    spec: DemoSpec,
+    spec: SceneSpec,
     activity: ActivityTemplate,
 ) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     roles = CASTS[spec.cast_key]
@@ -1169,7 +1084,7 @@ def region_visibility_maps(
 
 
 def compile_scene_layers(
-    spec: DemoSpec,
+    spec: SceneSpec,
     entry: PoseEntry,
     activity: ActivityTemplate,
     fingerprint: str,
@@ -1180,11 +1095,36 @@ def compile_scene_layers(
 ) -> ResolvedSceneLayers:
     required, visible = region_visibility_maps(spec, activity)
     required_supports = environment_supports(entry)
+    cast_roles = list(CASTS[spec.cast_key])
+    interaction_partners: dict[str, set[str]] = {role: set() for role in cast_roles}
+    for edge in activity.contact_edges:
+        source_role = edge.source.entity_id
+        target_role = edge.target.entity_id
+        if (
+            source_role in interaction_partners
+            and target_role in interaction_partners
+            and source_role != target_role
+        ):
+            interaction_partners[source_role].add(target_role)
+            interaction_partners[target_role].add(source_role)
+    for prop in (*activity.wearable_props, *activity.handheld_props):
+        owner_role = getattr(prop, "owner_role", None) or getattr(
+            prop,
+            "controller_role",
+            None,
+        )
+        if (
+            owner_role in interaction_partners
+            and activity.focus_role in interaction_partners
+            and owner_role != activity.focus_role
+        ):
+            interaction_partners[owner_role].add(activity.focus_role)
+            interaction_partners[activity.focus_role].add(owner_role)
     return resolve_scene_layers(
         scene_id=spec.scene_id,
         spatial_fingerprint=fingerprint,
         geometry=geometry,
-        cast_roles=list(CASTS[spec.cast_key]),
+        cast_roles=cast_roles,
         body_level=entry.central_pose.body_level,
         setting=setting,
         style=style,
@@ -1192,6 +1132,11 @@ def compile_scene_layers(
         required_environment_supports=required_supports,
         required_regions_by_role=required,
         visible_regions_by_role=visible,
+        activity_id=activity.activity_id,
+        focus_role=activity.focus_role,
+        interaction_partners_by_role={
+            role: sorted(partners) for role, partners in interaction_partners.items()
+        },
     )
 
 
@@ -1216,7 +1161,7 @@ def combine_prompt(geometry: str, layers: ResolvedSceneLayers) -> str:
 
 
 def prompt_issues(
-    spec: DemoSpec,
+    spec: SceneSpec,
     entry: PoseEntry,
     activity: ActivityTemplate,
     prompt: str,
@@ -1391,11 +1336,16 @@ def prompt_issues(
             "",
         )
         if actor_gives_oral(activity, actor_plan.role):
-            if (
-                "approaches her pelvis from" not in actor_sentence
-                or "lowering the torso" not in actor_sentence
-                or "both palms braced" not in actor_sentence
-            ):
+            reaches_contact = (
+                "approaches her pelvis from" in actor_sentence
+                and "lowering the torso" in actor_sentence
+            )
+            has_support = (
+                "supports " in actor_sentence
+                if actor_plan.pose_function == "supporting_central"
+                else "both palms braced" in actor_sentence
+            )
+            if not reaches_contact or not has_support:
                 issues.append(f"{name} lacks a resolved oral reach path")
         if actor_receives_oral(
             activity,
@@ -1442,192 +1392,3 @@ def prompt_issues(
             if not manual_support_resolved:
                 issues.append(f"{name} has conflicting manual-contact hand tasks")
     return issues
-
-
-def evaluation_contract_issues(
-    evaluations: EvaluationBatch,
-) -> dict[str, list[str]]:
-    issues: dict[str, list[str]] = {}
-    speculative = re.compile(
-        r"\b(?:may|might|could|potential|possibly|depending|risk|plausible|"
-        r"likely|unlikely|challenge|not definitive|not impossible)\b",
-        re.I,
-    )
-    for evaluation in evaluations.evaluations:
-        scores = (
-            evaluation.geometry_coherence,
-            evaluation.visual_impact,
-            evaluation.cast_clarity,
-            evaluation.contact_clarity,
-            evaluation.style_integration,
-        )
-        if evaluation.verdict == "pass" and min(scores) < 7:
-            issues[evaluation.scene_id] = [
-                "pass verdict has a score below 7 without an actionable defect"
-            ]
-        if evaluation.verdict != "pass" and speculative.search(
-            " ".join(evaluation.issues)
-        ):
-            issues[evaluation.scene_id] = [
-                "non-passing verdict relies on speculative rendering risk"
-            ]
-    return issues
-
-
-async def run() -> dict[str, object]:
-    selected = []
-    prompts = []
-    resolved_layers = []
-    layer_validation_issues: dict[str, list[str]] = {}
-    hard_issues: dict[str, list[str]] = {}
-    for spec in SPECS:
-        catalog = load_catalog(spec.cast_key)
-        entry, activity = select_plan(catalog, spec)
-        fingerprint = plan_fingerprint(spec, entry, activity)
-        geometry = compile_geometry(spec, entry, activity)
-        layer_inputs = SCENE_LAYER_PRESETS[spec.setting_id]
-        layers = compile_scene_layers(
-            spec,
-            entry,
-            activity,
-            fingerprint,
-            geometry,
-            layer_inputs.setting,
-            layer_inputs.style,
-            layer_inputs.presentation,
-        )
-        prompt = combine_prompt(geometry, layers)
-        selected.append((spec, entry, activity))
-        resolved_layers.append(layers)
-        prompts.append(prompt)
-        current_layer_issues = layer_issues(
-            layers,
-            list(CASTS[spec.cast_key]),
-        )
-        if current_layer_issues:
-            layer_validation_issues[spec.scene_id] = current_layer_issues
-        current_hard_issues = prompt_issues(spec, entry, activity, prompt)
-        if current_hard_issues:
-            hard_issues[spec.scene_id] = current_hard_issues
-
-    settings = load_story_provider_settings()
-    async with OpenAIStoryModel(settings) as model:
-        evaluation_payload: dict[str, object] = {
-            "scenes": [
-                {"scene_id": spec.scene_id, "prompt": prompt}
-                for (spec, _, _), prompt in zip(
-                    selected,
-                    prompts,
-                    strict=True,
-                )
-            ]
-        }
-        evaluation_rejections: list[list[str]] = []
-        evaluation_validation_issues: dict[str, list[str]] = {}
-        evaluation_attempts = 0
-        for _ in range(3):
-            evaluation_attempts += 1
-            evaluation_response, rejections = await _generate_with_repair(
-                model,
-                system=EVALUATION_SYSTEM,
-                payload=evaluation_payload,
-                response_model=EvaluationBatch,
-                max_output_tokens=min(8000, settings.output_token_limit),
-            )
-            evaluation_rejections.extend(rejections)
-            evaluations = EvaluationBatch.model_validate(evaluation_response.value)
-            evaluation_validation_issues = evaluation_contract_issues(evaluations)
-            if not evaluation_validation_issues:
-                break
-            evaluation_payload = {
-                "scenes": evaluation_payload["scenes"],
-                "previous_evaluations": evaluations.model_dump(mode="json"),
-                "validation_issues": evaluation_validation_issues,
-                "repair_requirement": (
-                    "Re-evaluate all six scenes. A non-passing verdict must "
-                    "identify a deterministic contradiction, not a possible "
-                    "rendering difficulty."
-                ),
-            }
-
-    average_impact = sum(
-        evaluation.visual_impact for evaluation in evaluations.evaluations
-    ) / len(evaluations.evaluations)
-    evaluation_passed = all(
-        evaluation.verdict == "pass" for evaluation in evaluations.evaluations
-    )
-    report = {
-        "model": settings.model,
-        "scene_count": len(prompts),
-        "cast_keys": [spec.cast_key for spec in SPECS],
-        "setting_ids": [spec.setting_id for spec in SPECS],
-        "layer_validation_issues": layer_validation_issues,
-        "hard_geometry_issues": hard_issues,
-        "token_metrics": {
-            "geometry_estimated_tokens": sum(
-                layers.token_metrics.geometry_estimated_tokens
-                for layers in resolved_layers
-            ),
-            "layer_estimated_tokens": sum(
-                layers.token_metrics.layer_estimated_tokens
-                for layers in resolved_layers
-            ),
-            "verbose_layer_estimated_tokens": sum(
-                layers.token_metrics.verbose_layer_estimated_tokens
-                for layers in resolved_layers
-            ),
-            "compact_saved_tokens": sum(
-                layers.token_metrics.compact_saved_tokens for layers in resolved_layers
-            ),
-            "final_estimated_tokens": sum(
-                layers.token_metrics.final_estimated_tokens
-                for layers in resolved_layers
-            ),
-            "saved_style_generation_calls": len(prompts),
-        },
-        "average_visual_impact": average_impact,
-        "evaluations": evaluations.model_dump(mode="json")["evaluations"],
-        "evaluation_attempts": evaluation_attempts,
-        "evaluation_validation_issues": evaluation_validation_issues,
-        "evaluation_structured_rejections": evaluation_rejections,
-        "passed": (
-            not layer_validation_issues
-            and not hard_issues
-            and not evaluation_validation_issues
-            and evaluation_passed
-        ),
-    }
-    OUTPUT.mkdir(parents=True, exist_ok=True)
-    (OUTPUT / "prompts.txt").write_text(
-        "\n".join(prompts) + "\n",
-        encoding="utf-8",
-    )
-    (OUTPUT / "layers.json").write_text(
-        json.dumps(
-            [layers.model_dump(mode="json") for layers in resolved_layers],
-            ensure_ascii=False,
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    (OUTPUT / "evaluations.json").write_text(
-        evaluations.model_dump_json(indent=2) + "\n",
-        encoding="utf-8",
-    )
-    (OUTPUT / "report.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    return report
-
-
-def main() -> None:
-    report = asyncio.run(run())
-    print(json.dumps(report, ensure_ascii=False, indent=2))
-    if not report["passed"]:
-        raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main()

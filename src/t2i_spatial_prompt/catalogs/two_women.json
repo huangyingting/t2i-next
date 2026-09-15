@@ -270,7 +270,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "f2",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -289,7 +289,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "f1",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f2",
@@ -308,7 +308,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "f2",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -321,7 +321,7 @@
           "edge_id": "secondary",
           "source": {
             "entity_id": "f1",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f2",
@@ -410,7 +410,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "f2",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -639,7 +639,7 @@
           "edge_id": "primary",
           "source": {
             "entity_id": "f2",
-            "region": "mouth"
+            "region": "tongue"
           },
           "target": {
             "entity_id": "f1",
@@ -19070,10 +19070,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19135,10 +19140,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19200,10 +19210,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19265,10 +19280,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19330,10 +19350,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19395,10 +19420,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19460,10 +19490,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19525,10 +19560,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19590,10 +19630,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19655,10 +19700,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19720,10 +19770,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19785,10 +19840,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19850,10 +19910,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19915,10 +19980,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -19980,10 +20050,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
@@ -20045,10 +20120,15 @@
       "compatible_activity_ids": [
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
+        "cunnilingus_receiving",
+        "cunnilingus_giving",
+        "mutual_oral",
+        "breast_licking",
         "tribadism",
         "toy_vaginal",
         "toy_anal",
         "dual_toy",
+        "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "low_temp_wax_sensory"
       ],
