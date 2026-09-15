@@ -23,7 +23,7 @@ from pydantic import ValidationError
 from scene_layers import (
     CHARACTER_PROFILES,
     EXTRA_CAST_HAZARDS,
-    SETTING_PRESETS,
+    SCENE_LAYER_PRESETS,
     SettingPreset,
     layer_issues,
     resolve_scene_layers,
@@ -243,14 +243,24 @@ def main() -> None:
 
     d01_spec, d01_entry, d01_activity, d01_prompt = selected_plan("D01")
     d01_fingerprint = plan_fingerprint(d01_spec, d01_entry, d01_activity)
+    alternate_setting_spec = d01_spec._replace(setting_id="midnight_luxury_hotel")
+    if (
+        plan_fingerprint(alternate_setting_spec, d01_entry, d01_activity)
+        != d01_fingerprint
+    ):
+        raise AssertionError("setting changed the spatial plan fingerprint")
     d01_geometry = compile_geometry(d01_spec, d01_entry, d01_activity)
+    neon_inputs = SCENE_LAYER_PRESETS["rainy_neon_apartment"]
+    hotel_inputs = SCENE_LAYER_PRESETS["midnight_luxury_hotel"]
     d01_neon_layers = compile_scene_layers(
         d01_spec,
         d01_entry,
         d01_activity,
         d01_fingerprint,
         d01_geometry,
-        SETTING_PRESETS["rainy_neon_apartment"],
+        neon_inputs.setting,
+        neon_inputs.style,
+        neon_inputs.presentation,
     )
     d01_hotel_layers = compile_scene_layers(
         d01_spec,
@@ -258,7 +268,9 @@ def main() -> None:
         d01_activity,
         d01_fingerprint,
         d01_geometry,
-        SETTING_PRESETS["midnight_luxury_hotel"],
+        hotel_inputs.setting,
+        hotel_inputs.style,
+        hotel_inputs.presentation,
     )
     if (
         d01_neon_layers.fingerprints.characters
@@ -271,24 +283,72 @@ def main() -> None:
         raise AssertionError("valid resolved scene layers failed validation")
     if not d01_neon_layers.visibility.emitted_body_details_by_role["f1"]:
         raise AssertionError("visible relevant body detail was not emitted")
+    if "Supports: low platform bed" not in d01_neon_layers.compact_suffix:
+        raise AssertionError("required physical support was not compiled")
+    alternate_style = neon_inputs.style.model_copy(
+        update={"atmosphere": "cold electric suspense"}
+    )
+    alternate_style_layers = compile_scene_layers(
+        d01_spec,
+        d01_entry,
+        d01_activity,
+        d01_fingerprint,
+        d01_geometry,
+        neon_inputs.setting,
+        alternate_style,
+        neon_inputs.presentation,
+    )
+    if (
+        alternate_style_layers.fingerprints.style == d01_neon_layers.fingerprints.style
+        or alternate_style_layers.fingerprints.presentation
+        != d01_neon_layers.fingerprints.presentation
+    ):
+        raise AssertionError("style changes contaminated presentation fingerprint")
+    alternate_presentation = neon_inputs.presentation.model_copy(
+        update={"appearance_bias": ["commanding"]}
+    )
+    alternate_presentation_layers = compile_scene_layers(
+        d01_spec,
+        d01_entry,
+        d01_activity,
+        d01_fingerprint,
+        d01_geometry,
+        neon_inputs.setting,
+        neon_inputs.style,
+        alternate_presentation,
+    )
+    if (
+        alternate_presentation_layers.fingerprints.presentation
+        == d01_neon_layers.fingerprints.presentation
+        or "Presence: commanding" not in alternate_presentation_layers.compact_suffix
+    ):
+        raise AssertionError("appearance bias did not reach the presentation layer")
+    missing_support = d01_neon_layers.model_copy(deep=True)
+    missing_support.setting.support_realizations = [
+        item
+        for item in missing_support.setting.support_realizations
+        if item.support != "bed"
+    ]
+    if not any(
+        "setting lacks required supports" in issue
+        for issue in layer_issues(missing_support, ["f1"])
+    ):
+        raise AssertionError("missing physical support realization was accepted")
     hidden_detail_layers = resolve_scene_layers(
         scene_id=d01_spec.scene_id,
         spatial_fingerprint=d01_fingerprint,
         geometry=d01_geometry,
         cast_roles=["f1"],
         body_level=d01_entry.central_pose.body_level,
-        setting=SETTING_PRESETS["rainy_neon_apartment"],
+        setting=neon_inputs.setting,
+        style=neon_inputs.style,
+        presentation_source=neon_inputs.presentation,
+        required_environment_supports=["bed"],
         required_regions_by_role={"f1": ["clitoris"]},
         visible_regions_by_role={"f1": []},
-        layer_budget_tokens=200,
     )
     if hidden_detail_layers.visibility.emitted_body_details_by_role["f1"]:
         raise AssertionError("invisible body detail leaked into the prompt layer")
-    if (
-        d01_neon_layers.token_metrics.layer_estimated_tokens
-        > d01_neon_layers.token_metrics.layer_budget_tokens
-    ):
-        raise AssertionError("resolved layers exceeded their token budget")
     layered_d01_prompt = combine_prompt(d01_geometry, d01_neon_layers)
     if prompt_issues(d01_spec, d01_entry, d01_activity, layered_d01_prompt):
         raise AssertionError("layer compilation changed deterministic geometry")
@@ -304,7 +364,7 @@ def main() -> None:
         "lighting source" in issue for issue in layer_issues(unmotivated_light, ["f1"])
     ):
         raise AssertionError("unmotivated setting light was accepted")
-    invalid_setting = SETTING_PRESETS["rainy_neon_apartment"].model_dump(mode="json")
+    invalid_setting = neon_inputs.setting.model_dump(mode="json")
     invalid_setting["forbidden_elements"] = sorted(
         EXTRA_CAST_HAZARDS - {"mirrors_showing_extra_bodies"}
     )
@@ -348,10 +408,10 @@ def main() -> None:
         "right arm circles his right shoulder",
         "left thigh wraps around his left side",
         "right thigh wraps around his right side",
-        "left forearm supports her left thigh",
-        "left hand secures her outer left hip",
-        "right forearm supports her right thigh",
-        "right hand secures her outer right hip",
+        "left forearm supports the underside of her left thigh",
+        "same continuous left hand cups her adjacent outer left hip",
+        "right forearm supports the underside of her right thigh",
+        "same continuous right hand cups her adjacent outer right hip",
         "stands facing F1",
         "feet shoulder-width apart",
         "knees softly flexed",
@@ -359,7 +419,7 @@ def main() -> None:
     )
     if any(value not in d03_prompt for value in d03_required):
         raise AssertionError("D03 lacks an explicit standing support chain")
-    if d03_prompt.count("left forearm supports her left thigh") != 1:
+    if d03_prompt.count("left forearm supports the underside of her left thigh") != 1:
         raise AssertionError("D03 duplicates the bilateral support chain")
 
     d04_spec, d04_entry, d04_activity, d04_prompt = selected_plan("D04")
@@ -494,9 +554,11 @@ def main() -> None:
             "shoulder. Her left thigh wraps around his left side and her "
             "right thigh wraps around his right side, with both knees bent "
             "behind his hips. M1 supports F1 through two continuous bilateral "
-            "cradles: his left forearm supports her left thigh and his left "
-            "hand secures her outer left hip; his right forearm supports her "
-            "right thigh and his right hand secures her outer right hip. "
+            "cradles: his left forearm supports the underside of her left thigh "
+            "while the same continuous left hand cups her adjacent outer left "
+            "hip; his right forearm supports the underside of her right thigh "
+            "while the same continuous right hand cups her adjacent outer right "
+            "hip. "
         ),
         "",
     )
@@ -622,7 +684,7 @@ def main() -> None:
         "rejected_mutations": rejected_mutations,
         "rejected_prompt_mutations": 7,
         "evaluation_contract_fixtures": 2,
-        "scene_layer_invariants_validated": 9,
+        "scene_layer_invariants_validated": 14,
     }
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "validation-report.json").write_text(

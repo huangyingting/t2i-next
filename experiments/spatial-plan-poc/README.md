@@ -66,9 +66,9 @@ checks all six representative scenes, and verifies that malformed prop,
 contact, limb-ownership, restraint, and evaluation fixtures are rejected.
 Evidence is written to `demo-output/validation-report.json`.
 
-## Four-layer scene architecture
+## Five-input scene architecture
 
-The current scene compiler uses four typed inputs and one deterministic
+The current scene compiler uses five typed inputs and one deterministic
 resolver:
 
 1. `SpatialPlan` owns cast, pose, contact, support, occlusion, projection, and
@@ -77,10 +77,14 @@ resolver:
    hair, body-detail profile, grooming profile, and fantasy body traits.
 3. `SettingPreset` owns world genre, location, era, time, weather,
    architecture, materials, environment props, motivated light sources,
-   presentation biases, and exact-cast hazards.
-4. `PresentationPlan` owns scene-local wardrobe, wardrobe state, footwear,
-   accessories, makeup, hair styling, surface finish, lighting use, palette,
-   and atmosphere.
+   typed physical support realizations, mood tags, and exact-cast hazards.
+4. `StylePreset` owns a coherent visual recipe: medium, rendering language,
+   surface texture, contrast, color treatment, lighting treatment, atmosphere,
+   and compatible mood tags.
+5. `PresentationPreset` owns scene-local wardrobe, accessories, makeup, and
+   soft appearance biases. The resolver turns it into a `PresentationPlan`
+   containing the final wardrobe state, footwear, hair styling, surface finish,
+   motivated lighting use, and selected style recipe.
 
 [`scene_layers.py`](./scene_layers.py) defines these schemas, their independent
 fingerprints, and the deterministic resolver. Final visibility is derived from
@@ -98,21 +102,20 @@ person-shaped shadows, and mirrors that show extra bodies. Lighting must use a
 source declared by the selected setting. Wardrobe must be moved clear of every
 required contact rather than changing the contact.
 
-Layer prose has a hard 200-token estimate budget. The compiler deduplicates
-shared wardrobe and makeup themes across roles, omits invisible body details,
-and stores full typed data in `layers.json` instead of repeating it in the
-prompt. Reports compare compact layer prose with verbose schema serialization.
-The setting layer is deterministic, eliminating one model-generation call per
-scene; DeepSeek is invoked only when `--evaluate` is requested. Evaluation
-requests send the compiled prompt and scene ID only, because selections,
-fingerprints, and layer JSON are redundant with the validation performed
-locally.
+The compiler deduplicates shared wardrobe and makeup themes across roles,
+omits invisible body details, and stores full typed data in `layers.json`
+instead of repeating schema metadata in the prompt. Reports retain token
+measurements for observation, but token count does not truncate style content
+or determine whether a scene passes.
+Scene resolution is deterministic and never makes a per-scene style-generation
+call. Dynamic creative inference uses one blueprint call for the complete
+batch; DeepSeek evaluation remains optional. Evaluation requests send the
+compiled prompt and scene ID only, because selections, fingerprints, and layer
+JSON are redundant with validation performed locally.
 
-The six-scene reference run compiles 4,382 estimated verbose layer tokens into
-900 compact tokens, a 79% reduction, and avoids six style-generation calls.
-For the twelve-scene second batch, removing redundant selection metadata from
-the evaluation request reduced measured DeepSeek prompt usage from 8,947 to
-5,451 tokens while retaining the complete compiled prompt.
+The current six-scene reference stores 5,565 estimated tokens of complete typed
+layer data while emitting 1,076 estimated tokens of prompt layer prose. This
+reduction removes schema metadata and repetition, not style content.
 
 Generate six representative scenes through deterministic geometry and layer
 compilation, then independently evaluate them with DeepSeek:
@@ -156,3 +159,44 @@ The second batch is written independently under
 emphasizes the less-tested right-side lying, upright standing, bent standing,
 elevated bridge, dual controlled props, BDSM, wall-supported group, and lifted
 support topologies.
+
+## Dynamic creative blueprints
+
+For a new visual world, use a natural-language setting brief rather than
+writing twelve scene presets by hand:
+
+```bash
+STORY_OPENAI_MODEL=DeepSeek-V3.2 STORY_OPENAI_TEMPERATURE=0 uv run python \
+  experiments/spatial-plan-poc/demon_hardcore_12.py \
+  --creative-brief "An infernal royal palace of black iron and ritual fire" \
+  --creative-seed 42 --evaluate
+```
+
+The model is called once to infer a typed `CreativeBlueprint` with three
+independent sub-blueprints. `WorldBlueprint` contains coherent location cards,
+typed support identifiers paired with physical object descriptions, and
+motivated light sources. `StyleBlueprint`
+contains complete internally coherent style recipes rather than independently
+shuffled style adjectives. `PresentationBlueprint` contains wardrobe,
+accessory, makeup, and soft appearance-bias option pools. The model cannot
+choose cast, anatomy, activity, pose, actor support, contact, lens, camera
+placement, or framing.
+
+A local seeded constraint solver processes the most restrictive poses first,
+filters locations by their required physically realized supports, filters styles by
+compatible mood tags, and greedily maximizes unused locations, styles, and
+location/style pairs. Shuffled cycles provide presentation variation. The
+result is twelve semantically unique combinations of `SettingPreset`,
+`StylePreset`, and `PresentationPreset`, compiled with the twelve locked
+spatial plans.
+
+The same brief, seed, model, blueprint schema, and system prompt reuse a
+content-addressed cache and reproduce the same creative selections without
+another blueprint call. Changing any of those inputs invalidates the cache.
+Use `--refresh-blueprint` to deliberately replace a cached inference; refreshed
+model output is not guaranteed to match an earlier inference even with the same
+seed. The compiler emits the complete selected style recipe in the prompt and
+keeps the full structured style data in `layers.json`. The current blueprint
+snapshot, cache key, prompts, selections, resolved layers, token metrics, and
+optional independent evaluation are written under
+`demon-hardcore-12-output/`.

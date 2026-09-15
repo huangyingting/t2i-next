@@ -1,0 +1,388 @@
+{
+  "schema_version": 4,
+  "system_prompt_hash": "a38b1eb263eaefe4ea91839d174d698708938dad83377b44efe0b24d7ce62026",
+  "brief_hash": "ed4829fae53c6b7c246ddbca9e3caa5174d08bcb9cbb362c55f7c74d776cf803",
+  "creative_seed": 42,
+  "model": "DeepSeek-V3.2",
+  "structured_rejections": [],
+  "usage": {
+    "prompt_tokens": 385,
+    "completion_tokens": 2359,
+    "total_tokens": 2744
+  },
+  "blueprint": {
+    "world": {
+      "family_id": "infernal_palace",
+      "world_genre": "dark_fantasy",
+      "era": "timeless_infernal",
+      "locations": [
+        {
+          "location_id": "obsidian_throne_room",
+          "location": "Grand Throne Hall",
+          "architecture": "Colossal obsidian rib vaults",
+          "materials": [
+            "Polished obsidian",
+            "Volcanic glass",
+            "Black iron inlay"
+          ],
+          "environment_props": [
+            "Massive basalt throne",
+            "Floating glyph braziers",
+            "Fallen crimson drapes"
+          ],
+          "light_sources": [
+            "Cold glyph fire",
+            "Supernatural lava veins in floor"
+          ],
+          "support_realizations": [
+            {
+              "support": "floor",
+              "description": "Glowing lava-veined obsidian"
+            },
+            {
+              "support": "furniture",
+              "description": "Basalt throne slab"
+            },
+            {
+              "support": "wall",
+              "description": "Ribbed obsidian wall"
+            }
+          ],
+          "mood_tags": [
+            "majestic",
+            "ominous",
+            "sovereign"
+          ]
+        },
+        {
+          "location_id": "consort_chambers",
+          "location": "Consort's Private Chambers",
+          "architecture": "Low vaulted ceiling",
+          "materials": [
+            "Black iron filigree",
+            "Crimson velvet",
+            "Charred oak"
+          ],
+          "environment_props": [
+            "Low-backed iron chair",
+            "Discarded ceremonial mantle",
+            "Iron-bound chest"
+          ],
+          "light_sources": [
+            "Low-burning ritual candles",
+            "Ember-filled hearth"
+          ],
+          "support_realizations": [
+            {
+              "support": "chair",
+              "description": "Low-backed iron chair"
+            },
+            {
+              "support": "floor",
+              "description": "Charred oak planking"
+            },
+            {
+              "support": "bed",
+              "description": "Low ebony platform bed"
+            },
+            {
+              "support": "furniture",
+              "description": "Iron-bound chest"
+            }
+          ],
+          "mood_tags": [
+            "intimate",
+            "shadowed",
+            "luxurious"
+          ]
+        },
+        {
+          "location_id": "crimson_audience_gallery",
+          "location": "Crimson Audience Gallery",
+          "architecture": "Long arched gallery",
+          "materials": [
+            "Crimson velvet hangings",
+            "Black iron stanchions",
+            "Basalt tiles"
+          ],
+          "environment_props": [
+            "Long velvet-draped sofa",
+            "Iron side tables",
+            "Scattered horned sigils"
+          ],
+          "light_sources": [
+            "Blood-red lanterns",
+            "Reflected firelight"
+          ],
+          "support_realizations": [
+            {
+              "support": "sofa",
+              "description": "Velvet-draped long sofa"
+            },
+            {
+              "support": "furniture",
+              "description": "Iron side table"
+            },
+            {
+              "support": "wall",
+              "description": "Velvet-hung stone wall"
+            }
+          ],
+          "mood_tags": [
+            "dramatic",
+            "voluptuous",
+            "ceremonial"
+          ]
+        },
+        {
+          "location_id": "ritual_bath_annex",
+          "location": "Ritual Bath Annex",
+          "architecture": "Sunken circular pool",
+          "materials": [
+            "Black iron grating",
+            "Smooth basalt",
+            "Steam"
+          ],
+          "environment_props": [
+            "Iron support sling",
+            "Stone benches",
+            "Drained braziers"
+          ],
+          "light_sources": [
+            "Underwater ember glow",
+            "Steam-shrouded vents"
+          ],
+          "support_realizations": [
+            {
+              "support": "support_sling",
+              "description": "Black iron chain sling"
+            },
+            {
+              "support": "floor",
+              "description": "Wet basalt pool surround"
+            },
+            {
+              "support": "bed_edge",
+              "description": "Wide stone bench edge"
+            }
+          ],
+          "mood_tags": [
+            "sensual",
+            "hazy",
+            "supernatural"
+          ]
+        },
+        {
+          "location_id": "infernal_scriptorium",
+          "location": "Infernal Scriptorium",
+          "architecture": "Narrow, high-ceilinged niche",
+          "materials": [
+            "Black iron shelves",
+            "Flayed parchment",
+            "Ash-dusted stone"
+          ],
+          "environment_props": [
+            "Heavy iron stool",
+            "Scroll-laden desk",
+            "Dangling chains"
+          ],
+          "light_sources": [
+            "Flickering soul-flame sconces"
+          ],
+          "support_realizations": [
+            {
+              "support": "chair",
+              "description": "Heavy iron stool"
+            },
+            {
+              "support": "furniture",
+              "description": "Scroll-laden iron desk"
+            },
+            {
+              "support": "wall",
+              "description": "Ash-dusted stone niche wall"
+            }
+          ],
+          "mood_tags": [
+            "arcane",
+            "forbidden",
+            "intense"
+          ]
+        },
+        {
+          "location_id": "processional_corridor",
+          "location": "Grand Processional Corridor",
+          "architecture": "Vast, sloping corridor",
+          "materials": [
+            "Polished obsidian walls",
+            "Black iron rivets",
+            "Charcrust floor"
+          ],
+          "environment_props": [
+            "Discarded horned crown prop",
+            "Shattered iron sconces"
+          ],
+          "light_sources": [
+            "Distant volcanic glow",
+            "Flickering residual magic"
+          ],
+          "support_realizations": [
+            {
+              "support": "floor",
+              "description": "Charcrust textured floor"
+            },
+            {
+              "support": "furniture",
+              "description": "Shattered iron sconce base"
+            },
+            {
+              "support": "bed_edge",
+              "description": "Low obsidian ledge"
+            }
+          ],
+          "mood_tags": [
+            "desolate",
+            "grandiose",
+            "ominous"
+          ]
+        }
+      ],
+      "time_options": [
+        "eternal_night",
+        "ritual_hour"
+      ],
+      "weather_options": [
+        "static_heat_haze",
+        "slow_ember_fall"
+      ]
+    },
+    "style": {
+      "recipes": [
+        {
+          "style_id": "regal_infernal_cinematic",
+          "medium": "digital_painting",
+          "rendering_language": "hyper-detailed_cinematic_illustration",
+          "surface_texture": "glossy_obsidian_crushed_velvet",
+          "contrast": "deep_shadow_high_gloss",
+          "color_treatment": "crimson_black_gold_accent",
+          "lighting_treatment": "supernatural_motivated_rim_light",
+          "atmosphere": "volumetric_smoke_ember_glow",
+          "compatible_moods": [
+            "majestic",
+            "ominous",
+            "dramatic",
+            "intense"
+          ]
+        },
+        {
+          "style_id": "intimate_demon_baroque",
+          "medium": "oil_on_canvas",
+          "rendering_language": "baroque_chiaroscuro",
+          "surface_texture": "velvet_iron_patina",
+          "contrast": "extreme_light_dark_pools",
+          "color_treatment": "desaturated_crimson_black",
+          "lighting_treatment": "single_motivated_candle_hearth",
+          "atmosphere": "close_thick_air_heat_haze",
+          "compatible_moods": [
+            "intimate",
+            "shadowed",
+            "sensual",
+            "arcane"
+          ]
+        },
+        {
+          "style_id": "ceremonial_fantasy_epic",
+          "medium": "3D_rendered",
+          "rendering_language": "epic_fantasy_concept_art",
+          "surface_texture": "rough_basalt_smooth_metal",
+          "contrast": "high_dynamic_range",
+          "color_treatment": "monochromatic_red_scale",
+          "lighting_treatment": "dramatic_god_rays_firelight",
+          "atmosphere": "grand_scale_volumetric_light",
+          "compatible_moods": [
+            "ceremonial",
+            "grandiose",
+            "voluptuous",
+            "sovereign"
+          ]
+        },
+        {
+          "style_id": "forbidden_ritual_etching",
+          "medium": "graphite_charcoal_digital",
+          "rendering_language": "detailed_etching_cross-hatch",
+          "surface_texture": "gritty_stone_flaky_parchment",
+          "contrast": "bold_black_white",
+          "color_treatment": "warm_sepia_blood_spot",
+          "lighting_treatment": "hard_directional_shadow",
+          "atmosphere": "dry_static_claustrophobic",
+          "compatible_moods": [
+            "forbidden",
+            "desolate",
+            "intense",
+            "arcane"
+          ]
+        },
+        {
+          "style_id": "supernatural_haze_dream",
+          "medium": "photomanipulation_painting",
+          "rendering_language": "dreamlike_surreal_compositing",
+          "surface_texture": "ethereal_glow_smoke",
+          "contrast": "low_soft_glow",
+          "color_treatment": "deep_red_black_haze",
+          "lighting_treatment": "internal_glow_ambient",
+          "atmosphere": "dense_magical_haze",
+          "compatible_moods": [
+            "hazy",
+            "supernatural",
+            "sensual",
+            "shadowed"
+          ]
+        },
+        {
+          "style_id": "volcanic_gothic_noir",
+          "medium": "mixed_media_collage",
+          "rendering_language": "gothic_noir_silhouette",
+          "surface_texture": "glossy_rough_jagged",
+          "contrast": "harsh_spotlight_deep_void",
+          "color_treatment": "black_white_crimson_splash",
+          "lighting_treatment": "single_hard_motivated_source",
+          "atmosphere": "tense_smoldering_stillness",
+          "compatible_moods": [
+            "ominous",
+            "intense",
+            "dramatic",
+            "forbidden"
+          ]
+        }
+      ]
+    },
+    "presentation": {
+      "wardrobe_options": [
+        "Obsidian-scale gown",
+        "Crimson velvet mantle",
+        "Black iron corsetry",
+        "Flowing char-silk robes",
+        "Horned crown regalia",
+        "Forged iron consort doublet"
+      ],
+      "accessory_options": [
+        "Iron sigil rings",
+        "Volcanic glass jewelry",
+        "Chain-linked belts",
+        "Ember-glowing amulets",
+        "Ritual dagger sheaths"
+      ],
+      "makeup_options": [
+        "Pale base with ash contour",
+        "Crimson lip and eyeliner",
+        "Metallic gold eye accent",
+        "Soot-smudged ritual marks"
+      ],
+      "appearance_bias": [
+        "powerful_demonic_features",
+        "sharp_elegant_lines",
+        "regal_supernatural_presence"
+      ]
+    }
+  }
+}

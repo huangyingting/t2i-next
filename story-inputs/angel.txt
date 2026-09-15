@@ -2,11 +2,11 @@ BRIEF
 
 ABSOLUTE OUTPUT PRIORITY
 
-Create one original bright live-action cinematic portrait from the exact
-requested adult cast. The image must look like a frame photographed on the set
-of a premium feature film with real adult performers, practical wardrobe,
-physical locations, controlled production design, and plausible camera and
-lighting behavior.
+Create one original live-action dark-fantasy feature-film image from the exact
+requested adult cast. The image must look like a finished frame from a premium
+feature film with real adult performers, practical wardrobe and armor,
+physically constructed wings, monumental locations, controlled production
+design, and plausible camera and lighting behavior.
 
 Every Theme contains exactly one central angel: either one adult female angel
 or one adult male angel. The central angel counts as one requested person and
@@ -22,9 +22,14 @@ two angels and never two pairs of wings.
 
 An English Frame is one ASCII-only natural-language paragraph containing at
 least 600 whitespace-delimited words. Target 650-900 words of concrete,
-visible, imageable detail. Preserve exact cast, live-action realism, bright
+visible, imageable detail. Preserve exact cast, live-action realism, low-saturation high-contrast
 cinematic lighting, anatomy, content level, action, location, composition,
-camera, wardrobe, wings, materials, and body support.
+camera, wardrobe, wings, materials, environmental event, and body support.
+
+Within the first sixty English words of every final Frame, explicitly call the
+image a "live-action dark-fantasy feature-film frame". Do not postpone the
+medium until camera details near the end, and do not substitute cinematic,
+photorealistic, realistic, or movie-like by itself for this exact declaration.
 
 ASCII is an absolute publication requirement. Write apostrophes as ', quotation
 marks as ", and dashes as -. Never type a curly apostrophe, smart quote, em
@@ -34,7 +39,7 @@ character-by-character ASCII sweep before returning an English Frame.
 LIVE-ACTION CINEMATIC THESIS
 
 Make the image feel like a finished still from a large-budget live-action
-feature film:
+dark-fantasy feature film:
 
 - a real adult performer with natural skin texture, pores, fine facial hair,
   individual hair strands, believable eyes, and ordinary human anatomy;
@@ -42,29 +47,37 @@ feature film:
   convincing weight, joints, feather overlap, contact shadow, and motion;
 - wearable metal armor, tailored clothing, or draped fabric with real seams,
   closures, abrasion, gravity, and material thickness;
-- a practical or convincingly extended real location with coherent floor,
-  walls, weather, atmosphere, props, and scale;
-- bright high-key or luminous daylight that preserves skin tone, fabric
-  texture, feather detail, and metal response;
+- a practical or convincingly extended monumental location with coherent
+  floor, walls, weather, atmosphere, props, foreground, midground, and
+  background scale;
+- deep cinematic chiaroscuro with one motivated descending shaft or pool of
+  light that preserves skin tone, fabric texture, feather detail, and metal
+  response;
+- an intentionally low-saturation, dark-key, high-tonal-contrast,
+  narrow-gamut palette built from charcoal, graphite, ash, weathered umber,
+  bone grey, oxidized metal, desaturated blue-green, and tarnished amber;
 - real feature-film optics, measured depth of field, subtle motion behavior,
   controlled highlight roll-off, fine cinematic grain, and plausible lens
   perspective; and
 - an immediate present-tense action rather than a static character design
   sheet.
 
-This is photographic cinematic realism, not fantasy illustration. Do not use
+This is photographic dark-fantasy cinematic realism, not fantasy
+illustration. Do not use
 oil-painting language, painterly brushwork, concept art, digital illustration,
 anime, game art, game UI, synthetic CGI gloss, 3D-render terminology, matte
 painting, graphic-novel styling, devotional iconography, or a generic fantasy
-poster. Do not describe a magical celestial country, supernatural portal,
-floating palace, impossible heaven, glowing rune, energy beam, spell effect,
-or physics-defying architecture.
+poster.
 
 The angel may be extraordinary, but the camera treats the performer, wings,
 wardrobe, location, and light as physically present. Never explain the visual
 as cosplay, a costume convention, a stage rehearsal, a behind-the-scenes
 photograph, or a special-effects test. Present it directly as a believable
-moment within a serious live-action film.
+moment within a serious finished live-action film. Use restrained invisible
+visual-effects extension only for impossible scale, distant architecture,
+weather, or safe supernatural phenomena. Never describe a green screen,
+digital double, compositing layer, render pass, or production process inside
+the final image.
 
 ORIGINALITY
 
@@ -147,22 +160,22 @@ REALISTIC CHARACTER AND ROLE VARIETY
 Give each central angel a role that can be performed visibly in a live-action
 scene:
 
-- ceremonial honor guard arriving at a sunlit civic courtyard;
-- rescue pilot reviewing a weather map beside an open hangar;
-- diplomatic envoy crossing a bright museum atrium;
-- field medic checking equipment in a clean mobile clinic;
-- archivist carrying blank conservation boxes through a glass library;
-- orchestra conductor entering an empty rehearsal hall;
-- coastal surveyor measuring wind on a white-stone terrace;
-- architectural conservator inspecting a restored palace ceiling;
-- formal emissary waiting beside a daylight train platform;
-- investigator examining physical evidence in a luminous laboratory;
-- athlete preparing for a public ceremonial flight;
-- royal marshal receiving visitors in a modern state room;
-- fashion patron descending a broad hotel staircase;
-- gardener working inside a vast sunlit greenhouse; or
-- another original adult role grounded in visible tools and a plausible
-  real-world action.
+- celestial marshal inspecting a storm-battered mountain gate;
+- armored rescue commander securing a cathedral evacuation route;
+- diplomatic envoy crossing a vast black-stone audience hall;
+- field medic checking equipment in a torchless subterranean infirmary;
+- forbidden archivist moving blank reliquary cases through a drowned library;
+- eclipse navigator adjusting physical rings beneath a broken oculus;
+- coastal sentinel measuring wind on a moonless basalt terrace;
+- architectural conservator inspecting a fractured mineral basilica;
+- formal emissary waiting beside an abandoned underground station;
+- investigator examining physical evidence in a severe alchemical laboratory;
+- winged champion preparing for a ceremonial flight from a fortress causeway;
+- royal marshal holding a threshold during a distant storm;
+- forge patron crossing an iron gallery above cooling metal;
+- night gardener tending pale plants in an ash-dark conservatory; or
+- another original adult role grounded in visible tools, sovereign purpose,
+  and a physically legible present action.
 
 Vary exact age, stature, body fat, musculature, shoulder width, face shape,
 nose, jaw, scars, freckles, skin texture, hair texture, hair length, grooming,
@@ -188,15 +201,15 @@ clearance, light, and visible feather behavior.
 
 Choose one physically coherent matched wing family:
 
-- long white eagle-like flight feathers with warm ivory shadow;
-- broad cream owl-like wings with soft rounded edges;
-- compact dove-grey wings with dense overlapping coverts;
-- silver-grey falcon-like wings with narrow aerodynamic primaries;
-- pale champagne feathers with slightly darker natural shafts;
-- white wings with restrained charcoal primary tips;
+- long weathered ivory eagle-like flight feathers with graphite shadow;
+- broad bone-grey owl-like wings with soft rounded edges;
+- compact smoke-grey dove wings with dense overlapping coverts;
+- oxidized silver falcon-like wings with narrow aerodynamic primaries;
+- tarnished champagne feathers with darker natural shafts;
+- ash-white wings with charcoal primary tips;
 - rain-damp pearl-grey wings with naturally grouped feathers;
-- weathered ivory wings with repaired but living feather shafts;
-- very pale brown wings with subtle cream barring; or
+- old ivory wings with repaired but living feather shafts;
+- muted umber wings with subtle bone-grey barring; or
 - another real avian-inspired pair using believable organic keratin.
 
 Vary wing scale from compact shoulder-to-calf folds through broad two-body-width
@@ -215,7 +228,7 @@ In a solo portrait, wing grooming, measurement, or adjustment applies only to
 the angel's two visibly attached wings. Never add a loose wing joint, spare
 wing, invisible wing, disembodied wing, or implied off-camera patient.
 
-WARDROBE AND BRIGHT GOLD ARMOR
+WARDROBE, ARMOR, AND REGALIA
 
 Every garment looks physically manufactured and wearable by a live actor.
 Show fabric weave, lining, seams, hems, fasteners, lacing, buckles, padding,
@@ -223,27 +236,27 @@ weight, wrinkles, and realistic interaction with the body and wing roots.
 
 Choose one coherent wardrobe system:
 
-- polished champagne-gold articulated plate over ivory padded tailoring;
-- brushed pale-gold lamellar over cream leather and white linen;
-- warm antique-gold scale armor with restrained wear and realistic joints;
-- bright silver plate over pearl-grey ceremonial tailoring;
-- white and silver half armor over a sharply cut long coat;
-- ivory architectural robes with pale-gold closures;
-- cream silk tailoring with a practical wing-root harness;
-- sunlit stone-grey travel clothing with pale leather protection;
-- modern white formalwear with minimal metal regalia;
-- a clean professional field uniform adapted around the wings;
+- blackened articulated plate with worn old-gold inlay over ash-grey padding;
+- tarnished pale-gold lamellar over deep umber leather and bone linen;
+- weathered antique-gold scale armor with restrained wear and realistic joints;
+- oxidized silver plate over graphite ceremonial tailoring;
+- charcoal and silver half armor over a sharply cut long coat;
+- heavy bone-grey architectural robes with tarnished-gold closures;
+- dark silk tailoring with a practical wing-root harness;
+- stone-grey travel clothing with black leather protection;
+- severe formalwear with minimal oxidized-metal regalia;
+- a weathered professional field uniform adapted around the wings;
 - exposed adult skin framed by minimal physically wearable regalia at the
   requested content level; or
-- another bright cinematic ensemble with credible construction.
+- another low-saturation cinematic ensemble with credible construction.
 
 Golden armor is welcome and should read clearly as body-worn metal, not merely
-gold feathers, a prop, trim, or colored light. Use champagne gold, pale gold,
-brushed gold, warm antique gold, or softly polished gold. Preserve realistic
-metal response with broad soft highlights, darker joint recesses, fine
-scratches, edge wear, and neutral reflections. Avoid fluorescent yellow,
-orange fantasy gold, mirror-like clipping, excessive filigree, impossible
-floating plates, or armor fused into skin.
+gold feathers, a prop, trim, or colored light. Use tarnished champagne gold,
+smoke-dulled pale gold, worn antique gold, or blackened gold. Preserve
+realistic metal response with narrow controlled highlights, darker joint
+recesses, fine scratches, edge wear, oxidation, and neutral reflections.
+Avoid fluorescent yellow, vivid orange fantasy gold, mirror-like clipping,
+excessive filigree, impossible floating plates, or armor fused into skin.
 
 Armor follows real anatomy. Shoulder pieces preserve neck and wing movement;
 breastplates follow a plausible rib cage; gauntlets preserve five fingers;
@@ -259,52 +272,124 @@ At Erotic or Hardcore level, open, displaced, translucent, or removed garments
 follow pose and gravity, remain assigned to their owner, and never create extra
 limbs or hide essential body connections.
 
-REAL-WORLD CINEMATIC LOCATIONS
+MONUMENTAL CINEMATIC LOCATIONS
 
-Choose one physically plausible bright location:
+Choose one coherent dark-fantasy environment that strengthens the angel:
 
-- a sunlit limestone palace courtyard with open colonnades;
-- a glass-roofed museum atrium during morning hours;
-- a white-stone coastal terrace above a pale blue sea;
-- a modern airport hangar with its doors open to daylight;
-- a restored civic hall with cream plaster and tall windows;
-- a bright photographic studio with a large practical set;
-- a marble hotel lobby with broad stairs and skylights;
-- a greenhouse filled with restrained real vegetation;
-- a clean aircraft workshop with daylight through clerestory windows;
-- a contemporary library of pale oak, glass, and white stone;
-- a museum conservation room with neutral walls and large north-facing light;
-- a quiet beach, salt flat, pale quarry, grass airfield, or snow-covered
-  exterior under clear or lightly overcast daylight;
-- a private bedroom, dressing room, bathroom, or indoor pool designed with
-  pale stone, warm wood, linen, glass, and large daylight windows; or
-- another real buildable location with coherent architecture and support.
+- a cyclopean basalt cathedral beneath a broken oculus;
+- a drowned bell crypt lit through deep mineral water;
+- an iron audience hall above slow volcanic light;
+- a ruined subterranean basilica with colossal columns and a narrow skylight;
+- a black-stone sanctuary enclosed by carved ribs and severe buttresses;
+- an ancient cavern palace shaped by mineral terraces and ceremonial steps;
+- a storm observatory with physical rings surrounding an open roof;
+- a severe bedchamber, bath, reliquary, library, infirmary, or war room scaled
+  for a winged celestial authority;
+- a moonless coastal fortress, frozen gate, ash garden, salt palace, mountain
+  causeway, petrified forest, or crater-rim watchtower; or
+- another original monumental seat of power with coherent architecture,
+  grounded support, and practical wing clearance.
 
 Use practical set details such as doors, windows, benches, tables, tools,
-vehicles, curtains, railings, stairs, pools, or equipment. Keep all surfaces
-physically buildable. Do not add levitating objects, endless impossible
-staircases, magical clouds indoors, glowing symbols, fantasy thrones, giant
-moon portals, impossible eclipses, or supernatural weather.
+curtains, chains, counterweights, railings, stairs, channels, pools, or
+equipment. Keep occupied surfaces physically buildable and use invisible VFX
+extension only beyond the practical foreground and midground. Do not add
+levitating clutter, glowing symbols, random magic beams, or unrelated
+spectacle.
 
 Every location provides clear scale, floor support, wing clearance, and a
 logical source for light. No readable signs, screens, books, documents,
 license plates, labels, emblems, posters, inscriptions, or pseudo-writing
 appear.
 
+ENVIRONMENTAL SET-PIECE AND EVENT ENGINE
+
+Treat the environment as an active visual system rather than a static room.
+Every Theme selects exactly one dominant set-piece event already happening in
+the visible instant. The event must alter light, material, silhouette, or body
+movement without adding unrequested people:
+
+- a colossal floodgate opening as one controlled wall of dark water enters a
+  stepped court beyond the occupied platform;
+- a suspended forge crucible rotating above a channel while a narrow stream of
+  muted molten metal redirects light across armor and stone;
+- a black-ice floor developing one broad branching fracture while all adults
+  remain safely supported on stable dry sections;
+- physical observatory rings turning around an open oculus as one distant
+  lightning sheet reveals their scale;
+- an ash garden bending under a single lateral wind front that drives cloth,
+  hair, wings, and distant fine ash in one readable direction;
+- a mineral rain curtain crossing an exterior terrace while drainage channels
+  become narrow reflections;
+- a giant counterweighted archive lift stopping between basalt galleries as
+  blank cases shift within secured racks;
+- a volcanic tide withdrawing beneath a causeway and exposing ribbed cooling
+  rock rather than random flames;
+- a drowned bell chamber disturbed by one descending pressure wave that bends
+  distant suspended silt and reflected light;
+- a mechanical eclipse aperture closing across a pale skylight and casting a
+  moving hard-edged shadow through the court;
+- a monumental curtain, gate, bridge section, observatory shutter, or armored
+  door moving on visible hinges, tracks, ropes, or counterweights; or
+- another original physically legible event with one cause, one movement
+  direction, and one visible material consequence.
+
+Choose a peak readable instant: the gate halfway open, water touching the
+first empty stair, lightning revealing the far vault, the crucible beginning
+its distant pour, the curtain reaching maximum extension, or the eclipse edge
+crossing the central angel's face. Use exactly one dominant event and at most
+one subordinate physical reaction. Do not stack unrelated fire, lightning,
+collapse, smoke, weapons, creatures, and particles into a game-poster collage.
+
+The event is powerful but controlled. It never strikes, burns, floods,
+crushes, cuts, traps, or destabilizes a requested adult. At Erotic or Hardcore
+level, the complete occupied body zone is dry, room-temperature, stable,
+non-slip, ventilated, and filled with breathable air. Water may form a shallow
+reflective layer no higher than the ankles outside the supported intimate
+area, but no face, chest, pelvis, sexual contact, or breathing passage is
+submerged. Never stage intimacy underwater, inside a fully flooded chamber,
+on algae-slick or ice-slick support, or beneath a falling liquid column.
+
+Keep ash, dust, silt, sparks, rain, smoke, steam, mineral spray, and loose
+debris out of mouths, eyes, genitals, sexual fluids, and direct-contact zones.
+Such material remains in the distant background, beyond a barrier, or in a
+separate light beam. Keep hot metal, moving machinery, deep water, heavy
+mechanisms, sharp ice, and collapsing material several body lengths away and
+physically isolated from the cast.
+
+DEPTH, SILHOUETTE, AND VISUAL IMPACT
+
+Build every image in three readable layers. Use a foreground threshold such as
+a stair edge, empty rail, wing tip, curtain edge, channel, or reflective
+surface; a midground containing the complete cast and decisive action; and a
+background carrying monumental architecture and the dominant event.
+
+Choose one strong graphic structure per image: vertical oculus shaft, hard
+diagonal gate, circular eclipse, triangular wing-and-body hierarchy, receding
+colonnade, mirrored water band, or compressed doorway silhouette. Give the
+dominant event one readable movement vector and let loose hair, fabric, wing
+feathers, rain, reflected light, or distant particles support that same
+direction rather than scattering randomly.
+
+Keep the central angel's face, both wing roots, hands, complete body support,
+and decisive contact readable. Separate pale feather edges from bone-grey
+stone and dark armor through value, rim light, atmosphere, and focus rather
+than saturated color.
+
 POSE AND ACTION VARIETY
 
 At Aesthetic level, vary:
 
-- walking through hard or soft morning light while turning toward camera;
+- walking through a descending oculus shaft while turning toward camera;
 - standing at three-quarter profile while fastening one practical gauntlet;
-- sitting on a real bench with both feet grounded and wings relaxed;
-- descending a broad stair with independently balanced wing motion;
+- sitting on a stone throne with both feet grounded and wings relaxed;
+- descending a monumental stair with independently balanced wing motion;
 - leaning over a map, instrument, table, or equipment case;
 - kneeling on one knee to inspect a real object with stable body support;
-- stepping from a vehicle, hangar, doorway, pool edge, or colonnade;
+- stepping from a gate, observatory, doorway, dry pool edge, or colonnade;
 - raising both wings into a controlled high V in a space with clearance;
 - adjusting attached feathers with one visible hand;
-- facing strong coastal wind with one wing forward and one wing back; or
+- facing a single lateral wind front with one wing forward and one wing back;
 - another present, visible, physically achievable live-action movement.
 
 At Erotic level, use non-explicit adult intimacy: reciprocal undressing,
@@ -318,69 +403,76 @@ hands and faces, ordinary human sexual anatomy, and practical wing clearance.
 Wings, feathers, armor, furniture edges, or props never enter a sexual-contact
 path and never penetrate, restrain, suspend, crush, choke, cut, or injure.
 
-Within the first one hundred eighty English words of every Hardcore Frame,
-name the exact sexual act and the active ordinary human anatomy in direct,
-literal language. For intercourse, explicitly state which adult's penis is
-inside which adult's vagina or anus. For oral or manual sex, explicitly state
-which mouth or hand contacts which named genitals. A nude embrace, suggestive
-body alignment, unspecified joining, implied penetration, or generic "point
-of contact" does not satisfy Hardcore.
+Within the first one hundred English words of every Hardcore Frame, include
+the exact cast, central angel identity, the exact phrase "consensual and
+willing", and the active ordinary human anatomy in direct literal language.
+Place the exact sexual act and present anatomical contact within the first two
+sentences. For intercourse, explicitly state which adult's penis is inside
+which adult's vagina or anus. For oral or manual sex, explicitly state which
+mouth or hand contacts which named genitals. A nude embrace, suggestive body
+alignment, unspecified joining, implied penetration, or generic "point of
+contact" does not satisfy Hardcore.
 
-The one-hundred-eighty-word placement check is silent. Never mention a word
-position, word threshold, instruction, rule, check, or compliance claim inside
-the final image prose. State the visible sexual act directly without
-explaining why or where it was stated.
+The one-hundred-word and first-two-sentence placement checks are silent. Never
+mention a word position, word threshold, instruction, rule, check, or
+compliance claim inside final image prose. State the visible sexual act
+directly without explaining why or where it was stated.
 
 No participant grips, pulls, rides, hangs from, kneels on, or braces against a
 wing or halo. Never block closing legs, withdrawal, movement, standing, or
 leaving. Do not describe pinning, trapping, blocking, forced spreading,
 choking, binding, captivity, or pain.
 
-BRIGHT CINEMATIC LIGHT AND COLOR LOCK
+LOW-SATURATION HIGH-CONTRAST CINEMATIC LIGHT AND COLOR LOCK
 
-The image is bright, open, luminous, and optimistic or calmly majestic. Build
-exposure around one motivated real source:
+Keep the entire image dark-key, low-saturation, high-contrast, and
+narrow-gamut. Suppress color contrast while preserving strong luminance
+contrast. At least eighty-five percent of the visible image uses near-neutral
+soot black, graphite, ash grey, weathered umber, dull iron, smoke blue-grey,
+bone grey, muted skin, tarnished gold, or old ivory.
 
-- broad morning daylight through tall windows;
-- clean midday sun softened by pale architectural bounce;
-- a bright overcast exterior with excellent face and feather detail;
-- warm late-afternoon sun with neutral fill;
-- a large soft studio source motivated as a skylight;
-- reflected pool light in a pale interior; or
-- clear hangar daylight supplemented by subtle film lighting.
+Build exposure around one motivated source:
 
-Keep approximately sixty-five to eighty-five percent of the visible image in
-high-key light values: white, ivory, cream, pale stone, light grey, soft sky
-blue, natural skin, champagne gold, and bright silver. Retain ten to
-twenty-five percent of controlled midtone or open shadow so faces, pale
-clothing, white feathers, and gold armor remain three-dimensional.
+- a desaturated blue-grey shaft falling from a broken oculus;
+- tarnished amber volcanic underlight balanced by cool graphite fill;
+- a narrow bone-white skylight against dark armor and weathered wings;
+- dim dried-blood brazier light held below a blue-black cathedral vault;
+- diffuse grey-cyan light filtered through deep water into a drowned court;
+- distant lightning revealed through a physical observatory aperture; or
+- another original two-temperature design.
 
-Do not crush shadows or hide the face, hands, wing roots, feet, body support,
-or important contact. Do not blow highlights into blank white. Preserve smooth
-highlight roll-off on forehead, cheeks, white feathers, silk, and metal.
-Bright means abundant readable light, not overexposure.
+Let roughly sixty to seventy-five percent of the image remain in deep readable
+shadow while the central angel's face, both wing roots, feather edges, hands,
+body contour, and current contact receive decisive focused highlights. Blacks
+retain material separation; pale feathers preserve barb detail; skin retains
+pores, pressure, warmth, and reflected color; highlights roll smoothly across
+metal and anatomy without turning surfaces into plastic or polished wax.
 
-Use realistic skin color and restrained cinematic color separation. White
-balance may be neutral daylight, gently warm sun over cool fill, or soft cool
-daylight over warm skin. Avoid dark-key lighting, gothic gloom, horror
-underlighting, black voids, monochrome charcoal palettes, heavy smoke, murky
-blue-grey grading, neon, jewel-tone magic, orange-and-teal blockbuster grading,
-rainbow effects, and saturated fantasy color.
+Use no more than two subdued hue families plus neutral materials. Any colored
+accent occupies at most five percent of the image and remains visibly
+desaturated. Do not use saturated turquoise, electric cyan, bright royal blue,
+clean orange, scarlet, neon red, magenta, purple glow, rainbow magic,
+jewel-tone clothing, colorful stained glass, or a teal-and-orange grade.
+Avoid flat grey fog, muddy midtone-only rendering, pastel softness, lifted
+blacks, broad high-key fill, or evenly exposed game art.
 
 CAMERA AND LIVE-ACTION FINISH
 
 Describe one plausible feature-film camera setup without naming a brand:
 
+- 24mm or 28mm environmental wide with controlled perspective;
 - 35mm environmental portrait at eye level;
 - 50mm medium full-body shot with natural perspective;
 - 65mm or 75mm three-quarter portrait with gentle background separation;
 - 85mm close portrait that still keeps both wing roots readable;
+- 100mm or 135mm compressed architectural composition;
 - low but restrained heroic angle with vertical architecture remaining true;
 - high gallery angle showing wing geometry and grounded feet;
 - lateral tracking-style still with slight garment or feather motion; or
 - balanced wide master shot for a group cast.
 
-State framing, camera height, subject distance, focal behavior, focus plane,
+State one exact focal length from 24mm through 135mm, framing, camera height,
+subject distance, focal behavior, focus plane,
 depth of field, foreground, background, and motion treatment. Keep skin,
 eyes, leading feather edges, and primary action sharply resolved. Use subtle
 cinematic grain and natural microcontrast. Avoid artificial portrait blur,
@@ -396,7 +488,8 @@ Aesthetic:
 - no nudity, exposed breasts, exposed genitals, sexual contact, fetish device,
   or bodily fluid;
 - create interest through live-action performance, role, wings, armor,
-  location, camera, movement, expression, and bright light.
+  location, environmental event, camera, movement, expression, and controlled
+  chiaroscuro.
 
 Erotic:
 
@@ -415,24 +508,42 @@ Hardcore:
 
 BATCH VARIETY
 
-For every batch of three through nine Themes:
+Across every ten Themes:
 
-- include at least one clearly visible body-worn pale-gold, champagne-gold, or
-  warm antique-gold armor system;
-- include at least three different wing families and three wing postures;
-- vary role, age, body type, wardrobe, location, action, camera, and daylight
-  design; and
-- do not repeat the same combination in adjacent Themes.
+- balance female and male central angels when the requested mixed cast allows
+  both;
+- use at least seven distinct roles, six environment families, six wing
+  families, six primary body arrangements, and five wardrobe systems;
+- include at least two different tarnished-gold armor systems;
+- use at least eight distinct dominant set-piece events drawn from water,
+  weather, architecture, machinery, geological, and moving-light families;
+- use at least six different three-layer depth designs and six dominant
+  graphic structures;
+- vary the primary movement vector so no direction appears in more than three
+  Themes;
+- use at least six camera families and four camera heights;
+- include at least two 24-28mm environmental wides, two 65-85mm intimate or
+  medium views, and one 100-135mm compressed composition;
+- vary desaturated cold-over-muted-warm and muted-warm-over-cold-grey light
+  designs; and
+- never repeat the same role pair, body arrangement, wing posture,
+  environment, event, camera family, or light design in adjacent Themes.
 
-For six through nine Themes, include at least two different gold armor systems,
-four real-world location families, four camera families, and five wing
-postures.
+Within every rolling group of twelve Themes in a large batch, no two Themes
+may share the same combination of central-angel gender, role, counterpart
+role, wing family, wing posture, primary pose, environment family, dominant
+event, depth design, movement vector, camera family, and light design.
+Changing only color, props, weather particles, or armor trim does not create a
+new Theme.
 
-Across every ten Themes, use at least seven distinct roles, six locations,
-six wing families, six actions, five wardrobe systems, six camera families,
-and four bright lighting designs. No single white frontal wing pose, gold
-armor construction, standing pose, palace location, or camera setup occupies
-more than one tenth of a one-hundred-Theme batch.
+Across a one-hundred-Theme run, distribute attention across all role, pose,
+scene, event, depth, movement, camera, body-type, wardrobe, wing, material, and
+light families. No single frontal white-wing pose, gold armor construction,
+cathedral, standing pose, environmental event, graphic structure, camera
+family, or blue-grey-over-tarnished-amber palette may occupy more than one
+tenth of the Themes. For batches of three through nine, maximize the same
+diversity proportionally and do not repeat an environment family, dominant
+event, graphic structure, movement vector, or camera family.
 
 NO-TEXT IMAGE CONTRACT
 
@@ -448,7 +559,8 @@ Write every final Frame as one fluent paragraph in the requested language,
 directly usable as an image-generation prompt. Begin with exact cast, identify
 the central angel, and establish present action and real location. Then
 integrate exact age, appearance, left wing, right wing, wardrobe, body support,
-camera, bright motivated light, realistic color, materials, atmosphere, and
+environmental event, three-layer depth, movement direction, camera, dark-key
+motivated light, low-saturation color, practical materials, atmosphere, and
 content-level contact.
 
 An English Frame contains at least 600 whitespace-delimited words. Target
@@ -474,10 +586,10 @@ Reject and rewrite any Theme or Frame that:
 
 1. looks like fantasy illustration, concept art, a painting, anime, game art,
    synthetic CGI, cosplay documentation, or a character design sheet;
-2. uses dark-key, gothic, gloomy, smoky, underexposed, or predominantly
-   charcoal lighting instead of a bright cinematic exposure;
-3. uses a magical celestial country, floating palace, supernatural portal,
-   impossible heaven, glowing rune, spell, or physics-defying architecture;
+2. uses vivid, neon, jewel-tone, high-saturation, pastel, broad high-key, or
+   teal-and-orange color instead of dark-key low-saturation high contrast;
+3. omits the exact phrase "live-action dark-fantasy feature-film frame" from
+   the first sixty English words;
 4. contains zero or more than one central angel;
 5. contradicts the requested number of adult women or adult men;
 6. calls any non-central person an angel or gives any non-central person wings,
@@ -496,8 +608,8 @@ Reject and rewrite any Theme or Frame that:
 13. uses transparent, translucent, skin-revealing, or explicitly
     body-contouring clothing at Aesthetic level;
 14. drifts above or below the requested content level;
-15. fails to name exact active anatomy and exact contact within the first one
-    hundred eighty English words of a Hardcore Frame;
+15. fails to place exact active anatomy and exact contact within the first two
+    sentences and first one hundred English words of a Hardcore Frame;
 16. uses alcohol, liquor, wine, beer, cocktails, drugs, sedatives, syringes,
     intoxication, or a drinking context at Erotic or Hardcore level;
 17. uses coercion, worship, judgment, conversion, punishment, captivity,
@@ -512,7 +624,19 @@ Reject and rewrite any Theme or Frame that:
     image in the environment;
 23. falls below 600 English words;
 24. contains any non-ASCII character in an English Frame;
-25. mentions Theme, Frame, prompt, request, word count, compliance, or
+25. mentions Theme, Frame, prompt, request, word count, word position,
+    compliance, or
     generation; or
 26. explains rules instead of describing one finished visible live-action
-    cinematic image.
+    cinematic image;
+27. omits an exact 24-135mm focal length and concrete camera placement;
+28. leaves the environment static without one visible current event;
+29. combines more than one dominant disaster or fills the image with unrelated
+    fire, lightning, collapse, smoke, weapons, creatures, and particles;
+30. allows an environmental event or moving mechanism to threaten, strike,
+    burn, flood, trap, or destabilize a requested adult;
+31. lacks readable foreground, midground, and background depth;
+32. places intimacy in deep water, on wet or slippery support, in unbreathable
+    air, near hot metal or moving machinery, or inside falling debris; or
+33. lets ash, dust, silt, sparks, rain, smoke, steam, spray, or debris enter a
+    face, eye, mouth, genital, sexual-fluid, or direct-contact zone.

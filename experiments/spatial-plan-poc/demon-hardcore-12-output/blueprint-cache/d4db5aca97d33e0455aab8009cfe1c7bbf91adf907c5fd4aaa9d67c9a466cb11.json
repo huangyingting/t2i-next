@@ -1,0 +1,375 @@
+{
+  "schema_version": 4,
+  "system_prompt_hash": "937997f076fad050f52340468ffc5f946778f9b5727a9e8abc359d7a3baf08f3",
+  "brief_hash": "ed4829fae53c6b7c246ddbca9e3caa5174d08bcb9cbb362c55f7c74d776cf803",
+  "creative_seed": 42,
+  "model": "DeepSeek-V3.2",
+  "structured_rejections": [],
+  "usage": {
+    "prompt_tokens": 371,
+    "completion_tokens": 2429,
+    "total_tokens": 2800
+  },
+  "blueprint": {
+    "world": {
+      "family_id": "infernal_sovereign_domain_seed42",
+      "world_genre": "dark_fantasy",
+      "era": "timeless_infernal",
+      "locations": [
+        {
+          "location_id": "obsidian_throne_hall",
+          "location": "primary throne hall",
+          "architecture": "vaulted ceilings, monolithic obsidian pillars",
+          "materials": [
+            "polished obsidian",
+            "black iron filigree",
+            "veins of volcanic glass"
+          ],
+          "environment_props": [
+            "obsidian throne dais",
+            "guttering braziers of ritual fire",
+            "fallen crimson velvet drapes"
+          ],
+          "light_sources": [
+            "supernatural braziers",
+            "bioluminescent lichen veins"
+          ],
+          "support_realizations": [
+            {
+              "support": "bed_edge",
+              "description": "obsidian dais edge"
+            },
+            {
+              "support": "wall",
+              "description": "polished obsidian pillar"
+            }
+          ],
+          "mood_tags": [
+            "ceremonial",
+            "sovereign",
+            "imposing",
+            "eerie_glow"
+          ]
+        },
+        {
+          "location_id": "crimson_council_chamber",
+          "location": "private council chamber",
+          "architecture": "low arched ceiling, intimate alcoves",
+          "materials": [
+            "black iron wall panels",
+            "crimson velvet wall coverings",
+            "black marble floor"
+          ],
+          "environment_props": [
+            "low iron table",
+            "scattered ritual scrolls",
+            "iron sconces"
+          ],
+          "light_sources": [
+            "ritual fire sconces",
+            "crimson candle clusters"
+          ],
+          "support_realizations": [
+            {
+              "support": "sofa",
+              "description": "low velvet-upholstered divan"
+            },
+            {
+              "support": "furniture",
+              "description": "heavy iron table"
+            }
+          ],
+          "mood_tags": [
+            "intimate",
+            "conspiratorial",
+            "ritualistic",
+            "crimson_shadow"
+          ]
+        },
+        {
+          "location_id": "black_iron_armillary_terrace",
+          "location": "open palace terrace",
+          "architecture": "sweeping black iron railings, flagstone floor",
+          "materials": [
+            "pitted black iron",
+            "soot-stained flagstone",
+            "charred wood"
+          ],
+          "environment_props": [
+            "giant armillary sphere",
+            "scattered iron braziers",
+            "tattered velvet banners"
+          ],
+          "light_sources": [
+            "ritual fire braziers",
+            "pulsing infernal sky"
+          ],
+          "support_realizations": [
+            {
+              "support": "chair",
+              "description": "iron-framed observation chair"
+            },
+            {
+              "support": "floor",
+              "description": "soot-stained flagstones"
+            }
+          ],
+          "mood_tags": [
+            "desolate",
+            "celestial_ominous",
+            "wind_swept",
+            "smoldering"
+          ]
+        },
+        {
+          "location_id": "velvet_consort_apartments",
+          "location": "consort's private apartments",
+          "architecture": "vaulted bedchamber, deep recesses",
+          "materials": [
+            "crimson velvet drapes",
+            "dark polished wood",
+            "black iron fittings"
+          ],
+          "environment_props": [
+            "massive canopied bed",
+            "ornate iron trunk",
+            "horn-motif candelabra"
+          ],
+          "light_sources": [
+            "candelabra flames",
+            "glowing iron hearth"
+          ],
+          "support_realizations": [
+            {
+              "support": "bed",
+              "description": "velvet-canopied infernal bed"
+            },
+            {
+              "support": "support_sling",
+              "description": "crimson silk hanging from bed frame"
+            }
+          ],
+          "mood_tags": [
+            "luxurious",
+            "private",
+            "sensual",
+            "gilded_shadow"
+          ]
+        },
+        {
+          "location_id": "igneous_reflection_pool",
+          "location": "subterranean reflection chamber",
+          "architecture": "low circular chamber, obsidian pool",
+          "materials": [
+            "rough-hewn obsidian",
+            "steam-veined rock",
+            "black pumice"
+          ],
+          "environment_props": [
+            "still obsidian pool",
+            "scattered ritual bones",
+            "iron offering bowls"
+          ],
+          "light_sources": [
+            "bioluminescent pool",
+            "floating ember motes"
+          ],
+          "support_realizations": [
+            {
+              "support": "sofa",
+              "description": "stone bench with velvet cushion"
+            },
+            {
+              "support": "furniture",
+              "description": "low obsidian altar"
+            }
+          ],
+          "mood_tags": [
+            "sacred",
+            "reflective",
+            "supernatural",
+            "subterranean_glow"
+          ]
+        },
+        {
+          "location_id": "iron_vault_archives",
+          "location": "palace vault archives",
+          "architecture": "narrow corridors, towering shelves",
+          "materials": [
+            "black iron shelving",
+            "dusty velvet folios",
+            "stone slab floor"
+          ],
+          "environment_props": [
+            "scattered scroll piles",
+            "dusted iron lecterns",
+            "horned skull reliquaries"
+          ],
+          "light_sources": [
+            "floating witch-light orbs",
+            "distant brazier glow"
+          ],
+          "support_realizations": [
+            {
+              "support": "chair",
+              "description": "iron archivists stool"
+            },
+            {
+              "support": "wall",
+              "description": "iron archive shelving"
+            }
+          ],
+          "mood_tags": [
+            "ancient",
+            "secretive",
+            "dust_moted",
+            "arcane"
+          ]
+        }
+      ],
+      "time_options": [
+        "eternal_dusk",
+        "ritual_night"
+      ],
+      "weather_options": [
+        "still_heat",
+        "ember_wind"
+      ]
+    },
+    "style": {
+      "recipes": [
+        {
+          "style_id": "baroque_infernal",
+          "medium": "oil painting on black canvas",
+          "rendering_language": "dramatic chiaroscuro, baroque detailing",
+          "surface_texture": "glossy obsidian, crushed velvet grain",
+          "contrast": "extremely high, deep blacks against vivid ember",
+          "color_treatment": "monochromatic with crimson and gold accents",
+          "lighting_treatment": "motivated ritual fire, supernatural rim light",
+          "atmosphere": "smoky, regal, operatic intensity",
+          "compatible_moods": [
+            "ceremonial",
+            "sovereign",
+            "imposing",
+            "luxurious",
+            "ritualistic"
+          ]
+        },
+        {
+          "style_id": "noir_gothic",
+          "medium": "high-contrast monochrome cinematography",
+          "rendering_language": "hard shadows, deep focus, graphic compositions",
+          "surface_texture": "polished stone, textured iron, matte velvet",
+          "contrast": "crushing black and white with mid-tone silver",
+          "color_treatment": "desaturated, occasional crimson tint",
+          "lighting_treatment": "directional shafts, practical sconce light",
+          "atmosphere": "tense, secretive, architecturally oppressive",
+          "compatible_moods": [
+            "conspiratorial",
+            "secretive",
+            "imposing",
+            "arcane",
+            "desolate"
+          ]
+        },
+        {
+          "style_id": "fantasy_pulp_painting",
+          "medium": "airbrushed acrylic illustration",
+          "rendering_language": "bold outlines, graphic color fields, dramatic poses",
+          "surface_texture": "smooth gradients, metallic sheen",
+          "contrast": "vibrant, bold color separation",
+          "color_treatment": "saturated crimson, obsidian black, hellfire orange",
+          "lighting_treatment": "unmotivated dramatic backlight, glowing effects",
+          "atmosphere": "dynamic, intense, mythic spectacle",
+          "compatible_moods": [
+            "ceremonial",
+            "sovereign",
+            "sensual",
+            "celestial_ominous",
+            "supernatural"
+          ]
+        },
+        {
+          "style_id": "somber_etching",
+          "medium": "intaglio print on aged parchment",
+          "rendering_language": "fine cross-hatching, dense linework",
+          "surface_texture": "paper grain, ink bleed",
+          "contrast": "rich mid-tones, deep etched blacks",
+          "color_treatment": "sepia and iron-gall ink tones",
+          "lighting_treatment": "subtle, diffuse, emanating from objects",
+          "atmosphere": "ancient, sacred, quietly ominous",
+          "compatible_moods": [
+            "sacred",
+            "reflective",
+            "ancient",
+            "arcane",
+            "subterranean_glow"
+          ]
+        },
+        {
+          "style_id": "velvet_noir",
+          "medium": "soft-focus large format photography",
+          "rendering_language": "shallow depth of field, luminous shadows",
+          "surface_texture": "velvet bloom, polished metal highlights",
+          "contrast": "soft, rich blacks, glowing highlights",
+          "color_treatment": "crimson and black duotone",
+          "lighting_treatment": "soft practical candlelight, bounced glow",
+          "atmosphere": "intimate, sensual, luxuriously dark",
+          "compatible_moods": [
+            "intimate",
+            "sensual",
+            "private",
+            "gilded_shadow",
+            "luxurious"
+          ]
+        },
+        {
+          "style_id": "ember_cinematic",
+          "medium": "anamorphic digital cinema",
+          "rendering_language": "wide vistas, dynamic flares, deep color grading",
+          "surface_texture": "wet stone, glowing ember, moving fabric",
+          "contrast": "punchy shadows, fiery highlights",
+          "color_treatment": "teal and orange split tone",
+          "lighting_treatment": "motivated firelight, volumetric smoke",
+          "atmosphere": "epic, smoldering, intensely cinematic",
+          "compatible_moods": [
+            "desolate",
+            "wind_swept",
+            "smoldering",
+            "ceremonial",
+            "eerie_glow"
+          ]
+        }
+      ]
+    },
+    "presentation": {
+      "wardrobe_options": [
+        "regal demon gowns: layered black and crimson velvet, horned shoulder pieces",
+        "consort's attire: fitted black leather, gold filigree embroidery",
+        "ceremonial robes: obsidian beadwork, flowing silk damask",
+        "armored regalia: black iron pauldrons, velvet underlay",
+        "informal drapery: silk chemises, fur-trimmed velvet mantles"
+      ],
+      "accessory_options": [
+        "horned crown of black iron and ruby",
+        "ornate ritual daggers",
+        "heavy signet rings",
+        "obsidian and iron neck torcs",
+        "bloodstone amulets on iron chains"
+      ],
+      "makeup_options": [
+        "pale complexion with stark contour",
+        "gold leaf facial markings",
+        "smoked kohl eyes",
+        "crimson lip stain",
+        "ash-dusted skin"
+      ],
+      "appearance_bias": [
+        "regal",
+        "supernaturally_attractive",
+        "sharp_featured",
+        "piercing_gaze"
+      ]
+    }
+  }
+}

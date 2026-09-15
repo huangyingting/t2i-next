@@ -14,12 +14,14 @@
     "activity_id": "vibrator_clitoral",
     "camera_viewpoint": "high_three_quarter",
     "shot_scale": "medium",
-    "plan_fingerprint": "db631803e21d176c04cf91ba4a284f0e814f4182377796cd263dcb7d46f943a1",
+    "plan_fingerprint": "ab12049ac63fa95de5b210dc1ff579d608dd2e487911a80293a50f2298006b70",
     "character_fingerprint": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
     "setting_id": "test_rain_lit_contemporary_apartment",
-    "setting_fingerprint": "f1290f200516bfc64df5e0ba68cbaeaff64488acc219bb4a983c1ff4c0461c8e",
-    "presentation_fingerprint": "32cbc55a9cd81eb57ea87a80a8a9127d4a2e1b02a5899e485430701d20c344b0",
-    "estimated_tokens": 408
+    "setting_fingerprint": "2d5e6f9d984b02630746c843d640f87b518b0d3a10d0b9b3a98f5bdc4d2a319a",
+    "style_id": "test_rain_lit_contemporary_apartment_style",
+    "style_fingerprint": "21aeb73aae90a9d68a06b8ad88b7232a70e1105c386421ebf2c2011fc91aa1ed",
+    "presentation_fingerprint": "9174e0662042c7dabb53fdae11e15488b0cfd4cb2b28c56d64e4cddcd83f0673",
+    "estimated_tokens": 435
   },
   {
     "scene_id": "D08",
@@ -37,12 +39,14 @@
     "activity_id": "anal_rear_entry",
     "camera_viewpoint": "rear_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "2da33cbf168830cdfb974c6a91ef94c8a03e5f2977d4e964374138f2edcf46cf",
+    "plan_fingerprint": "8412231c02f212df46caf48b2a4bc27dfb1f136b90a256c4113495e9f0f5bb57",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_minimal_dark_timber_bedroom",
-    "setting_fingerprint": "e101755fab472aa282aba835abbb49cadfc30f418c996ad407650175556c8d33",
-    "presentation_fingerprint": "1b2ce151afe7bf2a3ea0eebebf20f118c00e1136873d3cdaba4d57635fcad09f",
-    "estimated_tokens": 442
+    "setting_fingerprint": "04113c9e9de98a5052c11b881dde047e4897ff31aea75d636e02aa90f8398815",
+    "style_id": "test_minimal_dark_timber_bedroom_style",
+    "style_fingerprint": "2391ad84ac60289018128dcc11d4b691d7e3bb0cad10d4ce815d86c3c38ab68f",
+    "presentation_fingerprint": "6ce0b36464b41611c1c3277d7acc3e54ac768d0de80ce5033930c588375c7fd4",
+    "estimated_tokens": 469
   },
   {
     "scene_id": "D09",
@@ -60,12 +64,14 @@
     "activity_id": "strap_on_vaginal_side_lying",
     "camera_viewpoint": "side_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "ccace66d2b955a0331996b27dfa5f1aba6f7412ee74286fa68e1e5e694ddd922",
+    "plan_fingerprint": "9d870141d403eaf4685b3f30da74bd4fb4219bc31172459b9f9374fd817779db",
     "character_fingerprint": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
     "setting_id": "test_soft_linen_studio_bedroom",
-    "setting_fingerprint": "3fd9ee96aa3bd5f6cabc34f88c24fcba637e3f34900c1ba723089d98a9921bd6",
-    "presentation_fingerprint": "6d07b03e58ce03bba0f5222fdd54017c3978e8a87663cdbb10df6c46c3bb1a70",
-    "estimated_tokens": 507
+    "setting_fingerprint": "52cac27539e09f1d7821980565a14388b59445f196c7dd7fc5848a250ae6068d",
+    "style_id": "test_soft_linen_studio_bedroom_style",
+    "style_fingerprint": "7613359f5d9a69e44f53a61bfce52c014bbc7f482a8db5650645db83b59a449e",
+    "presentation_fingerprint": "7924bfed50c2704bb8fb79090f6b95e023291d881e636391ddb20d096ce34d9d",
+    "estimated_tokens": 535
   },
   {
     "scene_id": "D10",
@@ -82,12 +88,14 @@
     "activity_id": "vaginal_rear_entry",
     "camera_viewpoint": "overhead_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "93887bfb025f328438af076169b895f36854a1dd0e7752a20a143e512c5ddb3b",
+    "plan_fingerprint": "1cca1d4c5a5263cd32dd9763202d35a5bf338a2005bd71322ce0d94879529de3",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_geometric_hotel_bedroom",
-    "setting_fingerprint": "38b9a8f2f0769dd04c237d858d3391d73275a0e4874dfbcbede30b1e51ef46e8",
-    "presentation_fingerprint": "42cefd06bf8d0a3190de7219de3df4b6f950d9d04ccaf3908f31a54a7add1fca",
-    "estimated_tokens": 431
+    "setting_fingerprint": "c3c4a65b4972343286f72b0d9b8eec51cef1515b3b262c22813c8750b549ba32",
+    "style_id": "test_geometric_hotel_bedroom_style",
+    "style_fingerprint": "4c1177d5f8afcf461b9e9e8d9c328c9cb0381be6841ba2a0654bdd1ba51739f5",
+    "presentation_fingerprint": "2335f041757f7a9150f38c408fcd1200a58ecb01e6b5f642c711e91d1a07f9b5",
+    "estimated_tokens": 458
   },
   {
     "scene_id": "D11",
@@ -104,12 +112,14 @@
     "activity_id": "kneeling_group",
     "camera_viewpoint": "front_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "a7aea50def2c8f068fd77d19bdcf034cb0e2dc9c07a87a7de3497a234863b5ca",
+    "plan_fingerprint": "acfc3be6b355de6c2e0777c62aeac3c3341f7cbfa108f95d5c0cc7921180859f",
     "character_fingerprint": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
     "setting_id": "test_open_loft_with_polished_concrete",
-    "setting_fingerprint": "08fb1ea4dc999e476c66f16cb6e0b42722fcf07ce1eaf675a1849b81bd03bbea",
-    "presentation_fingerprint": "a12201dde38ea9c80093dd24646c17d43d70a0ac14a70a104cebe72076cf0744",
-    "estimated_tokens": 546
+    "setting_fingerprint": "bbcb15762217484d5e1910caa7bdae706100807b45d8b8a9ff5c2f75cd930f8a",
+    "style_id": "test_open_loft_with_polished_concrete_style",
+    "style_fingerprint": "796349c81345a9d3278661dfa8974d780b838aff52723bae80d7242d573fb974",
+    "presentation_fingerprint": "77ceb28cfe1efe9fc1000320b0bdb282cf4ed37beab062e73f331f29271ab35d",
+    "estimated_tokens": 574
   },
   {
     "scene_id": "D12",
@@ -126,12 +136,14 @@
     "activity_id": "dual_oral_on_woman",
     "camera_viewpoint": "low_three_quarter",
     "shot_scale": "medium",
-    "plan_fingerprint": "c0f8c16b1499e6a3afc5da17fe9d31c791b18814564b9745ee51206fd44627d3",
+    "plan_fingerprint": "42df212e6e9768d23de514800dc1b236dd33c70db6ec6cb21df0ef6697833fb2",
     "character_fingerprint": "48a8c283507a75a5b5a7bdcb93ff1d49fc7fae9fa42d12e102888acd298af285",
     "setting_id": "test_velvet_lined_private_suite",
-    "setting_fingerprint": "d9a053e5c7133a14d41d33480efd9e48a9d16eb07707700d6754c49d886a2e8e",
-    "presentation_fingerprint": "d036ae49c3f7e32fecd59236c26971dea46e1ef7243f824202659301c62d3104",
-    "estimated_tokens": 552
+    "setting_fingerprint": "33716e59dd58dc404992b8fab46fb82de04a91b88ac3f25c9e360985a8e79b80",
+    "style_id": "test_velvet_lined_private_suite_style",
+    "style_fingerprint": "14f51716b572aee64cf360610bb8a4e37b11290f3d43d5bf18e4f47f570435a5",
+    "presentation_fingerprint": "20c422cb51eb2b9fd4554ef3ab0cf953617880b7049659ac4562357476b43753",
+    "estimated_tokens": 579
   },
   {
     "scene_id": "D13",
@@ -148,12 +160,14 @@
     "activity_id": "tribadism",
     "camera_viewpoint": "high_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "7b73d233736bfd0ccf288879bca134a1849332d2e220db89eb34e508452f17cd",
+    "plan_fingerprint": "33323f4d5bfadc326409a88a3738151d6262b560f9634a29de32de0de875349a",
     "character_fingerprint": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
     "setting_id": "test_modern_lounge_with_a_sculptural_chair",
-    "setting_fingerprint": "9975c017f771763ed843d695ece36e9e3f870f6b2c2f69750f2cff7f189e250e",
-    "presentation_fingerprint": "e3e5b93224035f65ee0e4bd27ff409dd8a82dbfeee7ff6f339944927d99fc7fa",
-    "estimated_tokens": 375
+    "setting_fingerprint": "325fcfafff16f66a56258f7352452f0c2e3598f4ab97d90da3a945e74c4511a4",
+    "style_id": "test_modern_lounge_with_a_sculptural_chair_style",
+    "style_fingerprint": "80a558f3fb98dfa08e8564428fdd69e9a0413ecc3417aa315c427b1869d68d7f",
+    "presentation_fingerprint": "21a6fd0d44a2c16fdaacb5bcc7c012f4c58fd9611ce3fc7ebcaeec4e60077353",
+    "estimated_tokens": 402
   },
   {
     "scene_id": "D14",
@@ -171,12 +185,14 @@
     "activity_id": "seated_group",
     "camera_viewpoint": "front_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "36b6494034b386138f1b0cc23a0f8f6b48c8aad52b61aa3490f999f3486e9170",
+    "plan_fingerprint": "74ffb49b3b6918ba33767b838294c3532dbcd5b10bd9ee8a3b66e605df29995f",
     "character_fingerprint": "48a8c283507a75a5b5a7bdcb93ff1d49fc7fae9fa42d12e102888acd298af285",
     "setting_id": "test_low_modular_sofa_in_a_luxury_loft",
-    "setting_fingerprint": "a4d81034855303d49dba7c4d52cfa7321e4f462f6a9e8e0295da09f0e0da38df",
-    "presentation_fingerprint": "76e24116a80a324a36a2afb28eab03cc0ca0783094d5232110630ea5b5e8f789",
-    "estimated_tokens": 539
+    "setting_fingerprint": "5140aaa01b20035805155279907e2b9217b5e0a85a3d8b57ca642126614b45c2",
+    "style_id": "test_low_modular_sofa_in_a_luxury_loft_style",
+    "style_fingerprint": "83e730b6e4688d943bf6c0eeb67cfbb79426623794ef36fb6fc7a830a2623888",
+    "presentation_fingerprint": "e16c3d62dc9544483749b475eeec982da67676879b7a68e9abe62a2f5b9cc1cd",
+    "estimated_tokens": 566
   },
   {
     "scene_id": "D15",
@@ -193,12 +209,14 @@
     "activity_id": "bed_edge_masturbation",
     "camera_viewpoint": "side_three_quarter",
     "shot_scale": "medium",
-    "plan_fingerprint": "0559220bb00aed0ef5a12029fcffc28a675c0325e63df7f62cc89e6b89dc5149",
+    "plan_fingerprint": "2af57683845db88f7027d931aa7f4a9a37bdbcb45b8d99b8e5b29af33670ec4b",
     "character_fingerprint": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
     "setting_id": "test_compact_bedroom_with_a_low_platform_bed",
-    "setting_fingerprint": "7924e3ac5ff29ebafcce7c9e9d5926f318d4365b81db94f1c48dcbb7f41076d3",
-    "presentation_fingerprint": "f22d466059ee8eb226c89517b5f1269d519e11cf0c566cf50d2e12defa47d63f",
-    "estimated_tokens": 318
+    "setting_fingerprint": "2d00add6684e915a6f5f2f1c40cf4fa99008cf1449e51fbd559a612e608f2bba",
+    "style_id": "test_compact_bedroom_with_a_low_platform_bed_style",
+    "style_fingerprint": "a3e98a0e8b21ab73f5ae9e2b022f9fb8d2c48b8ece141c0ede04e488d3bb3f25",
+    "presentation_fingerprint": "90155af7cc3dde3e94950c1c377ccfc55d9e9bba834326126c18bcb240a84b59",
+    "estimated_tokens": 345
   },
   {
     "scene_id": "D16",
@@ -215,12 +233,14 @@
     "activity_id": "vaginal_standing",
     "camera_viewpoint": "rear_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "2f17207011dcd637cba56a74ac1e1babc5d9adf46e57258fd105d6e5003384ca",
+    "plan_fingerprint": "32727b6e0acfc5b9b04e2b146159f9e10445f3e48fee42723a24757fdbe0a847",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_narrow_architectural_corridor",
-    "setting_fingerprint": "f69013c54e089536641683242278ab27535bc04f8d4b51cb82d6bf60a3457b05",
-    "presentation_fingerprint": "f44a7a39517d08494ac1b44b730a8ee6ab6949956b03775d61d2ec251b0fefc1",
-    "estimated_tokens": 415
+    "setting_fingerprint": "bd5a20d4d8dece0eef61ae59a05fe3d2196d645bf6630ff14bcf25743a981642",
+    "style_id": "test_narrow_architectural_corridor_style",
+    "style_fingerprint": "54ddbd3e0f8b208d75e1394983b0a28582e6a186f707681a8f40c9290aca2432",
+    "presentation_fingerprint": "2e1c1949c7a55f11223f6556e0722fdd436f62f56a83954475a329547668b187",
+    "estimated_tokens": 442
   },
   {
     "scene_id": "D17",
@@ -236,12 +256,14 @@
     "activity_id": "central_manual_both_partners",
     "camera_viewpoint": "low_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "b6a4feb759aa3a02af3b21a48351d521c708c0aac7dad0e1fca5ee5dacaf1924",
+    "plan_fingerprint": "c799dbe267f4e095f8ccf05860b22852f9aa58e0f214e475e38940e5e522d88d",
     "character_fingerprint": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
     "setting_id": "test_minimal_stage_with_a_matte_floor",
-    "setting_fingerprint": "b0b4221bc122bd12dac7594a697140aa2153e8832776bde1c2807153267c127f",
-    "presentation_fingerprint": "30872f602aff0e22deb3f9d5f456a71339ffdb94d06e076988a61a6f9bc4350f",
-    "estimated_tokens": 529
+    "setting_fingerprint": "66214cb1caa10b1687a987c1471f6273ee97f916ea2bbfb5266d9751f5d9ed6a",
+    "style_id": "test_minimal_stage_with_a_matte_floor_style",
+    "style_fingerprint": "dd4954e472cf9a99e62e234f1876dedfe040c9067bc30c269178898dc92f05f6",
+    "presentation_fingerprint": "1d74dbddf49900d77b9d02fce939f27e28439a00196d6f3d24f18ff6f754e98a",
+    "estimated_tokens": 557
   },
   {
     "scene_id": "D18",
@@ -258,11 +280,13 @@
     "activity_id": "vaginal_lifted",
     "camera_viewpoint": "low_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "8d50ddfe01f36e834084dc4c5e3d6d48e1cdd86c0608920e29d8ec57893a226d",
+    "plan_fingerprint": "ce40482573a606715dfa88fac28a035741a8099789fe59b357ff401937568033",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_spacious_modern_corridor",
-    "setting_fingerprint": "778507747560e4165aa64cd196e426af979d20d97c0d3a1f12d9ce50b9ac29ee",
-    "presentation_fingerprint": "0cd43862300fe819fd893e2ad07ec4575955f9abc3d5a8686af02c03954d3d8c",
-    "estimated_tokens": 539
+    "setting_fingerprint": "b0589b98f52a949599b51fcfdda9e4f2db1a4acd9c79251a61f4db310da54d2e",
+    "style_id": "test_spacious_modern_corridor_style",
+    "style_fingerprint": "a097e3d3836dc8707ed83b6d46dac87300accbcde7e32b7a4a6b1a80118e1451",
+    "presentation_fingerprint": "056ace2b398a56b310705230208331194f66c149247483cd9a1c5d61705c4c65",
+    "estimated_tokens": 586
   }
 ]

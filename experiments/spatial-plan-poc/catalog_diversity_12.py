@@ -21,9 +21,10 @@ from catalog_scene_demo import (
 )
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 from run import _generate_with_repair
-from scene_layers import SettingPreset, layer_issues, make_setting_preset
+from scene_layers import SceneLayerInputs, layer_issues, make_scene_layer_inputs
 
 from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.errors import StoryStructuredOutputError
 from t2i_story_pipeline.provider import OpenAIStoryModel
 
 ROOT = Path(__file__).resolve().parent
@@ -110,9 +111,9 @@ def test_setting(
     time_of_day: str = "night",
     weather: str = "interior_controlled",
     appearance_bias: tuple[str, ...] = (),
-) -> SettingPreset:
+) -> SceneLayerInputs:
     setting_id = "test_" + re.sub(r"[^a-z0-9]+", "_", location.lower()).strip("_")
-    return make_setting_preset(
+    return make_scene_layer_inputs(
         setting_id,
         location,
         lighting,
@@ -123,6 +124,17 @@ def test_setting(
         weather=weather,
         materials=materials,
         environment_props=environment_props,
+        support_realizations=(
+            ("bed", "firm padded bed"),
+            ("bed_edge", "firm padded bed edge"),
+            ("chair", "stable armless chair"),
+            ("floor", "level finished floor"),
+            ("furniture", "solid support furniture"),
+            ("sofa", "firm padded sofa"),
+            ("support_sling", "anchored support sling"),
+            ("wall", "load-bearing structural wall"),
+        ),
+        mood_tags=("editorial",),
         wardrobe_theme=wardrobe_theme,
         accessory_theme=accessory_theme,
         makeup_theme=makeup_theme,
@@ -686,15 +698,30 @@ async def evaluate_prompts(
     responses = []
     rejections: list[list[str]] = []
     contract_issues: list[str] = []
+    last_structured_error: StoryStructuredOutputError | None = None
     async with OpenAIStoryModel(settings) as model:
         for _ in range(3):
-            response, structured_rejections = await _generate_with_repair(
-                model,
-                system=EVALUATION_SYSTEM,
-                payload=payload,
-                response_model=DiversityEvaluation,
-                max_output_tokens=min(12000, settings.output_token_limit),
-            )
+            try:
+                response, structured_rejections = await _generate_with_repair(
+                    model,
+                    system=EVALUATION_SYSTEM,
+                    payload=payload,
+                    response_model=DiversityEvaluation,
+                    max_output_tokens=min(12000, settings.output_token_limit),
+                )
+            except StoryStructuredOutputError as exc:
+                last_structured_error = exc
+                rejections.append(list(exc.validation_issues))
+                payload = {
+                    **payload,
+                    "structural_validation_issues": list(exc.validation_issues),
+                    "repair_requirement": (
+                        "Re-evaluate the complete batch with schema-consistent "
+                        "verdicts. A pass requires an empty issues array; any "
+                        "reported issue requires revise or reject."
+                    ),
+                }
+                continue
             responses.append(response)
             rejections.extend(structured_rejections)
             evaluation = DiversityEvaluation.model_validate(response.value)
@@ -716,6 +743,10 @@ async def evaluate_prompts(
                     "conclusions based only on speculative rendering risk."
                 ),
             }
+    if not responses:
+        if last_structured_error is not None:
+            raise last_structured_error
+        raise AssertionError("evaluation produced no response")
     return {
         "model": settings.model,
         "attempts": len(responses),
@@ -745,7 +776,7 @@ def main() -> None:
     selections = []
     resolved_layers = []
     issues: dict[str, list[str]] = {}
-    for spec, setting in tests:
+    for spec, layer_inputs in tests:
         catalog = load_catalog(spec.cast_key)
         entry, activity = select_plan(catalog, spec)
         fingerprint = plan_fingerprint(spec, entry, activity)
@@ -756,7 +787,9 @@ def main() -> None:
             activity,
             fingerprint,
             geometry,
-            setting,
+            layer_inputs.setting,
+            layer_inputs.style,
+            layer_inputs.presentation,
         )
         prompt = combine_prompt(geometry, layers)
         prompt_problems = [
@@ -784,6 +817,8 @@ def main() -> None:
                 "character_fingerprint": layers.fingerprints.characters,
                 "setting_id": layers.setting.setting_id,
                 "setting_fingerprint": layers.fingerprints.setting,
+                "style_id": layers.style.style_id,
+                "style_fingerprint": layers.fingerprints.style,
                 "presentation_fingerprint": layers.fingerprints.presentation,
                 "estimated_tokens": layers.token_metrics.final_estimated_tokens,
             }
@@ -864,9 +899,6 @@ def main() -> None:
             ),
             "compact_saved_total": sum(
                 layers.token_metrics.compact_saved_tokens for layers in resolved_layers
-            ),
-            "layer_budget_tokens": min(
-                layers.token_metrics.layer_budget_tokens for layers in resolved_layers
             ),
             "style_generation_calls": 0,
             "evaluation_payload": "scene_id_and_prompt_only",

@@ -35,14 +35,28 @@
       "motivated_light_sources": [
         "magenta and cyan neon through wet glass"
       ],
-      "appearance_bias": [],
-      "wardrobe_theme": "sleek black nightlife tailoring",
-      "accessory_theme": [
-        "silver ear cuffs"
+      "support_realizations": [
+        {
+          "support": "bed",
+          "description": "low platform bed"
+        },
+        {
+          "support": "bed_edge",
+          "description": "firm platform bed edge"
+        },
+        {
+          "support": "floor",
+          "description": "finished apartment floor"
+        },
+        {
+          "support": "wall",
+          "description": "structural apartment wall"
+        }
       ],
-      "makeup_theme": "smoky eyes with a glossy finish",
-      "preferred_palette": "slate, magenta and cyan",
-      "atmosphere": "electric nocturnal tension",
+      "mood_tags": [
+        "electric",
+        "nocturnal"
+      ],
       "forbidden_elements": [
         "background_people",
         "humanoid_statues",
@@ -50,10 +64,38 @@
         "person_shaped_shadows"
       ]
     },
+    "style": {
+      "style_id": "rainy_neon_apartment_style",
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "slate, magenta and cyan",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "electric nocturnal tension",
+      "compatible_moods": [
+        "electric",
+        "nocturnal"
+      ]
+    },
+    "presentation_source": {
+      "presentation_id": "rainy_neon_apartment_presentation",
+      "wardrobe_theme": "sleek black nightlife tailoring",
+      "accessory_theme": [
+        "silver ear cuffs"
+      ],
+      "makeup_theme": "smoky eyes with a glossy finish",
+      "appearance_bias": []
+    },
+    "required_environment_supports": [
+      "bed"
+    ],
     "presentation": {
       "scene_id": "D01",
-      "spatial_fingerprint": "1fc4b985611142a4176824dfe078ee0c52c9660d7ef974838ef4923dcd3f15e9",
+      "spatial_fingerprint": "3b248dc088f51e21ca1a81f1fee172ca577da492ec14c98a27c354058201d647",
       "setting_id": "rainy_neon_apartment",
+      "style_id": "rainy_neon_apartment_style",
+      "presentation_id": "rainy_neon_apartment_presentation",
       "roles": [
         {
           "role": "f1",
@@ -71,8 +113,14 @@
       "motivated_light_source": "magenta and cyan neon through wet glass",
       "lighting_direction": "geometry_preserving",
       "lighting_quality": "subject_separating",
-      "palette": "slate, magenta and cyan",
-      "atmosphere": "electric nocturnal tension"
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "slate, magenta and cyan",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "electric nocturnal tension",
+      "appearance_bias": []
     },
     "visibility": {
       "required_regions_by_role": {
@@ -96,19 +144,19 @@
       }
     },
     "fingerprints": {
-      "spatial": "1fc4b985611142a4176824dfe078ee0c52c9660d7ef974838ef4923dcd3f15e9",
+      "spatial": "3b248dc088f51e21ca1a81f1fee172ca577da492ec14c98a27c354058201d647",
       "characters": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
-      "setting": "36211a6dd02f29d9a3dcc1eddd60cbd5b14471b5e1d241018bf980d58e47e156",
-      "presentation": "f398474c103dde941b3f7b4a79d8dc66a66e06ea18ff37d7687d8f2d5db131a4"
+      "setting": "ea83f7ece32ec30143ab1a27ea59b81630680a23f6f5a07869209d32af13a3cb",
+      "style": "068dd2e4f4602a105006c984d7c47c678359732b96bfcc3e68a0cd58cf6fe559",
+      "presentation": "6b98f1d4449de8f031fdd3629794a31b12279c72c1ed434fe4a91510cc193d5a"
     },
-    "compact_suffix": "World: rain-darkened high-rise apartment, night; wet glass/brushed steel/dark linen; rain-streaked window, low platform bed. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face. Wardrobe: sleek black nightlife tailoring; clear F1; women smoky eyes with a glossy finish; F1 silver ear cuffs. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: magenta and cyan neon through wet glass. Palette slate, magenta and cyan; mood electric nocturnal tension. No extra figures, statues, human shadows or reflections.",
+    "compact_suffix": "World: rain-darkened high-rise apartment, night; wet glass/brushed steel/dark linen; rain-streaked window, low platform bed. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face. Wardrobe: sleek black nightlife tailoring; clear F1; women smoky eyes with a glossy finish; F1 silver ear cuffs. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Supports: low platform bed. Light: magenta and cyan neon through wet glass. Style: cinematic photography; editorial realism; tactile natural surfaces; controlled contrast; slate, magenta and cyan; clean subject separation; electric nocturnal tension. No extra figures, statues, human shadows or reflections.",
     "token_metrics": {
       "geometry_estimated_tokens": 281,
-      "verbose_layer_estimated_tokens": 537,
-      "layer_estimated_tokens": 138,
-      "compact_saved_tokens": 399,
-      "final_estimated_tokens": 419,
-      "layer_budget_tokens": 200
+      "verbose_layer_estimated_tokens": 785,
+      "layer_estimated_tokens": 172,
+      "compact_saved_tokens": 613,
+      "final_estimated_tokens": 453
     }
   },
   {
@@ -146,14 +194,28 @@
       "motivated_light_sources": [
         "shielded amber ceiling source"
       ],
-      "appearance_bias": [],
-      "wardrobe_theme": "minimalist performance styling",
-      "accessory_theme": [
-        "minimal jewelry"
+      "support_realizations": [
+        {
+          "support": "floor",
+          "description": "pale timber floor"
+        },
+        {
+          "support": "wall",
+          "description": "matte plaster wall"
+        },
+        {
+          "support": "furniture",
+          "description": "padded performance platform"
+        },
+        {
+          "support": "sofa",
+          "description": "firm padded studio sofa"
+        }
       ],
-      "makeup_theme": "polished editorial makeup",
-      "preferred_palette": "amber, umber and cream",
-      "atmosphere": "controlled sculptural ritual",
+      "mood_tags": [
+        "controlled",
+        "sculptural"
+      ],
       "forbidden_elements": [
         "background_people",
         "humanoid_statues",
@@ -161,10 +223,38 @@
         "person_shaped_shadows"
       ]
     },
+    "style": {
+      "style_id": "amber_restraint_studio_style",
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "amber, umber and cream",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "controlled sculptural ritual",
+      "compatible_moods": [
+        "controlled",
+        "sculptural"
+      ]
+    },
+    "presentation_source": {
+      "presentation_id": "amber_restraint_studio_presentation",
+      "wardrobe_theme": "minimalist performance styling",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "appearance_bias": []
+    },
+    "required_environment_supports": [
+      "sofa"
+    ],
     "presentation": {
       "scene_id": "D02",
-      "spatial_fingerprint": "90f88ab07b92ffb62f8e500ef952659dea7d69b1b583b846dfbbdc138254089f",
+      "spatial_fingerprint": "dfea44f0622a2354180210d3a998a5a6162cfdcd20eb51a898f967577b46c9b7",
       "setting_id": "amber_restraint_studio",
+      "style_id": "amber_restraint_studio_style",
+      "presentation_id": "amber_restraint_studio_presentation",
       "roles": [
         {
           "role": "f1",
@@ -182,8 +272,14 @@
       "motivated_light_source": "shielded amber ceiling source",
       "lighting_direction": "geometry_preserving",
       "lighting_quality": "subject_separating",
-      "palette": "amber, umber and cream",
-      "atmosphere": "controlled sculptural ritual"
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "amber, umber and cream",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "controlled sculptural ritual",
+      "appearance_bias": []
     },
     "visibility": {
       "required_regions_by_role": {
@@ -210,19 +306,19 @@
       }
     },
     "fingerprints": {
-      "spatial": "90f88ab07b92ffb62f8e500ef952659dea7d69b1b583b846dfbbdc138254089f",
+      "spatial": "dfea44f0622a2354180210d3a998a5a6162cfdcd20eb51a898f967577b46c9b7",
       "characters": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
-      "setting": "05952641488b10f7e80b6ba09595dc121150613b2860b48f39b271abf00ee2f7",
-      "presentation": "0ad1a98e4a31fdde3fbe59234e28f1c596fc0c333b4edb64bb9b5af15b7084b9"
+      "setting": "f26b507e3141cfdedcb77f5ce6bc8512dd9d8fdcc5baf438cbf577ac8d60158d",
+      "style": "4fc5f7737f538ecc0b397bd42d32a98babf9e9c20d24b1af99dc1ba088c12aba",
+      "presentation": "239149b2706fdd5a77bdc45a84b565c2df9aa0e231e4c3a47cb680fb05af54c4"
     },
-    "compact_suffix": "World: minimal amber performance studio, night; matte plaster/pale timber/padded leather; low platform. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face. Wardrobe: minimalist performance styling; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: shielded amber ceiling source. Palette amber, umber and cream; mood controlled sculptural ritual. No extra figures, statues, human shadows or reflections.",
+    "compact_suffix": "World: minimal amber performance studio, night; matte plaster/pale timber/padded leather; low platform. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face. Wardrobe: minimalist performance styling; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Supports: firm padded studio sofa. Light: shielded amber ceiling source. Style: cinematic photography; editorial realism; tactile natural surfaces; controlled contrast; amber, umber and cream; clean subject separation; controlled sculptural ritual. No extra figures, statues, human shadows or reflections.",
     "token_metrics": {
       "geometry_estimated_tokens": 287,
-      "verbose_layer_estimated_tokens": 534,
-      "layer_estimated_tokens": 129,
-      "compact_saved_tokens": 405,
-      "final_estimated_tokens": 416,
-      "layer_budget_tokens": 200
+      "verbose_layer_estimated_tokens": 785,
+      "layer_estimated_tokens": 165,
+      "compact_saved_tokens": 620,
+      "final_estimated_tokens": 452
     }
   },
   {
@@ -271,14 +367,20 @@
       "motivated_light_sources": [
         "hard architectural side light"
       ],
-      "appearance_bias": [],
-      "wardrobe_theme": "structured evening tailoring",
-      "accessory_theme": [
-        "minimal jewelry"
+      "support_realizations": [
+        {
+          "support": "floor",
+          "description": "polished stone floor"
+        },
+        {
+          "support": "wall",
+          "description": "structural corridor wall"
+        }
       ],
-      "makeup_theme": "polished editorial makeup",
-      "preferred_palette": "burgundy, ochre and slate",
-      "atmosphere": "dynamic cinematic intensity",
+      "mood_tags": [
+        "dynamic",
+        "cinematic"
+      ],
       "forbidden_elements": [
         "background_people",
         "humanoid_statues",
@@ -286,10 +388,38 @@
         "person_shaped_shadows"
       ]
     },
+    "style": {
+      "style_id": "burgundy_modern_corridor_style",
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "burgundy, ochre and slate",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "dynamic cinematic intensity",
+      "compatible_moods": [
+        "dynamic",
+        "cinematic"
+      ]
+    },
+    "presentation_source": {
+      "presentation_id": "burgundy_modern_corridor_presentation",
+      "wardrobe_theme": "structured evening tailoring",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "appearance_bias": []
+    },
+    "required_environment_supports": [
+      "wall"
+    ],
     "presentation": {
       "scene_id": "D03",
-      "spatial_fingerprint": "20895872eef78c0c0bcc679a3ed471455973e5ef5bddb17169c7130abb463605",
+      "spatial_fingerprint": "ccf4a968340b13f11c82aca3647bdc118c73ad125c9479f02f78ce856c33262b",
       "setting_id": "burgundy_modern_corridor",
+      "style_id": "burgundy_modern_corridor_style",
+      "presentation_id": "burgundy_modern_corridor_presentation",
       "roles": [
         {
           "role": "f1",
@@ -317,8 +447,14 @@
       "motivated_light_source": "hard architectural side light",
       "lighting_direction": "geometry_preserving",
       "lighting_quality": "subject_separating",
-      "palette": "burgundy, ochre and slate",
-      "atmosphere": "dynamic cinematic intensity"
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "burgundy, ochre and slate",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "dynamic cinematic intensity",
+      "appearance_bias": []
     },
     "visibility": {
       "required_regions_by_role": {
@@ -349,19 +485,19 @@
       }
     },
     "fingerprints": {
-      "spatial": "20895872eef78c0c0bcc679a3ed471455973e5ef5bddb17169c7130abb463605",
+      "spatial": "ccf4a968340b13f11c82aca3647bdc118c73ad125c9479f02f78ce856c33262b",
       "characters": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
-      "setting": "e46df8399a015cc8805821da188a982670b7e3c7ecbb059c01e50d5646c9d7c3",
-      "presentation": "82b7c9ebf64757b0e5af45839aaae24d1cb60f986d99a41c0939a8dd52a4ceb9"
+      "setting": "5fed07a16eaf8badcda8a4ba58db36f1b919e261037cd8f05da4e0630958a734",
+      "style": "65addb0706db2396fdac87bec8d9825c8a5eab9932920ad0f86f450e5a0deadb",
+      "presentation": "1d9390780981eea4ab4d7b08b6769bd5841dac8e9c8fc0566dd23c74d408a922"
     },
-    "compact_suffix": "World: spacious modern corridor, night; polished stone/dark timber/brushed brass. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face. Wardrobe: structured evening tailoring; clear F1, M1; women polished editorial makeup; F1 minimal jewelry. Light: hard architectural side light. Palette burgundy, ochre and slate; mood dynamic cinematic intensity. No extra figures, statues, human shadows or reflections.",
+    "compact_suffix": "World: spacious modern corridor, night; polished stone/dark timber/brushed brass. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face. Wardrobe: structured evening tailoring; clear F1, M1; women polished editorial makeup; F1 minimal jewelry. Supports: structural corridor wall. Light: hard architectural side light. Style: cinematic photography; editorial realism; tactile natural surfaces; controlled contrast; burgundy, ochre and slate; clean subject separation; dynamic cinematic intensity. No extra figures, statues, human shadows or reflections.",
     "token_metrics": {
-      "geometry_estimated_tokens": 414,
-      "verbose_layer_estimated_tokens": 698,
-      "layer_estimated_tokens": 121,
-      "compact_saved_tokens": 577,
-      "final_estimated_tokens": 535,
-      "layer_budget_tokens": 200
+      "geometry_estimated_tokens": 434,
+      "verbose_layer_estimated_tokens": 919,
+      "layer_estimated_tokens": 158,
+      "compact_saved_tokens": 761,
+      "final_estimated_tokens": 592
     }
   },
   {
@@ -426,18 +562,32 @@
       "motivated_light_sources": [
         "warm brass practicals and cool city window light"
       ],
-      "appearance_bias": [
-        "statuesque",
-        "polished"
+      "support_realizations": [
+        {
+          "support": "bed",
+          "description": "upholstered hotel bed"
+        },
+        {
+          "support": "bed_edge",
+          "description": "firm upholstered bed edge"
+        },
+        {
+          "support": "floor",
+          "description": "polished suite floor"
+        },
+        {
+          "support": "wall",
+          "description": "structural suite wall"
+        },
+        {
+          "support": "sofa",
+          "description": "deep hotel sofa"
+        }
       ],
-      "wardrobe_theme": "luxury evening wear arranged for the scene",
-      "accessory_theme": [
-        "fine gold jewelry",
-        "gemstone choker"
+      "mood_tags": [
+        "opulent",
+        "dramatic"
       ],
-      "makeup_theme": "precise evening makeup",
-      "preferred_palette": "dark emerald, brass and ivory",
-      "atmosphere": "opulent after-hours drama",
       "forbidden_elements": [
         "background_people",
         "humanoid_statues",
@@ -445,10 +595,42 @@
         "person_shaped_shadows"
       ]
     },
+    "style": {
+      "style_id": "midnight_luxury_hotel_style",
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "dark emerald, brass and ivory",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "opulent after-hours drama",
+      "compatible_moods": [
+        "opulent",
+        "dramatic"
+      ]
+    },
+    "presentation_source": {
+      "presentation_id": "midnight_luxury_hotel_presentation",
+      "wardrobe_theme": "luxury evening wear arranged for the scene",
+      "accessory_theme": [
+        "fine gold jewelry",
+        "gemstone choker"
+      ],
+      "makeup_theme": "precise evening makeup",
+      "appearance_bias": [
+        "statuesque",
+        "polished"
+      ]
+    },
+    "required_environment_supports": [
+      "bed"
+    ],
     "presentation": {
       "scene_id": "D04",
-      "spatial_fingerprint": "c657661e55666cf37996ab7c95ba34a2fc3addbfcbcff21c22313c4ea464d0bf",
+      "spatial_fingerprint": "401fb4b96e589c9f329c9a788ba285e85eff5f05e11b87226e5617e40bb47ac8",
       "setting_id": "midnight_luxury_hotel",
+      "style_id": "midnight_luxury_hotel_style",
+      "presentation_id": "midnight_luxury_hotel_presentation",
       "roles": [
         {
           "role": "f1",
@@ -487,8 +669,17 @@
       "motivated_light_source": "warm brass practicals and cool city window light",
       "lighting_direction": "geometry_preserving",
       "lighting_quality": "subject_separating",
-      "palette": "dark emerald, brass and ivory",
-      "atmosphere": "opulent after-hours drama"
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "dark emerald, brass and ivory",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "opulent after-hours drama",
+      "appearance_bias": [
+        "statuesque",
+        "polished"
+      ]
     },
     "visibility": {
       "required_regions_by_role": {
@@ -533,19 +724,19 @@
       }
     },
     "fingerprints": {
-      "spatial": "c657661e55666cf37996ab7c95ba34a2fc3addbfcbcff21c22313c4ea464d0bf",
+      "spatial": "401fb4b96e589c9f329c9a788ba285e85eff5f05e11b87226e5617e40bb47ac8",
       "characters": "48a8c283507a75a5b5a7bdcb93ff1d49fc7fae9fa42d12e102888acd298af285",
-      "setting": "9c83cc21a65e787a72f8ed111cde96c211371a1204e0acd5ae3aff2558c45938",
-      "presentation": "554ae8dbc51daff524f94a917b33ec75586889aaaab4f4a15e315940239e47e4"
+      "setting": "0e7d689864f1fec1b2991a1279279a5757803664d10956d023698a015811d210",
+      "style": "f9e4199f887f0bacd5a1bd29552e6ef92bb4e52922d6cf8d737d93bd133fb49e",
+      "presentation": "794856f2ff5ac9f17544752f526a38f8589f55b326b9961bb9ff068dcb42aa05"
     },
-    "compact_suffix": "World: double-height luxury hotel suite at midnight; emerald velvet/polished brass/ivory linen; city window, upholstered headboard. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face; M2 medium-tall athletic, short-dark-brown hair, oval-masculine face. Wardrobe: luxury evening wear arranged for the scene; clear F1, M1, M2; women precise evening makeup; F1 fine gold jewelry, gemstone choker. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed; M1 proportional adult intimate anatomy, closely trimmed. Light: warm brass practicals and cool city window light. Palette dark emerald, brass and ivory; mood opulent after-hours drama. No extra figures, statues, human shadows or reflections.",
+    "compact_suffix": "World: double-height luxury hotel suite at midnight; emerald velvet/polished brass/ivory linen; city window, upholstered headboard. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face; M2 medium-tall athletic, short-dark-brown hair, oval-masculine face. Wardrobe: luxury evening wear arranged for the scene; clear F1, M1, M2; women precise evening makeup; F1 fine gold jewelry, gemstone choker. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed; M1 proportional adult intimate anatomy, closely trimmed. Presence: statuesque, polished. Supports: upholstered hotel bed. Light: warm brass practicals and cool city window light. Style: cinematic photography; editorial realism; tactile natural surfaces; controlled contrast; dark emerald, brass and ivory; clean subject separation; opulent after-hours drama. No extra figures, statues, human shadows or reflections.",
     "token_metrics": {
       "geometry_estimated_tokens": 523,
-      "verbose_layer_estimated_tokens": 963,
-      "layer_estimated_tokens": 197,
-      "compact_saved_tokens": 766,
-      "final_estimated_tokens": 720,
-      "layer_budget_tokens": 200
+      "verbose_layer_estimated_tokens": 1229,
+      "layer_estimated_tokens": 241,
+      "compact_saved_tokens": 988,
+      "final_estimated_tokens": 764
     }
   },
   {
@@ -597,14 +788,28 @@
       "motivated_light_sources": [
         "broad window light with a warm rim"
       ],
-      "appearance_bias": [],
-      "wardrobe_theme": "soft silk sleepwear",
-      "accessory_theme": [
-        "minimal jewelry"
+      "support_realizations": [
+        {
+          "support": "bed",
+          "description": "low linen bed"
+        },
+        {
+          "support": "bed_edge",
+          "description": "firm low bed edge"
+        },
+        {
+          "support": "floor",
+          "description": "light oak floor"
+        },
+        {
+          "support": "wall",
+          "description": "structural bedroom wall"
+        }
       ],
-      "makeup_theme": "natural luminous makeup",
-      "preferred_palette": "pale linen, cream and soft gold",
-      "atmosphere": "quiet editorial warmth",
+      "mood_tags": [
+        "quiet",
+        "warm"
+      ],
       "forbidden_elements": [
         "background_people",
         "humanoid_statues",
@@ -612,10 +817,38 @@
         "person_shaped_shadows"
       ]
     },
+    "style": {
+      "style_id": "soft_morning_bedroom_style",
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "pale linen, cream and soft gold",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "quiet editorial warmth",
+      "compatible_moods": [
+        "quiet",
+        "warm"
+      ]
+    },
+    "presentation_source": {
+      "presentation_id": "soft_morning_bedroom_presentation",
+      "wardrobe_theme": "soft silk sleepwear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "natural luminous makeup",
+      "appearance_bias": []
+    },
+    "required_environment_supports": [
+      "bed"
+    ],
     "presentation": {
       "scene_id": "D05",
-      "spatial_fingerprint": "d7ee46a6406fe6dc109e1b2db874f4449f22110a1ed6af9cdb2986d0eb3b8bc7",
+      "spatial_fingerprint": "04386e7d436ee82fefbe6708607482aa654c452dbcc8a7b56485dc42299fcdcd",
       "setting_id": "soft_morning_bedroom",
+      "style_id": "soft_morning_bedroom_style",
+      "presentation_id": "soft_morning_bedroom_presentation",
       "roles": [
         {
           "role": "f1",
@@ -643,8 +876,14 @@
       "motivated_light_source": "broad window light with a warm rim",
       "lighting_direction": "geometry_preserving",
       "lighting_quality": "subject_separating",
-      "palette": "pale linen, cream and soft gold",
-      "atmosphere": "quiet editorial warmth"
+      "medium": "cinematic photography",
+      "rendering_language": "editorial realism",
+      "surface_texture": "tactile natural surfaces",
+      "contrast": "controlled contrast",
+      "color_treatment": "pale linen, cream and soft gold",
+      "lighting_treatment": "clean subject separation",
+      "atmosphere": "quiet editorial warmth",
+      "appearance_bias": []
     },
     "visibility": {
       "required_regions_by_role": {
@@ -673,19 +912,19 @@
       }
     },
     "fingerprints": {
-      "spatial": "d7ee46a6406fe6dc109e1b2db874f4449f22110a1ed6af9cdb2986d0eb3b8bc7",
+      "spatial": "04386e7d436ee82fefbe6708607482aa654c452dbcc8a7b56485dc42299fcdcd",
       "characters": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
-      "setting": "075648a999ecdff1841e705ad124ae31bf673f74f19d27d04fc64de567d37831",
-      "presentation": "5e9e4b39733e332574f2767714615bfe812d9866f7500670f1a48b7a7c770fd6"
+      "setting": "7e2d75453d2a33b6261f8b38eaab5b1daa5a7982c611c11ca7f8f8b8cd07088f",
+      "style": "9b33aee67f7c43efa170c0e3b519c61e49353cc1fde236c23641028e37937451",
+      "presentation": "98f1984934b7b486a9d19202eb93e5f2e1b3ac0d1682812d0ad98ffa467328d8"
     },
-    "compact_suffix": "World: quiet bedroom in early morning; washed linen/light oak/sheer fabric; low bed, sheer curtains. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face. Wardrobe: soft silk sleepwear; clear F1; women natural luminous makeup; F1 minimal jewelry. Light: broad window light with a warm rim. Palette pale linen, cream and soft gold; mood quiet editorial warmth. No extra figures, statues, human shadows or reflections.",
+    "compact_suffix": "World: quiet bedroom in early morning; washed linen/light oak/sheer fabric; low bed, sheer curtains. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face. Wardrobe: soft silk sleepwear; clear F1; women natural luminous makeup; F1 minimal jewelry. Supports: low linen bed. Light: broad window light with a warm rim. Style: cinematic photography; editorial realism; tactile natural surfaces; controlled contrast; pale linen, cream and soft gold; clean subject separation; quiet editorial warmth. No extra figures, statues, human shadows or reflections.",
     "token_metrics": {
       "geometry_estimated_tokens": 392,
-      "verbose_layer_estimated_tokens": 693,
-      "layer_estimated_tokens": 127,
-      "compact_saved_tokens": 566,
-      "final_estimated_tokens": 519,
-      "layer_budget_tokens": 200
+      "verbose_layer_estimated_tokens": 932,
+      "layer_estimated_tokens": 161,
+      "compact_saved_tokens": 771,
+      "final_estimated_tokens": 553
     }
   },
   {
@@ -751,19 +990,29 @@
       "motivated_light_sources": [
         "crimson braziers and molten floor fissures"
       ],
-      "appearance_bias": [
-        "statuesque",
+      "support_realizations": [
+        {
+          "support": "floor",
+          "description": "level obsidian floor"
+        },
+        {
+          "support": "wall",
+          "description": "load-bearing obsidian wall"
+        },
+        {
+          "support": "sofa",
+          "description": "firm crimson ceremonial divan"
+        },
+        {
+          "support": "furniture",
+          "description": "solid black iron altar"
+        }
+      ],
+      "mood_tags": [
         "commanding",
-        "supernatural_eyes"
+        "infernal",
+        "regal"
       ],
-      "wardrobe_theme": "dark fantasy regalia arranged for the scene",
-      "accessory_theme": [
-        "horned crown",
-        "black metal arm cuffs"
-      ],
-      "makeup_theme": "ritual smoky eyes and dark wine lips",
-      "preferred_palette": "obsidian, crimson and antique gold",
-      "atmosphere": "commanding infernal grandeur",
       "forbidden_elements": [
         "background_people",
         "humanoid_statues",
@@ -771,10 +1020,44 @@
         "person_shaped_shadows"
       ]
     },
+    "style": {
+      "style_id": "demon_sovereign_palace_style",
+      "medium": "dark fantasy cinematic photography",
+      "rendering_language": "high detail infernal realism",
+      "surface_texture": "polished obsidian and tactile velvet",
+      "contrast": "hard luminous contrast",
+      "color_treatment": "obsidian, crimson and antique gold",
+      "lighting_treatment": "ritual fire with restrained bloom",
+      "atmosphere": "commanding infernal grandeur",
+      "compatible_moods": [
+        "commanding",
+        "infernal",
+        "regal"
+      ]
+    },
+    "presentation_source": {
+      "presentation_id": "demon_sovereign_palace_presentation",
+      "wardrobe_theme": "dark fantasy regalia arranged for the scene",
+      "accessory_theme": [
+        "horned crown",
+        "black metal arm cuffs"
+      ],
+      "makeup_theme": "ritual smoky eyes and dark wine lips",
+      "appearance_bias": [
+        "statuesque",
+        "commanding",
+        "supernatural_eyes"
+      ]
+    },
+    "required_environment_supports": [
+      "sofa"
+    ],
     "presentation": {
       "scene_id": "D06",
-      "spatial_fingerprint": "9bf6ac7e1106291c5ce0fd828601f1b69c87314b74054cf6f1fc6cc1b5e07e8e",
+      "spatial_fingerprint": "65ea17d290ebd8cf302e775851c03ddb90515f4024e79e40ad755469a62ead70",
       "setting_id": "demon_sovereign_palace",
+      "style_id": "demon_sovereign_palace_style",
+      "presentation_id": "demon_sovereign_palace_presentation",
       "roles": [
         {
           "role": "f1",
@@ -813,8 +1096,18 @@
       "motivated_light_source": "crimson braziers and molten floor fissures",
       "lighting_direction": "geometry_preserving",
       "lighting_quality": "subject_separating",
-      "palette": "obsidian, crimson and antique gold",
-      "atmosphere": "commanding infernal grandeur"
+      "medium": "dark fantasy cinematic photography",
+      "rendering_language": "high detail infernal realism",
+      "surface_texture": "polished obsidian and tactile velvet",
+      "contrast": "hard luminous contrast",
+      "color_treatment": "obsidian, crimson and antique gold",
+      "lighting_treatment": "ritual fire with restrained bloom",
+      "atmosphere": "commanding infernal grandeur",
+      "appearance_bias": [
+        "statuesque",
+        "commanding",
+        "supernatural_eyes"
+      ]
     },
     "visibility": {
       "required_regions_by_role": {
@@ -862,19 +1155,19 @@
       }
     },
     "fingerprints": {
-      "spatial": "9bf6ac7e1106291c5ce0fd828601f1b69c87314b74054cf6f1fc6cc1b5e07e8e",
+      "spatial": "65ea17d290ebd8cf302e775851c03ddb90515f4024e79e40ad755469a62ead70",
       "characters": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
-      "setting": "010e58e6e77d3add3b1d4a38ccfc650f1aacf946cecaa03a72475c698771b738",
-      "presentation": "d14e7fee64890e5b2dbcf9031065dff2d21e658390a5a14137ed61349e793464"
+      "setting": "7973de9d470f8748627590382634497fccda2f5538e8ae68b6b8531fb1326b5c",
+      "style": "c6678028b22c2a2f61d5d8c63793f5f388dbe844b2b8a97455dec8d5fc50d5d9",
+      "presentation": "ee58ffd33278a8d8dd0d2f8f024105091af7ce5bcf39333052d1f8ef9c98b694"
     },
-    "compact_suffix": "World: obsidian throne chamber of a demon sovereign, night; obsidian/black iron/crimson velvet; empty throne, braziers, ritual sigil. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face; F3 tall soft-curvy, long-dark-brown hair, angular-elegant face. Wardrobe: dark fantasy regalia arranged for the scene; clear F1; women ritual smoky eyes and dark wine lips; F1 horned crown, black metal arm cuffs. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: crimson braziers and molten floor fissures. Palette obsidian, crimson and antique gold; mood commanding infernal grandeur. No extra figures, statues, human shadows or reflections.",
+    "compact_suffix": "World: obsidian throne chamber of a demon sovereign, night; obsidian/black iron/crimson velvet; empty throne, braziers, ritual sigil. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face; F3 tall soft-curvy, long-dark-brown hair, angular-elegant face. Wardrobe: dark fantasy regalia arranged for the scene; clear F1; women ritual smoky eyes and dark wine lips; F1 horned crown, black metal arm cuffs. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Presence: statuesque, commanding, supernatural eyes. Supports: firm crimson ceremonial divan. Light: crimson braziers and molten floor fissures. Style: dark fantasy cinematic photography; high detail infernal realism; polished obsidian and tactile velvet; hard luminous contrast; obsidian, crimson and antique gold; ritual fire with restrained bloom; commanding infernal grandeur. No extra figures, statues, human shadows or reflections.",
     "token_metrics": {
       "geometry_estimated_tokens": 412,
-      "verbose_layer_estimated_tokens": 957,
-      "layer_estimated_tokens": 188,
-      "compact_saved_tokens": 769,
-      "final_estimated_tokens": 600,
-      "layer_budget_tokens": 200
+      "verbose_layer_estimated_tokens": 1249,
+      "layer_estimated_tokens": 251,
+      "compact_saved_tokens": 998,
+      "final_estimated_tokens": 663
     }
   }
 ]

@@ -47,6 +47,11 @@ class CharacterProfile(StrictModel):
     fantasy_body_traits: list[Identifier] = Field(default_factory=list, max_length=4)
 
 
+class SupportRealization(StrictModel):
+    support: Identifier
+    description: str = Field(min_length=3, max_length=80)
+
+
 class SettingPreset(StrictModel):
     setting_id: Identifier
     world_genre: Identifier
@@ -58,12 +63,11 @@ class SettingPreset(StrictModel):
     materials: list[str] = Field(min_length=2, max_length=5)
     environment_props: list[str] = Field(default_factory=list, max_length=5)
     motivated_light_sources: list[str] = Field(min_length=1, max_length=4)
-    appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
-    wardrobe_theme: str = Field(min_length=5, max_length=100)
-    accessory_theme: list[str] = Field(default_factory=list, max_length=4)
-    makeup_theme: str = Field(min_length=3, max_length=80)
-    preferred_palette: str = Field(min_length=5, max_length=100)
-    atmosphere: str = Field(min_length=5, max_length=100)
+    support_realizations: list[SupportRealization] = Field(
+        min_length=1,
+        max_length=9,
+    )
+    mood_tags: list[Identifier] = Field(min_length=1, max_length=6)
     forbidden_elements: list[Identifier] = Field(
         default_factory=lambda: sorted(EXTRA_CAST_HAZARDS),
         min_length=4,
@@ -75,7 +79,36 @@ class SettingPreset(StrictModel):
         missing = EXTRA_CAST_HAZARDS.difference(self.forbidden_elements)
         if missing:
             raise ValueError(f"setting omits exact-cast hazards: {sorted(missing)}")
+        support_ids = [item.support for item in self.support_realizations]
+        if len(support_ids) != len(set(support_ids)):
+            raise ValueError("setting contains duplicate support realizations")
         return self
+
+
+class StylePreset(StrictModel):
+    style_id: Identifier
+    medium: str = Field(min_length=5, max_length=60)
+    rendering_language: str = Field(min_length=5, max_length=80)
+    surface_texture: str = Field(min_length=5, max_length=80)
+    contrast: str = Field(min_length=3, max_length=60)
+    color_treatment: str = Field(min_length=5, max_length=80)
+    lighting_treatment: str = Field(min_length=5, max_length=80)
+    atmosphere: str = Field(min_length=5, max_length=80)
+    compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
+
+
+class PresentationPreset(StrictModel):
+    presentation_id: Identifier
+    wardrobe_theme: str = Field(min_length=5, max_length=100)
+    accessory_theme: list[str] = Field(default_factory=list, max_length=4)
+    makeup_theme: str = Field(min_length=3, max_length=80)
+    appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
+
+
+class SceneLayerInputs(StrictModel):
+    setting: SettingPreset
+    style: StylePreset
+    presentation: PresentationPreset
 
 
 class RolePresentation(StrictModel):
@@ -93,12 +126,20 @@ class PresentationPlan(StrictModel):
     scene_id: Annotated[str, StringConstraints(pattern=r"^D\d{2}$")]
     spatial_fingerprint: Fingerprint
     setting_id: Identifier
+    style_id: Identifier
+    presentation_id: Identifier
     roles: list[RolePresentation] = Field(min_length=1, max_length=5)
     motivated_light_source: str
     lighting_direction: Identifier
     lighting_quality: Identifier
-    palette: str
+    medium: str
+    rendering_language: str
+    surface_texture: str
+    contrast: str
+    color_treatment: str
+    lighting_treatment: str
     atmosphere: str
+    appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
 
 
 class FinalVisibilityPlan(StrictModel):
@@ -112,6 +153,7 @@ class LayerFingerprints(StrictModel):
     spatial: Fingerprint
     characters: Fingerprint
     setting: Fingerprint
+    style: Fingerprint
     presentation: Fingerprint
 
 
@@ -121,12 +163,14 @@ class TokenMetrics(StrictModel):
     layer_estimated_tokens: int = Field(ge=1)
     compact_saved_tokens: int = Field(ge=0)
     final_estimated_tokens: int = Field(ge=1)
-    layer_budget_tokens: int = Field(ge=1)
 
 
 class ResolvedSceneLayers(StrictModel):
     characters: list[CharacterProfile] = Field(min_length=1, max_length=5)
     setting: SettingPreset
+    style: StylePreset
+    presentation_source: PresentationPreset
+    required_environment_supports: list[Identifier] = Field(max_length=4)
     presentation: PresentationPlan
     visibility: FinalVisibilityPlan
     fingerprints: LayerFingerprints
@@ -226,8 +270,6 @@ def make_setting_preset(
     setting_id: str,
     location: str,
     lighting: str,
-    palette: str,
-    atmosphere: str,
     *,
     world_genre: str = "contemporary",
     era: str = "contemporary",
@@ -236,10 +278,11 @@ def make_setting_preset(
     architecture: str | None = None,
     materials: tuple[str, ...] = ("textured fabric", "finished wood"),
     environment_props: tuple[str, ...] = (),
-    wardrobe_theme: str = "editorial evening wear",
-    accessory_theme: tuple[str, ...] = ("minimal jewelry",),
-    makeup_theme: str = "polished editorial makeup",
-    appearance_bias: tuple[str, ...] = (),
+    support_realizations: tuple[tuple[str, str], ...] = (
+        ("floor", "finished floor"),
+        ("wall", "structural wall"),
+    ),
+    mood_tags: tuple[str, ...] = ("editorial",),
 ) -> SettingPreset:
     return SettingPreset(
         setting_id=setting_id,
@@ -252,19 +295,83 @@ def make_setting_preset(
         materials=list(materials),
         environment_props=list(environment_props),
         motivated_light_sources=[lighting],
-        appearance_bias=list(appearance_bias),
-        wardrobe_theme=wardrobe_theme,
-        accessory_theme=list(accessory_theme),
-        makeup_theme=makeup_theme,
-        preferred_palette=palette,
-        atmosphere=atmosphere,
+        support_realizations=[
+            SupportRealization(support=support, description=description)
+            for support, description in support_realizations
+        ],
+        mood_tags=list(mood_tags),
     )
 
 
-SETTING_PRESETS = {
-    preset.setting_id: preset
-    for preset in (
-        make_setting_preset(
+def make_scene_layer_inputs(
+    setting_id: str,
+    location: str,
+    lighting: str,
+    color_treatment: str,
+    atmosphere: str,
+    *,
+    world_genre: str = "contemporary",
+    era: str = "contemporary",
+    time_of_day: str = "night",
+    weather: str = "interior_controlled",
+    architecture: str | None = None,
+    materials: tuple[str, ...] = ("textured fabric", "finished wood"),
+    environment_props: tuple[str, ...] = (),
+    support_realizations: tuple[tuple[str, str], ...] = (
+        ("floor", "finished floor"),
+        ("wall", "structural wall"),
+    ),
+    mood_tags: tuple[str, ...] = ("editorial",),
+    wardrobe_theme: str = "editorial evening wear",
+    accessory_theme: tuple[str, ...] = ("minimal jewelry",),
+    makeup_theme: str = "polished editorial makeup",
+    appearance_bias: tuple[str, ...] = (),
+    medium: str = "cinematic photography",
+    rendering_language: str = "editorial realism",
+    surface_texture: str = "tactile natural surfaces",
+    contrast: str = "controlled contrast",
+    lighting_treatment: str = "clean subject separation",
+) -> SceneLayerInputs:
+    return SceneLayerInputs(
+        setting=make_setting_preset(
+            setting_id,
+            location,
+            lighting,
+            world_genre=world_genre,
+            era=era,
+            time_of_day=time_of_day,
+            weather=weather,
+            architecture=architecture,
+            materials=materials,
+            environment_props=environment_props,
+            support_realizations=support_realizations,
+            mood_tags=mood_tags,
+        ),
+        style=StylePreset(
+            style_id=f"{setting_id}_style",
+            medium=medium,
+            rendering_language=rendering_language,
+            surface_texture=surface_texture,
+            contrast=contrast,
+            color_treatment=color_treatment,
+            lighting_treatment=lighting_treatment,
+            atmosphere=atmosphere,
+            compatible_moods=list(mood_tags),
+        ),
+        presentation=PresentationPreset(
+            presentation_id=f"{setting_id}_presentation",
+            wardrobe_theme=wardrobe_theme,
+            accessory_theme=list(accessory_theme),
+            makeup_theme=makeup_theme,
+            appearance_bias=list(appearance_bias),
+        ),
+    )
+
+
+SCENE_LAYER_PRESETS = {
+    item.setting.setting_id: item
+    for item in (
+        make_scene_layer_inputs(
             "rainy_neon_apartment",
             "rain-darkened high-rise apartment",
             "magenta and cyan neon through wet glass",
@@ -273,11 +380,18 @@ SETTING_PRESETS = {
             weather="rain",
             materials=("wet glass", "brushed steel", "dark linen"),
             environment_props=("rain-streaked window", "low platform bed"),
+            support_realizations=(
+                ("bed", "low platform bed"),
+                ("bed_edge", "firm platform bed edge"),
+                ("floor", "finished apartment floor"),
+                ("wall", "structural apartment wall"),
+            ),
+            mood_tags=("electric", "nocturnal"),
             wardrobe_theme="sleek black nightlife tailoring",
             accessory_theme=("silver ear cuffs",),
             makeup_theme="smoky eyes with a glossy finish",
         ),
-        make_setting_preset(
+        make_scene_layer_inputs(
             "amber_restraint_studio",
             "minimal amber performance studio",
             "shielded amber ceiling source",
@@ -285,18 +399,30 @@ SETTING_PRESETS = {
             "controlled sculptural ritual",
             materials=("matte plaster", "pale timber", "padded leather"),
             environment_props=("low platform",),
+            support_realizations=(
+                ("floor", "pale timber floor"),
+                ("wall", "matte plaster wall"),
+                ("furniture", "padded performance platform"),
+                ("sofa", "firm padded studio sofa"),
+            ),
+            mood_tags=("controlled", "sculptural"),
             wardrobe_theme="minimalist performance styling",
         ),
-        make_setting_preset(
+        make_scene_layer_inputs(
             "burgundy_modern_corridor",
             "spacious modern corridor",
             "hard architectural side light",
             "burgundy, ochre and slate",
             "dynamic cinematic intensity",
             materials=("polished stone", "dark timber", "brushed brass"),
+            support_realizations=(
+                ("floor", "polished stone floor"),
+                ("wall", "structural corridor wall"),
+            ),
+            mood_tags=("dynamic", "cinematic"),
             wardrobe_theme="structured evening tailoring",
         ),
-        make_setting_preset(
+        make_scene_layer_inputs(
             "midnight_luxury_hotel",
             "double-height luxury hotel suite at midnight",
             "warm brass practicals and cool city window light",
@@ -304,12 +430,20 @@ SETTING_PRESETS = {
             "opulent after-hours drama",
             materials=("emerald velvet", "polished brass", "ivory linen"),
             environment_props=("city window", "upholstered headboard"),
+            support_realizations=(
+                ("bed", "upholstered hotel bed"),
+                ("bed_edge", "firm upholstered bed edge"),
+                ("floor", "polished suite floor"),
+                ("wall", "structural suite wall"),
+                ("sofa", "deep hotel sofa"),
+            ),
+            mood_tags=("opulent", "dramatic"),
             wardrobe_theme="luxury evening wear arranged for the scene",
             accessory_theme=("fine gold jewelry", "gemstone choker"),
             makeup_theme="precise evening makeup",
             appearance_bias=("statuesque", "polished"),
         ),
-        make_setting_preset(
+        make_scene_layer_inputs(
             "soft_morning_bedroom",
             "quiet bedroom in early morning",
             "broad window light with a warm rim",
@@ -318,10 +452,17 @@ SETTING_PRESETS = {
             time_of_day="morning",
             materials=("washed linen", "light oak", "sheer fabric"),
             environment_props=("low bed", "sheer curtains"),
+            support_realizations=(
+                ("bed", "low linen bed"),
+                ("bed_edge", "firm low bed edge"),
+                ("floor", "light oak floor"),
+                ("wall", "structural bedroom wall"),
+            ),
+            mood_tags=("quiet", "warm"),
             wardrobe_theme="soft silk sleepwear",
             makeup_theme="natural luminous makeup",
         ),
-        make_setting_preset(
+        make_scene_layer_inputs(
             "demon_sovereign_palace",
             "obsidian throne chamber of a demon sovereign",
             "crimson braziers and molten floor fissures",
@@ -331,10 +472,22 @@ SETTING_PRESETS = {
             era="fantasy",
             materials=("obsidian", "black iron", "crimson velvet"),
             environment_props=("empty throne", "braziers", "ritual sigil"),
+            support_realizations=(
+                ("floor", "level obsidian floor"),
+                ("wall", "load-bearing obsidian wall"),
+                ("sofa", "firm crimson ceremonial divan"),
+                ("furniture", "solid black iron altar"),
+            ),
+            mood_tags=("commanding", "infernal", "regal"),
             wardrobe_theme="dark fantasy regalia arranged for the scene",
             accessory_theme=("horned crown", "black metal arm cuffs"),
             makeup_theme="ritual smoky eyes and dark wine lips",
             appearance_bias=("statuesque", "commanding", "supernatural_eyes"),
+            medium="dark fantasy cinematic photography",
+            rendering_language="high detail infernal realism",
+            surface_texture="polished obsidian and tactile velvet",
+            contrast="hard luminous contrast",
+            lighting_treatment="ritual fire with restrained bloom",
         ),
     )
 }
@@ -361,9 +514,11 @@ def resolve_scene_layers(
     cast_roles: list[str],
     body_level: str,
     setting: SettingPreset,
+    style: StylePreset,
+    presentation_source: PresentationPreset,
+    required_environment_supports: list[str],
     required_regions_by_role: dict[str, list[str]],
     visible_regions_by_role: dict[str, list[str]],
-    layer_budget_tokens: int = 150,
 ) -> ResolvedSceneLayers:
     characters = [CHARACTER_PROFILES[role] for role in cast_roles]
     role_presentations = []
@@ -373,7 +528,7 @@ def resolve_scene_layers(
         wardrobe_state = (
             "clear_of_required_contacts" if intimate_required else "scene_appropriate"
         )
-        wardrobe = setting.wardrobe_theme
+        wardrobe = presentation_source.wardrobe_theme
         if intimate_required:
             wardrobe = f"{wardrobe}, displaced only where contact requires"
         role_presentations.append(
@@ -387,10 +542,12 @@ def resolve_scene_layers(
                     else "footwear omitted for stable support"
                 ),
                 accessories=(
-                    setting.accessory_theme if profile.role == cast_roles[0] else []
+                    presentation_source.accessory_theme
+                    if profile.role == cast_roles[0]
+                    else []
                 ),
                 makeup=(
-                    setting.makeup_theme
+                    presentation_source.makeup_theme
                     if profile.role.startswith("f")
                     else "subtle polished grooming"
                 ),
@@ -402,12 +559,20 @@ def resolve_scene_layers(
         scene_id=scene_id,
         spatial_fingerprint=spatial_fingerprint,
         setting_id=setting.setting_id,
+        style_id=style.style_id,
+        presentation_id=presentation_source.presentation_id,
         roles=role_presentations,
         motivated_light_source=setting.motivated_light_sources[0],
         lighting_direction="geometry_preserving",
         lighting_quality="subject_separating",
-        palette=setting.preferred_palette,
-        atmosphere=setting.atmosphere,
+        medium=style.medium,
+        rendering_language=style.rendering_language,
+        surface_texture=style.surface_texture,
+        contrast=style.contrast,
+        color_treatment=style.color_treatment,
+        lighting_treatment=style.lighting_treatment,
+        atmosphere=style.atmosphere,
+        appearance_bias=list(presentation_source.appearance_bias),
     )
     emitted: dict[str, list[str]] = {}
     omitted: dict[str, list[str]] = {}
@@ -470,38 +635,63 @@ def resolve_scene_layers(
         ),
         f"Look: {'; '.join(character_phrases)}",
         (
-            f"Wardrobe: {setting.wardrobe_theme}; clear "
-            f"{', '.join(contact_clearance_roles)}; women {setting.makeup_theme}; "
+            f"Wardrobe: {presentation_source.wardrobe_theme}; clear "
+            f"{', '.join(contact_clearance_roles)}; women "
+            f"{presentation_source.makeup_theme}; "
             f"{'; '.join(accessory_phrases)}"
             if contact_clearance_roles
             else (
-                f"Wardrobe: {setting.wardrobe_theme}; women "
-                f"{setting.makeup_theme}; {'; '.join(accessory_phrases)}"
+                f"Wardrobe: {presentation_source.wardrobe_theme}; women "
+                f"{presentation_source.makeup_theme}; "
+                f"{'; '.join(accessory_phrases)}"
             )
         ),
     ]
     if visible_detail_phrases:
         suffix_parts.append(f"Visible detail: {'; '.join(visible_detail_phrases)}")
+    if presentation.appearance_bias:
+        suffix_parts.append(
+            "Presence: "
+            + ", ".join(
+                value.replace("_", " ") for value in presentation.appearance_bias
+            )
+        )
+    support_map = {
+        item.support: item.description for item in setting.support_realizations
+    }
+    required_support_phrases = [
+        support_map[support] for support in required_environment_supports
+    ]
+    if required_support_phrases:
+        suffix_parts.append(f"Supports: {', '.join(required_support_phrases)}")
     suffix_parts.extend(
         (
             f"Light: {presentation.motivated_light_source}",
-            f"Palette {presentation.palette}; mood {presentation.atmosphere}",
+            (
+                f"Style: {presentation.medium}; {presentation.rendering_language}; "
+                f"{presentation.surface_texture}; {presentation.contrast}; "
+                f"{presentation.color_treatment}; "
+                f"{presentation.lighting_treatment}; {presentation.atmosphere}"
+            ),
             "No extra figures, statues, human shadows or reflections",
         )
     )
     compact_suffix = ". ".join(suffix_parts) + "."
+    layer_tokens = estimate_tokens(compact_suffix)
     if not compact_suffix.isascii():
         raise ValueError("resolved scene layers must compile to ASCII")
-    layer_tokens = estimate_tokens(compact_suffix)
-    if layer_tokens > layer_budget_tokens:
-        raise ValueError(
-            f"layer prompt exceeds token budget: {layer_tokens} > {layer_budget_tokens}"
-        )
     fingerprints = LayerFingerprints(
         spatial=spatial_fingerprint,
         characters=stable_hash(characters),
         setting=stable_hash(setting),
-        presentation=stable_hash(presentation),
+        style=stable_hash(style),
+        presentation=stable_hash(
+            {
+                "source": presentation_source,
+                "roles": role_presentations,
+                "appearance_bias": presentation.appearance_bias,
+            }
+        ),
     )
     geometry_tokens = estimate_tokens(geometry)
     verbose_layer_tokens = estimate_tokens(
@@ -511,6 +701,8 @@ def resolve_scene_layers(
                     profile.model_dump(mode="json") for profile in characters
                 ],
                 "setting": setting.model_dump(mode="json"),
+                "style": style.model_dump(mode="json"),
+                "presentation_source": presentation_source.model_dump(mode="json"),
                 "presentation": presentation.model_dump(mode="json"),
                 "visibility": visibility.model_dump(mode="json"),
             },
@@ -521,6 +713,9 @@ def resolve_scene_layers(
     return ResolvedSceneLayers(
         characters=characters,
         setting=setting,
+        style=style,
+        presentation_source=presentation_source,
+        required_environment_supports=required_environment_supports,
         presentation=presentation,
         visibility=visibility,
         fingerprints=fingerprints,
@@ -531,7 +726,6 @@ def resolve_scene_layers(
             layer_estimated_tokens=layer_tokens,
             compact_saved_tokens=verbose_layer_tokens - layer_tokens,
             final_estimated_tokens=geometry_tokens + layer_tokens,
-            layer_budget_tokens=layer_budget_tokens,
         ),
     )
 
@@ -552,10 +746,14 @@ def layer_issues(
         not in layers.setting.motivated_light_sources
     ):
         issues.append("lighting source is not motivated by setting")
-    if layers.token_metrics.layer_estimated_tokens > (
-        layers.token_metrics.layer_budget_tokens
-    ):
-        issues.append("layer token budget exceeded")
+    realized_supports = {item.support for item in layers.setting.support_realizations}
+    missing_supports = set(layers.required_environment_supports).difference(
+        realized_supports
+    )
+    if missing_supports:
+        issues.append(f"setting lacks required supports: {sorted(missing_supports)}")
+    if not set(layers.setting.mood_tags).intersection(layers.style.compatible_moods):
+        issues.append("style is incompatible with setting mood")
     for role, required in layers.visibility.required_regions_by_role.items():
         presentation = next(
             item for item in layers.presentation.roles if item.role == role

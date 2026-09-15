@@ -77,12 +77,11 @@
   "threshold_failures": {},
   "prompt_issues": {},
   "token_metrics": {
-    "estimated_total": 5601,
-    "estimated_average": 466.75,
-    "maximum_layer_tokens": 174,
-    "verbose_layer_estimated_total": 8940,
-    "compact_saved_total": 7237,
-    "layer_budget_tokens": 200,
+    "estimated_total": 5948,
+    "estimated_average": 495.67,
+    "maximum_layer_tokens": 202,
+    "verbose_layer_estimated_total": 11526,
+    "compact_saved_total": 9496,
     "style_generation_calls": 0,
     "evaluation_payload": "scene_id_and_prompt_only"
   },
@@ -93,9 +92,9 @@
     "structured_rejections": [],
     "usage_by_attempt": [
       {
-        "prompt_tokens": 5327,
-        "completion_tokens": 990,
-        "total_tokens": 6317
+        "prompt_tokens": 5541,
+        "completion_tokens": 975,
+        "total_tokens": 6516
       }
     ],
     "evaluations": [

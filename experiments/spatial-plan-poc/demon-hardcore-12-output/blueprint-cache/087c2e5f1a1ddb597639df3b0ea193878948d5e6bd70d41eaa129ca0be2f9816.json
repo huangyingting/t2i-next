@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "system_prompt_hash": "7955d1ee2b23618c155dcaefa4406c1146b310be12bec371c89c1f34d8c6963b",
+  "brief_hash": "ed4829fae53c6b7c246ddbca9e3caa5174d08bcb9cbb362c55f7c74d776cf803",
+  "creative_seed": 42,
+  "model": "DeepSeek-V3.2",
+  "structured_rejections": [],
+  "usage": {
+    "prompt_tokens": 256,
+    "completion_tokens": 791,
+    "total_tokens": 1047
+  },
+  "blueprint": {
+    "family_id": "infernal",
+    "world_genre": "dark_fantasy_infernal",
+    "era": "timeless_demon_realm",
+    "location_options": [
+      "throne_hall_of_ashes",
+      "obsidian_grand_gallery",
+      "cryptic_palace_library",
+      "desolate_balcony_over_abyss",
+      "ritual_chamber_with_braziers",
+      "black_iron_promenade",
+      "courtyard_of_smoldering_statues",
+      "veil_weaving_atelier",
+      "underforge",
+      "crimson_council_antechamber"
+    ],
+    "time_options": [
+      "eternal_dusk",
+      "blood_moon_night",
+      "celestial_conjunction_hour",
+      "hour_of_silent_flames"
+    ],
+    "weather_options": [
+      "emberfall",
+      "slow_crimson_lightning",
+      "veil_of_soul_mist",
+      "still_and_heavy_air"
+    ],
+    "architecture_options": [
+      "obsidian_spires_and_buttresses",
+      "smooth_black_stone_floors",
+      "twisted_black_iron_filigree",
+      "vast_echoing_vaults",
+      "floating_daemonstone_islands",
+      "impossibly_high_ceilings"
+    ],
+    "material_options": [
+      "polished_obsidian",
+      "cold_black_iron",
+      "crimson_velvet",
+      "black_mahogany",
+      "glowing_runestone",
+      "bone_ivory_inlay",
+      "shadow_silk"
+    ],
+    "prop_options": [
+      "ritual_braziers",
+      "bloodstone_pedestals",
+      "tapestries_of_conquest",
+      "horned_throne",
+      "forbidden_tomes_chained",
+      "floating_censers",
+      "basalt_plinths",
+      "curtains_of_smoke",
+      "chalice_of_emberwine",
+      "pools_of_liquid_shadow"
+    ],
+    "light_options": [
+      "supernatural_brazier_glow",
+      "pulsing_heartlight",
+      "cold_runelight",
+      "underforge_forgefire",
+      "veil_light_leaks",
+      "bioluminescent_fungal_growths"
+    ],
+    "palette_options": [
+      "obsidian_and_crimson",
+      "black_iron_and_ember",
+      "deep_purple_and_gold",
+      "monochrome_with_blood_accent",
+      "shadow_and_brass",
+      "ashen_gray_and_dark_velvet"
+    ],
+    "atmosphere_options": [
+      "oppressive_regal_grandeur",
+      "silent_ritual_anticipation",
+      "smoldering_contemplation",
+      "echoing_isolation",
+      "ancient_power_resides_here",
+      "air_thick_with_potency"
+    ],
+    "wardrobe_theme": "regal_demon_sovereign",
+    "accessory_options": [
+      "horned_circlets",
+      "heavy_signet_rings",
+      "obsidian_shard_jewelry",
+      "black_iron_arm_bands",
+      "clawed_gauntlets",
+      "veils_of_shadow",
+      "chain_of_subjugation"
+    ],
+    "makeup_theme": "supernatural_emphasis",
+    "visual_style_options": [
+      "oil_painting_dark_academic",
+      "cinematic_high_fantasy",
+      "concept_art_illustration",
+      "dramatic_chiaroscuro",
+      "textured_brushstrokes",
+      "saturated_shadows",
+      "desaturated_with_fire_pop"
+    ],
+    "appearance_bias": [
+      "sharp_elegant_features",
+      "pale_or_dark_complexions",
+      "long_nimble_fingers",
+      "imposing_stature_suggested"
+    ]
+  }
+}

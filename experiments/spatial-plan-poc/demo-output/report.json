@@ -20,105 +20,101 @@
   "layer_validation_issues": {},
   "hard_geometry_issues": {},
   "token_metrics": {
-    "geometry_estimated_tokens": 2309,
-    "layer_estimated_tokens": 900,
-    "verbose_layer_estimated_tokens": 4382,
-    "compact_saved_tokens": 3482,
-    "final_estimated_tokens": 3209,
+    "geometry_estimated_tokens": 2329,
+    "layer_estimated_tokens": 1148,
+    "verbose_layer_estimated_tokens": 5899,
+    "compact_saved_tokens": 4751,
+    "final_estimated_tokens": 3477,
     "saved_style_generation_calls": 6
   },
-  "average_visual_impact": 10.0,
+  "average_visual_impact": 8.833333333333334,
   "evaluations": [
     {
       "scene_id": "D01",
-      "geometry_coherence": 10,
-      "visual_impact": 10,
+      "geometry_coherence": 8,
+      "visual_impact": 9,
       "cast_clarity": 10,
-      "contact_clarity": 10,
-      "style_integration": 10,
+      "contact_clarity": 8,
+      "style_integration": 9,
       "strengths": [
-        "Coherent single-actor pose",
-        "Clear device contact and ownership",
-        "Strong lighting and mood integration",
-        "No anatomical contradictions"
+        "Clear single-actor focus",
+        "Strong mood lighting",
+        "Specific anatomical and prop details"
       ],
       "issues": [],
       "verdict": "pass"
     },
     {
       "scene_id": "D02",
-      "geometry_coherence": 10,
-      "visual_impact": 10,
+      "geometry_coherence": 8,
+      "visual_impact": 8,
       "cast_clarity": 10,
-      "contact_clarity": 10,
-      "style_integration": 10,
+      "contact_clarity": 9,
+      "style_integration": 9,
       "strengths": [
-        "Pose is stable and anatomically consistent",
-        "Spread bar is visibly anchored to both ankles",
-        "Clear camera placement for the described contact",
-        "No extraneous elements or anatomical contradictions"
+        "Clear bondage prop anchoring",
+        "Consistent support plan",
+        "Coherent activity and contact"
       ],
       "issues": [],
       "verdict": "pass"
     },
     {
       "scene_id": "D03",
-      "geometry_coherence": 9,
-      "visual_impact": 10,
-      "cast_clarity": 10,
-      "contact_clarity": 9,
-      "style_integration": 10,
+      "geometry_coherence": 7,
+      "visual_impact": 9,
+      "cast_clarity": 8,
+      "contact_clarity": 7,
+      "style_integration": 9,
       "strengths": [
-        "Lifted pose is well-supported by the cradling partner",
-        "Camera viewpoint allows for full body composition",
-        "Silhouette is clear under described lighting"
+        "Dynamic lifted pose",
+        "Clear bilateral cradle description",
+        "Strong cinematic style"
       ],
       "issues": [],
       "verdict": "pass"
     },
     {
       "scene_id": "D04",
-      "geometry_coherence": 10,
-      "visual_impact": 10,
-      "cast_clarity": 10,
-      "contact_clarity": 10,
-      "style_integration": 10,
+      "geometry_coherence": 9,
+      "visual_impact": 9,
+      "cast_clarity": 8,
+      "contact_clarity": 8,
+      "style_integration": 9,
       "strengths": [
-        "All three bodies are distinctly placed and supported",
-        "Continuous connections for F1's torso and head are maintained",
-        "Multiple inserted contacts are clearly allocated to distinct actors",
-        "World and lighting details reinforce the composition"
+        "Precise multi-actor positioning",
+        "Clear body continuity statement",
+        "Rich environmental and lighting detail"
       ],
       "issues": [],
       "verdict": "pass"
     },
     {
       "scene_id": "D05",
-      "geometry_coherence": 10,
-      "visual_impact": 10,
-      "cast_clarity": 10,
-      "contact_clarity": 9,
-      "style_integration": 10,
+      "geometry_coherence": 8,
+      "visual_impact": 8,
+      "cast_clarity": 9,
+      "contact_clarity": 8,
+      "style_integration": 9,
       "strengths": [
-        "Stable all-fours and kneeling support",
-        "Harness ownership is explicitly clear and attached to F2",
-        "Camera angle shows the described spatial relationship"
+        "Clear strap-on harness anchoring",
+        "Coherent support structure",
+        "Atmosphere consistent with pose"
       ],
       "issues": [],
       "verdict": "pass"
     },
     {
       "scene_id": "D06",
-      "geometry_coherence": 10,
+      "geometry_coherence": 8,
       "visual_impact": 10,
-      "cast_clarity": 10,
-      "contact_clarity": 10,
+      "cast_clarity": 9,
+      "contact_clarity": 9,
       "style_integration": 10,
       "strengths": [
-        "All three actors have distinct, non-conflicting roles",
-        "External contacts (mouth-to-vulva, hand-to-breast) are clear",
-        "Support points for each body are credible and visible",
-        "Fantasy wardrobe and lighting details are integrated without contradiction"
+        "Strong fantasy theme integration",
+        "Clear multi-actor roles and contacts",
+        "Highly specific and evocative lighting"
       ],
       "issues": [],
       "verdict": "pass"
@@ -126,10 +122,6 @@
   ],
   "evaluation_attempts": 1,
   "evaluation_validation_issues": {},
-  "evaluation_structured_rejections": [
-    [
-      "evaluations.3: Value error, passing evaluations cannot contain issues"
-    ]
-  ],
+  "evaluation_structured_rejections": [],
   "passed": true
 }

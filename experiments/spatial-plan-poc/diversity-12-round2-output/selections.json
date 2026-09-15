@@ -15,12 +15,14 @@
     "activity_id": "anal_side_lying",
     "camera_viewpoint": "front_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "fc0a545c4cabc1b2481b4c224348046f29a939e7c1de0a14ae24811138580708",
+    "plan_fingerprint": "815c200dece7c5dcdd669b414bfc50d26db80fb84e20503967db3f93a52d0354",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_rain_soaked_roadside_motel_at_midnight",
-    "setting_fingerprint": "052a6780f23b4380572e75315165078c881cdac44e28ef5003348f7ccc4bdddd",
-    "presentation_fingerprint": "96fa9febc911dd659a84f4886be9769bd5fcc9588a9a6f5a12737dd9a983d2c2",
-    "estimated_tokens": 454
+    "setting_fingerprint": "cda88b14af8080cd6fda373aa212f6f609e25b2f8a1d490a2ae1a8a97447abb5",
+    "style_id": "test_rain_soaked_roadside_motel_at_midnight_style",
+    "style_fingerprint": "0da1f29fe402619f0d718394c0cb70016c45be04aaa69e56d7082ee939ac214e",
+    "presentation_fingerprint": "37fb2f1d553473d78df750497d1f19488319f628e04c36d064f4663efb7f0af6",
+    "estimated_tokens": 482
   },
   {
     "scene_id": "D20",
@@ -36,12 +38,14 @@
     "activity_id": "standing_wall_masturbation",
     "camera_viewpoint": "side_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "8e1f8890833046d06d3c9e366672124211a6e3632b9e34d2318f92b60832227a",
+    "plan_fingerprint": "4bd90133c88bac9fa2e5ff127f250601e1a6f564dc8d0652785460a28d82edab",
     "character_fingerprint": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
     "setting_id": "test_tall_concrete_studio_wall",
-    "setting_fingerprint": "8e705a8094acbaee7717b7dcb74c7eb2d7c3e1ebd25443588f6e330d1c66d760",
-    "presentation_fingerprint": "51c8fca50f8b94fb64fad0f19feb4f33907ebf4bf33309cf121d660fde089e98",
-    "estimated_tokens": 305
+    "setting_fingerprint": "a138345263265f10f30defbdb5fb81a9201a4335462e117d9fac40514fbcef50",
+    "style_id": "test_tall_concrete_studio_wall_style",
+    "style_fingerprint": "a8518302cd6c9f12096ffe97de8832104d82a2e97685ed5e516691495a1c1548",
+    "presentation_fingerprint": "2565b5c1fde4c900d8ef9370f0b947d7ef2726e2fb25ad3e9acfb618b90d4e1c",
+    "estimated_tokens": 333
   },
   {
     "scene_id": "D21",
@@ -57,12 +61,14 @@
     "activity_id": "vaginal_rear_entry",
     "camera_viewpoint": "rear_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "5238d6e063efe9199bc07af8b979c68b6068e34a103b42bf681cd5838b3a3c96",
+    "plan_fingerprint": "b390e6ebedfbf1320e47e1c164349252aea52dccbf92a4213424be28ee1075e2",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_double_height_luxury_hotel_suite_after_midnight",
-    "setting_fingerprint": "db3dfc8b1667ebaac2dce4934a700abe60ed0bd985d0b5ef4b82e72a62a4bbb2",
-    "presentation_fingerprint": "c717c43320fc4553175b971e4a1d59a828bb295e05b940c14150e1eba286a3fb",
-    "estimated_tokens": 435
+    "setting_fingerprint": "995b0ff324527fc879f13df026e8b8705707b10b44384c64ed27fdb33eb719c5",
+    "style_id": "test_double_height_luxury_hotel_suite_after_midnight_style",
+    "style_fingerprint": "eb29df664b58b5e60482b07803c2bd2bdf1f1dcc8d5ec6304c8c0180fae6447b",
+    "presentation_fingerprint": "d5fe5be7dbc3632f9cb4edffa61c382579ac72dddcb501a408743f2e6e58a0a3",
+    "estimated_tokens": 462
   },
   {
     "scene_id": "D22",
@@ -79,12 +85,14 @@
     "activity_id": "strap_on_vaginal_face_to_face",
     "camera_viewpoint": "high_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "00e6778b4dfe699451c442db4e087ba28e82d1b2592591a228af0476c61bd38b",
+    "plan_fingerprint": "8198fefb9c59f3e76fc46477aded4d929d648fa195763aafcc3dc87b2b0de1ce",
     "character_fingerprint": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
     "setting_id": "test_minimal_platform_bed_with_pale_fabric",
-    "setting_fingerprint": "abf869c249f34a2730840369e8fad9d578d43a736809d75e3fb0869d2a287f7a",
-    "presentation_fingerprint": "49ee86d58be171dcbd93c07293fde5f035ef180c4f983e2de31d312941c06152",
-    "estimated_tokens": 508
+    "setting_fingerprint": "e370a79e250a58cba69cfe3ea6e0d1cbdf832b03f12947e911e2674e0c4af562",
+    "style_id": "test_minimal_platform_bed_with_pale_fabric_style",
+    "style_fingerprint": "54943681142196bebdf654367129ee5402512d57327a6c8a955e672e3fbb8be3",
+    "presentation_fingerprint": "35681ece01b70f9fcf76e2d2c73b8006c2079eee17ccf8d0c10c90335fe76cc4",
+    "estimated_tokens": 535
   },
   {
     "scene_id": "D23",
@@ -101,12 +109,14 @@
     "activity_id": "double_toy_vaginal_anal",
     "camera_viewpoint": "high_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "0f321c0b350e25268348daabd5479834b49f3e12de40609a2e6571e3ce3c4299",
+    "plan_fingerprint": "5cfeb7039f309f93f95e4050a2e777b0c654e6a350a1e475a8297fad64040e98",
     "character_fingerprint": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
     "setting_id": "test_obsidian_throne_chamber_in_a_demon_sovereign_palace",
-    "setting_fingerprint": "d0abb8087926188f777fde83189caf14da89b2eca4a18bea91957089eacd39fd",
-    "presentation_fingerprint": "53020f4259549695a78808724c2ddc89ed83d66f860d5a6197d9dc2442161587",
-    "estimated_tokens": 703
+    "setting_fingerprint": "5c4896f3d3393928e4ebdc572c827b4257ba79e0585f03e4f9adc375a9a4c719",
+    "style_id": "test_obsidian_throne_chamber_in_a_demon_sovereign_palace_style",
+    "style_fingerprint": "24ede8dcee845300c6891b9a0ed79cf9bdd1c9cfa204ba649716e8586297fb45",
+    "presentation_fingerprint": "d968c662a008658b55a9b60a2cce84ff79352f15f49621bd92a8257d4e3bcedf",
+    "estimated_tokens": 730
   },
   {
     "scene_id": "D24",
@@ -123,12 +133,14 @@
     "activity_id": "chair_masturbation",
     "camera_viewpoint": "low_three_quarter",
     "shot_scale": "medium",
-    "plan_fingerprint": "9cf548498779512f54c229f0217605b4b32837506fbc658e97b4203202a8f9c5",
+    "plan_fingerprint": "3f2df83b27989ebd375fd4451b54965866f9d67da4708baadc1a2feabf2c28ec",
     "character_fingerprint": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
     "setting_id": "test_sculptural_chair_beside_a_low_window",
-    "setting_fingerprint": "8eaa79719dbacb0d7379e2f9a521f690e753e70d3a09ccf9feed64b54d7fdd73",
-    "presentation_fingerprint": "2f260291ef701803b2d1ec63980bc989e0548c0964082859f3355e5def14fc7b",
-    "estimated_tokens": 312
+    "setting_fingerprint": "c3b4dd5ccdeefdbec47c827152bfd5d076392d73417a99429afe47af27c61e1e",
+    "style_id": "test_sculptural_chair_beside_a_low_window_style",
+    "style_fingerprint": "139867d767571429924f754f9c11b1836bc5ada05c0eb4ed9028f2eb7bc3795d",
+    "presentation_fingerprint": "6fdb77825c0dd0b30bbb758fc83b2f528621135030807e366f2f847d41949297",
+    "estimated_tokens": 339
   },
   {
     "scene_id": "D25",
@@ -145,12 +157,14 @@
     "activity_id": "anal_plus_manual",
     "camera_viewpoint": "overhead_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "d504fa4c64bbbb77f7c9b38f89ae4ae16f6a24433f3c72c2a8b612f38dee3499",
+    "plan_fingerprint": "6117ba152e083abb9b4e693298191cf2064ca211bf56fea6ef3b534e00299685",
     "character_fingerprint": "48a8c283507a75a5b5a7bdcb93ff1d49fc7fae9fa42d12e102888acd298af285",
     "setting_id": "test_structured_hotel_bed_with_a_dark_headboard",
-    "setting_fingerprint": "c50f9d1f92c4391244a4e41e48f38c124cdc1bf9e310566eef62f821aa3e8ecc",
-    "presentation_fingerprint": "9b3af1cb8ca56e30c4f625fc1e971fa1b71a955bcda04cfddd454e3fdebcb555",
-    "estimated_tokens": 556
+    "setting_fingerprint": "b5f2705b099744dc673e10b170dbabc157ca407a3411540729ea20241f82f00b",
+    "style_id": "test_structured_hotel_bed_with_a_dark_headboard_style",
+    "style_fingerprint": "2e5f001859b874b0f11cfb7fe6dafd785bc632039f8b8e6b0375bfd423cb4caf",
+    "presentation_fingerprint": "3a920c69642e555538bbd1d65f8824e49dc97fa8a92dfe7eb967ae5783bbf08b",
+    "estimated_tokens": 583
   },
   {
     "scene_id": "D26",
@@ -167,12 +181,14 @@
     "activity_id": "wrist_bondage_oral",
     "camera_viewpoint": "front_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "769b204eeb4876325794f3d0b16f6ddbeddb1804d9c4ccc8d2aa098b84f9ffd3",
+    "plan_fingerprint": "3e1267837950d50ec443df6629890a0c0651c170199a90dfa9405d00e4fc2058",
     "character_fingerprint": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
     "setting_id": "test_minimal_amber_performance_space",
-    "setting_fingerprint": "286fbd3babf890bad91a7600e801b21b6d09b746e9f137184677db69bc4424bd",
-    "presentation_fingerprint": "893e287bf4dee8790b881979b26b6c777d185820039fb40c1f75455a4f34a537",
-    "estimated_tokens": 449
+    "setting_fingerprint": "d2771fe777b489f62aa7246552cb0b0d47a61eeb4566601d9a7bb8df448159ad",
+    "style_id": "test_minimal_amber_performance_space_style",
+    "style_fingerprint": "6b664ccd88ae5c9c41690419535961305cec658a4d1ea2e1ffa6b62a7afff591",
+    "presentation_fingerprint": "9cec50a7e5a04639d1bc6992e57d0491c73eb35552b33ad296a97b83187cd862",
+    "estimated_tokens": 477
   },
   {
     "scene_id": "D27",
@@ -189,12 +205,14 @@
     "activity_id": "mutual_masturbation",
     "camera_viewpoint": "high_three_quarter",
     "shot_scale": "medium",
-    "plan_fingerprint": "2e7ec183afc3647be98ed847b654be26e3d0e8420d0ed8b5df24054cb4506347",
+    "plan_fingerprint": "de49cc64426e4e8545a4452e177a49fb9871b268e48a20fe7f9a7de69cbf76fa",
     "character_fingerprint": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
     "setting_id": "test_modern_reading_room_with_one_sculptural_chair",
-    "setting_fingerprint": "717d7f14d19ad78b8199b943b601df7c5de745fd3a239b3e624c419745883f5c",
-    "presentation_fingerprint": "0fc3c14717c60eed91bc0b604d13c2357da7c23569cbff8dbb444b8079362a31",
-    "estimated_tokens": 475
+    "setting_fingerprint": "1a9c00a7e5b1d31a3520572d67fc524a4d95040b226f0ea11b32f8d8dcdfd4d6",
+    "style_id": "test_modern_reading_room_with_one_sculptural_chair_style",
+    "style_fingerprint": "621d56e14f7f3de03a8eb857734deab3189860ffb6daca9f2ef19c7803c1b92c",
+    "presentation_fingerprint": "410d03138481f67ec661765e30fd1446f07e929694cf9c3e29788cc7f84dcc51",
+    "estimated_tokens": 502
   },
   {
     "scene_id": "D28",
@@ -212,12 +230,14 @@
     "activity_id": "blindfolded_manual",
     "camera_viewpoint": "front_three_quarter",
     "shot_scale": "medium_wide",
-    "plan_fingerprint": "cb414d2aeb51334f005bb52bb2357662152d52301e33a970e4ed81cc3cf06ef7",
+    "plan_fingerprint": "ae78fa678c9537bee63e35490120e2072925916df94a1bd6f8feeb5a39e85c8b",
     "character_fingerprint": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
     "setting_id": "test_low_sofa_in_a_quiet_monochrome_loft",
-    "setting_fingerprint": "5809a626bdae51e31f44d7df82c6704edec67b063b536f866eba20122ad5b6f4",
-    "presentation_fingerprint": "a892f9cafe5fa8eb63533dd98d39f8213f29a292515e30332cf041fe571fc7ca",
-    "estimated_tokens": 339
+    "setting_fingerprint": "e0d87b6752f4c96bf722c962c657db3e70744bf5198c82ff5c7e6ba3fb1ca3c2",
+    "style_id": "test_low_sofa_in_a_quiet_monochrome_loft_style",
+    "style_fingerprint": "f72e2b174f959970e0c3f663b4b13cec43f5fbc59126db10792b3173638d2523",
+    "presentation_fingerprint": "2ac9fd3c491b2425eb62d5da2dbd2b69616967d3ca98e5aa0726f8fd004df446",
+    "estimated_tokens": 366
   },
   {
     "scene_id": "D29",
@@ -234,12 +254,14 @@
     "activity_id": "wall_supported_group",
     "camera_viewpoint": "side_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "d143429fae6f72143e7ebb45369cbbe4a57eda552b18be37cd3aedb7408b5fd9",
+    "plan_fingerprint": "2bb2f5eca2ea6bcc98e0c69a7708a74e82b2e978d8f6bdff5f724efcaeec28db",
     "character_fingerprint": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
     "setting_id": "test_long_plaster_wall_in_an_open_gallery",
-    "setting_fingerprint": "410f49eacab21f8b16c0f1ce6a07f2edbaee5bb9d8b17fefb7503220750a26e1",
-    "presentation_fingerprint": "5f03ed621a233214f86577fbfb853ea012b2393b1ea4f080103a55eb5ea509e1",
-    "estimated_tokens": 543
+    "setting_fingerprint": "b8e1f42679aea3ddaa896d65b0e1c8bc16a8aa05827d2488b076582c168eec32",
+    "style_id": "test_long_plaster_wall_in_an_open_gallery_style",
+    "style_fingerprint": "8968893ab69b9b12f245a682456218430b258a7197925770e1d9a8e6a698265c",
+    "presentation_fingerprint": "3acacc812a2c971bc07abc5b09cd2ecfe661dbd5b1ea3582b1c3b57c2755ec2d",
+    "estimated_tokens": 571
   },
   {
     "scene_id": "D30",
@@ -256,11 +278,13 @@
     "activity_id": "strap_on_vaginal_lifted",
     "camera_viewpoint": "low_three_quarter",
     "shot_scale": "full_body",
-    "plan_fingerprint": "23cd36626fbf640d948f46b318db05f891e23120d2138822d98016cc8c34b7b9",
+    "plan_fingerprint": "2d6df197b774b8a6fbab433826faaceeb2ebb6e40b528ada48ad09a09bbab4c0",
     "character_fingerprint": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
     "setting_id": "test_spacious_corridor_with_dark_polished_panels",
-    "setting_fingerprint": "16da414f422a95694a7ceef0188d02ac4e6b6083ea2cdcfc9e17168368083a26",
-    "presentation_fingerprint": "d274df1b126ffdea8cb2558af7a75f6dbf9e01bf5eb7ff4bcc7154ea195ec376",
-    "estimated_tokens": 550
+    "setting_fingerprint": "66214310858881ba7ba1804d78f8d9aabc18e8efac5ed9e3dcd0e2aef1322df0",
+    "style_id": "test_spacious_corridor_with_dark_polished_panels_style",
+    "style_fingerprint": "dda7a485bf21ff9123c9363b5c98c48574e006cc91e32efd392e874988faf6d7",
+    "presentation_fingerprint": "48f2fcd0315ce9c95982fcadefe5fb7b2c20f280b87e52b2ccf2b6f9778596b6",
+    "estimated_tokens": 577
   }
 ]

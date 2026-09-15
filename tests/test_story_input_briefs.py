@@ -3540,7 +3540,7 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert 'omits "live-action dark-fantasy feature-film frame"' in normalized
 
 
-def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
+def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
     brief = (REPOSITORY_ROOT / "story-inputs" / "angel.txt").read_text(
         encoding="utf-8"
     )
@@ -3548,7 +3548,7 @@ def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
 
     assert brief.startswith("BRIEF\n\n")
     assert brief.isascii()
-    assert "bright live-action cinematic portrait" in normalized
+    assert "live-action dark-fantasy feature-film image" in normalized
     assert "premium feature film with real adult performers" in normalized
     assert "exactly one central angel" in normalized
     assert "adult female angel or one adult male angel" in normalized
@@ -3560,14 +3560,19 @@ def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
     assert "Target 650-900 words" in normalized
     assert "ASCII is an absolute publication requirement" in normalized
     assert "final character-by-character ASCII sweep" in normalized
+    assert (
+        'first sixty English words of every final Frame, explicitly call the image '
+        'a "live-action dark-fantasy feature-film frame"'
+    ) in normalized
     assert "LIVE-ACTION CINEMATIC THESIS" in brief
     assert "real adult performer with natural skin texture" in normalized
-    assert "physical locations, controlled production design" in normalized
+    assert "physically constructed wings" in normalized
+    assert "monumental locations, controlled production design" in normalized
     assert "real feature-film optics" in normalized
-    assert "photographic cinematic realism, not fantasy illustration" in normalized
+    assert "photographic dark-fantasy cinematic realism" in normalized
     assert "Do not use oil-painting language" in normalized
     assert "synthetic CGI gloss" in normalized
-    assert "Do not describe a magical celestial country" in normalized
+    assert "Use restrained invisible visual-effects extension" in normalized
     assert "Create completely original adult characters and scenes" in normalized
     assert "Do not copy a reference face, body, pose" in normalized
     assert "Use exactly the requested number of adult women and adult men" in normalized
@@ -3588,9 +3593,9 @@ def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
     assert 'exact phrase "consensual and willing"' in normalized
     assert "show no alcohol, liquor, wine, beer, cocktail" in normalized
     assert "REALISTIC CHARACTER AND ROLE VARIETY" in brief
-    assert "ceremonial honor guard arriving at a sunlit civic courtyard" in normalized
-    assert "rescue pilot reviewing a weather map beside an open hangar" in normalized
-    assert "gardener working inside a vast sunlit greenhouse" in normalized
+    assert "celestial marshal inspecting a storm-battered mountain gate" in normalized
+    assert "eclipse navigator adjusting physical rings" in normalized
+    assert "night gardener tending pale plants in an ash-dark conservatory" in normalized
     assert "ANGEL ANATOMY AND WINGS" in brief
     assert "plus exactly one matched pair of wings" in normalized
     assert "Attach both wings across the upper back and shoulder-blade region" in (
@@ -3599,40 +3604,69 @@ def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
     assert "exactly one matched pair consisting of one left wing and one right wing" in (
         normalized
     )
-    assert "long white eagle-like flight feathers" in normalized
-    assert "silver-grey falcon-like wings" in normalized
+    assert "long weathered ivory eagle-like flight feathers" in normalized
+    assert "oxidized silver falcon-like wings" in normalized
     assert "Do not create six wings, eye-covered wings, detached wings" in normalized
-    assert "WARDROBE AND BRIGHT GOLD ARMOR" in brief
-    assert "polished champagne-gold articulated plate" in normalized
-    assert "brushed pale-gold lamellar" in normalized
+    assert "WARDROBE, ARMOR, AND REGALIA" in brief
+    assert "blackened articulated plate with worn old-gold inlay" in normalized
+    assert "tarnished pale-gold lamellar" in normalized
     assert "Golden armor is welcome" in normalized
-    assert "broad soft highlights, darker joint recesses" in normalized
-    assert "REAL-WORLD CINEMATIC LOCATIONS" in brief
-    assert "sunlit limestone palace courtyard" in normalized
-    assert "glass-roofed museum atrium" in normalized
-    assert "modern airport hangar with its doors open to daylight" in normalized
-    assert "Do not add levitating objects" in normalized
+    assert "narrow controlled highlights, darker joint recesses" in normalized
+    assert "MONUMENTAL CINEMATIC LOCATIONS" in brief
+    assert "cyclopean basalt cathedral beneath a broken oculus" in normalized
+    assert "drowned bell crypt lit through deep mineral water" in normalized
+    assert "storm observatory with physical rings surrounding an open roof" in normalized
+    assert "ENVIRONMENTAL SET-PIECE AND EVENT ENGINE" in brief
+    assert "exactly one dominant set-piece event" in normalized
+    assert "mechanical eclipse aperture closing across a pale skylight" in normalized
+    assert "exactly one dominant event and at most one subordinate" in normalized
+    assert "complete occupied body zone is dry, room-temperature, stable" in normalized
+    assert "filled with breathable air" in normalized
+    assert "no face, chest, pelvis, sexual contact, or breathing passage is submerged" in (
+        normalized
+    )
+    assert "Keep ash, dust, silt, sparks, rain, smoke, steam" in normalized
+    assert "several body lengths away and physically isolated" in normalized
+    assert "DEPTH, SILHOUETTE, AND VISUAL IMPACT" in brief
+    assert "Build every image in three readable layers" in normalized
+    assert "foreground threshold" in normalized
+    assert "midground containing the complete cast" in normalized
+    assert "background carrying monumental architecture" in normalized
+    assert "one strong graphic structure per image" in normalized
+    assert "one readable movement vector" in normalized
     assert "POSE AND ACTION VARIETY" in brief
-    assert "walking through hard or soft morning light" in normalized
+    assert "walking through a descending oculus shaft" in normalized
     assert "At Erotic level, use non-explicit adult intimacy" in normalized
     assert "one clearly visible consensual adult sexual act already in progress" in (
         normalized
     )
-    assert "Within the first one hundred eighty English words" in normalized
+    assert "Within the first one hundred English words" in normalized
+    assert "within the first two sentences" in normalized
     assert "which adult's penis is inside which adult's vagina or anus" in normalized
     assert "generic \"point of contact\" does not satisfy Hardcore" in normalized
-    assert "one-hundred-eighty-word placement check is silent" in normalized
+    assert "one-hundred-word and first-two-sentence placement checks are silent" in (
+        normalized
+    )
     assert "Never mention a word position, word threshold" in normalized
-    assert "BRIGHT CINEMATIC LIGHT AND COLOR LOCK" in brief
-    assert "sixty-five to eighty-five percent of the visible image" in normalized
-    assert "Bright means abundant readable light, not overexposure" in normalized
-    assert "Avoid dark-key lighting, gothic gloom" in normalized
+    assert "LOW-SATURATION HIGH-CONTRAST CINEMATIC LIGHT AND COLOR LOCK" in brief
+    assert "dark-key, low-saturation, high-contrast, and narrow-gamut" in normalized
+    assert "At least eighty-five percent of the visible image" in normalized
+    assert "roughly sixty to seventy-five percent of the image" in normalized
+    assert "colored accent occupies at most five percent" in normalized
+    assert "Do not use saturated turquoise, electric cyan" in normalized
     assert "CAMERA AND LIVE-ACTION FINISH" in brief
+    assert "24mm or 28mm environmental wide" in normalized
     assert "35mm environmental portrait at eye level" in normalized
     assert "50mm medium full-body shot" in normalized
+    assert "100mm or 135mm compressed architectural composition" in normalized
+    assert "one exact focal length from 24mm through 135mm" in normalized
     assert "subtle cinematic grain and natural microcontrast" in normalized
-    assert "For every batch of three through nine Themes" in normalized
-    assert "For six through nine Themes" in normalized
+    assert "Across every ten Themes" in normalized
+    assert "at least eight distinct dominant set-piece events" in normalized
+    assert "at least six different three-layer depth designs" in normalized
+    assert "Within every rolling group of twelve Themes" in normalized
+    assert "Across a one-hundred-Theme run" in normalized
+    assert "No single frontal white-wing pose" in normalized
     assert "NO-TEXT IMAGE CONTRACT" in brief
     assert "Word counting is a silent authoring check" in normalized
     assert "Use ASCII characters only in an English Frame" in normalized
@@ -3640,4 +3674,7 @@ def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:
     assert "calls any non-central person an angel" in normalized
     assert "more than one winged person or more than one matched pair" in normalized
     assert "uses alcohol, liquor, wine, beer, cocktails" in normalized
+    assert "leaves the environment static without one visible current event" in normalized
+    assert "lacks readable foreground, midground, and background depth" in normalized
+    assert "places intimacy in deep water, on wet or slippery support" in normalized
     assert "finished visible live-action cinematic image" in normalized

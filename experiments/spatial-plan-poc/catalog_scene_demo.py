@@ -20,9 +20,11 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 from run import _generate_with_repair
 from scene_layers import (
     CHARACTER_PROFILES,
-    SETTING_PRESETS,
+    SCENE_LAYER_PRESETS,
+    PresentationPreset,
     ResolvedSceneLayers,
     SettingPreset,
+    StylePreset,
     layer_issues,
     resolve_scene_layers,
 )
@@ -172,6 +174,8 @@ relationship, a disconnected ownership/contact chain, or a limb assigned to
 incompatible simultaneous tasks. Do not report speculative rendering
 difficulty, reduced prominence, possible overlap, or a contact being fully
 hidden when its plan explicitly requires occluded local endpoints.
+Distinct contiguous segments of one arm may perform compatible parts of one
+cradle: a forearm can support a thigh while its hand cups the adjacent hip.
 """.strip()
 
 
@@ -324,9 +328,10 @@ def lifted_bilateral_chain(
             f"{possessive} right side, with both knees bent behind "
             f"{possessive} hips. {partner_name} supports {central_name} through "
             f"two continuous bilateral cradles: {possessive} left forearm "
-            f"supports her left thigh and {possessive} left hand secures her "
-            f"outer left hip; {possessive} right forearm supports her right "
-            f"thigh and {possessive} right hand secures her outer right hip."
+            f"supports the underside of her left thigh while the same continuous "
+            f"left hand cups her adjacent outer left hip; {possessive} right "
+            f"forearm supports the underside of her right thigh while the same "
+            f"continuous right hand cups her adjacent outer right hip."
         )
     if (
         pose.leg_configuration == "thighs_supported"
@@ -726,7 +731,9 @@ def plan_fingerprint(
     activity: ActivityTemplate,
 ) -> str:
     payload = {
-        "spec": spec._asdict(),
+        "spec": {
+            key: value for key, value in spec._asdict().items() if key != "setting_id"
+        },
         "pose_signature": entry.signature,
         "activity": activity.model_dump(mode="json"),
     }
@@ -1168,8 +1175,11 @@ def compile_scene_layers(
     fingerprint: str,
     geometry: str,
     setting: SettingPreset,
+    style: StylePreset,
+    presentation: PresentationPreset,
 ) -> ResolvedSceneLayers:
     required, visible = region_visibility_maps(spec, activity)
+    required_supports = environment_supports(entry)
     return resolve_scene_layers(
         scene_id=spec.scene_id,
         spatial_fingerprint=fingerprint,
@@ -1177,10 +1187,28 @@ def compile_scene_layers(
         cast_roles=list(CASTS[spec.cast_key]),
         body_level=entry.central_pose.body_level,
         setting=setting,
+        style=style,
+        presentation_source=presentation,
+        required_environment_supports=required_supports,
         required_regions_by_role=required,
         visible_regions_by_role=visible,
-        layer_budget_tokens=200,
     )
+
+
+def environment_supports(entry: PoseEntry) -> list[str]:
+    supports = (
+        set()
+        if entry.central_pose.primary_surface == "partner_support"
+        else {entry.central_pose.primary_surface}
+    )
+    supports.update(
+        support
+        for support in entry.central_pose.support_points
+        if support in {"wall", "support_sling"}
+    )
+    if "furniture" in entry.central_pose.arm_configuration:
+        supports.add("furniture")
+    return sorted(supports)
 
 
 def combine_prompt(geometry: str, layers: ResolvedSceneLayers) -> str:
@@ -1457,14 +1485,16 @@ async def run() -> dict[str, object]:
         entry, activity = select_plan(catalog, spec)
         fingerprint = plan_fingerprint(spec, entry, activity)
         geometry = compile_geometry(spec, entry, activity)
-        setting = SETTING_PRESETS[spec.setting_id]
+        layer_inputs = SCENE_LAYER_PRESETS[spec.setting_id]
         layers = compile_scene_layers(
             spec,
             entry,
             activity,
             fingerprint,
             geometry,
-            setting,
+            layer_inputs.setting,
+            layer_inputs.style,
+            layer_inputs.presentation,
         )
         prompt = combine_prompt(geometry, layers)
         selected.append((spec, entry, activity))

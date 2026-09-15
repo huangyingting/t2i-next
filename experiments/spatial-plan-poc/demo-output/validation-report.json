@@ -43,5 +43,5 @@
   "rejected_mutations": 6,
   "rejected_prompt_mutations": 7,
   "evaluation_contract_fixtures": 2,
-  "scene_layer_invariants_validated": 9
+  "scene_layer_invariants_validated": 14
 }
