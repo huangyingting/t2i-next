@@ -27,7 +27,7 @@ from .layers import (
 
 ROOT = Path(__file__).resolve().parent
 CATALOGS = ROOT / "catalogs"
-PROMPT_AUDIT_VERSION = 5
+PROMPT_AUDIT_VERSION = 6
 
 
 class SceneSpec(NamedTuple):
@@ -295,6 +295,36 @@ def central_oral_reach_chain(
     )
 
 
+def central_oral_separation_clause(
+    activity: ActivityTemplate,
+    central_name: str,
+    cast_key: str,
+) -> str | None:
+    edge = next(
+        (
+            edge
+            for edge in activity.contact_edges
+            if edge.source.entity_id == activity.focus_role
+            and edge.source.region in {"mouth", "tongue"}
+            and edge.target.entity_id != activity.focus_role
+            and edge.target.region in {"penis", "vulva"}
+        ),
+        None,
+    )
+    if edge is None:
+        return None
+    recipient_name = actor_name(edge.target.entity_id, cast_key)
+    target = phrase(edge.target.region)
+    return (
+        f"The oral-contact zones remain separated: {central_name}'s mouth is "
+        f"located at {recipient_name}'s pelvis, while {recipient_name}'s head "
+        f"and mouth remain beyond {central_name}'s shoulder line. Only "
+        f"{central_name}'s single tongue is visible, rooted inside "
+        f"{central_name}'s mouth and terminating at {recipient_name}'s {target}; "
+        f"{recipient_name}'s tongue remains inside {recipient_name}'s own mouth."
+    )
+
+
 def lifted_bilateral_chain(
     entry: PoseEntry,
     central_name: str,
@@ -387,7 +417,7 @@ def actor_receives_oral(activity: ActivityTemplate, role: str) -> bool:
     central_role = activity.focus_role
     return any(
         edge.source.entity_id == central_role
-        and edge.source.region == "mouth"
+        and edge.source.region in {"mouth", "tongue"}
         and edge.target.entity_id == role
         for edge in activity.contact_edges
     )
@@ -527,6 +557,7 @@ def partner_relationship(
 ) -> str:
     role = actor_plan.role
     central_role = activity.focus_role
+    possessive = "his" if role.startswith("m") else "her"
     if activity.activity_id == "mutual_oral":
         return (
             f"lies fully visible in the opposite direction beside {central_name}; "
@@ -639,21 +670,25 @@ def partner_relationship(
                 )
                 break
         if edge.target.entity_id == role and edge.source.entity_id == central_role:
-            if edge.source.region == "mouth" and edge.target.region in {
+            if edge.source.region in {"mouth", "tongue"} and edge.target.region in {
                 "penis",
                 "vulva",
             }:
                 if central_pose.family == "seated_edge":
                     relation = (
                         f"stands directly in front of {central_name}'s inclined "
-                        "torso with both feet planted and his pelvis held at her "
-                        "mouth level"
+                        f"torso with both feet planted and {possessive} pelvis "
+                        f"held at {central_name}'s mouth level while "
+                        f"{possessive} head remains above {central_name}'s "
+                        "shoulder line"
                     )
                 else:
                     relation = (
                         f"holds a high half-kneel beside {central_name}'s head, "
                         "with one knee down and the opposite foot planted so the "
-                        "pelvis rises to her mouth level"
+                        f"pelvis rises to {central_name}'s mouth level while "
+                        f"{possessive} head remains beyond {central_name}'s "
+                        "shoulder line"
                     )
                 break
             if edge.source.region in {"hand", "left_hand", "right_hand"}:
@@ -1283,6 +1318,13 @@ def compile_geometry(
     )
     if central_oral_chain:
         sentences.append(central_oral_chain)
+    central_oral_separation = central_oral_separation_clause(
+        activity,
+        central_name,
+        spec.cast_key,
+    )
+    if central_oral_separation:
+        sentences.append(central_oral_separation)
     if len(descriptions) > 1:
         chain = lifted_bilateral_chain(
             entry,
@@ -1635,6 +1677,13 @@ def prompt_issues(
     )
     if expected_oral_chain and expected_oral_chain not in prompt:
         issues.append("central oral contact lacks a continuous reach path")
+    expected_oral_separation = central_oral_separation_clause(
+        activity,
+        central_name,
+        spec.cast_key,
+    )
+    if expected_oral_separation and expected_oral_separation not in prompt:
+        issues.append("central oral contact lacks separated head and pelvis zones")
     expected_lift_chain = (
         lifted_bilateral_chain(
             entry,

@@ -16,7 +16,7 @@ Identifier = Annotated[
     ),
 ]
 RoleCode = Annotated[str, StringConstraints(pattern=r"^[fm][1-9][0-9]*$")]
-TOPOLOGY_AUDIT_VERSION = 1
+TOPOLOGY_AUDIT_VERSION = 2
 
 
 class StrictModel(BaseModel):
@@ -1921,6 +1921,8 @@ def compatible_pose_families(activity_id: str) -> list[str]:
     all_families = set(POSE_FAMILIES)
     if activity_id == "mutual_oral":
         allowed = {"side_lying_left", "side_lying_right"}
+    elif has_tag(activity_id, "oral_one_manual_other"):
+        allowed = {"kneeling_upright", "seated_edge", "deep_squat"}
     elif has_tag(activity_id, "plus_fellatio"):
         allowed = {"prone", "all_fours", "kneeling_forward"}
     elif activity_id == "fellatio":

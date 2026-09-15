@@ -890,6 +890,42 @@ def test_two_women_one_man_uses_sex_correct_group_endpoints() -> None:
     ) == ("m1", "penis")
 
 
+def test_group_central_oral_keeps_recipient_head_away_from_contact() -> None:
+    catalog = build_catalog("two_women_one_man")
+    compatible_entries = [
+        entry
+        for entry in catalog.entries
+        if "central_oral_one_manual_other" in entry.compatible_activity_ids
+    ]
+    assert {
+        entry.central_pose.family for entry in compatible_entries
+    } == {"kneeling_upright", "seated_edge", "deep_squat"}
+    entry = compatible_entries[0]
+    activity = next(
+        item
+        for item in catalog.activities
+        if item.activity_id == "central_oral_one_manual_other"
+    )
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="two_women_one_man",
+        family=entry.central_pose.family,
+        variant=entry.central_pose.variant,
+        activity_id=activity.activity_id,
+        viewpoint=entry.central_pose.compatible_camera_views[0],
+        shot_scale="full_body",
+        setting_id="audit_setting",
+    )
+    profiles = character_profiles()
+    prompt = compile_geometry(spec, entry, activity, profiles)
+
+    assert "F2 holds a high half-kneel beside F1's head" in prompt
+    assert "F2's head and mouth remain beyond F1's shoulder line" in prompt
+    assert "F2's tongue remains inside F2's own mouth" in prompt
+    assert "F2 aligned with F1" not in prompt
+    assert prompt_issues(spec, entry, activity, prompt, profiles) == []
+
+
 def test_presentation_output_requires_requested_scene_count() -> None:
     role_style = RoleStylingRecipe(
         role="f1",
