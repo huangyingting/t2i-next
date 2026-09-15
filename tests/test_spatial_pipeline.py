@@ -23,6 +23,8 @@ from t2i_spatial_pipeline.blueprint import (
     StyleRecipe,
     WorldBlueprint,
     complete_style_mood_coverage,
+    normalize_presentation_moods,
+    normalize_world_mood_vocabulary,
     validate_forbidden_output_concepts,
     validate_output_concepts_with_pattern,
     validate_output_text,
@@ -315,7 +317,11 @@ def test_world_requires_sling_and_wall_in_one_location() -> None:
             support_realizations=[
                 BlueprintSupportRealization(
                     support=support,
-                    description=f"physical {support.replace('_', ' ')}",
+                    description=(
+                        "adult body-support sling"
+                        if support == "support_sling"
+                        else f"physical {support.replace('_', ' ')}"
+                    ),
                 )
                 for support in supports
             ],
@@ -340,6 +346,14 @@ def test_world_requires_sling_and_wall_in_one_location() -> None:
             ],
             time_options=["day", "night"],
             weather_options=["clear"],
+        )
+
+
+def test_support_sling_must_be_body_bearing() -> None:
+    with pytest.raises(ValidationError, match="adult body-support"):
+        BlueprintSupportRealization(
+            support="support_sling",
+            description="canvas sling holding damp paper rolls",
         )
 
 
@@ -628,6 +642,70 @@ def test_image_regression_scenes_lock_continuous_body_chains(
     assert prompt_issues(spec, entry, activity, prompt, profiles) == []
 
 
+def test_world_mood_vocabulary_is_normalized_to_twelve_tags() -> None:
+    support_sets = (
+        ("bed", "bed_edge"),
+        ("chair", "floor", "furniture"),
+        ("sofa", "bed"),
+        ("support_sling", "wall"),
+        ("floor", "furniture"),
+        ("sofa", "chair"),
+    )
+    locations = []
+    for index, supports in enumerate(support_sets):
+        locations.append(
+            LocationCard(
+                location_id=f"location_{index}",
+                location=f"Audit location number {index}",
+                architecture="Plain enclosed audit room",
+                materials=["wood", "stone"],
+                environment_props=["table"],
+                light_sources=["ceiling lamp"],
+                support_realizations=[
+                    BlueprintSupportRealization(
+                        support=support,
+                        description=(
+                            "adult body-support sling"
+                            if support == "support_sling"
+                            else f"physical {support.replace('_', ' ')}"
+                        ),
+                    )
+                    for support in supports
+                ],
+                mood_tags=[
+                    f"primary_{index}",
+                    f"secondary_{index}",
+                    f"tertiary_{index}",
+                ],
+            )
+        )
+    world = WorldBlueprint.model_validate(
+        {
+            "family_id": "audit_world",
+            "world_genre": "audit_genre",
+            "era": "current",
+            "locations": [
+                location.model_dump(mode="json") for location in locations
+            ],
+            "time_options": ["day", "night"],
+            "weather_options": ["clear"],
+        },
+        context={"normalize_mood_vocabulary": True},
+    )
+
+    normalized = normalize_world_mood_vocabulary(world)
+
+    WorldBlueprint.model_validate(normalized.model_dump(mode="json"))
+    assert len(
+        {
+            mood
+            for location in normalized.locations
+            for mood in location.mood_tags
+        }
+    ) == 12
+    assert all(location.mood_tags for location in normalized.locations)
+
+
 def test_pair_catalog_uses_only_explicit_mutual_manual_names() -> None:
     catalog = load_catalog("one_woman_one_man")
     activity_ids = {activity.activity_id for activity in catalog.activities}
@@ -642,6 +720,29 @@ def test_pair_catalog_uses_only_explicit_mutual_manual_names() -> None:
         "shower_mutual",
         "chair_mutual",
     }.isdisjoint(activity_ids)
+
+
+def test_pair_self_stimulation_keeps_contact_paths_separate() -> None:
+    catalog = load_catalog("one_woman_one_man")
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="one_woman_one_man",
+        family="sling_reclined",
+        variant="legs_in_v_arms_beside",
+        activity_id="mutual_manual_face_to_face",
+        viewpoint="overhead_three_quarter",
+        shot_scale="full_body",
+        setting_id="audit_setting",
+    )
+    entry, activity = select_plan(catalog, spec)
+    profiles = character_profiles()
+    prompt = compile_geometry(spec, entry, activity, profiles)
+
+    assert "separate self-directed contact paths" in prompt
+    assert "F1's hand stays on F1's clitoral area" in prompt
+    assert "M1's hand stays on M1's penis" in prompt
+    assert "mutual manual stimulation" not in prompt
+    assert prompt_issues(spec, entry, activity, prompt, profiles) == []
 
 
 @pytest.mark.parametrize("count", [0, 21])
@@ -781,6 +882,43 @@ def test_missing_style_moods_can_be_completed_locally() -> None:
         for recipe in style.recipes
         for mood in recipe.compatible_moods
     } == {"neutral", "tense"}
+
+
+def test_presentation_moods_are_normalized_to_world_enum() -> None:
+    presentation = PresentationBlueprint(
+        recipes=[
+            PresentationRecipe(
+                presentation_id="presentation_1",
+                role_styles=[
+                    RoleStylingRecipe(
+                        role="f1",
+                        coverage_mode="styled_nude",
+                        wardrobe="none",
+                        footwear_type="heels",
+                        footwear_details="black leather",
+                        accessories=[],
+                        makeup_and_grooming="restrained period styling",
+                    )
+                ],
+                compatible_moods=["invented"],
+            )
+        ]
+    )
+
+    normalized = normalize_presentation_moods(
+        presentation,
+        ("opulent", "tense"),
+    )
+
+    PresentationBlueprintOutput.model_validate(
+        {"presentation": normalized.model_dump()},
+        context={
+            "cast_roles": ("f1",),
+            "scene_count": 1,
+            "allowed_mood_tags": ("opulent", "tense"),
+        },
+    )
+    assert normalized.recipes[0].compatible_moods == ["opulent"]
 
 
 def test_minor_as_tonal_adjective_is_not_treated_as_an_age_concept() -> None:

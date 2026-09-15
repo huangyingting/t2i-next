@@ -417,6 +417,16 @@ async def generate_with_repair(
                     "ceramic vessel, screen, or plain furniture. Do not use any "
                     "forbidden token even inside a compound adjective."
                 )
+            if any(
+                "forbidden concepts" in issue.lower()
+                and "light_sources" in issue.lower()
+                for issue in exc.validation_issues
+            ):
+                repair_guidance += (
+                    " Replace the rejected light source with a lamp, bulb, neon "
+                    "tube, light strip, chandelier, sconce, or stage light. Do "
+                    "not use photographic or surveillance equipment."
+                )
             if isinstance(exc, SpatialProviderTruncatedOutputError):
                 repair_guidance += (
                     " Be concise, omit all reasoning and commentary, and reserve "

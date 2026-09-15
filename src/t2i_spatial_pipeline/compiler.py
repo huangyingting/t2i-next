@@ -106,12 +106,12 @@ def natural_activity(value: str) -> str:
             "oral stimulation with simultaneous manual breast contact"
         ),
         "mutual_manual_side_by_side": (
-            "side-by-side simultaneous mutual manual stimulation"
+            "side-by-side simultaneous self-stimulation"
         ),
         "mutual_manual_face_to_face": (
-            "face-to-face simultaneous mutual manual stimulation"
+            "simultaneous self-stimulation while face-to-face"
         ),
-        "mutual_manual_seated": "seated simultaneous mutual manual stimulation",
+        "mutual_manual_seated": "seated simultaneous self-stimulation",
     }.get(value, phrase(value))
 
 
@@ -1309,6 +1309,30 @@ def compile_geometry(
     sentences.append(
         f"The primary activity is {natural_activity(activity.activity_id)}."
     )
+    self_directed_edges = [
+        edge
+        for edge in activity.contact_edges
+        if edge.source.region == "hand"
+        and edge.source.entity_id == edge.target.entity_id
+    ]
+    if len(self_directed_edges) > 1:
+        paths = []
+        for edge in self_directed_edges:
+            source = endpoint_phrase(
+                edge.source.entity_id,
+                "hand",
+                spec.cast_key,
+            )
+            target = endpoint_phrase(
+                edge.target.entity_id,
+                edge.target.region,
+                spec.cast_key,
+            )
+            paths.append(f"{source} stays on {target}")
+        sentences.append(
+            "Keep these as separate self-directed contact paths: "
+            f"{joined(paths)}. Each contacting hand remains on its owner's anatomy."
+        )
     handled_prop_edges: set[str] = set()
     for prop in activity.handheld_props:
         prop_sentences, edge_id = compile_handheld_prop(

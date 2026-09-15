@@ -97,6 +97,19 @@ class BlueprintSupportRealization(StrictModel):
     support: SupportSurface
     description: str = Field(min_length=3, max_length=80)
 
+    @model_validator(mode="after")
+    def support_is_body_bearing(self) -> BlueprintSupportRealization:
+        if self.support == "support_sling" and not re.search(
+            r"\b(?:adult[- ]body|body[- ]support|human[- ]rated|load[- ]rated)\b",
+            self.description,
+            re.I,
+        ):
+            raise ValueError(
+                "support_sling description must identify an adult body-support "
+                "or human-rated load-bearing sling"
+            )
+        return self
+
 
 class LocationCard(StrictModel):
     location_id: Identifier
@@ -131,10 +144,26 @@ class WorldBlueprint(StrictModel):
     weather_options: list[Identifier] = Field(min_length=1, max_length=6)
 
     @model_validator(mode="after")
-    def locations_cover_support_ontology(self) -> WorldBlueprint:
+    def locations_cover_support_ontology(
+        self,
+        info: ValidationInfo,
+    ) -> WorldBlueprint:
         ensure_unique("location IDs", [item.location_id for item in self.locations])
         ensure_unique("time options", self.time_options)
         ensure_unique("weather options", self.weather_options)
+        mood_vocabulary = {
+            mood
+            for location in self.locations
+            for mood in location.mood_tags
+        }
+        normalize_moods = (info.context or {}).get(
+            "normalize_mood_vocabulary",
+            False,
+        )
+        if len(mood_vocabulary) > 12 and not normalize_moods:
+            raise ValueError(
+                "world mood vocabulary must contain at most 12 unique tags"
+            )
         coverage = {
             support: sum(
                 support in {item.support for item in location.support_realizations}
@@ -168,6 +197,43 @@ class WorldBlueprint(StrictModel):
                 f"world locations lack compound support coverage: {missing_compounds}"
             )
         return self
+
+
+def normalize_world_mood_vocabulary(
+    world: WorldBlueprint,
+    *,
+    maximum_moods: int = 12,
+) -> WorldBlueprint:
+    selected_moods: list[str] = []
+    for location in world.locations:
+        mood = location.mood_tags[0]
+        if mood not in selected_moods:
+            selected_moods.append(mood)
+    for location in world.locations:
+        for mood in location.mood_tags[1:]:
+            if mood not in selected_moods:
+                selected_moods.append(mood)
+            if len(selected_moods) == maximum_moods:
+                break
+        if len(selected_moods) == maximum_moods:
+            break
+    selected_mood_set = set(selected_moods)
+    locations = [
+        location.model_copy(
+            update={
+                "mood_tags": [
+                    mood
+                    for mood in location.mood_tags
+                    if mood in selected_mood_set
+                ]
+            },
+        )
+        for location in world.locations
+    ]
+    return WorldBlueprint(
+        **world.model_dump(mode="python", exclude={"locations"}),
+        locations=locations,
+    )
 
 
 class StyleRecipe(StrictModel):
@@ -413,6 +479,33 @@ class CharacterBlueprint(StrictModel):
                     f"{profile.role} intimate anatomy is not role-appropriate"
                 )
         return self
+
+
+def normalize_presentation_moods(
+    presentation: PresentationBlueprint,
+    allowed_moods: Sequence[str],
+) -> PresentationBlueprint:
+    ordered_allowed_moods = tuple(dict.fromkeys(allowed_moods))
+    if not ordered_allowed_moods:
+        raise ValueError("presentation mood normalization requires allowed moods")
+    allowed_mood_set = set(ordered_allowed_moods)
+    recipes = []
+    for index, recipe in enumerate(presentation.recipes):
+        compatible_moods = [
+            mood
+            for mood in recipe.compatible_moods
+            if mood in allowed_mood_set
+        ]
+        if not compatible_moods:
+            compatible_moods = [
+                ordered_allowed_moods[index % len(ordered_allowed_moods)]
+            ]
+        recipes.append(
+            recipe.model_copy(
+                update={"compatible_moods": compatible_moods},
+            )
+        )
+    return PresentationBlueprint(recipes=recipes)
 
 
 class CreativeBlueprint(StrictModel):
@@ -709,7 +802,11 @@ class PresentationBlueprintOutput(StrictModel):
             for mood in recipe.compatible_moods
         }
         unknown_moods = used_moods.difference(allowed_moods)
-        if allowed_moods and unknown_moods:
+        normalize_moods = (info.context or {}).get(
+            "normalize_mood_compatibility",
+            False,
+        )
+        if allowed_moods and unknown_moods and not normalize_moods:
             raise ValueError(
                 "presentation uses unsupported mood tags: "
                 f"{sorted(unknown_moods)}"
@@ -739,7 +836,7 @@ class BlueprintInference(StrictModel):
     blueprint: CreativeBlueprint
 
 
-BLUEPRINT_SCHEMA_VERSION = 24
+BLUEPRINT_SCHEMA_VERSION = 27
 BRIEF_NORMALIZATION_SYSTEM = """
 Translate and normalize the user's creative brief into concise semantic ASCII
 English. Preserve all setting, era, atmosphere, content, clothing or nudity,
@@ -757,6 +854,15 @@ the location. Across the locations, cover bed, bed_edge, chair, floor,
 furniture, sofa, support_sling, and wall at least once. Include one location
 that realizes both floor and furniture, and one that realizes both
 support_sling and wall.
+Create a shared global vocabulary of at most twelve mood tags and reuse those
+exact tags across location cards; never invent a separate vocabulary per card.
+Environment props must be non-reflective decor such as books, papers, textiles,
+ceramic vessels, screens, plants, or plain furniture. Light sources must be
+fixtures such as lamps, bulbs, neon tubes, light strips, chandeliers, sconces,
+or stage lights; never use photographic or surveillance equipment.
+Every support_sling description must explicitly call it an adult body-support
+sling or a human-rated load-bearing sling. It must support the subject's body,
+never paper, cargo, storage, or decor.
 Never add people, mirrors, humanoid objects, crowds,
 attendants, guards, servants, or minor concepts. Return only schema data.
 """.strip()
@@ -941,8 +1047,17 @@ async def infer_creative_blueprint(
             },
             response_model=WorldBlueprintOutput,
             max_output_tokens=min(12000, settings.output_token_limit),
+            validation_context={"normalize_mood_vocabulary": True},
         )
-        world = WorldBlueprintOutput.model_validate(world_response.value).world
+        world = normalize_world_mood_vocabulary(
+            WorldBlueprintOutput.model_validate(
+                world_response.value,
+                context={"normalize_mood_vocabulary": True},
+            ).world
+        )
+        WorldBlueprintOutput.model_validate(
+            {"world": world.model_dump(mode="json")},
+        )
         allowed_mood_tags = sorted(
             {
                 mood
@@ -1001,6 +1116,7 @@ async def infer_creative_blueprint(
                     "cast_roles": cast_roles,
                     "scene_count": scene_count,
                     "allowed_mood_tags": allowed_mood_tags,
+                    "normalize_mood_compatibility": True,
                 },
             ),
         )
@@ -1018,15 +1134,33 @@ async def infer_creative_blueprint(
         {"style": style.model_dump(mode="json")},
         context={"allowed_mood_tags": allowed_mood_tags},
     )
+    presentation = normalize_presentation_moods(
+        PresentationBlueprintOutput.model_validate(
+            presentation_response.value,
+            context={
+                "cast_roles": cast_roles,
+                "scene_count": scene_count,
+                "allowed_mood_tags": allowed_mood_tags,
+                "normalize_mood_compatibility": True,
+            },
+        ).presentation,
+        allowed_mood_tags,
+    )
+    PresentationBlueprintOutput.model_validate(
+        {"presentation": presentation.model_dump(mode="json")},
+        context={
+            "cast_roles": cast_roles,
+            "scene_count": scene_count,
+            "allowed_mood_tags": allowed_mood_tags,
+        },
+    )
     blueprint = CreativeBlueprint(
         characters=CharacterBlueprintOutput.model_validate(
             character_response.value
         ).characters,
         world=world,
         style=style,
-        presentation=PresentationBlueprintOutput.model_validate(
-            presentation_response.value
-        ).presentation,
+        presentation=presentation,
     )
     generated_roles = {
         profile.role for profile in blueprint.characters.profiles
