@@ -6,6 +6,7 @@ import asyncio
 import json
 import os
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -142,7 +143,13 @@ def schema_name(value: str) -> str:
 
 
 def normalize_ascii_punctuation(value: str) -> str:
-    return value.translate(_ASCII_PUNCTUATION_TRANSLATION)
+    translated = value.translate(_ASCII_PUNCTUATION_TRANSLATION)
+    decomposed = unicodedata.normalize("NFKD", translated)
+    return "".join(
+        character
+        for character in decomposed
+        if not unicodedata.combining(character)
+    )
 
 
 class OpenAISpatialModel:

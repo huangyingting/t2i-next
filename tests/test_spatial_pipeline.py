@@ -267,8 +267,9 @@ def test_role_coverage_can_mix_nudity_and_clothing_in_one_scene() -> None:
 
 def test_provider_normalizes_typographic_punctuation_to_ascii() -> None:
     assert normalize_ascii_punctuation(
-        "\u201cquoted\u201d\u2014text\u2026"
-    ) == '"quoted"-text...'
+        "\u201cquoted\u201d\u2014caf\u00e9\u2026"
+    ) == '"quoted"-cafe...'
+    assert normalize_ascii_punctuation("\u4e2d\u6587") == "\u4e2d\u6587"
 
 
 def test_forbidden_output_concepts_report_their_field_path() -> None:
