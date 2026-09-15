@@ -379,7 +379,11 @@ async def generate_with_repair(
                     "or unmatched parenthesis."
                 )
             if any(
-                "unsupported mood tags" in issue.lower()
+                "mood tags" in issue.lower()
+                and (
+                    "unsupported" in issue.lower()
+                    or "does not cover" in issue.lower()
+                )
                 for issue in exc.validation_issues
             ) and isinstance(payload, dict):
                 allowed_moods = payload.get("allowed_mood_tags")

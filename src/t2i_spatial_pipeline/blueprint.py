@@ -632,6 +632,11 @@ class StyleBlueprintOutput(StrictModel):
             raise ValueError(
                 f"style uses unsupported mood tags: {sorted(unknown_moods)}"
             )
+        missing_moods = allowed_moods.difference(used_moods)
+        if missing_moods:
+            raise ValueError(
+                f"style does not cover mood tags: {sorted(missing_moods)}"
+            )
         return self
 
 
@@ -702,7 +707,7 @@ class BlueprintInference(StrictModel):
     blueprint: CreativeBlueprint
 
 
-BLUEPRINT_SCHEMA_VERSION = 23
+BLUEPRINT_SCHEMA_VERSION = 24
 BRIEF_NORMALIZATION_SYSTEM = """
 Translate and normalize the user's creative brief into concise semantic ASCII
 English. Preserve all setting, era, atmosphere, content, clothing or nudity,
@@ -742,10 +747,11 @@ OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
 ASCII English, regardless of the brief's language.
 Infer only the StyleBlueprint from the brief. Produce six to twelve coherent
 complete style recipes rather than shuffled adjectives. Every compatible_moods
-value must come from the supplied allowed_mood_tags. Keep medium, rendering
-language, texture, contrast, color, lighting, and atmosphere mutually coherent.
-Do not describe people, anatomy, pose, contact, or camera geometry. Use concise
-printable ASCII English and return only schema data.
+value must come from the supplied allowed_mood_tags, and every supplied mood tag
+must appear in at least one recipe. Keep medium, rendering language, texture,
+contrast, color, lighting, and atmosphere mutually coherent. Do not describe
+people, anatomy, pose, contact, or camera geometry. Use concise printable ASCII
+English and return only schema data.
 """.strip()
 PRESENTATION_BLUEPRINT_SYSTEM = """
 OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable

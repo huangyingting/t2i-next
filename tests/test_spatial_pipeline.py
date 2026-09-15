@@ -18,6 +18,9 @@ from t2i_spatial_pipeline.blueprint import (
     PresentationBlueprintOutput,
     PresentationRecipe,
     RoleStylingRecipe,
+    StyleBlueprint,
+    StyleBlueprintOutput,
+    StyleRecipe,
     WorldBlueprint,
     validate_forbidden_output_concepts,
     validate_output_concepts_with_pattern,
@@ -695,6 +698,29 @@ def test_presentation_output_requires_requested_scene_count() -> None:
                 "scene_count": 2,
                 "allowed_mood_tags": ("restrained",),
             },
+        )
+
+
+def test_style_output_must_cover_every_world_mood() -> None:
+    recipes = [
+        StyleRecipe(
+            style_id=f"style_{index}",
+            medium="period photography",
+            rendering_language="documentary realism",
+            surface_texture="fine film grain",
+            contrast="moderate",
+            color_treatment="neutral monochrome",
+            lighting_treatment="soft practical light",
+            atmosphere="restrained observation",
+            compatible_moods=["neutral"],
+        )
+        for index in range(6)
+    ]
+
+    with pytest.raises(ValidationError, match="does not cover mood tags"):
+        StyleBlueprintOutput.model_validate(
+            {"style": StyleBlueprint(recipes=recipes).model_dump()},
+            context={"allowed_mood_tags": ("neutral", "tense")},
         )
 
 
