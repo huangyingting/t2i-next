@@ -19,7 +19,7 @@ from t2i_spatial_pipeline.service import (
 
 app = typer.Typer(
     name="t2i-spatial",
-    help="从自然语言主题生成具有锁定人数、姿势、接触和镜头几何的提示词。",
+    help="生成覆盖完整空间 catalog、且必须经出图复核的提示词。",
     no_args_is_help=True,
 )
 
@@ -72,7 +72,7 @@ def generate_command(
         help="忽略内容寻址缓存并重新推导 CreativeBlueprint。",
     ),
 ) -> None:
-    """Generate one validated spatial prompt batch."""
+    """Generate one symbolically audited spatial prompt batch."""
     try:
         cast_key = cast_key_for_counts(female_count, male_count)
         requests = build_scene_requests(cast_key, seed=seed, count=count)
@@ -92,6 +92,12 @@ def generate_command(
     typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
     if not report["passed"]:
         raise typer.Exit(code=1)
+    typer.secho(
+        "Local symbolic audit passed; image anatomy and cast count still require "
+        "render review.",
+        fg=typer.colors.YELLOW,
+        err=True,
+    )
 
 
 @app.command("audit")
@@ -127,7 +133,7 @@ def audit_command(
         help="丢弃不完整或已完成的同路径审计进度并重新开始。",
     ),
 ) -> None:
-    """Audit every catalog and stress scene allocation without an LLM."""
+    """Audit production catalogs and stress scene allocation without an LLM."""
     progress_path = runs_dir / "audit-progress.json"
     try:
         report = run_spatial_audit(

@@ -10,16 +10,20 @@ import t2i_spatial_pipeline.audit as spatial_audit
 from t2i_spatial_pipeline.audit import run_spatial_audit
 from t2i_spatial_pipeline.blueprint import (
     FORBIDDEN_STYLE_CONCEPTS,
+    BlueprintSupportRealization,
     CharacterBlueprint,
     CharacterBlueprintOutput,
+    LocationCard,
     PresentationBlueprint,
     PresentationBlueprintOutput,
     PresentationRecipe,
     RoleStylingRecipe,
+    WorldBlueprint,
     validate_forbidden_output_concepts,
     validate_output_concepts_with_pattern,
+    validate_output_text,
 )
-from t2i_spatial_pipeline.catalog import CASTS, cast_key_for_counts
+from t2i_spatial_pipeline.catalog import CASTS, activity_ids, cast_key_for_counts
 from t2i_spatial_pipeline.compiler import (
     SceneSpec,
     compile_geometry,
@@ -36,6 +40,13 @@ from t2i_spatial_pipeline.layers import (
     resolve_scene_layers,
 )
 from t2i_spatial_pipeline.provider import normalize_ascii_punctuation
+from t2i_spatial_pipeline.safety import (
+    SUPPORTED_ACTIVITIES_BY_CAST,
+    SUPPORTED_CASTS,
+    SUPPORTED_POSE_FAMILIES,
+    catalog_support_issues,
+    symbolic_validation_metadata,
+)
 from t2i_spatial_pipeline.service import (
     build_scene_requests,
     publish_prompt_batch,
@@ -282,7 +293,53 @@ def test_style_material_can_use_mirror_as_an_adjective() -> None:
     )
 
 
-@pytest.mark.parametrize("cast_key", CASTS)
+def test_world_requires_sling_and_wall_in_one_location() -> None:
+    def location(
+        index: int,
+        supports: tuple[str, ...],
+    ) -> LocationCard:
+        return LocationCard(
+            location_id=f"location_{index}",
+            location=f"Audit location number {index}",
+            architecture="Plain enclosed audit room",
+            materials=["wood", "stone"],
+            environment_props=["table"],
+            light_sources=["ceiling lamp"],
+            support_realizations=[
+                BlueprintSupportRealization(
+                    support=support,
+                    description=f"physical {support.replace('_', ' ')}",
+                )
+                for support in supports
+            ],
+            mood_tags=["neutral"],
+        )
+
+    with pytest.raises(
+        ValidationError,
+        match=r"support_sling.*wall",
+    ):
+        WorldBlueprint(
+            family_id="audit_world",
+            world_genre="audit_genre",
+            era="1930s",
+            locations=[
+                location(1, ("bed", "bed_edge")),
+                location(2, ("chair", "floor", "furniture")),
+                location(3, ("sofa", "bed")),
+                location(4, ("support_sling", "chair")),
+                location(5, ("wall", "floor")),
+                location(6, ("sofa", "furniture")),
+            ],
+            time_options=["day", "night"],
+            weather_options=["clear"],
+        )
+
+
+@pytest.mark.parametrize(
+    "cast_key",
+    CASTS,
+)
 def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
     requests = build_scene_requests(cast_key, seed=42, count=20)
 
@@ -296,6 +353,14 @@ def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
     ) == 20
     assert len({request.activity_id for request in requests}) >= 8
     assert len({request.family for request in requests}) == 20
+    assert all(
+        not catalog_support_issues(
+            request.cast_key,
+            request.family,
+            request.activity_id,
+        )
+        for request in requests
+    )
     assert {request.viewpoint for request in requests} == {
         "front_three_quarter",
         "high_three_quarter",
@@ -305,6 +370,55 @@ def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
         "side_three_quarter",
     }
     assert len({request.shot_scale for request in requests}) == 5
+
+
+@pytest.mark.parametrize("cast_key", ("one_woman_two_men", "three_women"))
+def test_group_casts_remain_available(cast_key: str) -> None:
+    requests = build_scene_requests(cast_key, seed=42, count=20)
+
+    assert len(requests) == 20
+    assert {request.cast_key for request in requests} == {cast_key}
+
+
+def test_symbolic_validation_metadata_requires_render_review() -> None:
+    metadata = symbolic_validation_metadata()
+
+    assert metadata == {
+        "validation_status": "symbolic_only",
+        "visual_validation": False,
+        "requires_render_review": True,
+        "production_policy": "full_catalog_symbolic_only",
+        "safety_policy_version": 2,
+    }
+
+
+def test_safety_policy_exposes_every_catalog_category() -> None:
+    assert SUPPORTED_CASTS == frozenset(CASTS)
+    assert len(SUPPORTED_POSE_FAMILIES) == 24
+    assert all(
+        SUPPORTED_ACTIVITIES_BY_CAST[cast_key]
+        == frozenset(activity_ids(cast_key))
+        and len(SUPPORTED_ACTIVITIES_BY_CAST[cast_key]) == 32
+        for cast_key in CASTS
+    )
+    assert catalog_support_issues(
+        "one_woman_one_man",
+        "lifted_supported",
+        "mutual_oral",
+    ) == []
+    assert catalog_support_issues(
+        "unsupported_cast",
+        "supine",
+        "manual_clitoral",
+    ) == ["cast is not present in the spatial catalog"]
+    for cast_key in CASTS:
+        catalog = load_catalog(cast_key)
+        reachable = {
+            activity_id
+            for entry in catalog.entries
+            for activity_id in entry.compatible_activity_ids
+        }
+        assert reachable == set(activity_ids(cast_key))
 
 
 def test_spatial_audit_resumes_from_atomic_seed_checkpoint(
@@ -397,6 +511,29 @@ def test_prompt_audit_matches_the_exact_secondary_contact_sentence() -> None:
     assert prompt_issues(spec, entry, activity, prompt, profiles) == []
 
 
+def test_handheld_prop_keeps_anatomical_endpoint_ownership() -> None:
+    catalog = load_catalog("one_woman_one_man")
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="one_woman_one_man",
+        family="side_lying_open",
+        variant="scissor_split_lower_arm_forward",
+        activity_id="dual_toy",
+        viewpoint="side_three_quarter",
+        shot_scale="medium_wide",
+        setting_id="audit_setting",
+    )
+    entry, activity = select_plan(catalog, spec)
+    profiles = character_profiles()
+    prompt = compile_geometry(spec, entry, activity, profiles)
+
+    assert (
+        "The secondary anatomical endpoint is rooted at M1's pelvis"
+        in prompt
+    )
+    assert prompt_issues(spec, entry, activity, prompt, profiles) == []
+
+
 def test_mutual_oral_compiles_one_continuous_reciprocal_body_axis() -> None:
     catalog = load_catalog("one_woman_one_man")
     spec = SceneSpec(
@@ -421,6 +558,83 @@ def test_mutual_oral_compiles_one_continuous_reciprocal_body_axis() -> None:
     assert body_axis is not None
     assert body_axis in prompt
     assert prompt_issues(spec, entry, activity, prompt, profiles) == []
+
+
+@pytest.mark.parametrize(
+    ("family", "variant", "activity_id", "expected_chain"),
+    [
+        (
+            "side_lying_right",
+            "top_leg_bent_lower_arm_forward",
+            "edging_manual",
+            "F1 lies on her right side",
+        ),
+        (
+            "side_lying_open",
+            "top_leg_raised_upper_arm_overhead",
+            "vaginal_face_to_face",
+            "M1, the man, forms one continuous body at the penetration axis",
+        ),
+        (
+            "supine",
+            "knees_to_chest_hands_on_thighs",
+            "cunnilingus",
+            "M1, the man, lowers the head attached through the neck",
+        ),
+        (
+            "supine_hips_raised",
+            "knees_high_wide_arms_overhead",
+            "wrist_bondage_oral",
+            "M1, the man, forms one continuous recipient body",
+        ),
+    ],
+)
+def test_image_regression_scenes_lock_continuous_body_chains(
+    family: str,
+    variant: str,
+    activity_id: str,
+    expected_chain: str,
+) -> None:
+    catalog = load_catalog("one_woman_one_man")
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="one_woman_one_man",
+        family=family,
+        variant=variant,
+        activity_id=activity_id,
+        viewpoint="high_three_quarter",
+        shot_scale="medium",
+        setting_id="audit_setting",
+    )
+    entry, activity = select_plan(catalog, spec)
+    profiles = character_profiles()
+    prompt = compile_geometry(spec, entry, activity, profiles)
+
+    assert expected_chain in prompt
+    assert {
+        "headless",
+        "duplicate",
+        "detached",
+        "extra body",
+        "partial body",
+    }.isdisjoint(prompt.lower().split())
+    assert prompt_issues(spec, entry, activity, prompt, profiles) == []
+
+
+def test_pair_catalog_uses_only_explicit_mutual_manual_names() -> None:
+    catalog = load_catalog("one_woman_one_man")
+    activity_ids = {activity.activity_id for activity in catalog.activities}
+
+    assert {
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
+    }.issubset(activity_ids)
+    assert {
+        "mirror_mutual",
+        "shower_mutual",
+        "chair_mutual",
+    }.isdisjoint(activity_ids)
 
 
 @pytest.mark.parametrize("count", [0, 21])
@@ -480,6 +694,21 @@ def test_presentation_output_requires_requested_scene_count() -> None:
                 "scene_count": 2,
                 "allowed_mood_tags": ("restrained",),
             },
+        )
+
+
+def test_minor_as_tonal_adjective_is_not_treated_as_an_age_concept() -> None:
+    class TextValue(BaseModel):
+        value: str
+
+    validate_output_text(
+        TextValue(value="minor tonal variation"),
+        "style blueprint",
+    )
+    with pytest.raises(ValueError, match="minor concepts"):
+        validate_output_text(
+            TextValue(value="minors in the scene"),
+            "style blueprint",
         )
 
 

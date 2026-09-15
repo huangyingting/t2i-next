@@ -25,9 +25,10 @@ from .compiler import (
     prompt_issues,
 )
 from .layers import CharacterProfile
+from .safety import SAFETY_POLICY_VERSION, SUPPORTED_CASTS
 from .service import ASSIGNMENT_ALGORITHM_VERSION, SceneRequest, build_scene_requests
 
-AUDIT_SCHEMA_VERSION = "1.1"
+AUDIT_SCHEMA_VERSION = "1.2"
 ProgressCallback = Callable[[str], None]
 
 
@@ -41,6 +42,7 @@ class AuditParameters(AuditModel):
     seed_count: int = Field(ge=1)
     scene_count: int = Field(ge=1, le=20)
     assignment_algorithm_version: int
+    safety_policy_version: int
     topology_audit_version: int
     prompt_audit_version: int
 
@@ -56,7 +58,7 @@ class CastAuditProgress(AuditModel):
 
 
 class SpatialAuditProgress(AuditModel):
-    schema_version: Literal["1.1"] = AUDIT_SCHEMA_VERSION
+    schema_version: Literal["1.2"] = AUDIT_SCHEMA_VERSION
     fingerprint: str
     parameters: AuditParameters
     casts: dict[str, CastAuditProgress]
@@ -271,7 +273,7 @@ def run_spatial_audit(
     start_seed: int = 0,
     seed_count: int = 100,
     scene_count: int = 20,
-    cast_keys: Sequence[str] = tuple(CASTS),
+    cast_keys: Sequence[str] = tuple(sorted(SUPPORTED_CASTS)),
     restart: bool = False,
     on_progress: ProgressCallback | None = None,
 ) -> SpatialAuditProgress:
@@ -287,6 +289,7 @@ def run_spatial_audit(
         seed_count=seed_count,
         scene_count=scene_count,
         assignment_algorithm_version=ASSIGNMENT_ALGORITHM_VERSION,
+        safety_policy_version=SAFETY_POLICY_VERSION,
         topology_audit_version=TOPOLOGY_AUDIT_VERSION,
         prompt_audit_version=PROMPT_AUDIT_VERSION,
     )

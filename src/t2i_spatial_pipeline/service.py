@@ -34,6 +34,11 @@ from .compiler import (
 )
 from .config import load_spatial_provider_settings
 from .layers import PRESENTATION_ROLE_CODES, layer_issues, stable_hash
+from .safety import (
+    SUPPORTED_CASTS,
+    catalog_support_issues,
+    symbolic_validation_metadata,
+)
 
 
 class SceneRequest(NamedTuple):
@@ -55,7 +60,7 @@ VIEWPOINTS = (
     "side_three_quarter",
 )
 SHOT_SCALES = ("medium_close", "medium", "medium_wide", "full_body", "wide")
-ASSIGNMENT_ALGORITHM_VERSION = 2
+ASSIGNMENT_ALGORITHM_VERSION = 3
 
 
 def _cast_filename_slug(cast_key: str) -> str:
@@ -113,6 +118,7 @@ def _assign_unique_activities(
     families: list[str],
     family_entries: dict[str, list[PoseEntry]],
     *,
+    cast_key: str,
     rng: random.Random,
 ) -> list[tuple[str, PoseEntry]]:
     options: dict[int, list[tuple[str, list[PoseEntry]]]] = {}
@@ -120,6 +126,12 @@ def _assign_unique_activities(
         by_activity: dict[str, list[PoseEntry]] = {}
         for entry in family_entries[family]:
             for activity_id in entry.compatible_activity_ids:
+                if catalog_support_issues(
+                    cast_key,
+                    entry.central_pose.family,
+                    activity_id,
+                ):
+                    continue
                 by_activity.setdefault(activity_id, []).append(entry)
         activity_ids = sorted(by_activity)
         rng.shuffle(activity_ids)
@@ -259,11 +271,34 @@ def build_scene_requests(
 ) -> tuple[SceneRequest, ...]:
     if not 1 <= count <= 20:
         raise ValueError("scene count must be between 1 and 20")
+    if cast_key not in SUPPORTED_CASTS:
+        raise ValueError(
+            f"{cast_key} is not configured in the spatial catalog"
+        )
     catalog = load_catalog(cast_key)
     rng = random.Random(seed)
-    families = sorted({entry.central_pose.family for entry in catalog.entries})
+    families = sorted(
+        {
+            entry.central_pose.family
+            for entry in catalog.entries
+            if any(
+                not catalog_support_issues(
+                    cast_key,
+                    entry.central_pose.family,
+                    activity_id,
+                )
+                for activity_id in entry.compatible_activity_ids
+            )
+        }
+    )
+    if not families:
+        raise ValueError(f"{cast_key} has no text-only production poses")
     rng.shuffle(families)
-    selected_families = rng.sample(families, k=count)
+    selected_families = [
+        families[index % len(families)]
+        for index in range(count)
+    ]
+    rng.shuffle(selected_families)
     family_entries = {
         family: [
             entry
@@ -275,6 +310,7 @@ def build_scene_requests(
     activity_assignment = _assign_unique_activities(
         selected_families,
         family_entries,
+        cast_key=cast_key,
         rng=rng,
     )
     selected_entries = [entry for _, entry in activity_assignment]
@@ -573,6 +609,7 @@ async def generate_spatial_batch(
                     "presentation_id",
                 ),
                 "estimated_tokens": layers.token_metrics.final_estimated_tokens,
+                **symbolic_validation_metadata(),
             }
         )
     metrics = {
@@ -738,18 +775,11 @@ async def generate_spatial_batch(
         if metrics[field] < minimum
     }
     presentation_policy_issues = []
-    if any(
-        len(accessories) < 2
-        for selection in selections
-        for accessories in selection["role_accessories"].values()
-    ):
-        presentation_policy_issues.append(
-            "every role presentation must retain at least two accessories"
-        )
     report: dict[str, object] = {
         "passed": not issues
         and not threshold_failures
         and not presentation_policy_issues,
+        **symbolic_validation_metadata(),
         "creative_brief": brief,
         "creative_seed": seed,
         "blueprint_fingerprint": stable_hash(inference.blueprint),

@@ -142,7 +142,7 @@ class RoleStylingPreset(StrictModel):
     coverage_mode: Literal["selective_access", "styled_nude"]
     wardrobe_theme: str = Field(min_length=4, max_length=100)
     footwear_theme: FootwearDescription
-    accessory_theme: list[str] = Field(min_length=2, max_length=4)
+    accessory_theme: list[str] = Field(default_factory=list, max_length=2)
     makeup_and_grooming_theme: str = Field(min_length=3, max_length=80)
 
 
@@ -192,6 +192,7 @@ class PresentationPreset(StrictModel):
         accessory_sets = [
             tuple(item.strip().lower() for item in style.accessory_theme)
             for style in self.role_styles
+            if style.accessory_theme
         ]
         if len(set(accessory_sets)) != len(accessory_sets):
             raise ValueError("role accessory sets must be visibly distinct")
@@ -416,9 +417,9 @@ def make_scene_layer_inputs(
                     ),
                     footwear_theme=f"{footwear_detail} {footwear_theme}",
                     accessory_theme=[
-                        *accessory_theme,
+                        *accessory_theme[:1],
                         f"{accessory_detail} accent",
-                    ][:4],
+                    ],
                     makeup_and_grooming_theme=(
                         f"{makeup_theme}, {grooming_detail}"
                         if role.startswith("f")
@@ -746,10 +747,13 @@ def resolve_scene_layers(
                 f"{presentation.color_treatment}; "
                 f"{presentation.lighting_treatment}; {presentation.atmosphere}"
             ),
-            "No extra figures, statues, human shadows or reflections",
             (
-                "Every pelvis connects to exactly two legs; no limb is duplicated, "
-                "fused, detached or assigned to two bodies"
+                "The listed cast fills the composition as complete foreground "
+                "subjects"
+            ),
+            (
+                "Each listed subject has a coherent head-to-torso-to-pelvis "
+                "silhouette and four clearly attributable limbs"
             ),
         )
     )

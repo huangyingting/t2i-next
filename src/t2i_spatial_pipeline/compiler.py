@@ -27,7 +27,7 @@ from .layers import (
 
 ROOT = Path(__file__).resolve().parent
 CATALOGS = ROOT / "catalogs"
-PROMPT_AUDIT_VERSION = 2
+PROMPT_AUDIT_VERSION = 5
 
 
 class SceneSpec(NamedTuple):
@@ -105,6 +105,13 @@ def natural_activity(value: str) -> str:
         "oral_and_manual_on_central": (
             "oral stimulation with simultaneous manual breast contact"
         ),
+        "mutual_manual_side_by_side": (
+            "side-by-side simultaneous mutual manual stimulation"
+        ),
+        "mutual_manual_face_to_face": (
+            "face-to-face simultaneous mutual manual stimulation"
+        ),
+        "mutual_manual_seated": "seated simultaneous mutual manual stimulation",
     }.get(value, phrase(value))
 
 
@@ -140,10 +147,10 @@ def body_ledger(cast_key: str) -> str:
         for role in roles
     ]
     return (
-        f"Only these {len(bodies)} complete bodies exist: {joined(bodies)}. "
-        "Each body has one connected head, chest and pelvis, one left arm and "
-        "one right arm ending in two hands, and one left leg and one right leg "
-        "ending in two feet; no extra or partial body is present."
+        f"The {len(bodies)} complete subjects are {joined(bodies)}. "
+        "Each subject forms one connected silhouette from head through chest "
+        "and waist to pelvis, with a left and right arm and a left and right "
+        "leg clearly belonging to that same subject."
     )
 
 
@@ -178,6 +185,12 @@ def support_clause(entry: PoseEntry) -> str:
         return "supported by the standing partner"
     if pose.primary_surface == "support_sling":
         return "supported by the sling with secondary support against the wall"
+    if pose.primary_surface == "wall":
+        load_points = [point for point in points if point != "wall"]
+        return (
+            f"supported through {joined(load_points)} with separate contact "
+            "against the wall"
+        )
     surface = {
         "bed": "the bed",
         "bed_edge": "the edge of the bed",
@@ -187,6 +200,75 @@ def support_clause(entry: PoseEntry) -> str:
         "sofa": "the sofa",
     }.get(pose.primary_surface, f"the {phrase(pose.primary_surface)}")
     return f"supported at {joined(points)} on {surface}"
+
+
+def side_lying_body_chain(
+    entry: PoseEntry,
+    central_name: str,
+) -> str | None:
+    pose = entry.central_pose
+    if pose.family not in {"side_lying_left", "side_lying_right"}:
+        return None
+    lower_side = "left" if pose.family == "side_lying_left" else "right"
+    upper_side = "right" if lower_side == "left" else "left"
+    leg_clause = {
+        "knees_stacked": (
+            f"both knees are bent and the {upper_side} knee remains stacked "
+            f"directly above the {lower_side} knee"
+        ),
+        "top_leg_bent": (
+            f"the lower {lower_side} leg extends along the bed while the upper "
+            f"{upper_side} thigh bends forward from its own hip"
+        ),
+        "fetal_tuck": (
+            "both thighs fold forward from their own hips with both knees bent "
+            "and the two lower legs remaining distinct"
+        ),
+        "top_leg_raised": (
+            f"the lower {lower_side} leg extends along the bed while the upper "
+            f"{upper_side} leg rises from its own hip"
+        ),
+    }[pose.leg_configuration]
+    return (
+        f"{central_name} lies on her {lower_side} side: her {lower_side} "
+        "shoulder, outer ribs, "
+        f"{lower_side} hip and outer {lower_side} thigh contact the bed, while "
+        f"her {upper_side} shoulder and {upper_side} hip stay stacked directly "
+        f"above them. Her head, chest and pelvis form one continuous "
+        f"horizontal body axis; {leg_clause}."
+    )
+
+
+def central_oral_reach_chain(
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+    central_name: str,
+    cast_key: str,
+) -> str | None:
+    recipient_role = next(
+        (
+            role
+            for role in CASTS[cast_key]
+            if role != activity.focus_role
+            and actor_receives_oral(activity, role)
+            and not actor_gives_oral(activity, role)
+        ),
+        None,
+    )
+    if recipient_role is None:
+        return None
+    recipient_name = actor_name(recipient_role, cast_key)
+    if entry.central_pose.family == "seated_edge":
+        return (
+            f"{central_name}'s buttocks and both feet keep their stated supports "
+            "while her torso inclines forward from the hips; her neck and head "
+            f"continue that body line until her mouth reaches {recipient_name}'s "
+            "pelvis directly in front of her."
+        )
+    return (
+        f"{central_name}'s supported torso continues through her shoulders and "
+        f"neck to the head whose mouth reaches {recipient_name}'s pelvis."
+    )
 
 
 def lifted_bilateral_chain(
@@ -220,7 +302,7 @@ def lifted_bilateral_chain(
             f"of {central_name}'s feet remain airborne behind {possessive} hips "
             f"and neither touches the floor. {partner_name}'s own left and right "
             "legs remain distinct below the pelvis with exactly two planted "
-            "feet. No additional leg emerges from either pelvis."
+            "feet."
         )
     if (
         pose.leg_configuration == "thighs_supported"
@@ -236,8 +318,7 @@ def lifted_bilateral_chain(
             f"{central_name}'s two-leg chain is closed and complete from each "
             "hip through one thigh, one knee, one lower leg and one foot; both "
             f"feet remain airborne. {partner_name}'s own two legs remain distinct "
-            "below the pelvis with exactly two planted feet. No additional leg "
-            "emerges from either pelvis."
+            "below the pelvis with exactly two planted feet."
         )
     return None
 
@@ -321,9 +402,27 @@ def actor_self_manual_contact(
     )
 
 
+def actor_receives_manual_contact(
+    activity: ActivityTemplate,
+    role: str,
+) -> ContactEdge | None:
+    central_role = activity.focus_role
+    return next(
+        (
+            edge
+            for edge in activity.contact_edges
+            if edge.source.entity_id == central_role
+            and edge.source.region in {"hand", "left_hand", "right_hand"}
+            and edge.target.entity_id == role
+        ),
+        None,
+    )
+
+
 def resolved_partner_supports(
     actor_plan,
     activity: ActivityTemplate,
+    central_pose,
 ) -> list[str]:
     if activity.activity_id == "mutual_oral":
         return ["side_shoulder", "side_hip", "side_thigh"]
@@ -341,6 +440,8 @@ def resolved_partner_supports(
         activity,
         actor_plan.role,
     ) and not actor_gives_oral(activity, actor_plan.role):
+        if central_pose.family == "seated_edge":
+            return ["both_feet"]
         return ["one_knee", "opposite_foot"]
     if actor_manual_contact(activity, actor_plan.role):
         return [
@@ -443,6 +544,11 @@ def partner_relationship(
     self_manual = actor_self_manual_contact(activity, role)
     if self_manual:
         side = "left" if actor_plan.screen_position == "center_left" else "right"
+        if "both_feet" in actor_plan.support_points:
+            return (
+                f"stands beside {central_name} on the {side} in a stable "
+                "staggered stance"
+            )
         return f"kneels beside {central_name} on the {side}"
     relation: str | None = None
     for edge in activity.contact_edges:
@@ -489,27 +595,56 @@ def partner_relationship(
                     )
                 break
             if edge.source.region in {"hand", "left_hand", "right_hand"}:
-                relation = f"aligns beside {central_name}'s upper body"
+                side = (
+                    "left" if actor_plan.screen_position == "center_left" else "right"
+                )
+                target_zone = (
+                    "pelvis"
+                    if edge.target.region
+                    in {"anus", "clitoris", "pubic_region", "vagina", "vulva"}
+                    else "upper body"
+                )
+                relation = (
+                    f"stands beside {central_name}'s {target_zone} on the {side} "
+                    "in a stable staggered stance"
+                    if "both_feet" in actor_plan.support_points
+                    else (
+                        f"kneels beside {central_name}'s {target_zone} on the "
+                        f"{side} with both knees on the support surface"
+                    )
+                )
                 break
         if edge.target.entity_id == role and edge.source.entity_id == central_role:
             if edge.source.region == "mouth" and edge.target.region in {
                 "penis",
                 "vulva",
             }:
-                relation = (
-                    f"holds a high half-kneel beside {central_name}'s head, "
-                    "with one knee down and the opposite foot planted so the "
-                    "pelvis rises to her mouth level"
-                )
+                if central_pose.family == "seated_edge":
+                    relation = (
+                        f"stands directly in front of {central_name}'s inclined "
+                        "torso with both feet planted and his pelvis held at her "
+                        "mouth level"
+                    )
+                else:
+                    relation = (
+                        f"holds a high half-kneel beside {central_name}'s head, "
+                        "with one knee down and the opposite foot planted so the "
+                        "pelvis rises to her mouth level"
+                    )
                 break
             if edge.source.region in {"hand", "left_hand", "right_hand"}:
                 side = (
                     "left" if actor_plan.screen_position == "center_left" else "right"
                 )
                 relation = (
-                    f"kneels on all fours to {central_name}'s {side}, with the "
-                    f"pelvis angled inward within reach of {central_name}'s "
-                    "assigned hand"
+                    f"stands beside {central_name} on the {side} with his pelvis "
+                    f"turned toward {central_name}'s assigned hand"
+                    if "both_feet" in actor_plan.support_points
+                    else (
+                        f"kneels on all fours to {central_name}'s {side}, with "
+                        f"the pelvis angled inward within reach of "
+                        f"{central_name}'s assigned hand"
+                    )
                 )
                 break
     if actor_plan.pose_function == "supporting_central":
@@ -529,6 +664,62 @@ def partner_relationship(
         detail = f" while {supporting_relation}" if supporting_relation else ""
         return f"supports {central_name} with both arms{detail}"
     return relation or f"aligned with {central_name}"
+
+
+def partner_body_chain_clause(
+    actor_plan,
+    activity: ActivityTemplate,
+    central_name: str,
+    cast_key: str,
+) -> str:
+    name = actor_name(actor_plan.role, cast_key)
+    possessive = "his" if actor_plan.role.startswith("m") else "her"
+    if actor_is_pelvic_penetrator(activity, actor_plan.role):
+        return (
+            f"{name}, the {role_sex(actor_plan.role)}, forms one continuous "
+            f"body at the penetration axis: {possessive} head connects through "
+            f"the neck, chest and waist to the pelvis positioned at {central_name}'s "
+            f"pelvis; the anatomical endpoint projects from that same pelvis. "
+            "Both shoulders, arms, hips and legs remain visibly attributable "
+            f"to {name}."
+        )
+    if actor_gives_oral(activity, actor_plan.role):
+        return (
+            f"{name}, the {role_sex(actor_plan.role)}, lowers the head attached "
+            f"through the neck to {possessive} visible torso; that torso continues "
+            f"through the waist to {possessive} pelvis and two supported legs."
+        )
+    if actor_receives_oral(activity, actor_plan.role):
+        return (
+            f"{name}, the {role_sex(actor_plan.role)}, forms one continuous "
+            f"recipient body: {possessive} head connects through neck and chest "
+            "to the pelvis raised "
+            f"beside {central_name}'s only head, and the anatomical endpoint "
+            f"projects from that pelvis toward {central_name}'s mouth. "
+            "Both shoulders connect to complete arms ending in two visible "
+            "hands that perform the stated limb task."
+        )
+    manual_edge = actor_manual_contact(activity, actor_plan.role)
+    if manual_edge:
+        return (
+            f"{name}'s right contact arm forms one visible shoulder-elbow-wrist-"
+            f"hand chain from {possessive} single torso to "
+            f"{central_name}'s {phrase(manual_edge.target.region)}; "
+            f"{possessive} left support arm remains separately attached to the "
+            "same torso."
+        )
+    received_manual = actor_receives_manual_contact(activity, actor_plan.role)
+    if received_manual:
+        return (
+            f"{name}'s only head, chest, waist and pelvis remain vertically "
+            f"connected as one body, with {central_name}'s assigned hand "
+            f"reaching the {phrase(received_manual.target.region)} on that pelvis."
+        )
+    return (
+        f"{name}, the {role_sex(actor_plan.role)}, has one continuous "
+        "head-to-chest-to-waist-to-pelvis silhouette with two attributable "
+        "arms and two attributable legs."
+    )
 
 
 def partner_limb_clause(
@@ -570,13 +761,13 @@ def partner_limb_clause(
             target = phrase(manual_edge.target.region)
             if "both_hands" not in actor_plan.support_points:
                 return (
-                    f", with the contacting hand maintained at {central_name}'s "
-                    f"{target} and the other hand stabilizing "
+                    f", with the right hand maintained at {central_name}'s "
+                    f"{target} and the left hand stabilizing "
                     f"{central_name}'s torso"
                 )
             return (
-                f", with the contacting hand maintained at {central_name}'s "
-                f"{target} and the other hand braced on the "
+                f", with the right hand maintained at {central_name}'s "
+                f"{target} and the left hand braced on the "
                 f"{phrase(support_surface)}"
             )
         self_manual = actor_self_manual_contact(activity, actor_plan.role)
@@ -763,11 +954,10 @@ def tongue_continuity(
     owner = actor_name(tongue.entity_id, cast_key)
     target = endpoint_phrase(other.entity_id, other.region, cast_key)
     return (
-        f"{owner} has exactly one natural human tongue extending continuously "
+        f"{owner}'s natural human tongue extends continuously "
         f"from inside their open mouth, with its base rooted behind the lower teeth; "
         f"the tongue stays slender and flat with a natural pink dorsal surface "
-        f"and one tapered rounded tip touching {target}. It is not detached, "
-        "duplicated, swollen, or fused with the lips."
+        f"and a tapered rounded tip touching {target}."
     )
 
 
@@ -832,12 +1022,13 @@ def compile_handheld_prop(
     screen_position, depth_plane = contact_projection(entry, activity, edge)
     controller = actor_name(prop.controller_role, cast_key)
     target = actor_name(edge.target.entity_id, cast_key)
+    possessive = "his" if prop.controller_role.startswith("m") else "her"
     if prop.category == "insertable_toy":
         target_region = phrase(edge.target.region)
         sentences = [
             (
                 f"{controller}'s right hand visibly grips the base of "
-                f"{prop.prop_id}; her left hand remains braced for support."
+                f"{prop.prop_id}; {possessive} left hand remains braced for support."
             ),
             (
                 f"The shaft of {prop.prop_id} follows one continuous line from "
@@ -859,21 +1050,41 @@ def compile_handheld_prop(
                 f"{phrase(screen_position)} in the {phrase(depth_plane)}."
             )
         return sentences, edge.edge_id
+    if prop.category == "vibrator":
+        sentences = [
+            (
+                f"{controller}'s right hand grips the vibrator body and controls "
+                f"its pressure; {possessive} left hand remains visibly on the "
+                "adjacent thigh."
+            ),
+            (
+                "The rounded vibrator head lies transversely across "
+                f"{target}'s external clitoral surface, with the device axis "
+                "parallel to the pubic line and entirely outside the vaginal "
+                "opening."
+            ),
+            (
+                f"The visible {phrase(edge.edge_id)} "
+                f"{phrase(edge.state)} edge is the vibrator head resting against "
+                f"the external clitoral surface at {phrase(screen_position)} "
+                f"in the {phrase(depth_plane)}."
+            ),
+        ]
+        return sentences, edge.edge_id
+    target_region = phrase(edge.target.region)
     sentences = [
         (
-            f"{controller}'s right hand grips the vibrator body and controls "
-            "its pressure; her left hand remains visibly on her inner thigh."
+            f"{controller}'s right hand grips {prop.prop_id} while "
+            f"{possessive} left hand remains available for the stated support."
         ),
         (
-            "The rounded vibrator head lies transversely across "
-            f"{target}'s external clitoral surface, with the device axis "
-            "parallel to the pubic line and entirely outside the vaginal "
-            "opening."
+            f"The active surface of {prop.prop_id} follows one continuous "
+            f"hand-to-tool path to {target}'s {target_region}."
         ),
         (
             f"The visible {phrase(edge.edge_id)} "
-            f"{phrase(edge.state)} edge is the vibrator head resting against "
-            f"the external clitoral surface at {phrase(screen_position)} "
+            f"{phrase(edge.state)} edge is the active surface of {prop.prop_id} "
+            f"resting against {target}'s {target_region} at {phrase(screen_position)} "
             f"in the {phrase(depth_plane)}."
         ),
     ]
@@ -931,22 +1142,20 @@ def distributed_contact_axis_clause(
         partner_name = actor_name(partner_role, cast_key)
         return (
             f"{focus_name} and {partner_name} form one side-lying reciprocal pair "
-            "along the bed's long axis, facing opposite directions. Exactly two "
-            f"heads, two chests and two pelvises are visible: {focus_name}'s only "
-            f"head is beside {partner_name}'s pelvis, and {partner_name}'s only "
+            "along the bed's long axis, facing opposite directions. "
+            f"{focus_name}'s head is beside {partner_name}'s pelvis, and "
+            f"{partner_name}'s "
             f"head is beside {focus_name}'s pelvis. Each head remains connected "
             "through one neck and chest to its own pelvis; the two torsos stay "
-            "parallel rather than stacked, and no headless lower torso, duplicate "
-            "pelvis or third body appears."
+            "parallel."
         )
     return (
         f"{focus_name} remains one continuous body along the bed's long axis: "
         f"her pelvis stays at {phrase(pelvic_position)} in the "
         f"{phrase(pelvic_depth)} beside {actor_name(pelvic_partner, cast_key)}, "
-        f"and her torso connects continuously to her only head at "
+        f"and her torso connects continuously to her head at "
         f"{phrase(mouth_position)} in the {phrase(mouth_depth)} beside "
-        f"{actor_name(mouth_partner, cast_key)}. No additional head, torso, "
-        "partial body or person occupies either contact zone."
+        f"{actor_name(mouth_partner, cast_key)}."
     )
 
 
@@ -1038,6 +1247,17 @@ def compile_geometry(
             f"she is {support_clause(entry)}."
         ),
     ]
+    central_body_chain = side_lying_body_chain(entry, central_name)
+    if central_body_chain:
+        sentences.append(central_body_chain)
+    central_oral_chain = central_oral_reach_chain(
+        entry,
+        activity,
+        central_name,
+        spec.cast_key,
+    )
+    if central_oral_chain:
+        sentences.append(central_oral_chain)
     if len(descriptions) > 1:
         chain = lifted_bilateral_chain(
             entry,
@@ -1057,6 +1277,7 @@ def compile_geometry(
         supports = resolved_partner_supports(
             actor_plan,
             activity,
+            pose,
         )
         limb_clause = partner_limb_clause(
             actor_plan,
@@ -1069,6 +1290,14 @@ def compile_geometry(
             f"{phrase(actor_plan.screen_position)} in the "
             f"{phrase(actor_plan.depth_plane)}, supported by "
             f"{joined([phrase(point) for point in supports])}."
+        )
+        sentences.append(
+            partner_body_chain_clause(
+                actor_plan,
+                activity,
+                central_name,
+                spec.cast_key,
+            )
         )
     distributed_axis = distributed_contact_axis_clause(
         entry,
@@ -1101,6 +1330,9 @@ def compile_geometry(
         handled_prop_edges.add(edge_id)
     for edge in activity.contact_edges:
         if edge.edge_id in handled_prop_edges:
+            ownership = anatomical_endpoint_ownership(edge, spec.cast_key)
+            if ownership:
+                sentences.append(ownership)
             continue
         screen_position, depth_plane = contact_projection(entry, activity, edge)
         ownership = anatomical_endpoint_ownership(edge, spec.cast_key)
@@ -1343,6 +1575,17 @@ def prompt_issues(
     expected_axis = distributed_contact_axis_clause(entry, activity, spec.cast_key)
     if expected_axis and expected_axis not in prompt:
         issues.append("distributed contacts lack one continuous body axis")
+    expected_central_chain = side_lying_body_chain(entry, central_name)
+    if expected_central_chain and expected_central_chain not in prompt:
+        issues.append("side-lying pose lacks a continuous horizontal body axis")
+    expected_oral_chain = central_oral_reach_chain(
+        entry,
+        activity,
+        central_name,
+        spec.cast_key,
+    )
+    if expected_oral_chain and expected_oral_chain not in prompt:
+        issues.append("central oral contact lacks a continuous reach path")
     expected_lift_chain = (
         lifted_bilateral_chain(
             entry,
@@ -1400,14 +1643,22 @@ def prompt_issues(
                 f"shaft of {prop.prop_id} follows one continuous line",
                 f"aligned to the {phrase(edge.target.region)} canal",
             )
-        else:
+        elif prop.category == "vibrator":
             required_prop_phrases = (
                 f"{controller}'s right hand grips the vibrator body",
-                "left hand remains visibly on her inner thigh",
+                "left hand remains visibly on the adjacent thigh",
                 "lies transversely across",
                 "external clitoral surface",
                 "parallel to the pubic line",
                 "entirely outside the vaginal opening",
+            )
+        else:
+            edge = handheld_edge(activity, prop)
+            target_name = actor_name(edge.target.entity_id, spec.cast_key)
+            required_prop_phrases = (
+                f"{controller}'s right hand grips {prop.prop_id}",
+                f"active surface of {prop.prop_id} follows one continuous",
+                f"hand-to-tool path to {target_name}",
             )
         for value in required_prop_phrases:
             if value.lower() not in lowered:
@@ -1420,12 +1671,17 @@ def prompt_issues(
                 or edge.target.region not in {"vagina", "anus"}
             ):
                 issues.append("insertable handheld prop topology changed")
-        elif (
+        elif prop.category == "vibrator" and (
             edge.source.entity_id != prop.prop_id
             or edge.state != "external_contact"
             or edge.target.region != "clitoris"
         ):
             issues.append("handheld vibrator contact topology changed")
+        elif prop.category == "surface_tool" and (
+            edge.source.entity_id != prop.prop_id
+            or edge.state != "external_contact"
+        ):
+            issues.append("handheld surface tool topology changed")
     if (
         activity.restraint is not None
         and activity.restraint.equipment == ["padded_spreader_bar"]
@@ -1441,6 +1697,14 @@ def prompt_issues(
             issues.append("spreader bar lacks a visible ankle attachment chain")
     for actor_plan in entry.actor_plans[1:]:
         name = actor_name(actor_plan.role, spec.cast_key)
+        expected_partner_chain = partner_body_chain_clause(
+            actor_plan,
+            activity,
+            central_name,
+            spec.cast_key,
+        )
+        if expected_partner_chain not in prompt:
+            issues.append(f"{name} lacks one continuous partner body chain")
         actor_sentence = next(
             (
                 sentence
@@ -1477,10 +1741,18 @@ def prompt_issues(
             activity,
             actor_plan.role,
         ) and not actor_gives_oral(activity, actor_plan.role):
-            if (
-                "high half-kneel" not in actor_sentence
-                or "both hands resting on the thighs" not in actor_sentence
-                or "supported by one knee and opposite foot" not in actor_sentence
+            seated_recipient = entry.central_pose.family == "seated_edge"
+            valid_stance = (
+                "stands directly in front" in actor_sentence
+                and "supported by both feet" in actor_sentence
+                if seated_recipient
+                else (
+                    "high half-kneel" in actor_sentence
+                    and "supported by one knee and opposite foot" in actor_sentence
+                )
+            )
+            if not valid_stance or "both hands resting on the thighs" not in (
+                actor_sentence
             ):
                 issues.append(f"{name} has conflicting oral recipient supports")
         if actor_is_pelvic_penetrator(
@@ -1501,17 +1773,17 @@ def prompt_issues(
                 issues.append(f"{name} has conflicting penetration support tasks")
         if actor_manual_contact(activity, actor_plan.role):
             manual_support_resolved = (
-                "contacting hand maintained" in actor_sentence
+                "right hand maintained" in actor_sentence
                 and (
                     (
                         "both_hands" in actor_plan.support_points
-                        and "other hand braced" in actor_sentence
+                        and "left hand braced" in actor_sentence
                         and "supported by both knees and one braced hand"
                         in actor_sentence
                     )
                     or (
                         "both_hands" not in actor_plan.support_points
-                        and "other hand stabilizing" in actor_sentence
+                        and "left hand stabilizing" in actor_sentence
                     )
                 )
             )

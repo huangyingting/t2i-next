@@ -35,6 +35,7 @@ Identifier = Annotated[
     StringConstraints(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$"),
 ]
 Fingerprint = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
+ShortPhrase = Annotated[str, StringConstraints(min_length=2, max_length=60)]
 SUPPORTED_SURFACES = {
     "bed",
     "bed_edge",
@@ -45,6 +46,7 @@ SUPPORTED_SURFACES = {
     "support_sling",
     "wall",
 }
+PRODUCTION_SUPPORT_SURFACES = SUPPORTED_SURFACES
 SupportSurface = Literal[
     "bed",
     "bed_edge",
@@ -56,7 +58,7 @@ SupportSurface = Literal[
     "wall",
 ]
 PROHIBITED_MINOR_PATTERN = (
-    r"child|children|minors?|teens?|teenage|teenaged|teenagers?|schoolgirls?|"
+    r"child|children|minors|minor[-\s]+aged|teens?|teenage|teenaged|teenagers?|schoolgirls?|"
     r"schoolboys?|juveniles?|high\s+school|middle\s+school|primary\s+school"
 )
 PROHIBITED_MINOR_CONCEPTS = re.compile(
@@ -76,6 +78,12 @@ FORBIDDEN_STYLE_CONCEPTS = re.compile(
     r"penis|vagina|vulva|anus|breast|clitoris|"
     + PROHIBITED_MINOR_PATTERN
     + r")\b",
+    re.I,
+)
+FORBIDDEN_PRESENTATION_CONCEPTS = re.compile(r"\b(?:mirror|mannequin|statue)\b", re.I)
+INCOMPLETE_TEXT_END = re.compile(
+    r"(?:\b(?:a|an|the|and|or|but|with|without|over|under|on|in|at|to|"
+    r"from|for|of)|[,(;/:-])\s*$",
     re.I,
 )
 
@@ -131,7 +139,7 @@ class WorldBlueprint(StrictModel):
                 support in {item.support for item in location.support_realizations}
                 for location in self.locations
             )
-            for support in SUPPORTED_SURFACES
+            for support in PRODUCTION_SUPPORT_SURFACES
         }
         insufficient = {
             support: count for support, count in coverage.items() if count < 1
@@ -140,7 +148,10 @@ class WorldBlueprint(StrictModel):
             raise ValueError(
                 f"world locations have insufficient support coverage: {insufficient}"
             )
-        compound_requirements = ({"floor", "furniture"},)
+        compound_requirements = (
+            {"floor", "furniture"},
+            {"support_sling", "wall"},
+        )
         missing_compounds = [
             sorted(requirement)
             for requirement in compound_requirements
@@ -201,7 +212,7 @@ class RoleStylingRecipe(StrictModel):
         "platforms",
     ]
     footwear_details: str = Field(min_length=3, max_length=60)
-    accessories: list[str] = Field(min_length=2, max_length=4)
+    accessories: list[ShortPhrase] = Field(default_factory=list, max_length=2)
     makeup_and_grooming: str = Field(min_length=3, max_length=80)
 
     @model_validator(mode="after")
@@ -299,6 +310,11 @@ class PresentationBlueprint(StrictModel):
             ],
         )
         ensure_unique("appearance biases", self.appearance_bias)
+        validate_output_concepts_with_pattern(
+            self,
+            "presentation blueprint",
+            FORBIDDEN_PRESENTATION_CONCEPTS,
+        )
         return self
 
 
@@ -488,6 +504,20 @@ def validate_output_text(value: BaseModel, label: str) -> None:
     )
     if minor_matches:
         raise ValueError(f"{label} contains minor concepts: {minor_matches}")
+    fragment_issues = [
+        path
+        for path, field_text in iter_string_paths(payload)
+        if " " in field_text
+        and (
+            INCOMPLETE_TEXT_END.search(field_text)
+            or field_text.count("(") != field_text.count(")")
+        )
+    ]
+    if fragment_issues:
+        raise ValueError(
+            f"{label} contains incomplete phrases at "
+            + ", ".join(fragment_issues[:12])
+        )
 
 
 def validate_forbidden_output_concepts(value: BaseModel, label: str) -> None:
@@ -672,7 +702,7 @@ class BlueprintInference(StrictModel):
     blueprint: CreativeBlueprint
 
 
-BLUEPRINT_SCHEMA_VERSION = 20
+BLUEPRINT_SCHEMA_VERSION = 23
 BRIEF_NORMALIZATION_SYSTEM = """
 Translate and normalize the user's creative brief into concise semantic ASCII
 English. Preserve all setting, era, atmosphere, content, clothing or nudity,
@@ -687,10 +717,11 @@ location cards with concise ASCII English architecture, materials, inanimate
 props, practical light sources, and identifier mood tags. Every support record
 must pair an allowed support identifier with a physical object or surface in
 the location. Across the locations, cover bed, bed_edge, chair, floor,
-furniture, sofa, support_sling, and wall at least once, and include one location
-that realizes both floor and furniture. Never add people, mirrors, humanoid
-objects, crowds, attendants, guards, servants, or minor concepts. Return only
-schema data.
+furniture, sofa, support_sling, and wall at least once. Include one location
+that realizes both floor and furniture, and one that realizes both
+support_sling and wall.
+Never add people, mirrors, humanoid objects, crowds,
+attendants, guards, servants, or minor concepts. Return only schema data.
 """.strip()
 CHARACTER_BLUEPRINT_SYSTEM = """
 OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
@@ -723,7 +754,10 @@ Infer only the PresentationBlueprint from the brief, supplied cast_roles, and
 allowed_mood_tags. Produce exactly scene_count recipes. Every recipe must
 contain exactly one role_styles entry for every supplied role and no unused
 role. Give each visible person separately designed but scene-coordinated garments,
-footwear, two to four accessories, and makeup-and-grooming treatment. Within a
+footwear, zero to two small wearable identity-relevant accessories, and
+makeup-and-grooming treatment. Never add handheld novelty props, occupational
+equipment, medical equipment, masks, or costume-role accessories unless the brief
+explicitly requires them. Within a
 scene, choose coverage_mode independently for every role according to the brief
 and creative composition. A role may use selective_access with named garments
 or styled_nude with wardrobe set to literal none. A scene may therefore be fully
@@ -732,9 +766,12 @@ must not be added merely to create variety. Dressed roles need visibly different
 garments, silhouettes, materials, and color accents. All roles, including nude
 roles, need distinct footwear, accessory sets, makeup, and grooming; male and
 female roles must never receive the same footwear description. Every
-compatible_moods value must come from allowed_mood_tags. Use actual footwear
-types from the schema, concise printable ASCII English, and return only schema
-data.
+compatible_moods value must come from allowed_mood_tags. Match the brief's era,
+region, professions, and stable character identities; do not introduce unrelated
+costume scenarios. Never use mirrors, mannequins, statues, sentence fragments,
+unclosed parentheses, or a footwear_details noun that contradicts footwear_type.
+Use actual footwear types from the schema, concise printable ASCII English, and
+return only schema data.
 """.strip()
 BLUEPRINT_SYSTEM_HASH = hashlib.sha256(
     "\n\n".join(
@@ -779,8 +816,19 @@ def compact_phrase(value: str, max_words: int) -> str:
     return " ".join(natural.split()[:max_words]).rstrip(",;:")
 
 
+def clean_phrase(value: str) -> str:
+    return " ".join(value.replace("_", " ").split()).strip(" ,;:")
+
+
 def presentation_footwear_phrase(recipe: RoleStylingRecipe) -> str:
-    details = compact_phrase(recipe.footwear_details, 6)
+    details = clean_phrase(recipe.footwear_details)
+    if re.search(
+        r"\b(?:boots?|heels?|sandals?|shoes?|slippers?|pumps?|mules?|"
+        r"sneakers?|loafers?|platforms?)\b",
+        details,
+        re.I,
+    ):
+        return details
     footwear_root = recipe.footwear_type.rstrip("s")
     if re.search(rf"\b{re.escape(footwear_root)}s?\b", details, re.I):
         return details
@@ -1207,15 +1255,14 @@ def sample_scene_layer_inputs(
                 RoleStylingPreset(
                     role=role_style.role,
                     coverage_mode=role_style.coverage_mode,
-                    wardrobe_theme=compact_phrase(role_style.wardrobe, 8),
+                    wardrobe_theme=clean_phrase(role_style.wardrobe),
                     footwear_theme=presentation_footwear_phrase(role_style),
                     accessory_theme=[
-                        compact_phrase(value, 4)
+                        clean_phrase(value)
                         for value in role_style.accessories
                     ],
-                    makeup_and_grooming_theme=compact_phrase(
-                        role_style.makeup_and_grooming,
-                        7,
+                    makeup_and_grooming_theme=clean_phrase(
+                        role_style.makeup_and_grooming
                     ),
                 )
                 for role_style in presentation_recipe.role_styles

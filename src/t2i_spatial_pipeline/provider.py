@@ -361,6 +361,28 @@ async def generate_with_repair(
                     " Use printable ASCII characters only in every string; "
                     "replace smart quotes, long dashes, and accented characters."
                 )
+            if any(
+                "incomplete phrases" in issue.lower()
+                for issue in exc.validation_issues
+            ):
+                repair_guidance += (
+                    " Rewrite every named field as a short complete phrase. "
+                    "End each phrase with a concrete noun or adjective, never "
+                    "with an article, preposition, conjunction, comma, semicolon, "
+                    "or unmatched parenthesis."
+                )
+            if any(
+                "unsupported mood tags" in issue.lower()
+                for issue in exc.validation_issues
+            ) and isinstance(payload, dict):
+                allowed_moods = payload.get("allowed_mood_tags")
+                if isinstance(allowed_moods, list):
+                    repair_guidance += (
+                        " Every compatible_moods value must be copied verbatim "
+                        "from this allowed_mood_tags list: "
+                        + json.dumps(allowed_moods, ensure_ascii=True)
+                        + "."
+                    )
             if isinstance(exc, SpatialProviderTruncatedOutputError):
                 repair_guidance += (
                     " Be concise, omit all reasoning and commentary, and reserve "

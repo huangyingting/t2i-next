@@ -1,5 +1,5 @@
 {
-  "schema_version": "4.0",
+  "schema_version": "5.0",
   "cast_key": "two_women",
   "cast_roles": [
     "f1",
@@ -520,7 +520,16 @@
           "preferred_visibility": "occluded"
         }
       ],
-      "handheld_props": [],
+      "handheld_props": [
+        {
+          "prop_id": "prop_a",
+          "controller_role": "f2",
+          "category": "insertable_toy",
+          "grip_region": "right_hand",
+          "deployment": "inserted",
+          "orientation": "aligned_to_target_canal"
+        }
+      ],
       "wearable_props": [],
       "restraint": null
     },
@@ -542,7 +551,16 @@
           "preferred_visibility": "visible"
         }
       ],
-      "handheld_props": [],
+      "handheld_props": [
+        {
+          "prop_id": "prop_a",
+          "controller_role": "f2",
+          "category": "insertable_toy",
+          "grip_region": "right_hand",
+          "deployment": "inserted",
+          "orientation": "aligned_to_target_canal"
+        }
+      ],
       "wearable_props": [],
       "restraint": null
     },
@@ -577,7 +595,24 @@
           "preferred_visibility": "visible"
         }
       ],
-      "handheld_props": [],
+      "handheld_props": [
+        {
+          "prop_id": "prop_a",
+          "controller_role": "f2",
+          "category": "insertable_toy",
+          "grip_region": "right_hand",
+          "deployment": "inserted",
+          "orientation": "aligned_to_target_canal"
+        },
+        {
+          "prop_id": "prop_b",
+          "controller_role": "f1",
+          "category": "surface_tool",
+          "grip_region": "right_hand",
+          "deployment": "external_surface_contact",
+          "orientation": "aligned_to_target_surface"
+        }
+      ],
       "wearable_props": [],
       "restraint": null
     },
@@ -604,7 +639,7 @@
       "restraint": null
     },
     {
-      "activity_id": "mirror_mutual",
+      "activity_id": "mutual_manual_side_by_side",
       "focus_role": "f1",
       "contact_edges": [
         {
@@ -639,7 +674,7 @@
       "restraint": null
     },
     {
-      "activity_id": "shower_mutual",
+      "activity_id": "mutual_manual_face_to_face",
       "focus_role": "f1",
       "contact_edges": [
         {
@@ -674,7 +709,7 @@
       "restraint": null
     },
     {
-      "activity_id": "chair_mutual",
+      "activity_id": "mutual_manual_seated",
       "focus_role": "f1",
       "contact_edges": [
         {
@@ -977,7 +1012,16 @@
           "preferred_visibility": "visible"
         }
       ],
-      "handheld_props": [],
+      "handheld_props": [
+        {
+          "prop_id": "prop_a",
+          "controller_role": "f2",
+          "category": "surface_tool",
+          "grip_region": "right_hand",
+          "deployment": "external_surface_contact",
+          "orientation": "aligned_to_target_surface"
+        }
+      ],
       "wearable_props": [],
       "restraint": {
         "category": "low_temp_wax_sensory",
@@ -1059,13 +1103,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "566047d447769d41a7b37ec718c30a9a0692d3643ac5c5e0093ffa266f7139e7"
     },
@@ -1129,12 +1177,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "20215668b3351c81b350ed659b28fe486e80b18f1638981115aa859dee12e109"
     },
@@ -1200,14 +1251,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "7b088d48ee5fd8258a11011c390ecd3aec75f7fea452b18fa6116eb6e6327b4f"
     },
@@ -1271,11 +1326,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "19ffc0f2940722fdfe9175982da01258d674aea781ceddda2f4290da8735cafe"
     },
@@ -1341,13 +1399,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "70d347a77f480deb96073d3caa792460f78879174379834f488d0f0d25bdd261"
     },
@@ -1411,12 +1473,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "03410c5e933e23d3bb3e5806819f4ce6d52771af902ef594a94a6426fcbfcd27"
     },
@@ -1482,14 +1547,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6a99c7626b788e573245d0da34adf0a4f839137eeb3e3f16625f839a1cb840e4"
     },
@@ -1553,11 +1622,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "75f3f6d315b59b580d76e333c0d16efa0ad1cfda454c19373d503356091e66c1"
     },
@@ -1623,13 +1695,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "756b01b627ba29c76366e27507338f78a6947ddd7ac8c1be3d0528d40e91f977"
     },
@@ -1693,12 +1769,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "bbbf801f9ec6b647b61d1afe111ee8b56aa99e8d3c048bbe9bff13ebb5a4002c"
     },
@@ -1764,14 +1843,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "54d50d12e9d7a61f424f1c13323125818bf3518e482f21782eb952ddb1cdd7e2"
     },
@@ -1835,11 +1918,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "5eca0531242512d4cc0385c3c9d7f70932bdc24b5cc37d6c731567c949b57ea9"
     },
@@ -1905,13 +1991,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "238652598adaab5fa7e917f2e384cd136e2ed4ef48e4b91adad892e0679d4f8b"
     },
@@ -1975,12 +2065,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "44f59885350fb499dc779a5837c80c81c877cd4e22d4fbb9770a5063c2b5a342"
     },
@@ -2046,14 +2139,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "cd8d94d131c31e1e5d3d0372d5c37fe7fdcd710bef19cffee291e472d6cc92b4"
     },
@@ -2117,11 +2214,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "507bfb46a46ae611be56f9ac9149f81c2588669a1b15255455625706a1f685c2"
     },
@@ -2182,7 +2282,8 @@
       "compatible_activity_ids": [
         "manual_clitoral_giving",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "2dbeaf2ac9069376a7bf875b06e502867816ec7e920cd50e6d781ba9a25cb3b2"
     },
@@ -2242,7 +2343,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "e5628775ec5d0e1ae430285a0c4e51b532afe10aba6862f4f82a117bdfe2d9b5"
     },
@@ -2303,7 +2405,8 @@
       "compatible_activity_ids": [
         "manual_clitoral_giving",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "b07e949f27963bbc019b15c9bd1a30e75fb84f07894b3944e9fd6efa682d0d0e"
     },
@@ -2363,7 +2466,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "49adf809d8d4b7ee4672b57e3042e4eefaeb0111801467e67b48332629ff3b9b"
     },
@@ -2429,13 +2533,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "fe081e0754d58615930b2de0d933a300f6a3329939afd9220bb67625668aeb96"
     },
@@ -2499,11 +2607,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "0c84a119ae183ac9b1f253f1ef3d6ee5c5a12cf81fae77bc5032084a256530ad"
     },
@@ -2569,13 +2680,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "86f17505a98b17e3eed624227335602ce4ad3e6963bcf41b5492d8a0d262beed"
     },
@@ -2639,11 +2754,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "36fbe158879cda00ac59cdb0f4abc05a7383b81a6a34f2996997c02fbf58cd2f"
     },
@@ -2709,13 +2827,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "c837c8cdba2189bc256da6727f0582a21b836c758865788312ca496b23266f7b"
     },
@@ -2779,11 +2901,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "df261f4fe67ed71ae741bb07b3fedcf8bd3a091eca20583e6a231d17ef78ce44"
     },
@@ -2849,13 +2974,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "f4ad8db4d7fd7ceaaeb2548e00cfcbc992900bb7671fbf9cbf21cd6e3662b74c"
     },
@@ -2919,11 +3048,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "ea2b3e555f99e81d9a44bf0e9f89f982e4c57682a6ec3f20e449ccd27c8fb770"
     },
@@ -2989,13 +3121,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "25fed18ecebaa4659e32d39edf028076c6778e57a1d0d3ab3b722683b01dca0e"
     },
@@ -3059,11 +3195,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "490730b5b85f72fd27fe9ec67b6f97794de8decaa1afb6ea802520516d29b173"
     },
@@ -3129,13 +3268,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "173f7cc26e66148bc25634ad7e9c63323a105ceb572201643d811bb7374f0ad9"
     },
@@ -3199,11 +3342,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "b387548ff4c0b82e7170293053867503684e2247118f404f29716d98eec46745"
     },
@@ -3266,7 +3412,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "dcc43bfd081e5fa80b381d1695cbfb5cde89e2167688a7bd4c6207c0ed0ec450"
     },
@@ -3329,7 +3476,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "719e77a4c31c5104db8ccd40942d196b8d171530946eeb4c78b3cc0c0b12a076"
     },
@@ -3392,7 +3540,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e4aa9825d6f82a2258026171ea57f7fd21b91f3bc8665c2bf1c10ee045e62ab0"
     },
@@ -3454,7 +3603,8 @@
         "cunnilingus_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "41189f51a169db7bad2804de8153846c88a4becb9c5a7ef9f893c1447040753a"
     },
@@ -3525,12 +3675,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "60e20d51acd2188bda4de1064b5a0fdb9ff83d2fcf4b5bb487ddb30934e7d891"
     },
@@ -3601,12 +3755,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "048c1fbbdacb3166d87677677f0bd07ca58dc254256c1d9e457f9b1b1dd89a68"
     },
@@ -3677,12 +3835,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "070743bade0816f7fc5a6df717fd70175e8959962ad4b8223121820073298379"
     },
@@ -3751,10 +3913,13 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b68650ffaa95ded6d4eca31bd3ce693849c32d6719987174cee71244230c9bc6"
     },
@@ -3825,12 +3990,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "8a8d6d9463d9278a55b8a560bef6a297b20fc1efdc28f36e95bb939b1df28cbe"
     },
@@ -3901,12 +4070,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "3ee4c84162009447c5c4b7cceda485a2caf3a2aaedc20e35220a55db1419f245"
     },
@@ -3977,12 +4150,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "d058e4bb3920d3683ff557039214802c223fc64a28ac510387eeb5ec3014aecb"
     },
@@ -4051,10 +4228,13 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6eb27d0bd763571582c6e36eabd3ce287e3c82d2d89260fa7281c8386df67215"
     },
@@ -4125,12 +4305,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c8ad5182eac7982a7a2510530eeba1e9c2f6e1611ac947d49cb8ad6b3f286b64"
     },
@@ -4201,12 +4385,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "85f4c8169e2862a4c7623b0684fa45923ec11d8902ab7f2720597f0428410026"
     },
@@ -4277,12 +4465,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "5de84e2f4718f3974d33167c3b97e2a6142c85215e508aa2f954836ad8df41f3"
     },
@@ -4351,10 +4543,13 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "391a6b170bcec021bfe2e0fc866fb0d7b8cc8a00abb78d19facb398f14dee1b3"
     },
@@ -4417,7 +4612,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f82a19c40df09c2c50d113027327f7841d79b1be5485955c1d4322b34484df24"
     },
@@ -4480,7 +4676,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "85a072887b37e40f4136b9041a7824ef6d6c205cbec600e95573a45838a2079e"
     },
@@ -4543,7 +4740,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6513dff17da00fb5867e74ee9eb0b1dc714a38e537ced8e4c75a92e11df82552"
     },
@@ -4605,7 +4803,8 @@
         "cunnilingus_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "274631580327af37e4f8d0f06073e86285e095c6bcaf51af48fb7fa8690c43c3"
     },
@@ -4676,12 +4875,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "348663ae3a16a6e1958c07815ea49f024d8e65ce70062f55e9b40ef56529db65"
     },
@@ -4752,12 +4955,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c21cacdbc67e0fcfdb80f88279305238a008bedf363289ae9831d8d68d17edb1"
     },
@@ -4828,12 +5035,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2ac3f16bcec710fc9bc54cf88d600248d3acaa3b0bc58be5628f59ef1359d309"
     },
@@ -4902,10 +5113,13 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "cfad0adadc9ff17b839df8ce8b4c70ad17eb7f673694a3594531a2b1c4938017"
     },
@@ -4976,12 +5190,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "0d76c3f901e3e39e6edb2ffc20554b3bcd575d5bf7f2387682d0dc87861d3ee4"
     },
@@ -5052,12 +5270,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ce9c05bde48d0d87e0115cf82f6a0d82046629102832520c35e176443c1237a5"
     },
@@ -5128,12 +5350,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2c7e3a4796b8caa3875c342feac65f51c453840e48048ce2e2bb04297b388a27"
     },
@@ -5202,10 +5428,13 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "bf2786db7f27dfdcbb44b8a7fb243498aaadfbbc1c122555c1be7b96569615ba"
     },
@@ -5276,12 +5505,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c2c3782edc2e0837796681e2c8a9aa53cd3ca2225b56e8a82dc32ae6e8606756"
     },
@@ -5352,12 +5585,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "afd95e5567599c08ca1405b0f1db27389302125e71051fa0c221709257166507"
     },
@@ -5428,12 +5665,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6a63dedb46e2db1b0bbb8adcc6fc62544e2c6b159c1b951a201ad4db27040d23"
     },
@@ -5502,10 +5743,13 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6bd1b97d70c05180396c0213fa42a90399d30f39a1b58cfcce24551aa376ac67"
     },
@@ -5568,11 +5812,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "ee60135232718462137b5c501914c90ed91406bcc3b1b07cb8096c0d3e13db66"
     },
@@ -5635,11 +5882,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "aa052e450e280ddc834dac892296a984d7bf37a40b527f7f0851d60ad9caf5d7"
     },
@@ -5704,13 +5954,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "73ae5cdc4813747edcec32d4515501d20f1f0df1710df75ec6954645385689ef"
     },
@@ -5773,11 +6027,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "3bb8ccf2d9d9df12b29216713a6be69b2100e48e99ae8bf8c289173399eda105"
     },
@@ -5840,11 +6097,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "544b5df1c7875a94966d4f37e2397b24415a6ac7be815c0828dc9cd58c2b7ddd"
     },
@@ -5907,11 +6167,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "7ac9090811f92f69665ce09eda6a95e71e7eb42ec0e3ae3aaeb4ba081f6d079f"
     },
@@ -5976,13 +6239,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "1dfddb58933bb48f495dae57c0050c988006d1575d6086199d072bcafa0c2023"
     },
@@ -6045,11 +6312,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "22d9646ac178635140ded8f0f2da84d638a6b57dcbc8dd0576ef68c1dacafe31"
     },
@@ -6112,11 +6382,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "f3c9905a460ee43b77ec0bc853e76ca9ef1c09383571682dd0f1ec3cd97c037f"
     },
@@ -6179,11 +6452,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "a39ead7d84a5c373a2f5bc20d17d073f04ed4ca022091344b5deb0b54d0d309a"
     },
@@ -6248,13 +6524,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "8b4f1fa4e90933aa1b2c8207468f98a810206fe0c389558fc9fb575bfdbb94cf"
     },
@@ -6317,11 +6597,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "fd6c5e870052ee5f53bbd9d241cf5f1f8fc5feccaca7bb123cd021d4b4414164"
     },
@@ -6384,11 +6667,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "8ffbd96f128c3e908e9901e6f994505e8a1761a07d360dbfa29e2b1341ca7fbe"
     },
@@ -6451,11 +6737,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "17de5fe6b16062d6354a07a4fcf489884c6861bfa6dea795db5ec334249eb1ae"
     },
@@ -6520,13 +6809,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "0d31119bcfce6a006fb759c05e84625e6725660547c898c798cb73b9b981245f"
     },
@@ -6589,11 +6882,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "f1342aea379a53e5503a78076e063b9af2851eefa069b02f69a3fb835f6f428e"
     },
@@ -6656,7 +6952,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "05c537d06d063314291096d2b3292121e6de3d41ff75a2e51aa9f6c6d1d1b608"
     },
@@ -6719,7 +7016,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "7b3292105b391879f79b51344ea7e475137921733ee01785b169edfde78c081a"
     },
@@ -6782,7 +7080,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "3bf95e61a89d1e272760babc4331a520eb366f5cd577940e8321afe12b9298db"
     },
@@ -6846,7 +7145,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "edc0e3fcb45c4769d444b6b0c1be215044c12d0ddc9e1130c9ddfd36d21ce2d6"
     },
@@ -6912,12 +7212,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "97e4c85c87c0c28a2490326f1f7f33f354301549a7164710de78531ccdb6268a"
     },
@@ -6983,13 +7286,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "b92aae9d83d04441d3af383245c65f30796a065cded487e664b7aefe3a9c927a"
     },
@@ -7055,13 +7361,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "23177850b922c3f155336c5c8e850635724e45f2d880fb5f8349009cf931cc16"
     },
@@ -7129,15 +7438,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "46e1b5d0099b571626228692a19fb24ead7ff7989ec5644f7393daec974638c6"
     },
@@ -7203,12 +7516,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "11cd048bed69c9634aa64dc685249d266fdb68c9b9b59e50c5777647f119be64"
     },
@@ -7274,13 +7590,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "e7c3ee030cf186373aa9a9764cf3a333521c841053d3b74483e5812490311fea"
     },
@@ -7346,13 +7665,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "7659864feef01e2706585ccb07e6008cfb565e0f89d341027887763ed6b86653"
     },
@@ -7420,15 +7742,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "7640524f66c9d205aa7adc887c9cfeaeca310aae14c7f524027b8ca7d9a39cc2"
     },
@@ -7494,12 +7820,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "a72e6e7b95e45bd054fae65cbc3d1eb549bb49d361c59ca485e6e6ef73d43e98"
     },
@@ -7565,13 +7894,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "caaf16c322bee582d00f80966ccc269e4fb3e8afa39ae4f84bfb0d8bc6c610a0"
     },
@@ -7637,13 +7969,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "0586732330ae70a6ee8930f1fc99eb9dad913804b5e5dcd485ec7d38807beac7"
     },
@@ -7711,15 +8046,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "1757a89bcb70ee8f3c895c112efef8d6427111c7ba83f4507cd58c633f2e0479"
     },
@@ -7778,7 +8117,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "b2fa57ea03c9d0e0185d43fea85abf7109ce719a1f255fa8cf27a089b438e303"
     },
@@ -7837,7 +8177,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "b7be29c1abdedd97d626bc64f1a3e93a43e84be867bf09c6a277f01ba6d03a76"
     },
@@ -7897,7 +8238,8 @@
       "compatible_activity_ids": [
         "manual_clitoral_giving",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "1dc9ca3a4330834f5ffe7a35574619e63ddf1f64a599b321a300ec4e5dab48a6"
     },
@@ -7956,7 +8298,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "6b9e1cba61271a2c9b74e365f6a0882bb0476ecdd1c1712e8f3186946253efbc"
     },
@@ -8019,11 +8362,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "63b7483fa0b4e6293728597e80a3cd53b14e395fa3ae8ae2be03c67d67eb1f74"
     },
@@ -8086,11 +8432,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "15ae0175553dda4ea97c0e5bdfd6bbe12bc41ea2849c678254738930e6f1843b"
     },
@@ -8155,13 +8504,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "8832a9fabbfc462880752171a7ccd879ed29d6956c5f70798ffff0a52b3de448"
     },
@@ -8224,12 +8577,15 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "c212aa99e374f2955518dee365a75c1fd52fd1a1baad409b21d47d3b3cb661f5"
     },
@@ -8292,11 +8648,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "f16aa61ddd93b5bc1793dad2cafbd97bafc27da4d2c60284b4e328d5a49bd222"
     },
@@ -8359,11 +8718,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "10b941dbd818605cbf1d6f4d639de9e28d24bdfb54b1ab8c6a73b56a8618fafc"
     },
@@ -8428,13 +8790,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "6144983b71b38be004235201fda64e475d5c12a4b12499b55aac83fc5089501d"
     },
@@ -8497,12 +8863,15 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "73f50160e0f49675765cfd7bc7c91a8ca9b0df85d48e9d2acff547c8f7331796"
     },
@@ -8565,11 +8934,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "6649d359cd6102c03352a6a060a1526fa0a24ea961ee95dcb623d65e4c2277b8"
     },
@@ -8632,11 +9004,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "d2e81dfa148c9513a49386a8566818790984097b60ebcb7d7831039d4b33709d"
     },
@@ -8701,13 +9076,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "4ec598be210dc03c8e4451aa0c828d34c77c0349d7572eb06d9259dea10ac53f"
     },
@@ -8770,12 +9149,15 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "1e6ccdc4287b61d38f0b56cf9ac457a08028dc712a81dea6a7e8c1314b066a33"
     },
@@ -8835,7 +9217,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "cdbd3c7f9c3a8345cfabc0d8bb7aa4437a0f07ff6cf5865602cacd0e970ef223"
     },
@@ -8895,7 +9278,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9136c698280e07854112e5062e8903e96133523483488614d9eb0fd95a93da1e"
     },
@@ -8955,7 +9339,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "3f93d451a80afc813c26416aed1e2a399675ec0f56aa8f8d631ca383aa544734"
     },
@@ -9016,7 +9401,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "8db8f982521d8631c8300e55a63050de8723e7a662029e71572faa31ef206808"
     },
@@ -9080,11 +9466,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "06d19aa11c36f6b89870f7d7468819c35ef7e0a0585c12657fee6377193a32b3"
     },
@@ -9148,12 +9537,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "0cff0c0c1dfa1e580c608797d354c30092677cdb6a4c109d9827022a7c42633a"
     },
@@ -9217,12 +9609,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4c689a7a7a186441adda19862e88531b2eb8b2db8d63f8546191185edbaede07"
     },
@@ -9288,13 +9683,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "375979e3bed488c9e4381119c6bc9e4b0c3c2781d4f74772546f795a4c2540ff"
     },
@@ -9358,11 +9757,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "be9b96ee5bbf58416d6bcf792b90fd43bf661ba037e9825116d1e1ee4b5038b5"
     },
@@ -9426,12 +9828,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "306dc3294e289d925a8c61305551b6b456a3c7d444b405a30ce72ebb1e0cfdf5"
     },
@@ -9495,12 +9900,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b9d8bf463b3ec887133ce8d1ae7e365e8b990e56c75631f6cd389bf7be9128bf"
     },
@@ -9566,13 +9974,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "160520f1281602326ab31f969a1b67cc92f0540a596fba34fc43dd33bc4544ed"
     },
@@ -9632,7 +10044,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "95334f0e062f15a0422183fd629924c07670be114b44cecbeb6ecccdbe4701f0"
     },
@@ -9692,7 +10105,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f72cb2e9e7e74c32fe4003df96c9416b1d8eea5ea8af21b64b8a277a88710b28"
     },
@@ -9752,7 +10166,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "dd7499dfd5ba4eda8aa61df6e51561b4540ffa912507f9424004b838d1928dee"
     },
@@ -9813,7 +10228,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b5942b39e84c557f72144a853efad567fbbf2dd96d4598d49417a6c7e65da27c"
     },
@@ -9881,12 +10297,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b2ce0d9e0c653a49d2747155548df9d8021ba813a5db49a1974dde94d7c14e35"
     },
@@ -9954,13 +10373,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "81e1ea0a3a18a8d60f28a6950cbdd7b748fc6958abc1afd7863d8c13c983ceee"
     },
@@ -10030,15 +10452,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "cbe0db298b4c9078154ab400a9ca23bc7fcbb4f788b5bd94cf436617bee7a566"
     },
@@ -10108,14 +10534,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "03c3bcdbfd7435382a64142f27e545502e03014115aa138339802ba61c3f211e"
     },
@@ -10183,12 +10613,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9c1e55e14a83b591f70a002a8a256cdeccaa710c74bd9a6dc84bc3f55e292d85"
     },
@@ -10256,13 +10689,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "cec4ae02da39d97536ea81284ae24a9646762e85f7675a4910c95a69e58fdd9a"
     },
@@ -10332,15 +10768,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "93a14daf18d64b751c9449be4defb6dc38ac3cadf82a83333f9242252139c56c"
     },
@@ -10410,14 +10850,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "7110f58f74d2db3e780e68516d2a79f35feb02703a2b7753db1385f35d6ed12c"
     },
@@ -10485,12 +10929,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4638e7641733674802c8fbd3a0642bba82d6d83820d0a7761a03ad990d15666a"
     },
@@ -10558,13 +11005,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "aa6b5c6f448bd015f1fc5b095c8ab3d5f561abb411b5cc4246f5b75d6d78d65b"
     },
@@ -10634,15 +11084,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f5d2134b52293a60cf41956482572f91ee3c991e34d194197cadfc476c088cc3"
     },
@@ -10712,14 +11166,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "0e3984ff065aa833998038130884bcbe70064dca151f5b76f30395c7c61cb567"
     },
@@ -10787,12 +11245,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "282717db35f1175232bb89a2c754285b822f5620340b00845ab00d61dce3faa0"
     },
@@ -10860,13 +11321,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "58a60714f588d827eef240f262fbc7126daa24f63e24a91d06fa15f0f13a438c"
     },
@@ -10936,15 +11400,19 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "726bb806483890bd2b82a0ea60a56252edb7bde8f8eb90cd740ed14daf827cf6"
     },
@@ -11014,14 +11482,18 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6bebfc5f84da118c274b787e0b8f575cf5d568414ed6d8a9445d8fc1b011baa2"
     },
@@ -11087,11 +11559,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ec26bf1a0248b3ce5fd2c120e364cedcf3ff688770a9b5f2a613aef6b3fc028e"
     },
@@ -11157,11 +11632,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "753c51c282c9ce01ec4982ce845f12a199e11a3bcfdd58bffb85c82106d77f15"
     },
@@ -11227,12 +11705,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c4c0fb36502dbb83d3c82687508e1fe98f8c07c0cd3ad6baaed38ba1a85286de"
     },
@@ -11300,13 +11781,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ec3465c125e94fde53bb7c185525ba02b7cbaedf3a40821759eaa73b2f0b10bf"
     },
@@ -11372,11 +11857,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "97ec04335bdc686a75bac866de9c04d52b7407e77fbb4ef7e605e0a4dcdff05c"
     },
@@ -11442,11 +11930,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "3e7e0e7f51903786fd7263ba7b9d10b0af80b31147db6e9d14070d600246dc40"
     },
@@ -11512,12 +12003,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "586c65396266c719c41455bf111d4859f9605434413eecafa94407e5d7f984cf"
     },
@@ -11585,13 +12079,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b66c84e9bbb657de145018766726637524dae9dc84c6b608c2d40edef385a8de"
     },
@@ -11657,11 +12155,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "065df64d002b7d3f9a7689a7369ad3371f3c30c64b31b618f6ca0b5b0cbb30eb"
     },
@@ -11727,11 +12228,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1289f7453f279e34d9d4b28246a2b8cf45a6e825bd8b1b9d02f6f60155660b8a"
     },
@@ -11797,12 +12301,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
-        "chair_mutual",
+        "mutual_manual_seated",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c1bc7dcca724749282e9dffa2658735cfebcc6cf2d9b10dd93d55e63398f6571"
     },
@@ -11870,13 +12377,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
-        "chair_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
+        "mutual_manual_seated",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "58f755503783dea949c57f9141d7496ecc7a8707ea969215fe646915b4dd23f4"
     },
@@ -11937,7 +12448,8 @@
         "cunnilingus_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "81259182a9004c660dcc7290891ed20d1f5a538b8cb74e3273a8f0c4a2f3ec4c"
     },
@@ -11998,7 +12510,8 @@
         "cunnilingus_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "60dce705f4df94d5a4ce9b01060cde5b591d6125f23ebd31d432a4fda4d608e4"
     },
@@ -12059,7 +12572,8 @@
         "cunnilingus_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "74592335ae438ae777c68aa55d3303c869daeeae9532e0ea7abbd33879cc6276"
     },
@@ -12121,7 +12635,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "580a7e20b9781a99c7793cd2f7c55d79801648bc90de15a253d79f6924de101f"
     },
@@ -12180,7 +12695,8 @@
         "manual_clitoral_giving",
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b6b603cc7135c9585f081a302d0f50fae9df25ff755cdf7a3ff0e144ab3a3f88"
     },
@@ -12238,7 +12754,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "18a33a9bea0b5a8fb32b5f5f1340721eda981d7e58ee17b5acd266d551c16865"
     },
@@ -12296,7 +12813,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "47992eab661fc92c62ddaf21bd6ad865df51c598c46121fcb84b56e86e619082"
     },
@@ -12354,7 +12872,8 @@
       "compatible_activity_ids": [
         "breast_licking",
         "nipple_manual",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "651097780d7e67d46f3b06c3f9f867a76beba789d25ac1c732fa0b2d3919253b"
     },
@@ -12418,12 +12937,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "033a136eb3ee569f0ee1ebc56306e46fe6dfbcfd2e34709939b5340170366de7"
     },
@@ -12485,11 +13008,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "7412cb9be33c529ea854d2ac1d308e360c6c395dfa88ad3fc68f6ebe66bb1868"
     },
@@ -12551,11 +13077,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f29fb62eb679b2846cb5f5ff178a241624d3e04f273d95dbc174a99207db9739"
     },
@@ -12617,11 +13146,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6943c78cc881542956489f008c91dfe20e412d60a234392ac8bf05953d0367d3"
     },
@@ -12685,12 +13217,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "afbcc0cd6b0967a6b4dc5318f025fb480ec9abb96e13a195a6d747f7a3ff22cb"
     },
@@ -12752,11 +13288,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ed831161dcea9a3f8aabd8b3578c5b25a977a5d693314e22dbbc1c3921e29f3f"
     },
@@ -12818,11 +13357,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f8ad237c40ed344de2f3359fac89b9ca298037bedfa54bf561c04bfcf2882e51"
     },
@@ -12884,11 +13426,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "640d97022ad3792a498a9857fc9fa357714c669256dd1d61f4ef73fa056e4598"
     },
@@ -12952,12 +13497,16 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4b3e23543ee1513755774f80438efdbc7f16cbfb61a9f6e2d4c437e2ca3b1511"
     },
@@ -13019,11 +13568,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e5af970b02d6d95e27a246c58c99f976393c7147fd722dc03d202328e620095e"
     },
@@ -13085,11 +13637,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "67548c784f34d8a4d20b4a1b4f23b08d3c6ddb648d78719ad0f6e67bf40cef92"
     },
@@ -13151,11 +13706,14 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9d2a59795644f34f7a4adb9cad6a20498622b1c3b3c6fbdfe1f8b4d78e2d21bf"
     },
@@ -13211,7 +13769,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "24560ee20becf51238a210e69fcabea75c0f5a65540442d8173ee112e7aaf9ef"
     },
@@ -13267,7 +13826,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "df2ee4af1b37593904ab197d1687299564f004a33c129ec0f43dc41b8ab81344"
     },
@@ -13323,7 +13883,8 @@
       ],
       "compatible_activity_ids": [
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "4d3adf0c4df11373aa5343fc6ab3736d6998423797e8cc281f5b0bf49f12cf5c"
     },
@@ -13380,7 +13941,8 @@
       "compatible_activity_ids": [
         "manual_clitoral_giving",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "c5aa587493d050ded19c268c32b5fb037c11955c219b4f8241074803ab2d0049"
     },
@@ -13441,11 +14003,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "bca0e7365ac998099a271d0240ecdeceab8a33a6bb774488cbf97868b7af3a35"
     },
@@ -13506,12 +14071,15 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "d3f89ac02795e7dac54587c78ef5e92f6120231d093f6e5791ac253cc9864bfe"
     },
@@ -13572,11 +14140,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "ef80bc295dd19ed1f1589397040d8cd0575a414c8b414c8c94fb36268ed0322a"
     },
@@ -13639,13 +14210,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "9acda4f2cd1874e2ecdad6e3645e1e7e850cfa94830b7e5134b9a5eb596bbe0e"
     },
@@ -13706,11 +14281,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "d11c825ae42ad524dccff3e2d6e820b89cfd89edcc5fd6bc76ce66d1be53d023"
     },
@@ -13771,12 +14349,15 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "0af4a0d4f20655e0c70c1d697fc48ce9b5f221e11994393c048d500ff48c6455"
     },
@@ -13837,11 +14418,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "cf9244f59efbdd05bcf490f576d9d691bdb8c0a18caac8f68073ee1c4dbaf973"
     },
@@ -13904,13 +14488,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "c5120255faafe5181d3afd1a5a1171dab82fda386a4abddb403d161a7c5c6e3f"
     },
@@ -13971,11 +14559,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "c22fdd4a0e374277112cc80b1ad56be9020e4af916e9f7cde00b224711b02b6e"
     },
@@ -14036,12 +14627,15 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "fd7f4691b527cb955132b33f1767747addd9dd17045dce4e81bbe9dda8d57f9a"
     },
@@ -14102,11 +14696,14 @@
         "strap_on_anal_rear_entry",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "34a92bf1064e9b43ac19d80487d90ec92d95aec2d19182c2a6f06a3e83f0c9f3"
     },
@@ -14169,13 +14766,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "impact_over_furniture"
+        "impact_over_furniture",
+        "low_temp_wax_sensory"
       ],
       "signature": "ebddac58b5f08e118805ab4211e4820698e8f3a3912ea8c0d00f517b88f74f9d"
     },
@@ -14235,7 +14836,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "96dd3740a2a8d34e3768b943dd5152d519100d90dacb87f8d9f2fd1321e0073f"
     },
@@ -14295,7 +14897,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "568e76f54fde034fe340dadbf60c40e4a36ef4aa405a62923d9ab99c049b01ae"
     },
@@ -14355,7 +14958,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "4dae06dd58143999da690313c1ad753287363a38f72e83341bea0acc725ae91d"
     },
@@ -14416,7 +15020,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "5b0bc0ab48986256179ce44880bf2201f591d27d43f95d92ed9edf74dec93f54"
     },
@@ -14479,12 +15084,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "b0c3fcee44f72292da9f7ee0aa15426b3fc40c8961994fb8deb24c9ab604f65f"
     },
@@ -14547,12 +15155,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "7bbb8e6781a299446bfbb033c50155138e6c29599ee202b003f7d3f655d6a4cf"
     },
@@ -14615,12 +15226,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "83268f2debbd53b74e98836536a9789a3534b5c51bf1fdafea608c361696d3f1"
     },
@@ -14685,13 +15299,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "8eddb9211c3612b7e9e59cb31935455a1c4135086b8fbf3ca088d7ef1cc69f93"
     },
@@ -14754,12 +15372,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "54bd70cdd2272ace475afb154e818b564c91524ed4e8b65b25097dc34070ef7d"
     },
@@ -14822,12 +15443,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "2750fd57b6ad8f8808a27495d3225947b3909c4e9a8e7014cfae475a73b550d6"
     },
@@ -14890,12 +15514,15 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "de419803490147491e051eb97f62e6be78bf0a299d996ff0026323ebbeeca854"
     },
@@ -14960,13 +15587,17 @@
         "breast_licking",
         "nipple_manual",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "00eaff58e542ee55fb670d8a0886a7be392adb8c2f54c2e3e5773d3e866d3561"
     },
@@ -15026,7 +15657,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "1aa0986df436749ac2f817ddbd95e0c1a10bc4d856a3c00df7b5cdc8a6b5aa6f"
     },
@@ -15086,7 +15718,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "a6db3a6c2b7b6644764d78bfc7556f6232e9184981ddefdaf2c77b24b03cdf4f"
     },
@@ -15146,7 +15779,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "25ebe06d0237a381996aebf760f698939bb0bfa4e97cd530d3936b9db1d149d5"
     },
@@ -15207,7 +15841,8 @@
         "breast_licking",
         "nipple_manual",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "7f683a881aa81714f8cea127fd4d355404fcebe0d5a58760dc56c895f9007a88"
     },
@@ -15266,12 +15901,15 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "d2243a9bac98563d9e7ec1579bc624fca356f38b11f7055cd199412860290e75"
     },
@@ -15332,14 +15970,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "9870d01edbb10093e6b5f4facd44a7fd1f67c7814396dbdcd049a580648c3ff8"
     },
@@ -15398,13 +16040,16 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "b8ed46a54603c9dafc77682460560eb243d543d621c62135977892594f9dd19a"
     },
@@ -15465,14 +16110,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "959677681638c2b624a4ed49161c3bbf4efd474b35c5c8ebb5997819cf1035ed"
     },
@@ -15531,12 +16180,15 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "8ec76b7ff3ebe881ed79cb4f3fd9871fa01784177957e90051ec7f4e405cc426"
     },
@@ -15597,14 +16249,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "f971bfaa366df0cafc25c5aef093ce649743baee59ba888eb00594c161d26dec"
     },
@@ -15663,13 +16319,16 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "3ae4da2d8fae908d2fe20b6b11e1025bd1970c2b522b7f5e2da974e007e544ed"
     },
@@ -15730,14 +16389,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "fd1de95ef8a1db79adb78e936f1d330876dc2141dc598e545e4f009e009486e3"
     },
@@ -15796,12 +16459,15 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "ba460f496b6f9308fe3d9975e6ceddddff340a3cda8888557cf9eead25ca167f"
     },
@@ -15862,14 +16528,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "e818639b086c4e4cf223e9693867b441166488b653467ef1ce74c2d3e7dda100"
     },
@@ -15928,13 +16598,16 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "aeb4e21165bb276bcd7a6ba942fa2ff4f384ed0b0a54c10106af5efaa1e84233"
     },
@@ -15995,14 +16668,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "ae97a0c9d335dfaa1bd9c32daa12afd43eee90e083910c7dd09f5ef2b1d8012e"
     },
@@ -16061,12 +16738,15 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "e264d428ec319a58ea4f73fc4df70b4128a26f8f56b8f6cbcc04684d9a3e3824"
     },
@@ -16127,14 +16807,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "9fc0e1aa5669b2393d373586b3bb9f54a349a1d996c69059cdc10041d47e4e04"
     },
@@ -16193,13 +16877,16 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "e364a7d16def9446a606c21729cf60901eba01b08636f8ccd4665e15dc3c173c"
     },
@@ -16260,14 +16947,18 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "spreader_bar_manual",
         "blindfold_sensory",
         "collar_guided_kneeling",
-        "rope_harness_partial_suspension"
+        "rope_harness_partial_suspension",
+        "low_temp_wax_sensory"
       ],
       "signature": "52592797935e86c6080787ee5d1f09a05a70684064ab3f633fd964e0233e40e8"
     },
@@ -16328,7 +17019,10 @@
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
         "tribadism",
-        "ankle_bondage_strap_on"
+        "toy_vaginal",
+        "toy_anal",
+        "ankle_bondage_strap_on",
+        "low_temp_wax_sensory"
       ],
       "signature": "1a5588dc41c5e10b5adf1ac406bc1c364e3afd2b50c652968591c62a09e28bbf"
     },
@@ -16497,12 +17191,7 @@
           ]
         }
       ],
-      "compatible_activity_ids": [
-        "strap_on_vaginal_face_to_face",
-        "strap_on_vaginal_lifted",
-        "tribadism",
-        "ankle_bondage_strap_on"
-      ],
+      "compatible_activity_ids": [],
       "signature": "f07e40b2502c9217c78c7e49013b2381e040e106e336ae195c5f09e22a33d8db"
     },
     {
@@ -17006,12 +17695,7 @@
           ]
         }
       ],
-      "compatible_activity_ids": [
-        "strap_on_vaginal_face_to_face",
-        "strap_on_vaginal_lifted",
-        "tribadism",
-        "ankle_bondage_strap_on"
-      ],
+      "compatible_activity_ids": [],
       "signature": "a9efc6c21987ff6c44b07404286bda722dfcb3dbd3e09ce12d4c4f1d01fbf388"
     },
     {
@@ -17183,7 +17867,11 @@
         "strap_on_vaginal_face_to_face",
         "strap_on_vaginal_lifted",
         "tribadism",
-        "ankle_bondage_strap_on"
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
+        "ankle_bondage_strap_on",
+        "low_temp_wax_sensory"
       ],
       "signature": "4000e622f2451efc364396e68d5d44ba75c15ef03db91e0519f1be388b792524"
     },
@@ -17246,12 +17934,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4d6400f045f66aaa5eefe0391b106a4cbb94a59874e79c45304764be0b4ab6eb"
     },
@@ -17312,11 +18004,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ef6fc824ea06d0ac057a7a68dbdbc9ce44e7dae7b96cb0e3c0ff20726b3d2f73"
     },
@@ -17377,10 +18072,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1721bea213156677d234e12c49c536d090f8d240d0c5b8b086e850aa31aa00cf"
     },
@@ -17441,10 +18139,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "3eb21dd1c20a4c3bc16a2848014f5eb6ba2bdaec7190b77409eec6c54592a3c0"
     },
@@ -17507,12 +18208,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "15babd2b9a4a5a482a290fe7b500c639ac9800a3902e6c3225925625d63d416b"
     },
@@ -17573,11 +18278,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "eac647210c5632917fdef69106a7791583c1ae1615f28e389319b400460ec77b"
     },
@@ -17638,10 +18346,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "78725ef77630bdb0f3facd6bd22c27d2c7864f35df126355d8cc00114d1a8dd6"
     },
@@ -17702,10 +18413,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6fdaaa6b51cd603d98a204fd77c981c9bc181a527dfbfc13e17722eb72b6fad0"
     },
@@ -17768,12 +18482,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f8627f7b17b5d20fe87d6a433c2c91127f671fa7226b56bc0d5427e6939760fe"
     },
@@ -17834,11 +18552,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ed35015ee6c4b7dc8d51ba0b427217797d260fcea176a6c26d6a9cc11205b038"
     },
@@ -17899,10 +18620,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c4ca4b1c9b4cff3b9fab80bb26b8294641a60cc771824110b8652edd7aafad60"
     },
@@ -17963,10 +18687,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1ed3693b80014cc982fdb645d82cd761b00dfa2cb058f57a212181e9e3223eaf"
     },
@@ -18029,12 +18756,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e151c5440cc03bcd210ebc3c3a7c8681cdb09ed0f0054a46a03c0ef2dfccb73d"
     },
@@ -18095,11 +18826,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c61c13cf01d4ffa0dc43a93229385ba7b44c0f2b81b30b4e6093b1cf90395bbd"
     },
@@ -18160,10 +18894,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9808b29901d93dde62797014c2eda7e3cfd54a0a438d54960544fe4fb094bbf2"
     },
@@ -18224,10 +18961,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a9274a36d82aefa4d223187a6feef228e78ca5e51d0c0da1cabf09c179fed6fc"
     },
@@ -18292,12 +19032,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "698f431687a489598fd86bec96e0031bdf53a376ca2be3ab84333c5fcca22554"
     },
@@ -18360,10 +19104,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b20ecc1cb300ce52edc52e65e075be2d1634384dc0b8f109b527ba03913d4390"
     },
@@ -18428,12 +19175,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a15d666580ede74deb758521118f02adba24601546c9398dbd74eb6ffb9c3bc0"
     },
@@ -18496,11 +19247,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "5c23958f50fa92239fc683cf772334ae0d43cef310b823a9aa3ea73e868c30fc"
     },
@@ -18565,12 +19319,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b4580443d058340e29fd7e66374a1580f3012178eabb0d893ace17036d3a7cb6"
     },
@@ -18633,10 +19391,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "19f0064a98b1f154c1e00f93d3f79b912e73ef01b0e01d1218ca25acf50c47ad"
     },
@@ -18701,12 +19462,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "39c37c999dfccaaed4cae9e8b92a8adede822c8f3cbfd05adfb597b58213e025"
     },
@@ -18769,11 +19534,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b675b52c0ea479d625908aa11f0250a35b902145049c363c3d1b8005321cd780"
     },
@@ -18838,12 +19606,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "799a57eed807c72c88f1cafaf008a169892bf8864765a756410f62e6dcd5dfd6"
     },
@@ -18906,10 +19678,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "92e085f0ecb50b48e84c32c383c874a144878cf654647d2fd84c119fe875d84e"
     },
@@ -18974,12 +19749,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9d648923985b62fabae8e11720251053c65d7765d2cb17a725fe2bc68f3a7ff2"
     },
@@ -19042,11 +19821,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "61a64ea564d621c3613a7e867f1ef717c9b5bcc5b2c24b9099dd44004ec2d073"
     },
@@ -19111,12 +19893,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "d1f77297d1fd7864c402691fa3d82e5ea37b0f82a3b2f187dbdfdf1bc37f4800"
     },
@@ -19179,10 +19965,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2866b0b8be3b6108f029e8e6e29710878065855d53f735fe1ffe2ac871d14a0a"
     },
@@ -19247,12 +20036,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "980ad17483ca0b2d22561d5452ea8de6c65a00e37b826ddaf533b7d891c92609"
     },
@@ -19315,11 +20108,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "69983b7b968275ac4ff1264c1ac041436f4f96a4d679bdcbf1a20e4b1f1a44a9"
     },
@@ -19382,10 +20178,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b233c35d816dfe4add0fdf679509a7b1afcfb95145168dcb52c6f8d23a428f41"
     },
@@ -19448,10 +20247,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "fa6f321197ad23f8e5d651e5c32b5bda1ed64b6406d16646be81f0fc43157ac0"
     },
@@ -19516,12 +20318,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "131c280af829b2bfe14de6721c3278801da90c41852968cdd03af49f9ab680a6"
     },
@@ -19584,10 +20390,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "dc4f45f0b30c9a1661a691585ab15f1fc532e382e183ec70e20859425305c936"
     },
@@ -19650,10 +20459,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "46d4d8ec26b625ccdaa6ec1cdf7d5eb29d33ee8ef5fe71b37af4ddae1364a29a"
     },
@@ -19716,10 +20528,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "299b52c811dde2722838e1dfeac7603d11f9acbd62643e3807e80cdd96f07c7b"
     },
@@ -19784,12 +20599,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "87d4a47a292ac4e339b351da8a3dce9e04d6b5e178656511813631b882144425"
     },
@@ -19852,10 +20671,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1012ab31201c58dbc4b26e8524c665a45071e16c7bfba0227e028b07cc0d891b"
     },
@@ -19918,10 +20740,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "878a8dbd6b467883bc3b1c184214dedc6b438171716761e85c49f42fd46a8dc1"
     },
@@ -19984,10 +20809,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a173ddbb94f1791f4bd826c925f7c5294369f4eae6fe97bda2cc0dc8f321852b"
     },
@@ -20052,12 +20880,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "313447ddab41ff1f2a3f488afdd1e50ec044e6fadf7dddbb989ff943941647dd"
     },
@@ -20120,10 +20952,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "7912e30015bce167b10c40d0caa9dc60754390d41bb3a06ecc3b6cc0d1a76a01"
     },
@@ -20186,10 +21021,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9ec5c8d61a77c6ca85dd8e6e1249bbdd2f7c73281608d53fab51f007b91656e4"
     },
@@ -20252,10 +21090,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "534606571671cd7ffb41abdbccf919d610450636195b0819cd55aeacbe8ec7da"
     },
@@ -20320,12 +21161,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b16e8f09d7e0dba7318e0f3d911a763f59e4ba6262271559fc5d995a213f71ce"
     },
@@ -20388,10 +21233,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "fbc44c1743a1db72b73987a18e50a190af023f52c86ccbef185a8d62f9f6a1ab"
     },
@@ -20453,11 +21301,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "271a65144629f236a45bfd1bd9c7d824fb551a9eb8a8c8d4099bb6ccbf30b254"
     },
@@ -20521,12 +21372,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a04e796e3860d59cc13638666172ec772bfc79ead5674f7db06961e4a4e50632"
     },
@@ -20590,12 +21445,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "20492fd0a23d2fd0531071a3223fc6bf009bc18c4f0ce520a6336cfe21b01d39"
     },
@@ -20659,13 +21518,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "47813dbde25f48e1424657b595bf66839ae12a8eaa2b507ae2a4a570aba5e549"
     },
@@ -20727,11 +21590,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "01d5630f6d542ff23a7a06de5258dd158b33bb18f5a6b06ba921f7ee89e8e398"
     },
@@ -20795,12 +21661,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "52bb7a610da80d37349d12f3d082f8379e438f4d331d1b4f5f28e5444c11f2e3"
     },
@@ -20864,12 +21734,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f2b6ac0490392b575f50cd000a49d2bb4913be768817290782d4c748511dab45"
     },
@@ -20933,13 +21807,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "eaa5039083f67c22048d5f15e40ca69d0aea9756ab654d4a794b72dd6f2ee050"
     },
@@ -21001,11 +21879,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "c56627c15c2a935abb889d41e433acf2e2af4913e81e0bce656183bec49aa5fe"
     },
@@ -21069,12 +21950,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "fddd637c56419922ce6795fc98c8e73a6ade07da96a001b7cc17a8c9d8d58be4"
     },
@@ -21138,12 +22023,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "8698e676fbb3201256c2a49a2a296b91ec57eb8cc56815a4547fb5815bb71b4b"
     },
@@ -21207,13 +22096,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6e607a06fa7a5d8d2899992d83767e5c5d3ce8e5fe11fa90d314d17d87a815c1"
     },
@@ -21275,11 +22168,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ede27b7e55c1e9d88f20b2bec207e0a346a92ef7c8cc26f193e850a238535b89"
     },
@@ -21343,12 +22239,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "8f6241299e64fc0dafafa20b7df7c035ac28ea6a07a1c67ee5ba426325f1cbed"
     },
@@ -21412,12 +22312,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "5af2cc3c0510bcc975a5d8bd1e818ae87114d6235f69dd8ad0776dc3d7c03489"
     },
@@ -21481,13 +22385,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2c95707d6a10898619d6e1c8d40b77a256df7c848b58482b9efc411bdcc6da95"
     },
@@ -21547,11 +22455,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "5f0b2767dfd8efcebaaeccac80c15f133c52f373c32f7080c9bc5eb75d19ff7d"
     },
@@ -21613,12 +22524,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e40c184dd5f2fae906796f49cc2fa1ba56f0fdae0a454236012bda8eaaf1150b"
     },
@@ -21678,11 +22593,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "de726896a4962f81db3c4c4a599dfff92f49122d5af45a1f7000413a635b8c98"
     },
@@ -21744,12 +22662,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e7214bed1574be094a4f6c78e19bdccfdce90ff39ad1aa5bb952f703c7d9cea2"
     },
@@ -21809,11 +22731,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9b80255238076e1a1285525bbc0e31a903b6a21ad8aecb1440dcc2892c763200"
     },
@@ -21875,12 +22800,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "38a31211ab9f6a508d75f2e94a5651ca3211ecbff733533e0c1b33f756a08de0"
     },
@@ -21940,11 +22869,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "88c24f12173b8748c6922fb86f57edc8d9f53e6d13741cc7f0fa8c2c8cf6ea00"
     },
@@ -22006,12 +22938,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b26b199a848ec142f2bed00729f281aa70848388aa834cb13142894fbc460394"
     },
@@ -22071,11 +23007,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9961009775e776733b2644fa8ac1549ca1d2d7dca74827a1926213fc99f4bf98"
     },
@@ -22137,12 +23076,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a6a0d485f3e1af2ce408880a867c34dde37e8447fbbe97af1748d748640eb1ee"
     },
@@ -22202,11 +23145,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b02cc4ab152ffa184b1ffb8c438f6e178ca64222fd439ca3c699035eff2c0a15"
     },
@@ -22268,12 +23214,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b7079790fabe0f1c22ff3bbf681f3383a6e92649bd52cdb64dc8135b571444dd"
     },
@@ -22333,11 +23283,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f5276e014b39e94747ba984e4b50a563e2875681b51fe734cf14d5d683beb44c"
     },
@@ -22399,12 +23352,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "16efb8bc814070a63bf18a7e896d18543b5d1c1ea019466e12099815c150b026"
     },
@@ -22464,11 +23421,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6b8f19a76e4e75dec4f27404c521599b7a58083e0143031578d21af0f6d6b5c1"
     },
@@ -22530,12 +23490,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "d9b50166b947b45ab9e560931a8f6d0314642ddf0c060dd6519127ab46897ef7"
     },
@@ -22596,10 +23560,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b3620287980ab3f57977a877338e85b6b8e443332109b342fa405de0848322b7"
     },
@@ -22660,11 +23627,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "fa3dc51f5a61b73d95c0adc115df3d0921ceb458989b0f3835e0712eaf20f202"
     },
@@ -22727,12 +23697,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f37c1e5bc0065805c0dfb3d12888680b6b3564f3e3e1de265bd99c3f2fa3a2fc"
     },
@@ -22793,11 +23767,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "323effc179b0416e7845084de3b855053bba09f336833465e540cf95b34385f5"
     },
@@ -22858,10 +23835,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "273a47e81bdf4ff789493304516b0d00d4073dc8b95ce087aabc382eb116013a"
     },
@@ -22922,11 +23902,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "dce4dad0fcfab7e1f0ced7ff0f679e4a5ceba1b3d779c7e88cbb9efd644268f4"
     },
@@ -22989,12 +23972,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1cc9d13539b5fd33531a251428f073b3b630067491ff3d4eef72cc8d3f07c021"
     },
@@ -23055,11 +24042,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "d4e7522ed8935876991f51b5f4082aebf0e25c69f9ff104429a0488fcf250ddf"
     },
@@ -23120,10 +24110,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "8d477788818fc12d8485a7741534fe9fd3876fc2f254914e7055e71244073967"
     },
@@ -23184,11 +24177,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e5f2ff77bcd36a7847981dd97105c191f179ca13d1cc5c985b7e1d1c5b72acf3"
     },
@@ -23251,12 +24247,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2d57e029f7bbddf7ce2ddc62d910e5942ce2f1c45547a08526ef5c23669738f4"
     },
@@ -23317,11 +24317,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a50682835d56069660551f45473ae7e3130c2144b841a27ed4d983b18d169679"
     },
@@ -23382,10 +24385,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ac98131bdd17d4864e7c89796796fd81775b8e9333419ac180759b62c2092fd9"
     },
@@ -23446,11 +24452,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "f07e788d158e2c0da956f8941a8565c7e2cea7dffb9a6aa9546bd5fe000d8828"
     },
@@ -23513,12 +24522,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "0890f409833162953b2e42b77c18d77986eb0fe484e259e0d42faf8176a49fb0"
     },
@@ -23579,11 +24592,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "23ffda5f7c057c00712babea291cfee5b1ca4fa9c73d1bcd009cbf1014307dfa"
     },
@@ -23647,12 +24663,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "189121a6ad9b6b07b61d0da30ed022ac437849a90c7ff9c64fc93dec38d678ce"
     },
@@ -23716,12 +24736,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a3e1630cfb7f41e354e0599fafcef4c09f1f2b47246e2492459e9ca55f7ec350"
     },
@@ -23785,12 +24809,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "097bf2a19fecf7aa99ef2629b16b44c073736766c27df9bce96a464fea626926"
     },
@@ -23854,13 +24882,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "3cf408cb4ede378ea9633ca5b1cc1156efb2b0cc7cd291e3aadb2435bcd30e69"
     },
@@ -23924,12 +24956,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4258f16f9e5cd89548778bb4b2957b7a9e6a23a5f989f1a3acd184d2b1e19f7e"
     },
@@ -23993,12 +25029,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a470507dea5c14fa933f404439dd1544cfb0df6fab83f8cdda7ae722f1228626"
     },
@@ -24062,12 +25102,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6a2948934255772492e435a1c2d57d201a6519675ad6426748ae465ad44ffb43"
     },
@@ -24131,13 +25175,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "43f216151123cf14746713e5596b981f7b204e3af41cab01c56b449031f34d20"
     },
@@ -24201,12 +25249,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "7c913adbd5e8449f6645cde578f62d33e2a800be7aa2385ff35bb81109450de7"
     },
@@ -24270,12 +25322,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "a04d8a3f9c37f823ac12a627477854b9770250bcaef0761979e9bedbd7afed7c"
     },
@@ -24339,12 +25395,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "16734e9fa013154a9fe7fac1cd4a0a9aba4e35d258000fb038896125c1f770f7"
     },
@@ -24408,13 +25468,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "d769f61a19a9a9c3d8ae4366c1ef33483460e4750d5248fa161f2947b77984a2"
     },
@@ -24478,12 +25542,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "5d7e0fbec65fe1edadb1bf1cb56e9212f030cdcc9a6692893985aeb3b0f61cbf"
     },
@@ -24547,12 +25615,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b96a354978b90f07905a2d0f2acec4a2f02e1ffb201750333283e5980e1140aa"
     },
@@ -24616,12 +25688,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "26ce3c8119b1ec8fad6705dcf6c837badd817be66fc43b573bd678379106d069"
     },
@@ -24685,13 +25761,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "141afb8a08e55e830d87fb232615f6bb5331d959128cbe8918dbad924b1f0811"
     },
@@ -24754,12 +25834,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9dd286518640ffcf0404208b9951ae57fe8539f72dd239bf4a41dba76cb63d7f"
     },
@@ -24820,10 +25904,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "d3fc57a548c56def192636ea4ef3aa460c7ad22883453b64c559eedddee24aaa"
     },
@@ -24884,11 +25971,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "704773a92872f25d937cc7b05c7a03a6c79988f723da151e7dd584642badd08c"
     },
@@ -24949,10 +26039,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "0db3e5f1a540cf7f4ddfe24237cda21f07d5e8e04459db504d44778c903719b9"
     },
@@ -25015,12 +26108,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "8f440c5c679e8382b6fb69459a982f2937d94266ba6f92faf032710a065f7bc1"
     },
@@ -25081,10 +26178,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6ac2055b712234d942f12098382384983d11b5b0a469fc4c1e9764759bbf95c7"
     },
@@ -25145,11 +26245,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "22e85d64310beea7b15e1e91ac4288d23cf87758283a934dd351d9e57a1e26e4"
     },
@@ -25210,10 +26313,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ab821eeb4ed365d1e39ffba77b9ce68ab677811d094cd3904a6a4930c9810863"
     },
@@ -25276,12 +26382,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "fd40913f1e78477ffacd2946ae93b9f46ce9c4be52d547e5865558f4e9b56886"
     },
@@ -25342,10 +26452,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "9525f9ea7ab34f6ccac9a483d0a8d5b6e79e2e8b2efc85d228bca878d28443d0"
     },
@@ -25406,11 +26519,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4f6cc84d607559262b42d0b406ffbc89d82a394b9e9a7f66bb81fbe7614dc4a9"
     },
@@ -25471,10 +26587,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "4625435705c62074217830abb8f4ff49c4e9463c502fee9320f648f7a247c7b2"
     },
@@ -25537,12 +26656,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ccac795576505afc3b64865f38c1360a7e8957382450fedee609225c04662a36"
     },
@@ -25603,10 +26726,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ba14c91b7e0fb31b97e8b1f687298f1df8b41dcae454999b0b7c4e60988ae344"
     },
@@ -25667,11 +26793,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "bf072be092d237b768ea10c3b2aa4c2a75ce8a1f213ac4433eb1f1668949eb79"
     },
@@ -25732,10 +26861,13 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e46d97fe4200a3e9cc3c3aee52a8eaa97d7fdb246e1dba816af09f9ba364cf6b"
     },
@@ -25799,12 +26931,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "7abbf883b80403664187ccc38dcb1914fa579526c2b2d0341da9f0123790bfae"
     },
@@ -25866,11 +27002,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ae28204f25b5905f63f033175882126d5dc317b0292f604b9175cdc04933ec7b"
     },
@@ -25934,12 +27073,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2849ff7225b712cf53ead6e1c356dfdc4b1e15efb1c9bb6ff5cb01f45ed3cc5e"
     },
@@ -26003,13 +27146,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "b9d8fb541a5ee6b2ed051765570397af19c5e30f29e97e40ffc8553eb8181db7"
     },
@@ -26073,12 +27220,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6fef4299dc0097630e07e633a6aff86047943458b00a833517ad9386f043db0e"
     },
@@ -26140,11 +27291,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1cfa44624d45c4ec97b38fd624d6767686c8edae3677b52c54d5058dca045bb7"
     },
@@ -26208,12 +27362,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "396e6115406e8a08931e1d71d858b9a3f73296aefe81aae3ea0041f8b19a23a3"
     },
@@ -26277,13 +27435,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "1f3f29dc06baecbc97ae48670ff6c66c8d60b6674c11683be486581baecc3648"
     },
@@ -26347,12 +27509,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "57cdda80aecf6ffef7abb2a5d3abe0bf4f11fedfc5baef5dd2b4369acb578452"
     },
@@ -26414,11 +27580,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "e63e9b1ea93967538222921569d07c291ac17d58b7603dd029cfbf8d9464d8d6"
     },
@@ -26482,12 +27651,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "871e8995b6dabdec88507bacd6654e6e973e02061df341e654abcd4288af4b7f"
     },
@@ -26551,13 +27724,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "6fd794cba4a57081e52815350f2d8f08a85ec803a049e21f13d5a6d3f0d5f163"
     },
@@ -26621,12 +27798,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "57ceebc641539d489b2650ee4acb1a2215c82f87b69d09f1bb12b74f82d042b6"
     },
@@ -26688,11 +27869,14 @@
         "strap_on_vaginal_face_to_face",
         "manual_clitoral_receiving",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
         "edging_manual",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "ec4fff9b512f21461058dfbfd7bfa80bcf1d9d306eb640d262c724251a2dc313"
     },
@@ -26756,12 +27940,16 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "67eeb49407b00ef77f304356deeb1f514467d6f49181e59fa459bb5826b412bb"
     },
@@ -26825,13 +28013,17 @@
         "manual_clitoral_giving",
         "mutual_masturbation",
         "tribadism",
+        "toy_vaginal",
+        "toy_anal",
+        "dual_toy",
         "edging_manual",
-        "mirror_mutual",
-        "shower_mutual",
+        "mutual_manual_side_by_side",
+        "mutual_manual_face_to_face",
         "wrist_bondage_oral",
         "ankle_bondage_strap_on",
         "blindfold_sensory",
-        "collar_guided_kneeling"
+        "collar_guided_kneeling",
+        "low_temp_wax_sensory"
       ],
       "signature": "2e0d4438f3ed1a27fbc61f5c9c164ec328b728a034339449ae5c0c31a8adc13c"
     }

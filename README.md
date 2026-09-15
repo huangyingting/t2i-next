@@ -192,8 +192,10 @@ uv run python -m t2i_spatial_pipeline generate \
 ```
 
 `--female-count` 和 `--male-count` 与 story 流水线采用相同的人数参数形式。
-当前 catalog 支持 `1女0男`、`1女1男`、`1女2男`、`2女0男` 和 `3女0男`。
-其他组合会在调用模型前明确报错。相同主题和 seed 会复用内容寻址的 Creative
+当前生成器支持 catalog 中全部 `1女0男`、`1女1男`、`1女2男`、`2女0男` 和
+`3女0男` cast，以及每类全部32种 activity 和24个姿势族。完整支持集合与符号
+验证元数据集中定义在 `src/t2i_spatial_pipeline/safety.py`。
+相同主题和 seed 会复用内容寻址的 Creative
 Blueprint 缓存；场景数量不同时会使用不同缓存。使用
 `--refresh-blueprint` 可以强制重新推导。
 
@@ -219,13 +221,21 @@ uv run t2i-spatial audit \
   --runs-dir runs/spatial
 ```
 
-审核会穷举检查五套 catalog 中所有保留的 pose/activity 拓扑，再对每种人数配置
+审核会穷举检查五套 catalog 中所有保留的 pose/activity 拓扑，再对全部五种 cast
 运行连续随机种子的20场分配压力测试，并编译、复核每条抽样几何 Prompt。进度在
 每个 seed 完成后原子保存到
 `runs/spatial/audit-progress.json`；命令中断后使用相同参数再次执行即可从下一个
-未完成 seed 继续。checkpoint 同时绑定 catalog 内容、拓扑规则、Prompt 审核规则
-和分配算法版本；参数、规则或 catalog 改变时会拒绝误续跑，此时显式传入
+未完成 seed 继续。checkpoint 同时绑定 catalog 内容、拓扑规则、Prompt 审核规则、
+分配算法版本和显式安全策略版本；参数、规则或 catalog 改变时会拒绝误续跑，
+此时显式传入
 `--restart` 开始新的审核。
+
+Spatial 的 `passed: true` 只表示 schema、catalog、接触端点、支撑和 Prompt
+一致性通过本地符号审核。输出中的 `validation_status` 固定为 `symbolic_only`，
+`visual_validation` 固定为 `false`，且 `requires_render_review` 为 `true`。
+它不证明真实图片人数、脸、躯干、手脚或接触方向正确。全部 activity 和姿势族
+虽然都可生成，但复杂构图仍必须实际渲染并经过人工或图像姿态检测；不得把本地
+audit 结果当作视觉验收。
 
 这个工具把文生图内容分成共享 Foundation 和两层具体画面事实：
 

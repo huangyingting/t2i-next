@@ -65,7 +65,7 @@ class HandheldProp(StrictModel):
     controller_role: RoleCode
     category: Annotated[
         str,
-        StringConstraints(pattern=r"^(vibrator|insertable_toy)$"),
+        StringConstraints(pattern=r"^(vibrator|insertable_toy|surface_tool)$"),
     ]
     grip_region: Annotated[str, StringConstraints(pattern=r"^right_hand$")]
     deployment: Annotated[
@@ -75,7 +75,10 @@ class HandheldProp(StrictModel):
     orientation: Annotated[
         str,
         StringConstraints(
-            pattern=(r"^(transverse_over_clitoral_surface|aligned_to_target_canal)$")
+            pattern=(
+                r"^(transverse_over_clitoral_surface|aligned_to_target_canal|"
+                r"aligned_to_target_surface)$"
+            )
         ),
     ]
 
@@ -147,18 +150,14 @@ class ActivityTemplate(StrictModel):
                 raise ValueError(
                     "insertable handheld prop must align with a target canal"
                 )
-        if self.activity_id == "vibrator_clitoral":
-            if len(self.handheld_props) != 1:
+            if prop.category == "surface_tool" and (
+                edge.state != "external_contact"
+                or prop.deployment != "external_surface_contact"
+                or prop.orientation != "aligned_to_target_surface"
+            ):
                 raise ValueError(
-                    "vibrator_clitoral requires one controlled handheld prop"
+                    "handheld surface tool must align with an external target"
                 )
-        elif self.activity_id == "double_toy_vaginal_anal":
-            if len(self.handheld_props) != 2:
-                raise ValueError(
-                    "double_toy_vaginal_anal requires two controlled handheld props"
-                )
-        elif self.handheld_props:
-            raise ValueError("activity does not support handheld prop topology")
         has_strap_on_tag = has_tag(self.activity_id, "strap_on")
         if (has_strap_on_tag and len(self.wearable_props) != 1) or (
             not has_strap_on_tag and self.wearable_props
@@ -239,7 +238,7 @@ class PoseEntry(StrictModel):
 
 
 class PoseCatalog(StrictModel):
-    schema_version: Annotated[str, StringConstraints(pattern=r"^4\.0$")]
+    schema_version: Annotated[str, StringConstraints(pattern=r"^5\.0$")]
     cast_key: Identifier
     cast_roles: list[RoleCode] = Field(min_length=1, max_length=8)
     activities: list[ActivityTemplate] = Field(min_length=32, max_length=32)
@@ -766,9 +765,9 @@ PAIR_WM_ACTIVITIES = (
     "toy_anal",
     "dual_toy",
     "edging_manual",
-    "mirror_mutual",
-    "shower_mutual",
-    "chair_mutual",
+    "mutual_manual_side_by_side",
+    "mutual_manual_face_to_face",
+    "mutual_manual_seated",
     "wrist_bondage_oral",
     "ankle_bondage_penetration",
     "spreader_bar_manual",
@@ -801,9 +800,9 @@ PAIR_WW_ACTIVITIES = (
     "toy_anal",
     "dual_toy",
     "edging_manual",
-    "mirror_mutual",
-    "shower_mutual",
-    "chair_mutual",
+    "mutual_manual_side_by_side",
+    "mutual_manual_face_to_face",
+    "mutual_manual_seated",
     "wrist_bondage_oral",
     "ankle_bondage_strap_on",
     "spreader_bar_manual",
@@ -1110,7 +1109,7 @@ def contact_specs(
                 edge(
                     "primary",
                     "prop_a",
-                    "vibrator_surface",
+                    "contact_surface",
                     "central",
                     "clitoris",
                     "external_contact",
@@ -1213,8 +1212,8 @@ def contact_specs(
             ]
         if activity_id == "mutual_masturbation" or has_tag(
             activity_id,
-            "mirror_mutual",
-            "shower_mutual",
+            "mutual_manual_side_by_side",
+            "mutual_manual_face_to_face",
         ):
             return [
                 edge(
@@ -1784,40 +1783,55 @@ def wearable_props(cast_key: str, activity_id: str) -> list[WearableProp]:
 
 
 def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
-    if activity_id == "double_toy_vaginal_anal":
-        if cast_key != "three_women":
-            raise ValueError(
-                f"{activity_id} requires two unambiguous controllers in {cast_key}"
+    wearable_ids = {"prop_a"} if has_tag(activity_id, "strap_on") else set()
+    prop_specs = []
+    for spec in contact_specs(cast_key, activity_id):
+        _, source_entity, _, _, target_region, state = spec
+        if (
+            source_entity.startswith("prop_")
+            and source_entity not in wearable_ids
+            and all(existing[0] != source_entity for existing in prop_specs)
+        ):
+            prop_specs.append((source_entity, target_region, state))
+    if not prop_specs:
+        return []
+
+    roles = list(CASTS[cast_key])
+    controller_roles = roles[1:] + roles[:1]
+    props = []
+    for index, (prop_id, target_region, state) in enumerate(prop_specs):
+        if state == "inserted":
+            category = "insertable_toy"
+            deployment = "inserted"
+            orientation = "aligned_to_target_canal"
+        elif (
+            target_region == "clitoris"
+            and has_tag(
+                activity_id,
+                "vibrator",
+                "wand",
+                "suction",
+                "remote",
             )
-        return [
+        ):
+            category = "vibrator"
+            deployment = "external_surface_contact"
+            orientation = "transverse_over_clitoral_surface"
+        else:
+            category = "surface_tool"
+            deployment = "external_surface_contact"
+            orientation = "aligned_to_target_surface"
+        props.append(
             HandheldProp(
                 prop_id=prop_id,
-                controller_role=controller_role,
-                category="insertable_toy",
+                controller_role=controller_roles[index % len(controller_roles)],
+                category=category,
                 grip_region="right_hand",
-                deployment="inserted",
-                orientation="aligned_to_target_canal",
+                deployment=deployment,
+                orientation=orientation,
             )
-            for prop_id, controller_role in zip(
-                ("prop_a", "prop_b"),
-                CASTS[cast_key][1:],
-                strict=True,
-            )
-        ]
-    if activity_id != "vibrator_clitoral":
-        return []
-    if cast_key != "one_woman":
-        raise ValueError(f"{activity_id} has no unambiguous controller in {cast_key}")
-    return [
-        HandheldProp(
-            prop_id="prop_a",
-            controller_role=CASTS[cast_key][0],
-            category="vibrator",
-            grip_region="right_hand",
-            deployment="external_surface_contact",
-            orientation="transverse_over_clitoral_surface",
         )
-    ]
+    return props
 
 
 def compatible_pose_families(activity_id: str) -> list[str]:
@@ -1828,8 +1842,6 @@ def compatible_pose_families(activity_id: str) -> list[str]:
         allowed = {"prone", "all_fours", "kneeling_forward"}
     elif activity_id == "fellatio":
         allowed = {
-            "side_lying_left",
-            "side_lying_right",
             "kneeling_upright",
             "seated_edge",
         }
@@ -2043,10 +2055,15 @@ def pose_activity_issues(
             for edge in activity.contact_edges
         ):
             issues.append("lift support conflicts with partner hand or mouth contact")
-        if pose.leg_configuration not in {"legs_wrapped", "thighs_supported"}:
-            issues.append("lifted leg configuration lacks a bilateral support chain")
-        if pose.arm_configuration not in {"arms_shoulders", "one_arm_partner"}:
-            issues.append("lifted arm configuration lacks a bilateral support chain")
+        supported_limb_pairs = {
+            ("legs_wrapped", "arms_shoulders"),
+            ("thighs_supported", "one_arm_partner"),
+        }
+        if (
+            pose.leg_configuration,
+            pose.arm_configuration,
+        ) not in supported_limb_pairs:
+            issues.append("lifted pose lacks a resolved bilateral limb chain")
 
     if activity.restraint is not None:
         restrained_regions = set(activity.restraint.body_regions)
@@ -2164,7 +2181,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
                 )
             )
     return PoseCatalog(
-        schema_version="4.0",
+        schema_version="5.0",
         cast_key=cast_key,
         cast_roles=roles,
         activities=activity_templates,
