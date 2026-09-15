@@ -199,7 +199,7 @@ uv run python -m t2i_spatial_pipeline generate \
 Blueprint 缓存；场景数量不同时会使用不同缓存。使用
 `--refresh-blueprint` 可以强制重新推导。
 
-五种 cast 的大批量生成使用 `bulk`。省略 `--seed` 时命令会先输出新的基础 seed；
+六种 cast 的大批量生成使用 `bulk`。省略 `--seed` 时命令会先输出新的基础 seed；
 每种 cast 共享一套 CreativeBlueprint，再通过独立空间 seed 分批编译，避免为
 每20条重复调用模型。每批完成后更新 `bulk-report.json`，使用相同 seed 和参数
 再次执行即可续跑。完成后每种 cast 发布一个聚合 TXT：
@@ -234,7 +234,7 @@ uv run t2i-spatial audit \
   --runs-dir runs/spatial
 ```
 
-审核会穷举检查五套 catalog 中所有保留的 pose/activity 拓扑，再对全部五种 cast
+审核会穷举检查六套 catalog 中所有保留的 pose/activity 拓扑，再对全部六种 cast
 运行连续随机种子的20场分配压力测试，并编译、复核每条抽样几何 Prompt。进度在
 每个 seed 完成后原子保存到
 `runs/spatial/audit-progress.json`；命令中断后使用相同参数再次执行即可从下一个

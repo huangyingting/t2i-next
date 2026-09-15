@@ -29,7 +29,12 @@ from t2i_spatial_pipeline.blueprint import (
     validate_output_concepts_with_pattern,
     validate_output_text,
 )
-from t2i_spatial_pipeline.catalog import CASTS, activity_ids, cast_key_for_counts
+from t2i_spatial_pipeline.catalog import (
+    CASTS,
+    activity_ids,
+    build_catalog,
+    cast_key_for_counts,
+)
 from t2i_spatial_pipeline.compiler import (
     SceneSpec,
     compile_geometry,
@@ -403,7 +408,10 @@ def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
     assert len({request.shot_scale for request in requests}) == 5
 
 
-@pytest.mark.parametrize("cast_key", ("one_woman_two_men", "three_women"))
+@pytest.mark.parametrize(
+    "cast_key",
+    ("one_woman_two_men", "two_women_one_man", "three_women"),
+)
 def test_group_casts_remain_available(cast_key: str) -> None:
     requests = build_scene_requests(cast_key, seed=42, count=20)
 
@@ -761,13 +769,13 @@ def test_scene_request_count_must_fit_catalog_capacity(count: int) -> None:
         build_scene_requests("one_woman_one_man", seed=42, count=count)
 
 
-def test_bulk_plan_covers_five_categories_with_shared_blueprints() -> None:
+def test_bulk_plan_covers_six_categories_with_shared_blueprints() -> None:
     plan = build_spatial_bulk_plan(12345, 600)
 
     assert BULK_BATCH_SIZE == 20
-    assert len(plan) == 150
-    assert len({batch.spatial_seed for batch in plan}) == 150
-    assert len({batch.blueprint_seed for batch in plan}) == 5
+    assert len(plan) == 180
+    assert len({batch.spatial_seed for batch in plan}) == 180
+    assert len({batch.blueprint_seed for batch in plan}) == 6
     for cast_key in CASTS:
         cast_batches = [batch for batch in plan if batch.cast_key == cast_key]
         assert len(cast_batches) == 30
@@ -792,6 +800,7 @@ def test_bulk_plan_supports_a_partial_final_batch() -> None:
         (1, 1, "one_woman_one_man"),
         (1, 2, "one_woman_two_men"),
         (2, 0, "two_women"),
+        (2, 1, "two_women_one_man"),
         (3, 0, "three_women"),
     ],
 )
@@ -805,7 +814,29 @@ def test_cast_key_is_resolved_from_people_counts(
 
 def test_unsupported_people_counts_are_rejected() -> None:
     with pytest.raises(ValueError, match="unsupported spatial cast counts"):
-        cast_key_for_counts(2, 1)
+        cast_key_for_counts(2, 2)
+
+
+def test_two_women_one_man_uses_sex_correct_group_endpoints() -> None:
+    activities = {
+        activity.activity_id: activity
+        for activity in build_catalog("two_women_one_man").activities
+    }
+    manual_edges = activities["central_manual_both_partners"].contact_edges
+    assert [
+        (edge.target.entity_id, edge.target.region)
+        for edge in manual_edges
+    ] == [("f2", "clitoris"), ("m1", "penis")]
+    oral_edges = activities["central_oral_one_manual_other"].contact_edges
+    assert (
+        oral_edges[0].target.entity_id,
+        oral_edges[0].target.region,
+        oral_edges[0].state,
+    ) == ("f2", "vulva", "external_contact")
+    assert (
+        oral_edges[1].target.entity_id,
+        oral_edges[1].target.region,
+    ) == ("m1", "penis")
 
 
 def test_presentation_output_requires_requested_scene_count() -> None:

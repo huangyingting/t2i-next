@@ -900,6 +900,7 @@ CASTS = {
     "one_woman_one_man": ("f1", "m1"),
     "one_woman_two_men": ("f1", "m1", "m2"),
     "two_women": ("f1", "f2"),
+    "two_women_one_man": ("f1", "f2", "m1"),
     "three_women": ("f1", "f2", "f3"),
 }
 CAST_KEYS_BY_COUNTS = {
@@ -907,6 +908,7 @@ CAST_KEYS_BY_COUNTS = {
     (1, 1): "one_woman_one_man",
     (1, 2): "one_woman_two_men",
     (2, 0): "two_women",
+    (2, 1): "two_women_one_man",
     (3, 0): "three_women",
 }
 
@@ -1414,10 +1416,12 @@ def contact_specs(
             )
         ]
 
-    partner_a_region = "penis" if cast_key == "one_woman_two_men" else "shaft"
-    partner_b_region = partner_a_region
-    source_a = "partner_a" if cast_key == "one_woman_two_men" else "prop_a"
-    source_b = "partner_b" if cast_key == "one_woman_two_men" else "prop_b"
+    partner_a_is_male = CASTS[cast_key][1].startswith("m")
+    partner_b_is_male = CASTS[cast_key][2].startswith("m")
+    partner_a_region = "penis" if partner_a_is_male else "shaft"
+    partner_b_region = "penis" if partner_b_is_male else "shaft"
+    source_a = "partner_a" if partner_a_is_male else "prop_a"
+    source_b = "partner_b" if partner_b_is_male else "prop_b"
     if has_tag(activity_id, "double") and has_tag(
         activity_id,
         "penetration",
@@ -1550,7 +1554,7 @@ def contact_specs(
             ),
         ]
     if has_tag(activity_id, "oral_one_manual_other"):
-        target_region = "penis" if cast_key == "one_woman_two_men" else "vulva"
+        target_region = "penis" if partner_a_is_male else "vulva"
         return [
             edge(
                 "primary",
@@ -1558,7 +1562,7 @@ def contact_specs(
                 "mouth",
                 "partner_a",
                 target_region,
-                "inserted" if cast_key == "one_woman_two_men" else "external_contact",
+                "inserted" if partner_a_is_male else "external_contact",
             ),
             edge(
                 "secondary",
@@ -1570,14 +1574,13 @@ def contact_specs(
             ),
         ]
     if has_tag(activity_id, "manual_both"):
-        target_region = "penis" if cast_key == "one_woman_two_men" else "clitoris"
         return [
             edge(
                 "primary",
                 "central",
                 "left_hand",
                 "partner_a",
-                target_region,
+                "penis" if partner_a_is_male else "clitoris",
                 "external_contact",
             ),
             edge(
@@ -1585,7 +1588,7 @@ def contact_specs(
                 "central",
                 "right_hand",
                 "partner_b",
-                target_region,
+                "penis" if partner_b_is_male else "clitoris",
                 "external_contact",
             ),
         ]
@@ -1763,7 +1766,7 @@ def make_contact_edges(
 def wearable_props(cast_key: str, activity_id: str) -> list[WearableProp]:
     if not has_tag(activity_id, "strap_on"):
         return []
-    if cast_key not in {"two_women", "three_women"}:
+    if cast_key not in {"two_women", "two_women_one_man", "three_women"}:
         raise ValueError(
             f"{activity_id} has no eligible wearable prop owner in {cast_key}"
         )
