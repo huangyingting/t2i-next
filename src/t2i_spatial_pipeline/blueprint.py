@@ -69,7 +69,7 @@ PROHIBITED_MINOR_CONCEPTS = re.compile(
 FORBIDDEN_CREATIVE_CONCEPTS = re.compile(
     r"\b(?:woman|man|person|people|crowd|attendant|guard|servant|"
     r"anatomy|pose|intercourse|fellatio|cunnilingus|masturbation|"
-    r"penis|vagina|vulva|anus|breast|clitoris|camera|lens|framing|viewpoint|"
+    r"penis|vagina|vulva|anus|breast|clitoris|camera|lens|viewpoint|"
     r"mirror|statue|mannequin|" + PROHIBITED_MINOR_PATTERN + r")\b",
     re.I,
 )
@@ -1303,6 +1303,153 @@ def maximum_location_assignment(
     return scene_matches
 
 
+def maximum_style_assignment(
+    blueprint: CreativeBlueprint,
+    required_supports: list[set[str]],
+    *,
+    reserved_location_scenes: set[int],
+    allow_reserved_fallback: bool = True,
+) -> dict[int, str]:
+    compatibility = {
+        recipe.style_id: [
+                scene_index
+                for scene_index, requirement in enumerate(required_supports)
+                if any(
+                    requirement.issubset(
+                        {
+                            realization.support
+                            for realization in location.support_realizations
+                        }
+                    )
+                    and set(location.mood_tags).intersection(
+                        recipe.compatible_moods
+                    )
+                    for location in blueprint.world.locations
+                )
+        ]
+        for recipe in blueprint.style.recipes
+    }
+
+    def match(
+        candidates_by_style: dict[str, list[int]],
+    ) -> dict[int, str]:
+        scene_matches: dict[int, str] = {}
+
+        def assign(style_id: str, visited_scenes: set[int]) -> bool:
+            for scene_index in candidates_by_style[style_id]:
+                if scene_index in visited_scenes:
+                    continue
+                visited_scenes.add(scene_index)
+                previous_style = scene_matches.get(scene_index)
+                if previous_style is None or assign(
+                    previous_style,
+                    visited_scenes,
+                ):
+                    scene_matches[scene_index] = style_id
+                    return True
+            return False
+
+        for style_id in candidates_by_style:
+            assign(style_id, set())
+        return scene_matches
+
+    unreserved_compatibility = {
+        style_id: [
+            scene_index
+            for scene_index in scene_indexes
+            if scene_index not in reserved_location_scenes
+        ]
+        for style_id, scene_indexes in compatibility.items()
+    }
+    unreserved_matches = match(unreserved_compatibility)
+    if (
+        len(unreserved_matches) == len(compatibility)
+        or not allow_reserved_fallback
+    ):
+        return unreserved_matches
+    return match(compatibility)
+
+
+def joint_diversity_assignment(
+    blueprint: CreativeBlueprint,
+    required_supports: list[set[str]],
+    *,
+    target: int = 6,
+) -> tuple[dict[int, str], dict[int, str]] | None:
+    style_candidates: dict[str, list[tuple[int, str]]] = {}
+    for recipe in blueprint.style.recipes:
+        candidates = []
+        for scene_index, requirement in enumerate(required_supports):
+            for location in blueprint.world.locations:
+                if not requirement.issubset(
+                    {
+                        realization.support
+                        for realization in location.support_realizations
+                    }
+                ):
+                    continue
+                if not set(location.mood_tags).intersection(
+                    recipe.compatible_moods
+                ):
+                    continue
+                candidates.append((scene_index, location.location_id))
+        style_candidates[recipe.style_id] = candidates
+
+    available_styles = [
+        style_id for style_id, candidates in style_candidates.items() if candidates
+    ]
+    assignment_target = min(
+        target,
+        len(available_styles),
+        len(blueprint.world.locations),
+        len(required_supports),
+    )
+    for style_subset in combinations(available_styles, assignment_target):
+        ordered_styles = sorted(
+            style_subset,
+            key=lambda style_id: len(style_candidates[style_id]),
+        )
+        assignments: dict[str, tuple[int, str]] = {}
+
+        def assign(
+            style_offset: int,
+            used_scenes: set[int],
+            used_locations: set[str],
+            ordered_style_ids: tuple[str, ...] = tuple(ordered_styles),
+            matched: dict[str, tuple[int, str]] = assignments,
+        ) -> bool:
+            if style_offset == len(ordered_style_ids):
+                return True
+            style_id = ordered_style_ids[style_offset]
+            for scene_index, location_id in style_candidates[style_id]:
+                if (
+                    scene_index in used_scenes
+                    or location_id in used_locations
+                ):
+                    continue
+                matched[style_id] = (scene_index, location_id)
+                if assign(
+                    style_offset + 1,
+                    used_scenes | {scene_index},
+                    used_locations | {location_id},
+                ):
+                    return True
+                matched.pop(style_id)
+            return False
+
+        if assign(0, set(), set()):
+            location_matches = {
+                scene_index: location_id
+                for scene_index, location_id in assignments.values()
+            }
+            style_matches = {
+                scene_index: style_id
+                for style_id, (scene_index, _) in assignments.items()
+            }
+            return location_matches, style_matches
+    return None
+
+
 def sample_scene_layer_inputs(
     blueprint: CreativeBlueprint,
     *,
@@ -1330,10 +1477,23 @@ def sample_scene_layer_inputs(
     used_setting_fingerprints: set[str] = set()
     used_presentation_fingerprints: set[str] = set()
     selected_by_index: dict[int, SceneLayerInputs] = {}
-    reserved_locations = maximum_location_assignment(
+    all_reserved_locations = maximum_location_assignment(
         blueprint,
         required_supports,
     )
+    joint_reservations = joint_diversity_assignment(
+        blueprint,
+        required_supports,
+    )
+    if joint_reservations is None:
+        reserved_locations = all_reserved_locations
+        reserved_styles = maximum_style_assignment(
+            blueprint,
+            required_supports,
+            reserved_location_scenes=set(reserved_locations),
+        )
+    else:
+        reserved_locations, reserved_styles = joint_reservations
     scene_order = sorted(
         range(count),
         key=lambda index: (
@@ -1368,6 +1528,12 @@ def sample_scene_layer_inputs(
                     )
                 )
                 score = (
+                    (
+                        2000
+                        if reserved_styles.get(index) == recipe.style_id
+                        else 0
+                    )
+                    +
                     (
                         1000
                         if reserved_locations.get(index) == location.location_id

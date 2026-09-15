@@ -302,6 +302,16 @@ def test_style_material_can_use_mirror_as_an_adjective() -> None:
     )
 
 
+def test_world_material_can_use_structural_framing() -> None:
+    class Output(BaseModel):
+        material: str
+
+    validate_forbidden_output_concepts(
+        Output(material="blackened steel framing"),
+        "world blueprint",
+    )
+
+
 def test_world_requires_sling_and_wall_in_one_location() -> None:
     def location(
         index: int,

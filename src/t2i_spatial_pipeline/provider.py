@@ -340,6 +340,7 @@ async def generate_with_repair(
     max_output_tokens: int,
     validation_context: dict[str, object] | None = None,
 ) -> tuple[ModelResponse, list[list[str]]]:
+    maximum_attempts = 5
     messages = [
         ChatMessage(role="system", content=system),
         ChatMessage(
@@ -348,7 +349,7 @@ async def generate_with_repair(
         ),
     ]
     rejected_issues: list[list[str]] = []
-    for attempt in range(3):
+    for attempt in range(maximum_attempts):
         try:
             response = await model.generate(
                 messages=messages,
@@ -358,7 +359,7 @@ async def generate_with_repair(
             )
         except SpatialStructuredOutputError as exc:
             rejected_issues.append(list(exc.validation_issues))
-            if attempt == 2:
+            if attempt == maximum_attempts - 1:
                 raise
             repair_guidance = ""
             if any(
