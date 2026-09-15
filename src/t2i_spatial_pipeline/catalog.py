@@ -211,6 +211,7 @@ class CentralPose(StrictModel):
 class ActorPlan(StrictModel):
     role: RoleCode
     pose_function: Identifier
+    composition_pattern: Identifier
     screen_position: Identifier
     depth_plane: Identifier
     limb_roles: list[Identifier] = Field(min_length=2, max_length=8)
@@ -238,7 +239,7 @@ class PoseEntry(StrictModel):
 
 
 class PoseCatalog(StrictModel):
-    schema_version: Annotated[str, StringConstraints(pattern=r"^5\.0$")]
+    schema_version: Annotated[str, StringConstraints(pattern=r"^6\.0$")]
     cast_key: Identifier
     cast_roles: list[RoleCode] = Field(min_length=1, max_length=8)
     activities: list[ActivityTemplate] = Field(min_length=32, max_length=32)
@@ -926,6 +927,79 @@ def cast_key_for_counts(female_count: int, male_count: int) -> str:
         ) from exc
 
 LOGICAL_ACTOR_ROLES = ("central", "partner_a", "partner_b")
+
+CAST_COMPOSITION_PATTERNS = {
+    "one_woman": (
+        "solo_diagonal",
+        "solo_vertical_column",
+        "solo_reclined_arc",
+        "solo_asymmetric_spiral",
+    ),
+    "one_woman_one_man": (
+        "counterweighted_pair",
+        "parallel_pair",
+        "front_back_pair",
+        "cross_axis_pair",
+    ),
+    "one_woman_two_men": (
+        "forward_triangle",
+        "split_depth_triangle",
+        "encircling_triangle",
+        "asymmetric_wedge",
+    ),
+    "two_women": (
+        "lateral_interlock",
+        "offset_duet",
+        "opposed_arcs",
+        "stacked_duet",
+    ),
+    "two_women_one_man": (
+        "queen_court_triangle",
+        "female_flank_male_rear",
+        "tiered_power_triangle",
+        "cross_depth_triad",
+    ),
+    "three_women": (
+        "radial_fan",
+        "linked_chain",
+        "three_plane_cascade",
+        "circular_triad",
+    ),
+}
+
+CAST_PARTNER_LAYOUTS = {
+    "one_woman": ((), (), (), ()),
+    "one_woman_one_man": (
+        (("center_left", "midground"),),
+        (("center_right", "midground"),),
+        (("center_left", "foreground"),),
+        (("center_right", "rear_midground"),),
+    ),
+    "one_woman_two_men": (
+        (("center_left", "midground"), ("center_right", "foreground")),
+        (("center_right", "midground"), ("center_left", "foreground")),
+        (("center_left", "foreground"), ("center_right", "rear_midground")),
+        (("center_right", "foreground"), ("center_left", "rear_midground")),
+    ),
+    "two_women": (
+        (("center_right", "foreground"),),
+        (("center_left", "foreground"),),
+        (("center_right", "midground"),),
+        (("center_left", "rear_midground"),),
+    ),
+    "two_women_one_man": (
+        (("center_right", "foreground"), ("center_left", "rear_midground")),
+        (("center_left", "foreground"), ("center_right", "rear_midground")),
+        (("center_right", "midground"), ("center_left", "foreground")),
+        (("center_left", "midground"), ("center_right", "foreground")),
+    ),
+    "three_women": (
+        (("center_left", "foreground"), ("center_right", "midground")),
+        (("center_right", "foreground"), ("center_left", "midground")),
+        (("center_left", "rear_midground"), ("center_right", "foreground")),
+        (("center_right", "rear_midground"), ("center_left", "foreground")),
+    ),
+}
 
 
 def resolve_actor_role(cast_key: str, entity_id: str) -> str:
@@ -1660,22 +1734,27 @@ def restraint_plan(
 
 def actor_plans(
     cast_key: str,
+    family_id: str,
     family: PoseFamily,
     central_support_points: list[str],
 ) -> list[ActorPlan]:
     central_role = CASTS[cast_key][0]
+    grammar_index = list(POSE_FAMILIES).index(family_id) % 4
+    composition_pattern = CAST_COMPOSITION_PATTERNS[cast_key][grammar_index]
+    partner_layout = CAST_PARTNER_LAYOUTS[cast_key][grammar_index]
     plans = [
         ActorPlan(
             role=central_role,
             pose_function="central_pose",
+            composition_pattern=composition_pattern,
             screen_position="center",
             depth_plane="midground",
             limb_roles=["pose_hold", "balance_support"],
             support_points=central_support_points,
         )
     ]
-    positions = ("center_left", "center_right")
     for index, role in enumerate(CASTS[cast_key][1:]):
+        screen_position, depth_plane = partner_layout[index]
         plans.append(
             ActorPlan(
                 role=role,
@@ -1686,8 +1765,9 @@ def actor_plans(
                     if index == 1
                     else "aligned_with_central"
                 ),
-                screen_position=positions[index],
-                depth_plane="midground" if index == 0 else "foreground",
+                composition_pattern=composition_pattern,
+                screen_position=screen_position,
+                depth_plane=depth_plane,
                 limb_roles=["primary_contact", "balance_support"],
                 support_points=(
                     ["both_feet"]
@@ -2156,6 +2236,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
             )
             plans = actor_plans(
                 cast_key,
+                family_id,
                 family,
                 central_pose.support_points,
             )
@@ -2184,7 +2265,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
                 )
             )
     return PoseCatalog(
-        schema_version="5.0",
+        schema_version="6.0",
         cast_key=cast_key,
         cast_roles=roles,
         activities=activity_templates,

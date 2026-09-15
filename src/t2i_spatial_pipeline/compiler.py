@@ -154,6 +154,30 @@ def body_ledger(cast_key: str) -> str:
     )
 
 
+def cast_composition_clause(entry: PoseEntry, cast_key: str) -> str:
+    central_plan = entry.actor_plans[0]
+    central_name = actor_name(central_plan.role, cast_key)
+    pattern = phrase(central_plan.composition_pattern)
+    partner_positions = [
+        (
+            f"{actor_name(plan.role, cast_key)} occupies "
+            f"{phrase(plan.screen_position)} in the {phrase(plan.depth_plane)}"
+        )
+        for plan in entry.actor_plans[1:]
+    ]
+    if not partner_positions:
+        return (
+            f"The solo silhouette follows a {pattern} composition, with "
+            f"{central_name}'s complete body isolated against clear negative space."
+        )
+    return (
+        f"The cast-specific macro-layout is {pattern}: {central_name} remains "
+        f"the central anchor while {joined(partner_positions)}. The complete "
+        "silhouettes occupy separate readable lanes before their local contact "
+        "paths converge."
+    )
+
+
 def cast_descriptions(
     cast_key: str,
     character_profiles: list[CharacterProfile],
@@ -1246,6 +1270,7 @@ def compile_geometry(
             f"{resolved_central_arm_description(pose, activity, spec.cast_key)}; "
             f"she is {support_clause(entry)}."
         ),
+        cast_composition_clause(entry, spec.cast_key),
     ]
     central_body_chain = side_lying_body_chain(entry, central_name)
     if central_body_chain:

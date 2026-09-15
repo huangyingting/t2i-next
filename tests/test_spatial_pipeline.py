@@ -30,6 +30,7 @@ from t2i_spatial_pipeline.blueprint import (
     validate_output_text,
 )
 from t2i_spatial_pipeline.catalog import (
+    CAST_COMPOSITION_PATTERNS,
     CASTS,
     activity_ids,
     build_catalog,
@@ -417,6 +418,56 @@ def test_group_casts_remain_available(cast_key: str) -> None:
 
     assert len(requests) == 20
     assert {request.cast_key for request in requests} == {cast_key}
+
+
+def test_cast_categories_use_disjoint_composition_grammars() -> None:
+    pattern_sets = [
+        set(CAST_COMPOSITION_PATTERNS[cast_key]) for cast_key in CASTS
+    ]
+
+    assert all(len(patterns) == 4 for patterns in pattern_sets)
+    assert len(set().union(*pattern_sets)) == len(CASTS) * 4
+
+
+def test_cast_composition_is_compiled_into_geometry() -> None:
+    catalog = build_catalog("two_women_one_man")
+    entry = next(
+        item
+        for item in catalog.entries
+        if item.central_pose.family == "supine"
+        and item.compatible_activity_ids
+    )
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="two_women_one_man",
+        family=entry.central_pose.family,
+        variant=entry.central_pose.variant,
+        activity_id=entry.compatible_activity_ids[0],
+        viewpoint=entry.central_pose.compatible_camera_views[0],
+        shot_scale="full_body",
+        setting_id="audit_setting",
+    )
+    activity = next(
+        item
+        for item in catalog.activities
+        if item.activity_id == spec.activity_id
+    )
+    prompt = compile_geometry(spec, entry, activity, character_profiles())
+
+    assert "cast-specific macro-layout is queen court triangle" in prompt
+    assert "F2 occupies center right in the foreground" in prompt
+    assert "M1 occupies center left in the rear midground" in prompt
+    assert prompt_issues(spec, entry, activity, prompt, character_profiles()) == []
+
+
+def test_contact_participants_never_use_distant_background_depth() -> None:
+    for cast_key in CASTS:
+        catalog = build_catalog(cast_key)
+        assert all(
+            plan.depth_plane != "background"
+            for entry in catalog.entries
+            for plan in entry.actor_plans
+        )
 
 
 def test_symbolic_validation_metadata_requires_render_review() -> None:
