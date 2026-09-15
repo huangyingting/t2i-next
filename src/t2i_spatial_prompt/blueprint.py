@@ -70,6 +70,14 @@ FORBIDDEN_CREATIVE_CONCEPTS = re.compile(
     r"mirror|statue|mannequin|" + PROHIBITED_MINOR_PATTERN + r")\b",
     re.I,
 )
+FORBIDDEN_STYLE_CONCEPTS = re.compile(
+    r"\b(?:woman|man|person|people|crowd|attendant|guard|servant|"
+    r"anatomy|pose|intercourse|fellatio|cunnilingus|masturbation|"
+    r"penis|vagina|vulva|anus|breast|clitoris|"
+    + PROHIBITED_MINOR_PATTERN
+    + r")\b",
+    re.I,
+)
 
 
 class StrictModel(BaseModel):
@@ -178,6 +186,7 @@ class StyleBlueprint(StrictModel):
 
 class RoleStylingRecipe(StrictModel):
     role: Literal["f1", "f2", "f3", "m1", "m2"]
+    coverage_mode: Literal["selective_access", "styled_nude"]
     wardrobe: str = Field(min_length=4, max_length=100)
     footwear_type: Literal[
         "boots",
@@ -197,13 +206,23 @@ class RoleStylingRecipe(StrictModel):
 
     @model_validator(mode="after")
     def styling_components_are_unique(self) -> RoleStylingRecipe:
+        normalized_wardrobe = self.wardrobe.strip().lower()
+        if (
+            self.coverage_mode == "selective_access"
+            and normalized_wardrobe == "none"
+        ):
+            raise ValueError("selective-access role styling requires a wardrobe")
+        if (
+            self.coverage_mode == "styled_nude"
+            and normalized_wardrobe != "none"
+        ):
+            raise ValueError("styled-nude role styling wardrobe must be none")
         ensure_unique("role styling accessories", self.accessories)
         return self
 
 
 class PresentationRecipe(StrictModel):
     presentation_id: Identifier
-    coverage_mode: Literal["selective_access", "styled_nude"]
     role_styles: list[RoleStylingRecipe] = Field(min_length=1, max_length=5)
     compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
 
@@ -213,17 +232,12 @@ class PresentationRecipe(StrictModel):
         if len(set(roles)) != len(roles):
             raise ValueError("role styles contain duplicate roles")
         wardrobes = [style.wardrobe for style in self.role_styles]
-        normalized_wardrobes = [
-            wardrobe.strip().lower() for wardrobe in wardrobes
+        dressed_wardrobes = [
+            wardrobe
+            for wardrobe in wardrobes
+            if wardrobe.strip().lower() != "none"
         ]
-        if self.coverage_mode == "selective_access":
-            if "none" in normalized_wardrobes:
-                raise ValueError(
-                    "selective-access recipe requires every role wardrobe"
-                )
-            ensure_unique("presentation role wardrobes", wardrobes)
-        elif set(normalized_wardrobes) != {"none"}:
-            raise ValueError("styled-nude role wardrobes must all be none")
+        ensure_unique("presentation role wardrobes", dressed_wardrobes)
         ensure_unique(
             "presentation role footwear",
             [
@@ -264,11 +278,11 @@ class PresentationBlueprint(StrictModel):
             [
                 "|".join(
                     (
-                        recipe.coverage_mode,
                         *(
                             "|".join(
                                 (
                                     style.role,
+                                    style.coverage_mode,
                                     style.wardrobe,
                                     style.footwear_type,
                                     style.footwear_details,
@@ -285,14 +299,6 @@ class PresentationBlueprint(StrictModel):
             ],
         )
         ensure_unique("appearance biases", self.appearance_bias)
-        nude_count = sum(
-            recipe.coverage_mode == "styled_nude" for recipe in self.recipes
-        )
-        if not 1 <= nude_count <= max(1, len(self.recipes) // 4):
-            raise ValueError(
-                "presentation recipes need limited styled nudity between one "
-                "recipe and one quarter of the pool"
-            )
         return self
 
 
@@ -433,26 +439,6 @@ class CreativeBlueprint(StrictModel):
             raise ValueError(
                 f"creative blueprint contains minor concepts: {minor_matches}"
             )
-        non_character_text = " ".join(
-            iter_strings(
-                {
-                    "world": self.world.model_dump(mode="json"),
-                    "style": self.style.model_dump(mode="json"),
-                }
-            )
-        )
-        matches = sorted(
-            {
-                match.group(0).lower()
-                for match in FORBIDDEN_CREATIVE_CONCEPTS.finditer(
-                    non_character_text
-                )
-            }
-        )
-        if matches:
-            raise ValueError(
-                f"creative blueprint contains forbidden concepts: {matches}"
-            )
         return self
 
 
@@ -505,6 +491,18 @@ def validate_output_text(value: BaseModel, label: str) -> None:
 
 
 def validate_forbidden_output_concepts(value: BaseModel, label: str) -> None:
+    validate_output_concepts_with_pattern(
+        value,
+        label,
+        FORBIDDEN_CREATIVE_CONCEPTS,
+    )
+
+
+def validate_output_concepts_with_pattern(
+    value: BaseModel,
+    label: str,
+    pattern: re.Pattern[str],
+) -> None:
     payload = value.model_dump(mode="json")
     issues = []
     for path_value in iter_string_paths(payload):
@@ -512,7 +510,7 @@ def validate_forbidden_output_concepts(value: BaseModel, label: str) -> None:
         matches = sorted(
             {
                 match.group(0).lower()
-                for match in FORBIDDEN_CREATIVE_CONCEPTS.finditer(text)
+                for match in pattern.finditer(text)
             }
         )
         if matches:
@@ -588,7 +586,11 @@ class StyleBlueprintOutput(StrictModel):
         info: ValidationInfo,
     ) -> StyleBlueprintOutput:
         validate_output_text(self, "style blueprint")
-        validate_forbidden_output_concepts(self, "style blueprint")
+        validate_output_concepts_with_pattern(
+            self,
+            "style blueprint",
+            FORBIDDEN_STYLE_CONCEPTS,
+        )
         allowed_moods = set((info.context or {}).get("allowed_mood_tags", ()))
         used_moods = {
             mood
@@ -638,6 +640,15 @@ class PresentationBlueprintOutput(StrictModel):
         return self
 
 
+class NormalizedBriefOutput(StrictModel):
+    brief: str = Field(min_length=5, max_length=1000)
+
+    @model_validator(mode="after")
+    def output_text_is_valid(self) -> NormalizedBriefOutput:
+        validate_output_text(self, "normalized brief")
+        return self
+
+
 class BlueprintInference(StrictModel):
     schema_version: int
     system_prompt_hash: Fingerprint
@@ -645,12 +656,19 @@ class BlueprintInference(StrictModel):
     inference_config_hash: Fingerprint
     creative_seed: int
     model: str
+    normalized_brief: str
     structured_rejections: list[list[str]]
     usage: dict[str, int]
     blueprint: CreativeBlueprint
 
 
-BLUEPRINT_SCHEMA_VERSION = 17
+BLUEPRINT_SCHEMA_VERSION = 19
+BRIEF_NORMALIZATION_SYSTEM = """
+Translate and normalize the user's creative brief into concise semantic ASCII
+English. Preserve all setting, era, atmosphere, content, clothing or nudity,
+and visual-style requirements without adding people, actions, or restrictions.
+Every character must be printable ASCII. Return only schema data.
+""".strip()
 WORLD_BLUEPRINT_SYSTEM = """
 OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
 ASCII English, regardless of the brief's language.
@@ -696,11 +714,14 @@ allowed_mood_tags. Produce exactly twelve recipes. Every recipe must contain
 exactly one role_styles entry for every supplied role and no unused role. Give
 each visible person separately designed but scene-coordinated garments,
 footwear, two to four accessories, and makeup-and-grooming treatment. Within a
-selective_access recipe, every role needs visibly different garments, footwear,
-accessory sets, silhouette, material, and color accent; male and female roles
-must never receive the same garment or footwear description. Between one and
-three recipes use styled_nude with every wardrobe set to literal none, while
-footwear, accessories, makeup, and grooming remain role-distinct. Every
+scene, choose coverage_mode independently for every role according to the brief
+and creative composition. A role may use selective_access with named garments
+or styled_nude with wardrobe set to literal none. A scene may therefore be fully
+nude, fully selectively dressed, or mixed; there is no nudity quota and garments
+must not be added merely to create variety. Dressed roles need visibly different
+garments, silhouettes, materials, and color accents. All roles, including nude
+roles, need distinct footwear, accessory sets, makeup, and grooming; male and
+female roles must never receive the same footwear description. Every
 compatible_moods value must come from allowed_mood_tags. Use actual footwear
 types from the schema, concise printable ASCII English, and return only schema
 data.
@@ -708,6 +729,7 @@ data.
 BLUEPRINT_SYSTEM_HASH = hashlib.sha256(
     "\n\n".join(
         (
+            BRIEF_NORMALIZATION_SYSTEM,
             WORLD_BLUEPRINT_SYSTEM,
             CHARACTER_BLUEPRINT_SYSTEM,
             STYLE_BLUEPRINT_SYSTEM,
@@ -789,11 +811,27 @@ async def infer_creative_blueprint(
     settings = load_spatial_provider_settings()
     brief_hash = hashlib.sha256(brief.strip().encode()).hexdigest()
     async with OpenAISpatialModel(settings) as model:
+        normalization_response, normalization_rejections = (
+            await generate_with_repair(
+                model,
+                system=BRIEF_NORMALIZATION_SYSTEM,
+                payload={
+                    "brief": brief.strip(),
+                    "creative_seed": creative_seed,
+                    "output_language": "ASCII English only",
+                },
+                response_model=NormalizedBriefOutput,
+                max_output_tokens=min(2000, settings.output_token_limit),
+            )
+        )
+        normalized_brief = NormalizedBriefOutput.model_validate(
+            normalization_response.value
+        ).brief
         world_response, world_rejections = await generate_with_repair(
             model,
             system=WORLD_BLUEPRINT_SYSTEM,
             payload={
-                "brief": brief.strip(),
+                "brief": normalized_brief,
                 "creative_seed": creative_seed,
                 "output_language": "ASCII English only",
             },
@@ -817,7 +855,7 @@ async def infer_creative_blueprint(
                 model,
                 system=CHARACTER_BLUEPRINT_SYSTEM,
                 payload={
-                    "brief": brief.strip(),
+                    "brief": normalized_brief,
                     "creative_seed": creative_seed,
                     "cast_roles": list(cast_roles),
                     "output_language": "ASCII English only",
@@ -830,7 +868,7 @@ async def infer_creative_blueprint(
                 model,
                 system=STYLE_BLUEPRINT_SYSTEM,
                 payload={
-                    "brief": brief.strip(),
+                    "brief": normalized_brief,
                     "creative_seed": creative_seed,
                     "allowed_mood_tags": allowed_mood_tags,
                     "output_language": "ASCII English only",
@@ -845,7 +883,7 @@ async def infer_creative_blueprint(
                 model,
                 system=PRESENTATION_BLUEPRINT_SYSTEM,
                 payload={
-                    "brief": brief.strip(),
+                    "brief": normalized_brief,
                     "creative_seed": creative_seed,
                     "cast_roles": list(cast_roles),
                     "allowed_mood_tags": allowed_mood_tags,
@@ -884,7 +922,9 @@ async def infer_creative_blueprint(
         inference_config_hash=blueprint_inference_config_hash(settings),
         creative_seed=creative_seed,
         model=settings.model,
+        normalized_brief=normalized_brief,
         structured_rejections=[
+            *normalization_rejections,
             *world_rejections,
             *character_rejections,
             *style_rejections,
@@ -894,6 +934,7 @@ async def infer_creative_blueprint(
             key: sum(
                 response.usage.model_dump(mode="json")[key]
                 for response in (
+                    normalization_response,
                     world_response,
                     character_response,
                     style_response,
@@ -1147,10 +1188,10 @@ def sample_scene_layer_inputs(
         )
         presentation = PresentationPreset(
             presentation_id=presentation_id,
-            coverage_mode=presentation_recipe.coverage_mode,
             role_styles=[
                 RoleStylingPreset(
                     role=role_style.role,
+                    coverage_mode=role_style.coverage_mode,
                     wardrobe_theme=compact_phrase(role_style.wardrobe, 8),
                     footwear_theme=presentation_footwear_phrase(role_style),
                     accessory_theme=[

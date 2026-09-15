@@ -139,6 +139,7 @@ class StylePreset(StrictModel):
 
 class RoleStylingPreset(StrictModel):
     role: RoleCode
+    coverage_mode: Literal["selective_access", "styled_nude"]
     wardrobe_theme: str = Field(min_length=4, max_length=100)
     footwear_theme: FootwearDescription
     accessory_theme: list[str] = Field(min_length=2, max_length=4)
@@ -147,7 +148,6 @@ class RoleStylingPreset(StrictModel):
 
 class PresentationPreset(StrictModel):
     presentation_id: Identifier
-    coverage_mode: Literal["selective_access", "styled_nude"]
     role_styles: list[RoleStylingPreset] = Field(min_length=1, max_length=5)
     appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
     compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
@@ -162,20 +162,23 @@ class PresentationPreset(StrictModel):
             raise ValueError(
                 f"presentation contains unsupported roles: {sorted(unsupported_roles)}"
             )
-        wardrobes = [
-            style.wardrobe_theme.strip().lower() for style in self.role_styles
-        ]
-        if self.coverage_mode == "selective_access":
-            if "none" in wardrobes:
+        dressed_wardrobes = []
+        for style in self.role_styles:
+            wardrobe = style.wardrobe_theme.strip().lower()
+            if style.coverage_mode == "selective_access":
+                if wardrobe == "none":
+                    raise ValueError(
+                        "selective-access role styling requires a wardrobe"
+                    )
+                dressed_wardrobes.append(wardrobe)
+            elif wardrobe != "none":
                 raise ValueError(
-                    "selective-access presentation requires every role wardrobe"
+                    "styled-nude role styling wardrobe must be none"
                 )
-            if len(set(wardrobes)) != len(wardrobes):
-                raise ValueError(
-                    "selective-access role wardrobes must be visibly distinct"
-                )
-        elif set(wardrobes) != {"none"}:
-            raise ValueError("styled-nude role wardrobes must all be none")
+        if len(set(dressed_wardrobes)) != len(dressed_wardrobes):
+            raise ValueError(
+                "selective-access role wardrobes must be visibly distinct"
+            )
         footwear = [
             style.footwear_theme.strip().lower() for style in self.role_styles
         ]
@@ -402,10 +405,10 @@ def make_scene_layer_inputs(
         ),
         presentation=PresentationPreset(
             presentation_id=f"{setting_id}_presentation",
-            coverage_mode=coverage_mode,
             role_styles=[
                 RoleStylingPreset(
                     role=role,
+                    coverage_mode=coverage_mode,
                     wardrobe_theme=(
                         f"{wardrobe_theme}, {wardrobe_detail}"
                         if coverage_mode == "selective_access"
@@ -574,8 +577,8 @@ def resolve_scene_layers(
     }
     for profile in characters:
         required = set(required_regions_by_role.get(profile.role, []))
-        styled_nude = presentation_source.coverage_mode == "styled_nude"
         role_style = role_style_map[profile.role]
+        styled_nude = role_style.coverage_mode == "styled_nude"
         exposed_regions = (
             ["whole_body"]
             if styled_nude
@@ -826,9 +829,14 @@ def layer_issues(
         issues.append("multi-actor expressions lack interpersonal interaction")
     if len(cast_roles) > 1:
         role_presentations = layers.presentation.roles
-        if layers.presentation_source.coverage_mode == "selective_access" and len(
-            {item.wardrobe.strip().lower() for item in role_presentations}
-        ) != len(role_presentations):
+        dressed_presentations = [
+            item
+            for item in role_presentations
+            if item.wardrobe_state != "styled_nude"
+        ]
+        if len(
+            {item.wardrobe.strip().lower() for item in dressed_presentations}
+        ) != len(dressed_presentations):
             issues.append("multi-actor wardrobes are not role-distinct")
         if len(
             {item.footwear.strip().lower() for item in role_presentations}
@@ -864,6 +872,11 @@ def layer_issues(
         presentation = next(
             item for item in layers.presentation.roles if item.role == role
         )
+        source_style = next(
+            item
+            for item in layers.presentation_source.role_styles
+            if item.role == role
+        )
         required_exposure = set(required).intersection(WARDROBE_ACCESS_REGIONS)
         actual_exposure = set(presentation.exposed_regions)
         styled_nude = presentation.wardrobe_state == "styled_nude"
@@ -871,7 +884,7 @@ def layer_issues(
             issues.append(f"{role} wardrobe blocks a required contact")
         expected_state = (
             "styled_nude"
-            if layers.presentation_source.coverage_mode == "styled_nude"
+            if source_style.coverage_mode == "styled_nude"
             else "localized_exposure"
             if required_exposure
             else "fully_dressed"

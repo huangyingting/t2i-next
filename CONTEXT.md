@@ -180,6 +180,12 @@ combined with a Spatial Plan. Each layer has one owner and a stable
 fingerprint.
 _Avoid_: Story Theme, Foundation
 
+**Role Coverage Mode**:
+The model-derived `selective_access` or `styled_nude` state for one visible
+role in one presentation recipe. Roles in the same scene may use different
+states, and no batch-wide nudity quota overrides the Creative Brief.
+_Avoid_: Scene-wide wardrobe state, fixed nudity ratio
+
 **Spatial Prompt**:
 One independently renderable final prompt compiled from geometry and Scene
 Layers. A batch passes only when every prompt and all batch diversity

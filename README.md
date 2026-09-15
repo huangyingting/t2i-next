@@ -157,13 +157,19 @@ Story Description 未明确人物国籍时，该人物缺省为中国籍；未�
 ## 独立空间提示词生成器
 
 `t2i_spatial_prompt` 是独立于 story 和旧 prompt pipeline 的约束求解模块。它先
-用一次模型调用把自然语言主题推导为 Character、World、Style 和 Presentation
-蓝图，再由本地 catalog 和几何编译器确定人物数量、姿势、接触、支撑面、肢体
-归属、表情与镜头。CharacterBlueprint 只为当前 cast 实际使用的 F1、F2、F3、
+把任意语言的自然语言主题规范化为 ASCII English，再通过有界 LLM 阶段推导
+Character、World、Style 和 Presentation 蓝图，最后由本地 catalog 和几何编译器
+确定人物数量、姿势、接触、支撑面、肢体归属、表情与镜头。CharacterBlueprint
+只为当前 cast 实际使用的 F1、F2、F3、
 M1、M2 角色分别设计成年年龄、身高体重、体型比例、肤色、脸型五官、发型发色、
 私密特征和体毛；PresentationBlueprint 再为这些角色分别设计协调但不同的服装、
 鞋履、配饰与妆容或仪容。cast roles 同时进入蓝图缓存键。当前发布格式固定为每批
 12 个相互不同的场景，并只使用二十一岁以上成年人。
+
+覆盖状态同样按角色推导，而不是整场共用一个开关。每个角色可以独立采用
+`selective_access` 或 `styled_nude`；因此同一场景可以全员裸体、全员局部穿着，
+也可以混合呈现。hardcore 批次没有固定裸体数量或比例，裸体角色仍分别保留鞋履、
+配饰以及妆容或仪容设计。
 
 ```bash
 uv run t2i-spatial \

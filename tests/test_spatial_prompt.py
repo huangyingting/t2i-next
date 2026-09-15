@@ -4,9 +4,11 @@ import pytest
 from pydantic import BaseModel, ValidationError
 
 from t2i_spatial_prompt.blueprint import (
+    FORBIDDEN_STYLE_CONCEPTS,
     CharacterBlueprint,
     CharacterBlueprintOutput,
     validate_forbidden_output_concepts,
+    validate_output_concepts_with_pattern,
 )
 from t2i_spatial_prompt.layers import (
     CharacterProfile,
@@ -181,6 +183,54 @@ def test_multi_character_layers_keep_people_and_styling_distinct() -> None:
     assert "M2 is 188 cm and 94 kg" in layers.compact_suffix
 
 
+def test_role_coverage_can_mix_nudity_and_clothing_in_one_scene() -> None:
+    profiles = character_profiles()
+    inputs = make_scene_layer_inputs(
+        "mixed_suite",
+        "private editorial suite",
+        "warm practical sconces",
+        "rich neutral palette",
+        "intimate editorial atmosphere",
+    )
+    role_styles = [
+        style.model_copy(
+            update={
+                "coverage_mode": "styled_nude",
+                "wardrobe_theme": "none",
+            }
+        )
+        if style.role == "m1"
+        else style
+        for style in inputs.presentation.role_styles
+    ]
+    presentation = inputs.presentation.model_copy(
+        update={"role_styles": role_styles}
+    )
+
+    layers = resolve_scene_layers(
+        scene_id="S02",
+        spatial_fingerprint="b" * 64,
+        geometry="Geometry.",
+        cast_roles=["f1", "m1"],
+        character_profiles=profiles,
+        body_level="floor",
+        setting=inputs.setting,
+        style=inputs.style,
+        presentation_source=presentation,
+        required_environment_supports=[],
+        required_regions_by_role={"f1": [], "m1": []},
+        visible_regions_by_role={"f1": [], "m1": []},
+        interaction_partners_by_role={"f1": ["m1"], "m1": ["f1"]},
+    )
+
+    states = {
+        role.role: role.wardrobe_state for role in layers.presentation.roles
+    }
+    assert states == {"f1": "fully_dressed", "m1": "styled_nude"}
+    assert "F1 remains visibly dressed" in layers.compact_suffix
+    assert "M1 is intentionally fully nude" in layers.compact_suffix
+
+
 def test_provider_normalizes_typographic_punctuation_to_ascii() -> None:
     assert normalize_ascii_punctuation(
         "\u201cquoted\u201d\u2014text\u2026"
@@ -196,3 +246,14 @@ def test_forbidden_output_concepts_report_their_field_path() -> None:
             Output(material="polished mirror panels"),
             "world blueprint",
         )
+
+
+def test_style_material_can_use_mirror_as_an_adjective() -> None:
+    class Output(BaseModel):
+        material: str
+
+    validate_output_concepts_with_pattern(
+        Output(material="mirror-polished obsidian"),
+        "style blueprint",
+        FORBIDDEN_STYLE_CONCEPTS,
+    )

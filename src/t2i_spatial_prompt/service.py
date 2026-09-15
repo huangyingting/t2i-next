@@ -417,7 +417,11 @@ async def generate_spatial_batch(
                 "world_location": layer_inputs.setting.location,
                 "style_id": layer_inputs.style.style_id,
                 "presentation_id": layer_inputs.presentation.presentation_id,
-                "coverage_mode": layer_inputs.presentation.coverage_mode,
+                "role_coverage_modes": {
+                    role_style.role: role_style.coverage_mode
+                    for role_style in layer_inputs.presentation.role_styles
+                    if role_style.role in catalog.cast_roles
+                },
                 "role_wardrobes": {
                     role_style.role: role_style.wardrobe_theme
                     for role_style in layer_inputs.presentation.role_styles
@@ -513,11 +517,27 @@ async def generate_spatial_batch(
                 {str(selection["shot_scale"]) for selection in selections}
             )
         },
-        "styled_nude_scenes": sum(
-            selection["coverage_mode"] == "styled_nude" for selection in selections
+        "styled_nude_roles": sum(
+            mode == "styled_nude"
+            for selection in selections
+            for mode in selection["role_coverage_modes"].values()
         ),
-        "selective_access_scenes": sum(
-            selection["coverage_mode"] == "selective_access" for selection in selections
+        "selective_access_roles": sum(
+            mode == "selective_access"
+            for selection in selections
+            for mode in selection["role_coverage_modes"].values()
+        ),
+        "fully_styled_nude_scenes": sum(
+            set(selection["role_coverage_modes"].values()) == {"styled_nude"}
+            for selection in selections
+        ),
+        "fully_selective_access_scenes": sum(
+            set(selection["role_coverage_modes"].values()) == {"selective_access"}
+            for selection in selections
+        ),
+        "mixed_coverage_scenes": sum(
+            len(set(selection["role_coverage_modes"].values())) > 1
+            for selection in selections
         ),
         "wardrobe_styles": len(
             {
@@ -604,10 +624,6 @@ async def generate_spatial_batch(
         if metrics[field] < minimum
     }
     presentation_policy_issues = []
-    if not 1 <= metrics["styled_nude_scenes"] <= max(1, len(prompts) // 4):
-        presentation_policy_issues.append(
-            "styled-nude scenes must remain between one and one quarter of the batch"
-        )
     if any(
         len(accessories) < 2
         for selection in selections
