@@ -3,32 +3,32 @@
     {
       "check": "cast",
       "passed": true,
-      "evidence": "Prose contains both actor descriptions verbatim: 'F1, woman 1, a 29-year-old Chinese woman' and 'M1, man 1, a 32-year-old Chinese man'."
+      "evidence": "Both actor descriptions are supplied verbatim as required."
     },
     {
       "check": "camera",
       "passed": true,
-      "evidence": "Prose states 'side rear three-quarter viewpoint' and 'medium-wide shot', matching the plan's viewpoint and shot scale."
+      "evidence": "The prose correctly states the viewpoint 'side_rear_three_quarter' and shot scale 'medium_wide' exactly once each."
     },
     {
       "check": "contact",
       "passed": true,
-      "evidence": "Prose states the 'activity of fellatio is occluded; the state is inserted' and names the occluders 'f1.head and m1.near_thigh', preserving activity, state, visibility, and occluders without naming hidden endpoints."
+      "evidence": "The activity 'fellatio' and state 'inserted' are stated, the contact is correctly described as occluded, hidden endpoints are omitted, and visible occluders 'f1.head' and 'm1.near_thigh' are named."
     },
     {
       "check": "visibility",
       "passed": true,
-      "evidence": "The plan's visible regions are implied by actor poses and positions, and the occluded contact is correctly noted; the prose does not add or remove visibility states."
+      "evidence": "The prose correctly lists all visible regions from the plan and explicitly states the contact is occluded."
     },
     {
       "check": "limb_assignments",
       "passed": true,
-      "evidence": "Prose states each actor's left/right knees and left/right hands are providing support, covering all non-contact limb assignments, while contact limb roles are implicit."
+      "evidence": "The prose accounts for all eight non-contact limb assignments for support (knees and hands for both actors) without adding, removing, or reclassifying them."
     },
     {
       "check": "supports",
       "passed": true,
-      "evidence": "Prose states F1 and M1 are each 'supported by the bed surface at both knees' and 'at both hands', matching all four environmental supports."
+      "evidence": "The prose correctly describes all four environmental supports on the mattress of the bed for the specified body parts and actors."
     }
   ],
   "contradictions": []

@@ -11,12 +11,23 @@ from catalog_scene_demo import (
     DemoSpec,
     EvaluationBatch,
     body_ledger,
+    combine_prompt,
     compile_geometry,
+    compile_scene_layers,
     evaluation_contract_issues,
+    plan_fingerprint,
     prompt_issues,
     select_plan,
 )
 from pydantic import ValidationError
+from scene_layers import (
+    CHARACTER_PROFILES,
+    EXTRA_CAST_HAZARDS,
+    SETTING_PRESETS,
+    SettingPreset,
+    layer_issues,
+    resolve_scene_layers,
+)
 
 CAST_KEYS = (
     "one_woman",
@@ -25,7 +36,7 @@ CAST_KEYS = (
     "two_women",
     "three_women",
 )
-EXPECTED_CAST_IDS = {
+EXPECTED_CAST_ROLES = {
     "one_woman": ["f1"],
     "one_woman_one_man": ["f1", "m1"],
     "one_woman_two_men": ["f1", "m1", "m2"],
@@ -34,14 +45,50 @@ EXPECTED_CAST_IDS = {
 }
 LEGACY_ACTOR_IDS = {"central", "partner_a", "partner_b"}
 LEGACY_NAMES = {"Li Na", "Zhang Wei", "Chen Hao", "Chen Mei", "Zhao Yue"}
+LEGACY_SCHEMA_FIELDS = {
+    "adult_only",
+    "cast_slots",
+    "central_role",
+    "central_slot",
+    "consent_required",
+    "controller_slot",
+    "controller_slots",
+    "exact_cast",
+    "owner_slot",
+    "pose_role",
+    "required_roles",
+    "required_slots",
+    "restrained_slots",
+    "slot_id",
+}
+ACTOR_REFERENCE_FIELDS = {
+    "controller_role",
+    "controller_roles",
+    "entity_id",
+    "focus_role",
+    "owner_role",
+    "restrained_roles",
+    "role",
+}
 
 
-def legacy_actor_values(value: object, path: str = "$") -> list[str]:
+def legacy_actor_values(
+    value: object,
+    path: str = "$",
+    field: str | None = None,
+) -> list[str]:
+    if field in ACTOR_REFERENCE_FIELDS:
+        candidates = value if isinstance(value, list) else [value]
+        return [
+            f"{path}={candidate}"
+            for candidate in candidates
+            if isinstance(candidate, str) and candidate in LEGACY_ACTOR_IDS
+        ]
     if isinstance(value, dict):
         return [
             leaked
             for key, item in value.items()
-            for leaked in legacy_actor_values(item, f"{path}.{key}")
+            for leaked in legacy_actor_values(item, f"{path}.{key}", key)
         ]
     if isinstance(value, list):
         return [
@@ -49,8 +96,22 @@ def legacy_actor_values(value: object, path: str = "$") -> list[str]:
             for index, item in enumerate(value)
             for leaked in legacy_actor_values(item, f"{path}[{index}]")
         ]
-    if isinstance(value, str) and value in LEGACY_ACTOR_IDS:
-        return [f"{path}={value}"]
+    return []
+
+
+def legacy_schema_fields(value: object, path: str = "$") -> list[str]:
+    if isinstance(value, dict):
+        return [f"{path}.{key}" for key in value if key in LEGACY_SCHEMA_FIELDS] + [
+            leaked
+            for key, item in value.items()
+            for leaked in legacy_schema_fields(item, f"{path}.{key}")
+        ]
+    if isinstance(value, list):
+        return [
+            leaked
+            for index, item in enumerate(value)
+            for leaked in legacy_schema_fields(item, f"{path}[{index}]")
+        ]
     return []
 
 
@@ -96,6 +157,8 @@ def rejected_prompt(
 
 
 def main() -> None:
+    if any(profile.adult_age < 21 for profile in CHARACTER_PROFILES.values()):
+        raise AssertionError("all role profiles must be adults")
     compiled_combinations = 0
     strap_on_activities = 0
     rejected_mutations = 0
@@ -108,14 +171,19 @@ def main() -> None:
             raise AssertionError(
                 f"{cast_key} persisted logical actor roles: {leaked_actor_values}"
             )
+        leaked_schema_fields = legacy_schema_fields(catalog_payload)
+        if leaked_schema_fields:
+            raise AssertionError(
+                f"{cast_key} persisted legacy schema: {leaked_schema_fields}"
+            )
         catalog = PoseCatalog.model_validate(catalog_payload)
-        if catalog.schema_version != "2.0":
-            raise AssertionError(f"{cast_key} did not use schema 2.0")
+        if catalog.schema_version != "3.0":
+            raise AssertionError(f"{cast_key} did not use schema 3.0")
         if len(catalog.entries) != 256 or len(catalog.activities) != 32:
             raise AssertionError(f"{cast_key} coverage changed")
-        cast_ids = [slot.slot_id for slot in catalog.cast_slots]
-        if cast_ids != EXPECTED_CAST_IDS[cast_key]:
-            raise AssertionError(f"{cast_key} actor codes changed: {cast_ids}")
+        cast_roles = catalog.cast_roles
+        if cast_roles != EXPECTED_CAST_ROLES[cast_key]:
+            raise AssertionError(f"{cast_key} actor roles changed: {cast_roles}")
         activity_map = {
             activity.activity_id: activity for activity in catalog.activities
         }
@@ -125,8 +193,11 @@ def main() -> None:
                 for edge in activity.contact_edges
                 for endpoint in (edge.source, edge.target)
             }
-            restraint_entities = set(activity.restraint.controller_slots) | set(
-                activity.restraint.restrained_slots
+            restraint_entities = (
+                set(activity.restraint.controller_roles)
+                | set(activity.restraint.restrained_roles)
+                if activity.restraint is not None
+                else set()
             )
             if LEGACY_ACTOR_IDS.intersection(endpoint_entities | restraint_entities):
                 raise AssertionError("logical actor role leaked into catalog entities")
@@ -145,7 +216,7 @@ def main() -> None:
                     if edge.source.entity_id == prop.prop_id
                 )
                 if (
-                    prop.owner_slot == edge.target.entity_id
+                    prop.owner_role == edge.target.entity_id
                     or edge.source.region != "shaft"
                 ):
                     raise AssertionError("wearable contact chain is disconnected")
@@ -171,6 +242,78 @@ def main() -> None:
                 compiled_combinations += 1
 
     d01_spec, d01_entry, d01_activity, d01_prompt = selected_plan("D01")
+    d01_fingerprint = plan_fingerprint(d01_spec, d01_entry, d01_activity)
+    d01_geometry = compile_geometry(d01_spec, d01_entry, d01_activity)
+    d01_neon_layers = compile_scene_layers(
+        d01_spec,
+        d01_entry,
+        d01_activity,
+        d01_fingerprint,
+        d01_geometry,
+        SETTING_PRESETS["rainy_neon_apartment"],
+    )
+    d01_hotel_layers = compile_scene_layers(
+        d01_spec,
+        d01_entry,
+        d01_activity,
+        d01_fingerprint,
+        d01_geometry,
+        SETTING_PRESETS["midnight_luxury_hotel"],
+    )
+    if (
+        d01_neon_layers.fingerprints.characters
+        != d01_hotel_layers.fingerprints.characters
+    ):
+        raise AssertionError("setting changed locked character identities")
+    if d01_neon_layers.fingerprints.spatial != d01_fingerprint:
+        raise AssertionError("scene layers changed the spatial fingerprint")
+    if layer_issues(d01_neon_layers, ["f1"]):
+        raise AssertionError("valid resolved scene layers failed validation")
+    if not d01_neon_layers.visibility.emitted_body_details_by_role["f1"]:
+        raise AssertionError("visible relevant body detail was not emitted")
+    hidden_detail_layers = resolve_scene_layers(
+        scene_id=d01_spec.scene_id,
+        spatial_fingerprint=d01_fingerprint,
+        geometry=d01_geometry,
+        cast_roles=["f1"],
+        body_level=d01_entry.central_pose.body_level,
+        setting=SETTING_PRESETS["rainy_neon_apartment"],
+        required_regions_by_role={"f1": ["clitoris"]},
+        visible_regions_by_role={"f1": []},
+        layer_budget_tokens=200,
+    )
+    if hidden_detail_layers.visibility.emitted_body_details_by_role["f1"]:
+        raise AssertionError("invisible body detail leaked into the prompt layer")
+    if (
+        d01_neon_layers.token_metrics.layer_estimated_tokens
+        > d01_neon_layers.token_metrics.layer_budget_tokens
+    ):
+        raise AssertionError("resolved layers exceeded their token budget")
+    layered_d01_prompt = combine_prompt(d01_geometry, d01_neon_layers)
+    if prompt_issues(d01_spec, d01_entry, d01_activity, layered_d01_prompt):
+        raise AssertionError("layer compilation changed deterministic geometry")
+    blocked_wardrobe = d01_neon_layers.model_copy(deep=True)
+    blocked_wardrobe.presentation.roles[0].wardrobe_state = "scene_appropriate"
+    if not any(
+        "wardrobe blocks" in issue for issue in layer_issues(blocked_wardrobe, ["f1"])
+    ):
+        raise AssertionError("blocked contact wardrobe was accepted")
+    unmotivated_light = d01_neon_layers.model_copy(deep=True)
+    unmotivated_light.presentation.motivated_light_source = "unlisted studio flash"
+    if not any(
+        "lighting source" in issue for issue in layer_issues(unmotivated_light, ["f1"])
+    ):
+        raise AssertionError("unmotivated setting light was accepted")
+    invalid_setting = SETTING_PRESETS["rainy_neon_apartment"].model_dump(mode="json")
+    invalid_setting["forbidden_elements"] = sorted(
+        EXTRA_CAST_HAZARDS - {"mirrors_showing_extra_bodies"}
+    )
+    try:
+        SettingPreset.model_validate(invalid_setting)
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("setting without exact-cast hazards was accepted")
     d01_required = (
         "complete body ledger contains exactly 1 continuous body",
         "one continuous woman body identified as F1 (woman 1)",
@@ -206,21 +349,18 @@ def main() -> None:
         "left thigh wraps around his left side",
         "right thigh wraps around his right side",
         "left forearm supports her left thigh",
-        "left hand cups her left buttock",
+        "left hand secures her outer left hip",
         "right forearm supports her right thigh",
-        "right hand cups her right buttock",
-        "his back and shoulders brace against the wall",
-        "both feet remain planted",
-        "stands with his back and shoulders against the wall",
+        "right hand secures her outer right hip",
+        "stands facing F1",
         "feet shoulder-width apart",
-        "left-side forearm-and-hand cradle",
-        "matching right-side cradle",
+        "knees softly flexed",
         "their pelvises aligned",
-        "front-to-back order is the wall, M1, F1",
-        "then the viewer",
     )
     if any(value not in d03_prompt for value in d03_required):
-        raise AssertionError("D03 lacks an explicit wall support contact")
+        raise AssertionError("D03 lacks an explicit standing support chain")
+    if d03_prompt.count("left forearm supports her left thigh") != 1:
+        raise AssertionError("D03 duplicates the bilateral support chain")
 
     d04_spec, d04_entry, d04_activity, d04_prompt = selected_plan("D04")
     d04_required = (
@@ -237,7 +377,14 @@ def main() -> None:
         "supported by one knee and opposite foot",
         "primary anatomical endpoint is rooted at M1's pelvis",
         "secondary anatomical endpoint is rooted at M2's pelvis",
-        "receiving actor's single head silhouette",
+        "her pelvis stays at center in the midground beside M1",
+        (
+            "her torso connects continuously to her only head at center right "
+            "in the foreground beside M2"
+        ),
+        "No additional head, torso, partial body or person",
+        "secondary inserted contact at center right in the foreground",
+        "F1's only head, visibly connected to F1's torso",
     )
     if any(value not in d04_prompt for value in d04_required):
         raise AssertionError("D04 has unresolved partner limbs or alignment")
@@ -257,8 +404,9 @@ def main() -> None:
 
     d06_spec, d06_entry, d06_activity, d06_prompt = selected_plan("D06")
     d06_required = (
-        "kneels between F1's knees and lowers the torso between her thighs",
-        "until the mouth reaches her pelvis",
+        "kneels beside F1's left thigh",
+        "approaches her pelvis from the left",
+        "lowering the torso until the mouth reaches its assigned contact",
         "both palms braced on the sofa beside F1's hips",
         "contacting hand maintained at F1's breast",
         "other hand braced on the sofa",
@@ -272,6 +420,22 @@ def main() -> None:
     rejected_activity(
         d01_without_controller,
         "vibrator_clitoral requires one controlled handheld prop",
+    )
+    rejected_mutations += 1
+
+    three_women_catalog = PoseCatalog.model_validate_json(
+        (CATALOGS / "three_women.json").read_text(encoding="utf-8")
+    )
+    dual_toy_activity = next(
+        activity
+        for activity in three_women_catalog.activities
+        if activity.activity_id == "double_toy_vaginal_anal"
+    )
+    dual_toy_missing_controller = deepcopy(dual_toy_activity.model_dump(mode="json"))
+    dual_toy_missing_controller["handheld_props"].pop()
+    rejected_activity(
+        dual_toy_missing_controller,
+        "double_toy_vaginal_anal requires two controlled handheld props",
     )
     rejected_mutations += 1
 
@@ -329,10 +493,10 @@ def main() -> None:
             "M1's left shoulder and her right arm circles his right "
             "shoulder. Her left thigh wraps around his left side and her "
             "right thigh wraps around his right side, with both knees bent "
-            "behind his hips. M1's left forearm supports her left "
-            "thigh and his left hand cups her left buttock; his right forearm "
-            "supports her right thigh and his right hand cups her right "
-            "buttock. "
+            "behind his hips. M1 supports F1 through two continuous bilateral "
+            "cradles: his left forearm supports her left thigh and his left "
+            "hand secures her outer left hip; his right forearm supports her "
+            "right thigh and his right hand secures her outer right hip. "
         ),
         "",
     )
@@ -357,6 +521,19 @@ def main() -> None:
         d04_activity,
         d04_missing_endpoint_owner,
         "secondary lacks anatomical endpoint ownership",
+    )
+
+    d04_split_body = d04_prompt.replace(
+        "No additional head, torso, partial body or person occupies either "
+        "contact zone.",
+        "",
+    )
+    rejected_prompt(
+        d04_spec,
+        d04_entry,
+        d04_activity,
+        d04_split_body,
+        "distributed contacts lack one continuous body axis",
     )
 
     d01_inserted = deepcopy(d01_activity.model_dump(mode="json"))
@@ -387,9 +564,7 @@ def main() -> None:
     rejected_mutations += 1
 
     d05_self_targeted = deepcopy(d05_activity.model_dump(mode="json"))
-    d05_self_targeted["wearable_props"][0]["owner_slot"] = d05_activity.required_slots[
-        0
-    ]
+    d05_self_targeted["wearable_props"][0]["owner_role"] = d05_activity.focus_role
     rejected_activity(
         d05_self_targeted,
         "wearable prop owner cannot also be its target",
@@ -426,10 +601,13 @@ def main() -> None:
 
     report = {
         "passed": True,
+        "catalog_schema_version": "3.0",
         "catalogs_validated": len(CAST_KEYS),
         "entries_validated": len(CAST_KEYS) * 256,
-        "coded_actor_ids_validated": EXPECTED_CAST_IDS,
+        "coded_actor_roles_validated": EXPECTED_CAST_ROLES,
         "persisted_legacy_actor_id_values": 0,
+        "persisted_legacy_schema_fields": 0,
+        "adult_role_profiles_validated": len(CHARACTER_PROFILES),
         "legacy_personal_names_in_compiled_prompts": 0,
         "compiled_pose_activity_combinations": compiled_combinations,
         "strap_on_activities_validated": strap_on_activities,
@@ -442,8 +620,9 @@ def main() -> None:
             "D06",
         ],
         "rejected_mutations": rejected_mutations,
-        "rejected_prompt_mutations": 6,
+        "rejected_prompt_mutations": 7,
         "evaluation_contract_fixtures": 2,
+        "scene_layer_invariants_validated": 9,
     }
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "validation-report.json").write_text(

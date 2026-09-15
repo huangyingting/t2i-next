@@ -22,11 +22,15 @@
     ],
     "C02": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
-      "actor description changed: M1, man 1, a 32-year-old Chinese man"
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center right",
+      "screen position changed: M1 -> center left"
     ],
     "C03": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
-      "actor description changed: M1, man 1, a 32-year-old Chinese man"
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center",
+      "screen position changed: M1 -> center right"
     ],
     "C04": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
@@ -37,7 +41,8 @@
     "C05": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
       "actor description changed: M1, man 1, a 32-year-old Chinese man",
-      "support topology omits semantic term: reclined"
+      "screen position changed: F1 -> center left",
+      "screen position changed: M1 -> center right"
     ],
     "C06": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
@@ -47,7 +52,9 @@
     ],
     "C07": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
-      "actor description changed: M1, man 1, a 32-year-old Chinese man"
+      "actor description changed: M1, man 1, a 32-year-old Chinese man",
+      "screen position changed: F1 -> center",
+      "screen position changed: M1 -> center right"
     ],
     "C08": [
       "actor description changed: F1, woman 1, a 29-year-old Chinese woman",
@@ -63,13 +70,13 @@
   "usage_by_attempt": [
     {
       "prompt_tokens": 1655,
-      "completion_tokens": 1150,
-      "total_tokens": 2805
+      "completion_tokens": 1121,
+      "total_tokens": 2776
     },
     {
-      "prompt_tokens": 3582,
-      "completion_tokens": 1102,
-      "total_tokens": 4684
+      "prompt_tokens": 3256,
+      "completion_tokens": 1142,
+      "total_tokens": 4398
     }
   ],
   "passed": true

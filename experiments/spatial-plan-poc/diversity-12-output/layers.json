@@ -1,0 +1,1766 @@
+[
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_rain_lit_contemporary_apartment",
+      "world_genre": "contemporary",
+      "location": "rain-lit contemporary apartment",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "rain-lit contemporary apartment",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "cool window light with restrained cyan reflections"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "slate blue, ivory and muted cyan",
+      "atmosphere": "quiet editorial tension",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D07",
+      "spatial_fingerprint": "db631803e21d176c04cf91ba4a284f0e814f4182377796cd263dcb7d46f943a1",
+      "setting_id": "test_rain_lit_contemporary_apartment",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "cool window light with restrained cyan reflections",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "slate blue, ivory and muted cyan",
+      "atmosphere": "quiet editorial tension"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "clitoris"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "clitoris"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [
+          "compact symmetrical intimate anatomy",
+          "neatly trimmed"
+        ]
+      },
+      "omitted_body_details_by_role": {
+        "f1": []
+      }
+    },
+    "fingerprints": {
+      "spatial": "db631803e21d176c04cf91ba4a284f0e814f4182377796cd263dcb7d46f943a1",
+      "characters": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
+      "setting": "f1290f200516bfc64df5e0ba68cbaeaff64488acc219bb4a983c1ff4c0461c8e",
+      "presentation": "32cbc55a9cd81eb57ea87a80a8a9127d4a2e1b02a5899e485430701d20c344b0"
+    },
+    "compact_suffix": "World: rain-lit contemporary apartment, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face. Wardrobe: editorial evening wear; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: cool window light with restrained cyan reflections. Palette slate blue, ivory and muted cyan; mood quiet editorial tension. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 281,
+      "verbose_layer_estimated_tokens": 537,
+      "layer_estimated_tokens": 127,
+      "compact_saved_tokens": 410,
+      "final_estimated_tokens": 408,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m1",
+        "adult_age": 32,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "lean_muscular",
+        "skin_tone": "warm_medium",
+        "face_structure": "square_defined",
+        "hair_base": "short_black",
+        "body_detail_profile": "proportional_adult_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_minimal_dark_timber_bedroom",
+      "world_genre": "contemporary",
+      "location": "minimal dark timber bedroom",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "minimal dark timber bedroom",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "warm directional light from a shaded bedside source"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "walnut, amber and charcoal",
+      "atmosphere": "controlled cinematic intimacy",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D08",
+      "spatial_fingerprint": "2da33cbf168830cdfb974c6a91ef94c8a03e5f2977d4e964374138f2edcf46cf",
+      "setting_id": "test_minimal_dark_timber_bedroom",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "warm directional light from a shaded bedside source",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "walnut, amber and charcoal",
+      "atmosphere": "controlled cinematic intimacy"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "anus"
+        ],
+        "m1": [
+          "penis"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "anus"
+        ],
+        "m1": [
+          "penis"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [
+          "compact symmetrical intimate anatomy",
+          "neatly trimmed"
+        ],
+        "m1": [
+          "proportional adult intimate anatomy",
+          "closely trimmed"
+        ]
+      },
+      "omitted_body_details_by_role": {
+        "f1": [],
+        "m1": []
+      }
+    },
+    "fingerprints": {
+      "spatial": "2da33cbf168830cdfb974c6a91ef94c8a03e5f2977d4e964374138f2edcf46cf",
+      "characters": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
+      "setting": "e101755fab472aa282aba835abbb49cadfc30f418c996ad407650175556c8d33",
+      "presentation": "1b2ce151afe7bf2a3ea0eebebf20f118c00e1136873d3cdaba4d57635fcad09f"
+    },
+    "compact_suffix": "World: minimal dark timber bedroom, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face. Wardrobe: editorial evening wear; clear F1, M1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed; M1 proportional adult intimate anatomy, closely trimmed. Light: warm directional light from a shaded bedside source. Palette walnut, amber and charcoal; mood controlled cinematic intimacy. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 285,
+      "verbose_layer_estimated_tokens": 723,
+      "layer_estimated_tokens": 157,
+      "compact_saved_tokens": 566,
+      "final_estimated_tokens": 442,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "f2",
+        "adult_age": 30,
+        "nationality": "Chinese",
+        "stature": "medium",
+        "build": "compact_athletic",
+        "skin_tone": "neutral_light",
+        "face_structure": "heart_shaped",
+        "hair_base": "shoulder_length_black",
+        "body_detail_profile": "soft_full_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_soft_linen_studio_bedroom",
+      "world_genre": "contemporary",
+      "location": "soft linen studio bedroom",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "soft linen studio bedroom",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "broad diffused morning light with a pale rim"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "cream, sand and dusty rose",
+      "atmosphere": "calm sculptural warmth",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D09",
+      "spatial_fingerprint": "ccace66d2b955a0331996b27dfa5f1aba6f7412ee74286fa68e1e5e694ddd922",
+      "setting_id": "test_soft_linen_studio_bedroom",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "f2",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "broad diffused morning light with a pale rim",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "cream, sand and dusty rose",
+      "atmosphere": "calm sculptural warmth"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "vagina"
+        ],
+        "f2": []
+      },
+      "visible_regions_by_role": {
+        "f1": [],
+        "f2": []
+      },
+      "emitted_body_details_by_role": {
+        "f1": [],
+        "f2": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "f2": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "ccace66d2b955a0331996b27dfa5f1aba6f7412ee74286fa68e1e5e694ddd922",
+      "characters": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
+      "setting": "3fd9ee96aa3bd5f6cabc34f88c24fcba637e3f34900c1ba723089d98a9921bd6",
+      "presentation": "6d07b03e58ce03bba0f5222fdd54017c3978e8a87663cdbb10df6c46c3bb1a70"
+    },
+    "compact_suffix": "World: soft linen studio bedroom, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face. Wardrobe: editorial evening wear; clear F1; women polished editorial makeup; F1 minimal jewelry. Light: broad diffused morning light with a pale rim. Palette cream, sand and dusty rose; mood calm sculptural warmth. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 385,
+      "verbose_layer_estimated_tokens": 693,
+      "layer_estimated_tokens": 122,
+      "compact_saved_tokens": 571,
+      "final_estimated_tokens": 507,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m1",
+        "adult_age": 32,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "lean_muscular",
+        "skin_tone": "warm_medium",
+        "face_structure": "square_defined",
+        "hair_base": "short_black",
+        "body_detail_profile": "proportional_adult_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_geometric_hotel_bedroom",
+      "world_genre": "contemporary",
+      "location": "geometric hotel bedroom",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "geometric hotel bedroom",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "focused overhead light with softened falloff"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "deep green, brass and neutral linen",
+      "atmosphere": "precise dramatic stillness",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D10",
+      "spatial_fingerprint": "93887bfb025f328438af076169b895f36854a1dd0e7752a20a143e512c5ddb3b",
+      "setting_id": "test_geometric_hotel_bedroom",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "focused overhead light with softened falloff",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "deep green, brass and neutral linen",
+      "atmosphere": "precise dramatic stillness"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "vagina"
+        ],
+        "m1": [
+          "penis"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [],
+        "m1": []
+      },
+      "emitted_body_details_by_role": {
+        "f1": [],
+        "m1": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "m1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "93887bfb025f328438af076169b895f36854a1dd0e7752a20a143e512c5ddb3b",
+      "characters": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
+      "setting": "38b9a8f2f0769dd04c237d858d3391d73275a0e4874dfbcbede30b1e51ef46e8",
+      "presentation": "42cefd06bf8d0a3190de7219de3df4b6f950d9d04ccaf3908f31a54a7add1fca"
+    },
+    "compact_suffix": "World: geometric hotel bedroom, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face. Wardrobe: editorial evening wear; clear F1, M1; women polished editorial makeup; F1 minimal jewelry. Light: focused overhead light with softened falloff. Palette deep green, brass and neutral linen; mood precise dramatic stillness. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 308,
+      "verbose_layer_estimated_tokens": 709,
+      "layer_estimated_tokens": 123,
+      "compact_saved_tokens": 586,
+      "final_estimated_tokens": 431,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "f2",
+        "adult_age": 30,
+        "nationality": "Chinese",
+        "stature": "medium",
+        "build": "compact_athletic",
+        "skin_tone": "neutral_light",
+        "face_structure": "heart_shaped",
+        "hair_base": "shoulder_length_black",
+        "body_detail_profile": "soft_full_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "f3",
+        "adult_age": 31,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "soft_curvy",
+        "skin_tone": "warm_medium",
+        "face_structure": "angular_elegant",
+        "hair_base": "long_dark_brown",
+        "body_detail_profile": "defined_natural_intimate_anatomy",
+        "pubic_hair_profile": "natural_groomed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_open_loft_with_polished_concrete",
+      "world_genre": "contemporary",
+      "location": "open loft with polished concrete",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "open loft with polished concrete",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "large frontal softbox balanced by narrow edge lights"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "graphite, silver and warm ochre",
+      "atmosphere": "bold ensemble portraiture",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D11",
+      "spatial_fingerprint": "a7aea50def2c8f068fd77d19bdcf034cb0e2dc9c07a87a7de3497a234863b5ca",
+      "setting_id": "test_open_loft_with_polished_concrete",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "f2",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "f3",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "large frontal softbox balanced by narrow edge lights",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "graphite, silver and warm ochre",
+      "atmosphere": "bold ensemble portraiture"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "breast",
+          "vulva"
+        ],
+        "f2": [
+          "mouth"
+        ],
+        "f3": [
+          "hand"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "breast",
+          "vulva"
+        ],
+        "f2": [
+          "mouth"
+        ],
+        "f3": [
+          "hand"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [
+          "compact symmetrical intimate anatomy",
+          "neatly trimmed"
+        ],
+        "f2": [],
+        "f3": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [],
+        "f2": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "f3": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "a7aea50def2c8f068fd77d19bdcf034cb0e2dc9c07a87a7de3497a234863b5ca",
+      "characters": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
+      "setting": "08fb1ea4dc999e476c66f16cb6e0b42722fcf07ce1eaf675a1849b81bd03bbea",
+      "presentation": "a12201dde38ea9c80093dd24646c17d43d70a0ac14a70a104cebe72076cf0744"
+    },
+    "compact_suffix": "World: open loft with polished concrete, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face; F3 tall soft-curvy, long-dark-brown hair, angular-elegant face. Wardrobe: editorial evening wear; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: large frontal softbox balanced by narrow edge lights. Palette graphite, silver and warm ochre; mood bold ensemble portraiture. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 384,
+      "verbose_layer_estimated_tokens": 896,
+      "layer_estimated_tokens": 162,
+      "compact_saved_tokens": 734,
+      "final_estimated_tokens": 546,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m1",
+        "adult_age": 32,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "lean_muscular",
+        "skin_tone": "warm_medium",
+        "face_structure": "square_defined",
+        "hair_base": "short_black",
+        "body_detail_profile": "proportional_adult_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m2",
+        "adult_age": 30,
+        "nationality": "Chinese",
+        "stature": "medium_tall",
+        "build": "athletic",
+        "skin_tone": "neutral_medium",
+        "face_structure": "oval_masculine",
+        "hair_base": "short_dark_brown",
+        "body_detail_profile": "lean_proportional_intimate_anatomy",
+        "pubic_hair_profile": "natural_groomed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_velvet_lined_private_suite",
+      "world_genre": "contemporary",
+      "location": "velvet-lined private suite",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "velvet-lined private suite",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "low side light with a narrow golden highlight"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "burgundy, black and antique gold",
+      "atmosphere": "dense theatrical focus",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D12",
+      "spatial_fingerprint": "c0f8c16b1499e6a3afc5da17fe9d31c791b18814564b9745ee51206fd44627d3",
+      "setting_id": "test_velvet_lined_private_suite",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m1",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m2",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "low side light with a narrow golden highlight",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "burgundy, black and antique gold",
+      "atmosphere": "dense theatrical focus"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "clitoris",
+          "vulva"
+        ],
+        "m1": [
+          "mouth"
+        ],
+        "m2": [
+          "mouth"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "clitoris",
+          "vulva"
+        ],
+        "m1": [
+          "mouth"
+        ],
+        "m2": [
+          "mouth"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [
+          "compact symmetrical intimate anatomy",
+          "neatly trimmed"
+        ],
+        "m1": [],
+        "m2": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [],
+        "m1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "m2": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "c0f8c16b1499e6a3afc5da17fe9d31c791b18814564b9745ee51206fd44627d3",
+      "characters": "48a8c283507a75a5b5a7bdcb93ff1d49fc7fae9fa42d12e102888acd298af285",
+      "setting": "d9a053e5c7133a14d41d33480efd9e48a9d16eb07707700d6754c49d886a2e8e",
+      "presentation": "d036ae49c3f7e32fecd59236c26971dea46e1ef7243f824202659301c62d3104"
+    },
+    "compact_suffix": "World: velvet-lined private suite, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face; M2 medium-tall athletic, short-dark-brown hair, oval-masculine face. Wardrobe: editorial evening wear; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: low side light with a narrow golden highlight. Palette burgundy, black and antique gold; mood dense theatrical focus. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 395,
+      "verbose_layer_estimated_tokens": 888,
+      "layer_estimated_tokens": 157,
+      "compact_saved_tokens": 731,
+      "final_estimated_tokens": 552,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "f2",
+        "adult_age": 30,
+        "nationality": "Chinese",
+        "stature": "medium",
+        "build": "compact_athletic",
+        "skin_tone": "neutral_light",
+        "face_structure": "heart_shaped",
+        "hair_base": "shoulder_length_black",
+        "body_detail_profile": "soft_full_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_modern_lounge_with_a_sculptural_chair",
+      "world_genre": "contemporary",
+      "location": "modern lounge with a sculptural chair",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "modern lounge with a sculptural chair",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "clean skylight with a soft reflected fill"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "stone, ivory and muted teal",
+      "atmosphere": "balanced contemporary elegance",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D13",
+      "spatial_fingerprint": "7b73d233736bfd0ccf288879bca134a1849332d2e220db89eb34e508452f17cd",
+      "setting_id": "test_modern_lounge_with_a_sculptural_chair",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "f2",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "clean skylight with a soft reflected fill",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "stone, ivory and muted teal",
+      "atmosphere": "balanced contemporary elegance"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "pubic_region"
+        ],
+        "f2": [
+          "vulva"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "pubic_region"
+        ],
+        "f2": [
+          "vulva"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [],
+        "f2": [
+          "soft full intimate anatomy",
+          "closely trimmed"
+        ]
+      },
+      "omitted_body_details_by_role": {
+        "f1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "f2": []
+      }
+    },
+    "fingerprints": {
+      "spatial": "7b73d233736bfd0ccf288879bca134a1849332d2e220db89eb34e508452f17cd",
+      "characters": "2d6300a70207601ea552c42c105605ea4bc980aa79323931d7c95e6e77222527",
+      "setting": "9975c017f771763ed843d695ece36e9e3f870f6b2c2f69750f2cff7f189e250e",
+      "presentation": "e3e5b93224035f65ee0e4bd27ff409dd8a82dbfeee7ff6f339944927d99fc7fa"
+    },
+    "compact_suffix": "World: modern lounge with a sculptural chair, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face. Wardrobe: editorial evening wear; clear F2; women polished editorial makeup; F1 minimal jewelry. Visible detail: F2 soft full intimate anatomy, closely trimmed. Light: clean skylight with a soft reflected fill. Palette stone, ivory and muted teal; mood balanced contemporary elegance. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 232,
+      "verbose_layer_estimated_tokens": 717,
+      "layer_estimated_tokens": 143,
+      "compact_saved_tokens": 574,
+      "final_estimated_tokens": 375,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m1",
+        "adult_age": 32,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "lean_muscular",
+        "skin_tone": "warm_medium",
+        "face_structure": "square_defined",
+        "hair_base": "short_black",
+        "body_detail_profile": "proportional_adult_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m2",
+        "adult_age": 30,
+        "nationality": "Chinese",
+        "stature": "medium_tall",
+        "build": "athletic",
+        "skin_tone": "neutral_medium",
+        "face_structure": "oval_masculine",
+        "hair_base": "short_dark_brown",
+        "body_detail_profile": "lean_proportional_intimate_anatomy",
+        "pubic_hair_profile": "natural_groomed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_low_modular_sofa_in_a_luxury_loft",
+      "world_genre": "contemporary",
+      "location": "low modular sofa in a luxury loft",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "low modular sofa in a luxury loft",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "triangular key lights with controlled shadow separation"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "black, ivory and copper",
+      "atmosphere": "graphic ensemble energy",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D14",
+      "spatial_fingerprint": "36b6494034b386138f1b0cc23a0f8f6b48c8aad52b61aa3490f999f3486e9170",
+      "setting_id": "test_low_modular_sofa_in_a_luxury_loft",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m1",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m2",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "triangular key lights with controlled shadow separation",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "black, ivory and copper",
+      "atmosphere": "graphic ensemble energy"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "breast",
+          "vulva"
+        ],
+        "m1": [
+          "mouth"
+        ],
+        "m2": [
+          "hand"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "breast",
+          "vulva"
+        ],
+        "m1": [
+          "mouth"
+        ],
+        "m2": [
+          "hand"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [
+          "compact symmetrical intimate anatomy",
+          "neatly trimmed"
+        ],
+        "m1": [],
+        "m2": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [],
+        "m1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "m2": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "36b6494034b386138f1b0cc23a0f8f6b48c8aad52b61aa3490f999f3486e9170",
+      "characters": "48a8c283507a75a5b5a7bdcb93ff1d49fc7fae9fa42d12e102888acd298af285",
+      "setting": "a4d81034855303d49dba7c4d52cfa7321e4f462f6a9e8e0295da09f0e0da38df",
+      "presentation": "76e24116a80a324a36a2afb28eab03cc0ca0783094d5232110630ea5b5e8f789"
+    },
+    "compact_suffix": "World: low modular sofa in a luxury loft, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face; M2 medium-tall athletic, short-dark-brown hair, oval-masculine face. Wardrobe: editorial evening wear; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: triangular key lights with controlled shadow separation. Palette black, ivory and copper; mood graphic ensemble energy. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 380,
+      "verbose_layer_estimated_tokens": 894,
+      "layer_estimated_tokens": 159,
+      "compact_saved_tokens": 735,
+      "final_estimated_tokens": 539,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_compact_bedroom_with_a_low_platform_bed",
+      "world_genre": "contemporary",
+      "location": "compact bedroom with a low platform bed",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "compact bedroom with a low platform bed",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "late afternoon window stripe with gentle ambient fill"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "honey wood, white and muted blue",
+      "atmosphere": "observational editorial calm",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D15",
+      "spatial_fingerprint": "0559220bb00aed0ef5a12029fcffc28a675c0325e63df7f62cc89e6b89dc5149",
+      "setting_id": "test_compact_bedroom_with_a_low_platform_bed",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "late afternoon window stripe with gentle ambient fill",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "honey wood, white and muted blue",
+      "atmosphere": "observational editorial calm"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "clitoris",
+          "hand"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "clitoris",
+          "hand"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [
+          "compact symmetrical intimate anatomy",
+          "neatly trimmed"
+        ]
+      },
+      "omitted_body_details_by_role": {
+        "f1": []
+      }
+    },
+    "fingerprints": {
+      "spatial": "0559220bb00aed0ef5a12029fcffc28a675c0325e63df7f62cc89e6b89dc5149",
+      "characters": "a5badb978533a60a424993915fa5da0a97eefd23e2bd561354f8e8e74e0d2359",
+      "setting": "7924e3ac5ff29ebafcce7c9e9d5926f318d4365b81db94f1c48dcbb7f41076d3",
+      "presentation": "f22d466059ee8eb226c89517b5f1269d519e11cf0c566cf50d2e12defa47d63f"
+    },
+    "compact_suffix": "World: compact bedroom with a low platform bed, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face. Wardrobe: editorial evening wear; clear F1; women polished editorial makeup; F1 minimal jewelry. Visible detail: F1 compact symmetrical intimate anatomy, neatly trimmed. Light: late afternoon window stripe with gentle ambient fill. Palette honey wood, white and muted blue; mood observational editorial calm. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 187,
+      "verbose_layer_estimated_tokens": 552,
+      "layer_estimated_tokens": 131,
+      "compact_saved_tokens": 421,
+      "final_estimated_tokens": 318,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m1",
+        "adult_age": 32,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "lean_muscular",
+        "skin_tone": "warm_medium",
+        "face_structure": "square_defined",
+        "hair_base": "short_black",
+        "body_detail_profile": "proportional_adult_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_narrow_architectural_corridor",
+      "world_genre": "contemporary",
+      "location": "narrow architectural corridor",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "narrow architectural corridor",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "hard side light tracing the wall geometry"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "concrete gray, rust and deep navy",
+      "atmosphere": "tense architectural drama",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D16",
+      "spatial_fingerprint": "2f17207011dcd637cba56a74ac1e1babc5d9adf46e57258fd105d6e5003384ca",
+      "setting_id": "test_narrow_architectural_corridor",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "setting-matched footwear",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "setting-matched footwear",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "hard side light tracing the wall geometry",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "concrete gray, rust and deep navy",
+      "atmosphere": "tense architectural drama"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "vagina"
+        ],
+        "m1": [
+          "penis"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [],
+        "m1": []
+      },
+      "emitted_body_details_by_role": {
+        "f1": [],
+        "m1": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "m1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "2f17207011dcd637cba56a74ac1e1babc5d9adf46e57258fd105d6e5003384ca",
+      "characters": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
+      "setting": "f69013c54e089536641683242278ab27535bc04f8d4b51cb82d6bf60a3457b05",
+      "presentation": "f44a7a39517d08494ac1b44b730a8ee6ab6949956b03775d61d2ec251b0fefc1"
+    },
+    "compact_suffix": "World: narrow architectural corridor, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face. Wardrobe: editorial evening wear; clear F1, M1; women polished editorial makeup; F1 minimal jewelry. Light: hard side light tracing the wall geometry. Palette concrete gray, rust and deep navy; mood tense architectural drama. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 292,
+      "verbose_layer_estimated_tokens": 707,
+      "layer_estimated_tokens": 123,
+      "compact_saved_tokens": 584,
+      "final_estimated_tokens": 415,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "f2",
+        "adult_age": 30,
+        "nationality": "Chinese",
+        "stature": "medium",
+        "build": "compact_athletic",
+        "skin_tone": "neutral_light",
+        "face_structure": "heart_shaped",
+        "hair_base": "shoulder_length_black",
+        "body_detail_profile": "soft_full_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "f3",
+        "adult_age": 31,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "soft_curvy",
+        "skin_tone": "warm_medium",
+        "face_structure": "angular_elegant",
+        "hair_base": "long_dark_brown",
+        "body_detail_profile": "defined_natural_intimate_anatomy",
+        "pubic_hair_profile": "natural_groomed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_minimal_stage_with_a_matte_floor",
+      "world_genre": "contemporary",
+      "location": "minimal stage with a matte floor",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "minimal stage with a matte floor",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "low frontal key light and two symmetric rim lights"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "black, crimson and warm white",
+      "atmosphere": "high-impact graphic symmetry",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D17",
+      "spatial_fingerprint": "b6a4feb759aa3a02af3b21a48351d521c708c0aac7dad0e1fca5ee5dacaf1924",
+      "setting_id": "test_minimal_stage_with_a_matte_floor",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear",
+          "wardrobe_state": "scene_appropriate",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "f2",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "f3",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "footwear omitted for stable support",
+          "accessories": [],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "low frontal key light and two symmetric rim lights",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "black, crimson and warm white",
+      "atmosphere": "high-impact graphic symmetry"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "left_hand",
+          "right_hand"
+        ],
+        "f2": [
+          "clitoris"
+        ],
+        "f3": [
+          "clitoris"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [
+          "left_hand",
+          "right_hand"
+        ],
+        "f2": [
+          "clitoris"
+        ],
+        "f3": [
+          "clitoris"
+        ]
+      },
+      "emitted_body_details_by_role": {
+        "f1": [],
+        "f2": [
+          "soft full intimate anatomy",
+          "closely trimmed"
+        ],
+        "f3": [
+          "defined natural intimate anatomy",
+          "natural groomed"
+        ]
+      },
+      "omitted_body_details_by_role": {
+        "f1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "f2": [],
+        "f3": []
+      }
+    },
+    "fingerprints": {
+      "spatial": "b6a4feb759aa3a02af3b21a48351d521c708c0aac7dad0e1fca5ee5dacaf1924",
+      "characters": "0d099a4c9e9b2cea02a00d3a7ce8f693fa4396c142c13e61dfa2edee524e4fa4",
+      "setting": "b0b4221bc122bd12dac7594a697140aa2153e8832776bde1c2807153267c127f",
+      "presentation": "30872f602aff0e22deb3f9d5f456a71339ffdb94d06e076988a61a6f9bc4350f"
+    },
+    "compact_suffix": "World: minimal stage with a matte floor, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; F2 medium compact-athletic, shoulder-length-black hair, heart-shaped face; F3 tall soft-curvy, long-dark-brown hair, angular-elegant face. Wardrobe: editorial evening wear; clear F2, F3; women polished editorial makeup; F1 minimal jewelry. Visible detail: F2 soft full intimate anatomy, closely trimmed; F3 defined natural intimate anatomy, natural groomed. Light: low frontal key light and two symmetric rim lights. Palette black, crimson and warm white; mood high-impact graphic symmetry. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 355,
+      "verbose_layer_estimated_tokens": 916,
+      "layer_estimated_tokens": 174,
+      "compact_saved_tokens": 742,
+      "final_estimated_tokens": 529,
+      "layer_budget_tokens": 200
+    }
+  },
+  {
+    "characters": [
+      {
+        "role": "f1",
+        "adult_age": 29,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "athletic_slim",
+        "skin_tone": "warm_light",
+        "face_structure": "oval_defined",
+        "hair_base": "long_black_wavy",
+        "body_detail_profile": "compact_symmetrical_intimate_anatomy",
+        "pubic_hair_profile": "neatly_trimmed",
+        "fantasy_body_traits": []
+      },
+      {
+        "role": "m1",
+        "adult_age": 32,
+        "nationality": "Chinese",
+        "stature": "tall",
+        "build": "lean_muscular",
+        "skin_tone": "warm_medium",
+        "face_structure": "square_defined",
+        "hair_base": "short_black",
+        "body_detail_profile": "proportional_adult_intimate_anatomy",
+        "pubic_hair_profile": "closely_trimmed",
+        "fantasy_body_traits": []
+      }
+    ],
+    "setting": {
+      "setting_id": "test_spacious_modern_corridor",
+      "world_genre": "contemporary",
+      "location": "spacious modern corridor",
+      "era": "contemporary",
+      "time_of_day": "night",
+      "weather": "interior_controlled",
+      "architecture": "spacious modern corridor",
+      "materials": [
+        "textured fabric",
+        "finished wood"
+      ],
+      "environment_props": [],
+      "motivated_light_sources": [
+        "hard directional sidelight with deep controlled shadows"
+      ],
+      "appearance_bias": [],
+      "wardrobe_theme": "editorial evening wear",
+      "accessory_theme": [
+        "minimal jewelry"
+      ],
+      "makeup_theme": "polished editorial makeup",
+      "preferred_palette": "deep burgundy, ochre and slate",
+      "atmosphere": "dynamic cinematic intensity",
+      "forbidden_elements": [
+        "background_people",
+        "humanoid_statues",
+        "mirrors_showing_extra_bodies",
+        "person_shaped_shadows"
+      ]
+    },
+    "presentation": {
+      "scene_id": "D18",
+      "spatial_fingerprint": "8d50ddfe01f36e834084dc4c5e3d6d48e1cdd86c0608920e29d8ec57893a226d",
+      "setting_id": "test_spacious_modern_corridor",
+      "roles": [
+        {
+          "role": "f1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "setting-matched footwear",
+          "accessories": [
+            "minimal jewelry"
+          ],
+          "makeup": "polished editorial makeup",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        },
+        {
+          "role": "m1",
+          "wardrobe": "editorial evening wear, displaced only where contact requires",
+          "wardrobe_state": "clear_of_required_contacts",
+          "footwear": "setting-matched footwear",
+          "accessories": [],
+          "makeup": "subtle polished grooming",
+          "hair_styling": "setting-coherent styling of the locked base hair",
+          "surface_finish": "lighting-responsive natural skin finish"
+        }
+      ],
+      "motivated_light_source": "hard directional sidelight with deep controlled shadows",
+      "lighting_direction": "geometry_preserving",
+      "lighting_quality": "subject_separating",
+      "palette": "deep burgundy, ochre and slate",
+      "atmosphere": "dynamic cinematic intensity"
+    },
+    "visibility": {
+      "required_regions_by_role": {
+        "f1": [
+          "vagina"
+        ],
+        "m1": [
+          "penis"
+        ]
+      },
+      "visible_regions_by_role": {
+        "f1": [],
+        "m1": []
+      },
+      "emitted_body_details_by_role": {
+        "f1": [],
+        "m1": []
+      },
+      "omitted_body_details_by_role": {
+        "f1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ],
+        "m1": [
+          "body_detail_profile",
+          "pubic_hair_profile"
+        ]
+      }
+    },
+    "fingerprints": {
+      "spatial": "8d50ddfe01f36e834084dc4c5e3d6d48e1cdd86c0608920e29d8ec57893a226d",
+      "characters": "f4456cfa2250463f3eaa2f04e6d5a0318ccf0b37f6a32f9e1bd7aaf270f88f0a",
+      "setting": "778507747560e4165aa64cd196e426af979d20d97c0d3a1f12d9ce50b9ac29ee",
+      "presentation": "0cd43862300fe819fd893e2ad07ec4575955f9abc3d5a8686af02c03954d3d8c"
+    },
+    "compact_suffix": "World: spacious modern corridor, night; textured fabric/finished wood. Look: F1 tall athletic-slim, long-black-wavy hair, oval-defined face; M1 tall lean-muscular, short-black hair, square-defined face. Wardrobe: editorial evening wear; clear F1, M1; women polished editorial makeup; F1 minimal jewelry. Light: hard directional sidelight with deep controlled shadows. Palette deep burgundy, ochre and slate; mood dynamic cinematic intensity. No extra figures, statues, human shadows or reflections.",
+    "token_metrics": {
+      "geometry_estimated_tokens": 414,
+      "verbose_layer_estimated_tokens": 708,
+      "layer_estimated_tokens": 125,
+      "compact_saved_tokens": 583,
+      "final_estimated_tokens": 539,
+      "layer_budget_tokens": 200
+    }
+  }
+]

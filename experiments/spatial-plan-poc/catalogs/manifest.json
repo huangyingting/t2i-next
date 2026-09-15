@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "requested_configurations": [
     "one_woman",
     "one_woman_one_man",

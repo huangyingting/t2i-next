@@ -23,13 +23,8 @@
       "contact_edges": 36,
       "wearable_props": 0,
       "handheld_props": 1,
-      "cast_slots": [
-        {
-          "slot_id": "f1",
-          "sex": "female",
-          "role": "central",
-          "adult_only": true
-        }
+      "cast_roles": [
+        "f1"
       ],
       "readback_validated": true
     },
@@ -53,19 +48,9 @@
       "contact_edges": 37,
       "wearable_props": 0,
       "handheld_props": 0,
-      "cast_slots": [
-        {
-          "slot_id": "f1",
-          "sex": "female",
-          "role": "central",
-          "adult_only": true
-        },
-        {
-          "slot_id": "m1",
-          "sex": "male",
-          "role": "partner",
-          "adult_only": true
-        }
+      "cast_roles": [
+        "f1",
+        "m1"
       ],
       "readback_validated": true
     },
@@ -89,25 +74,10 @@
       "contact_edges": 64,
       "wearable_props": 0,
       "handheld_props": 0,
-      "cast_slots": [
-        {
-          "slot_id": "f1",
-          "sex": "female",
-          "role": "central",
-          "adult_only": true
-        },
-        {
-          "slot_id": "m1",
-          "sex": "male",
-          "role": "partner",
-          "adult_only": true
-        },
-        {
-          "slot_id": "m2",
-          "sex": "male",
-          "role": "partner",
-          "adult_only": true
-        }
+      "cast_roles": [
+        "f1",
+        "m1",
+        "m2"
       ],
       "readback_validated": true
     },
@@ -131,19 +101,9 @@
       "contact_edges": 37,
       "wearable_props": 9,
       "handheld_props": 0,
-      "cast_slots": [
-        {
-          "slot_id": "f1",
-          "sex": "female",
-          "role": "central",
-          "adult_only": true
-        },
-        {
-          "slot_id": "f2",
-          "sex": "female",
-          "role": "partner",
-          "adult_only": true
-        }
+      "cast_roles": [
+        "f1",
+        "f2"
       ],
       "readback_validated": true
     },
@@ -166,26 +126,11 @@
       "compatibility_links": 6448,
       "contact_edges": 64,
       "wearable_props": 7,
-      "handheld_props": 0,
-      "cast_slots": [
-        {
-          "slot_id": "f1",
-          "sex": "female",
-          "role": "central",
-          "adult_only": true
-        },
-        {
-          "slot_id": "f2",
-          "sex": "female",
-          "role": "partner",
-          "adult_only": true
-        },
-        {
-          "slot_id": "f3",
-          "sex": "female",
-          "role": "partner",
-          "adult_only": true
-        }
+      "handheld_props": 2,
+      "cast_roles": [
+        "f1",
+        "f2",
+        "f3"
       ],
       "readback_validated": true
     }

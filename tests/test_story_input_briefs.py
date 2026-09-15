@@ -3260,6 +3260,10 @@ def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() ->
     assert "ABSOLUTE OUTPUT PRIORITY" in brief
     assert "at least 600 whitespace-delimited words" in normalized
     assert "Target 650-900 words" in normalized
+    assert 'call the image a "live-action dark-fantasy feature-film frame"' in (
+        normalized
+    )
+    assert "do not substitute cinematic, photorealistic" in normalized
     assert "ASCII is an absolute publication requirement" in normalized
     assert "final character-by-character ASCII sweep" in normalized
     assert "This minimum overrides every later request for brevity" in normalized
@@ -3357,7 +3361,13 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "Never place both a female and a male demon sovereign" in normalized
     assert "at least 600 whitespace-delimited words" in normalized
     assert "Target 650-900 words" in normalized
-    assert "museum-scale dark-fantasy painting" in normalized
+    assert "live-action dark-fantasy feature-film image" in normalized
+    assert "LIVE-ACTION CINEMATIC THESIS" in brief
+    assert "real adult performer with natural skin texture" in normalized
+    assert "physically wearable horns, wings, armor" in normalized
+    assert "finished frame from a large-budget live-action" in normalized
+    assert "not an oil painting, illustration, concept art" in normalized
+    assert "restrained invisible visual-effects extension" in normalized
     assert "intentionally low-saturation, dark-key, high-tonal-contrast" in (
         normalized
     )
@@ -3371,6 +3381,10 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "Never convert a requested woman into a man" in normalized
     assert "Within the first sixty English words" in normalized
     assert "exactly one adult woman and exactly one adult man" in normalized
+    assert "For every mixed cast, the first sentence states all requested gender counts" in (
+        normalized
+    )
+    assert "Reserve those two exact \"only\" constructions exclusively" in normalized
     assert "SOLO CAST LOCK" in brief
     assert "strict solo portrait containing only that one demon sovereign" in normalized
     assert 'first sentence must say "one adult Chinese man only"' in normalized
@@ -3384,12 +3398,24 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
         normalized
     )
     assert "may never replace it" in normalized
+    assert "Use one exact integer age for every person" in normalized
+    assert "Never write mid-thirties, early forties, late fifties" in normalized
     assert "retain a clearly Chinese adult identity" in normalized
     assert "EQUAL AGENCY AND CONSENT" in brief
     assert "awake, unimpaired, willing, responsive" in normalized
     assert "describes the interaction as consensual and willing" in normalized
     assert "Within the first one hundred English words" in normalized
     assert 'include the exact phrase "consensual and willing"' in normalized
+    assert "Within the first one hundred English words of every Hardcore Frame" in (
+        normalized
+    )
+    assert "whose erect penis is inside whose vagina or anus" in normalized
+    assert "Place that direct Hardcore contact in the first or second sentence" in (
+        normalized
+    )
+    assert "Do not spend the opening on face, horns, wardrobe" in normalized
+    assert "All word-position checks are silent" in normalized
+    assert "Never mention first words, first one hundred words" in normalized
     assert "Never use a prisoner, slave, sacrifice, tribute" in normalized
     assert "ROLE AND CHARACTER VARIETY" in brief
     assert "infernal judge weighing an impossible dispute" in normalized
@@ -3410,7 +3436,29 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "exterior domains" in normalized
     assert "original transitional spaces" in normalized
     assert "Do not default every scene to smoke, embers" in normalized
+    assert "ENVIRONMENTAL SET-PIECE AND EVENT ENGINE" in brief
+    assert "exactly one dominant set-piece event already happening" in normalized
+    assert "colossal floodgate opening" in normalized
+    assert "suspended forge crucible rotating" in normalized
+    assert "storm observatory's physical rings turning" in normalized
+    assert "mechanical eclipse aperture closing" in normalized
+    assert "Choose a peak readable instant" in normalized
+    assert "one dominant event and at most one subordinate environmental reaction" in (
+        normalized
+    )
+    assert "complete occupied body zone is dry, room-temperature, stable" in normalized
+    assert "Water may form a shallow reflective layer no higher than the ankles" in (
+        normalized
+    )
+    assert "Never stage intimacy underwater" in normalized
+    assert "Keep ash, dust, silt, sparks, rain, smoke, steam" in normalized
+    assert "remain several body lengths away behind a visible" in normalized
     assert "Do not repeat the reference's close frontal lap arrangement" in normalized
+    assert "DEPTH, SILHOUETTE, AND VISUAL IMPACT" in brief
+    assert "three readable spatial layers" in normalized
+    assert "one dominant graphic structure" in normalized
+    assert "Add one scale contrast and one material contrast" in normalized
+    assert "Choose one movement vector" in normalized
     assert "POSE AND INTERACTION VARIETY" in brief
     assert "open-ended pose engines" in normalized
     assert "At Aesthetic level, vary" in normalized
@@ -3424,9 +3472,19 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "rear-entry vaginal or anal intercourse" in normalized
     assert "mutual masturbation, reciprocal oral contact" in normalized
     assert "one dominant body arrangement" in normalized
-    assert "typically 35-85mm equivalent" in normalized
+    assert "24-135mm equivalent" in normalized
+    assert "Reserve 24-28mm for environmental wides" in normalized
     assert "Rotate camera families among frontal eye-level symmetry" in normalized
-    assert "realistic oil-painted depth" in normalized
+    assert "floor-level view along a reflective surface" in normalized
+    assert "Select one decisive cinematic instant" in normalized
+    assert "Every final Frame states one exact focal length in millimeters" in normalized
+    assert "vague phrase such as cinematic view, dramatic angle" in normalized
+    assert "LIGHT, COLOR, AND LIVE-ACTION FINISH" in brief
+    assert "Render as live-action cinematic photography" in normalized
+    assert "Practical prosthetics meet skin through credible bases" in normalized
+    assert "fine cinematic grain" in normalized
+    assert "Avoid oil painting, visible brushwork, illustration" in normalized
+    assert "frame from the finished fictional film itself" in normalized
     assert "LOW-SATURATION HIGH-CONTRAST COLOR LOCK" in brief
     assert "Suppress color contrast while preserving strong luminance contrast" in (
         normalized
@@ -3458,9 +3516,14 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "Frames within one Theme are parallel finished images" in normalized
     assert "Within every rolling group of twelve Themes" in normalized
     assert "Across a one-hundred-Theme run" in normalized
+    assert "eight distinct dominant set-piece events" in normalized
+    assert "six different three-layer depth designs" in normalized
+    assert "do not repeat the same environment family, dominant event" in normalized
     assert "may occupy more than one tenth of the Themes" in normalized
     assert "NO-TEXT IMAGE CONTRACT" in brief
     assert "Use ASCII characters only in an English Frame" in normalized
+    assert "absolute publication requirement" in normalized
+    assert "silently rescan every character" in normalized
     assert "End by restating the exact number of adult women and adult men" in normalized
     assert "Word counting is a silent authoring check" in normalized
     assert 'Do not write phrases such as "six hundred words"' in normalized
@@ -3468,6 +3531,13 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     assert "adds any second person, name, owner, gaze partner" in normalized
     assert "falls below 600 English words" in normalized
     assert "uses vivid, neon, jewel-tone, high-saturation" in normalized
+    assert "leaves the environment static without one visible current event" in normalized
+    assert "combines more than one dominant disaster" in normalized
+    assert "omits an exact 24-135mm focal length" in normalized
+    assert "postpones exact Hardcore anatomy or direct contact" in normalized
+    assert "stages Erotic or Hardcore intimacy underwater" in normalized
+    assert "places ash, dust, silt, sparks, rain, smoke" in normalized
+    assert 'omits "live-action dark-fantasy feature-film frame"' in normalized
 
 
 def test_angel_brief_has_bright_live_action_exact_cast_contract() -> None:

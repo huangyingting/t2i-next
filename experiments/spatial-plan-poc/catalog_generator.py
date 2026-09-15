@@ -18,17 +18,11 @@ Identifier = Annotated[
         pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$",
     ),
 ]
+RoleCode = Annotated[str, StringConstraints(pattern=r"^[fm][1-9][0-9]*$")]
 
 
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
-
-
-class ActorSlot(StrictModel):
-    slot_id: Identifier
-    sex: Annotated[str, StringConstraints(pattern=r"^(female|male)$")]
-    role: Identifier
-    adult_only: bool
 
 
 class ContactEndpoint(StrictModel):
@@ -44,8 +38,6 @@ class ContactEdge(StrictModel):
         str,
         StringConstraints(pattern=r"^(external_contact|inserted)$"),
     ]
-    screen_position: Identifier
-    depth_plane: Identifier
     preferred_visibility: Annotated[
         str,
         StringConstraints(pattern=r"^(visible|occluded)$"),
@@ -54,7 +46,7 @@ class ContactEdge(StrictModel):
 
 class WearableProp(StrictModel):
     prop_id: Identifier
-    owner_slot: Identifier
+    owner_role: RoleCode
     category: Annotated[str, StringConstraints(pattern=r"^strap_on$")]
     mount_region: Annotated[str, StringConstraints(pattern=r"^pelvis$")]
     attachment: Annotated[str, StringConstraints(pattern=r"^pelvic_harness$")]
@@ -72,41 +64,39 @@ class WearableProp(StrictModel):
 
 class HandheldProp(StrictModel):
     prop_id: Identifier
-    controller_slot: Identifier
-    category: Annotated[str, StringConstraints(pattern=r"^vibrator$")]
+    controller_role: RoleCode
+    category: Annotated[
+        str,
+        StringConstraints(pattern=r"^(vibrator|insertable_toy)$"),
+    ]
     grip_region: Annotated[str, StringConstraints(pattern=r"^right_hand$")]
     deployment: Annotated[
         str,
-        StringConstraints(pattern=r"^external_surface_contact$"),
+        StringConstraints(pattern=r"^(external_surface_contact|inserted)$"),
     ]
     orientation: Annotated[
         str,
-        StringConstraints(pattern=r"^transverse_over_clitoral_surface$"),
+        StringConstraints(
+            pattern=(r"^(transverse_over_clitoral_surface|aligned_to_target_canal)$")
+        ),
     ]
 
 
 class RestraintPlan(StrictModel):
-    enabled: bool
-    category: Identifier | None
-    controller_slots: list[Identifier]
-    restrained_slots: list[Identifier]
+    category: Identifier
+    controller_roles: list[RoleCode]
+    restrained_roles: list[RoleCode]
     body_regions: list[Identifier]
     equipment: list[Identifier]
-    quick_release_visible: bool
-    safeword_required: bool
-    injury_required: bool
 
 
 class ActivityTemplate(StrictModel):
     activity_id: Identifier
-    activity_family: Identifier
-    coverage_tags: list[Identifier] = Field(min_length=1, max_length=8)
-    required_slots: list[Identifier] = Field(min_length=1, max_length=8)
+    focus_role: RoleCode
     contact_edges: list[ContactEdge] = Field(min_length=1, max_length=6)
-    handheld_props: list[HandheldProp] = Field(max_length=2)
-    wearable_props: list[WearableProp] = Field(max_length=2)
-    restraint: RestraintPlan
-    compatible_pose_families: list[Identifier] = Field(min_length=1, max_length=16)
+    handheld_props: list[HandheldProp] = Field(default_factory=list, max_length=2)
+    wearable_props: list[WearableProp] = Field(default_factory=list, max_length=2)
+    restraint: RestraintPlan | None = None
 
     @model_validator(mode="after")
     def activity_is_coherent(self) -> ActivityTemplate:
@@ -123,11 +113,14 @@ class ActivityTemplate(StrictModel):
         handheld_ids = [prop.prop_id for prop in self.handheld_props]
         if len(handheld_ids) != len(set(handheld_ids)):
             raise ValueError("handheld prop IDs must be unique")
+        controller_grips = [
+            (prop.controller_role, prop.grip_region) for prop in self.handheld_props
+        ]
+        if len(controller_grips) != len(set(controller_grips)):
+            raise ValueError("a controller hand cannot operate two handheld props")
         if set(wearable_ids).intersection(handheld_ids):
             raise ValueError("a prop cannot be both handheld and wearable")
         for prop in self.handheld_props:
-            if prop.controller_slot not in self.required_slots:
-                raise ValueError("handheld prop controller is not in required cast")
             matching_edges = [
                 edge
                 for edge in self.contact_edges
@@ -136,23 +129,38 @@ class ActivityTemplate(StrictModel):
             if len(matching_edges) != 1:
                 raise ValueError("handheld prop requires exactly one contact edge")
             edge = matching_edges[0]
-            if (
-                edge.source.region != "contact_surface"
-                or edge.target.region != "clitoris"
+            if edge.source.region != "contact_surface":
+                raise ValueError("handheld prop must use its contact surface")
+            if prop.category == "vibrator" and (
+                edge.target.region != "clitoris"
                 or edge.state != "external_contact"
+                or prop.deployment != "external_surface_contact"
+                or prop.orientation != "transverse_over_clitoral_surface"
             ):
                 raise ValueError(
                     "clitoral vibrator must remain an external surface contact"
+                )
+            if prop.category == "insertable_toy" and (
+                edge.target.region not in {"vagina", "anus"}
+                or edge.state != "inserted"
+                or prop.deployment != "inserted"
+                or prop.orientation != "aligned_to_target_canal"
+            ):
+                raise ValueError(
+                    "insertable handheld prop must align with a target canal"
                 )
         if self.activity_id == "vibrator_clitoral":
             if len(self.handheld_props) != 1:
                 raise ValueError(
                     "vibrator_clitoral requires one controlled handheld prop"
                 )
+        elif self.activity_id == "double_toy_vaginal_anal":
+            if len(self.handheld_props) != 2:
+                raise ValueError(
+                    "double_toy_vaginal_anal requires two controlled handheld props"
+                )
         elif self.handheld_props:
-            raise ValueError(
-                "handheld vibrator topology belongs only to vibrator_clitoral"
-            )
+            raise ValueError("activity does not support handheld prop topology")
         has_strap_on_tag = has_tag(self.activity_id, "strap_on")
         if (has_strap_on_tag and len(self.wearable_props) != 1) or (
             not has_strap_on_tag and self.wearable_props
@@ -161,8 +169,6 @@ class ActivityTemplate(StrictModel):
                 "strap-on activities require exactly one explicit wearable prop"
             )
         for prop in self.wearable_props:
-            if prop.owner_slot not in self.required_slots:
-                raise ValueError("wearable prop owner is not in required cast")
             matching_edges = [
                 edge
                 for edge in self.contact_edges
@@ -174,7 +180,7 @@ class ActivityTemplate(StrictModel):
                 raise ValueError(
                     "wearable prop must connect through its shaft endpoint"
                 )
-            if matching_edges[0].target.entity_id == prop.owner_slot:
+            if matching_edges[0].target.entity_id == prop.owner_role:
                 raise ValueError("wearable prop owner cannot also be its target")
         if any(
             endpoint.region == "strap_on"
@@ -182,28 +188,12 @@ class ActivityTemplate(StrictModel):
             for endpoint in (edge.source, edge.target)
         ):
             raise ValueError("strap-on is a wearable prop, not a body region")
-        if self.restraint.enabled:
-            if (
-                not self.restraint.category
-                or not self.restraint.equipment
-                or not self.restraint.restrained_slots
-                or not self.restraint.quick_release_visible
-                or not self.restraint.safeword_required
-                or self.restraint.injury_required
-            ):
+        if self.restraint is not None:
+            if not self.restraint.equipment or not self.restraint.restrained_roles:
                 raise ValueError("BDSM activities require reversible safety metadata")
-        elif any(
-            (
-                self.restraint.category,
-                self.restraint.controller_slots,
-                self.restraint.restrained_slots,
-                self.restraint.body_regions,
-                self.restraint.equipment,
-                self.restraint.quick_release_visible,
-                self.restraint.safeword_required,
-                self.restraint.injury_required,
-            )
-        ):
+        elif activity_family(self.activity_id) == "bdsm":
+            raise ValueError("BDSM activity requires restraint topology")
+        if self.restraint is not None and activity_family(self.activity_id) != "bdsm":
             raise ValueError("non-BDSM activities cannot carry restraint metadata")
         return self
 
@@ -222,8 +212,8 @@ class CentralPose(StrictModel):
 
 
 class ActorPlan(StrictModel):
-    slot_id: Identifier
-    pose_role: Identifier
+    role: RoleCode
+    pose_function: Identifier
     screen_position: Identifier
     depth_plane: Identifier
     limb_roles: list[Identifier] = Field(min_length=2, max_length=8)
@@ -232,43 +222,33 @@ class ActorPlan(StrictModel):
 
 class PoseEntry(StrictModel):
     pose_id: Identifier
-    cast_key: Identifier
-    central_slot: Identifier
     central_pose: CentralPose
     actor_plans: list[ActorPlan] = Field(min_length=1, max_length=8)
     compatible_activity_ids: list[Identifier] = Field(min_length=1, max_length=32)
-    exact_cast: list[Identifier] = Field(min_length=1, max_length=8)
-    consent_required: bool
     signature: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
 
     @model_validator(mode="after")
     def entry_is_coherent(self) -> PoseEntry:
-        plan_slots = [plan.slot_id for plan in self.actor_plans]
-        if plan_slots != self.exact_cast:
-            raise ValueError("actor plans must cover exact_cast in order")
-        if self.central_slot not in self.exact_cast:
-            raise ValueError("central slot is not in exact_cast")
-        if not self.consent_required:
-            raise ValueError("every catalog entry requires adult consent")
+        plan_roles = [plan.role for plan in self.actor_plans]
+        if len(plan_roles) != len(set(plan_roles)):
+            raise ValueError("actor plans must use unique roles")
+        if sum(plan.pose_function == "central_pose" for plan in self.actor_plans) != 1:
+            raise ValueError("actor plans require exactly one central pose function")
         return self
 
 
 class PoseCatalog(StrictModel):
-    schema_version: Annotated[str, StringConstraints(pattern=r"^2\.0$")]
+    schema_version: Annotated[str, StringConstraints(pattern=r"^3\.0$")]
     cast_key: Identifier
-    cast_slots: list[ActorSlot] = Field(min_length=1, max_length=8)
-    requested_entry_count: int
+    cast_roles: list[RoleCode] = Field(min_length=1, max_length=8)
     activities: list[ActivityTemplate] = Field(min_length=32, max_length=32)
     entries: list[PoseEntry]
-    coverage: dict[str, dict[str, int] | int]
 
     @model_validator(mode="after")
     def catalog_has_exact_coverage(self) -> PoseCatalog:
-        if self.requested_entry_count != 256 or len(self.entries) != 256:
+        if len(self.entries) != 256:
             raise ValueError("each catalog must contain exactly 256 entries")
-        expected_slots = [slot.slot_id for slot in self.cast_slots]
-        if not all(slot.adult_only for slot in self.cast_slots):
-            raise ValueError("all actor slots must be adult-only")
+        expected_roles = self.cast_roles
         pose_ids = [entry.pose_id for entry in self.entries]
         if len(pose_ids) != len(set(pose_ids)):
             raise ValueError("pose IDs must be unique")
@@ -286,7 +266,7 @@ class PoseCatalog(StrictModel):
         if len(central_topologies) != 256:
             raise ValueError("catalog requires 256 unique central pose topologies")
         if any(
-            entry.cast_key != self.cast_key or entry.exact_cast != expected_slots
+            [plan.role for plan in entry.actor_plans] != expected_roles
             for entry in self.entries
         ):
             raise ValueError("entry cast differs from catalog cast")
@@ -296,7 +276,7 @@ class PoseCatalog(StrictModel):
         activity_ids = [activity.activity_id for activity in self.activities]
         if len(activity_ids) != len(set(activity_ids)):
             raise ValueError("catalog activity IDs must be unique")
-        if sum(activity.restraint.enabled for activity in self.activities) != 8:
+        if sum(activity.restraint is not None for activity in self.activities) != 8:
             raise ValueError("catalog requires exactly eight BDSM activity templates")
         activity_map = {activity.activity_id: activity for activity in self.activities}
         used_activities: set[str] = set()
@@ -305,23 +285,40 @@ class PoseCatalog(StrictModel):
             if not compatible or not compatible.issubset(activity_map):
                 raise ValueError(f"{entry.pose_id} has unknown compatible activities")
             if any(
-                entry.central_pose.family
-                not in activity_map[activity_id].compatible_pose_families
+                entry.central_pose.family not in compatible_pose_families(activity_id)
                 for activity_id in compatible
             ):
                 raise ValueError(f"{entry.pose_id} has incompatible activities")
             used_activities.update(compatible)
         if used_activities != set(activity_ids):
             raise ValueError("every activity must be reachable from at least one pose")
-        actor_sexes = {slot.slot_id: slot.sex for slot in self.cast_slots}
-        valid_entities = set(expected_slots) | {
+        actor_sexes = {
+            role: "female" if role.startswith("f") else "male"
+            for role in self.cast_roles
+        }
+        valid_entities = set(expected_roles) | {
             "prop_a",
             "prop_b",
             "environment",
         }
         for activity in self.activities:
-            if activity.required_slots != expected_slots:
-                raise ValueError(f"{activity.activity_id} required cast changed")
+            if activity.focus_role != expected_roles[0]:
+                raise ValueError(f"{activity.activity_id} focus role changed")
+            referenced_roles = {
+                endpoint.entity_id
+                for edge in activity.contact_edges
+                for endpoint in (edge.source, edge.target)
+                if endpoint.entity_id not in {"prop_a", "prop_b", "environment"}
+            }
+            if activity.restraint is not None:
+                referenced_roles.update(activity.restraint.controller_roles)
+                referenced_roles.update(activity.restraint.restrained_roles)
+            referenced_roles.update(prop.owner_role for prop in activity.wearable_props)
+            referenced_roles.update(
+                prop.controller_role for prop in activity.handheld_props
+            )
+            if not referenced_roles.issubset(expected_roles):
+                raise ValueError(f"{activity.activity_id} uses a role outside its cast")
             for edge in activity.contact_edges:
                 for endpoint in (edge.source, edge.target):
                     if endpoint.entity_id not in valid_entities:
@@ -348,13 +345,14 @@ class PoseCatalog(StrictModel):
                 for edge in activity.contact_edges
                 for endpoint in (edge.source, edge.target)
             }
-            if "penetration" in activity.coverage_tags and not any(
+            tags = activity_tags(activity.activity_id)
+            if "penetration" in tags and not any(
                 edge.state == "inserted" for edge in activity.contact_edges
             ):
                 raise ValueError(f"{activity.activity_id} lacks an inserted contact")
-            if "oral" in activity.coverage_tags and "mouth" not in regions:
+            if "oral" in tags and "mouth" not in regions:
                 raise ValueError(f"{activity.activity_id} lacks an oral endpoint")
-            if "toy" in activity.coverage_tags and not {
+            if "toy" in tags and not {
                 "prop_a",
                 "prop_b",
             }.intersection(entities):
@@ -382,7 +380,9 @@ class PoseCatalog(StrictModel):
                         f"{activity.activity_id} lacks a mounted shaft contact"
                     )
         catalog_tags = {
-            tag for activity in self.activities for tag in activity.coverage_tags
+            tag
+            for activity in self.activities
+            for tag in activity_tags(activity.activity_id)
         }
         required_tags = {"masturbation", "toy", "bdsm", "penetration"}
         if self.cast_key != "one_woman":
@@ -784,25 +784,11 @@ BDSM_EQUIPMENT = (
 
 
 CASTS = {
-    "one_woman": (("f1", "female", "central"),),
-    "one_woman_one_man": (
-        ("f1", "female", "central"),
-        ("m1", "male", "partner"),
-    ),
-    "one_woman_two_men": (
-        ("f1", "female", "central"),
-        ("m1", "male", "partner"),
-        ("m2", "male", "partner"),
-    ),
-    "two_women": (
-        ("f1", "female", "central"),
-        ("f2", "female", "partner"),
-    ),
-    "three_women": (
-        ("f1", "female", "central"),
-        ("f2", "female", "partner"),
-        ("f3", "female", "partner"),
-    ),
+    "one_woman": ("f1",),
+    "one_woman_one_man": ("f1", "m1"),
+    "one_woman_two_men": ("f1", "m1", "m2"),
+    "two_women": ("f1", "f2"),
+    "three_women": ("f1", "f2", "f3"),
 }
 
 LOGICAL_ACTOR_ROLES = ("central", "partner_a", "partner_b")
@@ -815,7 +801,7 @@ def resolve_actor_role(cast_key: str, entity_id: str) -> str:
     cast = CASTS[cast_key]
     if index >= len(cast):
         raise ValueError(f"{cast_key} has no actor for {entity_id}")
-    return cast[index][0]
+    return cast[index]
 
 
 def activity_ids(cast_key: str) -> tuple[str, ...]:
@@ -1035,7 +1021,7 @@ def contact_specs(
             )
         ]
 
-    partner_is_male = CASTS[cast_key][1][1] == "male"
+    partner_is_male = CASTS[cast_key][1].startswith("m")
     penetration_source = "partner_a" if partner_is_male else "prop_a"
     penetration_region = "penis" if partner_is_male else "shaft"
     if len(CASTS[cast_key]) == 2:
@@ -1494,19 +1480,9 @@ def contact_specs(
 def restraint_plan(
     cast_key: str,
     activity_id: str,
-) -> RestraintPlan:
+) -> RestraintPlan | None:
     if activity_family(activity_id) != "bdsm":
-        return RestraintPlan(
-            enabled=False,
-            category=None,
-            controller_slots=[],
-            restrained_slots=[],
-            body_regions=[],
-            equipment=[],
-            quick_release_visible=False,
-            safeword_required=False,
-            injury_required=False,
-        )
+        return None
     equipment_index = next(
         (
             index
@@ -1531,12 +1507,11 @@ def restraint_plan(
         if has_tag(activity_id, "impact")
         else BDSM_EQUIPMENT[equipment_index]
     )
-    slots = [slot[0] for slot in CASTS[cast_key]]
+    roles = list(CASTS[cast_key])
     return RestraintPlan(
-        enabled=True,
         category=activity_id,
-        controller_slots=slots[1:] or [slots[0]],
-        restrained_slots=[slots[0]],
+        controller_roles=roles[1:] or [roles[0]],
+        restrained_roles=[roles[0]],
         body_regions=(
             ["wrists"]
             if has_tag(activity_id, "wrist")
@@ -1545,33 +1520,31 @@ def restraint_plan(
             else ["torso"]
         ),
         equipment=[equipment],
-        quick_release_visible=True,
-        safeword_required=True,
-        injury_required=False,
     )
 
 
 def actor_plans(
     cast_key: str,
     family: PoseFamily,
+    central_support_points: list[str],
 ) -> list[ActorPlan]:
-    central_slot = CASTS[cast_key][0][0]
+    central_role = CASTS[cast_key][0]
     plans = [
         ActorPlan(
-            slot_id=central_slot,
-            pose_role="central_pose",
+            role=central_role,
+            pose_function="central_pose",
             screen_position="center",
             depth_plane="midground",
             limb_roles=["pose_hold", "balance_support"],
-            support_points=list(family.supports),
+            support_points=central_support_points,
         )
     ]
     positions = ("center_left", "center_right")
-    for index, (slot_id, _, _) in enumerate(CASTS[cast_key][1:]):
+    for index, role in enumerate(CASTS[cast_key][1:]):
         plans.append(
             ActorPlan(
-                slot_id=slot_id,
-                pose_role=(
+                role=role,
+                pose_function=(
                     "supporting_central"
                     if family.surface == "partner_support" and index == 0
                     else "secondary_aligned_with_central"
@@ -1589,6 +1562,25 @@ def actor_plans(
             )
         )
     return plans
+
+
+def resolved_support_points(
+    family: PoseFamily,
+    leg_configuration: str,
+) -> list[str]:
+    points = list(family.supports)
+    if leg_configuration in {
+        "one_leg_extended",
+        "one_leg_raised",
+        "one_knee_raised",
+    }:
+        points = ["planted_foot" if point == "both_feet" else point for point in points]
+    if leg_configuration == "one_foot_planted":
+        points = [
+            point for point in points if point not in {"both_knees", "both_shins"}
+        ]
+        points.extend(("supporting_knee", "planted_foot"))
+    return points
 
 
 def make_contact_edges(
@@ -1624,8 +1616,6 @@ def make_contact_edges(
                     region=target_region,
                 ),
                 state=state,
-                screen_position="center",
-                depth_plane="midground",
                 preferred_visibility=visibility,
             )
         )
@@ -1642,7 +1632,7 @@ def wearable_props(cast_key: str, activity_id: str) -> list[WearableProp]:
     return [
         WearableProp(
             prop_id="prop_a",
-            owner_slot=CASTS[cast_key][1][0],
+            owner_role=CASTS[cast_key][1],
             category="strap_on",
             mount_region="pelvis",
             attachment="pelvic_harness",
@@ -1655,6 +1645,26 @@ def wearable_props(cast_key: str, activity_id: str) -> list[WearableProp]:
 
 
 def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
+    if activity_id == "double_toy_vaginal_anal":
+        if cast_key != "three_women":
+            raise ValueError(
+                f"{activity_id} requires two unambiguous controllers in {cast_key}"
+            )
+        return [
+            HandheldProp(
+                prop_id=prop_id,
+                controller_role=controller_role,
+                category="insertable_toy",
+                grip_region="right_hand",
+                deployment="inserted",
+                orientation="aligned_to_target_canal",
+            )
+            for prop_id, controller_role in zip(
+                ("prop_a", "prop_b"),
+                CASTS[cast_key][1:],
+                strict=True,
+            )
+        ]
     if activity_id != "vibrator_clitoral":
         return []
     if cast_key != "one_woman":
@@ -1662,7 +1672,7 @@ def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
     return [
         HandheldProp(
             prop_id="prop_a",
-            controller_slot=CASTS[cast_key][0][0],
+            controller_role=CASTS[cast_key][0],
             category="vibrator",
             grip_region="right_hand",
             deployment="external_surface_contact",
@@ -1724,30 +1734,28 @@ def compatible_pose_families(activity_id: str) -> list[str]:
 def activity_compatible_with_pose(
     activity: ActivityTemplate,
     pose: CentralPose,
+    cast_roles: list[str],
 ) -> bool:
-    if pose.family not in activity.compatible_pose_families:
+    if pose.family not in compatible_pose_families(activity.activity_id):
         return False
     if pose.family == "lifted_supported" and pose.primary_surface == "partner_support":
-        occupied_lift_slots = set(activity.required_slots[:2])
+        occupied_lift_roles = set(cast_roles[:2])
         if any(
-            edge.source.entity_id in occupied_lift_slots
+            edge.source.entity_id in occupied_lift_roles
             and edge.source.region in {"hand", "left_hand", "right_hand", "mouth"}
             for edge in activity.contact_edges
         ):
             return False
-    if activity.handheld_props:
+    if activity.activity_id == "vibrator_clitoral":
         return pose.family == "supine" and pose.arm_configuration == "hands_on_thighs"
     return True
 
 
 def build_activity_templates(cast_key: str) -> list[ActivityTemplate]:
-    slots = [slot[0] for slot in CASTS[cast_key]]
     return [
         ActivityTemplate(
             activity_id=activity_id,
-            activity_family=activity_family(activity_id),
-            coverage_tags=activity_tags(activity_id),
-            required_slots=slots,
+            focus_role=CASTS[cast_key][0],
             contact_edges=make_contact_edges(
                 cast_key,
                 activity_id,
@@ -1756,7 +1764,6 @@ def build_activity_templates(cast_key: str) -> list[ActivityTemplate]:
             handheld_props=handheld_props(cast_key, activity_id),
             wearable_props=wearable_props(cast_key, activity_id),
             restraint=restraint_plan(cast_key, activity_id),
-            compatible_pose_families=compatible_pose_families(activity_id),
         )
         for activity_index, activity_id in enumerate(activity_ids(cast_key))
     ]
@@ -1773,15 +1780,7 @@ def entry_signature(payload: dict[str, object]) -> str:
 
 
 def build_catalog(cast_key: str) -> PoseCatalog:
-    slots = [
-        ActorSlot(
-            slot_id=slot_id,
-            sex=sex,
-            role=role,
-            adult_only=True,
-        )
-        for slot_id, sex, role in CASTS[cast_key]
-    ]
+    roles = list(CASTS[cast_key])
     activities = activity_ids(cast_key)
     if len(activities) != 32 or len(set(activities)) != 32:
         raise ValueError(f"{cast_key} does not define 32 unique activities")
@@ -1806,14 +1805,25 @@ def build_catalog(cast_key: str) -> PoseCatalog:
                 leg_configuration=family.legs[leg_index],
                 arm_configuration=family.arms[arm_index],
                 primary_surface=family.surface,
-                support_points=list(family.supports),
+                support_points=resolved_support_points(
+                    family,
+                    family.legs[leg_index],
+                ),
                 compatible_camera_views=list(family.cameras),
             )
-            plans = actor_plans(cast_key, family)
+            plans = actor_plans(
+                cast_key,
+                family,
+                central_pose.support_points,
+            )
             compatible_activities = [
                 activity.activity_id
                 for activity in activity_templates
-                if activity_compatible_with_pose(activity, central_pose)
+                if activity_compatible_with_pose(
+                    activity,
+                    central_pose,
+                    roles,
+                )
             ]
             signature_payload = {
                 "cast_key": cast_key,
@@ -1824,62 +1834,18 @@ def build_catalog(cast_key: str) -> PoseCatalog:
             entries.append(
                 PoseEntry(
                     pose_id=f"{cast_key}_p{entry_index + 1:03d}",
-                    cast_key=cast_key,
-                    central_slot=slots[0].slot_id,
                     central_pose=central_pose,
                     actor_plans=plans,
                     compatible_activity_ids=compatible_activities,
-                    exact_cast=[slot.slot_id for slot in slots],
-                    consent_required=True,
                     signature=entry_signature(signature_payload),
                 )
             )
-    coverage = {
-        "entry_count": len(entries),
-        "pose_families": dict(
-            sorted(Counter(entry.central_pose.family for entry in entries).items())
-        ),
-        "activity_families": dict(
-            sorted(
-                Counter(
-                    activity.activity_family for activity in activity_templates
-                ).items()
-            )
-        ),
-        "activity_templates": dict(
-            sorted(
-                (
-                    activity.activity_id,
-                    sum(
-                        activity.activity_id in entry.compatible_activity_ids
-                        for entry in entries
-                    ),
-                )
-                for activity in activity_templates
-            )
-        ),
-        "bdsm_activity_templates": sum(
-            activity.restraint.enabled for activity in activity_templates
-        ),
-        "visible_contacts": sum(
-            edge.preferred_visibility == "visible"
-            for activity in activity_templates
-            for edge in activity.contact_edges
-        ),
-        "occluded_contacts": sum(
-            edge.preferred_visibility == "occluded"
-            for activity in activity_templates
-            for edge in activity.contact_edges
-        ),
-    }
     return PoseCatalog(
-        schema_version="2.0",
+        schema_version="3.0",
         cast_key=cast_key,
-        cast_slots=slots,
-        requested_entry_count=256,
+        cast_roles=roles,
         activities=activity_templates,
         entries=entries,
-        coverage=coverage,
     )
 
 
@@ -1890,7 +1856,12 @@ def main() -> None:
     for cast_key, catalog in catalogs.items():
         path = OUTPUT / f"{cast_key}.json"
         path.write_text(
-            catalog.model_dump_json(indent=2) + "\n",
+            catalog.model_dump_json(
+                indent=2,
+                exclude_defaults=True,
+                exclude_none=True,
+            )
+            + "\n",
             encoding="utf-8",
         )
         restored = PoseCatalog.model_validate_json(path.read_text(encoding="utf-8"))
@@ -1898,7 +1869,9 @@ def main() -> None:
             raise ValueError(f"{cast_key} changed during persistence")
         family_counts = Counter(entry.central_pose.family for entry in catalog.entries)
         tag_counts = Counter(
-            tag for activity in catalog.activities for tag in activity.coverage_tags
+            tag
+            for activity in catalog.activities
+            for tag in activity_tags(activity.activity_id)
         )
         audit_catalogs[cast_key] = {
             "entries": len(catalog.entries),
@@ -1916,7 +1889,7 @@ def main() -> None:
             "poses_per_family_max": max(family_counts.values()),
             "activity_templates": len(catalog.activities),
             "bdsm_activity_templates": sum(
-                activity.restraint.enabled for activity in catalog.activities
+                activity.restraint is not None for activity in catalog.activities
             ),
             "coverage_tag_counts": dict(sorted(tag_counts.items())),
             "compatibility_links": sum(
@@ -1931,7 +1904,7 @@ def main() -> None:
             "handheld_props": sum(
                 len(activity.handheld_props) for activity in catalog.activities
             ),
-            "cast_slots": [slot.model_dump(mode="json") for slot in catalog.cast_slots],
+            "cast_roles": catalog.cast_roles,
             "readback_validated": True,
         }
     audit_report = {
@@ -1948,7 +1921,7 @@ def main() -> None:
         encoding="utf-8",
     )
     manifest = {
-        "schema_version": "2.0",
+        "schema_version": "3.0",
         "requested_configurations": [
             "one_woman",
             "one_woman_one_man",

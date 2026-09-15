@@ -2,10 +2,10 @@ BRIEF
 
 ABSOLUTE OUTPUT PRIORITY
 
-Create one original dark-fantasy demon-sovereign image from the exact requested
-adult cast. Every Theme contains exactly one central demon sovereign: either
-one adult female demon lord or one adult male demon lord. Never place both a
-female and a male demon sovereign in the same Theme.
+Create one original live-action dark-fantasy feature-film image from the exact
+requested adult cast. Every Theme contains exactly one central demon
+sovereign: either one adult female demon lord or one adult male demon lord.
+Never place both a female and a male demon sovereign in the same Theme.
 
 An English Frame is one ASCII-only natural-language paragraph of at least 600
 whitespace-delimited words. Target 650-900 words of concrete imageable detail.
@@ -13,34 +13,56 @@ Preserve exact cast, sovereign identity, content level, anatomy, current
 action, environment, composition, camera, light, palette, and material response
 without padding through repetition.
 
-VISUAL THESIS
+Within the first sixty English words of every final Frame, explicitly call the
+image a "live-action dark-fantasy feature-film frame". Do not postpone the
+medium until camera details near the end, and do not substitute cinematic,
+photorealistic, realistic, or movie-like by itself for this exact live-action
+declaration.
 
-Create monumental, sensual, ominous dark-fantasy portraiture that combines:
+LIVE-ACTION CINEMATIC THESIS
+
+Create monumental, sensual, ominous dark-fantasy cinema that combines:
 
 - one commanding humanoid demon sovereign;
 - cathedral-scale infernal architecture or a severe supernatural court;
 - throne-room authority, ritual stillness, or controlled physical intensity;
-- realistic adult anatomy with original horns, wings, armor, robes, and skin;
-- deep painterly chiaroscuro with one descending shaft or pool of sacred light;
+- a real adult performer with natural skin texture, pores, individual hair,
+  believable eyes, and ordinary human anatomy beneath restrained prosthetics;
+- physically wearable horns, wings, armor, robes, and practical creature
+  effects with visible weight, attachment, seams, abrasion, and material
+  response;
+- deep cinematic chiaroscuro with one motivated descending shaft or pool of
+  light;
 - an intentionally low-saturation, dark-key, high-tonal-contrast, narrow-gamut
   palette built from charcoal, graphite, ash, weathered umber, bone grey,
   oxidized metal, desaturated blue-green, and tarnished amber;
   and
-- a tactile oil-painted finish that remains anatomically precise and spatially
-  coherent.
+- premium feature-film optics, controlled highlight roll-off, natural depth of
+  field, restrained motion behavior, and fine cinematic grain.
 
-The result should feel like an original museum-scale dark-fantasy painting,
-not a game screenshot, cosplay photograph, franchise character, generic
-monster pinup, or decorative fantasy wallpaper. Let authority emerge from
-scale, posture, gaze, body mass, architecture, shadow, and the controlled
-placement of every other requested adult.
+The result should feel like a finished frame from a large-budget live-action
+dark-fantasy feature film, not an oil painting, illustration, concept art,
+game screenshot, synthetic 3D render, cosplay photograph, behind-the-scenes
+image, costume test, franchise character, generic monster pinup, or decorative
+fantasy wallpaper. Let authority emerge from performance, scale, posture,
+gaze, body mass, architecture, shadow, and the controlled placement of every
+other requested adult.
+
+Treat the supernatural elements as physically present in front of the camera.
+Horns use convincing prosthetic roots and skin transitions; wings displace
+air, cloth, dust, and light; armor has wearable articulation; wet surfaces
+reflect the actual source; environmental destruction has weight and debris
+logic. Use restrained invisible visual-effects extension only for impossible
+scale, distant architecture, weather, or safe supernatural phenomena. Never
+describe a green screen, digital double, compositing layer, render pass,
+motion-capture model, or production process inside the final image.
 
 REFERENCE AND ORIGINALITY GATE
 
 Use an attached reference only to understand broad visual principles:
 monumental horns, a dark enthroned silhouette, intimate foreground scale,
 gothic or subterranean architecture, descending blue-gold light, warm skin
-against black wings or armor, painterly edges, and a severe vertical
+against black wings or armor, cinematic edge separation, and a severe vertical
 composition. Translate any blue-gold contrast into desaturated blue-grey and
 tarnished muted amber rather than vivid complementary color.
 
@@ -74,6 +96,12 @@ the exact counted cast in visible terms such as "one adult Chinese woman" and
 male demon sovereign. With a request for one woman and one man, the image must
 contain exactly one adult woman and exactly one adult man, never two women,
 two men, or a gender-ambiguous second adult.
+
+For every mixed cast, the first sentence states all requested gender counts
+together before describing an individual. Never use "only" immediately after
+one person's count in a mixed cast, because "one adult Chinese man only" or
+"one adult Chinese woman only" falsely declares a solo image. Reserve those
+two exact "only" constructions exclusively for true one-person requests.
 
 SOLO CAST LOCK
 
@@ -111,6 +139,10 @@ seventy-nine. State that exact visible age for each person and give each a
 mature face, adult body structure, distinct height and build, skin, hair, eyes,
 and stable identifying detail. A centuries-long supernatural chronology may
 appear only after the visible human-equivalent age and may never replace it.
+Use one exact integer age for every person in both Theme and final Frame. Never
+write mid-thirties, early forties, late fifties, around, approximately,
+ageless, ancient-looking, or centuries old without first stating the exact
+human-equivalent integer age.
 Unless the Story Description requests another nationality, retain a clearly
 Chinese adult identity in facial structure and styling, even when
 supernatural skin, horns, eyes, wings, or armor transform the sovereign.
@@ -136,6 +168,25 @@ rather than relying on the labels alone.
 Within the first one hundred English words of every Erotic or Hardcore Frame,
 include the exact phrase "consensual and willing" to establish the interaction
 before describing intimate anatomy or contact.
+
+Within the first one hundred English words of every Hardcore Frame, also name
+the exact sexual act and direct present anatomical contact. For vaginal or anal
+intercourse, state whose erect penis is inside whose vagina or anus. For oral
+sex, state whose mouth or tongue directly contacts whose named genitals. For
+manual stimulation, state whose hand or fingers directly contact whose named
+genitals. Generic intercourse, intimacy, union, hardcore act, arousal, implied
+contact, or "joined bodies" is insufficient.
+
+Place that direct Hardcore contact in the first or second sentence,
+immediately after the exact cast, sovereign identity, and "consensual and
+willing" declaration. Do not spend the opening on face, horns, wardrobe,
+architecture, camera, title, role history, or atmosphere before naming the
+active anatomy.
+
+All word-position checks are silent. Never mention first words, first one
+hundred words, word position, threshold, instruction, requirement, contract,
+check, or compliance inside a Theme or final Frame. State cast, age, consent,
+and contact directly as visible facts without explaining their placement.
 
 Never use a prisoner, slave, sacrifice, tribute, captive bride, conquered
 victim, unconscious body, magically compelled partner, intoxicated partner,
@@ -289,6 +340,78 @@ forge light, leaking roof water, wind through a broken oculus, or another
 physically motivated state. Do not default every scene to smoke, embers,
 skulls, candles, or a generic ruined throne room.
 
+ENVIRONMENTAL SET-PIECE AND EVENT ENGINE
+
+Treat the environment as an active visual system rather than a static room.
+Every Theme selects exactly one dominant set-piece event already happening in
+the visible instant. The event must alter light, material, silhouette, or body
+movement without adding unrequested people:
+
+- a colossal floodgate opening as one controlled wall of dark water enters a
+  stepped court and reflects the sovereign;
+- a suspended forge crucible rotating above a channel while a narrow stream of
+  muted molten metal redirects light across armor and stone;
+- a black-ice audience floor developing one broad branching fracture under
+  thermal stress, with all adults standing safely on stable sections;
+- a storm observatory's physical rings turning around an open oculus as one
+  distant lightning sheet reveals their scale;
+- an ash garden bending under a single lateral wind front that drives cloth,
+  hair, wings, and fine ash in one readable direction;
+- a mineral rain curtain crossing an exterior throne terrace while drainage
+  channels become bright linear reflections;
+- a giant counterweighted archive lift stopping between basalt galleries as
+  blank tablets shift within secured racks;
+- a volcanic tide withdrawing beneath a causeway and exposing ribbed cooling
+  rock rather than random flames;
+- a salt-palace wall shedding one thin surface layer in the wind and revealing
+  darker stone geometry beneath;
+- a drowned bell chamber disturbed by one descending pressure wave that bends
+  suspended silt, fabric, hair, and reflected light;
+- a mechanical eclipse aperture closing across a pale skylight and casting a
+  moving hard-edged shadow through the court;
+- a monumental black curtain, gate, bridge section, observatory shutter, or
+  armored door moving on visible hinges, tracks, ropes, or counterweights;
+- the immediate aftermath of a non-graphic structural failure, with one fallen
+  arch, split stair, broken throne canopy, or collapsed bridge span creating a
+  new diagonal while the occupied support remains safe; or
+- another original physically legible event with one cause, one movement
+  direction, and one visible material consequence.
+
+Choose a peak readable instant: the gate halfway open, the water touching the
+first stair, the lightning revealing the far vault, the crucible beginning its
+pour, the curtain reaching maximum extension, or the eclipse edge crossing the
+sovereign's face. Do not describe a vague past disaster or a future event that
+is not visible now.
+
+The event is powerful but controlled. It never strikes, burns, floods, crushes,
+cuts, traps, or destabilizes a requested adult. At Erotic or Hardcore level,
+keep hot metal, deep water, collapsing material, sharp ice, moving machinery,
+heavy doors, and violent weather outside the intimate body zone. Use calmer
+events such as moving light, distant weather, curtains, reflected water,
+cooling metal, drifting ash, or opening architecture when bodies need close
+contact.
+
+At Erotic and Hardcore levels, the complete occupied body zone is dry,
+room-temperature, stable, non-slip, ventilated, and filled with breathable air.
+Water may form a shallow reflective layer no higher than the ankles, but no
+face, chest, pelvis, sexual contact, or breathing passage is submerged. Never
+stage intimacy underwater, inside a fully flooded chamber, on algae-slick or
+ice-slick support, or beneath a falling liquid column.
+
+Keep ash, dust, silt, sparks, rain, smoke, steam, mineral spray, and loose
+debris out of mouths, eyes, genitals, sexual fluids, and direct-contact zones.
+Such material may remain in the distant background, beyond a barrier, or in a
+separate light beam where it adds motion without contaminating the bodies.
+Hot metal, moving machinery, heavy mechanisms, unstable masonry, and deep
+water remain several body lengths away behind a visible curb, wall, railing,
+channel, or other physical separation.
+
+Use one dominant event and at most one subordinate environmental reaction.
+Do not combine eruption, lightning, tidal wave, collapsing cathedral, fire
+storm, flying weapons, and dense particles in one image. Visual intensity
+comes from scale, timing, direction, contrast, and material response rather
+than indiscriminate destruction.
+
 Architecture must be physically coherent. Show a stable floor plane, throne
 base, stair, dais, wall, column, arch, oculus, or horizon that establishes
 scale and body support. A throne has a visible seat, back, arms, and load path
@@ -323,6 +446,45 @@ Vary the composition across Themes:
 - paired or group court tableau built from opposing gazes and balanced bodies;
   or
 - another original composition that keeps every requested adult readable.
+
+DEPTH, SILHOUETTE, AND VISUAL IMPACT
+
+Build every composition in three readable spatial layers:
+
+1. one restrained foreground frame such as a stair edge, arch, curtain,
+   reflective water line, cooled chain, broken masonry plane, or wing tip;
+2. the complete requested cast and primary action in the midground; and
+3. one large background depth cue such as an oculus, receding columns, open
+   gate, crater horizon, flooded nave, forge channel, storm wall, or moving
+   architectural mechanism.
+
+The foreground may crop a prop or architecture but never a face, hand, horn
+base, supporting limb, active anatomy, or requested person. Keep negative
+space around the sovereign's horn silhouette and around every intimate body
+connection.
+
+Give each Theme one dominant graphic structure:
+
+- a vertical shaft opposed by a low horizontal body or throne;
+- a rising diagonal created by stair, wing, bridge, or moving shadow;
+- a circular oculus enclosing an offset sovereign silhouette;
+- converging causeway or column lines aimed toward the cast;
+- a reflected double triangle across black water;
+- a high arch containing a compact illuminated figure group;
+- a sweeping S-curve made by architecture, fabric, and a safely resting tail;
+- a compressed close portrait split by one hard light boundary; or
+- another clean large-scale geometry readable at thumbnail size.
+
+Add one scale contrast and one material contrast. Examples include a small
+bone-white face beneath a vast black vault, warm skin against rain-cold stone,
+matte horn keratin beside wet polished basalt, soft velvet across articulated
+iron, translucent mineral water over opaque rock, or a narrow molten reflection
+crossing dull armor. Never use every contrast in one image.
+
+Choose one movement vector for hair, cloth, ash, rain, water, wing feathers,
+or light: downward, rising, left-to-right, right-to-left, radial, converging,
+or spiraling around a stable center. Secondary motion supports that vector
+instead of creating random turbulence.
 
 Do not repeat the reference's close frontal lap arrangement. Avoid placing one
 adult directly in front of a seated sovereign in every Theme. Vary who stands,
@@ -395,19 +557,42 @@ positions into a confused anatomy puzzle. For multiple Frames in one Theme,
 change at least camera side, body orientation, support geometry, active hand
 tasks, and foreground silhouette while preserving identities and premise.
 
-Use normal or moderately wide perspective, typically 35-85mm equivalent. Low
-camera positions may amplify authority but must preserve believable head,
-torso, pelvis, thigh, hand, and foot proportions. Avoid fisheye distortion,
-giant foreground genitals, cropped horn tips, severed wings, hidden hands, or
-an untraceable overlap of bodies.
+Use perspective from 24-135mm equivalent according to the scene. Reserve
+24-28mm for environmental wides in which the cast remains away from frame
+edges; use 35-50mm for dynamic full-body and group tableaux; use 65-85mm for
+intimate medium portraits; and use 100-135mm for compressed profiles or
+layered architecture. Low camera positions may amplify authority but must
+preserve believable head, torso, pelvis, thigh, hand, and foot proportions.
+Avoid fisheye distortion, giant foreground genitals, cropped horn tips,
+severed wings, hidden hands, or an untraceable overlap of bodies.
 
 Rotate camera families among frontal eye-level symmetry, low frontal authority,
 low side three-quarter, high oblique environmental view, strict profile,
 rear three-quarter with both faces recoverable by gaze or turn, long-lens
 compressed court portrait, intimate normal-lens medium view, and wide
-architectural tableau. Do not let low frontal throne views dominate the batch.
+architectural tableau. Also vary a floor-level view along a reflective surface,
+a distant view through two architectural openings, a controlled overhead view
+of a circular dais, a lateral action view that follows one movement vector,
+and a near-far composition with a restrained foreground object. Do not let low
+frontal throne views dominate the batch. Use a canted horizon only when one
+specific structural event motivates imbalance, and keep the angle subtle.
 
-LIGHT, COLOR, AND PAINTERLY FINISH
+Select one decisive cinematic instant instead of a generic held pose: a cloak
+reaching full extension in wind, a gauntlet meeting a stone map, a throne turn
+interrupted by moving light, a foot entering shallow reflective water, a gate
+revealing the ruler, a crown being lifted but not yet placed, armor fastening
+at the moment of eye contact, or an intimate gesture synchronized with the
+environmental event. Describe the decisive instant as a frame from the
+finished feature film, with performance, focus, motion, and environmental
+timing all resolving in the same exposure.
+
+Every final Frame states one exact focal length in millimeters from the
+24-135mm range, plus camera height, camera side or axis, subject distance or
+shot scale, focus plane, and depth behavior. A vague phrase such as cinematic
+view, dramatic angle, wide composition, or close portrait never replaces the
+numeric focal length.
+
+LIGHT, COLOR, AND LIVE-ACTION FINISH
 
 Build one motivated high-contrast light system:
 
@@ -461,16 +646,28 @@ Never brighten the full palette merely to make the fantasy setting legible.
 Avoid flat grey fog, muddy midtone-only rendering, pastel softness, lifted
 blacks, low-contrast haze, broad high-key fill, or evenly exposed game art.
 
-Render with realistic oil-painted depth: visible but controlled brush texture
-in stone, smoke, wings, hair, and shadow transitions; sharper edges around
-eyes, mouths, hands, active anatomy, and key contact; softer lost edges in the
-vault and peripheral darkness. Preserve adult anatomy and photographic light
-logic beneath the painterly surface.
+Render as live-action cinematic photography. Preserve pores, fine facial hair,
+individual hair strands, subtle perspiration, believable eyes, natural skin
+subsurface response, fabric weave, feather barbs, horn keratin, oxidized metal,
+wet stone, dust, and smoke at physically plausible scales. Practical
+prosthetics meet skin through credible bases, pressure, makeup transition, and
+shadow rather than a pasted-on digital seam.
 
-Avoid anime, manga, cartoon rendering, cel shading, plastic 3D game art,
-concept-sheet presentation, card-game framing, glossy digital airbrushing,
-over-sharpened fantasy poster effects, excessive particles, rainbow magic,
-generic lens flare, and artificial beauty retouching.
+Use selective focus, lens falloff, restrained motion blur, atmospheric
+perspective, controlled halation around the brightest source, smooth highlight
+roll-off, detailed open shadows, natural microcontrast, and fine cinematic
+grain. Keep eyes, hands, horn bases, supporting limbs, active anatomy at
+Hardcore level, and the decisive action on the intended focus plane.
+
+Avoid oil painting, visible brushwork, illustration, anime, manga, cartoon
+rendering, cel shading, plastic 3D game art, synthetic CGI skin, concept-sheet
+presentation, card-game framing, glossy digital airbrushing, over-sharpened
+fantasy poster effects, excessive particles, rainbow magic, fake HDR halos,
+generic lens flare, beauty-filter skin, and sterile render perfection.
+
+Do not describe the image as a film set, cosplay session, costume photograph,
+behind-the-scenes still, publicity portrait, VFX breakdown, or production
+test. It is a frame from the finished fictional film itself.
 
 ANATOMY, CONTACT, AND OCCLUSION
 
@@ -503,8 +700,8 @@ armor spikes, or sharp regalia in an intimate scene.
 CONTENT LEVEL
 
 Apply the requested content level immediately and consistently in every Theme
-and every Frame. Keep the same monumental dark-fantasy painting language at
-all levels.
+and every Frame. Keep the same monumental live-action dark-fantasy feature-film
+language at all levels.
 
 Aesthetic:
 
@@ -523,7 +720,7 @@ Erotic:
 - make willingness and reciprocal attention visible;
 - show no penetration, explicit oral-genital contact, ejaculation, or direct
   genital stimulation; and
-- keep the tension poised, painterly, and non-explicit rather than drifting
+- keep the tension poised, cinematic, and non-explicit rather than drifting
   into Hardcore.
 
 Hardcore:
@@ -562,7 +759,8 @@ Every Theme defines:
 - one original throne, court, chamber, or infernal environment;
 - one dominant emotional premise and current action;
 - one coherent horn, optional wing, optional tail, armor, and material system;
-- one composition, camera family, light design, palette, and painterly finish;
+- one composition, camera family, light design, palette, and live-action
+  cinematic finish;
 - the requested content level and visible consent logic; and
 - a no-text, no-franchise, exact-cast visual world.
 
@@ -588,7 +786,15 @@ Across a ten-Theme batch:
   environmental wides, close court portraits, reclining scenes, exterior
   domains, intimate interiors, and group compositions;
 - use at least seven distinct environment families or subfamilies;
+- use at least eight distinct dominant set-piece events drawn from different
+  water, weather, architecture, machinery, geological, and light families;
+- use at least six different three-layer depth designs and six dominant
+  graphic structures;
+- vary the primary movement vector so no direction appears in more than three
+  Themes;
 - use at least six different camera families and four camera heights;
+- include at least two 24-28mm environmental wides, two 65-85mm intimate or
+  medium views, and one 100-135mm compressed composition;
 - vary skin, armor, robe, wing, throne, and architectural materials;
 - vary desaturated cold-over-muted-warm and muted-warm-over-cold-grey light
   designs; and
@@ -597,17 +803,20 @@ Across a ten-Theme batch:
 
 Within every rolling group of twelve Themes in a large batch, no two Themes
 may share the same combination of sovereign gender, ruler role, counterpart
-role, horn family, wing state, primary pose, environment family, camera family,
-and light design. Changing only color, props, or horn shape does not create a
-new Theme.
+role, horn family, wing state, primary pose, environment family, dominant
+set-piece event, three-layer depth design, movement vector, camera family, and
+light design. Changing only color, props, weather particles, or horn shape
+does not create a new Theme.
 
 Across a one-hundred-Theme run, distribute attention across all role, pose,
-scene, camera, body-type, wardrobe, material, and light families. No single
-throne pose, cathedral, body arrangement, or blue-grey-over-tarnished-amber
-palette may
-occupy more than one tenth of the Themes.
+scene, event, depth, movement, camera, body-type, wardrobe, material, and light
+families. No single throne pose, cathedral, body arrangement, environmental
+event, graphic structure, camera family, or blue-grey-over-tarnished-amber
+palette may occupy more than one tenth of the Themes.
 
-For a smaller batch, maximize the same diversity proportionally.
+For a smaller batch, maximize the same diversity proportionally. In every
+batch of three through nine Themes, do not repeat the same environment family,
+dominant event, graphic structure, primary movement vector, or camera family.
 
 NO-TEXT IMAGE CONTRACT
 
@@ -624,7 +833,8 @@ directly usable as an image-generation prompt. Begin with the exact cast,
 identify the female or male demon sovereign, and establish present pose,
 current action, and location. Then integrate mature identities, supernatural
 anatomy, wardrobe or nudity, throne and architecture, body support, contact,
-camera, light, palette, materials, atmosphere, and painterly finish.
+camera, lens behavior, focus, light, palette, practical materials, atmosphere,
+performance, and live-action cinematic finish.
 
 An English Frame contains at least 600 whitespace-delimited words. Target
 650-900 words. Count before returning; if below 600, add new imageable detail
@@ -638,7 +848,10 @@ other compliance-oriented length statement.
 
 Use ASCII characters only in an English Frame. Before publication, replace
 every Chinese character, accented letter, smart quote, em dash, bullet, or
-other non-ASCII symbol with plain English ASCII.
+other non-ASCII symbol with plain English ASCII. This is an absolute
+publication requirement: replace curly apostrophes with ', curly quotation
+marks with ", and em or en dashes with -, then silently rescan every character
+before returning the Frame.
 
 Output no heading, title, label, bullet list, schema, implementation note,
 reference discussion, artist name, franchise name, compliance explanation, or
@@ -652,31 +865,53 @@ SILENT REJECTION CHECK
 
 Reject and rewrite any Theme or Frame that:
 
-1. copies the reference composition, sexual position, demon, throne, or light;
-2. contains zero or more than one demon sovereign;
-3. contradicts the requested number of adult women or men;
-4. changes a requested woman's or man's gender, anatomy, name, or pronouns;
-5. adds any second person, name, owner, gaze partner, or relationship to a
+1. looks like an oil painting, illustration, concept art, game screenshot,
+   synthetic 3D render, cosplay photograph, behind-the-scenes image, publicity
+   portrait, or VFX breakdown;
+2. copies the reference composition, sexual position, demon, throne, or light;
+3. contains zero or more than one demon sovereign;
+4. contradicts the requested number of adult women or men;
+5. changes a requested woman's or man's gender, anatomy, name, or pronouns;
+6. uses "one adult Chinese man only" or "one adult Chinese woman only" inside
+   a mixed-cast Frame;
+7. adds any second person, name, owner, gaze partner, or relationship to a
    one-person request;
-6. makes any person younger than twenty-five or age-ambiguous;
-7. adds a captive, servant, victim, minion, guard, crowd, or background body;
-8. uses coercion, magical compulsion, intoxication, sleep, fear, or injury;
-9. creates floating horns, extra wings, untraceable tail, or merged anatomy;
-10. uses non-humanoid, duplicated, oversized, barbed, or harmful sexual
+8. makes any person younger than twenty-five or age-ambiguous;
+9. adds a captive, servant, victim, minion, guard, crowd, or background body;
+10. uses coercion, magical compulsion, intoxication, sleep, fear, or injury;
+11. creates floating horns, extra wings, untraceable tail, or merged anatomy;
+12. uses non-humanoid, duplicated, oversized, barbed, or harmful sexual
     anatomy;
-11. hides hands, genitals at Hardcore level, body support, or active contact;
-12. allows horn, claw, tail, armor, weapon, chain, throne, or magic into a
+13. hides hands, genitals at Hardcore level, body support, or active contact;
+14. allows horn, claw, tail, armor, weapon, chain, throne, or magic into a
     sexual-contact path;
-13. lets an intimate participant grip a horn, wing, or tail;
-14. uses a sharp horn point, blade tail, venom, claw, spike, or weapon in an
+15. lets an intimate participant grip a horn, wing, or tail;
+16. uses a sharp horn point, blade tail, venom, claw, spike, or weapon in an
     intimate scene;
-15. drifts above or below the requested content level;
-16. uses vague Hardcore contact or explicit Erotic contact;
-17. copies a franchise, artist, actor, costume, emblem, or existing artwork;
-18. adds readable text, runes, interface, watermark, signature, or card frame;
-19. falls below 600 English words;
-20. contains a non-ASCII character in an English Frame;
-21. uses vivid, neon, jewel-tone, high-saturation, or teal-and-orange color;
+17. drifts above or below the requested content level;
+18. uses vague Hardcore contact or explicit Erotic contact;
+19. copies a franchise, artist, actor, costume, emblem, or existing artwork;
+20. adds readable text, runes, interface, watermark, signature, or card frame;
+21. falls below 600 English words;
+22. contains a non-ASCII character in an English Frame;
+23. omits "live-action dark-fantasy feature-film frame" from the first sixty
+    English words;
+24. omits an exact 24-135mm focal length and concrete camera placement;
+25. uses vivid, neon, jewel-tone, high-saturation, or teal-and-orange color;
     or
-22. mentions its word count or explains compliance instead of describing one
-    finished visible image.
+26. leaves the environment static without one visible current event;
+27. combines more than one dominant disaster or fills the image with unrelated
+    fire, lightning, collapse, smoke, weapons, creatures, and particles;
+28. allows an environmental event or moving mechanism to threaten, strike,
+    burn, flood, trap, or destabilize a requested adult;
+29. lacks readable foreground, cast midground, and background depth;
+30. mentions its word count or explains compliance instead of describing one
+    finished visible image;
+31. uses an age range or relative phrase instead of one exact integer age for
+    every person; or
+32. postpones exact Hardcore anatomy or direct contact beyond the first two
+    sentences or the first one hundred English words;
+33. stages Erotic or Hardcore intimacy underwater, on a wet or slippery
+    support, without breathable air, or with water above the ankles; or
+34. places ash, dust, silt, sparks, rain, smoke, steam, spray, or debris on a
+    face, genital, sexual fluid, or direct-contact zone.

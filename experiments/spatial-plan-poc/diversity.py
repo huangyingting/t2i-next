@@ -178,16 +178,12 @@ def audit_draft(
     for value in required_values:
         if phrase(value) not in lowered:
             issues.append(f"missing planned phrase: {value}")
-    pose_terms = set(case.central_pose.split("_")) | set(
-        case.partner_pose.split("_")
-    )
+    pose_terms = set(case.central_pose.split("_")) | set(case.partner_pose.split("_"))
     ignored_support_terms = {"woman", "man"} | pose_terms
     support_terms = set(case.support_topology.split("_")) - ignored_support_terms
     for support_term in support_terms:
         if re.search(rf"\b{re.escape(support_term)}\b", lowered) is None:
-            issues.append(
-                f"support topology omits semantic term: {support_term}"
-            )
+            issues.append(f"support topology omits semantic term: {support_term}")
     expected_positions = (
         (
             actors[0].split(",", 1)[0],
@@ -199,12 +195,15 @@ def audit_draft(
         ),
     )
     for actor_name, expected_position in expected_positions:
-        if re.search(
-            rf"{re.escape(actor_name)}[^.]{{0,180}}"
-            rf"\b(?:at|in|on)(?: the)? {re.escape(expected_position)}\b",
-            draft.prose,
-            re.I,
-        ) is None:
+        if (
+            re.search(
+                rf"{re.escape(actor_name)}[^.]{{0,180}}"
+                rf"\b(?:at|in|on)(?: the)? {re.escape(expected_position)}\b",
+                draft.prose,
+                re.I,
+            )
+            is None
+        ):
             issues.append(
                 f"screen position changed: {actor_name} -> {expected_position}"
             )
@@ -233,9 +232,7 @@ def diversity_metrics(matrix: DiversityMatrix) -> dict[str, object]:
     )
     return {
         "cases": len(matrix.cases),
-        "unique_geometry_signatures": len(
-            {case.signature() for case in matrix.cases}
-        ),
+        "unique_geometry_signatures": len({case.signature() for case in matrix.cases}),
         "axis_cardinality": {
             field: len({getattr(case, field) for case in matrix.cases})
             for field in fields

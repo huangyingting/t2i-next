@@ -18,6 +18,14 @@ from catalog_generator import (
 )
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 from run import _generate_with_repair
+from scene_layers import (
+    CHARACTER_PROFILES,
+    SETTING_PRESETS,
+    ResolvedSceneLayers,
+    SettingPreset,
+    layer_issues,
+    resolve_scene_layers,
+)
 
 from t2i_story_pipeline.config import load_story_provider_settings
 from t2i_story_pipeline.provider import OpenAIStoryModel
@@ -30,19 +38,6 @@ SceneId = Annotated[str, StringConstraints(pattern=r"^D\d{2}$")]
 
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
-
-
-class StyleLayer(StrictModel):
-    scene_id: SceneId
-    plan_fingerprint: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
-    setting: str = Field(min_length=20, max_length=220)
-    lighting: str = Field(min_length=20, max_length=180)
-    palette: str = Field(min_length=10, max_length=150)
-    atmosphere: str = Field(min_length=10, max_length=150)
-
-
-class StyleBatch(StrictModel):
-    styles: list[StyleLayer] = Field(min_length=6, max_length=6)
 
 
 class SceneEvaluation(StrictModel):
@@ -92,21 +87,7 @@ class DemoSpec(NamedTuple):
     activity_id: str
     viewpoint: str
     shot_scale: str
-    style_direction: str
-
-
-class ActorIdentity(NamedTuple):
-    code: str
-    role_label: str
-    age: int
-    nationality: str
-    sex: str
-
-    def description(self) -> str:
-        return (
-            f"{self.code}, {self.role_label}, a {self.age}-year-old "
-            f"{self.nationality} {self.sex}"
-        )
+    setting_id: str
 
 
 SPECS = (
@@ -118,7 +99,7 @@ SPECS = (
         "vibrator_clitoral",
         "high_three_quarter",
         "medium",
-        "rainy neon apartment, reflective surfaces, magenta and cyan edge light",
+        "rainy_neon_apartment",
     ),
     DemoSpec(
         "D02",
@@ -128,7 +109,7 @@ SPECS = (
         "spreader_bar_self_play",
         "front_three_quarter",
         "medium_wide",
-        "minimal amber studio, sculptural restraint shadows, fine-art mood",
+        "amber_restraint_studio",
     ),
     DemoSpec(
         "D03",
@@ -138,7 +119,7 @@ SPECS = (
         "vaginal_lifted",
         "low_three_quarter",
         "full_body",
-        "modern corridor, hard side light, deep burgundy and warm skin palette",
+        "burgundy_modern_corridor",
     ),
     DemoSpec(
         "D04",
@@ -148,7 +129,7 @@ SPECS = (
         "vaginal_plus_fellatio",
         "high_three_quarter",
         "medium_wide",
-        "luxury hotel suite, focused overhead pool of light, dark emerald accents",
+        "midnight_luxury_hotel",
     ),
     DemoSpec(
         "D05",
@@ -158,7 +139,7 @@ SPECS = (
         "strap_on_vaginal_rear_entry",
         "rear_three_quarter",
         "medium",
-        "soft morning bedroom, pale linen, warm rim light and quiet editorial tone",
+        "soft_morning_bedroom",
     ),
     DemoSpec(
         "D06",
@@ -168,42 +149,9 @@ SPECS = (
         "oral_and_manual_on_central",
         "front_three_quarter",
         "medium_wide",
-        "contemporary loft, theatrical triangular light, black gold and ivory",
+        "demon_sovereign_palace",
     ),
 )
-
-CAST_IDENTITIES = {
-    "one_woman": (ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),),
-    "one_woman_one_man": (
-        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
-        ActorIdentity("M1", "man 1", 32, "Chinese", "man"),
-    ),
-    "one_woman_two_men": (
-        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
-        ActorIdentity("M1", "man 1", 32, "Chinese", "man"),
-        ActorIdentity("M2", "man 2", 30, "Chinese", "man"),
-    ),
-    "two_women": (
-        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
-        ActorIdentity("F2", "woman 2", 30, "Chinese", "woman"),
-    ),
-    "three_women": (
-        ActorIdentity("F1", "woman 1", 29, "Chinese", "woman"),
-        ActorIdentity("F2", "woman 2", 30, "Chinese", "woman"),
-        ActorIdentity("F3", "woman 3", 31, "Chinese", "woman"),
-    ),
-}
-
-STYLE_SYSTEM = """
-Generate only a non-geometric visual style layer for each supplied scene.
-Return exactly D01 through D06 in order and copy each plan fingerprint. Describe
-only the room, materials, motivated lighting, palette, and atmosphere. Do not
-mention any person, body, pose, activity, contact, camera, framing, viewpoint,
-screen position, or anatomy. Keep each field to one concise phrase without a
-trailing period. Do not put lighting, palette, or atmosphere content in the
-setting field. Use precise ASCII English and no line breaks. Return only schema
-data.
-""".strip()
 
 EVALUATION_SYSTEM = """
 Evaluate each complete image prompt independently. Score geometry coherence,
@@ -290,14 +238,30 @@ def joined(values: list[str]) -> str:
     return ", ".join(values[:-1]) + f" and {values[-1]}"
 
 
+def role_sex(role: str) -> str:
+    return "woman" if role.startswith("f") else "man"
+
+
+def role_label(role: str) -> str:
+    return f"{role_sex(role)} {role[1:]}"
+
+
+def role_description(role: str) -> str:
+    profile = CHARACTER_PROFILES[role]
+    return (
+        f"{role.upper()}, {role_label(role)}, a {profile.adult_age}-year-old "
+        f"{profile.nationality} {role_sex(role)}"
+    )
+
+
 def body_ledger(cast_key: str) -> str:
-    identities = CAST_IDENTITIES[cast_key]
+    roles = CASTS[cast_key]
     bodies = [
         (
-            f"one continuous {identity.sex} body identified as "
-            f"{identity.code} ({identity.role_label})"
+            f"one continuous {role_sex(role)} body identified as "
+            f"{role.upper()} ({role_label(role)})"
         )
-        for identity in identities
+        for role in roles
     ]
     noun = "body" if len(bodies) == 1 else "bodies"
     return (
@@ -309,7 +273,7 @@ def body_ledger(cast_key: str) -> str:
 
 
 def cast_descriptions(cast_key: str) -> tuple[str, ...]:
-    return tuple(identity.description() for identity in CAST_IDENTITIES[cast_key])
+    return tuple(role_description(role) for role in CASTS[cast_key])
 
 
 def support_clause(entry: PoseEntry) -> str:
@@ -325,13 +289,7 @@ def support_clause(entry: PoseEntry) -> str:
         for point in pose.support_points
     ]
     if pose.primary_surface == "partner_support":
-        return (
-            "supported by two continuous bilateral cradles: the standing "
-            "partner's left forearm supports her left thigh and his left hand "
-            "cups her left buttock, while his right forearm supports her right "
-            "thigh and his right hand cups her right buttock; his back and "
-            "shoulders brace against the wall while both feet remain planted"
-        )
+        return "supported by the standing partner"
     if pose.primary_surface == "support_sling":
         return "supported by the sling with secondary support against the wall"
     surface = {
@@ -351,81 +309,114 @@ def lifted_bilateral_chain(
     partner_name: str,
 ) -> str | None:
     pose = entry.central_pose
-    if (
-        pose.family != "lifted_supported"
-        or pose.leg_configuration != "legs_wrapped"
-        or pose.arm_configuration != "arms_shoulders"
-    ):
+    if pose.family != "lifted_supported":
         return None
-    return (
-        f"{central_name}'s single torso faces {partner_name}; her left arm "
-        f"circles {partner_name}'s left shoulder and her right arm circles his "
-        "right shoulder. Her left thigh wraps around his left side and her "
-        "right thigh wraps around his right side, with both knees bent behind "
-        f"his hips. {partner_name}'s left forearm supports her left thigh and "
-        "his left hand cups her left buttock; his right forearm supports her "
-        "right thigh and his right hand cups her right buttock."
-    )
+    possessive = "his" if partner_name.startswith("M") else "her"
+    if (
+        pose.leg_configuration == "legs_wrapped"
+        and pose.arm_configuration == "arms_shoulders"
+    ):
+        return (
+            f"{central_name}'s single torso faces {partner_name}; her left arm "
+            f"circles {partner_name}'s left shoulder and her right arm circles "
+            f"{possessive} right shoulder. Her left thigh wraps around "
+            f"{possessive} left side and her right thigh wraps around "
+            f"{possessive} right side, with both knees bent behind "
+            f"{possessive} hips. {partner_name} supports {central_name} through "
+            f"two continuous bilateral cradles: {possessive} left forearm "
+            f"supports her left thigh and {possessive} left hand secures her "
+            f"outer left hip; {possessive} right forearm supports her right "
+            f"thigh and {possessive} right hand secures her outer right hip."
+        )
+    if (
+        pose.leg_configuration == "thighs_supported"
+        and pose.arm_configuration == "one_arm_partner"
+    ):
+        return (
+            f"{central_name}'s left arm circles {partner_name}'s right shoulder "
+            "while her right palm braces against the wall. "
+            f"{partner_name} supports {central_name} through two continuous "
+            f"bilateral cradles: {possessive} left forearm carries her right "
+            f"thigh and {possessive} right forearm carries her left thigh, with "
+            "both hands securing the outer hips."
+        )
+    return None
 
 
-def active_regions(activity: ActivityTemplate, slot_id: str) -> set[str]:
+def active_regions(activity: ActivityTemplate, role: str) -> set[str]:
     return {
         endpoint.region
         for edge in activity.contact_edges
         for endpoint in (edge.source, edge.target)
-        if endpoint.entity_id == slot_id
+        if endpoint.entity_id == role
     }
 
 
 def actor_is_pelvic_penetrator(
     activity: ActivityTemplate,
-    slot_id: str,
+    role: str,
 ) -> bool:
-    prop = wearable_prop_for_owner(activity, slot_id)
-    central_slot = activity.required_slots[0]
+    prop = wearable_prop_for_owner(activity, role)
+    central_role = activity.focus_role
     return any(
-        edge.target.entity_id == central_slot
+        edge.target.entity_id == central_role
         and edge.target.region in {"vagina", "anus"}
         and (
-            (edge.source.entity_id == slot_id and edge.source.region == "penis")
+            (edge.source.entity_id == role and edge.source.region == "penis")
             or (prop is not None and edge.source.entity_id == prop.prop_id)
         )
         for edge in activity.contact_edges
     )
 
 
-def actor_gives_oral(activity: ActivityTemplate, slot_id: str) -> bool:
-    central_slot = activity.required_slots[0]
+def actor_gives_oral(activity: ActivityTemplate, role: str) -> bool:
+    central_role = activity.focus_role
     return any(
-        edge.source.entity_id == slot_id
+        edge.source.entity_id == role
         and edge.source.region == "mouth"
-        and edge.target.entity_id == central_slot
+        and edge.target.entity_id == central_role
         for edge in activity.contact_edges
     )
 
 
-def actor_receives_oral(activity: ActivityTemplate, slot_id: str) -> bool:
-    central_slot = activity.required_slots[0]
+def actor_receives_oral(activity: ActivityTemplate, role: str) -> bool:
+    central_role = activity.focus_role
     return any(
-        edge.source.entity_id == central_slot
+        edge.source.entity_id == central_role
         and edge.source.region == "mouth"
-        and edge.target.entity_id == slot_id
+        and edge.target.entity_id == role
         for edge in activity.contact_edges
     )
 
 
 def actor_manual_contact(
     activity: ActivityTemplate,
-    slot_id: str,
+    role: str,
 ) -> ContactEdge | None:
-    central_slot = activity.required_slots[0]
+    central_role = activity.focus_role
     return next(
         (
             edge
             for edge in activity.contact_edges
-            if edge.source.entity_id == slot_id
+            if edge.source.entity_id == role
             and edge.source.region in {"hand", "left_hand", "right_hand"}
-            and edge.target.entity_id == central_slot
+            and edge.target.entity_id == central_role
+        ),
+        None,
+    )
+
+
+def actor_self_manual_contact(
+    activity: ActivityTemplate,
+    role: str,
+) -> ContactEdge | None:
+    return next(
+        (
+            edge
+            for edge in activity.contact_edges
+            if edge.source.entity_id == role
+            and edge.target.entity_id == role
+            and edge.source.region in {"hand", "left_hand", "right_hand"}
         ),
         None,
     )
@@ -436,28 +427,29 @@ def resolved_partner_supports(
     activity: ActivityTemplate,
 ) -> list[str]:
     supports = list(actor_plan.support_points)
-    if wearable_prop_for_owner(
-        activity, actor_plan.slot_id
-    ) or actor_is_pelvic_penetrator(activity, actor_plan.slot_id):
+    if (
+        wearable_prop_for_owner(activity, actor_plan.role)
+        or handheld_prop_for_controller(activity, actor_plan.role)
+        or actor_is_pelvic_penetrator(activity, actor_plan.role)
+    ):
         return [
             "one_braced_hand" if support == "both_hands" else support
             for support in supports
         ]
     if actor_receives_oral(
         activity,
-        actor_plan.slot_id,
-    ) and not actor_gives_oral(activity, actor_plan.slot_id):
+        actor_plan.role,
+    ) and not actor_gives_oral(activity, actor_plan.role):
         return ["one_knee", "opposite_foot"]
-    if actor_manual_contact(activity, actor_plan.slot_id):
+    if actor_manual_contact(activity, actor_plan.role):
         return [
             "one_braced_hand" if support == "both_hands" else support
             for support in supports
         ]
-    regions = active_regions(activity, actor_plan.slot_id)
+    regions = active_regions(activity, actor_plan.role)
     if {"hand", "left_hand", "right_hand"}.intersection(regions):
         supports = [
             "one_braced_hand" if support == "both_hands" else support
-            for support in supports
             for support in supports
         ]
     return supports
@@ -465,10 +457,10 @@ def resolved_partner_supports(
 
 def wearable_prop_for_owner(
     activity: ActivityTemplate,
-    slot_id: str,
+    role: str,
 ) -> WearableProp | None:
     return next(
-        (prop for prop in activity.wearable_props if prop.owner_slot == slot_id),
+        (prop for prop in activity.wearable_props if prop.owner_role == role),
         None,
     )
 
@@ -491,17 +483,28 @@ def handheld_edge(
     )
 
 
+def handheld_prop_for_controller(
+    activity: ActivityTemplate,
+    role: str,
+) -> HandheldProp | None:
+    return next(
+        (prop for prop in activity.handheld_props if prop.controller_role == role),
+        None,
+    )
+
+
 def partner_relationship(
     actor_plan,
     activity: ActivityTemplate,
     central_name: str,
+    central_pose,
 ) -> str:
-    slot_id = actor_plan.slot_id
-    central_slot = activity.required_slots[0]
-    prop = wearable_prop_for_owner(activity, slot_id)
+    role = actor_plan.role
+    central_role = activity.focus_role
+    prop = wearable_prop_for_owner(activity, role)
     if prop:
         stance = "stands" if "both_feet" in actor_plan.support_points else "kneels"
-        if actor_plan.pose_role == "supporting_central":
+        if actor_plan.pose_function == "supporting_central":
             return (
                 f"supports {central_name} with both arms while keeping her "
                 f"pelvis aligned with {central_name}'s pelvis"
@@ -520,40 +523,90 @@ def partner_relationship(
             f"{stance} facing {central_name} with their pelvises centered on "
             "the same contact axis"
         )
+    handheld = handheld_prop_for_controller(activity, role)
+    if handheld:
+        edge = handheld_edge(activity, handheld)
+        side = "left" if actor_plan.screen_position == "center_left" else "right"
+        target = phrase(edge.target.region)
+        return (
+            f"kneels beside {central_name}'s {side} hip, approaching from the "
+            f"{side} while guiding {handheld.prop_id} toward her {target}"
+        )
+    self_manual = actor_self_manual_contact(activity, role)
+    if self_manual:
+        side = "left" if actor_plan.screen_position == "center_left" else "right"
+        return f"kneels beside {central_name} on the {side}"
     relation: str | None = None
     for edge in activity.contact_edges:
-        if edge.source.entity_id == slot_id and edge.target.entity_id == central_slot:
+        if edge.source.entity_id == role and edge.target.entity_id == central_role:
             if edge.source.region == "penis":
-                relation = (
-                    f"kneels between {central_name}'s raised thighs with his "
-                    f"pelvis centered on {central_name}'s pelvic contact axis"
-                )
+                if central_pose.body_level == "high":
+                    relation = (
+                        f"stands directly behind {central_name} with his pelvis "
+                        f"centered on {central_name}'s pelvic contact axis"
+                    )
+                elif central_pose.family in {
+                    "prone",
+                    "all_fours",
+                    "kneeling_forward",
+                }:
+                    relation = (
+                        f"kneels directly behind {central_name} with his pelvis "
+                        f"centered on {central_name}'s pelvic contact axis"
+                    )
+                else:
+                    relation = (
+                        f"kneels between {central_name}'s raised thighs with his "
+                        f"pelvis centered on {central_name}'s pelvic contact axis"
+                    )
                 break
             if edge.source.region == "mouth":
-                relation = (
-                    f"kneels between {central_name}'s knees and lowers the "
-                    f"torso between her thighs until the mouth reaches her "
-                    "pelvis"
+                side = (
+                    "left" if actor_plan.screen_position == "center_left" else "right"
                 )
+                if "both_feet" in actor_plan.support_points:
+                    relation = (
+                        f"holds a low standing crouch beside {central_name}'s "
+                        f"{side} thigh and approaches her pelvis from the {side}, "
+                        "lowering the torso until the mouth reaches its assigned "
+                        "contact"
+                    )
+                else:
+                    relation = (
+                        f"kneels beside {central_name}'s {side} thigh and "
+                        f"approaches her pelvis from the {side}, lowering the "
+                        "torso until the mouth reaches its assigned contact"
+                    )
                 break
             if edge.source.region in {"hand", "left_hand", "right_hand"}:
                 relation = f"aligns beside {central_name}'s upper body"
                 break
-        if edge.target.entity_id == slot_id and edge.source.entity_id == central_slot:
-            if edge.target.region in {"penis", "vulva"}:
+        if edge.target.entity_id == role and edge.source.entity_id == central_role:
+            if edge.source.region == "mouth" and edge.target.region in {
+                "penis",
+                "vulva",
+            }:
                 relation = (
                     f"holds a high half-kneel beside {central_name}'s head, "
                     "with one knee down and the opposite foot planted so the "
                     "pelvis rises to her mouth level"
                 )
                 break
-    if actor_plan.pose_role == "supporting_central":
-        if actor_is_pelvic_penetrator(activity, actor_plan.slot_id):
+            if edge.source.region in {"hand", "left_hand", "right_hand"}:
+                side = (
+                    "left" if actor_plan.screen_position == "center_left" else "right"
+                )
+                relation = (
+                    f"kneels on all fours to {central_name}'s {side}, with the "
+                    f"pelvis angled inward within reach of {central_name}'s "
+                    "assigned hand"
+                )
+                break
+    if actor_plan.pose_function == "supporting_central":
+        if actor_is_pelvic_penetrator(activity, actor_plan.role):
             return (
-                "stands with his back and shoulders against the wall, facing "
-                f"{central_name} with feet shoulder-width apart, and supports "
-                "her through a left-side forearm-and-hand cradle and a matching "
-                "right-side cradle while keeping their pelvises aligned"
+                f"stands facing {central_name} with feet shoulder-width apart "
+                "and knees softly flexed while keeping their pelvises aligned"
             )
         supporting_relation = (
             relation.replace("aligns", "aligning", 1)
@@ -573,24 +626,30 @@ def partner_limb_clause(
     central_name: str,
     support_surface: str,
 ) -> str:
-    if not wearable_prop_for_owner(activity, actor_plan.slot_id):
-        if actor_plan.pose_role == "supporting_central":
+    if not wearable_prop_for_owner(activity, actor_plan.role):
+        if actor_plan.pose_function == "supporting_central":
             return ""
-        if actor_is_pelvic_penetrator(activity, actor_plan.slot_id):
+        handheld = handheld_prop_for_controller(activity, actor_plan.role)
+        if handheld:
+            return (
+                f", with the right hand controlling {handheld.prop_id} and "
+                f"the left hand braced on the {phrase(support_surface)}"
+            )
+        if actor_is_pelvic_penetrator(activity, actor_plan.role):
             if "both_hands" in actor_plan.support_points:
                 return (
                     f", with one hand braced on the {phrase(support_surface)} "
                     f"and the other stabilizing {central_name}'s thigh"
                 )
             return f", with both hands stabilizing {central_name}'s hips"
-        if actor_gives_oral(activity, actor_plan.slot_id):
+        if actor_gives_oral(activity, actor_plan.role):
             return (
                 f", with both palms braced on the {phrase(support_surface)} "
                 f"beside {central_name}'s hips"
             )
-        if actor_receives_oral(activity, actor_plan.slot_id):
+        if actor_receives_oral(activity, actor_plan.role):
             return ", with both hands resting on the thighs"
-        manual_edge = actor_manual_contact(activity, actor_plan.slot_id)
+        manual_edge = actor_manual_contact(activity, actor_plan.role)
         if manual_edge:
             target = phrase(manual_edge.target.region)
             if "both_hands" not in actor_plan.support_points:
@@ -604,8 +663,15 @@ def partner_limb_clause(
                 f"{target} and the other hand braced on the "
                 f"{phrase(support_surface)}"
             )
+        self_manual = actor_self_manual_contact(activity, actor_plan.role)
+        if self_manual:
+            return (
+                f", with the right hand maintained at their own "
+                f"{phrase(self_manual.target.region)} and the left hand braced "
+                f"on the {phrase(support_surface)}"
+            )
         return ""
-    if actor_plan.pose_role == "supporting_central":
+    if actor_plan.pose_function == "supporting_central":
         return ""
     if "both_hands" in actor_plan.support_points:
         return (
@@ -670,20 +736,59 @@ def plan_fingerprint(
 
 
 def actor_name(entity_id: str, cast_key: str) -> str:
-    slots = [slot[0] for slot in CASTS[cast_key]]
-    if entity_id in slots:
-        index = slots.index(entity_id)
-        identities = CAST_IDENTITIES[cast_key]
-        if index < len(identities):
-            return identities[index].code
+    roles = list(CASTS[cast_key])
+    if entity_id in roles:
+        return entity_id.upper()
     if entity_id.startswith("prop_"):
         return "the selected toy or wearable prop"
     return entity_id
 
 
-def occluders_for(edge_regions: set[str]) -> str:
+def contact_projection(
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+    edge: ContactEdge,
+) -> tuple[str, str]:
+    anchor_role = activity.focus_role
+    if edge.edge_id != "primary":
+        controlled_prop = next(
+            (
+                prop
+                for prop in activity.handheld_props
+                if prop.prop_id == edge.source.entity_id
+            ),
+            None,
+        )
+        planned_roles = {plan.role for plan in entry.actor_plans}
+        anchor_role = (
+            controlled_prop.controller_role
+            if controlled_prop is not None
+            else next(
+                (
+                    endpoint.entity_id
+                    for endpoint in (edge.source, edge.target)
+                    if endpoint.entity_id != activity.focus_role
+                    and endpoint.entity_id in planned_roles
+                ),
+                activity.focus_role,
+            )
+        )
+    anchor = next(plan for plan in entry.actor_plans if plan.role == anchor_role)
+    return anchor.screen_position, anchor.depth_plane
+
+
+def occluders_for(edge: ContactEdge, cast_key: str) -> str:
+    edge_regions = {edge.source.region, edge.target.region}
     if {"mouth", "penis"}.issubset(edge_regions):
-        return "the receiving actor's single head silhouette"
+        receiver = next(
+            endpoint
+            for endpoint in (edge.source, edge.target)
+            if endpoint.region == "mouth"
+        )
+        receiver_name = actor_name(receiver.entity_id, cast_key)
+        return (
+            f"{receiver_name}'s only head, visibly connected to {receiver_name}'s torso"
+        )
     if "mouth" in edge_regions:
         return "the head silhouette"
     if {"vagina", "anus"}.intersection(edge_regions):
@@ -713,12 +818,14 @@ def anatomical_endpoint_ownership(
 
 
 def compile_wearable_prop(
+    entry: PoseEntry,
     activity: ActivityTemplate,
     prop: WearableProp,
     cast_key: str,
 ) -> tuple[list[str], str]:
     edge = wearable_edge(activity, prop)
-    owner = actor_name(prop.owner_slot, cast_key)
+    screen_position, depth_plane = contact_projection(entry, activity, edge)
+    owner = actor_name(prop.owner_role, cast_key)
     target = actor_name(edge.target.entity_id, cast_key)
     if edge.target.region == "vagina":
         route = (
@@ -746,29 +853,58 @@ def compile_wearable_prop(
     if edge.preferred_visibility == "occluded":
         sentences.append(
             f"The {phrase(edge.edge_id)} {phrase(edge.state)} contact at "
-            f"{phrase(edge.screen_position)} in the "
-            f"{phrase(edge.depth_plane)} remains occluded by "
-            f"{occluders_for({edge.source.region, edge.target.region})}; "
+            f"{phrase(screen_position)} in the "
+            f"{phrase(depth_plane)} remains occluded by "
+            f"{occluders_for(edge, cast_key)}; "
             "the actual insertion point is not shown."
         )
     else:
         sentences.append(
             f"The visible {phrase(edge.edge_id)} {phrase(edge.state)} contact "
             f"continues directly from the fixed base at "
-            f"{phrase(edge.screen_position)} in the "
-            f"{phrase(edge.depth_plane)}."
+            f"{phrase(screen_position)} in the "
+            f"{phrase(depth_plane)}."
         )
     return sentences, edge.edge_id
 
 
 def compile_handheld_prop(
+    entry: PoseEntry,
     activity: ActivityTemplate,
     prop: HandheldProp,
     cast_key: str,
 ) -> tuple[list[str], str]:
     edge = handheld_edge(activity, prop)
-    controller = actor_name(prop.controller_slot, cast_key)
+    screen_position, depth_plane = contact_projection(entry, activity, edge)
+    controller = actor_name(prop.controller_role, cast_key)
     target = actor_name(edge.target.entity_id, cast_key)
+    if prop.category == "insertable_toy":
+        target_region = phrase(edge.target.region)
+        sentences = [
+            (
+                f"{controller}'s right hand visibly grips the base of "
+                f"{prop.prop_id}; her left hand remains braced for support."
+            ),
+            (
+                f"The shaft of {prop.prop_id} follows one continuous line from "
+                f"{controller}'s right hand toward {target}'s {target_region}, "
+                f"aligned to the {target_region} canal."
+            ),
+        ]
+        if edge.preferred_visibility == "occluded":
+            sentences.append(
+                f"The {phrase(edge.edge_id)} inserted contact at "
+                f"{phrase(screen_position)} in the {phrase(depth_plane)} "
+                f"remains occluded by {occluders_for(edge, cast_key)}; the "
+                "controller, gripped base and proximal shaft remain visible."
+            )
+        else:
+            sentences.append(
+                f"The visible {phrase(edge.edge_id)} inserted edge continues "
+                f"from the gripped base into {target}'s {target_region} at "
+                f"{phrase(screen_position)} in the {phrase(depth_plane)}."
+            )
+        return sentences, edge.edge_id
     sentences = [
         (
             f"{controller}'s right hand grips the vibrator body and controls "
@@ -783,11 +919,65 @@ def compile_handheld_prop(
         (
             f"The visible {phrase(edge.edge_id)} "
             f"{phrase(edge.state)} edge is the vibrator head resting against "
-            f"the external clitoral surface at {phrase(edge.screen_position)} "
-            f"in the {phrase(edge.depth_plane)}."
+            f"the external clitoral surface at {phrase(screen_position)} "
+            f"in the {phrase(depth_plane)}."
         ),
     ]
     return sentences, edge.edge_id
+
+
+def distributed_contact_axis_clause(
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+    cast_key: str,
+) -> str | None:
+    mouth_edge = next(
+        (
+            edge
+            for edge in activity.contact_edges
+            if any(
+                endpoint.entity_id == activity.focus_role and endpoint.region == "mouth"
+                for endpoint in (edge.source, edge.target)
+            )
+        ),
+        None,
+    )
+    pelvic_edge = next(
+        (
+            edge
+            for edge in activity.contact_edges
+            if any(
+                endpoint.entity_id == activity.focus_role
+                and endpoint.region in {"vagina", "anus"}
+                for endpoint in (edge.source, edge.target)
+            )
+        ),
+        None,
+    )
+    if mouth_edge is None or pelvic_edge is None:
+        return None
+    focus_name = actor_name(activity.focus_role, cast_key)
+    mouth_partner = next(
+        endpoint.entity_id
+        for endpoint in (mouth_edge.source, mouth_edge.target)
+        if endpoint.entity_id != activity.focus_role
+    )
+    pelvic_partner = next(
+        endpoint.entity_id
+        for endpoint in (pelvic_edge.source, pelvic_edge.target)
+        if endpoint.entity_id != activity.focus_role
+    )
+    mouth_position, mouth_depth = contact_projection(entry, activity, mouth_edge)
+    pelvic_position, pelvic_depth = contact_projection(entry, activity, pelvic_edge)
+    return (
+        f"{focus_name} remains one continuous body along the bed's long axis: "
+        f"her pelvis stays at {phrase(pelvic_position)} in the "
+        f"{phrase(pelvic_depth)} beside {actor_name(pelvic_partner, cast_key)}, "
+        f"and her torso connects continuously to her only head at "
+        f"{phrase(mouth_position)} in the {phrase(mouth_depth)} beside "
+        f"{actor_name(mouth_partner, cast_key)}. No additional head, torso, "
+        "partial body or person occupies either contact zone."
+    )
 
 
 def compile_geometry(
@@ -796,7 +986,7 @@ def compile_geometry(
     activity: ActivityTemplate,
 ) -> str:
     descriptions = cast_descriptions(spec.cast_key)
-    central_name = actor_name(entry.central_slot, spec.cast_key)
+    central_name = actor_name(activity.focus_role, spec.cast_key)
     cast_text = "; ".join(descriptions)
     adult_noun = "adult" if len(descriptions) == 1 else "adults"
     pose = entry.central_pose
@@ -823,16 +1013,17 @@ def compile_geometry(
         chain = lifted_bilateral_chain(
             entry,
             central_name,
-            actor_name(entry.actor_plans[1].slot_id, spec.cast_key),
+            actor_name(entry.actor_plans[1].role, spec.cast_key),
         )
         if chain:
             sentences.append(chain)
     for actor_plan in entry.actor_plans[1:]:
-        actor_name_value = actor_name(actor_plan.slot_id, spec.cast_key)
+        actor_name_value = actor_name(actor_plan.role, spec.cast_key)
         relationship = partner_relationship(
             actor_plan,
             activity,
             central_name,
+            pose,
         )
         supports = resolved_partner_supports(
             actor_plan,
@@ -850,20 +1041,20 @@ def compile_geometry(
             f"{phrase(actor_plan.depth_plane)}, supported by "
             f"{joined([phrase(point) for point in supports])}."
         )
-        if actor_plan.pose_role == "supporting_central" and actor_is_pelvic_penetrator(
-            activity, actor_plan.slot_id
-        ):
-            sentences.append(
-                "The front-to-back order is the wall, "
-                f"{actor_name_value}, {central_name}, "
-                "then the viewer."
-            )
+    distributed_axis = distributed_contact_axis_clause(
+        entry,
+        activity,
+        spec.cast_key,
+    )
+    if distributed_axis:
+        sentences.append(distributed_axis)
     sentences.append(
         f"The primary activity is {natural_activity(activity.activity_id)}."
     )
     handled_prop_edges: set[str] = set()
     for prop in activity.handheld_props:
         prop_sentences, edge_id = compile_handheld_prop(
+            entry,
             activity,
             prop,
             spec.cast_key,
@@ -872,6 +1063,7 @@ def compile_geometry(
         handled_prop_edges.add(edge_id)
     for prop in activity.wearable_props:
         prop_sentences, edge_id = compile_wearable_prop(
+            entry,
             activity,
             prop,
             spec.cast_key,
@@ -881,16 +1073,17 @@ def compile_geometry(
     for edge in activity.contact_edges:
         if edge.edge_id in handled_prop_edges:
             continue
-        regions = {edge.source.region, edge.target.region}
+        screen_position, depth_plane = contact_projection(entry, activity, edge)
         ownership = anatomical_endpoint_ownership(edge, spec.cast_key)
         if ownership:
             sentences.append(ownership)
         if edge.preferred_visibility == "occluded":
             sentences.append(
                 f"The {phrase(edge.edge_id)} {phrase(edge.state)} contact "
-                f"at {phrase(edge.screen_position)} in the "
-                f"{phrase(edge.depth_plane)} remains occluded by "
-                f"{occluders_for(regions)}; its local endpoints are not shown."
+                f"at {phrase(screen_position)} in the "
+                f"{phrase(depth_plane)} remains occluded by "
+                f"{occluders_for(edge, spec.cast_key)}; "
+                "its local endpoints are not shown."
             )
         else:
             source = endpoint_phrase(
@@ -908,10 +1101,10 @@ def compile_geometry(
                 f"{phrase(edge.state)} edge joins "
                 f"{source} to {target} "
                 f"at "
-                f"{phrase(edge.screen_position)} in the "
-                f"{phrase(edge.depth_plane)}."
+                f"{phrase(screen_position)} in the "
+                f"{phrase(depth_plane)}."
             )
-    if activity.restraint.enabled:
+    if activity.restraint is not None:
         if activity.restraint.equipment == [
             "padded_spreader_bar"
         ] and activity.restraint.body_regions == ["ankles"]:
@@ -945,60 +1138,53 @@ def endpoint_phrase(entity_id: str, region: str, cast_key: str) -> str:
     return f"{name}'s {natural_region}"
 
 
-def style_issues(
-    expected: dict[str, str],
-    style: StyleLayer,
-) -> list[str]:
-    issues: list[str] = []
-    if style.scene_id != expected["scene_id"]:
-        issues.append("scene_id changed")
-    if style.plan_fingerprint != expected["plan_fingerprint"]:
-        issues.append("plan fingerprint changed")
-    text = " ".join((style.setting, style.lighting, style.palette, style.atmosphere))
-    if not text.isascii():
-        issues.append("style layer contains non-ASCII text")
-    forbidden = re.compile(
-        r"\b(?:camera|frame|framing|viewpoint|woman|man|person|body|skin|pose|"
-        r"contact|intercourse|fellatio|cunnilingus|masturbation|penis|vagina|"
-        r"vulva|anus|breast|clitoris)\b",
-        re.I,
+def region_visibility_maps(
+    spec: DemoSpec,
+    activity: ActivityTemplate,
+) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
+    roles = CASTS[spec.cast_key]
+    required = {role: set() for role in roles}
+    visible = {role: set() for role in roles}
+    for edge in activity.contact_edges:
+        for endpoint in (edge.source, edge.target):
+            if endpoint.entity_id not in required:
+                continue
+            required[endpoint.entity_id].add(endpoint.region)
+            if edge.preferred_visibility == "visible":
+                visible[endpoint.entity_id].add(endpoint.region)
+    if activity.restraint is not None:
+        for role in activity.restraint.restrained_roles:
+            required[role].update(activity.restraint.body_regions)
+    return (
+        {role: sorted(regions) for role, regions in required.items()},
+        {role: sorted(regions) for role, regions in visible.items()},
     )
-    matches = sorted({match.group(0).lower() for match in forbidden.finditer(text)})
-    if matches:
-        issues.append(f"style layer changed geometry vocabulary: {matches}")
-    if re.search(
-        r"\b(?:lighting|palette|atmosphere|motivated)\b",
-        style.setting,
-        re.I,
-    ):
-        issues.append("setting contains another style field")
-    for field_name, value in (
-        ("setting", style.setting),
-        ("lighting", style.lighting),
-        ("palette", style.palette),
-        ("atmosphere", style.atmosphere),
-    ):
-        if value.rstrip().endswith("."):
-            issues.append(f"{field_name} has a trailing period")
-        if re.search(r"\b[a-z]{1,2}\.?$", value.rstrip(), re.I):
-            issues.append(f"{field_name} ends with a truncated word")
-    return issues
 
 
-def combine_prompt(geometry: str, style: StyleLayer) -> str:
-    setting = style.setting.strip().rstrip(".")
-    lighting = style.lighting.strip().rstrip(".")
-    palette = style.palette.strip().rstrip(".")
-    atmosphere = style.atmosphere.strip().rstrip(".")
-    return " ".join(
-        (
-            geometry,
-            f"Setting: {setting}.",
-            f"Lighting: {lighting}.",
-            f"Palette: {palette}.",
-            f"Atmosphere: {atmosphere}.",
-        )
+def compile_scene_layers(
+    spec: DemoSpec,
+    entry: PoseEntry,
+    activity: ActivityTemplate,
+    fingerprint: str,
+    geometry: str,
+    setting: SettingPreset,
+) -> ResolvedSceneLayers:
+    required, visible = region_visibility_maps(spec, activity)
+    return resolve_scene_layers(
+        scene_id=spec.scene_id,
+        spatial_fingerprint=fingerprint,
+        geometry=geometry,
+        cast_roles=list(CASTS[spec.cast_key]),
+        body_level=entry.central_pose.body_level,
+        setting=setting,
+        required_regions_by_role=required,
+        visible_regions_by_role=visible,
+        layer_budget_tokens=200,
     )
+
+
+def combine_prompt(geometry: str, layers: ResolvedSceneLayers) -> str:
+    return f"{geometry} {layers.compact_suffix}"
 
 
 def prompt_issues(
@@ -1009,7 +1195,7 @@ def prompt_issues(
 ) -> list[str]:
     issues: list[str] = []
     descriptions = cast_descriptions(spec.cast_key)
-    central_name = actor_name(entry.central_slot, spec.cast_key)
+    central_name = actor_name(activity.focus_role, spec.cast_key)
     if not prompt.isascii() or "\n" in prompt or "\r" in prompt:
         issues.append("prompt is not one ASCII paragraph")
     if len(re.findall(r"\bcamera\b", prompt, re.I)) != 1:
@@ -1040,29 +1226,41 @@ def prompt_issues(
         visibility = edge.preferred_visibility
         if visibility not in lowered:
             issues.append(f"missing contact visibility: {visibility}")
+        edge_sentence = next(
+            (
+                sentence
+                for sentence in prompt.split(". ")
+                if phrase(edge.edge_id) in sentence
+                and "activity is" not in sentence
+                and ("contact" in sentence or "edge" in sentence)
+            ),
+            "",
+        )
+        screen_position, depth_plane = contact_projection(entry, activity, edge)
+        projection = f"at {phrase(screen_position)} in the {phrase(depth_plane)}"
+        if projection not in edge_sentence:
+            issues.append(f"{edge.edge_id} changed contact projection")
         if visibility == "occluded":
             local_terms = {edge.source.region, edge.target.region}
-            geometry_contact = next(
-                (
-                    sentence
-                    for sentence in prompt.split(". ")
-                    if phrase(edge.edge_id) in sentence and "contact" in sentence
-                ),
-                "",
-            )
-            if any(phrase(term) in geometry_contact for term in local_terms):
+            if any(phrase(term) in edge_sentence for term in local_terms):
                 issues.append(f"{edge.edge_id} exposes an occluded endpoint")
+            expected_occluder = occluders_for(edge, spec.cast_key)
+            if expected_occluder not in edge_sentence:
+                issues.append(f"{edge.edge_id} changed contact occluder ownership")
         expected_ownership = anatomical_endpoint_ownership(
             edge,
             spec.cast_key,
         )
         if expected_ownership and expected_ownership not in prompt:
             issues.append(f"{edge.edge_id} lacks anatomical endpoint ownership")
+    expected_axis = distributed_contact_axis_clause(entry, activity, spec.cast_key)
+    if expected_axis and expected_axis not in prompt:
+        issues.append("distributed contacts lack one continuous body axis")
     expected_lift_chain = (
         lifted_bilateral_chain(
             entry,
             central_name,
-            actor_name(entry.actor_plans[1].slot_id, spec.cast_key),
+            actor_name(entry.actor_plans[1].role, spec.cast_key),
         )
         if len(descriptions) > 1
         else None
@@ -1070,7 +1268,7 @@ def prompt_issues(
     if expected_lift_chain and expected_lift_chain not in prompt:
         issues.append("lifted pose lacks a bilateral limb chain")
     for prop in activity.wearable_props:
-        owner = actor_name(prop.owner_slot, spec.cast_key)
+        owner = actor_name(prop.owner_role, spec.cast_key)
         required_prop_phrases = (
             f"strap-on harness is visibly secured around {owner}'s hips",
             "base fixed to the front of her pelvis",
@@ -1092,9 +1290,9 @@ def prompt_issues(
             "",
         )
         owner_plan = next(
-            plan for plan in entry.actor_plans if plan.slot_id == prop.owner_slot
+            plan for plan in entry.actor_plans if plan.role == prop.owner_role
         )
-        if owner_plan.pose_role == "supporting_central":
+        if owner_plan.pose_function == "supporting_central":
             if "supports" not in owner_sentence or "both arms" not in owner_sentence:
                 issues.append("supporting wearable owner lacks arm tasks")
         elif "both_hands" in owner_plan.support_points:
@@ -1107,28 +1305,45 @@ def prompt_issues(
         elif "both hands holding" not in owner_sentence:
             issues.append("standing wearable prop owner lacks hand tasks")
     for prop in activity.handheld_props:
-        controller = actor_name(prop.controller_slot, spec.cast_key)
-        required_prop_phrases = (
-            f"{controller}'s right hand grips the vibrator body",
-            "left hand remains visibly on her inner thigh",
-            "lies transversely across",
-            "external clitoral surface",
-            "parallel to the pubic line",
-            "entirely outside the vaginal opening",
-        )
+        controller = actor_name(prop.controller_role, spec.cast_key)
+        if prop.category == "insertable_toy":
+            edge = handheld_edge(activity, prop)
+            required_prop_phrases = (
+                f"{controller}'s right hand visibly grips the base of {prop.prop_id}",
+                f"shaft of {prop.prop_id} follows one continuous line",
+                f"aligned to the {phrase(edge.target.region)} canal",
+            )
+        else:
+            required_prop_phrases = (
+                f"{controller}'s right hand grips the vibrator body",
+                "left hand remains visibly on her inner thigh",
+                "lies transversely across",
+                "external clitoral surface",
+                "parallel to the pubic line",
+                "entirely outside the vaginal opening",
+            )
         for value in required_prop_phrases:
             if value.lower() not in lowered:
                 issues.append(f"missing handheld prop topology: {value}")
         edge = handheld_edge(activity, prop)
-        if (
+        if prop.category == "insertable_toy":
+            if (
+                edge.source.entity_id != prop.prop_id
+                or edge.state != "inserted"
+                or edge.target.region not in {"vagina", "anus"}
+            ):
+                issues.append("insertable handheld prop topology changed")
+        elif (
             edge.source.entity_id != prop.prop_id
             or edge.state != "external_contact"
             or edge.target.region != "clitoris"
         ):
             issues.append("handheld vibrator contact topology changed")
-    if activity.restraint.equipment == [
-        "padded_spreader_bar"
-    ] and activity.restraint.body_regions == ["ankles"]:
+    if (
+        activity.restraint is not None
+        and activity.restraint.equipment == ["padded_spreader_bar"]
+        and activity.restraint.body_regions == ["ankles"]
+    ):
         restraint_chain = (
             f"spreader bar spans directly between {central_name}'s ankles",
             "left end is visibly secured to her left ankle",
@@ -1138,7 +1353,7 @@ def prompt_issues(
         if any(value not in prompt for value in restraint_chain):
             issues.append("spreader bar lacks a visible ankle attachment chain")
     for actor_plan in entry.actor_plans[1:]:
-        name = actor_name(actor_plan.slot_id, spec.cast_key)
+        name = actor_name(actor_plan.role, spec.cast_key)
         actor_sentence = next(
             (
                 sentence
@@ -1147,16 +1362,17 @@ def prompt_issues(
             ),
             "",
         )
-        if actor_gives_oral(activity, actor_plan.slot_id):
+        if actor_gives_oral(activity, actor_plan.role):
             if (
-                "lowers the torso" not in actor_sentence
+                "approaches her pelvis from" not in actor_sentence
+                or "lowering the torso" not in actor_sentence
                 or "both palms braced" not in actor_sentence
             ):
                 issues.append(f"{name} lacks a resolved oral reach path")
         if actor_receives_oral(
             activity,
-            actor_plan.slot_id,
-        ) and not actor_gives_oral(activity, actor_plan.slot_id):
+            actor_plan.role,
+        ) and not actor_gives_oral(activity, actor_plan.role):
             if (
                 "high half-kneel" not in actor_sentence
                 or "both hands resting on the thighs" not in actor_sentence
@@ -1164,13 +1380,13 @@ def prompt_issues(
             ):
                 issues.append(f"{name} has conflicting oral recipient supports")
         if actor_is_pelvic_penetrator(
-            activity, actor_plan.slot_id
-        ) and not wearable_prop_for_owner(activity, actor_plan.slot_id):
-            if actor_plan.pose_role == "supporting_central":
+            activity, actor_plan.role
+        ) and not wearable_prop_for_owner(activity, actor_plan.role):
+            if actor_plan.pose_function == "supporting_central":
                 if (
-                    "stands with his back and shoulders against the wall"
-                    not in actor_sentence
-                    or "front-to-back order is the wall" not in prompt
+                    "stands facing" not in actor_sentence
+                    or "feet shoulder-width apart" not in actor_sentence
+                    or "knees softly flexed" not in actor_sentence
                 ):
                     issues.append(f"{name} lacks a stable lifted support topology")
             elif "both_hands" in actor_plan.support_points and (
@@ -1179,7 +1395,7 @@ def prompt_issues(
                 or "supported by both knees and one braced hand" not in actor_sentence
             ):
                 issues.append(f"{name} has conflicting penetration support tasks")
-        if actor_manual_contact(activity, actor_plan.slot_id):
+        if actor_manual_contact(activity, actor_plan.role):
             manual_support_resolved = (
                 "contacting hand maintained" in actor_sentence
                 and (
@@ -1210,6 +1426,17 @@ def evaluation_contract_issues(
         re.I,
     )
     for evaluation in evaluations.evaluations:
+        scores = (
+            evaluation.geometry_coherence,
+            evaluation.visual_impact,
+            evaluation.cast_clarity,
+            evaluation.contact_clarity,
+            evaluation.style_integration,
+        )
+        if evaluation.verdict == "pass" and min(scores) < 7:
+            issues[evaluation.scene_id] = [
+                "pass verdict has a score below 7 without an actionable defect"
+            ]
         if evaluation.verdict != "pass" and speculative.search(
             " ".join(evaluation.issues)
         ):
@@ -1221,79 +1448,44 @@ def evaluation_contract_issues(
 
 async def run() -> dict[str, object]:
     selected = []
-    style_requests = []
+    prompts = []
+    resolved_layers = []
+    layer_validation_issues: dict[str, list[str]] = {}
+    hard_issues: dict[str, list[str]] = {}
     for spec in SPECS:
         catalog = load_catalog(spec.cast_key)
         entry, activity = select_plan(catalog, spec)
         fingerprint = plan_fingerprint(spec, entry, activity)
         geometry = compile_geometry(spec, entry, activity)
-        selected.append((spec, entry, activity, fingerprint, geometry))
-        style_requests.append(
-            {
-                "scene_id": spec.scene_id,
-                "plan_fingerprint": fingerprint,
-                "style_direction": spec.style_direction,
-            }
+        setting = SETTING_PRESETS[spec.setting_id]
+        layers = compile_scene_layers(
+            spec,
+            entry,
+            activity,
+            fingerprint,
+            geometry,
+            setting,
         )
+        prompt = combine_prompt(geometry, layers)
+        selected.append((spec, entry, activity))
+        resolved_layers.append(layers)
+        prompts.append(prompt)
+        current_layer_issues = layer_issues(
+            layers,
+            list(CASTS[spec.cast_key]),
+        )
+        if current_layer_issues:
+            layer_validation_issues[spec.scene_id] = current_layer_issues
+        current_hard_issues = prompt_issues(spec, entry, activity, prompt)
+        if current_hard_issues:
+            hard_issues[spec.scene_id] = current_hard_issues
 
     settings = load_story_provider_settings()
-    style_attempts = 0
-    style_rejections: list[list[str]] = []
-    style_validation_issues: dict[str, list[str]] = {}
-    payload: dict[str, object] = {"scenes": style_requests}
     async with OpenAIStoryModel(settings) as model:
-        for _ in range(3):
-            style_attempts += 1
-            style_response, rejections = await _generate_with_repair(
-                model,
-                system=STYLE_SYSTEM,
-                payload=payload,
-                response_model=StyleBatch,
-                max_output_tokens=min(8000, settings.output_token_limit),
-            )
-            style_rejections.extend(rejections)
-            style_batch = StyleBatch.model_validate(style_response.value)
-            style_validation_issues = {}
-            for request, style in zip(
-                style_requests,
-                style_batch.styles,
-                strict=True,
-            ):
-                issues = style_issues(request, style)
-                if issues:
-                    style_validation_issues[request["scene_id"]] = issues
-            if not style_validation_issues:
-                break
-            payload = {
-                "scenes": style_requests,
-                "previous_styles": style_batch.model_dump(mode="json"),
-                "validation_issues": style_validation_issues,
-                "repair_requirement": (
-                    "Return all six corrected style layers without geometry words."
-                ),
-            }
-
-        prompts = [
-            combine_prompt(geometry, style)
-            for (_, _, _, _, geometry), style in zip(
-                selected,
-                style_batch.styles,
-                strict=True,
-            )
-        ]
-        hard_issues: dict[str, list[str]] = {}
-        for (spec, entry, activity, _, _), prompt in zip(
-            selected,
-            prompts,
-            strict=True,
-        ):
-            issues = prompt_issues(spec, entry, activity, prompt)
-            if issues:
-                hard_issues[spec.scene_id] = issues
         evaluation_payload: dict[str, object] = {
             "scenes": [
                 {"scene_id": spec.scene_id, "prompt": prompt}
-                for (spec, _, _, _, _), prompt in zip(
+                for (spec, _, _), prompt in zip(
                     selected,
                     prompts,
                     strict=True,
@@ -1338,17 +1530,38 @@ async def run() -> dict[str, object]:
         "model": settings.model,
         "scene_count": len(prompts),
         "cast_keys": [spec.cast_key for spec in SPECS],
-        "style_attempts": style_attempts,
-        "style_validation_issues": style_validation_issues,
-        "style_structured_rejections": style_rejections,
+        "setting_ids": [spec.setting_id for spec in SPECS],
+        "layer_validation_issues": layer_validation_issues,
         "hard_geometry_issues": hard_issues,
+        "token_metrics": {
+            "geometry_estimated_tokens": sum(
+                layers.token_metrics.geometry_estimated_tokens
+                for layers in resolved_layers
+            ),
+            "layer_estimated_tokens": sum(
+                layers.token_metrics.layer_estimated_tokens
+                for layers in resolved_layers
+            ),
+            "verbose_layer_estimated_tokens": sum(
+                layers.token_metrics.verbose_layer_estimated_tokens
+                for layers in resolved_layers
+            ),
+            "compact_saved_tokens": sum(
+                layers.token_metrics.compact_saved_tokens for layers in resolved_layers
+            ),
+            "final_estimated_tokens": sum(
+                layers.token_metrics.final_estimated_tokens
+                for layers in resolved_layers
+            ),
+            "saved_style_generation_calls": len(prompts),
+        },
         "average_visual_impact": average_impact,
         "evaluations": evaluations.model_dump(mode="json")["evaluations"],
         "evaluation_attempts": evaluation_attempts,
         "evaluation_validation_issues": evaluation_validation_issues,
         "evaluation_structured_rejections": evaluation_rejections,
         "passed": (
-            not style_validation_issues
+            not layer_validation_issues
             and not hard_issues
             and not evaluation_validation_issues
             and evaluation_passed
@@ -1359,8 +1572,13 @@ async def run() -> dict[str, object]:
         "\n".join(prompts) + "\n",
         encoding="utf-8",
     )
-    (OUTPUT / "styles.json").write_text(
-        style_batch.model_dump_json(indent=2) + "\n",
+    (OUTPUT / "layers.json").write_text(
+        json.dumps(
+            [layers.model_dump(mode="json") for layers in resolved_layers],
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
         encoding="utf-8",
     )
     (OUTPUT / "evaluations.json").write_text(

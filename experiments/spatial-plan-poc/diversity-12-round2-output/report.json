@@ -1,0 +1,240 @@
+{
+  "passed": true,
+  "batch": 2,
+  "catalog_entries_per_cast": 256,
+  "reference_128": {
+    "poses": 128,
+    "unique_signatures": 128,
+    "pose_families": 16,
+    "poses_per_family": {
+      "all_fours": 8,
+      "bridge_elevated": 8,
+      "deep_squat": 8,
+      "kneeling_forward": 8,
+      "kneeling_upright": 8,
+      "lifted_supported": 8,
+      "prone": 8,
+      "seated_edge": 8,
+      "seated_reclined": 8,
+      "seated_upright": 8,
+      "side_lying_left": 8,
+      "side_lying_right": 8,
+      "standing_bent": 8,
+      "standing_upright": 8,
+      "standing_wall_supported": 8,
+      "supine": 8
+    },
+    "body_levels": [
+      "high",
+      "low",
+      "middle"
+    ],
+    "primary_surfaces": [
+      "bed",
+      "bed_edge",
+      "chair",
+      "floor",
+      "partner_support",
+      "sofa",
+      "wall"
+    ],
+    "leg_configurations": 37,
+    "arm_configurations": 33,
+    "camera_viewpoints": [
+      "front_three_quarter",
+      "high_three_quarter",
+      "low_three_quarter",
+      "overhead_three_quarter",
+      "rear_three_quarter",
+      "side_three_quarter"
+    ],
+    "support_topologies": 19
+  },
+  "sample_12": {
+    "prompts": 12,
+    "unique_pose_signatures": 12,
+    "pose_families": 12,
+    "cast_configurations": 5,
+    "activities": 12,
+    "body_levels": 3,
+    "primary_surfaces": 7,
+    "camera_viewpoints": 6,
+    "shot_scales": 3,
+    "settings": 12
+  },
+  "thresholds": {
+    "prompts": 12,
+    "unique_pose_signatures": 12,
+    "pose_families": 12,
+    "cast_configurations": 5,
+    "activities": 12,
+    "body_levels": 3,
+    "primary_surfaces": 7,
+    "camera_viewpoints": 6,
+    "shot_scales": 3,
+    "settings": 12
+  },
+  "threshold_failures": {},
+  "prompt_issues": {},
+  "token_metrics": {
+    "estimated_total": 5629,
+    "estimated_average": 469.08,
+    "maximum_layer_tokens": 190,
+    "verbose_layer_estimated_total": 8802,
+    "compact_saved_total": 7056,
+    "layer_budget_tokens": 200,
+    "style_generation_calls": 0,
+    "evaluation_payload": "scene_id_and_prompt_only"
+  },
+  "deepseek_evaluation": {
+    "model": "DeepSeek-V3.2",
+    "attempts": 1,
+    "contract_issues": [],
+    "structured_rejections": [
+      [
+        "evaluations.0: Value error, passing evaluations cannot contain issues",
+        "evaluations.2: Value error, passing evaluations cannot contain issues",
+        "evaluations.3: Value error, passing evaluations cannot contain issues",
+        "evaluations.4: Value error, passing evaluations cannot contain issues",
+        "evaluations.6: Value error, passing evaluations cannot contain issues",
+        "evaluations.11: Value error, passing evaluations cannot contain issues"
+      ]
+    ],
+    "usage_by_attempt": [
+      {
+        "prompt_tokens": 5451,
+        "completion_tokens": 992,
+        "total_tokens": 6443
+      }
+    ],
+    "evaluations": [
+      {
+        "scene_id": "D19",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D20",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D21",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D22",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D23",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D24",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D25",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D26",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D27",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D28",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D29",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      },
+      {
+        "scene_id": "D30",
+        "geometry_coherence": 10,
+        "cast_clarity": 10,
+        "pose_distinctiveness": 10,
+        "support_clarity": 10,
+        "visual_impact": 9,
+        "issues": [],
+        "verdict": "pass"
+      }
+    ],
+    "pose_diversity": 10,
+    "support_diversity": 10,
+    "composition_diversity": 10,
+    "duplicate_pairs": [],
+    "coverage_gaps": [],
+    "issues": [],
+    "verdict": "pass"
+  }
+}
