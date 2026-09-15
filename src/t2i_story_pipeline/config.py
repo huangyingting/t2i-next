@@ -12,16 +12,16 @@ from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.provider import StoryProviderSettings
 
 _ENV_FIELDS = {
-    "STORY_OPENAI_BASE_URL": "base_url",
-    "STORY_OPENAI_API_KEY_ENV": "api_key_env",
-    "STORY_OPENAI_AUTH_MODE": "auth_mode",
-    "STORY_OPENAI_MODEL": "model",
-    "STORY_OPENAI_THINKING_MODE": "thinking_mode",
-    "STORY_OPENAI_REASONING_EFFORT": "reasoning_effort",
-    "STORY_OPENAI_TEMPERATURE": "temperature",
-    "STORY_OPENAI_OUTPUT_TOKEN_LIMIT": "output_token_limit",
-    "STORY_OPENAI_TIMEOUT_SECONDS": "timeout_seconds",
-    "STORY_OPENAI_TRANSPORT_RETRIES": "transport_retries",
+    "OPENAI_BASE_URL": "base_url",
+    "OPENAI_API_KEY_ENV": "api_key_env",
+    "OPENAI_AUTH_MODE": "auth_mode",
+    "OPENAI_MODEL": "model",
+    "OPENAI_THINKING_MODE": "thinking_mode",
+    "OPENAI_REASONING_EFFORT": "reasoning_effort",
+    "OPENAI_TEMPERATURE": "temperature",
+    "OPENAI_OUTPUT_TOKEN_LIMIT": "output_token_limit",
+    "OPENAI_TIMEOUT_SECONDS": "timeout_seconds",
+    "OPENAI_TRANSPORT_RETRIES": "transport_retries",
 }
 
 

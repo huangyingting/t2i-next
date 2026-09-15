@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import random
+from datetime import date
 from pathlib import Path
 from typing import NamedTuple
 
@@ -31,7 +33,12 @@ from .compiler import (
     select_plan,
 )
 from .config import load_spatial_provider_settings
-from .layers import PRESENTATION_ROLE_CODES, layer_issues, stable_hash
+from .layers import (
+    PRESENTATION_ROLE_CODES,
+    SceneLayerInputs,
+    layer_issues,
+    stable_hash,
+)
 
 
 class SceneRequest(NamedTuple):
@@ -53,6 +60,59 @@ VIEWPOINTS = (
     "side_three_quarter",
 )
 SHOT_SCALES = ("medium_close", "medium", "medium_wide", "full_body", "wide")
+CREATIVE_BATCH_SIZE = 20
+MAX_SCENE_COUNT = 1200
+
+
+def _cast_filename_slug(cast_key: str) -> str:
+    roles = CASTS[cast_key]
+    female_count = sum(role.startswith("f") for role in roles)
+    male_count = sum(role.startswith("m") for role in roles)
+    woman_label = "woman" if female_count == 1 else "women"
+    man_label = "man" if male_count == 1 else "men"
+    return (
+        f"{female_count}_{woman_label}_{male_count}_{man_label}"
+    )
+
+
+def publish_prompt_batch(
+    prompts: list[str],
+    *,
+    semantic_name: str,
+    cast_key: str,
+    prompts_directory: Path,
+    published_on: date | None = None,
+) -> Path:
+    if not prompts:
+        raise ValueError("cannot publish an empty spatial prompt batch")
+    directory = (
+        prompts_directory
+        / (published_on or date.today()).isoformat()
+        / "hardcore"
+    )
+    directory.mkdir(parents=True, exist_ok=True)
+    stem = (
+        f"{semantic_name}_hardcore_{_cast_filename_slug(cast_key)}"
+    )
+    content = "\n".join(prompts) + "\n"
+    for sequence in range(1, 10000):
+        path = directory / f"{stem}_{sequence:04d}.txt"
+        try:
+            descriptor = os.open(
+                path,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                0o644,
+            )
+        except FileExistsError:
+            continue
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                stream.write(content)
+        except BaseException:
+            path.unlink(missing_ok=True)
+            raise
+        return path
+    raise ValueError(f"prompt filename sequence exhausted for {stem}")
 
 
 def _assign_unique_activities(
@@ -60,108 +120,122 @@ def _assign_unique_activities(
     family_entries: dict[str, list[PoseEntry]],
     *,
     rng: random.Random,
-) -> dict[str, tuple[str, PoseEntry]]:
-    options: dict[str, list[tuple[str, PoseEntry]]] = {}
-    for family in families:
+) -> list[tuple[str, PoseEntry]]:
+    options: dict[int, list[tuple[str, list[PoseEntry]]]] = {}
+    for slot, family in enumerate(families):
         by_activity: dict[str, list[PoseEntry]] = {}
         for entry in family_entries[family]:
             for activity_id in entry.compatible_activity_ids:
                 by_activity.setdefault(activity_id, []).append(entry)
         activity_ids = sorted(by_activity)
         rng.shuffle(activity_ids)
-        options[family] = [
-            (activity_id, rng.choice(by_activity[activity_id]))
-            for activity_id in activity_ids
-        ]
-    assignment: dict[str, tuple[str, PoseEntry]] = {}
+        slot_options = []
+        for activity_id in activity_ids:
+            entries = list(by_activity[activity_id])
+            rng.shuffle(entries)
+            slot_options.append((activity_id, entries))
+        options[slot] = slot_options
+    assignment: dict[int, tuple[str, PoseEntry]] = {}
     used_activities: set[str] = set()
+    used_poses: set[str] = set()
 
-    def search(remaining: list[str]) -> bool:
+    def search(remaining: list[int]) -> bool:
         if not remaining:
             return True
-        family = min(
+        slot = min(
             remaining,
             key=lambda item: sum(
                 activity_id not in used_activities
-                for activity_id, _ in options[item]
+                and any(entry.pose_id not in used_poses for entry in entries)
+                for activity_id, entries in options[item]
             ),
         )
-        next_remaining = [item for item in remaining if item != family]
-        for activity_id, entry in options[family]:
+        next_remaining = [item for item in remaining if item != slot]
+        for activity_id, entries in options[slot]:
             if activity_id in used_activities:
                 continue
-            assignment[family] = (activity_id, entry)
-            used_activities.add(activity_id)
-            if search(next_remaining):
-                return True
-            used_activities.remove(activity_id)
-            assignment.pop(family)
+            for entry in entries:
+                if entry.pose_id in used_poses:
+                    continue
+                assignment[slot] = (activity_id, entry)
+                used_activities.add(activity_id)
+                used_poses.add(entry.pose_id)
+                if search(next_remaining):
+                    return True
+                used_poses.remove(entry.pose_id)
+                used_activities.remove(activity_id)
+                assignment.pop(slot)
         return False
 
-    if not search(list(families)):
+    if not search(list(range(len(families)))):
         raise ValueError(
-            "cannot assign unique activities across selected pose families"
+            "cannot assign unique activity and pose pairs across selected scenes"
         )
-    return assignment
+    return [assignment[index] for index in range(len(families))]
 
 
 def _assign_camera_views(
-    families: list[str],
-    family_entries: dict[str, list[PoseEntry]],
-) -> dict[str, str]:
+    entries: list[PoseEntry],
+) -> list[str]:
     compatible_views = {
-        family: set(family_entries[family][0].central_pose.compatible_camera_views)
-        for family in families
+        index: set(entry.central_pose.compatible_camera_views)
+        for index, entry in enumerate(entries)
     }
     eligible_families = {
         viewpoint: [
-            family for family in families if viewpoint in compatible_views[family]
+            index
+            for index in range(len(entries))
+            if viewpoint in compatible_views[index]
         ]
         for viewpoint in VIEWPOINTS
     }
-    required_order = sorted(
-        VIEWPOINTS,
-        key=lambda viewpoint: len(eligible_families[viewpoint]),
+    required_order = (
+        sorted(
+            VIEWPOINTS,
+            key=lambda viewpoint: len(eligible_families[viewpoint]),
+        )
+        if len(entries) >= len(VIEWPOINTS)
+        else []
     )
-    required_assignment: dict[str, str] = {}
-    used_families: set[str] = set()
+    required_assignment: dict[int, str] = {}
+    used_entries: set[int] = set()
 
     def cover(index: int) -> bool:
         if index == len(required_order):
             return True
         viewpoint = required_order[index]
-        for family in eligible_families[viewpoint]:
-            if family in used_families:
+        for entry_index in eligible_families[viewpoint]:
+            if entry_index in used_entries:
                 continue
-            required_assignment[family] = viewpoint
-            used_families.add(family)
+            required_assignment[entry_index] = viewpoint
+            used_entries.add(entry_index)
             if cover(index + 1):
                 return True
-            used_families.remove(family)
-            required_assignment.pop(family)
+            used_entries.remove(entry_index)
+            required_assignment.pop(entry_index)
         return False
 
     if not cover(0):
-        raise ValueError("selected pose families cannot cover all camera viewpoints")
+        raise ValueError("selected poses cannot cover all camera viewpoints")
 
     assignment = dict(required_assignment)
     view_counts = {
         viewpoint: sum(value == viewpoint for value in assignment.values())
         for viewpoint in VIEWPOINTS
     }
-    for index, family in enumerate(families):
-        if family in assignment:
+    for index in range(len(entries)):
+        if index in assignment:
             continue
         preference = VIEWPOINTS[index % len(VIEWPOINTS) :] + VIEWPOINTS[
             : index % len(VIEWPOINTS)
         ]
         viewpoint = min(
-            (view for view in preference if view in compatible_views[family]),
+            (view for view in preference if view in compatible_views[index]),
             key=lambda view: (view_counts[view], preference.index(view)),
         )
-        assignment[family] = viewpoint
+        assignment[index] = viewpoint
         view_counts[viewpoint] += 1
-    return assignment
+    return [assignment[index] for index in range(len(entries))]
 
 
 def build_scene_requests(
@@ -170,37 +244,82 @@ def build_scene_requests(
     seed: int,
     count: int = 12,
 ) -> tuple[SceneRequest, ...]:
-    if count != 12:
-        raise ValueError("the released creative blueprint requires exactly 12 scenes")
+    if not 1 <= count <= MAX_SCENE_COUNT:
+        raise ValueError(
+            f"scene count must be between 1 and {MAX_SCENE_COUNT}"
+        )
     catalog = load_catalog(cast_key)
     rng = random.Random(seed)
+    if count > CREATIVE_BATCH_SIZE:
+        candidates = [
+            (
+                entry,
+                activity_id,
+                viewpoint,
+                shot_scale,
+            )
+            for entry in catalog.entries
+            for activity_id in entry.compatible_activity_ids
+            for viewpoint in entry.central_pose.compatible_camera_views
+            for shot_scale in SHOT_SCALES
+        ]
+        if count > len(candidates):
+            raise ValueError(
+                f"{cast_key} supports only {len(candidates)} unique spatial scenes"
+            )
+        rng.shuffle(candidates)
+        scene_id_width = max(2, len(str(count)))
+        return tuple(
+            SceneRequest(
+                scene_id=f"S{index + 1:0{scene_id_width}d}",
+                family=entry.central_pose.family,
+                variant=entry.central_pose.variant,
+                activity_id=activity_id,
+                viewpoint=viewpoint,
+                shot_scale=shot_scale,
+                cast_key=cast_key,
+            )
+            for index, (
+                entry,
+                activity_id,
+                viewpoint,
+                shot_scale,
+            ) in enumerate(candidates[:count])
+        )
     families = sorted({entry.central_pose.family for entry in catalog.entries})
     rng.shuffle(families)
-    selected_families = families[:count]
+    selected_families = [
+        families[index % len(families)]
+        for index in range(count)
+    ]
     family_entries = {
         family: [
             entry
             for entry in catalog.entries
             if entry.central_pose.family == family
         ]
-        for family in selected_families
+        for family in set(selected_families)
     }
     activity_assignment = _assign_unique_activities(
         selected_families,
         family_entries,
         rng=rng,
     )
-    camera_assignment = _assign_camera_views(selected_families, family_entries)
+    selected_entries = [entry for _, entry in activity_assignment]
+    camera_assignment = _assign_camera_views(selected_entries)
     requests = []
-    for index, family in enumerate(selected_families):
-        chosen_activity, chosen_entry = activity_assignment[family]
+    scene_id_width = max(2, len(str(count)))
+    for index, (family, assignment) in enumerate(
+        zip(selected_families, activity_assignment, strict=True)
+    ):
+        chosen_activity, chosen_entry = assignment
         requests.append(
             SceneRequest(
-                scene_id=f"S{index + 1:02d}",
+                scene_id=f"S{index + 1:0{scene_id_width}d}",
                 family=family,
                 variant=chosen_entry.central_pose.variant,
                 activity_id=chosen_activity,
-                viewpoint=camera_assignment[family],
+                viewpoint=camera_assignment[index],
                 shot_scale=SHOT_SCALES[index % len(SHOT_SCALES)],
                 cast_key=cast_key,
             )
@@ -208,11 +327,56 @@ def build_scene_requests(
     return tuple(requests)
 
 
+def _sample_layer_input_batches(
+    blueprint,
+    *,
+    required_supports: list[set[str]],
+    seed: int,
+) -> list[SceneLayerInputs]:
+    sampled: list[SceneLayerInputs] = []
+    for batch_index, start in enumerate(
+        range(0, len(required_supports), CREATIVE_BATCH_SIZE)
+    ):
+        batch = sample_scene_layer_inputs(
+            blueprint,
+            required_supports=required_supports[
+                start : start + CREATIVE_BATCH_SIZE
+            ],
+            seed=seed + batch_index,
+        )
+        for local_index, item in enumerate(batch):
+            global_index = start + local_index + 1
+            sampled.append(
+                item.model_copy(
+                    update={
+                        "setting": item.setting.model_copy(
+                            update={
+                                "setting_id": (
+                                    f"{item.setting.setting_id}_"
+                                    f"scene_{global_index:04d}"
+                                )
+                            }
+                        ),
+                        "presentation": item.presentation.model_copy(
+                            update={
+                                "presentation_id": (
+                                    f"{item.presentation.presentation_id}_"
+                                    f"scene_{global_index:04d}"
+                                )
+                            }
+                        ),
+                    }
+                )
+            )
+    return sampled
+
+
 def blueprint_cache_path(
     brief: str,
     seed: int,
     output: Path,
     cast_roles: tuple[str, ...],
+    scene_count: int,
 ) -> Path:
     settings = load_spatial_provider_settings()
     identity = json.dumps(
@@ -220,6 +384,7 @@ def blueprint_cache_path(
             "brief_hash": hashlib.sha256(brief.strip().encode()).hexdigest(),
             "creative_seed": seed,
             "cast_roles": cast_roles,
+            "scene_count": scene_count,
             "inference_config_hash": blueprint_inference_config_hash(settings),
             "schema_version": BLUEPRINT_SCHEMA_VERSION,
             "system_prompt_hash": BLUEPRINT_SYSTEM_HASH,
@@ -239,8 +404,9 @@ def cached_inference(
     seed: int,
     output: Path,
     cast_roles: tuple[str, ...],
+    scene_count: int,
 ) -> BlueprintInference | None:
-    path = blueprint_cache_path(brief, seed, output, cast_roles)
+    path = blueprint_cache_path(brief, seed, output, cast_roles, scene_count)
     if not path.exists():
         return None
     try:
@@ -258,6 +424,7 @@ def cached_inference(
         or inference.inference_config_hash != blueprint_inference_config_hash(settings)
         or inference.schema_version != BLUEPRINT_SCHEMA_VERSION
         or inference.system_prompt_hash != BLUEPRINT_SYSTEM_HASH
+        or len(inference.blueprint.presentation.recipes) != scene_count
         or {
             profile.role for profile in inference.blueprint.characters.profiles
         }
@@ -273,7 +440,8 @@ async def generate_spatial_batch(
     *,
     refresh_blueprint: bool,
     scene_requests: tuple[SceneRequest, ...],
-    output: Path,
+    runs_directory: Path,
+    prompts_directory: Path,
 ) -> dict[str, object]:
     if not scene_requests:
         raise ValueError("spatial batch requires at least one scene request")
@@ -289,22 +457,41 @@ async def generate_spatial_batch(
         for role in PRESENTATION_ROLE_CODES
         if any(role in CASTS[request.cast_key] for request in scene_requests)
     )
+    scene_count = len(scene_requests)
+    presentation_count = min(scene_count, CREATIVE_BATCH_SIZE)
     inference = (
         None
         if refresh_blueprint
-        else cached_inference(brief, seed, output, cast_roles)
+        else cached_inference(
+            brief,
+            seed,
+            runs_directory,
+            cast_roles,
+            presentation_count,
+        )
     )
     blueprint_cache_hit = inference is not None
     if inference is None:
-        inference = await infer_creative_blueprint(brief, seed, cast_roles)
-    output.mkdir(parents=True, exist_ok=True)
-    (output / "blueprint-cache").mkdir(parents=True, exist_ok=True)
-    cache_path = blueprint_cache_path(brief, seed, output, cast_roles)
+        inference = await infer_creative_blueprint(
+            brief,
+            seed,
+            cast_roles,
+            presentation_count,
+        )
+    runs_directory.mkdir(parents=True, exist_ok=True)
+    (runs_directory / "blueprint-cache").mkdir(parents=True, exist_ok=True)
+    cache_path = blueprint_cache_path(
+        brief,
+        seed,
+        runs_directory,
+        cast_roles,
+        presentation_count,
+    )
     cache_path.write_text(
         inference.model_dump_json(indent=2) + "\n",
         encoding="utf-8",
     )
-    (output / "blueprint.json").write_text(
+    (runs_directory / "blueprint.json").write_text(
         inference.model_dump_json(indent=2) + "\n",
         encoding="utf-8",
     )
@@ -325,7 +512,7 @@ async def generate_spatial_batch(
         entry, activity = select_plan(catalog, spec)
         spatial_plans.append((request, spec, entry, activity, catalog))
         support_requirements.append(set(environment_supports(entry)))
-    scene_inputs = sample_scene_layer_inputs(
+    scene_inputs = _sample_layer_input_batches(
         inference.blueprint,
         required_supports=support_requirements,
         seed=seed,
@@ -336,12 +523,12 @@ async def generate_spatial_batch(
             support_requirements,
         )
     )
-    repeated_inputs = sample_scene_layer_inputs(
+    repeated_inputs = _sample_layer_input_batches(
         inference.blueprint,
         required_supports=support_requirements,
         seed=seed,
     )
-    alternate_inputs = sample_scene_layer_inputs(
+    alternate_inputs = _sample_layer_input_batches(
         inference.blueprint,
         required_supports=support_requirements,
         seed=seed + 1,
@@ -605,10 +792,10 @@ async def generate_spatial_batch(
         "cast_configurations": len({spec.cast_key for spec in scene_requests}),
         "pose_families": len({spec.family for spec in scene_requests}),
         "activities": len({spec.activity_id for spec in scene_requests}),
-        "settings": len(scene_requests),
+        "settings": min(CREATIVE_BATCH_SIZE, len(scene_requests)),
         "world_locations": min(6, assignable_world_locations),
         "styles": min(6, len(scene_requests)),
-        "presentations": len(scene_requests),
+        "presentations": min(CREATIVE_BATCH_SIZE, len(scene_requests)),
         "camera_viewpoints": min(
             6,
             len({spec.viewpoint for spec in scene_requests}),
@@ -647,15 +834,22 @@ async def generate_spatial_batch(
         "presentation_policy_issues": presentation_policy_issues,
         "prompt_issues": issues,
     }
-    (output / "prompts.txt").write_text(
-        "\n".join(prompts) + "\n",
-        encoding="utf-8",
-    )
-    (output / "selections.json").write_text(
+    cast_keys = {request.cast_key for request in scene_requests}
+    if report["passed"] and len(cast_keys) == 1:
+        prompt_file = publish_prompt_batch(
+            prompts,
+            semantic_name=inference.blueprint.world.family_id,
+            cast_key=next(iter(cast_keys)),
+            prompts_directory=prompts_directory,
+        )
+        report["prompt_file"] = str(prompt_file)
+    else:
+        report["prompt_file"] = None
+    (runs_directory / "selections.json").write_text(
         json.dumps(selections, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    (output / "layers.json").write_text(
+    (runs_directory / "layers.json").write_text(
         json.dumps(
             [layers.model_dump(mode="json") for layers in resolved_layers],
             ensure_ascii=False,
@@ -664,7 +858,7 @@ async def generate_spatial_batch(
         + "\n",
         encoding="utf-8",
     )
-    (output / "report.json").write_text(
+    (runs_directory / "report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )

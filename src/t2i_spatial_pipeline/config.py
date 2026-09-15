@@ -12,17 +12,18 @@ from t2i_spatial_pipeline.errors import SpatialConfigurationError
 from t2i_spatial_pipeline.provider import SpatialProviderSettings
 
 _ENV_FIELDS = {
-    "SPATIAL_OPENAI_BASE_URL": "base_url",
-    "SPATIAL_OPENAI_API_KEY_ENV": "api_key_env",
-    "SPATIAL_OPENAI_AUTH_MODE": "auth_mode",
-    "SPATIAL_OPENAI_MODEL": "model",
-    "SPATIAL_OPENAI_THINKING_MODE": "thinking_mode",
-    "SPATIAL_OPENAI_REASONING_EFFORT": "reasoning_effort",
-    "SPATIAL_OPENAI_TEMPERATURE": "temperature",
-    "SPATIAL_OPENAI_OUTPUT_TOKEN_LIMIT": "output_token_limit",
-    "SPATIAL_OPENAI_TIMEOUT_SECONDS": "timeout_seconds",
-    "SPATIAL_OPENAI_TRANSPORT_RETRIES": "transport_retries",
+    "OPENAI_BASE_URL": "base_url",
+    "OPENAI_API_KEY_ENV": "api_key_env",
+    "OPENAI_AUTH_MODE": "auth_mode",
+    "OPENAI_MODEL": "model",
+    "OPENAI_THINKING_MODE": "thinking_mode",
+    "OPENAI_REASONING_EFFORT": "reasoning_effort",
+    "OPENAI_TEMPERATURE": "temperature",
+    "OPENAI_OUTPUT_TOKEN_LIMIT": "output_token_limit",
+    "OPENAI_TIMEOUT_SECONDS": "timeout_seconds",
+    "OPENAI_TRANSPORT_RETRIES": "transport_retries",
 }
+
 
 def load_spatial_provider_settings() -> SpatialProviderSettings:
     load_dotenv(Path.cwd() / ".env", override=False)

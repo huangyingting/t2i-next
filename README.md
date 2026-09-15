@@ -2,7 +2,7 @@
 
 ## 原地润色文本文件
 
-`scripts/refine-text-file.py` 使用 `.env` 中的 `STORY_OPENAI_*` 模型配置，把
+`scripts/refine-text-file.py` 使用 `.env` 中共享的 `OPENAI_*` 模型配置，把
 `--instruction` 原样作为 system prompt，并把指定 UTF-8 文件的完整内容作为 user
 消息。模型成功返回非空结果后，脚本会原子替换原文件；调用失败时原文件保持不变。
 
@@ -148,7 +148,7 @@ prompts root 和 runs directory。
 必须在 Story Description 中明确清醒、自愿、持续回应和可随时停止。三个等级都
 严格限制为二十一岁以上成年人，并禁止胁迫、伤害与无法退出的互动。
 
-Provider 使用独立的 `STORY_OPENAI_*` 环境变量；完整说明见
+Provider 直接复用共享的 `OPENAI_*` 环境变量；完整说明见
 [独立故事生成器](docs/story-pipeline.md)。
 Story Description 未明确人物国籍时，该人物缺省为中国籍；未明确故事发生国家
 或可确定国家的地点时，场景缺省位于中国。Theme premise 和每个最终 Frame 都会
@@ -163,8 +163,10 @@ Character、World、Style 和 Presentation 蓝图，最后由本地 catalog 和�
 只为当前 cast 实际使用的 F1、F2、F3、
 M1、M2 角色分别设计成年年龄、身高体重、体型比例、肤色、脸型五官、发型发色、
 私密特征和体毛；PresentationBlueprint 再为这些角色分别设计协调但不同的服装、
-鞋履、配饰与妆容或仪容。cast roles 同时进入蓝图缓存键。当前发布格式固定为每批
-12 个相互不同的场景，并只使用二十一岁以上成年人。
+鞋履、配饰与妆容或仪容。cast roles 和场景数量同时进入蓝图缓存键。可以通过
+`--count` 生成 1 至 1200 个相互不同的空间场景，并只使用二十一岁以上成年人。
+数量超过20时仍只请求20套 Creative Presentation，再由本地编译器分批复用这些
+设计并抽取不重复的姿势、活动、机位和景别组合，避免超大的单次模型响应。
 
 覆盖状态同样按角色推导，而不是整场共用一个开关。每个角色可以独立采用
 `selective_access` 或 `styled_nude`；因此同一场景可以全员裸体、全员局部穿着，
@@ -174,9 +176,12 @@ M1、M2 角色分别设计成年年龄、身高体重、体型比例、肤色、
 ```bash
 uv run t2i-spatial generate \
   "午夜魔王城中的奢华仪式空间，高对比暗色奇幻摄影" \
-  --cast one_woman_one_man \
+  --female-count 1 \
+  --male-count 1 \
+  --count 20 \
   --seed 42 \
-  --output spatial-output
+  --prompts-dir prompts \
+  --runs-dir runs/spatial
 ```
 
 模块入口使用相同的显式子命令：
@@ -184,36 +189,27 @@ uv run t2i-spatial generate \
 ```bash
 uv run python -m t2i_spatial_pipeline generate \
   "午夜魔王城中的奢华仪式空间，高对比暗色奇幻摄影" \
-  --cast one_woman_one_man
+  --female-count 1 \
+  --male-count 1
 ```
 
-`--cast` 支持 `one_woman`、`one_woman_one_man`、`one_woman_two_men`、
-`two_women` 和 `three_women`。相同主题和 seed 会复用内容寻址的 Creative
-Blueprint 缓存；使用 `--refresh-blueprint` 可以强制重新推导。
+`--female-count` 和 `--male-count` 与 story 流水线采用相同的人数参数形式。
+当前 catalog 支持 `1女0男`、`1女1男`、`1女2男`、`2女0男` 和 `3女0男`。
+其他组合会在调用模型前明确报错。相同主题和 seed 会复用内容寻址的 Creative
+Blueprint 缓存；场景数量不同时会使用不同缓存。使用
+`--refresh-blueprint` 可以强制重新推导。
 
-Provider 使用独立的 `SPATIAL_OPENAI_*` 环境变量：
+Provider 与其他流水线一样直接复用现有 `.env` 中的 `OPENAI_*`。至少需要设置
+`OPENAI_MODEL`；API 密钥由 `OPENAI_API_KEY_ENV` 指向。最终提示词与其他流水线
+一样保存到 `prompts/YYYY-MM-DD/hardcore/`，文件名包含世界语义名、内容等级、
+人数和四位冲突序号。每行是一条可独立渲染的提示词。
 
-```text
-SPATIAL_OPENAI_BASE_URL
-SPATIAL_OPENAI_API_KEY_ENV
-SPATIAL_OPENAI_AUTH_MODE
-SPATIAL_OPENAI_MODEL
-SPATIAL_OPENAI_THINKING_MODE
-SPATIAL_OPENAI_REASONING_EFFORT
-SPATIAL_OPENAI_TEMPERATURE
-SPATIAL_OPENAI_OUTPUT_TOKEN_LIMIT
-SPATIAL_OPENAI_TIMEOUT_SECONDS
-SPATIAL_OPENAI_TRANSPORT_RETRIES
-```
+结构化运行资料保存在 `runs/spatial/`：
 
-至少需要配置 `SPATIAL_OPENAI_MODEL`，并在
-`SPATIAL_OPENAI_API_KEY_ENV` 指定的环境变量中提供密钥。输出目录包含：
-
-- `prompts.txt`：12 条可独立渲染的最终提示词。
 - `blueprint.json`：本次采用的 CreativeBlueprint 与 token usage。
 - `layers.json`：每个场景解析后的角色、环境、风格和呈现层。
 - `selections.json`：pose、activity、镜头及各层指纹。
-- `report.json`：多样性阈值、本地约束校验和发布结果。
+- `report.json`：最终 TXT 路径、多样性阈值和本地约束校验结果。
 - `blueprint-cache/`：按主题、seed、模型配置和 schema 寻址的缓存。
 
 这个工具把文生图内容分成共享 Foundation 和两层具体画面事实：

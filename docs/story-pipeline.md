@@ -272,5 +272,5 @@ attempt 和完整 result JSON 只保存在 `runs/`，不会复制到 `prompts/`�
 也都是 32,768 tokens。该 token 上限由同一次调用中的全部 frames 和 JSON
 结构共同使用，不是每帧单独分配。
 
-Provider 使用独立的 `STORY_OPENAI_*` 环境变量。凭证只从配置的环境变量读取，
+Provider 使用共享的 `OPENAI_*` 环境变量。凭证只从配置的环境变量读取，
 不会写入产物或日志。

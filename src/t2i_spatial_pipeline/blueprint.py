@@ -254,7 +254,7 @@ class PresentationRecipe(StrictModel):
 
 
 class PresentationBlueprint(StrictModel):
-    recipes: list[PresentationRecipe] = Field(min_length=12, max_length=12)
+    recipes: list[PresentationRecipe] = Field(min_length=1, max_length=20)
     appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
 
     @model_validator(mode="after")
@@ -625,6 +625,16 @@ class PresentationBlueprintOutput(StrictModel):
                 "presentation recipes must exactly match requested cast roles: "
                 f"{mismatched_recipes}"
             )
+        expected_scene_count = (info.context or {}).get("scene_count")
+        if (
+            expected_scene_count is not None
+            and len(self.presentation.recipes) != expected_scene_count
+        ):
+            raise ValueError(
+                "presentation recipe count must exactly match requested scene count: "
+                f"expected {expected_scene_count}, got "
+                f"{len(self.presentation.recipes)}"
+            )
         allowed_moods = set((info.context or {}).get("allowed_mood_tags", ()))
         used_moods = {
             mood
@@ -662,7 +672,7 @@ class BlueprintInference(StrictModel):
     blueprint: CreativeBlueprint
 
 
-BLUEPRINT_SCHEMA_VERSION = 19
+BLUEPRINT_SCHEMA_VERSION = 20
 BRIEF_NORMALIZATION_SYSTEM = """
 Translate and normalize the user's creative brief into concise semantic ASCII
 English. Preserve all setting, era, atmosphere, content, clothing or nudity,
@@ -710,9 +720,9 @@ PRESENTATION_BLUEPRINT_SYSTEM = """
 OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
 ASCII English, regardless of the brief's language.
 Infer only the PresentationBlueprint from the brief, supplied cast_roles, and
-allowed_mood_tags. Produce exactly twelve recipes. Every recipe must contain
-exactly one role_styles entry for every supplied role and no unused role. Give
-each visible person separately designed but scene-coordinated garments,
+allowed_mood_tags. Produce exactly scene_count recipes. Every recipe must
+contain exactly one role_styles entry for every supplied role and no unused
+role. Give each visible person separately designed but scene-coordinated garments,
 footwear, two to four accessories, and makeup-and-grooming treatment. Within a
 scene, choose coverage_mode independently for every role according to the brief
 and creative composition. A role may use selective_access with named garments
@@ -799,6 +809,7 @@ async def infer_creative_blueprint(
     brief: str,
     creative_seed: int,
     cast_roles: tuple[str, ...],
+    scene_count: int,
 ) -> BlueprintInference:
     if not brief.strip():
         raise ValueError("creative brief cannot be empty")
@@ -808,6 +819,8 @@ async def infer_creative_blueprint(
         or set(cast_roles).difference(PRESENTATION_ROLE_CODES)
     ):
         raise ValueError(f"invalid creative blueprint cast roles: {cast_roles}")
+    if not 1 <= scene_count <= 20:
+        raise ValueError("creative blueprint scene count must be between 1 and 20")
     settings = load_spatial_provider_settings()
     brief_hash = hashlib.sha256(brief.strip().encode()).hexdigest()
     async with OpenAISpatialModel(settings) as model:
@@ -886,6 +899,7 @@ async def infer_creative_blueprint(
                     "brief": normalized_brief,
                     "creative_seed": creative_seed,
                     "cast_roles": list(cast_roles),
+                    "scene_count": scene_count,
                     "allowed_mood_tags": allowed_mood_tags,
                     "output_language": "ASCII English only",
                 },
@@ -893,6 +907,7 @@ async def infer_creative_blueprint(
                 max_output_tokens=min(20000, settings.output_token_limit),
                 validation_context={
                     "cast_roles": cast_roles,
+                    "scene_count": scene_count,
                     "allowed_mood_tags": allowed_mood_tags,
                 },
             ),

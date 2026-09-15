@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 from pydantic import BaseModel, ValidationError
 
@@ -7,9 +9,15 @@ from t2i_spatial_pipeline.blueprint import (
     FORBIDDEN_STYLE_CONCEPTS,
     CharacterBlueprint,
     CharacterBlueprintOutput,
+    PresentationBlueprint,
+    PresentationBlueprintOutput,
+    PresentationRecipe,
+    RoleStylingRecipe,
     validate_forbidden_output_concepts,
     validate_output_concepts_with_pattern,
 )
+from t2i_spatial_pipeline.catalog import CASTS, cast_key_for_counts
+from t2i_spatial_pipeline.config import load_spatial_provider_settings
 from t2i_spatial_pipeline.layers import (
     CharacterProfile,
     layer_issues,
@@ -17,6 +25,10 @@ from t2i_spatial_pipeline.layers import (
     resolve_scene_layers,
 )
 from t2i_spatial_pipeline.provider import normalize_ascii_punctuation
+from t2i_spatial_pipeline.service import (
+    build_scene_requests,
+    publish_prompt_batch,
+)
 
 
 def character_profiles() -> list[CharacterProfile]:
@@ -256,4 +268,179 @@ def test_style_material_can_use_mirror_as_an_adjective() -> None:
         Output(material="mirror-polished obsidian"),
         "style blueprint",
         FORBIDDEN_STYLE_CONCEPTS,
+    )
+
+
+@pytest.mark.parametrize("cast_key", CASTS)
+def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
+    requests = build_scene_requests(cast_key, seed=42, count=20)
+
+    assert len(requests) == 20
+    assert len({request.scene_id for request in requests}) == 20
+    assert len(
+        {
+            (request.family, request.variant)
+            for request in requests
+        }
+    ) == 20
+    assert len({request.activity_id for request in requests}) == 20
+    assert len({request.family for request in requests}) == 16
+    assert {request.viewpoint for request in requests} == {
+        "front_three_quarter",
+        "high_three_quarter",
+        "low_three_quarter",
+        "overhead_three_quarter",
+        "rear_three_quarter",
+        "side_three_quarter",
+    }
+    assert len({request.shot_scale for request in requests}) == 5
+
+
+@pytest.mark.parametrize("count", [0, 1201])
+def test_scene_request_count_must_fit_catalog_capacity(count: int) -> None:
+    with pytest.raises(ValueError, match="between 1 and 1200"):
+        build_scene_requests("one_woman_one_man", seed=42, count=count)
+
+
+@pytest.mark.parametrize("cast_key", CASTS)
+def test_twelve_hundred_scene_requests_are_unique(cast_key: str) -> None:
+    requests = build_scene_requests(cast_key, seed=42, count=1200)
+
+    spatial_keys = {
+        (
+            request.family,
+            request.variant,
+            request.activity_id,
+            request.viewpoint,
+            request.shot_scale,
+        )
+        for request in requests
+    }
+    assert len(requests) == 1200
+    assert len(spatial_keys) == 1200
+    assert len({request.scene_id for request in requests}) == 1200
+    assert len({request.family for request in requests}) == 16
+    assert len({request.activity_id for request in requests}) == 32
+    assert len({request.viewpoint for request in requests}) == 6
+    assert len({request.shot_scale for request in requests}) == 5
+
+
+@pytest.mark.parametrize(
+    ("female_count", "male_count", "cast_key"),
+    [
+        (1, 0, "one_woman"),
+        (1, 1, "one_woman_one_man"),
+        (1, 2, "one_woman_two_men"),
+        (2, 0, "two_women"),
+        (3, 0, "three_women"),
+    ],
+)
+def test_cast_key_is_resolved_from_people_counts(
+    female_count: int,
+    male_count: int,
+    cast_key: str,
+) -> None:
+    assert cast_key_for_counts(female_count, male_count) == cast_key
+
+
+def test_unsupported_people_counts_are_rejected() -> None:
+    with pytest.raises(ValueError, match="unsupported spatial cast counts"):
+        cast_key_for_counts(2, 1)
+
+
+def test_presentation_output_requires_requested_scene_count() -> None:
+    role_style = RoleStylingRecipe(
+        role="f1",
+        coverage_mode="selective_access",
+        wardrobe="silk evening dress",
+        footwear_type="heels",
+        footwear_details="black lacquered",
+        accessories=["jade earrings", "silver bracelet"],
+        makeup_and_grooming="precise period makeup",
+    )
+    presentation = PresentationBlueprint(
+        recipes=[
+            PresentationRecipe(
+                presentation_id="look_one",
+                role_styles=[role_style],
+                compatible_moods=["restrained"],
+            )
+        ]
+    )
+
+    with pytest.raises(ValidationError, match="requested scene count"):
+        PresentationBlueprintOutput.model_validate(
+            {"presentation": presentation.model_dump()},
+            context={
+                "cast_roles": ("f1",),
+                "scene_count": 2,
+                "allowed_mood_tags": ("restrained",),
+            },
+        )
+
+
+def clear_provider_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    for suffix in (
+        "BASE_URL",
+        "API_KEY_ENV",
+        "AUTH_MODE",
+        "MODEL",
+        "THINKING_MODE",
+        "REASONING_EFFORT",
+        "TEMPERATURE",
+        "OUTPUT_TOKEN_LIMIT",
+        "TIMEOUT_SECONDS",
+        "TRANSPORT_RETRIES",
+    ):
+        monkeypatch.delenv(f"OPENAI_{suffix}", raising=False)
+
+
+def test_spatial_settings_reuse_shared_environment(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    clear_provider_environment(monkeypatch)
+    monkeypatch.setenv("OPENAI_MODEL", "shared-model")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://shared.example/v1")
+    monkeypatch.setenv("OPENAI_TEMPERATURE", "0.6")
+    monkeypatch.setenv("OPENAI_REASONING_EFFORT", "high")
+
+    settings = load_spatial_provider_settings()
+
+    assert settings.model == "shared-model"
+    assert settings.base_url == "https://shared.example/v1"
+    assert settings.temperature == 0.6
+    assert settings.reasoning_effort == "high"
+    assert settings.thinking_mode is None
+
+
+def test_spatial_prompts_publish_with_story_directory_convention(
+    tmp_path,
+) -> None:
+    first = publish_prompt_batch(
+        ["first prompt", "second prompt"],
+        semantic_name="republican_social_satire",
+        cast_key="one_woman_one_man",
+        prompts_directory=tmp_path / "prompts",
+        published_on=date(2026, 9, 15),
+    )
+    second = publish_prompt_batch(
+        ["third prompt"],
+        semantic_name="republican_social_satire",
+        cast_key="one_woman_one_man",
+        prompts_directory=tmp_path / "prompts",
+        published_on=date(2026, 9, 15),
+    )
+
+    assert first == (
+        tmp_path
+        / "prompts"
+        / "2026-09-15"
+        / "hardcore"
+        / "republican_social_satire_hardcore_1_woman_1_man_0001.txt"
+    )
+    assert second.name.endswith("_0002.txt")
+    assert first.read_text(encoding="utf-8") == (
+        "first prompt\nsecond prompt\n"
     )

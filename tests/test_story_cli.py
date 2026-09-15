@@ -7,12 +7,26 @@ from typer.testing import CliRunner
 import t2i_story_pipeline.cli as story_cli
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.cli import app
+from t2i_story_pipeline.config import load_story_provider_settings
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
     LocalStoryRunStore,
     StoryRunSettings,
 )
 from tests.story_factories import make_story_request
+
+
+def test_story_settings_reuse_shared_environment(monkeypatch, tmp_path) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("OPENAI_MODEL", "shared-model")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://shared.example/v1")
+    monkeypatch.setenv("OPENAI_TEMPERATURE", "0.35")
+
+    settings = load_story_provider_settings()
+
+    assert settings.model == "shared-model"
+    assert settings.base_url == "https://shared.example/v1"
+    assert settings.temperature == 0.35
 
 
 def test_story_cli_exposes_generate_command() -> None:

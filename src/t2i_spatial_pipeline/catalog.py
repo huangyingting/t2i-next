@@ -787,6 +787,26 @@ CASTS = {
     "two_women": ("f1", "f2"),
     "three_women": ("f1", "f2", "f3"),
 }
+CAST_KEYS_BY_COUNTS = {
+    (1, 0): "one_woman",
+    (1, 1): "one_woman_one_man",
+    (1, 2): "one_woman_two_men",
+    (2, 0): "two_women",
+    (3, 0): "three_women",
+}
+
+
+def cast_key_for_counts(female_count: int, male_count: int) -> str:
+    try:
+        return CAST_KEYS_BY_COUNTS[(female_count, male_count)]
+    except KeyError as exc:
+        supported = ", ".join(
+            f"{women}F+{men}M" for women, men in CAST_KEYS_BY_COUNTS
+        )
+        raise ValueError(
+            "unsupported spatial cast counts "
+            f"({female_count}F, {male_count}M); supported: {supported}"
+        ) from exc
 
 LOGICAL_ACTOR_ROLES = ("central", "partner_a", "partner_b")
 
