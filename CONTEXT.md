@@ -148,10 +148,19 @@ atmosphere, and visual presentation. It does not prescribe catalog IDs.
 _Avoid_: Brief, Story Description
 
 **Creative Blueprint**:
-The single model-derived World, Style, and Presentation design space shared
-by a twelve-scene batch. It contains no cast, anatomy, pose, contact, or
-camera geometry; those remain deterministic local constraints.
+The single model-derived Character, World, Style, and Presentation design
+space shared by a twelve-scene batch. It contains one reusable adult
+character-design slot for each role required by the batch's requested cast
+configurations. Cast selection, pose, contact, and camera geometry remain
+deterministic local constraints.
 _Avoid_: Foundation, Narrative Theme
+
+**Character Design Profile**:
+The model-derived physical identity for one reusable F1, F2, F3, M1, or M2
+slot: adult age, nationality, height, weight, build, proportions, skin, face,
+hair style and color, intimate anatomy, pubic-hair design, and fantasy traits.
+Profiles are independently designed and remain stable across the batch.
+_Avoid_: Cast selection, shared default person
 
 **Scene Request**:
 One deterministic selection of cast configuration, pose family and variant,

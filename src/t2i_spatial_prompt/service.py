@@ -18,7 +18,7 @@ from .blueprint import (
     sample_scene_layer_inputs,
     semantic_hash,
 )
-from .catalog import PoseEntry
+from .catalog import CASTS, PoseEntry
 from .compiler import (
     SceneSpec,
     combine_prompt,
@@ -31,7 +31,7 @@ from .compiler import (
     select_plan,
 )
 from .config import load_spatial_provider_settings
-from .layers import layer_issues, stable_hash
+from .layers import PRESENTATION_ROLE_CODES, layer_issues, stable_hash
 
 
 class SceneRequest(NamedTuple):
@@ -212,12 +212,14 @@ def blueprint_cache_path(
     brief: str,
     seed: int,
     output: Path,
+    cast_roles: tuple[str, ...],
 ) -> Path:
     settings = load_spatial_provider_settings()
     identity = json.dumps(
         {
             "brief_hash": hashlib.sha256(brief.strip().encode()).hexdigest(),
             "creative_seed": seed,
+            "cast_roles": cast_roles,
             "inference_config_hash": blueprint_inference_config_hash(settings),
             "schema_version": BLUEPRINT_SCHEMA_VERSION,
             "system_prompt_hash": BLUEPRINT_SYSTEM_HASH,
@@ -236,8 +238,9 @@ def cached_inference(
     brief: str,
     seed: int,
     output: Path,
+    cast_roles: tuple[str, ...],
 ) -> BlueprintInference | None:
-    path = blueprint_cache_path(brief, seed, output)
+    path = blueprint_cache_path(brief, seed, output, cast_roles)
     if not path.exists():
         return None
     try:
@@ -255,6 +258,10 @@ def cached_inference(
         or inference.inference_config_hash != blueprint_inference_config_hash(settings)
         or inference.schema_version != BLUEPRINT_SCHEMA_VERSION
         or inference.system_prompt_hash != BLUEPRINT_SYSTEM_HASH
+        or {
+            profile.role for profile in inference.blueprint.characters.profiles
+        }
+        != set(cast_roles)
     ):
         return None
     return inference
@@ -268,13 +275,31 @@ async def generate_spatial_batch(
     scene_requests: tuple[SceneRequest, ...],
     output: Path,
 ) -> dict[str, object]:
-    inference = None if refresh_blueprint else cached_inference(brief, seed, output)
+    if not scene_requests:
+        raise ValueError("spatial batch requires at least one scene request")
+    unknown_casts = {
+        request.cast_key
+        for request in scene_requests
+        if request.cast_key not in CASTS
+    }
+    if unknown_casts:
+        raise ValueError(f"unknown cast configurations: {sorted(unknown_casts)}")
+    cast_roles = tuple(
+        role
+        for role in PRESENTATION_ROLE_CODES
+        if any(role in CASTS[request.cast_key] for request in scene_requests)
+    )
+    inference = (
+        None
+        if refresh_blueprint
+        else cached_inference(brief, seed, output, cast_roles)
+    )
     blueprint_cache_hit = inference is not None
     if inference is None:
-        inference = await infer_creative_blueprint(brief, seed)
+        inference = await infer_creative_blueprint(brief, seed, cast_roles)
     output.mkdir(parents=True, exist_ok=True)
     (output / "blueprint-cache").mkdir(parents=True, exist_ok=True)
-    cache_path = blueprint_cache_path(brief, seed, output)
+    cache_path = blueprint_cache_path(brief, seed, output, cast_roles)
     cache_path.write_text(
         inference.model_dump_json(indent=2) + "\n",
         encoding="utf-8",
@@ -338,6 +363,7 @@ async def generate_spatial_batch(
     selections = []
     resolved_layers = []
     issues: dict[str, list[str]] = {}
+    character_profiles = inference.blueprint.characters.profiles
     for (_, base_spec, entry, activity, catalog), layer_inputs in zip(
         spatial_plans,
         scene_inputs,
@@ -345,7 +371,12 @@ async def generate_spatial_batch(
     ):
         spec = base_spec._replace(setting_id=layer_inputs.setting.setting_id)
         fingerprint = plan_fingerprint(spec, entry, activity)
-        geometry = compile_geometry(spec, entry, activity)
+        geometry = compile_geometry(
+            spec,
+            entry,
+            activity,
+            character_profiles,
+        )
         layers = compile_scene_layers(
             spec,
             entry,
@@ -355,11 +386,18 @@ async def generate_spatial_batch(
             layer_inputs.setting,
             layer_inputs.style,
             layer_inputs.presentation,
+            character_profiles,
         )
         prompt = combine_prompt(geometry, layers)
         current_issues = [
             *layer_issues(layers, list(catalog.cast_roles)),
-            *prompt_issues(spec, entry, activity, prompt),
+            *prompt_issues(
+                spec,
+                entry,
+                activity,
+                prompt,
+                character_profiles,
+            ),
         ]
         if current_issues:
             issues[spec.scene_id] = current_issues
@@ -380,9 +418,21 @@ async def generate_spatial_batch(
                 "style_id": layer_inputs.style.style_id,
                 "presentation_id": layer_inputs.presentation.presentation_id,
                 "coverage_mode": layer_inputs.presentation.coverage_mode,
-                "wardrobe_theme": layer_inputs.presentation.wardrobe_theme,
-                "footwear_theme": layer_inputs.presentation.footwear_theme,
-                "accessory_theme": layer_inputs.presentation.accessory_theme,
+                "role_wardrobes": {
+                    role_style.role: role_style.wardrobe_theme
+                    for role_style in layer_inputs.presentation.role_styles
+                    if role_style.role in catalog.cast_roles
+                },
+                "role_footwear": {
+                    role_style.role: role_style.footwear_theme
+                    for role_style in layer_inputs.presentation.role_styles
+                    if role_style.role in catalog.cast_roles
+                },
+                "role_accessories": {
+                    role_style.role: role_style.accessory_theme
+                    for role_style in layer_inputs.presentation.role_styles
+                    if role_style.role in catalog.cast_roles
+                },
                 "expression_intensities": [
                     expression.intensity
                     for expression in layers.presentation.expressions
@@ -409,6 +459,28 @@ async def generate_spatial_batch(
         )
     metrics = {
         "scenes": len(prompts),
+        "character_profiles": len(character_profiles),
+        "character_ages": len(
+            {profile.adult_age for profile in character_profiles}
+        ),
+        "character_height_weight_designs": len(
+            {
+                (profile.height_cm, profile.weight_kg)
+                for profile in character_profiles
+            }
+        ),
+        "character_faces": len(
+            {profile.face_features for profile in character_profiles}
+        ),
+        "character_hair_designs": len(
+            {
+                (profile.hair_style, profile.hair_color)
+                for profile in character_profiles
+            }
+        ),
+        "character_intimate_designs": len(
+            {profile.intimate_anatomy for profile in character_profiles}
+        ),
         "cast_configurations": len({selection["cast_key"] for selection in selections}),
         "cast_distribution": {
             cast_key: sum(selection["cast_key"] == cast_key for selection in selections)
@@ -447,14 +519,27 @@ async def generate_spatial_batch(
         "selective_access_scenes": sum(
             selection["coverage_mode"] == "selective_access" for selection in selections
         ),
+        "wardrobe_styles": len(
+            {
+                wardrobe
+                for selection in selections
+                for wardrobe in selection["role_wardrobes"].values()
+                if wardrobe != "none"
+            }
+        ),
         "footwear_styles": len(
-            {selection["footwear_theme"] for selection in selections}
+            {
+                footwear
+                for selection in selections
+                for footwear in selection["role_footwear"].values()
+            }
         ),
         "accessory_styles": len(
             {
                 accessory
                 for selection in selections
-                for accessory in selection["accessory_theme"]
+                for accessories in selection["role_accessories"].values()
+                for accessory in accessories
             }
         ),
         "presentation_mood_matches": sum(
@@ -491,6 +576,12 @@ async def generate_spatial_batch(
     }
     thresholds = {
         "scenes": len(scene_requests),
+        "character_profiles": len(cast_roles),
+        "character_ages": len(cast_roles),
+        "character_height_weight_designs": len(cast_roles),
+        "character_faces": len(cast_roles),
+        "character_hair_designs": len(cast_roles),
+        "character_intimate_designs": len(cast_roles),
         "cast_configurations": len({spec.cast_key for spec in scene_requests}),
         "pose_families": len({spec.family for spec in scene_requests}),
         "activities": len({spec.activity_id for spec in scene_requests}),
@@ -517,9 +608,13 @@ async def generate_spatial_batch(
         presentation_policy_issues.append(
             "styled-nude scenes must remain between one and one quarter of the batch"
         )
-    if any(len(selection["accessory_theme"]) < 2 for selection in selections):
+    if any(
+        len(accessories) < 2
+        for selection in selections
+        for accessories in selection["role_accessories"].values()
+    ):
         presentation_policy_issues.append(
-            "every presentation must retain at least two accessories"
+            "every role presentation must retain at least two accessories"
         )
     report: dict[str, object] = {
         "passed": not issues

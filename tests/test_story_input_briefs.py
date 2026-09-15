@@ -1522,13 +1522,49 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
     ).read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
-    assert "Use exactly one human protagonist and no other human figure." in brief
-    assert "either one woman and zero men or zero women and one man" in normalized
-    assert "The protagonist remains fully human." in brief
-    assert "Include one to three furry beings." in brief
+    assert "REQUESTED CAST ALLOCATION" in brief
+    assert "total_count = female_count + male_count" in normalized
+    assert "If total_count equals one, that sole requested adult is furry" in normalized
+    assert "furry_count uniformly at random from one through total_count minus one" in (
+        normalized
+    )
+    assert "human_count = total_count - furry_count" in normalized
+    assert "Preserve exactly female_count female slots and male_count male slots" in (
+        normalized
+    )
+    assert "SINGLE-SLOT EXACT OPENING" in brief
+    assert "exactly one requested adult woman and zero adult men, allocated as" in (
+        normalized
+    )
+    assert "exactly one visible adult body" in normalized
+    assert "with zero humans and zero other furry beings" in normalized
+    assert "Never add a character outside those requested slots." in normalized
     assert "alert, intelligent, speaking or clearly reasoning adult" in normalized
+    assert "FURRY GENDER CONTRACT" in brief
+    assert "Each furry character inherits the gender of the requested slot" in (
+        normalized
+    )
+    assert (
+        "If only female_count is nonzero, every furry being is female." in normalized
+    )
+    assert "If only male_count is nonzero, every furry being is male." in normalized
+    assert "keep name, gender, pronouns, and sexual anatomy consistent" in normalized
+    assert "FURRY GENDER OVERRIDES ACT SELECTION" in brief
+    assert (
+        "one woman and zero men means one female furry adult and zero humans"
+        in normalized
+    )
+    assert "An all-female run contains no penis, scrotum, testicles" in normalized
+    assert "choose only an act compatible with the locked anatomy" in normalized
+    assert "ungendered presentation" not in normalized
     assert "photographed adult performer" in normalized
     assert "physically present cinematic creature" in normalized
+    assert "FURRY WARDROBE FREEDOM" in brief
+    assert "Every furry being wears at least one clearly visible" in normalized
+    assert "Do not assign a fixed outfit or garment family" in normalized
+    assert "never leave the furry being as an entirely unclothed fur-only body" in (
+        normalized
+    )
     assert "public-domain mythological" in normalized
     assert "Journey to the West figures" in normalized
     assert "The Eight Immortals" in normalized
@@ -1539,18 +1575,26 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
     assert "Marvel" in brief
     assert "Do not name, imitate, evoke, combine, or transpose the style" in normalized
     assert "Do not use the name, title, alias, face, biography" in normalized
-    assert "T001: one public-domain Journey to the West figure" in normalized
-    assert "T002: one of the Eight Immortals" in normalized
-    assert "T003: one completely original high-fantasy furry adult" in normalized
-    assert "T004: one traditional angel, demon" in normalized
-    assert "T006: one completely original heroic" in normalized
+    assert (
+        "The requested themes and frames run parameters are the sole authority"
+        in normalized
+    )
+    assert (
+        "Do not assign T001, T002, or any other Theme ID to a predetermined source"
+        in normalized
+    )
+    assert "When these Theme IDs exist" not in brief
+    assert "- T001:" not in brief
     assert "visible, consequential decision that has already taken effect" in normalized
     assert 'Never write "must choose," "must decide,"' in normalized
     assert "End every Theme premise with two concise proof clauses" in normalized
     assert '"Decision: [protagonist name]' in normalized
     assert "The premise must end after the Immediate response clause." in brief
     assert "Put the visual style only in the separate Theme style value." in normalized
-    assert "Begin every Frame by independently naming the precise location" in normalized
+    assert (
+        "At Aesthetic and Erotic levels, begin every Frame by independently naming "
+        "the precise location"
+    ) in normalized
     assert "with no backward pointer" in normalized
     assert "Restage one equivalent decisive instant" in normalized
     assert "F02 is not later than F01" in normalized
@@ -1569,6 +1613,91 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
     assert "At aesthetic level" in brief
     assert "At erotic level" in brief
     assert "At hardcore level" in brief
+    assert "one explicit consensual adult sexual act already occurring" in normalized
+    assert "Within the first one hundred English words" in normalized
+    assert 'exact phrase "consensual and willing"' in normalized
+    assert "For total_count equal to one, place the furry protagonist's explicit" in (
+        normalized
+    )
+    assert "For larger casts, place every participant in the same direct" in (
+        normalized
+    )
+    assert "whose penis is inside whose vagina or anus" in normalized
+    assert "Vague phrases such as intimate contact" in normalized
+    assert 'calling the image a "live-action fantasy photograph"' in normalized
+    assert (
+        "stating the exact requested adult gender totals, exact human_count, exact "
+        "furry_count"
+    ) in normalized
+    assert "Put the direct anatomical contact in this same first sentence." in normalized
+    assert "first sentence takes absolute priority" in normalized
+    assert "All sexual anatomy is ordinary adult humanoid anatomy" in normalized
+    assert "Never use a muzzle shape, beak, horn, claw, tail, wing, paw pad" in (
+        normalized
+    )
+    assert "no adult merely watches from the background" in normalized
+    assert "ALLOCATED BODY COUNT AND CONTACT LOCK" in brief
+    assert "state the exact total number of visible adult bodies" in normalized
+    assert "Name every human and furry being individually in the first sentence" in (
+        normalized
+    )
+    assert (
+        "the first two sentences must give every furry and human participant one "
+        "current"
+    ) in normalized
+    assert "A second or later participant may not stand beside" in normalized
+    assert "one separate, unobscured body slot for each participant" in normalized
+    assert "hard minimum of 600 whitespace-delimited words" in normalized
+    assert "Target 750-950 words" in normalized
+    assert "Never mention a word count or length check" in normalized
+    assert "At Aesthetic and Erotic levels, begin every Frame" in normalized
+    assert "At Hardcore level, use the mandatory cast-and-contact first" in normalized
+    assert "HARDCORE POSE GEOMETRY" in brief
+    assert "broad, dry, level, room-temperature, non-slip support" in normalized
+    assert "Do not select from or repeat a fixed catalog of named poses." in brief
+    assert "invent a new physically plausible pose" in normalized
+    assert "There is no mandatory pose sequence, quota, or four-pose cycle." in (
+        normalized
+    )
+    assert "Do not use standing penetration, a wall-pressed body" in normalized
+    assert "pelvises to meet at incompatible heights" in normalized
+    assert "complete a silent limb ledger for every participant" in normalized
+    assert "left thigh, left knee, left lower leg, and left foot" in normalized
+    assert "right thigh, right knee, right lower leg, and right foot" in normalized
+    assert "within the first three hundred English words" in normalized
+    assert 'Use the literal side labels "left arm", "left hand", "right arm"' in (
+        normalized
+    )
+    assert "they never replace the side-specific map" in normalized
+    assert "Immediately after the mandatory Hardcore cast-and-contact sentence" in (
+        normalized
+    )
+    assert "the complete human limb map, then the complete furry limb map" in normalized
+    assert "Do not insert face, hair, biography, mythology, wardrobe" in normalized
+    assert "Keep human arms visually separate from furry forelimbs." in brief
+    assert "NON-ORAL MOUTH SAFETY" in brief
+    assert (
+        "keep every hand, finger, forepaw, claw, object, garment edge, and tail "
+        "outside the human and furry mouths"
+    ) in normalized
+    assert "Do not cradle, cover, press, pull, or stroke a face near the lips" in (
+        normalized
+    )
+    assert "place supporting hands below the collarbones or on the shared support" in (
+        normalized
+    )
+    assert "Every furry being has exactly two arms and two legs." in brief
+    assert "Never add a third leg, duplicate a knee" in normalized
+    assert "The tail is never load-bearing during intimacy." in brief
+    assert "Do not coil it around architecture, furniture, a limb" in normalized
+    assert "Match the sexual act to the visible head anatomy." in brief
+    assert "with a beak, bill, rigid muzzle, tusks, large fangs" in normalized
+    assert "never performs oral-genital contact" in normalized
+    assert "Use a 35mm to 65mm three-quarter or full-body camera view" in normalized
+    assert "camera obliquely enough to separate overlapping limbs" in normalized
+    assert "Hardcore Frame without a clearly named adult sexual act" in normalized
+    assert "uses \"explicit interaction\" for nonsexual ritual" in normalized
+    assert "an English Frame below 600 whitespace-delimited words" in normalized
     assert "THEME CONTRACT" in brief
     assert "FRAME CONTRACT" in brief
     assert "VARIATION AND REJECTION RULES" in brief

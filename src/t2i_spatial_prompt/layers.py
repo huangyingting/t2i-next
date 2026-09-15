@@ -14,6 +14,7 @@ Identifier = Annotated[
 ]
 RoleCode = Annotated[str, StringConstraints(pattern=r"^[fm][1-9][0-9]*$")]
 Fingerprint = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
+PRESENTATION_ROLE_CODES = ("f1", "f2", "f3", "m1", "m2")
 INTIMATE_REGIONS = {
     "anus",
     "clitoris",
@@ -50,6 +51,19 @@ EXTRA_CAST_HAZARDS = {
     "mirrors_showing_extra_bodies",
     "person_shaped_shadows",
 }
+DEFAULT_ROLE_STYLE_DETAILS = (
+    ("f1", "structured silhouette", "ivory-accented", "pearl", "defined eyes"),
+    ("f2", "draped silhouette", "burgundy-accented", "silver", "soft contour"),
+    (
+        "f3",
+        "asymmetric silhouette",
+        "emerald-accented",
+        "crystal",
+        "graphic liner",
+    ),
+    ("m1", "tailored silhouette", "onyx-accented", "steel", "clean contour"),
+    ("m2", "layered silhouette", "cobalt-accented", "leather", "matte finish"),
+)
 
 
 class StrictModel(BaseModel):
@@ -60,14 +74,17 @@ class CharacterProfile(StrictModel):
     role: RoleCode
     adult_age: int = Field(ge=21, le=75)
     nationality: str = Field(min_length=2, max_length=40)
-    stature: Identifier
-    build: Identifier
-    skin_tone: Identifier
-    face_structure: Identifier
-    hair_base: Identifier
-    body_detail_profile: Identifier
-    pubic_hair_profile: Identifier
-    fantasy_body_traits: list[Identifier] = Field(default_factory=list, max_length=4)
+    height_cm: int = Field(ge=140, le=210)
+    weight_kg: int = Field(ge=38, le=160)
+    body_build: str = Field(min_length=3, max_length=60)
+    body_proportions: str = Field(min_length=3, max_length=80)
+    skin_tone: str = Field(min_length=3, max_length=50)
+    face_features: str = Field(min_length=5, max_length=100)
+    hair_style: str = Field(min_length=3, max_length=70)
+    hair_color: str = Field(min_length=3, max_length=40)
+    intimate_anatomy: str = Field(min_length=5, max_length=100)
+    pubic_hair: str = Field(min_length=3, max_length=60)
+    fantasy_body_traits: list[str] = Field(default_factory=list, max_length=4)
 
 
 class SupportRealization(StrictModel):
@@ -120,25 +137,61 @@ class StylePreset(StrictModel):
     compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
 
 
-class PresentationPreset(StrictModel):
-    presentation_id: Identifier
-    coverage_mode: Literal["selective_access", "styled_nude"]
+class RoleStylingPreset(StrictModel):
+    role: RoleCode
     wardrobe_theme: str = Field(min_length=4, max_length=100)
     footwear_theme: FootwearDescription
     accessory_theme: list[str] = Field(min_length=2, max_length=4)
-    makeup_theme: str = Field(min_length=3, max_length=80)
+    makeup_and_grooming_theme: str = Field(min_length=3, max_length=80)
+
+
+class PresentationPreset(StrictModel):
+    presentation_id: Identifier
+    coverage_mode: Literal["selective_access", "styled_nude"]
+    role_styles: list[RoleStylingPreset] = Field(min_length=1, max_length=5)
     appearance_bias: list[Identifier] = Field(default_factory=list, max_length=4)
     compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
 
     @model_validator(mode="after")
     def coverage_has_matching_wardrobe(self) -> PresentationPreset:
-        normalized = self.wardrobe_theme.strip().lower()
-        if self.coverage_mode == "selective_access" and normalized == "none":
-            raise ValueError("selective-access presentation requires a wardrobe")
-        if self.coverage_mode == "styled_nude" and normalized != "none":
-            raise ValueError("styled-nude presentation wardrobe must be none")
-        if not FOOTWEAR_PATTERN.search(self.footwear_theme):
-            raise ValueError("footwear theme must name an actual footwear type")
+        roles = [style.role for style in self.role_styles]
+        if len(set(roles)) != len(roles):
+            raise ValueError("presentation role styles contain duplicate roles")
+        unsupported_roles = set(roles).difference(PRESENTATION_ROLE_CODES)
+        if unsupported_roles:
+            raise ValueError(
+                f"presentation contains unsupported roles: {sorted(unsupported_roles)}"
+            )
+        wardrobes = [
+            style.wardrobe_theme.strip().lower() for style in self.role_styles
+        ]
+        if self.coverage_mode == "selective_access":
+            if "none" in wardrobes:
+                raise ValueError(
+                    "selective-access presentation requires every role wardrobe"
+                )
+            if len(set(wardrobes)) != len(wardrobes):
+                raise ValueError(
+                    "selective-access role wardrobes must be visibly distinct"
+                )
+        elif set(wardrobes) != {"none"}:
+            raise ValueError("styled-nude role wardrobes must all be none")
+        footwear = [
+            style.footwear_theme.strip().lower() for style in self.role_styles
+        ]
+        if len(set(footwear)) != len(footwear):
+            raise ValueError("role footwear must be visibly distinct")
+        if any(
+            not FOOTWEAR_PATTERN.search(style.footwear_theme)
+            for style in self.role_styles
+        ):
+            raise ValueError("every role footwear theme must name a footwear type")
+        accessory_sets = [
+            tuple(item.strip().lower() for item in style.accessory_theme)
+            for style in self.role_styles
+        ]
+        if len(set(accessory_sets)) != len(accessory_sets):
+            raise ValueError("role accessory sets must be visibly distinct")
         return self
 
 
@@ -156,7 +209,7 @@ class RolePresentation(StrictModel):
     covered_regions: list[Identifier] = Field(default_factory=list, max_length=10)
     footwear: str
     accessories: list[str] = Field(default_factory=list, max_length=4)
-    makeup: str
+    makeup_and_grooming: str
     hair_styling: str
     surface_finish: str
 
@@ -173,7 +226,7 @@ class RoleExpression(StrictModel):
 
 
 class PresentationPlan(StrictModel):
-    scene_id: Annotated[str, StringConstraints(pattern=r"^D\d{2}$")]
+    scene_id: Annotated[str, StringConstraints(pattern=r"^S\d{2}$")]
     spatial_fingerprint: Fingerprint
     setting_id: Identifier
     style_id: Identifier
@@ -227,70 +280,6 @@ class ResolvedSceneLayers(StrictModel):
     fingerprints: LayerFingerprints
     compact_suffix: str
     token_metrics: TokenMetrics
-
-
-CHARACTER_PROFILES = {
-    "f1": CharacterProfile(
-        role="f1",
-        adult_age=29,
-        nationality="Chinese",
-        stature="tall",
-        build="athletic_slim",
-        skin_tone="warm_light",
-        face_structure="oval_defined",
-        hair_base="long_black_wavy",
-        body_detail_profile="compact_symmetrical_intimate_anatomy",
-        pubic_hair_profile="neatly_trimmed",
-    ),
-    "f2": CharacterProfile(
-        role="f2",
-        adult_age=30,
-        nationality="Chinese",
-        stature="medium",
-        build="compact_athletic",
-        skin_tone="neutral_light",
-        face_structure="heart_shaped",
-        hair_base="shoulder_length_black",
-        body_detail_profile="soft_full_intimate_anatomy",
-        pubic_hair_profile="closely_trimmed",
-    ),
-    "f3": CharacterProfile(
-        role="f3",
-        adult_age=31,
-        nationality="Chinese",
-        stature="tall",
-        build="soft_curvy",
-        skin_tone="warm_medium",
-        face_structure="angular_elegant",
-        hair_base="long_dark_brown",
-        body_detail_profile="defined_natural_intimate_anatomy",
-        pubic_hair_profile="natural_groomed",
-    ),
-    "m1": CharacterProfile(
-        role="m1",
-        adult_age=32,
-        nationality="Chinese",
-        stature="tall",
-        build="lean_muscular",
-        skin_tone="warm_medium",
-        face_structure="square_defined",
-        hair_base="short_black",
-        body_detail_profile="proportional_adult_intimate_anatomy",
-        pubic_hair_profile="closely_trimmed",
-    ),
-    "m2": CharacterProfile(
-        role="m2",
-        adult_age=30,
-        nationality="Chinese",
-        stature="medium_tall",
-        build="athletic",
-        skin_tone="neutral_medium",
-        face_structure="oval_masculine",
-        hair_base="short_dark_brown",
-        body_detail_profile="lean_proportional_intimate_anatomy",
-        pubic_hair_profile="natural_groomed",
-    ),
-}
 
 
 def stable_hash(value: object) -> str:
@@ -414,12 +403,36 @@ def make_scene_layer_inputs(
         presentation=PresentationPreset(
             presentation_id=f"{setting_id}_presentation",
             coverage_mode=coverage_mode,
-            wardrobe_theme=wardrobe_theme
-            if coverage_mode == "selective_access"
-            else "none",
-            footwear_theme=footwear_theme,
-            accessory_theme=list(accessory_theme),
-            makeup_theme=makeup_theme,
+            role_styles=[
+                RoleStylingPreset(
+                    role=role,
+                    wardrobe_theme=(
+                        f"{wardrobe_theme}, {wardrobe_detail}"
+                        if coverage_mode == "selective_access"
+                        else "none"
+                    ),
+                    footwear_theme=f"{footwear_detail} {footwear_theme}",
+                    accessory_theme=[
+                        *accessory_theme,
+                        f"{accessory_detail} accent",
+                    ][:4],
+                    makeup_and_grooming_theme=(
+                        f"{makeup_theme}, {grooming_detail}"
+                        if role.startswith("f")
+                        else (
+                            "no makeup with polished masculine grooming, "
+                            f"{grooming_detail}"
+                        )
+                    ),
+                )
+                for (
+                    role,
+                    wardrobe_detail,
+                    footwear_detail,
+                    accessory_detail,
+                    grooming_detail,
+                ) in DEFAULT_ROLE_STYLE_DETAILS
+            ],
             appearance_bias=list(appearance_bias),
             compatible_moods=list(mood_tags),
         ),
@@ -528,6 +541,7 @@ def resolve_scene_layers(
     spatial_fingerprint: str,
     geometry: str,
     cast_roles: list[str],
+    character_profiles: list[CharacterProfile],
     body_level: str,
     setting: SettingPreset,
     style: StylePreset,
@@ -539,7 +553,13 @@ def resolve_scene_layers(
     focus_role: str | None = None,
     interaction_partners_by_role: dict[str, list[str]] | None = None,
 ) -> ResolvedSceneLayers:
-    characters = [CHARACTER_PROFILES[role] for role in cast_roles]
+    profile_by_role = {profile.role: profile for profile in character_profiles}
+    missing_profiles = set(cast_roles).difference(profile_by_role)
+    if missing_profiles:
+        raise ValueError(
+            f"character blueprint lacks roles: {sorted(missing_profiles)}"
+        )
+    characters = [profile_by_role[role] for role in cast_roles]
     expressions = resolve_role_expressions(
         scene_id=scene_id,
         cast_roles=cast_roles,
@@ -548,9 +568,14 @@ def resolve_scene_layers(
         interaction_partners_by_role=interaction_partners_by_role or {},
     )
     role_presentations = []
-    for role_index, profile in enumerate(characters):
+    role_style_map = {
+        role_style.role: role_style
+        for role_style in presentation_source.role_styles
+    }
+    for profile in characters:
         required = set(required_regions_by_role.get(profile.role, []))
         styled_nude = presentation_source.coverage_mode == "styled_nude"
+        role_style = role_style_map[profile.role]
         exposed_regions = (
             ["whole_body"]
             if styled_nude
@@ -563,7 +588,7 @@ def resolve_scene_layers(
             if exposed_regions
             else "fully_dressed"
         )
-        wardrobe = "no garments" if styled_nude else presentation_source.wardrobe_theme
+        wardrobe = "no garments" if styled_nude else role_style.wardrobe_theme
         role_presentations.append(
             RolePresentation(
                 role=profile.role,
@@ -571,17 +596,9 @@ def resolve_scene_layers(
                 wardrobe_state=wardrobe_state,
                 exposed_regions=exposed_regions,
                 covered_regions=[] if styled_nude else RETAINED_COVERAGE_REGIONS,
-                footwear=presentation_source.footwear_theme,
-                accessories=[
-                    presentation_source.accessory_theme[
-                        role_index % len(presentation_source.accessory_theme)
-                    ]
-                ],
-                makeup=(
-                    presentation_source.makeup_theme
-                    if profile.role.startswith("f")
-                    else "subtle polished grooming"
-                ),
+                footwear=role_style.footwear_theme,
+                accessories=list(role_style.accessory_theme),
+                makeup_and_grooming=role_style.makeup_and_grooming_theme,
                 hair_styling="setting-coherent styling of the locked base hair",
                 surface_finish="lighting-responsive natural skin finish",
             )
@@ -612,15 +629,15 @@ def resolve_scene_layers(
         visible = set(visible_regions_by_role.get(profile.role, []))
         if visible.intersection(INTIMATE_REGIONS):
             emitted[profile.role] = [
-                profile.body_detail_profile.replace("_", " "),
-                profile.pubic_hair_profile.replace("_", " "),
+                profile.intimate_anatomy,
+                profile.pubic_hair,
             ]
             omitted[profile.role] = []
         else:
             emitted[profile.role] = []
             omitted[profile.role] = [
-                "body_detail_profile",
-                "pubic_hair_profile",
+                "intimate_anatomy",
+                "pubic_hair",
             ]
     visibility = FinalVisibilityPlan(
         required_regions_by_role=required_regions_by_role,
@@ -630,16 +647,20 @@ def resolve_scene_layers(
     )
     character_phrases = [
         (
-            f"{profile.role.upper()} {profile.stature.replace('_', '-')} "
-            f"{profile.build.replace('_', '-')}, "
-            f"{profile.hair_base.replace('_', '-')} hair, "
-            f"{profile.face_structure.replace('_', '-')} face"
+            f"{profile.role.upper()} is {profile.height_cm} cm and "
+            f"{profile.weight_kg} kg, with {profile.body_build}, "
+            f"{profile.body_proportions}, {profile.skin_tone} skin, "
+            f"{profile.face_features}, and {profile.hair_color} "
+            f"{profile.hair_style} hair"
         )
         for profile in characters
     ]
     wardrobe_phrases = []
     for role in role_presentations:
-        styling_extras = f"wearing {role.footwear} with {', '.join(role.accessories)}"
+        styling_extras = (
+            f"wearing {role.footwear} with {', '.join(role.accessories)}; "
+            f"{role.makeup_and_grooming}"
+        )
         if role.wardrobe_state == "styled_nude":
             wardrobe_phrases.append(
                 f"{role.role.upper()} is intentionally fully nude for this scene, "
@@ -692,8 +713,7 @@ def resolve_scene_layers(
         ),
         f"Look: {'; '.join(character_phrases)}",
         (
-            f"Wardrobe: {'; '.join(wardrobe_phrases)}. "
-            f"Women {presentation_source.makeup_theme}"
+            f"Wardrobe: {'; '.join(wardrobe_phrases)}"
         ),
         f"Expression: {'; '.join(expression_phrases)}",
     ]
@@ -804,6 +824,27 @@ def layer_issues(
         for expression in layers.presentation.expressions
     ):
         issues.append("multi-actor expressions lack interpersonal interaction")
+    if len(cast_roles) > 1:
+        role_presentations = layers.presentation.roles
+        if layers.presentation_source.coverage_mode == "selective_access" and len(
+            {item.wardrobe.strip().lower() for item in role_presentations}
+        ) != len(role_presentations):
+            issues.append("multi-actor wardrobes are not role-distinct")
+        if len(
+            {item.footwear.strip().lower() for item in role_presentations}
+        ) != len(role_presentations):
+            issues.append("multi-actor footwear is not role-distinct")
+        styling_signatures = {
+            (
+                tuple(accessory.strip().lower() for accessory in item.accessories),
+                item.makeup_and_grooming.strip().lower(),
+            )
+            for item in role_presentations
+        }
+        if len(styling_signatures) != len(role_presentations):
+            issues.append(
+                "multi-actor accessories, makeup, and grooming are not role-distinct"
+            )
     if layers.presentation.spatial_fingerprint != layers.fingerprints.spatial:
         issues.append("presentation changed spatial fingerprint")
     if (
@@ -847,6 +888,15 @@ def layer_issues(
         r"\b(?:crowd|onlookers|attendants|guards|servants)\b",
         re.I,
     )
-    if forbidden_words.search(layers.compact_suffix):
+    setting_text = " ".join(
+        (
+            layers.setting.location,
+            layers.setting.architecture,
+            *layers.setting.materials,
+            *layers.setting.environment_props,
+            *layers.setting.motivated_light_sources,
+        )
+    )
+    if forbidden_words.search(setting_text):
         issues.append("setting introduces unplanned background people")
     return issues

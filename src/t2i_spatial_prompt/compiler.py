@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 from pathlib import Path
 from typing import NamedTuple
 
@@ -16,7 +15,7 @@ from .catalog import (
     WearableProp,
 )
 from .layers import (
-    CHARACTER_PROFILES,
+    CharacterProfile,
     PresentationPreset,
     ResolvedSceneLayers,
     SettingPreset,
@@ -120,8 +119,8 @@ def role_label(role: str) -> str:
     return f"{role_sex(role)} {role[1:]}"
 
 
-def role_description(role: str) -> str:
-    profile = CHARACTER_PROFILES[role]
+def role_description(profile: CharacterProfile) -> str:
+    role = profile.role
     return (
         f"{role.upper()}, {role_label(role)}, a {profile.adult_age}-year-old "
         f"{profile.nationality} {role_sex(role)}"
@@ -146,8 +145,19 @@ def body_ledger(cast_key: str) -> str:
     )
 
 
-def cast_descriptions(cast_key: str) -> tuple[str, ...]:
-    return tuple(role_description(role) for role in CASTS[cast_key])
+def cast_descriptions(
+    cast_key: str,
+    character_profiles: list[CharacterProfile],
+) -> tuple[str, ...]:
+    profile_by_role = {profile.role: profile for profile in character_profiles}
+    missing_profiles = set(CASTS[cast_key]).difference(profile_by_role)
+    if missing_profiles:
+        raise ValueError(
+            f"character blueprint lacks roles: {sorted(missing_profiles)}"
+        )
+    return tuple(
+        role_description(profile_by_role[role]) for role in CASTS[cast_key]
+    )
 
 
 def support_clause(entry: PoseEntry) -> str:
@@ -902,8 +912,9 @@ def compile_geometry(
     spec: SceneSpec,
     entry: PoseEntry,
     activity: ActivityTemplate,
+    character_profiles: list[CharacterProfile],
 ) -> str:
-    descriptions = cast_descriptions(spec.cast_key)
+    descriptions = cast_descriptions(spec.cast_key, character_profiles)
     central_name = actor_name(activity.focus_role, spec.cast_key)
     cast_text = "; ".join(descriptions)
     adult_noun = "adult" if len(descriptions) == 1 else "adults"
@@ -1092,6 +1103,7 @@ def compile_scene_layers(
     setting: SettingPreset,
     style: StylePreset,
     presentation: PresentationPreset,
+    character_profiles: list[CharacterProfile],
 ) -> ResolvedSceneLayers:
     required, visible = region_visibility_maps(spec, activity)
     required_supports = environment_supports(entry)
@@ -1125,6 +1137,7 @@ def compile_scene_layers(
         spatial_fingerprint=fingerprint,
         geometry=geometry,
         cast_roles=cast_roles,
+        character_profiles=character_profiles,
         body_level=entry.central_pose.body_level,
         setting=setting,
         style=style,
@@ -1165,14 +1178,15 @@ def prompt_issues(
     entry: PoseEntry,
     activity: ActivityTemplate,
     prompt: str,
+    character_profiles: list[CharacterProfile],
 ) -> list[str]:
     issues: list[str] = []
-    descriptions = cast_descriptions(spec.cast_key)
+    descriptions = cast_descriptions(spec.cast_key, character_profiles)
     central_name = actor_name(activity.focus_role, spec.cast_key)
     if not prompt.isascii() or "\n" in prompt or "\r" in prompt:
         issues.append("prompt is not one ASCII paragraph")
-    if len(re.findall(r"\bcamera\b", prompt, re.I)) != 1:
-        issues.append("camera is not stated exactly once")
+    if prompt.count("The camera uses a ") != 1:
+        issues.append("planned camera geometry is not stated exactly once")
     for description in descriptions:
         if prompt.count(description) != 1:
             issues.append(f"cast description changed: {description}")

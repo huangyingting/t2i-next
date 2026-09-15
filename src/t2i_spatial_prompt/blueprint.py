@@ -1,16 +1,27 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import random
 import re
 from itertools import combinations, product
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    ValidationInfo,
+    model_validator,
+)
 
 from .config import SpatialProviderSettings, load_spatial_provider_settings
 from .layers import (
+    PRESENTATION_ROLE_CODES,
+    CharacterProfile,
     PresentationPreset,
+    RoleStylingPreset,
     SceneLayerInputs,
     SettingPreset,
     StylePreset,
@@ -54,7 +65,7 @@ PROHIBITED_MINOR_CONCEPTS = re.compile(
 )
 FORBIDDEN_CREATIVE_CONCEPTS = re.compile(
     r"\b(?:woman|man|person|people|crowd|attendant|guard|servant|"
-    r"anatomy|pose|contact|intercourse|fellatio|cunnilingus|masturbation|"
+    r"anatomy|pose|intercourse|fellatio|cunnilingus|masturbation|"
     r"penis|vagina|vulva|anus|breast|clitoris|camera|lens|framing|viewpoint|"
     r"mirror|statue|mannequin|" + PROHIBITED_MINOR_PATTERN + r")\b",
     re.I,
@@ -165,9 +176,8 @@ class StyleBlueprint(StrictModel):
         return self
 
 
-class PresentationRecipe(StrictModel):
-    presentation_id: Identifier
-    coverage_mode: Literal["selective_access", "styled_nude"]
+class RoleStylingRecipe(StrictModel):
+    role: Literal["f1", "f2", "f3", "m1", "m2"]
     wardrobe: str = Field(min_length=4, max_length=100)
     footwear_type: Literal[
         "boots",
@@ -183,17 +193,48 @@ class PresentationRecipe(StrictModel):
     ]
     footwear_details: str = Field(min_length=3, max_length=60)
     accessories: list[str] = Field(min_length=2, max_length=4)
-    makeup: str = Field(min_length=3, max_length=80)
+    makeup_and_grooming: str = Field(min_length=3, max_length=80)
+
+    @model_validator(mode="after")
+    def styling_components_are_unique(self) -> RoleStylingRecipe:
+        ensure_unique("role styling accessories", self.accessories)
+        return self
+
+
+class PresentationRecipe(StrictModel):
+    presentation_id: Identifier
+    coverage_mode: Literal["selective_access", "styled_nude"]
+    role_styles: list[RoleStylingRecipe] = Field(min_length=1, max_length=5)
     compatible_moods: list[Identifier] = Field(min_length=1, max_length=6)
 
     @model_validator(mode="after")
     def recipe_is_coherent(self) -> PresentationRecipe:
-        normalized = self.wardrobe.strip().lower()
-        if self.coverage_mode == "selective_access" and normalized == "none":
-            raise ValueError("selective-access recipe requires wearable garments")
-        if self.coverage_mode == "styled_nude" and normalized != "none":
-            raise ValueError("styled-nude recipe wardrobe must be none")
-        ensure_unique("presentation accessories", self.accessories)
+        roles = [style.role for style in self.role_styles]
+        if len(set(roles)) != len(roles):
+            raise ValueError("role styles contain duplicate roles")
+        wardrobes = [style.wardrobe for style in self.role_styles]
+        normalized_wardrobes = [
+            wardrobe.strip().lower() for wardrobe in wardrobes
+        ]
+        if self.coverage_mode == "selective_access":
+            if "none" in normalized_wardrobes:
+                raise ValueError(
+                    "selective-access recipe requires every role wardrobe"
+                )
+            ensure_unique("presentation role wardrobes", wardrobes)
+        elif set(normalized_wardrobes) != {"none"}:
+            raise ValueError("styled-nude role wardrobes must all be none")
+        ensure_unique(
+            "presentation role footwear",
+            [
+                f"{style.footwear_details} {style.footwear_type}"
+                for style in self.role_styles
+            ],
+        )
+        ensure_unique(
+            "presentation role accessory sets",
+            ["|".join(style.accessories) for style in self.role_styles],
+        )
         ensure_unique("presentation moods", self.compatible_moods)
         return self
 
@@ -211,7 +252,10 @@ class PresentationBlueprint(StrictModel):
         ensure_unique(
             "presentation footwear",
             [
-                f"{recipe.footwear_details} {recipe.footwear_type}"
+                "|".join(
+                    f"{style.footwear_details} {style.footwear_type}"
+                    for style in recipe.role_styles
+                )
                 for recipe in self.recipes
             ],
         )
@@ -221,11 +265,19 @@ class PresentationBlueprint(StrictModel):
                 "|".join(
                     (
                         recipe.coverage_mode,
-                        recipe.wardrobe,
-                        recipe.footwear_type,
-                        recipe.footwear_details,
-                        *recipe.accessories,
-                        recipe.makeup,
+                        *(
+                            "|".join(
+                                (
+                                    style.role,
+                                    style.wardrobe,
+                                    style.footwear_type,
+                                    style.footwear_details,
+                                    *style.accessories,
+                                    style.makeup_and_grooming,
+                                )
+                            )
+                            for style in recipe.role_styles
+                        ),
                         *recipe.compatible_moods,
                     )
                 )
@@ -244,13 +296,96 @@ class PresentationBlueprint(StrictModel):
         return self
 
 
+class CharacterBlueprint(StrictModel):
+    profiles: list[CharacterProfile] = Field(min_length=1, max_length=5)
+
+    @model_validator(mode="after")
+    def profiles_are_complete_and_distinct(self) -> CharacterBlueprint:
+        roles = [profile.role for profile in self.profiles]
+        if len(set(roles)) != len(roles):
+            raise ValueError("character profiles contain duplicate roles")
+        unsupported_roles = set(roles).difference(PRESENTATION_ROLE_CODES)
+        if unsupported_roles:
+            raise ValueError(
+                f"character profiles contain unsupported roles: "
+                f"{sorted(unsupported_roles)}"
+            )
+        ensure_unique(
+            "character ages",
+            [str(profile.adult_age) for profile in self.profiles],
+        )
+        ensure_unique(
+            "character height-weight designs",
+            [
+                f"{profile.height_cm}|{profile.weight_kg}"
+                for profile in self.profiles
+            ],
+        )
+        ensure_unique(
+            "character physical designs",
+            [
+                "|".join(
+                    (
+                        profile.body_build,
+                        profile.body_proportions,
+                        profile.skin_tone,
+                        profile.face_features,
+                        profile.hair_style,
+                        profile.hair_color,
+                    )
+                )
+                for profile in self.profiles
+            ],
+        )
+        ensure_unique(
+            "character faces",
+            [profile.face_features for profile in self.profiles],
+        )
+        ensure_unique(
+            "character hair designs",
+            [
+                f"{profile.hair_color} {profile.hair_style}"
+                for profile in self.profiles
+            ],
+        )
+        ensure_unique(
+            "character intimate designs",
+            [profile.intimate_anatomy for profile in self.profiles],
+        )
+        for profile in self.profiles:
+            pattern = (
+                r"\b(?:clitoris|clitoral|labia|vulva|vulvar|vagina|vaginal)\b"
+                if profile.role.startswith("f")
+                else r"\b(?:penis|penile|scrotum|scrotal|testicles|testicular)\b"
+            )
+            if not re.search(pattern, profile.intimate_anatomy, re.I):
+                raise ValueError(
+                    f"{profile.role} intimate anatomy is not role-appropriate"
+                )
+        return self
+
+
 class CreativeBlueprint(StrictModel):
+    characters: CharacterBlueprint
     world: WorldBlueprint
     style: StyleBlueprint
     presentation: PresentationBlueprint
 
     @model_validator(mode="after")
     def layers_are_safe_and_compatible(self) -> CreativeBlueprint:
+        character_roles = {
+            profile.role for profile in self.characters.profiles
+        }
+        mismatched_presentations = [
+            recipe.presentation_id
+            for recipe in self.presentation.recipes
+            if {style.role for style in recipe.role_styles} != character_roles
+        ]
+        if mismatched_presentations:
+            raise ValueError(
+                "presentation role styles do not match character profiles: "
+                f"{mismatched_presentations}"
+            )
         world_moods = {
             mood for location in self.world.locations for mood in location.mood_tags
         }
@@ -288,6 +423,92 @@ class CreativeBlueprint(StrictModel):
         text = " ".join(iter_strings(self.model_dump(mode="json")))
         if not text.isascii():
             raise ValueError("creative blueprint must use ASCII text")
+        minor_matches = sorted(
+            {
+                match.group(0).lower()
+                for match in PROHIBITED_MINOR_CONCEPTS.finditer(text)
+            }
+        )
+        if minor_matches:
+            raise ValueError(
+                f"creative blueprint contains minor concepts: {minor_matches}"
+            )
+        non_character_text = " ".join(
+            iter_strings(
+                {
+                    "world": self.world.model_dump(mode="json"),
+                    "style": self.style.model_dump(mode="json"),
+                }
+            )
+        )
+        matches = sorted(
+            {
+                match.group(0).lower()
+                for match in FORBIDDEN_CREATIVE_CONCEPTS.finditer(
+                    non_character_text
+                )
+            }
+        )
+        if matches:
+            raise ValueError(
+                f"creative blueprint contains forbidden concepts: {matches}"
+            )
+        return self
+
+
+def non_ascii_paths(value: object, path: str = "") -> list[str]:
+    if isinstance(value, str):
+        characters = sorted(
+            {character for character in value if not character.isascii()}
+        )
+        if characters:
+            codepoints = ",".join(
+                f"U+{ord(character):04X}" for character in characters
+            )
+            return [f"{path or '<root>'} ({codepoints})"]
+        return []
+    if isinstance(value, dict):
+        return [
+            issue
+            for key, item in value.items()
+            for issue in non_ascii_paths(
+                item,
+                f"{path}.{key}" if path else str(key),
+            )
+        ]
+    if isinstance(value, list):
+        return [
+            issue
+            for index, item in enumerate(value)
+            for issue in non_ascii_paths(item, f"{path}.{index}")
+        ]
+    return []
+
+
+def validate_output_text(value: BaseModel, label: str) -> None:
+    payload = value.model_dump(mode="json")
+    non_ascii_issues = non_ascii_paths(payload)
+    if non_ascii_issues:
+        raise ValueError(
+            f"{label} must use ASCII English in every string; replace fields "
+            + "; ".join(non_ascii_issues[:12])
+        )
+    text = " ".join(iter_strings(payload))
+    minor_matches = sorted(
+        {
+            match.group(0).lower()
+            for match in PROHIBITED_MINOR_CONCEPTS.finditer(text)
+        }
+    )
+    if minor_matches:
+        raise ValueError(f"{label} contains minor concepts: {minor_matches}")
+
+
+def validate_forbidden_output_concepts(value: BaseModel, label: str) -> None:
+    payload = value.model_dump(mode="json")
+    issues = []
+    for path_value in iter_string_paths(payload):
+        path, text = path_value
         matches = sorted(
             {
                 match.group(0).lower()
@@ -295,8 +516,124 @@ class CreativeBlueprint(StrictModel):
             }
         )
         if matches:
+            issues.append(f"{path}: {', '.join(matches)}")
+    if issues:
+        raise ValueError(
+            f"{label} contains forbidden concepts at "
+            + "; ".join(issues[:12])
+        )
+
+
+def iter_string_paths(
+    value: object,
+    path: str = "",
+) -> list[tuple[str, str]]:
+    if isinstance(value, str):
+        return [(path or "<root>", value)]
+    if isinstance(value, dict):
+        return [
+            issue
+            for key, item in value.items()
+            for issue in iter_string_paths(
+                item,
+                f"{path}.{key}" if path else str(key),
+            )
+        ]
+    if isinstance(value, list):
+        return [
+            issue
+            for index, item in enumerate(value)
+            for issue in iter_string_paths(item, f"{path}.{index}")
+        ]
+    return []
+
+
+class WorldBlueprintOutput(StrictModel):
+    world: WorldBlueprint
+
+    @model_validator(mode="after")
+    def output_text_is_valid(self) -> WorldBlueprintOutput:
+        validate_output_text(self, "world blueprint")
+        validate_forbidden_output_concepts(self, "world blueprint")
+        return self
+
+
+class CharacterBlueprintOutput(StrictModel):
+    characters: CharacterBlueprint
+
+    @model_validator(mode="after")
+    def output_text_is_valid(
+        self,
+        info: ValidationInfo,
+    ) -> CharacterBlueprintOutput:
+        validate_output_text(self, "character blueprint")
+        expected_roles = set((info.context or {}).get("cast_roles", ()))
+        actual_roles = {
+            profile.role for profile in self.characters.profiles
+        }
+        if expected_roles and actual_roles != expected_roles:
             raise ValueError(
-                f"creative blueprint contains forbidden concepts: {matches}"
+                "character profiles must exactly match requested cast roles: "
+                f"expected {sorted(expected_roles)}, got {sorted(actual_roles)}"
+            )
+        return self
+
+
+class StyleBlueprintOutput(StrictModel):
+    style: StyleBlueprint
+
+    @model_validator(mode="after")
+    def output_text_is_valid(
+        self,
+        info: ValidationInfo,
+    ) -> StyleBlueprintOutput:
+        validate_output_text(self, "style blueprint")
+        validate_forbidden_output_concepts(self, "style blueprint")
+        allowed_moods = set((info.context or {}).get("allowed_mood_tags", ()))
+        used_moods = {
+            mood
+            for recipe in self.style.recipes
+            for mood in recipe.compatible_moods
+        }
+        unknown_moods = used_moods.difference(allowed_moods)
+        if allowed_moods and unknown_moods:
+            raise ValueError(
+                f"style uses unsupported mood tags: {sorted(unknown_moods)}"
+            )
+        return self
+
+
+class PresentationBlueprintOutput(StrictModel):
+    presentation: PresentationBlueprint
+
+    @model_validator(mode="after")
+    def output_text_is_valid(
+        self,
+        info: ValidationInfo,
+    ) -> PresentationBlueprintOutput:
+        validate_output_text(self, "presentation blueprint")
+        expected_roles = set((info.context or {}).get("cast_roles", ()))
+        mismatched_recipes = [
+            recipe.presentation_id
+            for recipe in self.presentation.recipes
+            if {style.role for style in recipe.role_styles} != expected_roles
+        ]
+        if expected_roles and mismatched_recipes:
+            raise ValueError(
+                "presentation recipes must exactly match requested cast roles: "
+                f"{mismatched_recipes}"
+            )
+        allowed_moods = set((info.context or {}).get("allowed_mood_tags", ()))
+        used_moods = {
+            mood
+            for recipe in self.presentation.recipes
+            for mood in recipe.compatible_moods
+        }
+        unknown_moods = used_moods.difference(allowed_moods)
+        if allowed_moods and unknown_moods:
+            raise ValueError(
+                "presentation uses unsupported mood tags: "
+                f"{sorted(unknown_moods)}"
             )
         return self
 
@@ -313,44 +650,71 @@ class BlueprintInference(StrictModel):
     blueprint: CreativeBlueprint
 
 
-BLUEPRINT_SYSTEM = """
-Convert the user brief into one compact CreativeBlueprint with three independent
-parts. WorldBlueprint contains coherent location cards with architecture,
-materials, inanimate props, motivated practical light sources, mood tags, and
-support realization records. Every support record must pair an allowed
-identifier with a concise physical object or surface description that exists
-in the location or its props. Across the location cards, each allowed support
-identifier bed, bed_edge, chair, floor, furniture, sofa, support_sling, and wall
-must appear at least once. Use only those exact support identifiers and never
-invent a support name. At least one location card must physically realize both
-floor and furniture. StyleBlueprint
-contains coherent complete style recipes,
-not independently shuffled style adjectives. Each recipe controls medium,
-rendering language, surface texture, contrast, color treatment, lighting
-treatment, atmosphere, and compatible mood tags. PresentationBlueprint contains
-exactly twelve coherent presentation recipes. Each recipe keeps coverage,
-named garments, named footwear, two to four accessories, makeup, and compatible
-mood tags together rather than independently shuffling them. Most recipes use
-selective_access and name wearable garments. Between one recipe and at most one
-quarter of the pool use styled_nude with wardrobe set to the literal none, while still
-naming footwear, accessories, and makeup. This permits occasional intentional
-nudity without making the batch visually monotonous. Choose footwear_type from
-the supplied footwear enum and use footwear_details only for its material,
-height, color, or decoration; bare feet and foot decoration are not footwear.
-
-Do not decide cast count, people, roles, names, age, bodies, anatomy, activity,
-pose, contact, actor support, screen position, lens, camera placement, viewpoint,
-or framing. Do not include mirrors, humanoid statues, crowds, attendants,
-guards, servants, or person-shaped objects. Keep every prose field to roughly
-two to seven words, use concise ASCII English, and make mood tags match between
-each location and at least one style recipe. Never use child, minor, teen,
-schoolgirl, schoolboy, juvenile, primary-school, middle-school, or high-school
-concepts; any academic theme must be explicitly adult university or
-graduate-level. Use the supplied creative seed as a diversity nonce. Return
-only schema data.
+BLUEPRINT_SCHEMA_VERSION = 17
+WORLD_BLUEPRINT_SYSTEM = """
+OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
+ASCII English, regardless of the brief's language.
+Infer only the WorldBlueprint from the brief. Produce six to twelve coherent
+location cards with concise ASCII English architecture, materials, inanimate
+props, practical light sources, and identifier mood tags. Every support record
+must pair an allowed support identifier with a physical object or surface in
+the location. Across the locations, cover bed, bed_edge, chair, floor,
+furniture, sofa, support_sling, and wall at least once, and include one location
+that realizes both floor and furniture. Never add people, mirrors, humanoid
+objects, crowds, attendants, guards, servants, or minor concepts. Return only
+schema data.
 """.strip()
-BLUEPRINT_SCHEMA_VERSION = 12
-BLUEPRINT_SYSTEM_HASH = hashlib.sha256(BLUEPRINT_SYSTEM.encode()).hexdigest()
+CHARACTER_BLUEPRINT_SYSTEM = """
+OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
+ASCII English, regardless of the brief's language.
+Infer only the CharacterBlueprint from the brief and supplied cast_roles. Return
+exactly one profile for every supplied role and no other role. Every profile is
+an independently designed adult aged at least 21, with a distinct age,
+height-weight pair, build and fatness or leanness, proportions, skin tone,
+facial structure and features, hair style and color, role-appropriate adult
+intimate anatomy, pubic-hair treatment, and coherent fantasy traits. Female
+anatomy must name clitoris, labia, vulva, or vagina; male anatomy must name
+penis, scrotum, or testicles. Do not copy faces, hair, physical designs, or
+intimate designs. Use concise printable ASCII English and return only schema
+data.
+""".strip()
+STYLE_BLUEPRINT_SYSTEM = """
+OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
+ASCII English, regardless of the brief's language.
+Infer only the StyleBlueprint from the brief. Produce six to twelve coherent
+complete style recipes rather than shuffled adjectives. Every compatible_moods
+value must come from the supplied allowed_mood_tags. Keep medium, rendering
+language, texture, contrast, color, lighting, and atmosphere mutually coherent.
+Do not describe people, anatomy, pose, contact, or camera geometry. Use concise
+printable ASCII English and return only schema data.
+""".strip()
+PRESENTATION_BLUEPRINT_SYSTEM = """
+OUTPUT LANGUAGE IS MANDATORY: every string value must be concise printable
+ASCII English, regardless of the brief's language.
+Infer only the PresentationBlueprint from the brief, supplied cast_roles, and
+allowed_mood_tags. Produce exactly twelve recipes. Every recipe must contain
+exactly one role_styles entry for every supplied role and no unused role. Give
+each visible person separately designed but scene-coordinated garments,
+footwear, two to four accessories, and makeup-and-grooming treatment. Within a
+selective_access recipe, every role needs visibly different garments, footwear,
+accessory sets, silhouette, material, and color accent; male and female roles
+must never receive the same garment or footwear description. Between one and
+three recipes use styled_nude with every wardrobe set to literal none, while
+footwear, accessories, makeup, and grooming remain role-distinct. Every
+compatible_moods value must come from allowed_mood_tags. Use actual footwear
+types from the schema, concise printable ASCII English, and return only schema
+data.
+""".strip()
+BLUEPRINT_SYSTEM_HASH = hashlib.sha256(
+    "\n\n".join(
+        (
+            WORLD_BLUEPRINT_SYSTEM,
+            CHARACTER_BLUEPRINT_SYSTEM,
+            STYLE_BLUEPRINT_SYSTEM,
+            PRESENTATION_BLUEPRINT_SYSTEM,
+        )
+    ).encode()
+).hexdigest()
 
 
 def ensure_unique(label: str, values: list[str]) -> None:
@@ -383,7 +747,7 @@ def compact_phrase(value: str, max_words: int) -> str:
     return " ".join(natural.split()[:max_words]).rstrip(",;:")
 
 
-def presentation_footwear_phrase(recipe: PresentationRecipe) -> str:
+def presentation_footwear_phrase(recipe: RoleStylingRecipe) -> str:
     details = compact_phrase(recipe.footwear_details, 6)
     footwear_root = recipe.footwear_type.rstrip("s")
     if re.search(rf"\b{re.escape(footwear_root)}s?\b", details, re.I):
@@ -404,7 +768,7 @@ def blueprint_inference_config_hash(settings: SpatialProviderSettings) -> str:
             else None
         ),
         "temperature": settings.temperature,
-        "max_output_tokens": min(20000, settings.output_token_limit),
+        "max_output_tokens": min(32768, settings.output_token_limit),
     }
     return stable_hash(payload)
 
@@ -412,23 +776,107 @@ def blueprint_inference_config_hash(settings: SpatialProviderSettings) -> str:
 async def infer_creative_blueprint(
     brief: str,
     creative_seed: int,
+    cast_roles: tuple[str, ...],
 ) -> BlueprintInference:
     if not brief.strip():
         raise ValueError("creative brief cannot be empty")
+    if (
+        not cast_roles
+        or len(set(cast_roles)) != len(cast_roles)
+        or set(cast_roles).difference(PRESENTATION_ROLE_CODES)
+    ):
+        raise ValueError(f"invalid creative blueprint cast roles: {cast_roles}")
     settings = load_spatial_provider_settings()
     brief_hash = hashlib.sha256(brief.strip().encode()).hexdigest()
     async with OpenAISpatialModel(settings) as model:
-        response, rejections = await generate_with_repair(
+        world_response, world_rejections = await generate_with_repair(
             model,
-            system=BLUEPRINT_SYSTEM,
+            system=WORLD_BLUEPRINT_SYSTEM,
             payload={
                 "brief": brief.strip(),
                 "creative_seed": creative_seed,
+                "output_language": "ASCII English only",
             },
-            response_model=CreativeBlueprint,
-            max_output_tokens=min(20000, settings.output_token_limit),
+            response_model=WorldBlueprintOutput,
+            max_output_tokens=min(12000, settings.output_token_limit),
         )
-    blueprint = CreativeBlueprint.model_validate(response.value)
+        world = WorldBlueprintOutput.model_validate(world_response.value).world
+        allowed_mood_tags = sorted(
+            {
+                mood
+                for location in world.locations
+                for mood in location.mood_tags
+            }
+        )
+        (
+            (character_response, character_rejections),
+            (style_response, style_rejections),
+            (presentation_response, presentation_rejections),
+        ) = await asyncio.gather(
+            generate_with_repair(
+                model,
+                system=CHARACTER_BLUEPRINT_SYSTEM,
+                payload={
+                    "brief": brief.strip(),
+                    "creative_seed": creative_seed,
+                    "cast_roles": list(cast_roles),
+                    "output_language": "ASCII English only",
+                },
+                response_model=CharacterBlueprintOutput,
+                max_output_tokens=min(8000, settings.output_token_limit),
+                validation_context={"cast_roles": cast_roles},
+            ),
+            generate_with_repair(
+                model,
+                system=STYLE_BLUEPRINT_SYSTEM,
+                payload={
+                    "brief": brief.strip(),
+                    "creative_seed": creative_seed,
+                    "allowed_mood_tags": allowed_mood_tags,
+                    "output_language": "ASCII English only",
+                },
+                response_model=StyleBlueprintOutput,
+                max_output_tokens=min(8000, settings.output_token_limit),
+                validation_context={
+                    "allowed_mood_tags": allowed_mood_tags,
+                },
+            ),
+            generate_with_repair(
+                model,
+                system=PRESENTATION_BLUEPRINT_SYSTEM,
+                payload={
+                    "brief": brief.strip(),
+                    "creative_seed": creative_seed,
+                    "cast_roles": list(cast_roles),
+                    "allowed_mood_tags": allowed_mood_tags,
+                    "output_language": "ASCII English only",
+                },
+                response_model=PresentationBlueprintOutput,
+                max_output_tokens=min(20000, settings.output_token_limit),
+                validation_context={
+                    "cast_roles": cast_roles,
+                    "allowed_mood_tags": allowed_mood_tags,
+                },
+            ),
+        )
+    blueprint = CreativeBlueprint(
+        characters=CharacterBlueprintOutput.model_validate(
+            character_response.value
+        ).characters,
+        world=world,
+        style=StyleBlueprintOutput.model_validate(style_response.value).style,
+        presentation=PresentationBlueprintOutput.model_validate(
+            presentation_response.value
+        ).presentation,
+    )
+    generated_roles = {
+        profile.role for profile in blueprint.characters.profiles
+    }
+    if generated_roles != set(cast_roles):
+        raise ValueError(
+            "creative blueprint changed requested cast roles: "
+            f"expected {sorted(cast_roles)}, got {sorted(generated_roles)}"
+        )
     return BlueprintInference(
         schema_version=BLUEPRINT_SCHEMA_VERSION,
         system_prompt_hash=BLUEPRINT_SYSTEM_HASH,
@@ -436,8 +884,28 @@ async def infer_creative_blueprint(
         inference_config_hash=blueprint_inference_config_hash(settings),
         creative_seed=creative_seed,
         model=settings.model,
-        structured_rejections=rejections,
-        usage=response.usage.model_dump(mode="json"),
+        structured_rejections=[
+            *world_rejections,
+            *character_rejections,
+            *style_rejections,
+            *presentation_rejections,
+        ],
+        usage={
+            key: sum(
+                response.usage.model_dump(mode="json")[key]
+                for response in (
+                    world_response,
+                    character_response,
+                    style_response,
+                    presentation_response,
+                )
+            )
+            for key in (
+                "prompt_tokens",
+                "completion_tokens",
+                "total_tokens",
+            )
+        },
         blueprint=blueprint,
     )
 
@@ -680,12 +1148,22 @@ def sample_scene_layer_inputs(
         presentation = PresentationPreset(
             presentation_id=presentation_id,
             coverage_mode=presentation_recipe.coverage_mode,
-            wardrobe_theme=compact_phrase(presentation_recipe.wardrobe, 8),
-            footwear_theme=presentation_footwear_phrase(presentation_recipe),
-            accessory_theme=[
-                compact_phrase(value, 4) for value in presentation_recipe.accessories
+            role_styles=[
+                RoleStylingPreset(
+                    role=role_style.role,
+                    wardrobe_theme=compact_phrase(role_style.wardrobe, 8),
+                    footwear_theme=presentation_footwear_phrase(role_style),
+                    accessory_theme=[
+                        compact_phrase(value, 4)
+                        for value in role_style.accessories
+                    ],
+                    makeup_and_grooming_theme=compact_phrase(
+                        role_style.makeup_and_grooming,
+                        7,
+                    ),
+                )
+                for role_style in presentation_recipe.role_styles
             ],
-            makeup_theme=compact_phrase(presentation_recipe.makeup, 7),
             appearance_bias=list(blueprint.presentation.appearance_bias),
             compatible_moods=list(presentation_recipe.compatible_moods),
         )

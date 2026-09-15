@@ -104,6 +104,18 @@ _SCHEMA_MAP_KEYS = frozenset(
         "properties",
     }
 )
+_ASCII_PUNCTUATION_TRANSLATION = str.maketrans(
+    {
+        "\u00a0": " ",
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2026": "...",
+    }
+)
 
 
 def strict_json_schema(value: Any, *, schema_map: bool = False) -> Any:
@@ -127,6 +139,10 @@ def strict_json_schema(value: Any, *, schema_map: bool = False) -> Any:
 def schema_name(value: str) -> str:
     normalized = re.sub(r"[^A-Za-z0-9_-]+", "_", value).strip("_")
     return normalized[:64] or "spatial_response"
+
+
+def normalize_ascii_punctuation(value: str) -> str:
+    return value.translate(_ASCII_PUNCTUATION_TRANSLATION)
 
 
 class OpenAISpatialModel:
@@ -167,6 +183,7 @@ class OpenAISpatialModel:
         messages: list[ChatMessage],
         response_model: type[ResponseT],
         max_output_tokens: int,
+        validation_context: dict[str, object] | None = None,
     ) -> ModelResponse:
         schema = strict_json_schema(response_model.model_json_schema())
         payload: dict[str, object] = {
@@ -206,8 +223,12 @@ class OpenAISpatialModel:
             ) from exc
         if not isinstance(content, str) or not content.strip():
             raise SpatialProviderResponseError("spatial model returned empty content")
+        content = normalize_ascii_punctuation(content)
         try:
-            value = response_model.model_validate_json(content)
+            value = response_model.model_validate_json(
+                content,
+                context=validation_context,
+            )
         except ValidationError as exc:
             validation_issues = tuple(
                 f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}"
@@ -310,6 +331,7 @@ async def generate_with_repair(
     payload: object,
     response_model: type[BaseModel],
     max_output_tokens: int,
+    validation_context: dict[str, object] | None = None,
 ) -> tuple[ModelResponse, list[list[str]]]:
     messages = [
         ChatMessage(role="system", content=system),
@@ -325,11 +347,25 @@ async def generate_with_repair(
                 messages=messages,
                 response_model=response_model,
                 max_output_tokens=max_output_tokens,
+                validation_context=validation_context,
             )
         except SpatialStructuredOutputError as exc:
             rejected_issues.append(list(exc.validation_issues))
             if attempt == 2:
                 raise
+            repair_guidance = ""
+            if any(
+                "ascii" in issue.lower() for issue in exc.validation_issues
+            ):
+                repair_guidance = (
+                    " Use printable ASCII characters only in every string; "
+                    "replace smart quotes, long dashes, and accented characters."
+                )
+            if isinstance(exc, SpatialProviderTruncatedOutputError):
+                repair_guidance += (
+                    " Be concise, omit all reasoning and commentary, and reserve "
+                    "the output budget for one complete JSON object."
+                )
             messages.append(
                 ChatMessage(
                     role="user",
@@ -339,6 +375,7 @@ async def generate_with_repair(
                         "concept named by these validation issues, and correct every "
                         "issue: "
                         + "; ".join(exc.validation_issues)
+                        + repair_guidance
                     ),
                 )
             )
