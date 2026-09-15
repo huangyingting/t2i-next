@@ -22,6 +22,7 @@ from t2i_spatial_pipeline.blueprint import (
     StyleBlueprintOutput,
     StyleRecipe,
     WorldBlueprint,
+    complete_style_mood_coverage,
     validate_forbidden_output_concepts,
     validate_output_concepts_with_pattern,
     validate_output_text,
@@ -748,6 +749,38 @@ def test_style_output_must_cover_every_world_mood() -> None:
             {"style": StyleBlueprint(recipes=recipes).model_dump()},
             context={"allowed_mood_tags": ("neutral", "tense")},
         )
+
+
+def test_missing_style_moods_can_be_completed_locally() -> None:
+    recipes = [
+        StyleRecipe(
+            style_id=f"style_{index}",
+            medium="period photography",
+            rendering_language="documentary realism",
+            surface_texture="fine film grain",
+            contrast="moderate",
+            color_treatment="neutral monochrome",
+            lighting_treatment="soft practical light",
+            atmosphere="restrained observation",
+            compatible_moods=["neutral"],
+        )
+        for index in range(6)
+    ]
+
+    style = complete_style_mood_coverage(
+        StyleBlueprint(recipes=recipes),
+        ("neutral", "tense"),
+    )
+
+    StyleBlueprintOutput.model_validate(
+        {"style": style.model_dump()},
+        context={"allowed_mood_tags": ("neutral", "tense")},
+    )
+    assert {
+        mood
+        for recipe in style.recipes
+        for mood in recipe.compatible_moods
+    } == {"neutral", "tense"}
 
 
 def test_minor_as_tonal_adjective_is_not_treated_as_an_age_concept() -> None:

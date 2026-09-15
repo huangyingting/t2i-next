@@ -406,6 +406,17 @@ async def generate_with_repair(
                     "Do not use any forbidden token even inside a compound "
                     "adjective."
                 )
+            if any(
+                "forbidden concepts" in issue.lower()
+                and "environment_props" in issue.lower()
+                for issue in exc.validation_issues
+            ):
+                repair_guidance += (
+                    " Replace the rejected environment prop with an inanimate, "
+                    "non-reflective item such as a lamp, book, paper, textile, "
+                    "ceramic vessel, screen, or plain furniture. Do not use any "
+                    "forbidden token even inside a compound adjective."
+                )
             if isinstance(exc, SpatialProviderTruncatedOutputError):
                 repair_guidance += (
                     " Be concise, omit all reasoning and commentary, and reserve "

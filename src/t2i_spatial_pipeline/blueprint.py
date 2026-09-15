@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import random
 import re
+from collections.abc import Sequence
 from itertools import combinations, product
 from typing import Annotated, Literal
 
@@ -193,6 +194,33 @@ class StyleBlueprint(StrictModel):
     def recipes_are_unique(self) -> StyleBlueprint:
         ensure_unique("style IDs", [item.style_id for item in self.recipes])
         return self
+
+
+def complete_style_mood_coverage(
+    style: StyleBlueprint,
+    allowed_moods: Sequence[str],
+) -> StyleBlueprint:
+    mood_lists = [list(recipe.compatible_moods) for recipe in style.recipes]
+    used_moods = {mood for moods in mood_lists for mood in moods}
+    missing_moods = sorted(set(allowed_moods).difference(used_moods))
+    cursor = 0
+    for mood in missing_moods:
+        for offset in range(len(mood_lists)):
+            index = (cursor + offset) % len(mood_lists)
+            if len(mood_lists[index]) < 6:
+                mood_lists[index].append(mood)
+                cursor = (index + 1) % len(mood_lists)
+                break
+        else:
+            raise ValueError(
+                "style recipes lack capacity for complete mood coverage"
+            )
+    return StyleBlueprint(
+        recipes=[
+            recipe.model_copy(update={"compatible_moods": mood_lists[index]})
+            for index, recipe in enumerate(style.recipes)
+        ]
+    )
 
 
 class RoleStylingRecipe(StrictModel):
@@ -633,7 +661,11 @@ class StyleBlueprintOutput(StrictModel):
                 f"style uses unsupported mood tags: {sorted(unknown_moods)}"
             )
         missing_moods = allowed_moods.difference(used_moods)
-        if missing_moods:
+        require_complete_coverage = (info.context or {}).get(
+            "require_complete_mood_coverage",
+            True,
+        )
+        if missing_moods and require_complete_coverage:
             raise ValueError(
                 f"style does not cover mood tags: {sorted(missing_moods)}"
             )
@@ -949,6 +981,7 @@ async def infer_creative_blueprint(
                 max_output_tokens=min(8000, settings.output_token_limit),
                 validation_context={
                     "allowed_mood_tags": allowed_mood_tags,
+                    "require_complete_mood_coverage": False,
                 },
             ),
             generate_with_repair(
@@ -971,12 +1004,26 @@ async def infer_creative_blueprint(
                 },
             ),
         )
+    style = complete_style_mood_coverage(
+        StyleBlueprintOutput.model_validate(
+            style_response.value,
+            context={
+                "allowed_mood_tags": allowed_mood_tags,
+                "require_complete_mood_coverage": False,
+            },
+        ).style,
+        allowed_mood_tags,
+    )
+    StyleBlueprintOutput.model_validate(
+        {"style": style.model_dump(mode="json")},
+        context={"allowed_mood_tags": allowed_mood_tags},
+    )
     blueprint = CreativeBlueprint(
         characters=CharacterBlueprintOutput.model_validate(
             character_response.value
         ).characters,
         world=world,
-        style=StyleBlueprintOutput.model_validate(style_response.value).style,
+        style=style,
         presentation=PresentationBlueprintOutput.model_validate(
             presentation_response.value
         ).presentation,
