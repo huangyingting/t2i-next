@@ -3,20 +3,20 @@ from __future__ import annotations
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from t2i_spatial_prompt.blueprint import (
+from t2i_spatial_pipeline.blueprint import (
     FORBIDDEN_STYLE_CONCEPTS,
     CharacterBlueprint,
     CharacterBlueprintOutput,
     validate_forbidden_output_concepts,
     validate_output_concepts_with_pattern,
 )
-from t2i_spatial_prompt.layers import (
+from t2i_spatial_pipeline.layers import (
     CharacterProfile,
     layer_issues,
     make_scene_layer_inputs,
     resolve_scene_layers,
 )
-from t2i_spatial_prompt.provider import normalize_ascii_punctuation
+from t2i_spatial_pipeline.provider import normalize_ascii_punctuation
 
 
 def character_profiles() -> list[CharacterProfile]:

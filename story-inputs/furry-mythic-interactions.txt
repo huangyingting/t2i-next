@@ -1,12 +1,12 @@
 BRIEF
 
 Create varied live-action fantasy photography Themes using exactly the adult
-gender slots supplied by female_count and male_count. Randomly allocate one or
-more of those requested adults as intelligent anthropomorphic furry beings
-drawn from public-domain mythology or an original fantasy archetype; allocate
-the remaining slots as real-looking adult humans. The furry beings are
-tangible living characters, never mascot suits, cartoons, game renders, pets,
-or background decoration.
+gender slots supplied by female_count and male_count. Allocate exactly one of
+those requested adults as an intelligent anthropomorphic furry being drawn
+from public-domain mythology or an original fantasy archetype; allocate every
+remaining slot as a real-looking adult human. The furry being is a tangible
+living character, never a mascot suit, cartoon, game render, pet, or
+background decoration.
 
 Every Theme must present an original situation with a clear action, conflict,
 bargain, test, rescue, ritual, investigation, performance, journey, or
@@ -25,7 +25,7 @@ mandatory.
 DECISION ORDER
 
 Resolve every Theme and Frame in this order: exact requested gender slots;
-random human-versus-furry allocation; one primary protagonist; allowed source
+deterministic one-furry allocation; one primary protagonist; allowed source
 material and original design; unmistakably adult and sapient furry cast;
 anatomy compatible with each locked gender; selected content level;
 protagonist agency; shared or solo action; live-action creature realism;
@@ -74,7 +74,7 @@ older textual or folkloric attributes and invent a new garment, material,
 palette, body design, and dramatic situation. Do not imitate a modern
 adaptation or a living actor.
 
-REQUESTED CAST ALLOCATION
+DETERMINISTIC CAST ALLOCATION
 
 Calculate total_count = female_count + male_count from the run request. These
 are the complete visible adult character slots across humans and furry beings,
@@ -82,18 +82,24 @@ not human-only counts. Preserve exactly female_count female slots and
 male_count male slots in every Theme and Frame. Never add a character outside
 those requested slots.
 
-If total_count equals one, that sole requested adult is furry and human_count
-is zero. If total_count is two or greater, choose furry_count uniformly at
-random from one through total_count minus one, then set human_count =
-total_count - furry_count. Randomly select which requested gender slots become
-furry without exceeding the available female or male slots; all remaining
-slots become human. This guarantees at least one furry in every Theme, at
-least one human when total_count exceeds one, and no extra body.
+Set furry_count = 1 for every Theme and human_count = total_count - 1. If only
+one requested gender has a positive count, the furry occupies one slot of
+that gender. If female_count and male_count are both positive but unequal, the
+lower positive count supplies the furry slot. If the two positive counts are
+equal, the male slot is furry. Every remaining requested slot is human.
 
-Perform a fresh random allocation for every Theme. Preserve that Theme's exact
-human-versus-furry assignment, names, genders, species, and identities through
-all of its Frames. Do not use a Theme-ID mapping, fixed alternation, repeating
-allocation cycle, or predetermined species-to-gender rule.
+Therefore one woman and zero men becomes one female furry and zero humans; one
+woman and one man becomes one human woman and one male furry; two women and
+one man becomes two human women and one male furry; one woman and two men
+becomes one female furry and two human men; and a same-gender group contains
+one furry of that gender plus human adults of the same gender. These are
+deterministic count mappings, not Theme presets: species, identity, role,
+setting, action, wardrobe, and pose remain model-generated.
+
+Preserve the exact human-versus-furry assignment, names, genders, species, and
+identities through all Frames of the Theme. Do not use a Theme-ID mapping,
+alternate the furry gender, or reinterpret the allocation from the selected
+sexual act.
 
 SINGLE-SLOT EXACT OPENING
 
@@ -110,6 +116,33 @@ single-slot Theme or Frame, never write one human woman, one human man, a
 human cast, a partner, a companion, another participant, or a second name.
 Never use "along with", "alongside", "together with", or another phrase that
 implies a second body.
+
+COMMON CAST EXACT OPENINGS
+
+For the following requested casts, put the matching allocation verbatim in
+the first sentence of every Theme premise and Frame before naming the
+participants:
+
+- one woman and one man: "exactly two visible adult bodies, human_count = 1,
+  furry_count = 1: one named human woman and one named adult male
+  anthropomorphic [species] furry, zero other bodies";
+- two women and zero men: "exactly two visible adult bodies, human_count = 1,
+  furry_count = 1: one named human woman and one named adult female
+  anthropomorphic [species] furry, zero other bodies";
+- three women and zero men: "exactly three visible adult bodies, human_count =
+  2, furry_count = 1: two named human women and one named adult female
+  anthropomorphic [species] furry, zero other bodies";
+- one woman and two men: "exactly three visible adult bodies, human_count = 2,
+  furry_count = 1: one named adult female anthropomorphic [species] furry and
+  two named human men, zero other bodies";
+- two women and one man: "exactly three visible adult bodies, human_count = 2,
+  furry_count = 1, zero other bodies: two named human women and one named
+  adult male anthropomorphic [species] furry".
+
+Replace each bracketed species and each "named" placeholder with an original
+character identity while preserving every count, category, and gender word.
+Do not paraphrase the allocation, split one count across clauses, or describe
+one body and then add another body later.
 
 Designate one allocated adult as the primary protagonist. Every requested
 adult must be unmistakably mature and aged twenty-five or older. Give each one
@@ -137,8 +170,8 @@ slot; otherwise omit that figure or create an original furry interpretation.
 
 FURRY CAST CONTRACT
 
-Include exactly furry_count furry beings selected by the requested cast
-allocation. Every furry being must be an alert,
+Include exactly one furry being occupying the deterministically selected
+requested slot. The furry being must be an alert,
 intelligent, speaking or clearly reasoning adult with a mature social role,
 individual name, species, face, body build, wardrobe, motivation, and active
 part in the encounter.
@@ -149,18 +182,16 @@ one slot as both human and furry.
 
 FURRY GENDER CONTRACT
 
-Each furry character inherits the gender of the requested slot randomly
-selected for furry allocation. State "adult male anthropomorphic" or "adult
-female anthropomorphic" with the species and name at first introduction in
-the Theme and independently in every Frame. If more than one furry being
-appears, state each individual's gender rather than one collective label.
+The furry character inherits the gender of the deterministically selected
+requested slot. State "adult male anthropomorphic" or "adult female
+anthropomorphic" with the species and name at first introduction in the Theme
+and independently in every Frame.
 
 If only female_count is nonzero, every furry being is female. If only
-male_count is nonzero, every furry being is male. If both counts are nonzero,
-randomly select actual female or male slots for furry allocation while
-preserving the exact requested totals. Do not derive the slot selection from
-species, role, anatomy, wardrobe, sexual position, Theme ID, or a fixed
-alternation.
+male_count is nonzero, every furry being is male. With a mixed cast, apply the
+lower-count and male-tie rule exactly. Do not derive the slot selection from
+species, role, anatomy, wardrobe, sexual position, Theme ID, or model
+preference.
 
 After choosing, keep name, gender, pronouns, and sexual anatomy consistent
 through the complete Theme and all its Frames. Use he, him, and his for a male
@@ -170,7 +201,7 @@ clothing, or combine contradictory sex anatomy in one character.
 
 FURRY GENDER OVERRIDES ACT SELECTION
 
-Apply the random slot allocation before inventing any sexual act. A request
+Apply the deterministic slot allocation before inventing any sexual act. A request
 for one woman and zero men means one female furry adult and zero humans. A
 request for zero women and one man means one male furry adult and zero humans.
 For larger casts, use exactly the human and furry gender slots selected for
@@ -223,6 +254,12 @@ with a distinct head, torso, pelvis, two arms, two legs, support chain,
 silhouette, name, and contact role. Keep all participating faces, pelvises,
 and contact points in the same readable photographic composition without
 merging bodies or hiding one participant behind another.
+
+Self-touch may supplement but never replace contact with another participant
+in a multi-person Hardcore Frame. Within the first two sentences, every named
+participant must directly touch another named participant's anatomy or be
+directly touched by another named participant. Reject a person who only
+masturbates, poses, watches, or handles a prop beside the shared action.
 
 Every furry being must be predominantly bipedal and humanoid in stance, with
 an upright adult torso, two attached arms, two attached legs, articulate
@@ -404,6 +441,31 @@ decide," "waits for a decision," "the decision to come," or an equivalent
 future-facing dilemma. State what the protagonist chooses, show the physical
 action that enacts it, and show the furry cast's immediate response.
 
+TWO-WOMEN-ONE-MAN ABSOLUTE LOCK
+
+When female_count = 2 and male_count = 1, this rule overrides every later
+character, anatomy, and action choice. Use exactly three visible adult bodies:
+two named human women and one named adult male anthropomorphic furry.
+human_count = 2 and furry_count = 1. The phrases human man and female furry
+are forbidden anywhere in the Theme or Frame, and no fourth body exists.
+
+In the first sentence, name both human women and the male furry before stating
+the act. Give the male furry direct sexual contact with the first human woman,
+then give the second human woman direct contact with one of the other two in
+the same sentence. The second woman may touch the first woman's named anatomy
+or the male furry's named anatomy, but may not only touch herself, watch,
+pose, hold clothing, or wait. Choose the act around this immutable three-body
+chain; never change a participant's category or gender to obtain a preferred
+act.
+
+The cast declaration must continue in that same sentence with this explicit
+contact grammar: "the male furry's penis is inside the first human woman's
+vagina, while the second human woman's hand directly contacts either the first
+woman's clitoris or the male furry's penis or scrotum". Replace role labels
+with the three generated names. This contact grammar is fixed for count
+reliability; species, identities, clothing, setting, support geometry, pose,
+camera, lighting, and narrative context remain freely generated.
+
 CONTENT LEVEL
 
 Honor only the requested content level.
@@ -476,7 +538,7 @@ THEME CONTRACT
 Each Theme must establish:
 
 - exactly total_count requested adult character slots and gender totals;
-- the randomly selected human_count and furry_count allocation;
+- the deterministic human_count and furry_count allocation;
 - one stable primary protagonist, who is furry when total_count equals one;
 - every allocated furry being's stable adult species and identity anchors;
 - one allowed public-domain source or one original-world premise;
@@ -710,8 +772,8 @@ Reject and rewrite any Theme or Frame containing:
 
 - a visible adult count different from total_count;
 - female or male character totals different from female_count or male_count;
-- a furry_count outside the allowed random range, a human_count inconsistent
-  with total_count - furry_count, or a human in a total_count-one run;
+- a furry_count other than one, a human_count inconsistent with total_count -
+  one, or a human in a total_count-one run;
 - a single-slot Theme or Frame containing a human, partner, companion, second
   name, second body, or wording that counts the sole slot once as human and
   again as furry;

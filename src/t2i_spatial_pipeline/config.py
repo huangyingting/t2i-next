@@ -8,8 +8,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
-from t2i_spatial_prompt.errors import SpatialConfigurationError
-from t2i_spatial_prompt.provider import SpatialProviderSettings
+from t2i_spatial_pipeline.errors import SpatialConfigurationError
+from t2i_spatial_pipeline.provider import SpatialProviderSettings
 
 _ENV_FIELDS = {
     "SPATIAL_OPENAI_BASE_URL": "base_url",

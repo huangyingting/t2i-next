@@ -1,17 +1,17 @@
-"""Expected failures from the standalone spatial prompt module."""
+"""Expected failures from the standalone spatial pipeline."""
 
 from __future__ import annotations
 
 
-class SpatialPromptError(Exception):
+class SpatialPipelineError(Exception):
     """Base class for failures callers may present to users."""
 
 
-class SpatialConfigurationError(SpatialPromptError):
+class SpatialConfigurationError(SpatialPipelineError):
     """Provider configuration is invalid or incomplete."""
 
 
-class SpatialProviderError(SpatialPromptError):
+class SpatialProviderError(SpatialPipelineError):
     """The configured model could not complete a request."""
 
 

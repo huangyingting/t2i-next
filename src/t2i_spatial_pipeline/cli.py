@@ -1,4 +1,4 @@
-"""CLI for standalone spatial prompt generation."""
+"""CLI for the standalone spatial prompt pipeline."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
-from t2i_spatial_prompt.errors import SpatialPromptError
-from t2i_spatial_prompt.service import (
+from t2i_spatial_pipeline.errors import SpatialPipelineError
+from t2i_spatial_pipeline.service import (
     build_scene_requests,
     generate_spatial_batch,
 )
@@ -30,6 +30,11 @@ app = typer.Typer(
     help="从自然语言主题生成具有锁定人数、姿势、接触和镜头几何的提示词。",
     no_args_is_help=True,
 )
+
+
+@app.callback()
+def main() -> None:
+    """Generate constraint-solved spatial image prompts."""
 
 
 @app.command("generate")
@@ -65,7 +70,7 @@ def generate_command(
                 output=output,
             )
         )
-    except (OSError, ValidationError, ValueError, SpatialPromptError) as exc:
+    except (OSError, ValidationError, ValueError, SpatialPipelineError) as exc:
         typer.secho(str(exc), fg=typer.colors.RED, err=True)
         raise typer.Exit(code=1) from exc
     typer.echo(json.dumps(report, ensure_ascii=False, indent=2))

@@ -136,9 +136,9 @@ Together they form a micro-story while each frame remains independently
 understandable.
 _Avoid_: Review cycle, storyboard schema
 
-## Standalone Spatial Prompt Generation
+## Standalone Spatial Pipeline
 
-The `t2i_spatial_prompt` package is independent from both Prompt Generation
+The `t2i_spatial_pipeline` package is independent from both Prompt Generation
 and Standalone Story Generation. Do not reuse their stages, persistence, or
 provider configuration.
 

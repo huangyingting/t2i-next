@@ -156,7 +156,7 @@ Story Description 未明确人物国籍时，该人物缺省为中国籍；未�
 
 ## 独立空间提示词生成器
 
-`t2i_spatial_prompt` 是独立于 story 和旧 prompt pipeline 的约束求解模块。它先
+`t2i_spatial_pipeline` 是独立于 story 和旧 prompt pipeline 的约束求解流水线。它先
 把任意语言的自然语言主题规范化为 ASCII English，再通过有界 LLM 阶段推导
 Character、World、Style 和 Presentation 蓝图，最后由本地 catalog 和几何编译器
 确定人物数量、姿势、接触、支撑面、肢体归属、表情与镜头。CharacterBlueprint
@@ -172,11 +172,19 @@ M1、M2 角色分别设计成年年龄、身高体重、体型比例、肤色、
 配饰以及妆容或仪容设计。
 
 ```bash
-uv run t2i-spatial \
+uv run t2i-spatial generate \
   "午夜魔王城中的奢华仪式空间，高对比暗色奇幻摄影" \
   --cast one_woman_one_man \
   --seed 42 \
   --output spatial-output
+```
+
+模块入口使用相同的显式子命令：
+
+```bash
+uv run python -m t2i_spatial_pipeline generate \
+  "午夜魔王城中的奢华仪式空间，高对比暗色奇幻摄影" \
+  --cast one_woman_one_man
 ```
 
 `--cast` 支持 `one_woman`、`one_woman_one_man`、`one_woman_two_men`、

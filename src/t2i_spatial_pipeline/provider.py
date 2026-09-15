@@ -21,7 +21,7 @@ from pydantic import (
     model_validator,
 )
 
-from t2i_spatial_prompt.errors import (
+from t2i_spatial_pipeline.errors import (
     SpatialConfigurationError,
     SpatialProviderError,
     SpatialProviderHTTPError,

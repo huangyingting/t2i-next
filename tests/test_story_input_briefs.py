@@ -1522,13 +1522,35 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
     ).read_text(encoding="utf-8")
     normalized = " ".join(brief.split())
 
-    assert "REQUESTED CAST ALLOCATION" in brief
+    assert "DETERMINISTIC CAST ALLOCATION" in brief
     assert "total_count = female_count + male_count" in normalized
-    assert "If total_count equals one, that sole requested adult is furry" in normalized
-    assert "furry_count uniformly at random from one through total_count minus one" in (
+    assert "Set furry_count = 1 for every Theme" in normalized
+    assert "human_count = total_count - 1" in normalized
+    assert "the lower positive count supplies the furry slot" in normalized
+    assert "If the two positive counts are equal, the male slot is furry" in normalized
+    assert "two women and one man becomes two human women and one male furry" in (
         normalized
     )
-    assert "human_count = total_count - furry_count" in normalized
+    assert "one woman and two men becomes one female furry and two human men" in (
+        normalized
+    )
+    assert "COMMON CAST EXACT OPENINGS" in brief
+    assert "human_count = 2, furry_count = 1, zero other bodies" in normalized
+    assert "two named human women and one named adult male anthropomorphic" in (
+        normalized
+    )
+    assert "TWO-WOMEN-ONE-MAN ABSOLUTE LOCK" in brief
+    assert "The phrases human man and female furry are forbidden" in normalized
+    assert "name both human women and the male furry before stating the act" in (
+        normalized
+    )
+    assert "give the second human woman direct contact with one of the other two" in (
+        normalized
+    )
+    assert "The cast declaration must continue in that same sentence with" in normalized
+    assert "the male furry's penis is inside the first human woman's vagina" in (
+        normalized
+    )
     assert "Preserve exactly female_count female slots and male_count male slots" in (
         normalized
     )
@@ -1541,7 +1563,7 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
     assert "Never add a character outside those requested slots." in normalized
     assert "alert, intelligent, speaking or clearly reasoning adult" in normalized
     assert "FURRY GENDER CONTRACT" in brief
-    assert "Each furry character inherits the gender of the requested slot" in (
+    assert "The furry character inherits the gender of the deterministically selected" in (
         normalized
     )
     assert (
@@ -1646,6 +1668,9 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         "current"
     ) in normalized
     assert "A second or later participant may not stand beside" in normalized
+    assert "Self-touch may supplement but never replace contact with another" in (
+        normalized
+    )
     assert "one separate, unobscured body slot for each participant" in normalized
     assert "hard minimum of 600 whitespace-delimited words" in normalized
     assert "Target 750-950 words" in normalized
