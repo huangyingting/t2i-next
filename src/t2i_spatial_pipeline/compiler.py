@@ -13,6 +13,7 @@ from .catalog import (
     PoseCatalog,
     PoseEntry,
     WearableProp,
+    pose_activity_issues,
 )
 from .layers import (
     CharacterProfile,
@@ -136,12 +137,11 @@ def body_ledger(cast_key: str) -> str:
         )
         for role in roles
     ]
-    noun = "body" if len(bodies) == 1 else "bodies"
     return (
-        f"The complete body ledger contains exactly {len(bodies)} continuous "
-        f"{noun}: {joined(bodies)}. Each coded body has one head, one torso, "
-        "two arms ending in two hands, and two legs ending in two feet. Every "
-        "visible face and limb belongs to exactly one coded body."
+        f"Only these {len(bodies)} complete bodies exist: {joined(bodies)}. "
+        "Each body has one connected head, chest and pelvis, one left arm and "
+        "one right arm ending in two hands, and one left leg and one right leg "
+        "ending in two feet; no extra or partial body is present."
     )
 
 
@@ -323,6 +323,8 @@ def resolved_partner_supports(
     actor_plan,
     activity: ActivityTemplate,
 ) -> list[str]:
+    if activity.activity_id == "mutual_oral":
+        return ["side_shoulder", "side_hip", "side_thigh"]
     supports = list(actor_plan.support_points)
     if (
         wearable_prop_for_owner(activity, actor_plan.role)
@@ -398,6 +400,13 @@ def partner_relationship(
 ) -> str:
     role = actor_plan.role
     central_role = activity.focus_role
+    if activity.activity_id == "mutual_oral":
+        return (
+            f"lies fully visible in the opposite direction beside {central_name}; "
+            "the two non-overlapping torsos stay parallel, with this actor's "
+            f"only head beside {central_name}'s pelvis and this actor's pelvis "
+            f"beside {central_name}'s only head"
+        )
     prop = wearable_prop_for_owner(activity, role)
     if prop:
         stance = "stands" if "both_feet" in actor_plan.support_points else "kneels"
@@ -526,6 +535,11 @@ def partner_limb_clause(
     central_name: str,
     support_surface: str,
 ) -> str:
+    if activity.activity_id == "mutual_oral":
+        return (
+            ", with the left and right arms attached to the same visible torso "
+            "and both legs extending from the same pelvis"
+        )
     if not wearable_prop_for_owner(activity, actor_plan.role):
         if actor_plan.pose_function == "supporting_central":
             return ""
@@ -615,6 +629,15 @@ def select_plan(
         raise ValueError(f"{spec.scene_id} activity not found")
     if activity.activity_id not in entry.compatible_activity_ids:
         raise ValueError(f"{spec.scene_id} pose and activity are incompatible")
+    unresolved = pose_activity_issues(
+        activity,
+        entry.central_pose,
+        catalog.cast_roles,
+    )
+    if unresolved:
+        raise ValueError(
+            f"{spec.scene_id} pose and activity topology is unresolved: {unresolved}"
+        )
     if spec.viewpoint not in entry.central_pose.compatible_camera_views:
         raise ValueError(f"{spec.scene_id} camera and pose are incompatible")
     return entry, activity
@@ -897,6 +920,21 @@ def distributed_contact_axis_clause(
     )
     mouth_position, mouth_depth = contact_projection(entry, activity, mouth_edge)
     pelvic_position, pelvic_depth = contact_projection(entry, activity, pelvic_edge)
+    if activity.activity_id == "mutual_oral":
+        partner_role = next(
+            role for role in CASTS[cast_key] if role != activity.focus_role
+        )
+        partner_name = actor_name(partner_role, cast_key)
+        return (
+            f"{focus_name} and {partner_name} form one side-lying reciprocal pair "
+            "along the bed's long axis, facing opposite directions. Exactly two "
+            f"heads, two chests and two pelvises are visible: {focus_name}'s only "
+            f"head is beside {partner_name}'s pelvis, and {partner_name}'s only "
+            f"head is beside {focus_name}'s pelvis. Each head remains connected "
+            "through one neck and chest to its own pelvis; the two torsos stay "
+            "parallel rather than stacked, and no headless lower torso, duplicate "
+            "pelvis or third body appears."
+        )
     return (
         f"{focus_name} remains one continuous body along the bed's long axis: "
         f"her pelvis stays at {phrase(pelvic_position)} in the "
@@ -906,6 +944,63 @@ def distributed_contact_axis_clause(
         f"{actor_name(mouth_partner, cast_key)}. No additional head, torso, "
         "partial body or person occupies either contact zone."
     )
+
+
+def resolved_central_arm_description(
+    pose,
+    activity: ActivityTemplate,
+    cast_key: str,
+) -> str:
+    natural = natural_component(pose.arm_configuration)
+    focus_role = activity.focus_role
+    tasks: list[tuple[str, str]] = []
+    assigned_hands: set[str] = set()
+    for edge in activity.contact_edges:
+        if (
+            edge.source.entity_id != focus_role
+            or edge.source.region not in {"hand", "left_hand", "right_hand"}
+        ):
+            continue
+        hand = (
+            edge.source.region
+            if edge.source.region in {"left_hand", "right_hand"}
+            else "right_hand"
+            if "right_hand" not in assigned_hands
+            else "left_hand"
+        )
+        assigned_hands.add(hand)
+        tasks.append(
+            (
+                hand,
+                f"performs the assigned contact at "
+                f"{actor_name(edge.target.entity_id, cast_key)}'s "
+                f"{phrase(edge.target.region)}",
+            )
+        )
+    for prop in activity.handheld_props:
+        if prop.controller_role != focus_role:
+            continue
+        assigned_hands.add(prop.grip_region)
+        tasks.append(
+            (
+                prop.grip_region,
+                f"holds {prop.prop_id} as one continuous hand-to-prop chain",
+            )
+        )
+    if not tasks:
+        return natural
+    if len(tasks) == 1:
+        hand, task = tasks[0]
+        other = "left_hand" if hand == "right_hand" else "right_hand"
+        return (
+            f"{natural}; specifically, the {phrase(hand)} {task}, while the "
+            f"{phrase(other)} alone maintains the named pose support or remains "
+            "clearly visible and free"
+        )
+    task_text = "; ".join(
+        f"the {phrase(hand)} {task}" for hand, task in tasks
+    )
+    return f"{natural}; specifically, {task_text}"
 
 
 def compile_geometry(
@@ -935,7 +1030,7 @@ def compile_geometry(
             f"{central_name} holds {article} "
             f"{pose_name} pose at image center with "
             f"{natural_component(pose.leg_configuration)} and "
-            f"{natural_component(pose.arm_configuration)}; "
+            f"{resolved_central_arm_description(pose, activity, spec.cast_key)}; "
             f"she is {support_clause(entry)}."
         ),
     ]

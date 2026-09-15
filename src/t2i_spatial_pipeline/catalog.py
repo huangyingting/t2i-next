@@ -221,7 +221,7 @@ class PoseEntry(StrictModel):
     pose_id: Identifier
     central_pose: CentralPose
     actor_plans: list[ActorPlan] = Field(min_length=1, max_length=8)
-    compatible_activity_ids: list[Identifier] = Field(min_length=1, max_length=32)
+    compatible_activity_ids: list[Identifier] = Field(default_factory=list, max_length=32)
     signature: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
 
     @model_validator(mode="after")
@@ -235,7 +235,7 @@ class PoseEntry(StrictModel):
 
 
 class PoseCatalog(StrictModel):
-    schema_version: Annotated[str, StringConstraints(pattern=r"^3\.0$")]
+    schema_version: Annotated[str, StringConstraints(pattern=r"^4\.0$")]
     cast_key: Identifier
     cast_roles: list[RoleCode] = Field(min_length=1, max_length=8)
     activities: list[ActivityTemplate] = Field(min_length=32, max_length=32)
@@ -243,8 +243,11 @@ class PoseCatalog(StrictModel):
 
     @model_validator(mode="after")
     def catalog_has_exact_coverage(self) -> PoseCatalog:
-        if len(self.entries) != 256:
-            raise ValueError("each catalog must contain exactly 256 entries")
+        expected_entry_count = len(POSE_FAMILIES) * 16
+        if len(self.entries) != expected_entry_count:
+            raise ValueError(
+                f"each catalog must contain exactly {expected_entry_count} entries"
+            )
         expected_roles = self.cast_roles
         pose_ids = [entry.pose_id for entry in self.entries]
         if len(pose_ids) != len(set(pose_ids)):
@@ -260,16 +263,24 @@ class PoseCatalog(StrictModel):
             )
             for entry in self.entries
         }
-        if len(central_topologies) != 256:
-            raise ValueError("catalog requires 256 unique central pose topologies")
+        if len(central_topologies) != expected_entry_count:
+            raise ValueError(
+                f"catalog requires {expected_entry_count} unique central pose "
+                "topologies"
+            )
         if any(
             [plan.role for plan in entry.actor_plans] != expected_roles
             for entry in self.entries
         ):
             raise ValueError("entry cast differs from catalog cast")
         family_counts = Counter(entry.central_pose.family for entry in self.entries)
-        if len(family_counts) != 16 or set(family_counts.values()) != {16}:
-            raise ValueError("catalog requires 16 families with 16 poses each")
+        if (
+            set(family_counts) != set(POSE_FAMILIES)
+            or set(family_counts.values()) != {16}
+        ):
+            raise ValueError(
+                f"catalog requires {len(POSE_FAMILIES)} families with 16 poses each"
+            )
         activity_ids = [activity.activity_id for activity in self.activities]
         if len(activity_ids) != len(set(activity_ids)):
             raise ValueError("catalog activity IDs must be unique")
@@ -279,16 +290,27 @@ class PoseCatalog(StrictModel):
         used_activities: set[str] = set()
         for entry in self.entries:
             compatible = set(entry.compatible_activity_ids)
-            if not compatible or not compatible.issubset(activity_map):
+            if not compatible.issubset(activity_map):
                 raise ValueError(f"{entry.pose_id} has unknown compatible activities")
             if any(
                 entry.central_pose.family not in compatible_pose_families(activity_id)
                 for activity_id in compatible
             ):
                 raise ValueError(f"{entry.pose_id} has incompatible activities")
+            for activity_id in compatible:
+                compatibility_issues = pose_activity_issues(
+                    activity_map[activity_id],
+                    entry.central_pose,
+                    self.cast_roles,
+                )
+                if compatibility_issues:
+                    raise ValueError(
+                        f"{entry.pose_id} has unresolved {activity_id} topology: "
+                        f"{compatibility_issues}"
+                    )
             used_activities.update(compatible)
-        if used_activities != set(activity_ids):
-            raise ValueError("every activity must be reachable from at least one pose")
+        if len(used_activities) < 8:
+            raise ValueError("catalog must retain at least eight reachable activities")
         actor_sexes = {
             role: "female" if role.startswith("f") else "male"
             for role in self.cast_roles
@@ -571,6 +593,96 @@ POSE_FAMILIES: dict[str, PoseFamily] = {
         ("knees_bent", "knees_wide", "one_leg_extended", "feet_elevated"),
         ("arms_beside", "arms_overhead", "hands_hips", "hands_grip_edge"),
         CAMERAS[:5],
+    ),
+    "supine_hips_raised": PoseFamily(
+        "low",
+        "horizontal_up",
+        "elevated",
+        "bed",
+        ("shoulders", "upper_back", "both_feet"),
+        ("knees_high_wide", "one_leg_vertical", "legs_in_v", "heels_near_hips"),
+        ("arms_beside", "hands_grip_edge", "one_hand_thigh", "arms_overhead"),
+        CAMERAS[:5],
+    ),
+    "prone_hips_raised": PoseFamily(
+        "middle",
+        "diagonal_down",
+        "elevated",
+        "bed",
+        ("chest", "forearms", "both_knees"),
+        ("knees_wide", "one_knee_forward", "toes_planted", "thighs_open"),
+        (
+            "forearms_parallel",
+            "arms_extended",
+            "one_hand_headboard",
+            "hands_grip_edge",
+        ),
+        CAMERAS[1:],
+    ),
+    "kneeling_backbend": PoseFamily(
+        "middle",
+        "arched_back",
+        "forward_tilt",
+        "bed",
+        ("both_knees", "both_shins"),
+        ("knees_wide", "frog_kneel", "one_foot_planted", "thighs_open"),
+        ("arms_overhead", "one_hand_thigh", "one_arm_partner", "arms_outward"),
+        CAMERAS,
+    ),
+    "standing_one_leg_supported": PoseFamily(
+        "high",
+        "vertical",
+        "side_tilted",
+        "wall",
+        ("planted_foot", "wall"),
+        ("one_leg_raised", "one_leg_extended", "one_knee_high", "one_leg_hooked"),
+        ("palms_wall", "one_hand_wall", "arms_overhead", "one_arm_partner"),
+        CAMERAS[:5],
+    ),
+    "seated_straddle": PoseFamily(
+        "middle",
+        "vertical",
+        "forward_tilt",
+        "chair",
+        ("buttocks", "both_feet"),
+        ("knees_wide", "one_leg_extended", "feet_staggered", "thighs_open"),
+        ("hands_thighs", "hands_behind", "one_arm_reaching", "arms_overhead"),
+        CAMERAS[:5],
+    ),
+    "side_lying_open": PoseFamily(
+        "low",
+        "horizontal_left",
+        "side_tilted",
+        "bed",
+        ("left_shoulder", "left_hip", "left_thigh"),
+        ("top_leg_raised", "top_leg_extended", "knees_open", "scissor_split"),
+        (
+            "lower_arm_forward",
+            "upper_arm_overhead",
+            "upper_hand_hip",
+            "arms_outward",
+        ),
+        CAMERAS[:4],
+    ),
+    "inverted_hips_elevated": PoseFamily(
+        "low",
+        "inverted",
+        "elevated",
+        "bed",
+        ("shoulders", "upper_back"),
+        ("legs_vertical", "legs_in_v", "knees_bent_wide", "one_leg_lowered"),
+        ("arms_beside", "hands_grip_edge", "arms_overhead", "hands_hips"),
+        CAMERAS[:5],
+    ),
+    "sling_reclined": PoseFamily(
+        "middle",
+        "diagonal_back",
+        "elevated",
+        "support_sling",
+        ("support_sling", "wall"),
+        ("knees_wide", "legs_in_v", "one_leg_extended", "thighs_supported"),
+        ("arms_beside", "arms_overhead", "one_hand_wall", "arms_outward"),
+        CAMERAS,
     ),
 }
 
@@ -1706,7 +1818,27 @@ def handheld_props(cast_key: str, activity_id: str) -> list[HandheldProp]:
 
 def compatible_pose_families(activity_id: str) -> list[str]:
     all_families = set(POSE_FAMILIES)
-    if has_tag(activity_id, "lifted"):
+    if activity_id == "mutual_oral":
+        allowed = {"side_lying_left", "side_lying_right"}
+    elif has_tag(activity_id, "plus_fellatio"):
+        allowed = {"prone", "all_fours", "kneeling_forward"}
+    elif activity_id == "fellatio":
+        allowed = {
+            "side_lying_left",
+            "side_lying_right",
+            "kneeling_upright",
+            "seated_edge",
+        }
+    elif has_tag(activity_id, "cunnilingus", "dual_oral", "dual_cunnilingus"):
+        allowed = {
+            "supine",
+            "side_lying_left",
+            "side_lying_right",
+            "kneeling_upright",
+            "seated_reclined",
+            "seated_edge",
+        }
+    elif has_tag(activity_id, "lifted"):
         allowed = {"lifted_supported"}
     elif has_tag(activity_id, "partial_suspension"):
         allowed = {
@@ -1742,6 +1874,25 @@ def compatible_pose_families(activity_id: str) -> list[str]:
         }
     elif has_tag(activity_id, "prone"):
         allowed = {"prone"}
+    elif has_tag(activity_id, "impact"):
+        allowed = {
+            "prone",
+            "all_fours",
+            "kneeling_forward",
+            "standing_bent",
+        }
+    elif has_tag(activity_id, "breast", "nipple"):
+        allowed = {
+            "supine",
+            "side_lying_left",
+            "side_lying_right",
+            "kneeling_upright",
+            "seated_upright",
+            "seated_reclined",
+            "seated_edge",
+            "standing_upright",
+            "standing_wall_supported",
+        }
     elif has_tag(activity_id, "spreader"):
         allowed = {
             "supine",
@@ -1754,13 +1905,132 @@ def compatible_pose_families(activity_id: str) -> list[str]:
     return [family for family in POSE_FAMILIES if family in allowed]
 
 
-def activity_compatible_with_pose(
+_CLOSED_PELVIC_CONFIGURATIONS = {
+    "ankles_crossed",
+    "feet_together",
+    "knees_stacked",
+    "knees_together",
+    "legs_together",
+}
+_TWO_FREE_HAND_CONFIGURATIONS = {
+    "arms_beside",
+    "arms_forward",
+    "arms_hanging",
+    "arms_outward",
+}
+_ONE_FREE_HAND_CONFIGURATIONS = {
+    "lower_arm_forward",
+    "one_arm_partner",
+    "one_arm_reaching",
+    "one_hand_chair",
+    "one_hand_floor",
+    "one_hand_headboard",
+    "one_hand_thigh",
+    "one_hand_wall",
+    "upper_arm_overhead",
+    "upper_hand_hip",
+}
+_PELVIC_REGIONS = {
+    "anus",
+    "clitoris",
+    "penis",
+    "pubic_region",
+    "vagina",
+    "vulva",
+}
+_ORAL_REGIONS = {"mouth", "tongue"}
+
+
+def _central_hand_capacity(pose: CentralPose) -> int:
+    if pose.arm_configuration in _TWO_FREE_HAND_CONFIGURATIONS:
+        return 2
+    if pose.arm_configuration in _ONE_FREE_HAND_CONFIGURATIONS:
+        return 1
+    return 0
+
+
+def _role_contact_regions(
+    activity: ActivityTemplate,
+) -> dict[str, set[str]]:
+    regions: dict[str, set[str]] = {}
+    for edge in activity.contact_edges:
+        for endpoint in (edge.source, edge.target):
+            regions.setdefault(endpoint.entity_id, set()).add(endpoint.region)
+    return regions
+
+
+def pose_activity_issues(
     activity: ActivityTemplate,
     pose: CentralPose,
     cast_roles: list[str],
-) -> bool:
+) -> list[str]:
+    issues: list[str] = []
     if pose.family not in compatible_pose_families(activity.activity_id):
-        return False
+        issues.append("activity topology is incompatible with pose family")
+        return issues
+
+    focus_role = activity.focus_role
+    contact_regions = _role_contact_regions(activity)
+    distributed_roles = {
+        role
+        for role, regions in contact_regions.items()
+        if regions.intersection(_ORAL_REGIONS)
+        and regions.intersection(_PELVIC_REGIONS)
+    }
+    if distributed_roles:
+        if len(cast_roles) == 2:
+            if (
+                activity.activity_id != "mutual_oral"
+                or pose.family not in {"side_lying_left", "side_lying_right"}
+            ):
+                issues.append("reciprocal head-pelvis contacts lack a side-lying plan")
+        elif distributed_roles != {focus_role} or pose.family not in {
+            "prone",
+            "all_fours",
+            "kneeling_forward",
+        }:
+            issues.append("distributed group contacts lack a longitudinal body plan")
+
+    central_pelvic_contact = any(
+        endpoint.entity_id == focus_role
+        and endpoint.region in _PELVIC_REGIONS
+        for edge in activity.contact_edges
+        for endpoint in (edge.source, edge.target)
+    )
+    if (
+        central_pelvic_contact
+        and pose.leg_configuration in _CLOSED_PELVIC_CONFIGURATIONS
+    ):
+        issues.append("closed leg configuration blocks the pelvic contact zone")
+
+    central_hand_regions = {
+        endpoint.region
+        for edge in activity.contact_edges
+        for endpoint in (edge.source, edge.target)
+        if endpoint.entity_id == focus_role
+        and endpoint is edge.source
+        and endpoint.region in {"hand", "left_hand", "right_hand"}
+    }
+    central_hand_demand = len(central_hand_regions)
+    central_hand_demand += sum(
+        prop.controller_role == focus_role for prop in activity.handheld_props
+    )
+    if central_hand_demand > _central_hand_capacity(pose):
+        issues.append("central pose does not leave enough hands for contact tasks")
+
+    declared_props = {
+        prop.prop_id
+        for prop in (*activity.handheld_props, *activity.wearable_props)
+    }
+    unrooted_props = {
+        edge.source.entity_id
+        for edge in activity.contact_edges
+        if edge.source.entity_id.startswith("prop_")
+        and edge.source.entity_id not in declared_props
+    }
+    if unrooted_props:
+        issues.append("contact prop has no explicit owner and hand or harness chain")
+
     if pose.family == "lifted_supported" and pose.primary_surface == "partner_support":
         occupied_lift_roles = set(cast_roles[:2])
         if any(
@@ -1768,10 +2038,36 @@ def activity_compatible_with_pose(
             and edge.source.region in {"hand", "left_hand", "right_hand", "mouth"}
             for edge in activity.contact_edges
         ):
-            return False
-    if activity.activity_id == "vibrator_clitoral":
-        return pose.family == "supine" and pose.arm_configuration == "hands_on_thighs"
-    return True
+            issues.append("lift support conflicts with partner hand or mouth contact")
+        if pose.leg_configuration not in {"legs_wrapped", "thighs_supported"}:
+            issues.append("lifted leg configuration lacks a bilateral support chain")
+        if pose.arm_configuration not in {"arms_shoulders", "one_arm_partner"}:
+            issues.append("lifted arm configuration lacks a bilateral support chain")
+
+    if activity.restraint is not None:
+        restrained_regions = set(activity.restraint.body_regions)
+        if "wrists" in restrained_regions and pose.arm_configuration not in {
+            "arms_overhead",
+            "arms_outward",
+            "hands_behind",
+            "hands_wall",
+            "palms_wall",
+        }:
+            issues.append("wrist restraint does not match the arm configuration")
+        if (
+            "ankles" in restrained_regions
+            and pose.leg_configuration in _CLOSED_PELVIC_CONFIGURATIONS
+        ):
+            issues.append("ankle restraint does not match the leg configuration")
+    return issues
+
+
+def activity_compatible_with_pose(
+    activity: ActivityTemplate,
+    pose: CentralPose,
+    cast_roles: list[str],
+) -> bool:
+    return not pose_activity_issues(activity, pose, cast_roles)
 
 
 def build_activity_templates(cast_key: str) -> list[ActivityTemplate]:
@@ -1864,7 +2160,7 @@ def build_catalog(cast_key: str) -> PoseCatalog:
                 )
             )
     return PoseCatalog(
-        schema_version="3.0",
+        schema_version="4.0",
         cast_key=cast_key,
         cast_roles=roles,
         activities=activity_templates,

@@ -296,33 +296,10 @@ def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
     assert len({request.shot_scale for request in requests}) == 5
 
 
-@pytest.mark.parametrize("count", [0, 1201])
+@pytest.mark.parametrize("count", [0, 21])
 def test_scene_request_count_must_fit_catalog_capacity(count: int) -> None:
-    with pytest.raises(ValueError, match="between 1 and 1200"):
+    with pytest.raises(ValueError, match="between 1 and 20"):
         build_scene_requests("one_woman_one_man", seed=42, count=count)
-
-
-@pytest.mark.parametrize("cast_key", CASTS)
-def test_twelve_hundred_scene_requests_are_unique(cast_key: str) -> None:
-    requests = build_scene_requests(cast_key, seed=42, count=1200)
-
-    spatial_keys = {
-        (
-            request.family,
-            request.variant,
-            request.activity_id,
-            request.viewpoint,
-            request.shot_scale,
-        )
-        for request in requests
-    }
-    assert len(requests) == 1200
-    assert len(spatial_keys) == 1200
-    assert len({request.scene_id for request in requests}) == 1200
-    assert len({request.family for request in requests}) == 16
-    assert len({request.activity_id for request in requests}) == 32
-    assert len({request.viewpoint for request in requests}) == 6
-    assert len({request.shot_scale for request in requests}) == 5
 
 
 @pytest.mark.parametrize(

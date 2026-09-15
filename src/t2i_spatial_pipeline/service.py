@@ -33,12 +33,7 @@ from .compiler import (
     select_plan,
 )
 from .config import load_spatial_provider_settings
-from .layers import (
-    PRESENTATION_ROLE_CODES,
-    SceneLayerInputs,
-    layer_issues,
-    stable_hash,
-)
+from .layers import PRESENTATION_ROLE_CODES, layer_issues, stable_hash
 
 
 class SceneRequest(NamedTuple):
@@ -60,8 +55,6 @@ VIEWPOINTS = (
     "side_three_quarter",
 )
 SHOT_SCALES = ("medium_close", "medium", "medium_wide", "full_body", "wide")
-CREATIVE_BATCH_SIZE = 20
-MAX_SCENE_COUNT = 1200
 
 
 def _cast_filename_slug(cast_key: str) -> str:
@@ -139,37 +132,51 @@ def _assign_unique_activities(
     used_activities: set[str] = set()
     used_poses: set[str] = set()
 
-    def search(remaining: list[int]) -> bool:
+    def search(remaining: list[int], *, require_unique_activity: bool) -> bool:
         if not remaining:
             return True
         slot = min(
             remaining,
             key=lambda item: sum(
-                activity_id not in used_activities
+                (
+                    not require_unique_activity
+                    or activity_id not in used_activities
+                )
                 and any(entry.pose_id not in used_poses for entry in entries)
                 for activity_id, entries in options[item]
             ),
         )
         next_remaining = [item for item in remaining if item != slot]
         for activity_id, entries in options[slot]:
-            if activity_id in used_activities:
+            if require_unique_activity and activity_id in used_activities:
                 continue
             for entry in entries:
                 if entry.pose_id in used_poses:
                     continue
                 assignment[slot] = (activity_id, entry)
-                used_activities.add(activity_id)
+                activity_was_used = activity_id in used_activities
+                if not activity_was_used:
+                    used_activities.add(activity_id)
                 used_poses.add(entry.pose_id)
-                if search(next_remaining):
+                if search(
+                    next_remaining,
+                    require_unique_activity=require_unique_activity,
+                ):
                     return True
                 used_poses.remove(entry.pose_id)
-                used_activities.remove(activity_id)
+                if not activity_was_used:
+                    used_activities.remove(activity_id)
                 assignment.pop(slot)
         return False
 
-    if not search(list(range(len(families)))):
+    slots = list(range(len(families)))
+    if not search(slots, require_unique_activity=True):
+        assignment.clear()
+        used_activities.clear()
+        used_poses.clear()
+    if not assignment and not search(slots, require_unique_activity=False):
         raise ValueError(
-            "cannot assign unique activity and pose pairs across selected scenes"
+            "cannot assign compatible pose and activity pairs across selected scenes"
         )
     return [assignment[index] for index in range(len(families))]
 
@@ -244,48 +251,10 @@ def build_scene_requests(
     seed: int,
     count: int = 12,
 ) -> tuple[SceneRequest, ...]:
-    if not 1 <= count <= MAX_SCENE_COUNT:
-        raise ValueError(
-            f"scene count must be between 1 and {MAX_SCENE_COUNT}"
-        )
+    if not 1 <= count <= 20:
+        raise ValueError("scene count must be between 1 and 20")
     catalog = load_catalog(cast_key)
     rng = random.Random(seed)
-    if count > CREATIVE_BATCH_SIZE:
-        candidates = [
-            (
-                entry,
-                activity_id,
-                viewpoint,
-                shot_scale,
-            )
-            for entry in catalog.entries
-            for activity_id in entry.compatible_activity_ids
-            for viewpoint in entry.central_pose.compatible_camera_views
-            for shot_scale in SHOT_SCALES
-        ]
-        if count > len(candidates):
-            raise ValueError(
-                f"{cast_key} supports only {len(candidates)} unique spatial scenes"
-            )
-        rng.shuffle(candidates)
-        scene_id_width = max(2, len(str(count)))
-        return tuple(
-            SceneRequest(
-                scene_id=f"S{index + 1:0{scene_id_width}d}",
-                family=entry.central_pose.family,
-                variant=entry.central_pose.variant,
-                activity_id=activity_id,
-                viewpoint=viewpoint,
-                shot_scale=shot_scale,
-                cast_key=cast_key,
-            )
-            for index, (
-                entry,
-                activity_id,
-                viewpoint,
-                shot_scale,
-            ) in enumerate(candidates[:count])
-        )
     families = sorted({entry.central_pose.family for entry in catalog.entries})
     rng.shuffle(families)
     selected_families = [
@@ -325,50 +294,6 @@ def build_scene_requests(
             )
         )
     return tuple(requests)
-
-
-def _sample_layer_input_batches(
-    blueprint,
-    *,
-    required_supports: list[set[str]],
-    seed: int,
-) -> list[SceneLayerInputs]:
-    sampled: list[SceneLayerInputs] = []
-    for batch_index, start in enumerate(
-        range(0, len(required_supports), CREATIVE_BATCH_SIZE)
-    ):
-        batch = sample_scene_layer_inputs(
-            blueprint,
-            required_supports=required_supports[
-                start : start + CREATIVE_BATCH_SIZE
-            ],
-            seed=seed + batch_index,
-        )
-        for local_index, item in enumerate(batch):
-            global_index = start + local_index + 1
-            sampled.append(
-                item.model_copy(
-                    update={
-                        "setting": item.setting.model_copy(
-                            update={
-                                "setting_id": (
-                                    f"{item.setting.setting_id}_"
-                                    f"scene_{global_index:04d}"
-                                )
-                            }
-                        ),
-                        "presentation": item.presentation.model_copy(
-                            update={
-                                "presentation_id": (
-                                    f"{item.presentation.presentation_id}_"
-                                    f"scene_{global_index:04d}"
-                                )
-                            }
-                        ),
-                    }
-                )
-            )
-    return sampled
 
 
 def blueprint_cache_path(
@@ -458,7 +383,6 @@ async def generate_spatial_batch(
         if any(role in CASTS[request.cast_key] for request in scene_requests)
     )
     scene_count = len(scene_requests)
-    presentation_count = min(scene_count, CREATIVE_BATCH_SIZE)
     inference = (
         None
         if refresh_blueprint
@@ -467,7 +391,7 @@ async def generate_spatial_batch(
             seed,
             runs_directory,
             cast_roles,
-            presentation_count,
+            scene_count,
         )
     )
     blueprint_cache_hit = inference is not None
@@ -476,7 +400,7 @@ async def generate_spatial_batch(
             brief,
             seed,
             cast_roles,
-            presentation_count,
+            scene_count,
         )
     runs_directory.mkdir(parents=True, exist_ok=True)
     (runs_directory / "blueprint-cache").mkdir(parents=True, exist_ok=True)
@@ -485,7 +409,7 @@ async def generate_spatial_batch(
         seed,
         runs_directory,
         cast_roles,
-        presentation_count,
+        scene_count,
     )
     cache_path.write_text(
         inference.model_dump_json(indent=2) + "\n",
@@ -512,7 +436,7 @@ async def generate_spatial_batch(
         entry, activity = select_plan(catalog, spec)
         spatial_plans.append((request, spec, entry, activity, catalog))
         support_requirements.append(set(environment_supports(entry)))
-    scene_inputs = _sample_layer_input_batches(
+    scene_inputs = sample_scene_layer_inputs(
         inference.blueprint,
         required_supports=support_requirements,
         seed=seed,
@@ -523,12 +447,12 @@ async def generate_spatial_batch(
             support_requirements,
         )
     )
-    repeated_inputs = _sample_layer_input_batches(
+    repeated_inputs = sample_scene_layer_inputs(
         inference.blueprint,
         required_supports=support_requirements,
         seed=seed,
     )
-    alternate_inputs = _sample_layer_input_batches(
+    alternate_inputs = sample_scene_layer_inputs(
         inference.blueprint,
         required_supports=support_requirements,
         seed=seed + 1,
@@ -792,10 +716,10 @@ async def generate_spatial_batch(
         "cast_configurations": len({spec.cast_key for spec in scene_requests}),
         "pose_families": len({spec.family for spec in scene_requests}),
         "activities": len({spec.activity_id for spec in scene_requests}),
-        "settings": min(CREATIVE_BATCH_SIZE, len(scene_requests)),
+        "settings": len(scene_requests),
         "world_locations": min(6, assignable_world_locations),
         "styles": min(6, len(scene_requests)),
-        "presentations": min(CREATIVE_BATCH_SIZE, len(scene_requests)),
+        "presentations": len(scene_requests),
         "camera_viewpoints": min(
             6,
             len({spec.viewpoint for spec in scene_requests}),

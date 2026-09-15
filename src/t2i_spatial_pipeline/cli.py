@@ -12,7 +12,6 @@ from pydantic import ValidationError
 from t2i_spatial_pipeline.catalog import cast_key_for_counts
 from t2i_spatial_pipeline.errors import SpatialPipelineError
 from t2i_spatial_pipeline.service import (
-    MAX_SCENE_COUNT,
     build_scene_requests,
     generate_spatial_batch,
 )
@@ -51,8 +50,8 @@ def generate_command(
         12,
         "--count",
         min=1,
-        max=MAX_SCENE_COUNT,
-        help=f"生成场景数量；支持1至{MAX_SCENE_COUNT}个。",
+        max=20,
+        help="生成场景数量；每批支持1至20个。",
     ),
     prompts_dir: Path = typer.Option(
         Path("prompts"),
