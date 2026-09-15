@@ -3832,3 +3832,353 @@ def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
     assert "lacks readable foreground, midground, and background depth" in normalized
     assert "places intimacy in deep water, on wet or slippery support" in normalized
     assert "finished visible live-action cinematic image" in normalized
+
+
+def _legacy_motion_blur_photography_contract() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "motion-blur-photography.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "HIGHEST PRIORITY OUTPUT CONTRACT" in brief
+    assert "one self-contained English paragraph of at least 700 words" in normalized
+    assert "Target 850-1200 words" in normalized
+    assert "silently rewrite it if it falls below 700" in normalized
+    assert "Do not pad the paragraph with repetition" in normalized
+    assert "Write with maximum information density" in normalized
+    assert "make every sentence add new, concrete, visible, renderable information" in normalized
+    assert "prefer exact nouns and measurements over decorative adjectives" in normalized
+    assert "Concision means removing redundancy, never removing required information" in normalized
+    assert "Do not shorten by omitting, generalizing, or merely implying" in normalized
+    assert "background population, setting, camera, light, exposure" in normalized
+    assert "CAVEMAN OUTPUT MODE" in brief
+    assert "compact, telegraphic image-prompt prose instead of literary narration" in normalized
+    assert "short subject-verb-object clauses joined by semicolons" in normalized
+    assert "State each fact once" in normalized
+    assert "remove conversational transitions, scene-setting filler" in normalized
+    assert "Order information once in this sequence" in normalized
+    assert "Do not circle back to restate an earlier section" in normalized
+    assert "one continuous paragraph without headings" in normalized
+    assert "compressed syntax and zero ornament, not missing facts" in normalized
+    assert "requested female and male counts apply exactly to the primary adult subjects" in normalized
+    assert "Contextual background adults are governed only by" in normalized
+    assert "lock one complete visual dossier for each requested person" in normalized
+    assert "exact adult age, exact height, body proportions" in normalized
+    assert "chest and breast proportions as applicable" in normalized
+    assert "Repeat that complete dossier independently in every Frame" in normalized
+    assert "COMPLETE PERSON DESCRIPTION IN EVERY FRAME" in brief
+    assert "exact height in centimeters" in normalized
+    assert "natural breast size, shape, projection" in normalized
+    assert "face shape and mature facial anatomy" in normalized
+    assert "precise skin color and undertone" in normalized
+    assert "every visible garment from inner visible layer to outer layer" in normalized
+    assert "complete footwear, including shoe type" in normalized
+    assert "every piece of jewelry and every accessory" in normalized
+    assert "one specific facial expression" in normalized
+    assert "one complete current action or held pose" in normalized
+    assert "EXPRESSION LEDGER" in brief
+    assert "one distinct, stable expression" in normalized
+    assert "exact gaze target; eye openness and focus" in normalized
+    assert "upper and lower eyelid tension" in normalized
+    assert "brow height, angle, and asymmetry" in normalized
+    assert "jaw tension; cheek tension" in normalized
+    assert "visible evidence of alertness, agency, response, and consent" in normalized
+    assert "complementary but non-identical expressions" in normalized
+    assert "Lock one expression for the entire exposure" in normalized
+    assert "WARDROBE, UNDRESSING, AND ACCESSORY LEDGER" in brief
+    assert "one fixed wardrobe inventory for every primary adult" in normalized
+    assert "eyeglasses or sunglasses, scarf or neckwear, jewelry" in normalized
+    assert "every primary adult exactly one complete pair of footwear" in normalized
+    assert "If the person is barefoot, describe both removed shoes" in normalized
+    assert "never write only that the person wears no shoes" in normalized
+    assert "every primary adult at least two distinctive accessories" in normalized
+    assert "at least one jewelry item" in normalized
+    assert "one signature non-jewelry item chosen from eyeglasses, sunglasses" in normalized
+    assert "cannot replace the required eyeglasses, sunglasses, or silk scarf" in normalized
+    assert "Do not satisfy this rule with two jewelry items" in normalized
+    assert "Every Frame must account for every inventoried item" in normalized
+    assert "partly removed, naming which limb or body region remains inside it" in normalized
+    assert "fully removed and visibly placed at one exact location" in normalized
+    assert "Never make clothing, shoes, glasses, a scarf, jewelry" in normalized
+    assert "where every removed garment, underwear piece, shoe" in normalized
+    assert "Place and describe every item separately" in normalized
+    assert "never use the words pile, cluster, heap, bundle" in normalized
+    assert "A fully nude adult may deliberately retain jewelry, glasses, a scarf" in normalized
+    assert "Lay a removed garment flat" in normalized
+    assert "never roll it into a bundle" in normalized
+    assert "one person's garment on top of another person's garment" in normalized
+    assert "at least twenty centimeters apart with no overlap" in normalized
+    assert "No garment may be simultaneously worn and lying elsewhere" in normalized
+    assert "Audit garment construction before accepting the Frame" in normalized
+    assert "A pullover T-shirt has no front opening, buttons, placket, or shirt cuffs" in normalized
+    assert "A button-front dress shirt may open along its placket" in normalized
+    assert "A slip dress uses straps rather than sleeves" in normalized
+    assert "EROTIC LEVEL" in brief
+    assert "at least three of those five signals" in normalized
+    assert "Bare breasts and nipples, cleavage, back, abdomen" in normalized
+    assert "use a self-possessed held pose with deliberate adult self-touch" in normalized
+    assert "every requested adult must participate in reciprocal contact" in normalized
+    assert "Erotic Frames do not show genital close-ups" in normalized
+    assert "HARDCORE LEVEL" in brief
+    assert "State the act near the beginning of the Frame" in normalized
+    assert "HARDCORE WARDROBE DISTRIBUTION" in brief
+    assert "Partial clothing is the default Hardcore styling" in normalized
+    assert "Do not choose full nudity merely because" in normalized
+    assert "Plan the wardrobe distribution from the requested Hardcore Theme count" in normalized
+    assert "At least seventy-five percent of the requested Themes" in normalized
+    assert "round this minimum upward to a whole Theme" in normalized
+    assert "At most twenty-five percent may show all primary adults fully nude" in normalized
+    assert "round this maximum downward to a whole Theme" in normalized
+    assert "When the rounded all-nude maximum is zero" in normalized
+    assert "Every requested Frame inherits its Theme's" in normalized
+    assert "each primary adult retains at least two worn clothing categories" in normalized
+    assert "roughly thirty-five to seventy percent" in normalized
+    assert "Open, lift, lower, loosen, or displace only the specific garment area" in normalized
+    assert "Do not remove an upper garment when only lower anatomy needs access" in normalized
+    assert "For a one-person cast, show explicit solo masturbation already in progress" in normalized
+    assert "every requested adult must have one active, unmistakable role" in normalized
+    assert "An inserted structure enters once at one receiving boundary" in normalized
+    assert "For standing penetration, separate and bend the receiving adult's legs" in normalized
+    assert "align both pelvises at the same height and depth plane" in normalized
+    assert "Do not combine closed or touching legs with visible vaginal" in normalized
+    assert "trace only the externally visible portion" in normalized
+    assert "end the description at that boundary" in normalized
+    assert "fully inserted while also calling its entire length fully visible" in normalized
+    assert "Never describe the glans or any internal segment as visible" in normalized
+    assert "the external shaft leads continuously from its owner's pelvis" in normalized
+    assert "everything beyond the boundary is internal and omitted" in normalized
+    assert '"fully inserted," "visibly inserted," "fully visible penis,"' in normalized
+    assert "Do not describe the glans in an inserted act" in normalized
+    assert "sexual fluid remains a small, localized, sharp surface detail" in normalized
+    assert "MOTION MODE CONTRACT" in brief
+    assert "SUBJECT MOTION BLUR" in brief
+    assert "FLASH-FROZEN ACTION PEAK" in brief
+    assert "STILL ANCHOR, MOVING WORLD" in brief
+    assert "The modes are mutually exclusive" in normalized
+    assert "do not add independently moving crowds, weather, liquid, or thrown props" in normalized
+    assert "Never write \"secondary motion,\" \"additional motion evidence,\"" in normalized
+    assert "MOTION NECESSITY AND SCENE CAUSALITY" in brief
+    assert "Build the believable scene and current activity first" in normalized
+    assert "Never add a moving object, weather condition, crowd behavior" in normalized
+    assert "Because this visible current activity is happening" in normalized
+    assert "Do not add a scarf, jacket, shirt, or stocking solely so it can fly" in normalized
+    assert "never introduce a bucket, glass, hose, splash, or spray only for motion" in normalized
+    assert "do not give extras flashlights, lanterns, fabric, or choreographed gestures" in normalized
+    assert "If deleting the moving element leaves the scene's activity unchanged" in normalized
+    assert "SCENE, MECHANICS, AND PHOTOGRAPHIC RESULT" in brief
+    assert "Close three causal loops before writing" in normalized
+    assert "Scene loop: location, operating state, weather, population" in normalized
+    assert "Mechanics loop: every force must have a visible source" in normalized
+    assert "Imaging loop: camera movement, shutter time, flash duration" in normalized
+    assert "a camera setting that cannot create the claimed result" in normalized
+    assert "Never make one hand throw ten liters of water" in normalized
+    assert "Every released object follows a ballistic arc" in normalized
+    assert "Rain outside glass stays outside" in normalized
+    assert "casual conversation, cleanup, equipment handling, or walking extras as sharp" in normalized
+    assert "This is the only mode in which every primary adult remains completely motionless" in normalized
+    assert "synchronized panning or flash" in normalized
+    assert "Never blur the entire person into an unreadable silhouette" in normalized
+    assert "Synchronized panning can keep only one tracked plane and velocity" in normalized
+    assert "At Hardcore level, do not use synchronized panning" in normalized
+    assert "a just-thrown garment flies open above or beside its owner" in normalized
+    assert "a longer ambient exposure leaves one coherent trailing path" in normalized
+    assert "one of the image's two largest visual masses" in normalized
+    assert "roughly thirty to seventy percent of the visible frame" in normalized
+    assert "The viewer must recognize motion before reading facial or wardrobe detail" in normalized
+    assert "MOTION RECOGNIZABLE AT FIRST GLANCE" in brief
+    assert "Choose one dominant motion-evidence carrier per Frame" in normalized
+    assert "A subject action and its directly caused garment" in normalized
+    assert "background adult group that translates, rotates, falls" in normalized
+    assert "When background adults carry the blur" in normalized
+    assert "A dense crowd field requires multiple parallel walking lanes" in normalized
+    assert "a single-file line cannot fill a broad region" in normalized
+    assert "never a top-to-bottom vertical curtain" in normalized
+    assert "Choose one dominant motion system, never unrelated competing systems" in normalized
+    assert "render background adults as sharp secondary figures" in normalized
+    assert "They do not walk, walk in place, gesture, turn" in normalized
+    assert "Changing pixels, refreshing data, scrolling screen content" in normalized
+    assert "does not count as physical motion" in normalized
+    assert "must be visibly active during the current exposure" in normalized
+    assert "a boat that already passed, residual wake, aftermath" in normalized
+    assert "Describe motion direction in the image plane" in normalized
+    assert "a river seen from its bank blurs along its downstream course" in normalized
+    assert "Rain in calm air produces vertical trails" in normalized
+    assert "Wind-driven rain produces diagonal trails" in normalized
+    assert "Choose exactly one of those states per Frame" in normalized
+    assert "Gravity-driven water travels downward" in normalized
+    assert "Pump-driven water may travel upward" in normalized
+    assert "Never describe upward water as gravity-driven" in normalized
+    assert "Choose camera movement according to the motion mode" in normalized
+    assert "permit one smooth horizontal, vertical, or diagonal pan" in normalized
+    assert "the environment streaks in the opposite screen direction" in normalized
+    assert "Never combine panning with zooming, rotation, random shake" in normalized
+    assert "roughly 1/15 to 1/4 second for panned subject motion" in normalized
+    assert "roughly 1/15 to 1/2 second for a frozen action peak" in normalized
+    assert "roughly 1/4 to 1 second for a still anchor" in normalized
+    assert "Separate shutter time from flash duration" in normalized
+    assert "Use a plausible t.1 flash duration around 1/2000 to 1/10000 second" in normalized
+    assert "Never call 1/200 or 1/250 second the flash pulse" in normalized
+    assert "Flash freezes only surfaces receiving enough flash illumination" in normalized
+    assert "at least three stops below the flash exposure" in normalized
+    assert "First-curtain flash places the crisp image at the beginning" in normalized
+    assert "rear-curtain flash places the crisp image at the end" in normalized
+    assert "Estimate the photographed displacement during the open shutter" in normalized
+    assert "Do not pair a two-second exposure with a tiny three-centimeter trail" in normalized
+    assert "Do not use camera flash to freeze distant rain or a crowd" in normalized
+    assert "Claim sharpness only within depth of field" in normalized
+    assert "airborne immediately after its owner releases or throws it" in normalized
+    assert "An airborne garment is not worn, held, or placed elsewhere" in normalized
+    assert "show that hand open immediately after release" in normalized
+    assert "Repeat the same owner and same releasing hand" in normalized
+    assert "The garment owner must be the person who releases it" in normalized
+    assert "may not simultaneously grip a partner, brace on a surface" in normalized
+    assert "A panning camera is not locked off" in normalized
+    assert "a lean, facial reaction, braced stationary act" in normalized
+    assert "Every stationary background object and stationary background adult streaks opposite" in normalized
+    assert "Do not claim that fixed architecture blurs while stationary extras" in normalized
+    assert "Hardcore motion must be visually consequential" in normalized
+    assert "a free hand may release a shirt, blouse, scarf, stocking, jacket" in normalized
+    assert "dense informed adult extra crowd follows ordinary routes" in normalized
+    assert "Do not reduce Hardcore motion to a distant train" in normalized
+    assert "only when removing that item is a natural current part of undressing" in normalized
+    assert "Do not add rain, a bucket, thrown liquid, a fan, loose paper" in normalized
+    assert "must be visibly moved clear of that exact junction" in normalized
+    assert "Never show penetration through intact, normally worn" in normalized
+    assert "If a skirt is fastened and worn at normal height" in normalized
+    assert '"fully visible externally," "entire visible length,"' in normalized
+    assert "A fully nude adult still has a complete removed-clothing inventory" in normalized
+    assert "kneeling footwear may contact through toes, uppers, or side edges" in normalized
+    assert "glasses cannot be both on the face or head and described as removed" in normalized
+    assert "Count physical emitting fixtures, not lighting roles" in normalized
+    assert "A bank of four uplights counts as four sources" in normalized
+    assert "BACKGROUND POPULATION LEDGER" in brief
+    assert "Every Theme and Frame must explicitly state the background population" in normalized
+    assert "private, residential, secured, closed, or after-hours location" in normalized
+    assert "quiet public location: two to five background adults" in normalized
+    assert "ordinarily active public location: six to fifteen background adults" in normalized
+    assert "sixteen to thirty background adults" in normalized
+    assert "A normally operating public place must look inhabited" in normalized
+    assert "A Beijing subway platform, high-speed rail concourse" in normalized
+    assert "must never be empty" in normalized
+    assert "Do not write a deserted Beijing public location" in normalized
+    assert "informed, consenting adult extra" in normalized
+    assert "closed to the public and operating as a controlled adult film set" in normalized
+    assert "within the first one hundred English words" in normalized
+    assert "closure to ordinary public access" in normalized
+    assert "informed consenting adult extras is invalid" in normalized
+    assert "Render no legible sign, label, advertisement" in normalized
+    assert "LIGHTING LEDGER" in brief
+    assert "exact number of active light sources" in normalized
+    assert "exact position and height relative to the primary subjects" in normalized
+    assert "approximate color temperature or precise hue" in normalized
+    assert "apparent size, hardness or diffusion, relative intensity" in normalized
+    assert "which source is the key, fill, rim, background practical" in normalized
+    assert "resulting catchlight shape and position" in normalized
+    assert "shadow direction, edge hardness, density" in normalized
+    assert "Use a short-duration flash to freeze a moving primary subject" in normalized
+    assert "A continuous key may resolve the primary cast without blur only when" in normalized
+    assert "Ambient light accumulated during the slow shutter records the selected motion carrier" in normalized
+    assert "Keep one Theme's exact location, architectural identity" in normalized
+    assert "completely self-contained prompt for isolated rendering" in normalized
+    assert "Silently reject and rewrite any Frame that fails" in normalized
+
+
+def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
+    brief = (
+        REPOSITORY_ROOT
+        / "story-inputs"
+        / "motion-blur-photography.txt"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(brief.split())
+
+    assert brief.startswith("BRIEF\n\n")
+    assert "HIGHEST PRIORITY" in brief
+    assert "every moving element must be a necessary result" in normalized
+    assert "Never add rain, crowds, flying clothes, liquid, props, lights" in normalized
+    assert "If the stated camera settings could not produce the described final image" in normalized
+    assert "one self-contained English paragraph of at least 700 words" in normalized
+    assert "Target 850-1200 words" in normalized
+    assert "short subject-verb-object clauses joined by semicolons" in normalized
+    assert "Theme count, Frame count, female count, male count" in normalized
+    assert "requested primary count" in normalized
+    assert "unmistakably mature adults aged 25 or older" in normalized
+
+    assert "PRIMARY ADULT DOSSIER" in brief
+    assert "exact age and height in centimeters" in normalized
+    assert "natural breast size, shape, projection" in normalized
+    assert "face shape; brow, eyes and color, nose, cheeks" in normalized
+    assert "exact skin color and undertone" in normalized
+    assert "one precise expression using gaze target" in normalized
+    assert "WARDROBE AND ITEM STATE" in brief
+    assert "one complete footwear pair" in normalized
+    assert "at least one non-jewelry signature item" in normalized
+    assert "Every item has exactly one visible current state" in normalized
+    assert "A nude adult still has a complete removed-clothing" in normalized
+    assert "One hand performs one task" in normalized
+
+    assert "ONE NECESSARY MOTION SYSTEM" in brief
+    assert "Natural fit outranks variety" in normalized
+    assert "If deleting the carrier leaves the activity unchanged" in normalized
+    assert "Do not combine carrier classes" in normalized
+    assert "SUBJECT MOTION BLUR" in brief
+    assert "Use only for aesthetic or erotic content, not Hardcore" in normalized
+    assert "FLASH-FROZEN ACTION PEAK" in brief
+    assert "its owner has just finished removing that same garment" in normalized
+    assert "Do not add a scarf, shirt, jacket, or stocking solely so it can fly" in normalized
+    assert "Do not use required signature glasses, sunglasses, or a silk scarf as the airborne item" in normalized
+    assert "exposing only the neck, collarbone, or an accessory position is insufficient" in normalized
+    assert "must use real side ties, side snaps" in normalized
+    assert "Never pull ordinary closed-loop underwear over occupied legs" in normalized
+    assert "Never throw a filled bucket, ten liters of water" in normalized
+    assert "prefer installed showerheads, faucets, or tub spouts" in normalized
+    assert "Do not add a portable pitcher, bucket, or floating ceramic vessel" in normalized
+    assert "STILL ANCHOR, MOVING WORLD" in brief
+    assert "Do not give extras lanterns, flashlights, flags, cloth" in normalized
+    assert "one single-file line cannot fill a wide area" in normalized
+    assert "Do not combine city buildings and tunnel lights" in normalized
+    assert "roughly 30-70 percent of the frame" in normalized
+
+    assert "SCENE AND MECHANICS" in brief
+    assert "Scene loop: location, operating state, time, weather" in normalized
+    assert "Mechanics loop: force has a visible source" in normalized
+    assert "CAMERA, EXPOSURE, AND RECORDED RESULT" in brief
+    assert "Shutter time and flash duration are different" in normalized
+    assert "plausible t.1 flash duration around 1/2000 to 1/10000 second" in normalized
+    assert "at least three stops below flash exposure" in normalized
+    assert "A tripod prevents camera shake; it does not freeze people" in normalized
+    assert "At shutter times slower than 1/4 second" in normalized
+    assert "a still-anchor shutter slower than 1/4 second must use a short flash" in normalized
+    assert "Without that flash, cap the shutter at 1/4 second" in normalized
+    assert "First-curtain flash puts the crisp image at the beginning" in normalized
+    assert "Rear-curtain flash puts the crisp image at the end" in normalized
+    assert "A stationary lamp reflected on a stationary floor does not streak" in normalized
+    assert "Claim sharpness only inside plausible depth of field" in normalized
+    assert "sensor whose entire width is about 36 millimeters" in normalized
+
+    assert "LIGHTING" in brief
+    assert "exact number of physical emitting fixtures" in normalized
+    assert "a reflector, diffusion panel, wall, floor, or umbrella is not an emitter" in normalized
+    assert "BACKGROUND POPULATION" in brief
+    assert "A normally operating Beijing subway" in normalized
+    assert "closed, access-controlled production" in normalized
+    assert "CONTENT LEVEL" in brief
+    assert "Hardcore uses only FLASH-FROZEN ACTION PEAK or STILL ANCHOR" in normalized
+    assert "Partial clothing is the Hardcore default" in normalized
+    assert "at least 75 percent of Themes" in normalized
+    assert "at most 25 percent may make all primary adults nude" in normalized
+    assert "THEMES AND FINAL AUDIT" in brief
+    assert "Reject a Theme before generating any Frame" in normalized
+    assert "title, premise, and style all name the same single mode and carrier" in normalized
+    assert "The title names one motion idea, not \"X and Y,\"" in normalized
+    assert "For a FLASH-FROZEN Theme" in normalized
+    assert "For a STILL ANCHOR Theme" in normalized
+    assert "If the carrier is a train, extras do not walk or blur" in normalized
+    assert "If the carrier is a crowd, no train, traffic, weather" in normalized
+    assert "Do not mix a private interior with an ordinarily operating public exterior" in normalized
+    assert "Do not call a replica corridor a functioning station" in normalized
+    assert "scene loop and mechanics loop pass ordinary-life logic" in normalized
+    assert "Finally search the draft for pile, heap, bundle, scattered" in normalized
+    assert "Silently reject and rewrite any Frame that fails one check" in normalized
