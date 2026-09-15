@@ -51,7 +51,9 @@ from t2i_spatial_pipeline.safety import (
     symbolic_validation_metadata,
 )
 from t2i_spatial_pipeline.service import (
+    BULK_BATCH_SIZE,
     build_scene_requests,
+    build_spatial_bulk_plan,
     publish_prompt_batch,
 )
 
@@ -645,6 +647,30 @@ def test_pair_catalog_uses_only_explicit_mutual_manual_names() -> None:
 def test_scene_request_count_must_fit_catalog_capacity(count: int) -> None:
     with pytest.raises(ValueError, match="between 1 and 20"):
         build_scene_requests("one_woman_one_man", seed=42, count=count)
+
+
+def test_bulk_plan_covers_five_categories_with_shared_blueprints() -> None:
+    plan = build_spatial_bulk_plan(12345, 600)
+
+    assert BULK_BATCH_SIZE == 20
+    assert len(plan) == 150
+    assert len({batch.spatial_seed for batch in plan}) == 150
+    assert len({batch.blueprint_seed for batch in plan}) == 5
+    for cast_key in CASTS:
+        cast_batches = [batch for batch in plan if batch.cast_key == cast_key]
+        assert len(cast_batches) == 30
+        assert sum(batch.scene_count for batch in cast_batches) == 600
+        assert len({batch.blueprint_seed for batch in cast_batches}) == 1
+
+
+def test_bulk_plan_supports_a_partial_final_batch() -> None:
+    plan = build_spatial_bulk_plan(
+        12345,
+        21,
+        cast_keys=("one_woman",),
+    )
+
+    assert [batch.scene_count for batch in plan] == [20, 1]
 
 
 @pytest.mark.parametrize(

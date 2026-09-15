@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import secrets
 from pathlib import Path
 
 import typer
@@ -15,6 +16,7 @@ from t2i_spatial_pipeline.errors import SpatialPipelineError
 from t2i_spatial_pipeline.service import (
     build_scene_requests,
     generate_spatial_batch,
+    generate_spatial_bulk,
 )
 
 app = typer.Typer(
@@ -95,6 +97,67 @@ def generate_command(
     typer.secho(
         "Local symbolic audit passed; image anatomy and cast count still require "
         "render review.",
+        fg=typer.colors.YELLOW,
+        err=True,
+    )
+
+
+@app.command("bulk")
+def bulk_command(
+    brief: str = typer.Argument(..., help="五种人数配置共享的主题。"),
+    count_per_category: int = typer.Option(
+        600,
+        "--count-per-category",
+        min=1,
+        help="每种人数配置生成的记录数。",
+    ),
+    seed: int | None = typer.Option(
+        None,
+        "--seed",
+        min=0,
+        help="基础随机种子；省略时生成并输出一个新种子。",
+    ),
+    prompts_dir: Path = typer.Option(
+        Path("prompts"),
+        "--prompts-dir",
+        file_okay=False,
+        help="保存每种人数配置的聚合 TXT。",
+    ),
+    runs_dir: Path = typer.Option(
+        Path("runs") / "spatial",
+        "--runs-dir",
+        file_okay=False,
+        help="保存可恢复的批次、共享蓝图缓存和 bulk 报告。",
+    ),
+    refresh_blueprints: bool = typer.Option(
+        False,
+        "--refresh-blueprints",
+        help="为每种人数配置重新推导一次 CreativeBlueprint。",
+    ),
+) -> None:
+    """Generate resumable batches for every supported cast category."""
+    base_seed = secrets.randbelow(2_000_000_000) if seed is None else seed
+    bulk_directory = runs_dir / f"bulk-{base_seed}"
+    typer.echo(f"bulk base seed: {base_seed}")
+    try:
+        report = asyncio.run(
+            generate_spatial_bulk(
+                brief,
+                base_seed,
+                count_per_cast=count_per_category,
+                refresh_blueprints=refresh_blueprints,
+                runs_directory=bulk_directory,
+                prompts_directory=prompts_dir,
+                on_progress=typer.echo,
+            )
+        )
+    except (OSError, ValidationError, ValueError, SpatialPipelineError) as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
+    typer.secho(
+        "Bulk prompts passed symbolic checks only; rendered images still require "
+        "visual review.",
         fg=typer.colors.YELLOW,
         err=True,
     )

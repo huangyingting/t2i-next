@@ -199,6 +199,19 @@ uv run python -m t2i_spatial_pipeline generate \
 Blueprint 缓存；场景数量不同时会使用不同缓存。使用
 `--refresh-blueprint` 可以强制重新推导。
 
+五种 cast 的大批量生成使用 `bulk`。省略 `--seed` 时命令会先输出新的基础 seed；
+每种 cast 共享一套 CreativeBlueprint，再通过独立空间 seed 分批编译，避免为
+每20条重复调用模型。每批完成后更新 `bulk-report.json`，使用相同 seed 和参数
+再次执行即可续跑。完成后每种 cast 发布一个聚合 TXT：
+
+```bash
+uv run t2i-spatial bulk \
+  "1930年代中国原创社会讽刺，成熟的女性作家与男性大学讲师，民国电影摄影质感" \
+  --count-per-category 600 \
+  --runs-dir runs/spatial \
+  --prompts-dir prompts
+```
+
 Provider 与其他流水线一样直接复用现有 `.env` 中的 `OPENAI_*`。至少需要设置
 `OPENAI_MODEL`；API 密钥由 `OPENAI_API_KEY_ENV` 指向。最终提示词与其他流水线
 一样保存到 `prompts/YYYY-MM-DD/hardcore/`，文件名包含世界语义名、内容等级、

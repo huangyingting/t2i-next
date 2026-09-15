@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import random
+from collections.abc import Callable, Sequence
 from datetime import date
 from pathlib import Path
 from typing import NamedTuple
@@ -51,6 +52,14 @@ class SceneRequest(NamedTuple):
     cast_key: str = "one_woman_one_man"
 
 
+class BulkBatch(NamedTuple):
+    cast_key: str
+    batch_index: int
+    scene_count: int
+    spatial_seed: int
+    blueprint_seed: int
+
+
 VIEWPOINTS = (
     "front_three_quarter",
     "high_three_quarter",
@@ -61,6 +70,8 @@ VIEWPOINTS = (
 )
 SHOT_SCALES = ("medium_close", "medium", "medium_wide", "full_body", "wide")
 ASSIGNMENT_ALGORITHM_VERSION = 3
+BULK_SCHEMA_VERSION = 1
+BULK_BATCH_SIZE = 20
 
 
 def _cast_filename_slug(cast_key: str) -> str:
@@ -335,6 +346,44 @@ def build_scene_requests(
     return tuple(requests)
 
 
+def build_spatial_bulk_plan(
+    base_seed: int,
+    count_per_cast: int,
+    *,
+    cast_keys: Sequence[str] = tuple(CASTS),
+    batch_size: int = BULK_BATCH_SIZE,
+) -> tuple[BulkBatch, ...]:
+    if count_per_cast < 1:
+        raise ValueError("bulk count per cast must be positive")
+    if not 1 <= batch_size <= 20:
+        raise ValueError("bulk batch size must be between 1 and 20")
+    unknown_casts = set(cast_keys).difference(CASTS)
+    if unknown_casts:
+        raise ValueError(f"unknown bulk cast configurations: {sorted(unknown_casts)}")
+    if not cast_keys or len(cast_keys) != len(set(cast_keys)):
+        raise ValueError("bulk cast list must contain unique cast keys")
+
+    batches = []
+    for cast_index, cast_key in enumerate(cast_keys):
+        category_seed = base_seed + cast_index * 1_000_000
+        remaining = count_per_cast
+        batch_index = 1
+        while remaining:
+            scene_count = min(batch_size, remaining)
+            batches.append(
+                BulkBatch(
+                    cast_key=cast_key,
+                    batch_index=batch_index,
+                    scene_count=scene_count,
+                    spatial_seed=category_seed + batch_index - 1,
+                    blueprint_seed=category_seed,
+                )
+            )
+            remaining -= scene_count
+            batch_index += 1
+    return tuple(batches)
+
+
 def blueprint_cache_path(
     brief: str,
     seed: int,
@@ -406,6 +455,9 @@ async def generate_spatial_batch(
     scene_requests: tuple[SceneRequest, ...],
     runs_directory: Path,
     prompts_directory: Path,
+    blueprint_seed: int | None = None,
+    blueprint_cache_directory: Path | None = None,
+    publish: bool = True,
 ) -> dict[str, object]:
     if not scene_requests:
         raise ValueError("spatial batch requires at least one scene request")
@@ -422,13 +474,19 @@ async def generate_spatial_batch(
         if any(role in CASTS[request.cast_key] for request in scene_requests)
     )
     scene_count = len(scene_requests)
+    creative_seed = seed if blueprint_seed is None else blueprint_seed
+    cache_directory = (
+        runs_directory
+        if blueprint_cache_directory is None
+        else blueprint_cache_directory
+    )
     inference = (
         None
         if refresh_blueprint
         else cached_inference(
             brief,
-            seed,
-            runs_directory,
+            creative_seed,
+            cache_directory,
             cast_roles,
             scene_count,
         )
@@ -437,19 +495,20 @@ async def generate_spatial_batch(
     if inference is None:
         inference = await infer_creative_blueprint(
             brief,
-            seed,
+            creative_seed,
             cast_roles,
             scene_count,
         )
     runs_directory.mkdir(parents=True, exist_ok=True)
-    (runs_directory / "blueprint-cache").mkdir(parents=True, exist_ok=True)
+    cache_directory.mkdir(parents=True, exist_ok=True)
     cache_path = blueprint_cache_path(
         brief,
-        seed,
-        runs_directory,
+        creative_seed,
+        cache_directory,
         cast_roles,
         scene_count,
     )
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
         inference.model_dump_json(indent=2) + "\n",
         encoding="utf-8",
@@ -781,7 +840,8 @@ async def generate_spatial_batch(
         and not presentation_policy_issues,
         **symbolic_validation_metadata(),
         "creative_brief": brief,
-        "creative_seed": seed,
+        "creative_seed": creative_seed,
+        "spatial_seed": seed,
         "blueprint_fingerprint": stable_hash(inference.blueprint),
         "blueprint_cache_key": cache_path.stem,
         "sampler_validation": sampler_validation,
@@ -793,12 +853,16 @@ async def generate_spatial_batch(
     }
     cast_keys = {request.cast_key for request in scene_requests}
     if report["passed"] and len(cast_keys) == 1:
-        prompt_file = publish_prompt_batch(
-            prompts,
-            semantic_name=inference.blueprint.world.family_id,
-            cast_key=next(iter(cast_keys)),
-            prompts_directory=prompts_directory,
-        )
+        if publish:
+            prompt_file = publish_prompt_batch(
+                prompts,
+                semantic_name=inference.blueprint.world.family_id,
+                cast_key=next(iter(cast_keys)),
+                prompts_directory=prompts_directory,
+            )
+        else:
+            prompt_file = runs_directory / "prompts.txt"
+            prompt_file.write_text("\n".join(prompts) + "\n", encoding="utf-8")
         report["prompt_file"] = str(prompt_file)
     else:
         report["prompt_file"] = None
@@ -820,3 +884,147 @@ async def generate_spatial_batch(
         encoding="utf-8",
     )
     return report
+
+
+def _write_bulk_progress(path: Path, progress: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(f"{path.suffix}.tmp")
+    temporary.write_text(
+        json.dumps(progress, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+
+
+async def generate_spatial_bulk(
+    brief: str,
+    base_seed: int,
+    *,
+    count_per_cast: int,
+    refresh_blueprints: bool,
+    runs_directory: Path,
+    prompts_directory: Path,
+    cast_keys: Sequence[str] = tuple(CASTS),
+    on_progress: Callable[[str], None] | None = None,
+) -> dict[str, object]:
+    plan = build_spatial_bulk_plan(
+        base_seed,
+        count_per_cast,
+        cast_keys=cast_keys,
+    )
+    progress_path = runs_directory / "bulk-report.json"
+    identity = {
+        "schema_version": BULK_SCHEMA_VERSION,
+        "brief": brief,
+        "base_seed": base_seed,
+        "count_per_cast": count_per_cast,
+        "batch_size": BULK_BATCH_SIZE,
+        "cast_keys": list(cast_keys),
+    }
+    if progress_path.exists():
+        progress = json.loads(progress_path.read_text(encoding="utf-8"))
+        existing_identity = {
+            key: progress.get(key) for key in identity
+        }
+        if existing_identity != identity:
+            raise ValueError(
+                f"bulk checkpoint does not match requested generation: "
+                f"{progress_path}"
+            )
+    else:
+        progress = {
+            **identity,
+            "completed_batches": [],
+            "categories": {},
+            "complete": False,
+        }
+        _write_bulk_progress(progress_path, progress)
+
+    completed = set(progress["completed_batches"])
+    for batch in plan:
+        batch_id = f"{batch.cast_key}:{batch.batch_index:03d}"
+        batch_directory = (
+            runs_directory
+            / batch.cast_key
+            / f"batch-{batch.batch_index:03d}"
+        )
+        report_path = batch_directory / "report.json"
+        if batch_id in completed and report_path.exists():
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            if (
+                report.get("passed") is True
+                and report.get("spatial_seed") == batch.spatial_seed
+            ):
+                continue
+        requests = build_scene_requests(
+            batch.cast_key,
+            seed=batch.spatial_seed,
+            count=batch.scene_count,
+        )
+        report = await generate_spatial_batch(
+            brief,
+            batch.spatial_seed,
+            refresh_blueprint=(
+                refresh_blueprints and batch.batch_index == 1
+            ),
+            scene_requests=requests,
+            runs_directory=batch_directory,
+            prompts_directory=prompts_directory,
+            blueprint_seed=batch.blueprint_seed,
+            blueprint_cache_directory=runs_directory / batch.cast_key,
+            publish=False,
+        )
+        if report["passed"] is not True:
+            raise ValueError(f"bulk batch failed local audit: {batch_id}")
+        completed.add(batch_id)
+        progress["completed_batches"] = sorted(completed)
+        _write_bulk_progress(progress_path, progress)
+        if on_progress is not None:
+            on_progress(
+                f"{batch.cast_key}: batch {batch.batch_index:03d} complete"
+            )
+
+    categories: dict[str, object] = {}
+    for cast_key in cast_keys:
+        cast_batches = [batch for batch in plan if batch.cast_key == cast_key]
+        prompts = []
+        for batch in cast_batches:
+            prompt_path = (
+                runs_directory
+                / cast_key
+                / f"batch-{batch.batch_index:03d}"
+                / "prompts.txt"
+            )
+            prompts.extend(prompt_path.read_text(encoding="utf-8").splitlines())
+        if len(prompts) != count_per_cast:
+            raise ValueError(
+                f"{cast_key} bulk aggregation produced {len(prompts)} of "
+                f"{count_per_cast} prompts"
+            )
+        existing_category = progress.get("categories", {}).get(cast_key, {})
+        existing_path_value = existing_category.get("prompt_file")
+        existing_path = (
+            Path(existing_path_value) if isinstance(existing_path_value, str) else None
+        )
+        if existing_path is not None and existing_path.exists():
+            aggregate_path = existing_path
+        else:
+            aggregate_path = publish_prompt_batch(
+                prompts,
+                semantic_name=f"spatial_bulk_{base_seed}",
+                cast_key=cast_key,
+                prompts_directory=prompts_directory,
+            )
+        categories[cast_key] = {
+            "records": len(prompts),
+            "unique_prompts": len(set(prompts)),
+            "prompt_file": str(aggregate_path),
+        }
+        progress["categories"] = categories
+        _write_bulk_progress(progress_path, progress)
+
+    progress["categories"] = categories
+    progress["total_records"] = count_per_cast * len(cast_keys)
+    progress["complete"] = True
+    _write_bulk_progress(progress_path, progress)
+    return progress

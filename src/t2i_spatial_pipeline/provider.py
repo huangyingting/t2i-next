@@ -394,6 +394,18 @@ async def generate_with_repair(
                         + json.dumps(allowed_moods, ensure_ascii=True)
                         + "."
                     )
+            if any(
+                "forbidden concepts" in issue.lower()
+                and "accessories" in issue.lower()
+                for issue in exc.validation_issues
+            ):
+                repair_guidance += (
+                    " Replace the rejected accessory with a wearable item chosen "
+                    "only from earrings, necklaces, bracelets, rings, watches, "
+                    "hairpins, brooches, cufflinks, tie clips, or pocket squares. "
+                    "Do not use any forbidden token even inside a compound "
+                    "adjective."
+                )
             if isinstance(exc, SpatialProviderTruncatedOutputError):
                 repair_guidance += (
                     " Be concise, omit all reasoning and commentary, and reserve "

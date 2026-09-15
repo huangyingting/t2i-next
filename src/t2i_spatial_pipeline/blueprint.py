@@ -748,7 +748,9 @@ ASCII English, regardless of the brief's language.
 Infer only the StyleBlueprint from the brief. Produce six to twelve coherent
 complete style recipes rather than shuffled adjectives. Every compatible_moods
 value must come from the supplied allowed_mood_tags, and every supplied mood tag
-must appear in at least one recipe. Keep medium, rendering language, texture,
+must appear in at least one recipe. Treat allowed_mood_tags as a closed enum:
+copy its values character-for-character and never derive, combine, or invent
+additional mood tags. Keep medium, rendering language, texture,
 contrast, color, lighting, and atmosphere mutually coherent. Do not describe
 people, anatomy, pose, contact, or camera geometry. Use concise printable ASCII
 English and return only schema data.
@@ -763,7 +765,10 @@ role. Give each visible person separately designed but scene-coordinated garment
 footwear, zero to two small wearable identity-relevant accessories, and
 makeup-and-grooming treatment. Never add handheld novelty props, occupational
 equipment, medical equipment, masks, or costume-role accessories unless the brief
-explicitly requires them. Within a
+explicitly requires them. Accessories must be wearable items selected from
+earrings, necklaces, bracelets, rings, watches, hairpins, brooches, cufflinks,
+tie clips, or pocket squares; do not use handheld or reflective accessories.
+Within a
 scene, choose coverage_mode independently for every role according to the brief
 and creative composition. A role may use selective_access with named garments
 or styled_nude with wardrobe set to literal none. A scene may therefore be fully
