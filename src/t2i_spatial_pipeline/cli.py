@@ -9,6 +9,7 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
+from t2i_spatial_pipeline.audit import run_spatial_audit
 from t2i_spatial_pipeline.catalog import cast_key_for_counts
 from t2i_spatial_pipeline.errors import SpatialPipelineError
 from t2i_spatial_pipeline.service import (
@@ -91,3 +92,53 @@ def generate_command(
     typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
     if not report["passed"]:
         raise typer.Exit(code=1)
+
+
+@app.command("audit")
+def audit_command(
+    start_seed: int = typer.Option(
+        0,
+        "--start-seed",
+        min=0,
+        help="开始审核的本地随机种子。",
+    ),
+    seed_count: int = typer.Option(
+        100,
+        "--seed-count",
+        min=1,
+        help="每种人数配置审核的连续随机种子数量。",
+    ),
+    count: int = typer.Option(
+        20,
+        "--count",
+        min=1,
+        max=20,
+        help="每个随机种子分配并审核的场景数量。",
+    ),
+    runs_dir: Path = typer.Option(
+        Path("runs") / "spatial",
+        "--runs-dir",
+        file_okay=False,
+        help="保存可恢复的本地审计进度。",
+    ),
+    restart: bool = typer.Option(
+        False,
+        "--restart",
+        help="丢弃不完整或已完成的同路径审计进度并重新开始。",
+    ),
+) -> None:
+    """Audit every catalog and stress scene allocation without an LLM."""
+    progress_path = runs_dir / "audit-progress.json"
+    try:
+        report = run_spatial_audit(
+            progress_path,
+            start_seed=start_seed,
+            seed_count=seed_count,
+            scene_count=count,
+            restart=restart,
+            on_progress=typer.echo,
+        )
+    except (OSError, ValidationError, ValueError) as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(report.model_dump_json(indent=2))

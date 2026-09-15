@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 
 import pytest
 from pydantic import BaseModel, ValidationError
 
+import t2i_spatial_pipeline.audit as spatial_audit
+from t2i_spatial_pipeline.audit import run_spatial_audit
 from t2i_spatial_pipeline.blueprint import (
     FORBIDDEN_STYLE_CONCEPTS,
     CharacterBlueprint,
@@ -17,6 +20,14 @@ from t2i_spatial_pipeline.blueprint import (
     validate_output_concepts_with_pattern,
 )
 from t2i_spatial_pipeline.catalog import CASTS, cast_key_for_counts
+from t2i_spatial_pipeline.compiler import (
+    SceneSpec,
+    compile_geometry,
+    distributed_contact_axis_clause,
+    load_catalog,
+    prompt_issues,
+    select_plan,
+)
 from t2i_spatial_pipeline.config import load_spatial_provider_settings
 from t2i_spatial_pipeline.layers import (
     CharacterProfile,
@@ -283,8 +294,8 @@ def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
             for request in requests
         }
     ) == 20
-    assert len({request.activity_id for request in requests}) == 20
-    assert len({request.family for request in requests}) == 16
+    assert len({request.activity_id for request in requests}) >= 8
+    assert len({request.family for request in requests}) == 20
     assert {request.viewpoint for request in requests} == {
         "front_three_quarter",
         "high_three_quarter",
@@ -294,6 +305,122 @@ def test_twenty_scene_requests_are_unique_and_diverse(cast_key: str) -> None:
         "side_three_quarter",
     }
     assert len({request.shot_scale for request in requests}) == 5
+
+
+def test_spatial_audit_resumes_from_atomic_seed_checkpoint(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    progress_path = tmp_path / "audit-progress.json"
+    original_build = spatial_audit.build_scene_requests
+    interrupted_calls = 0
+
+    def interrupt_second_seed(*args, **kwargs):
+        nonlocal interrupted_calls
+        interrupted_calls += 1
+        if interrupted_calls == 2:
+            raise RuntimeError("simulated interruption")
+        return original_build(*args, **kwargs)
+
+    monkeypatch.setattr(
+        spatial_audit,
+        "build_scene_requests",
+        interrupt_second_seed,
+    )
+    with pytest.raises(RuntimeError, match="simulated interruption"):
+        run_spatial_audit(
+            progress_path,
+            seed_count=3,
+            cast_keys=("one_woman",),
+        )
+
+    checkpoint = json.loads(progress_path.read_text(encoding="utf-8"))
+    assert checkpoint["casts"]["one_woman"]["completed_seeds"] == 1
+    assert "simulated interruption" in checkpoint["last_error"]
+
+    resumed_calls = 0
+
+    def count_resumed_seeds(*args, **kwargs):
+        nonlocal resumed_calls
+        resumed_calls += 1
+        return original_build(*args, **kwargs)
+
+    monkeypatch.setattr(
+        spatial_audit,
+        "build_scene_requests",
+        count_resumed_seeds,
+    )
+    progress = run_spatial_audit(
+        progress_path,
+        seed_count=3,
+        cast_keys=("one_woman",),
+    )
+
+    assert progress.complete is True
+    assert progress.casts["one_woman"].completed_seeds == 3
+    assert progress.last_error is None
+    assert resumed_calls == 2
+
+
+def test_spatial_audit_rejects_checkpoint_for_different_options(tmp_path) -> None:
+    progress_path = tmp_path / "audit-progress.json"
+    run_spatial_audit(
+        progress_path,
+        seed_count=1,
+        cast_keys=("one_woman",),
+    )
+
+    with pytest.raises(ValueError, match="use --restart"):
+        run_spatial_audit(
+            progress_path,
+            seed_count=2,
+            cast_keys=("one_woman",),
+        )
+
+
+def test_prompt_audit_matches_the_exact_secondary_contact_sentence() -> None:
+    catalog = load_catalog("one_woman")
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="one_woman",
+        family="sling_reclined",
+        variant="knees_wide_arms_outward",
+        activity_id="dual_manual",
+        viewpoint="high_three_quarter",
+        shot_scale="full_body",
+        setting_id="audit_setting",
+    )
+    entry, activity = select_plan(catalog, spec)
+    profiles = character_profiles()
+    prompt = compile_geometry(spec, entry, activity, profiles)
+
+    assert prompt_issues(spec, entry, activity, prompt, profiles) == []
+
+
+def test_mutual_oral_compiles_one_continuous_reciprocal_body_axis() -> None:
+    catalog = load_catalog("one_woman_one_man")
+    spec = SceneSpec(
+        scene_id="S01",
+        cast_key="one_woman_one_man",
+        family="side_lying_right",
+        variant="fetal_tuck_arms_folded",
+        activity_id="mutual_oral",
+        viewpoint="side_three_quarter",
+        shot_scale="medium_wide",
+        setting_id="audit_setting",
+    )
+    entry, activity = select_plan(catalog, spec)
+    profiles = character_profiles()
+    prompt = compile_geometry(spec, entry, activity, profiles)
+    body_axis = distributed_contact_axis_clause(
+        entry,
+        activity,
+        spec.cast_key,
+    )
+
+    assert body_axis is not None
+    assert body_axis in prompt
+    assert prompt_issues(spec, entry, activity, prompt, profiles) == []
 
 
 @pytest.mark.parametrize("count", [0, 21])

@@ -16,6 +16,7 @@ Identifier = Annotated[
     ),
 ]
 RoleCode = Annotated[str, StringConstraints(pattern=r"^[fm][1-9][0-9]*$")]
+TOPOLOGY_AUDIT_VERSION = 1
 
 
 class StrictModel(BaseModel):
@@ -221,7 +222,10 @@ class PoseEntry(StrictModel):
     pose_id: Identifier
     central_pose: CentralPose
     actor_plans: list[ActorPlan] = Field(min_length=1, max_length=8)
-    compatible_activity_ids: list[Identifier] = Field(default_factory=list, max_length=32)
+    compatible_activity_ids: list[Identifier] = Field(
+        default_factory=list,
+        max_length=32,
+    )
     signature: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
 
     @model_validator(mode="after")

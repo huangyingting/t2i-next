@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import NamedTuple
 
@@ -26,6 +27,7 @@ from .layers import (
 
 ROOT = Path(__file__).resolve().parent
 CATALOGS = ROOT / "catalogs"
+PROMPT_AUDIT_VERSION = 2
 
 
 class SceneSpec(NamedTuple):
@@ -596,6 +598,7 @@ def partner_limb_clause(
     return f", with both hands holding {central_name}'s hips"
 
 
+@lru_cache(maxsize=len(CASTS))
 def load_catalog(cast_key: str) -> PoseCatalog:
     return PoseCatalog.model_validate_json(
         (CATALOGS / f"{cast_key}.json").read_text(encoding="utf-8")
@@ -899,7 +902,8 @@ def distributed_contact_axis_clause(
             for edge in activity.contact_edges
             if any(
                 endpoint.entity_id == activity.focus_role
-                and endpoint.region in {"vagina", "anus"}
+                and endpoint.region
+                in {"vagina", "vulva", "anus", "clitoris", "pubic_region"}
                 for endpoint in (edge.source, edge.target)
             )
         ),
@@ -1308,11 +1312,12 @@ def prompt_issues(
         visibility = edge.preferred_visibility
         if visibility not in lowered:
             issues.append(f"missing contact visibility: {visibility}")
+        edge_marker = f"{phrase(edge.edge_id)} {phrase(edge.state)}"
         edge_sentence = next(
             (
                 sentence
                 for sentence in prompt.split(". ")
-                if phrase(edge.edge_id) in sentence
+                if edge_marker in sentence
                 and "activity is" not in sentence
                 and ("contact" in sentence or "edge" in sentence)
             ),
@@ -1445,15 +1450,27 @@ def prompt_issues(
             "",
         )
         if actor_gives_oral(activity, actor_plan.role):
-            reaches_contact = (
-                "approaches her pelvis from" in actor_sentence
-                and "lowering the torso" in actor_sentence
-            )
-            has_support = (
-                "supports " in actor_sentence
-                if actor_plan.pose_function == "supporting_central"
-                else "both palms braced" in actor_sentence
-            )
+            if activity.activity_id == "mutual_oral":
+                reaches_contact = (
+                    "lies fully visible in the opposite direction"
+                    in actor_sentence
+                    and "only head beside" in actor_sentence
+                    and "pelvis beside" in actor_sentence
+                )
+                has_support = (
+                    "supported by side shoulder, side hip and side thigh"
+                    in actor_sentence
+                )
+            else:
+                reaches_contact = (
+                    "approaches her pelvis from" in actor_sentence
+                    and "lowering the torso" in actor_sentence
+                )
+                has_support = (
+                    "supports " in actor_sentence
+                    if actor_plan.pose_function == "supporting_central"
+                    else "both palms braced" in actor_sentence
+                )
             if not reaches_contact or not has_support:
                 issues.append(f"{name} lacks a resolved oral reach path")
         if actor_receives_oral(

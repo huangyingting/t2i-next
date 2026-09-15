@@ -55,6 +55,7 @@ VIEWPOINTS = (
     "side_three_quarter",
 )
 SHOT_SCALES = ("medium_close", "medium", "medium_wide", "full_body", "wide")
+ASSIGNMENT_ALGORITHM_VERSION = 2
 
 
 def _cast_filename_slug(cast_key: str) -> str:
@@ -128,56 +129,61 @@ def _assign_unique_activities(
             rng.shuffle(entries)
             slot_options.append((activity_id, entries))
         options[slot] = slot_options
-    assignment: dict[int, tuple[str, PoseEntry]] = {}
-    used_activities: set[str] = set()
-    used_poses: set[str] = set()
+    activity_to_slot: dict[str, int] = {}
+    slot_to_activity: dict[int, str] = {}
 
-    def search(remaining: list[int], *, require_unique_activity: bool) -> bool:
-        if not remaining:
-            return True
-        slot = min(
-            remaining,
-            key=lambda item: sum(
-                (
-                    not require_unique_activity
-                    or activity_id not in used_activities
-                )
-                and any(entry.pose_id not in used_poses for entry in entries)
-                for activity_id, entries in options[item]
-            ),
-        )
-        next_remaining = [item for item in remaining if item != slot]
-        for activity_id, entries in options[slot]:
-            if require_unique_activity and activity_id in used_activities:
+    def augment(slot: int, visited_activities: set[str]) -> bool:
+        for activity_id, _ in options[slot]:
+            if activity_id in visited_activities:
                 continue
-            for entry in entries:
-                if entry.pose_id in used_poses:
-                    continue
-                assignment[slot] = (activity_id, entry)
-                activity_was_used = activity_id in used_activities
-                if not activity_was_used:
-                    used_activities.add(activity_id)
-                used_poses.add(entry.pose_id)
-                if search(
-                    next_remaining,
-                    require_unique_activity=require_unique_activity,
-                ):
-                    return True
-                used_poses.remove(entry.pose_id)
-                if not activity_was_used:
-                    used_activities.remove(activity_id)
-                assignment.pop(slot)
+            visited_activities.add(activity_id)
+            previous_slot = activity_to_slot.get(activity_id)
+            if previous_slot is None or augment(
+                previous_slot,
+                visited_activities,
+            ):
+                activity_to_slot[activity_id] = slot
+                slot_to_activity[slot] = activity_id
+                return True
         return False
 
-    slots = list(range(len(families)))
-    if not search(slots, require_unique_activity=True):
-        assignment.clear()
-        used_activities.clear()
-        used_poses.clear()
-    if not assignment and not search(slots, require_unique_activity=False):
-        raise ValueError(
-            "cannot assign compatible pose and activity pairs across selected scenes"
-        )
+    for slot in sorted(options, key=lambda item: len(options[item])):
+        augment(slot, set())
+
+    assignment: dict[int, tuple[str, PoseEntry]] = {}
+    used_poses: set[str] = set()
+    activity_counts: dict[str, int] = {}
+    for slot in range(len(families)):
+        matched_activity = slot_to_activity.get(slot)
+        candidate_options = options[slot]
+        if matched_activity is not None:
+            candidate_options = sorted(
+                candidate_options,
+                key=lambda item: item[0] != matched_activity,
+            )
+        else:
+            candidate_options = sorted(
+                candidate_options,
+                key=lambda item: activity_counts.get(item[0], 0),
+            )
+        chosen: tuple[str, PoseEntry] | None = None
+        for activity_id, entries in candidate_options:
+            available_entry = next(
+                (entry for entry in entries if entry.pose_id not in used_poses),
+                None,
+            )
+            if available_entry is not None:
+                chosen = (activity_id, available_entry)
+                break
+        if chosen is None:
+            raise ValueError(
+                "cannot assign compatible pose and activity pairs across "
+                "selected scenes"
+            )
+        activity_id, entry = chosen
+        assignment[slot] = chosen
+        used_poses.add(entry.pose_id)
+        activity_counts[activity_id] = activity_counts.get(activity_id, 0) + 1
     return [assignment[index] for index in range(len(families))]
 
 
@@ -257,10 +263,7 @@ def build_scene_requests(
     rng = random.Random(seed)
     families = sorted({entry.central_pose.family for entry in catalog.entries})
     rng.shuffle(families)
-    selected_families = [
-        families[index % len(families)]
-        for index in range(count)
-    ]
+    selected_families = rng.sample(families, k=count)
     family_entries = {
         family: [
             entry

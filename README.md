@@ -210,6 +210,23 @@ Provider 与其他流水线一样直接复用现有 `.env` 中的 `OPENAI_*`。�
 - `report.json`：最终 TXT 路径、多样性阈值和本地约束校验结果。
 - `blueprint-cache/`：按主题、seed、模型配置和 schema 寻址的缓存。
 
+姿势 catalog 和场景分配器可以完全在本地审核，不读取模型配置，也不调用 LLM：
+
+```bash
+uv run t2i-spatial audit \
+  --seed-count 100 \
+  --count 20 \
+  --runs-dir runs/spatial
+```
+
+审核会穷举检查五套 catalog 中所有保留的 pose/activity 拓扑，再对每种人数配置
+运行连续随机种子的20场分配压力测试，并编译、复核每条抽样几何 Prompt。进度在
+每个 seed 完成后原子保存到
+`runs/spatial/audit-progress.json`；命令中断后使用相同参数再次执行即可从下一个
+未完成 seed 继续。checkpoint 同时绑定 catalog 内容、拓扑规则、Prompt 审核规则
+和分配算法版本；参数、规则或 catalog 改变时会拒绝误续跑，此时显式传入
+`--restart` 开始新的审核。
+
 这个工具把文生图内容分成共享 Foundation 和两层具体画面事实：
 
 - `StyleConstraints`：保存 brief 明示且逐字复制的作品或虚构世界、导演、艺术家、
