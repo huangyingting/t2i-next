@@ -12,6 +12,25 @@ uv run python scripts/refine-text-file.py \
   story-inputs/miniature-fantasy-v2.txt
 ```
 
+## 作品集合电影风格编译器
+
+`t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
+视觉档案，再把档案编译进一个以 `BRIEF` 开始的现行 Story Description。它只建立
+作品级来源关系，不把结果扩展为对导演全部个人风格的模仿，也不复制原作人物、
+演员肖像、对白、剧情、独特道具或具体镜头。
+
+```bash
+uv run t2i-film-style generate "张艺谋" \
+  --work "英雄 (2002)" \
+  --work "十面埋伏 (2004)" \
+  --brief-file story-inputs/classic-film-erotic-reinterpretation.txt
+```
+
+结构化档案和完整结果写入 `runs/film-style/<run-id>/`；可直接传给
+`t2i-story --prompt-file` 的编译结果写入 `film-style-inputs/`。每次运行使用唯一
+文件名，不覆盖先前生成物。详细接口见
+[`docs/film-style-pipeline.md`](docs/film-style-pipeline.md)。
+
 ## 独立故事生成器
 
 `t2i_story_pipeline` 是完全独立的极简叙事生成器。它不复用下文旧管线的

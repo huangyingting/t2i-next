@@ -26,9 +26,11 @@ dev = [
 t2i-prompts = "t2i_prompt_pipeline.cli:app"
 t2i-story = "t2i_story_pipeline.cli:app"
 t2i-spatial = "t2i_spatial_pipeline.cli:app"
+t2i-film-style = "t2i_film_style_pipeline.cli:app"
 
 [tool.hatch.build.targets.wheel]
 packages = [
+  "src/t2i_film_style_pipeline",
   "src/t2i_prompt_pipeline",
   "src/t2i_spatial_pipeline",
   "src/t2i_story_pipeline",
@@ -48,8 +50,15 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.per-file-ignores]
 # Typer builds its CLI from call expressions in argument defaults.
 "src/t2i_prompt_pipeline/cli.py" = ["B008"]
+"src/t2i_film_style_pipeline/cli.py" = ["B008"]
 "src/t2i_spatial_pipeline/cli.py" = ["B008"]
 "src/t2i_story_pipeline/cli.py" = ["B008"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["t2i_prompt_pipeline", "t2i_spatial_pipeline", "tests"]
+known-first-party = [
+  "t2i_film_style_pipeline",
+  "t2i_prompt_pipeline",
+  "t2i_spatial_pipeline",
+  "t2i_story_pipeline",
+  "tests",
+]
