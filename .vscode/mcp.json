@@ -1,0 +1,19 @@
+{
+  "servers": {
+    "krea2": {
+      "type": "http",
+      "url": "https://krea2.aimy.i-csu.com/mcp",
+      "headers": {
+        "X-Api-Key": "${input:krea2-mcp-api-key}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "krea2-mcp-api-key",
+      "description": "KREA2 MCP API key",
+      "password": true
+    }
+  ]
+}
