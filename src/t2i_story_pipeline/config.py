@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
+from t2i_model_provider.backend import selected_backend_values
 from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.provider import StoryProviderSettings
 
@@ -27,11 +27,7 @@ _ENV_FIELDS = {
 
 def load_story_provider_settings() -> StoryProviderSettings:
     load_dotenv(Path.cwd() / ".env", override=False)
-    values = {
-        field_name: value
-        for environment_name, field_name in _ENV_FIELDS.items()
-        if (value := os.environ.get(environment_name)) is not None
-    }
+    values = selected_backend_values(_ENV_FIELDS)
     try:
         return StoryProviderSettings.model_validate(values)
     except ValidationError as exc:

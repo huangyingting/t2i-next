@@ -1,5 +1,35 @@
 # t2i-prompt-pipeline
 
+## 模型后端
+
+所有现行 pipeline 使用同一个后端选择变量。默认直接调用 OpenAI-compatible
+endpoint：
+
+```dotenv
+T2I_MODEL_BACKEND=openai
+OPENAI_MODEL=gpt-4.1-mini
+OPENAI_API_KEY=...
+```
+
+切换到 GitHub Copilot SDK：
+
+```dotenv
+T2I_MODEL_BACKEND=copilot
+COPILOT_MODEL=auto
+COPILOT_REASONING_EFFORT=high
+COPILOT_OUTPUT_TOKEN_LIMIT=16384
+COPILOT_TIMEOUT_SECONDS=180
+```
+
+Copilot 模式使用已登录的 GitHub Copilot 用户，也支持 SDK 识别的
+`COPILOT_GITHUB_TOKEN`、`GH_TOKEN` 或 `GITHUB_TOKEN`。每个结构化阶段只开放一个
+终端提交工具，不开放文件、终端或网络工具；工具参数沿用当前 Pydantic schema。
+run 会冻结 backend 和模型配置，恢复时不能混用另一个 backend。
+
+Theme 相似度检查仍使用 embeddings API。Copilot 模式若同时设置
+`OPENAI_EMBEDDING_MODEL`，还需保留对应的 `OPENAI_BASE_URL`、凭据与认证配置；
+未启用相似度检查时不需要这些 OpenAI 配置。
+
 ## 原地润色文本文件
 
 `scripts/refine-text-file.py` 使用 `.env` 中共享的 `OPENAI_*` 模型配置，把
@@ -15,20 +45,31 @@ uv run python scripts/refine-text-file.py \
 ## 作品集合电影风格编译器
 
 `t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
-视觉档案，再把档案编译进一个以 `BRIEF` 开始的现行 Story Description。它只建立
-作品级来源关系，不把结果扩展为对导演全部个人风格的模仿，也不复制原作人物、
-演员肖像、对白、剧情、独特道具或具体镜头。
+视觉档案，并在同一命令中生成最终提示词。它自带导演场景的 Theme/Frame 系统
+workflow，不依赖 `story-inputs/film.txt`。它只建立作品级来源关系，不把结果
+扩展为对导演全部个人风格的模仿，也不复制原作人物、演员肖像、对白、剧情、
+独特道具或具体镜头。
 
 ```bash
 uv run t2i-film-style generate "张艺谋" \
   --work "英雄 (2002)" \
   --work "十面埋伏 (2004)" \
-  --brief-file story-inputs/classic-film-erotic-reinterpretation.txt
+  --scene "雨夜室内，两名成年人隔着长桌交谈" \
+  --themes 8 \
+  --frames 1 \
+  --content-level aesthetic
 ```
 
-结构化档案和完整结果写入 `runs/film-style/<run-id>/`；可直接传给
-`t2i-story --prompt-file` 的编译结果写入 `film-style-inputs/`。每次运行使用唯一
-文件名，不覆盖先前生成物。详细接口见
+`--scene` 可省略，省略时自动创作原创电影场景。顶层进度、结构化档案、内部动态
+视觉上下文及 Theme/Frame checkpoint 全部写入 `runs/film-style/<run-id>/`；
+最终提示词写入 `prompts/`。不再创建 `film-style-inputs/`。中断后只需顶层 run ID：
+
+```bash
+uv run t2i-film-style resume RUN_ID
+```
+
+恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
+详细接口见
 [`docs/film-style-pipeline.md`](docs/film-style-pipeline.md)。
 
 ## 独立故事生成器

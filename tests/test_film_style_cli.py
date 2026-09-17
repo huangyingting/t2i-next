@@ -6,6 +6,8 @@ from typer.testing import CliRunner
 
 import t2i_film_style_pipeline.cli as film_style_cli
 from t2i_film_style_pipeline.cli import app
+from t2i_film_style_pipeline.provider import FilmStyleProviderSettings
+from t2i_story_pipeline.provider import StoryProviderSettings
 
 
 def test_film_style_cli_exposes_generate_command() -> None:
@@ -13,38 +15,42 @@ def test_film_style_cli_exposes_generate_command() -> None:
 
     assert result.exit_code == 0
     assert "generate" in result.stdout
+    assert "resume" in result.stdout
     assert "具体作品集合" in result.stdout
 
 
 def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
-    brief = tmp_path / "base.txt"
-    brief.write_text("BRIEF\n\nCreate original stills.", encoding="utf-8")
     captured = {}
 
     async def fake_generate(
         request,
-        *,
-        source_stem,
         settings,
+        rules,
+        *,
         runs_directory,
-        output_directory,
+        prompts_directory,
     ):
         captured["request"] = request
-        captured["source_stem"] = source_stem
+        captured["settings"] = settings
+        captured["rules"] = rules
         captured["runs_directory"] = runs_directory
-        captured["output_directory"] = output_directory
+        captured["prompts_directory"] = prompts_directory
         return SimpleNamespace(
-            result=SimpleNamespace(run_id="film-run"),
-            published=SimpleNamespace(
-                profile_file=runs_directory / "film-run" / "profile.json",
-                prompt_file=output_directory / "compiled.txt",
-            ),
+            run_id="film-run",
+            profile_file=runs_directory / "film-run" / "profile.json",
+            compiled_story_file=runs_directory / "film-run" / "compiled-story.txt",
+            prompt_file=prompts_directory / "prompts.txt",
         )
 
     monkeypatch.setattr(
         film_style_cli,
         "load_film_style_provider_settings",
-        lambda: object(),
+        lambda: FilmStyleProviderSettings(model="test-model"),
+    )
+    monkeypatch.setattr(
+        film_style_cli,
+        "load_story_provider_settings",
+        lambda: StoryProviderSettings(model="test-model"),
     )
     monkeypatch.setattr(film_style_cli, "_generate", fake_generate)
 
@@ -57,26 +63,37 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
             "英雄 (2002)",
             "--work",
             "十面埋伏 (2004)",
-            "--brief-file",
-            str(brief),
-            "--output-dir",
-            str(tmp_path / "outputs"),
+            "--scene",
+            "只生成雨夜室内场景。",
+            "--themes",
+            "4",
+            "--frames",
+            "1",
+            "--prompts-dir",
+            str(tmp_path / "prompts"),
             "--runs-dir",
             str(tmp_path / "runs"),
         ],
     )
 
     assert result.exit_code == 0
-    assert captured["request"].director == "张艺谋"
-    assert [work.year for work in captured["request"].works] == [2002, 2004]
-    assert captured["source_stem"] == "base"
+    assert captured["request"].film_style.director == "张艺谋"
+    assert [
+        work.year for work in captured["request"].film_style.works
+    ] == [2002, 2004]
+    assert captured["request"].scene_direction == "只生成雨夜室内场景。"
+    assert captured["request"].theme_count == 4
+    assert captured["request"].frames_per_theme == 1
+    assert any(
+        "completely standalone image prompt" in rule
+        for rule in captured["rules"].frames
+    )
+    assert captured["prompts_directory"] == tmp_path / "prompts"
     assert "Run：film-run" in result.output
+    assert "叙事提示词：" in result.output
 
 
-def test_generate_rejects_legacy_brief(tmp_path) -> None:
-    brief = tmp_path / "legacy.txt"
-    brief.write_text("not a current Story Description", encoding="utf-8")
-
+def test_generate_no_longer_accepts_brief_file() -> None:
     result = CliRunner().invoke(
         app,
         [
@@ -85,9 +102,18 @@ def test_generate_rejects_legacy_brief(tmp_path) -> None:
             "--work",
             "Film (2000)",
             "--brief-file",
-            str(brief),
+            "story-inputs/film.txt",
         ],
     )
 
-    assert result.exit_code == 1
-    assert "base brief must start" in result.output
+    assert result.exit_code == 2
+    assert "No such option: --brief-file" in result.output
+
+
+def test_generate_help_exposes_scene_not_intermediate_output() -> None:
+    result = CliRunner().invoke(app, ["generate", "--help"])
+
+    assert result.exit_code == 0
+    assert "--scene" in result.output
+    assert "--brief-file" not in result.output
+    assert "--output-dir" not in result.output

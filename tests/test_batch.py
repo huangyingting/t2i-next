@@ -104,7 +104,7 @@ def case(tmp_path, monkeypatch):
         tmp_path / "batch.json",
         ManagedAuthor(spec),
     )
-    monkeypatch.setattr(batch, "OpenAICompatibleProvider", lambda _: value.author)
+    monkeypatch.setattr(batch, "author_model", lambda _: value.author)
     return value
 
 
@@ -125,7 +125,7 @@ def forbid_provider(monkeypatch):
     def unexpected_provider(_config):
         pytest.fail("resumption must not open a provider")
 
-    monkeypatch.setattr(batch, "OpenAICompatibleProvider", unexpected_provider)
+    monkeypatch.setattr(batch, "author_model", unexpected_provider)
 
 
 async def pause_at_attempt_limit(case, limit=1):

@@ -42,9 +42,9 @@ StyleSummaryText = Annotated[
     StringConstraints(min_length=1, max_length=600, strip_whitespace=True),
     AfterValidator(_single_line),
 ]
-BriefText = Annotated[
+SceneDirectionText = Annotated[
     str,
-    StringConstraints(min_length=1, max_length=55000, strip_whitespace=True),
+    StringConstraints(min_length=1, max_length=8000, strip_whitespace=True),
 ]
 CompiledBriefText = Annotated[
     str,
@@ -60,13 +60,10 @@ class FilmWorkReference(Model):
 class FilmStyleRequest(Model):
     director: ShortText
     works: tuple[FilmWorkReference, ...] = Field(min_length=1, max_length=12)
-    base_brief: BriefText
     output_language: str = Field(default="chinese", pattern=r"^(chinese|english)$")
 
     @model_validator(mode="after")
-    def base_brief_uses_current_contract(self) -> FilmStyleRequest:
-        if not self.base_brief.startswith("BRIEF\n\n"):
-            raise ValueError("base brief must start with 'BRIEF\\n\\n'")
+    def works_are_unique(self) -> FilmStyleRequest:
         normalized = {
             (work.title.casefold(), work.year)
             for work in self.works
@@ -77,7 +74,6 @@ class FilmStyleRequest(Model):
 
 
 class FilmStyleProfile(Model):
-    profile_name: ShortText
     style_summary: StyleSummaryText
     work_style_summaries: tuple[StyleSummaryText, ...] = Field(
         min_length=1,

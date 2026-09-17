@@ -30,7 +30,7 @@ from t2i_prompt_pipeline.models import (
 )
 from t2i_prompt_pipeline.persistence import exclusive_file_lock, write_json
 from t2i_prompt_pipeline.pipeline import PromptStudio
-from t2i_prompt_pipeline.providers.openai_compatible import OpenAICompatibleProvider
+from t2i_prompt_pipeline.providers.configured import author_model
 from t2i_prompt_pipeline.store import LocalRunStore
 from t2i_prompt_pipeline.theme_similarity import ThemeSimilarityAnalyzer
 
@@ -173,7 +173,7 @@ async def run_batch(
         deadline = asyncio.timeout(_remaining_seconds(state))
         try:
             async with deadline:
-                async with OpenAICompatibleProvider(config.provider) as author:
+                async with author_model(config.provider) as author:
                     similarity = (
                         ThemeSimilarityAnalyzer(author, state.settings.theme_similarity)
                         if state.settings.theme_similarity is not None

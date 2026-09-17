@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -20,6 +22,11 @@ from pydantic import (
     model_validator,
 )
 
+from t2i_model_provider import (
+    CopilotGenerationError,
+    CopilotStructuredModel,
+    ModelBackend,
+)
 from t2i_story_pipeline.errors import (
     StoryConfigurationError,
     StoryProviderAuthenticationError,
@@ -65,6 +72,7 @@ class ReasoningEffort(StrEnum):
 class StoryProviderSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    backend: ModelBackend = ModelBackend.OPENAI
     base_url: str = "https://api.openai.com/v1"
     api_key_env: str = "OPENAI_API_KEY"
     auth_mode: ProviderAuthMode = ProviderAuthMode.BEARER
@@ -326,3 +334,78 @@ class OpenAIStoryModel(StoryModel):
             if isinstance(value, int) and not isinstance(value, bool) and value >= 0
         }
         return TokenUsage.model_validate(values)
+
+
+class CopilotStoryModel(StoryModel):
+    """Generate typed story objects through GitHub Copilot."""
+
+    def __init__(self, settings: StoryProviderSettings) -> None:
+        self._model = CopilotStructuredModel(settings)
+
+    async def __aenter__(self) -> CopilotStoryModel:
+        try:
+            await self._model.__aenter__()
+        except CopilotGenerationError as exc:
+            raise StoryProviderError(str(exc)) from exc
+        return self
+
+    async def __aexit__(self, *args: object) -> None:
+        await self._model.__aexit__(*args)
+
+    async def generate(
+        self,
+        *,
+        stage: StoryStage,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+    ) -> ModelResponse:
+        try:
+            response = await self._model.generate(
+                messages=messages,
+                response_model=response_model,
+                max_output_tokens=max_output_tokens,
+            )
+        except CopilotGenerationError as exc:
+            usage = TokenUsage(
+                prompt_tokens=exc.prompt_tokens,
+                completion_tokens=exc.completion_tokens,
+                total_tokens=exc.total_tokens,
+            )
+            if exc.truncated:
+                raise StoryProviderTruncatedOutputError(
+                    f"{stage.value} 输出达到 Copilot token 上限",
+                    raw_content=exc.raw_content,
+                    usage=usage,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            if exc.raw_content or exc.validation_issues:
+                raise StoryStructuredOutputError(
+                    f"{stage.value} Copilot 返回内容不符合 "
+                    f"{response_model.__name__}",
+                    raw_content=exc.raw_content,
+                    usage=usage,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            raise StoryProviderError(str(exc)) from exc
+        return ModelResponse(
+            value=response.value,
+            usage=TokenUsage(
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+            ),
+        )
+
+
+@asynccontextmanager
+async def story_model(
+    settings: StoryProviderSettings,
+) -> AsyncIterator[StoryModel]:
+    model = (
+        CopilotStoryModel(settings)
+        if settings.backend == ModelBackend.COPILOT
+        else OpenAIStoryModel(settings)
+    )
+    async with model:
+        yield model

@@ -22,8 +22,8 @@ from t2i_story_pipeline.models import (
     StoryRuleSet,
 )
 from t2i_story_pipeline.provider import (
-    OpenAIStoryModel,
     StoryProviderSettings,
+    story_model,
 )
 from t2i_story_pipeline.run_store import (
     CompletedStoryRun,
@@ -284,7 +284,7 @@ async def _generate(
         concurrency=concurrency,
     )
     store = LocalStoryRunStore(runs_directory, prompts_directory)
-    async with OpenAIStoryModel(settings) as model:
+    async with story_model(settings) as model:
         return await StoryStudio(
             model,
             store,
@@ -301,7 +301,7 @@ async def _resume(
     store: LocalStoryRunStore,
 ) -> CompletedStoryRun:
     rules = store.inspect(run_id).rules
-    async with OpenAIStoryModel(provider) as model:
+    async with story_model(provider) as model:
         return await StoryStudio(
             model,
             store,

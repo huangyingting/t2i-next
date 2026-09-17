@@ -38,9 +38,7 @@ from t2i_prompt_pipeline.models import (
     RunSummary,
 )
 from t2i_prompt_pipeline.pipeline import PromptStudio
-from t2i_prompt_pipeline.providers.openai_compatible import (
-    OpenAICompatibleProvider,
-)
+from t2i_prompt_pipeline.providers.configured import author_model
 from t2i_prompt_pipeline.safe_avant_garde_batch import (
     build_safe_avant_garde_tasks,
     run_safe_avant_garde_batch,
@@ -522,7 +520,7 @@ async def _run(config: AppConfig) -> ArchivedRun:
         config.runs_directory,
         config.prompts_directory,
     )
-    async with OpenAICompatibleProvider(config.provider) as author:
+    async with author_model(config.provider) as author:
         similarity = (
             ThemeSimilarityAnalyzer(author, config.run_settings.theme_similarity)
             if config.run_settings.theme_similarity is not None
@@ -544,7 +542,7 @@ async def _resume(
     settings: RunSettings,
     store: LocalRunStore,
 ) -> ArchivedRun:
-    async with OpenAICompatibleProvider(provider) as author:
+    async with author_model(provider) as author:
         similarity = (
             ThemeSimilarityAnalyzer(author, settings.theme_similarity)
             if settings.theme_similarity is not None

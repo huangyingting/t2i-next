@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal, Protocol, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 
 from t2i_prompt_pipeline.models import GenerationStage, TokenUsage
+from t2i_prompt_pipeline.theme_similarity import EmbeddingResponse
 
 
 class ChatMessage(BaseModel):
@@ -35,3 +37,11 @@ class AuthorModel(Protocol):
         response_model: type[ResponseT],
         max_output_tokens: int,
     ) -> ModelResponse[ResponseT]: ...
+
+    async def embed(
+        self,
+        texts: Sequence[str],
+        *,
+        model: str,
+        dimensions: int | None,
+    ) -> EmbeddingResponse: ...

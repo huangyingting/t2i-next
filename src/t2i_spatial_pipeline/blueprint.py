@@ -29,7 +29,7 @@ from .layers import (
     SupportRealization,
     stable_hash,
 )
-from .provider import OpenAISpatialModel, generate_with_repair
+from .provider import generate_with_repair, spatial_model
 
 Identifier = Annotated[
     str,
@@ -986,7 +986,7 @@ def presentation_footwear_phrase(recipe: RoleStylingRecipe) -> str:
 
 def blueprint_inference_config_hash(settings: SpatialProviderSettings) -> str:
     payload = {
-        "base_url": settings.base_url.rstrip("/"),
+        "backend": settings.backend.value,
         "model": settings.model,
         "thinking_mode": (
             settings.thinking_mode.value if settings.thinking_mode is not None else None
@@ -996,9 +996,11 @@ def blueprint_inference_config_hash(settings: SpatialProviderSettings) -> str:
             if settings.reasoning_effort is not None
             else None
         ),
-        "temperature": settings.temperature,
         "max_output_tokens": min(32768, settings.output_token_limit),
     }
+    if settings.backend.value == "openai":
+        payload["base_url"] = settings.base_url.rstrip("/")
+        payload["temperature"] = settings.temperature
     return stable_hash(payload)
 
 
@@ -1020,7 +1022,7 @@ async def infer_creative_blueprint(
         raise ValueError("creative blueprint scene count must be between 1 and 20")
     settings = load_spatial_provider_settings()
     brief_hash = hashlib.sha256(brief.strip().encode()).hexdigest()
-    async with OpenAISpatialModel(settings) as model:
+    async with spatial_model(settings) as model:
         normalization_response, normalization_rejections = (
             await generate_with_repair(
                 model,

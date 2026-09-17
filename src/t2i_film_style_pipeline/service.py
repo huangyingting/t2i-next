@@ -35,17 +35,15 @@ class FilmStyleStudio:
         model: FilmStyleModel,
         *,
         runs_directory: Path = Path("runs") / "film-style",
-        output_directory: Path = Path("film-style-inputs"),
     ) -> None:
         self._model = model
         self._runs_directory = runs_directory
-        self._output_directory = output_directory
 
     async def run(
         self,
         request: FilmStyleRequest,
         *,
-        source_stem: str,
+        scene_direction: str | None = None,
     ) -> CompletedFilmStyleRun:
         response = await self._model.generate(
             messages=profile_messages(request),
@@ -56,7 +54,11 @@ class FilmStyleStudio:
             raise TypeError("film-style model returned an unexpected value")
         profile = _normalize_source_labels(response.value, request)
         run_id = _new_run_id()
-        compiled = compile_story_description(request, profile)
+        compiled = compile_story_description(
+            request,
+            profile,
+            scene_direction=scene_direction,
+        )
         result = FilmStyleResult(
             run_id=run_id,
             request=request,
@@ -64,14 +66,9 @@ class FilmStyleStudio:
             compiled_story=compiled,
             usage=response.usage,
         )
-        output_name = (
-            f"{_slug(source_stem)}__{_slug(request.director)}"
-            f"__film_style__{run_id}.txt"
-        )
         published = publish_film_style(
             result,
             runs_directory=self._runs_directory,
-            prompt_file=self._output_directory / output_name,
         )
         return CompletedFilmStyleRun(result=result, published=published)
 
@@ -79,11 +76,6 @@ class FilmStyleStudio:
 def _new_run_id() -> str:
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     return f"{timestamp}-{secrets.token_hex(4)}"
-
-
-def _slug(value: str) -> str:
-    normalized = re.sub(r"[^\w]+", "_", value.casefold()).strip("_")
-    return normalized[:80] or "film_style"
 
 
 def _normalize_source_labels(

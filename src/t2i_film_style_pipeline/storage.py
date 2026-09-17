@@ -1,4 +1,4 @@
-"""Atomic persistence for film-style runs and compiled Story Descriptions."""
+"""Atomic persistence for film-style profile checkpoints."""
 
 from __future__ import annotations
 
@@ -16,20 +16,18 @@ from t2i_film_style_pipeline.models import FilmStyleResult
 class PublishedFilmStyle:
     run_directory: Path
     profile_file: Path
-    prompt_file: Path
+    compiled_story_file: Path
 
 
 def publish_film_style(
     result: FilmStyleResult,
     *,
     runs_directory: Path,
-    prompt_file: Path,
 ) -> PublishedFilmStyle:
     run_directory = (runs_directory / result.run_id).resolve()
     profile_file = run_directory / "profile.json"
-    prompt_file = prompt_file.resolve()
+    compiled_story_file = run_directory / "compiled-story.txt"
     staging_directory: Path | None = None
-    prompt_published = False
     try:
         runs_directory = runs_directory.resolve()
         runs_directory.mkdir(parents=True, exist_ok=True)
@@ -54,15 +52,14 @@ def publish_film_style(
             staging_directory / "result.json",
             result.model_dump_json(indent=2) + "\n",
         )
+        _write_file(
+            staging_directory / "compiled-story.txt",
+            result.compiled_story.rstrip() + "\n",
+        )
         _fsync_directory(staging_directory)
-        _atomic_write(prompt_file, result.compiled_story.rstrip() + "\n")
-        prompt_published = True
         _commit_run_directory(staging_directory, run_directory)
         staging_directory = None
     except OSError as exc:
-        if prompt_published:
-            prompt_file.unlink(missing_ok=True)
-            _fsync_directory(prompt_file.parent)
         if staging_directory is not None:
             shutil.rmtree(staging_directory, ignore_errors=True)
         raise FilmStyleStorageError(
@@ -71,7 +68,7 @@ def publish_film_style(
     return PublishedFilmStyle(
         run_directory=run_directory,
         profile_file=profile_file,
-        prompt_file=prompt_file,
+        compiled_story_file=compiled_story_file,
     )
 
 
@@ -85,30 +82,6 @@ def _write_file(path: Path, text: str) -> None:
 def _commit_run_directory(staging: Path, destination: Path) -> None:
     os.replace(staging, destination)
     _fsync_directory(destination.parent)
-
-
-def _atomic_write(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary: Path | None = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            mode="w",
-            encoding="utf-8",
-            prefix=f".{path.name}-",
-            suffix=".tmp",
-            dir=path.parent,
-            delete=False,
-        ) as handle:
-            temporary = Path(handle.name)
-            handle.write(text)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary, path)
-        _fsync_directory(path.parent)
-    except OSError:
-        if temporary is not None:
-            temporary.unlink(missing_ok=True)
-        raise
 
 
 def _fsync_directory(path: Path) -> None:

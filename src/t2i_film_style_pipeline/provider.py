@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
 from enum import StrEnum
@@ -22,6 +24,11 @@ from t2i_film_style_pipeline.errors import (
     FilmStyleStructuredOutputError,
 )
 from t2i_film_style_pipeline.models import TokenUsage
+from t2i_model_provider import (
+    CopilotGenerationError,
+    CopilotStructuredModel,
+    ModelBackend,
+)
 
 
 class ChatMessage(BaseModel):
@@ -53,6 +60,7 @@ class ReasoningEffort(StrEnum):
 class FilmStyleProviderSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    backend: ModelBackend = ModelBackend.OPENAI
     base_url: str = "https://api.openai.com/v1"
     api_key_env: str = "OPENAI_API_KEY"
     auth_mode: ProviderAuthMode = ProviderAuthMode.BEARER
@@ -300,3 +308,69 @@ class OpenAIFilmStyleModel:
             completion_tokens=count("completion_tokens"),
             total_tokens=count("total_tokens"),
         )
+
+
+class CopilotFilmStyleModel:
+    """Generate a film-style profile through GitHub Copilot."""
+
+    def __init__(self, settings: FilmStyleProviderSettings) -> None:
+        self._model = CopilotStructuredModel(settings)
+
+    async def __aenter__(self) -> CopilotFilmStyleModel:
+        try:
+            await self._model.__aenter__()
+        except CopilotGenerationError as exc:
+            raise FilmStyleProviderError(str(exc)) from exc
+        return self
+
+    async def __aexit__(self, *args: object) -> None:
+        await self._model.__aexit__(*args)
+
+    async def generate(
+        self,
+        *,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+    ) -> ModelResponse:
+        try:
+            response = await self._model.generate(
+                messages=messages,
+                response_model=response_model,
+                max_output_tokens=max_output_tokens,
+            )
+        except CopilotGenerationError as exc:
+            if exc.truncated:
+                raise FilmStyleProviderTruncatedOutputError(
+                    str(exc),
+                    raw_content=exc.raw_content,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            if exc.raw_content or exc.validation_issues:
+                raise FilmStyleStructuredOutputError(
+                    str(exc),
+                    raw_content=exc.raw_content,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            raise FilmStyleProviderError(str(exc)) from exc
+        return ModelResponse(
+            value=response.value,
+            usage=TokenUsage(
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+            ),
+        )
+
+
+@asynccontextmanager
+async def film_style_model(
+    settings: FilmStyleProviderSettings,
+) -> AsyncIterator[FilmStyleModel]:
+    model = (
+        CopilotFilmStyleModel(settings)
+        if settings.backend == ModelBackend.COPILOT
+        else OpenAIFilmStyleModel(settings)
+    )
+    async with model:
+        yield model

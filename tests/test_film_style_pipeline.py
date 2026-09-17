@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
+from t2i_film_style_pipeline.authoring_rules import resolve_film_style_rules
 from t2i_film_style_pipeline.compiler import (
     compile_story_description,
     source_attribution,
@@ -31,14 +33,12 @@ def make_request() -> FilmStyleRequest:
             FilmWorkReference(title="英雄", year=2002),
             FilmWorkReference(title="十面埋伏", year=2004),
         ),
-        base_brief="BRIEF\n\nCreate original adult wuxia stills.",
         output_language="chinese",
     )
 
 
 def make_profile() -> FilmStyleProfile:
     return FilmStyleProfile(
-        profile_name="单色礼序",
         style_summary="以单色空间、中轴秩序和克制动作建立史诗尺度。",
         work_style_summaries=(
             "用饱和单色章节、纪念碑式空间和书法性运动组织人物冲突。",
@@ -75,13 +75,7 @@ def test_parse_work_reference_accepts_optional_year() -> None:
     )
 
 
-def test_request_requires_current_story_contract_and_unique_works() -> None:
-    with pytest.raises(ValidationError, match="base brief must start"):
-        FilmStyleRequest(
-            director="Director",
-            works=(FilmWorkReference(title="Film"),),
-            base_brief="legacy brief",
-        )
+def test_request_requires_unique_works() -> None:
     with pytest.raises(ValidationError, match="works must be unique"):
         FilmStyleRequest(
             director="Director",
@@ -89,22 +83,30 @@ def test_request_requires_current_story_contract_and_unique_works() -> None:
                 FilmWorkReference(title="Film", year=2000),
                 FilmWorkReference(title="film", year=2000),
             ),
-            base_brief="BRIEF\n\nCurrent brief.",
         )
 
 
 def test_compile_story_description_injects_profile_after_brief_header() -> None:
     request = make_request()
-    compiled = compile_story_description(request, make_profile())
+    compiled = compile_story_description(
+        request,
+        make_profile(),
+        scene_direction="只生成雨夜室内场景。",
+    )
 
-    assert compiled.startswith("BRIEF\n\nWORK-SPECIFIC FILM STYLE PROFILE")
-    assert "张艺谋执导的作品《英雄》（2002）、《十面埋伏》（2004）" in compiled
-    assert "“单色礼序”" in compiled
-    assert "逐部电影风格总结" in compiled
+    assert compiled.startswith("BRIEF\n\nWORK-SPECIFIC VISUAL CONTEXT")
+    assert "张艺谋导演的《英雄》（2002）、《十面埋伏》（2004）" in compiled
+    assert "逐部作品视觉证据" in compiled
     assert "《英雄》（2002）：用饱和单色章节" in compiled
-    assert "作品集合风格总结：" in compiled
-    assert "每个 Frame 的第一分句" in compiled
-    assert compiled.endswith("Create original adult wuxia stills.")
+    assert (
+        "这是一个采用张艺谋导演的《英雄》（2002）、"
+        "《十面埋伏》（2004）视觉风格的原创电影场景。"
+    ) in compiled
+    assert "只生成雨夜室内场景。" in compiled
+    assert "生成与输出规则" not in compiled
+    assert "母风格名称" not in compiled
+    assert "作品集合风格总结：" not in compiled
+    assert "story-inputs/film.txt" not in compiled
 
 
 def test_profile_prompt_uses_only_work_metadata() -> None:
@@ -113,8 +115,21 @@ def test_profile_prompt_uses_only_work_metadata() -> None:
 
     assert payload["director"] == "张艺谋"
     assert payload["works"][0] == {"title": "英雄", "year": 2002}
-    assert "base_brief" not in payload
+    assert set(payload) == {"director", "works", "output_language", "task"}
     assert "unrestricted personal style" in messages[0].content
+    assert "invented style names" in messages[0].content
+
+
+def test_director_rules_own_theme_and_frame_workflow() -> None:
+    from t2i_story_pipeline.models import StoryRequest
+
+    rules = resolve_film_style_rules(StoryRequest(story="Director scene context"))
+
+    assert any("fixed Theme-ID menu" in rule for rule in rules.themes)
+    assert any("completely standalone image prompt" in rule for rule in rules.frames)
+    assert any("aspect ratio, resolution" in rule for rule in rules.frames)
+    assert any("Never expose internal terms" in rule for rule in rules.frames)
+    assert not (Path(__file__).parents[1] / "story-inputs" / "film.txt").exists()
 
 
 @pytest.mark.asyncio
@@ -131,20 +146,24 @@ async def test_studio_publishes_profile_run_and_compiled_story(tmp_path) -> None
     completed = await FilmStyleStudio(
         FakeModel(),
         runs_directory=tmp_path / "runs",
-        output_directory=tmp_path / "outputs",
-    ).run(make_request(), source_stem="hero-erotic")
+    ).run(make_request(), scene_direction="只生成雨夜室内场景。")
 
     assert completed.result.profile == profile
     assert completed.result.usage.total_tokens == 42
-    assert completed.published.prompt_file.exists()
-    assert "张艺谋" in completed.published.prompt_file.name
-    assert completed.result.run_id in completed.published.prompt_file.name
+    assert completed.published.compiled_story_file.exists()
+    assert completed.published.compiled_story_file.name == "compiled-story.txt"
+    assert (
+        completed.published.compiled_story_file.parent
+        == completed.published.run_directory
+    )
     assert completed.published.profile_file.exists()
     persisted = json.loads(completed.published.profile_file.read_text("utf-8"))
-    assert persisted["profile_name"] == "单色礼序"
-    assert completed.published.prompt_file.read_text("utf-8").startswith(
-        "BRIEF\n\nWORK-SPECIFIC FILM STYLE PROFILE"
+    assert persisted["style_summary"] == profile.style_summary
+    assert "profile_name" not in persisted
+    assert completed.published.compiled_story_file.read_text("utf-8").startswith(
+        "BRIEF\n\nWORK-SPECIFIC VISUAL CONTEXT"
     )
+    assert "只生成雨夜室内场景。" in completed.result.compiled_story
 
 
 @pytest.mark.asyncio
@@ -166,8 +185,7 @@ async def test_studio_strips_repeated_source_labels_from_summaries(tmp_path) -> 
     completed = await FilmStyleStudio(
         FakeModel(),
         runs_directory=tmp_path / "runs",
-        output_directory=tmp_path / "outputs",
-    ).run(make_request(), source_stem="base")
+    ).run(make_request())
 
     assert completed.result.profile.style_summary == "单色空间与中轴秩序。"
     assert completed.result.profile.work_style_summaries == (
@@ -195,8 +213,7 @@ async def test_studio_replaces_meta_summary_with_visual_work_summary(
     completed = await FilmStyleStudio(
         FakeModel(),
         runs_directory=tmp_path / "runs",
-        output_directory=tmp_path / "outputs",
-    ).run(make_request(), source_stem="base")
+    ).run(make_request())
 
     summary = completed.result.profile.style_summary
     assert "张艺谋" not in summary
@@ -210,7 +227,6 @@ async def test_single_work_uses_complete_per_film_summary(tmp_path) -> None:
     request = FilmStyleRequest(
         director="张艺谋",
         works=(FilmWorkReference(title="英雄", year=2002),),
-        base_brief="BRIEF\n\nCreate original stills.",
     )
     profile = make_profile().model_copy(
         update={
@@ -228,8 +244,7 @@ async def test_single_work_uses_complete_per_film_summary(tmp_path) -> None:
     completed = await FilmStyleStudio(
         FakeModel(),
         runs_directory=tmp_path / "runs",
-        output_directory=tmp_path / "outputs",
-    ).run(request, source_stem="base")
+    ).run(request)
 
     assert completed.result.profile.style_summary == (
         "单色章节、对称构图与书法性动作形成完整风格总结。"
@@ -243,7 +258,6 @@ async def test_single_work_opening_summary_uses_complete_first_sentence(
     request = FilmStyleRequest(
         director="张艺谋",
         works=(FilmWorkReference(title="英雄", year=2002),),
-        base_brief="BRIEF\n\nCreate original stills.",
     )
     profile = make_profile().model_copy(
         update={
@@ -260,8 +274,7 @@ async def test_single_work_opening_summary_uses_complete_first_sentence(
     completed = await FilmStyleStudio(
         FakeModel(),
         runs_directory=tmp_path / "runs",
-        output_directory=tmp_path / "outputs",
-    ).run(request, source_stem="base")
+    ).run(request)
 
     assert completed.result.profile.style_summary == (
         "单色章节与中轴构图建立视觉秩序。"
@@ -271,52 +284,27 @@ async def test_single_work_opening_summary_uses_complete_first_sentence(
     )
 
 
-def test_compiler_source_attribution_overrides_base_blanket_ban() -> None:
+def test_compiler_requires_one_direct_source_sentence() -> None:
     compiled = compile_story_description(make_request(), make_profile())
 
-    assert "唯一来源署名优先于基础 brief" in compiled
-    assert "该例外只适用于这一次来源署名" in compiled
+    source_sentence = (
+        "这是一个采用张艺谋导演的《英雄》（2002）、"
+        "《十面埋伏》（2004）视觉风格的原创电影场景。"
+    )
+    assert compiled.count(source_sentence) == 1
 
 
 def test_english_source_attribution_is_work_specific() -> None:
     request = FilmStyleRequest(
         director="Jane Director",
         works=(FilmWorkReference(title="Example", year=1999),),
-        base_brief="BRIEF\n\nCreate original stills.",
         output_language="english",
     )
 
     assert source_attribution(request) == "Example (1999), directed by Jane Director"
 
 
-def test_compiled_story_can_exceed_base_brief_limit() -> None:
-    base_brief = "BRIEF\n\n" + ("x" * (55000 - len("BRIEF\n\n")))
-    request = FilmStyleRequest(
-        director="Director",
-        works=(FilmWorkReference(title="Film"),),
-        base_brief=base_brief,
-    )
-    profile = make_profile().model_copy(
-        update={
-            "work_style_summaries": (
-                "单色章节与书法性动作形成完整风格总结。",
-            ),
-        }
-    )
-    compiled = compile_story_description(request, profile)
-
-    result = FilmStyleResult(
-        run_id="run",
-        request=request,
-        profile=profile,
-        compiled_story=compiled,
-        usage=TokenUsage(),
-    )
-
-    assert len(result.compiled_story) > 55000
-
-
-def test_publish_removes_prompt_when_run_commit_fails(
+def test_publish_removes_staging_when_run_commit_fails(
     tmp_path,
     monkeypatch,
 ) -> None:
@@ -328,8 +316,6 @@ def test_publish_removes_prompt_when_run_commit_fails(
         compiled_story=compile_story_description(request, make_profile()),
         usage=TokenUsage(),
     )
-    prompt_file = tmp_path / "outputs" / "compiled.txt"
-
     def fail_commit(_staging, _destination):
         raise OSError("commit failed")
 
@@ -342,9 +328,7 @@ def test_publish_removes_prompt_when_run_commit_fails(
         publish_film_style(
             result,
             runs_directory=tmp_path / "runs",
-            prompt_file=prompt_file,
         )
 
-    assert not prompt_file.exists()
     assert not (tmp_path / "runs" / "run").exists()
     assert not list((tmp_path / "runs").glob(".run-*.tmp"))

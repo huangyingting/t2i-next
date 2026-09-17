@@ -7,11 +7,13 @@ import json
 import os
 import re
 import unicodedata
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from enum import StrEnum
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, Protocol, TypeVar
 
 import httpx
 from pydantic import (
@@ -22,6 +24,11 @@ from pydantic import (
     model_validator,
 )
 
+from t2i_model_provider import (
+    CopilotGenerationError,
+    CopilotStructuredModel,
+    ModelBackend,
+)
 from t2i_spatial_pipeline.errors import (
     SpatialConfigurationError,
     SpatialProviderError,
@@ -69,6 +76,7 @@ class ReasoningEffort(StrEnum):
 class SpatialProviderSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    backend: ModelBackend = ModelBackend.OPENAI
     base_url: str = "https://api.openai.com/v1"
     api_key_env: str = "OPENAI_API_KEY"
     auth_mode: ProviderAuthMode = ProviderAuthMode.BEARER
@@ -94,6 +102,17 @@ ResponseT = TypeVar("ResponseT", bound=BaseModel)
 class ModelResponse:
     value: BaseModel
     usage: TokenUsage
+
+
+class SpatialModel(Protocol):
+    async def generate(
+        self,
+        *,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+        validation_context: dict[str, object] | None = None,
+    ) -> ModelResponse: ...
 
 
 _SCHEMA_MAP_KEYS = frozenset(
@@ -331,8 +350,90 @@ class OpenAISpatialModel:
         return TokenUsage.model_validate(values)
 
 
+class CopilotSpatialModel:
+    """Generate typed spatial blueprints through GitHub Copilot."""
+
+    def __init__(self, settings: SpatialProviderSettings) -> None:
+        self._model = CopilotStructuredModel(settings)
+
+    async def __aenter__(self) -> CopilotSpatialModel:
+        try:
+            await self._model.__aenter__()
+        except CopilotGenerationError as exc:
+            raise SpatialProviderError(str(exc)) from exc
+        return self
+
+    async def __aexit__(self, *args: object) -> None:
+        await self._model.__aexit__(*args)
+
+    async def generate(
+        self,
+        *,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+        validation_context: dict[str, object] | None = None,
+    ) -> ModelResponse:
+        try:
+            response = await self._model.generate(
+                messages=messages,
+                response_model=response_model,
+                max_output_tokens=max_output_tokens,
+                validation_context=validation_context,
+                argument_transform=_normalize_payload_punctuation,
+            )
+        except CopilotGenerationError as exc:
+            if exc.truncated:
+                raise SpatialProviderTruncatedOutputError(
+                    str(exc),
+                    raw_content=exc.raw_content,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            if exc.raw_content or exc.validation_issues:
+                raise SpatialStructuredOutputError(
+                    str(exc),
+                    raw_content=exc.raw_content,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            raise SpatialProviderError(str(exc)) from exc
+        return ModelResponse(
+            value=response.value,
+            usage=TokenUsage(
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+            ),
+        )
+
+
+@asynccontextmanager
+async def spatial_model(
+    settings: SpatialProviderSettings,
+) -> AsyncIterator[SpatialModel]:
+    model = (
+        CopilotSpatialModel(settings)
+        if settings.backend == ModelBackend.COPILOT
+        else OpenAISpatialModel(settings)
+    )
+    async with model:
+        yield model
+
+
+def _normalize_payload_punctuation(value: Any) -> Any:
+    if isinstance(value, str):
+        return normalize_ascii_punctuation(value)
+    if isinstance(value, list):
+        return [_normalize_payload_punctuation(item) for item in value]
+    if isinstance(value, dict):
+        return {
+            key: _normalize_payload_punctuation(item)
+            for key, item in value.items()
+        }
+    return value
+
+
 async def generate_with_repair(
-    model: OpenAISpatialModel,
+    model: SpatialModel,
     *,
     system: str,
     payload: object,

@@ -8,6 +8,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
+from t2i_model_provider.backend import (
+    ModelBackend,
+    selected_backend_values,
+)
 from t2i_prompt_pipeline.authoring_rules import resolve_rules
 from t2i_prompt_pipeline.errors import ConfigurationError
 from t2i_prompt_pipeline.models import (
@@ -88,11 +92,17 @@ def load_provider_settings(
 ) -> ProviderSettings:
     if load_dotenv_file:
         load_environment()
-    values = {
-        field_name: value
-        for environment_name, field_name in _PROVIDER_ENV_FIELDS.items()
-        if (value := os.environ.get(environment_name)) is not None
-    }
+    values = selected_backend_values(_PROVIDER_ENV_FIELDS)
+    if values["backend"] == ModelBackend.COPILOT.value:
+        for environment_name in (
+            "OPENAI_BASE_URL",
+            "OPENAI_API_KEY_ENV",
+            "OPENAI_AUTH_MODE",
+            "OPENAI_EMBEDDING_MODEL",
+            "OPENAI_EMBEDDING_DIMENSIONS",
+        ):
+            if (value := os.environ.get(environment_name)) is not None:
+                values[_PROVIDER_ENV_FIELDS[environment_name]] = value
     try:
         return ProviderSettings.model_validate(values)
     except ValidationError as exc:

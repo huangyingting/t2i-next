@@ -67,7 +67,6 @@ async def test_provider_sends_strict_profile_schema(monkeypatch) -> None:
     schema = captured["response_format"]["json_schema"]["schema"]
     assert schema["additionalProperties"] is False
     assert set(schema["required"]) == {
-        "profile_name",
         "style_summary",
         "work_style_summaries",
         "palette",

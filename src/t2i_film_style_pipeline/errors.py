@@ -50,3 +50,14 @@ class FilmStyleProviderHTTPError(FilmStyleProviderError):
 
 class FilmStyleStorageError(FilmStylePipelineError):
     """A run record or compiled story description could not be persisted."""
+
+
+class FilmStyleRunIncompleteError(FilmStylePipelineError):
+    """A resumable film-style prompt run stopped before completion."""
+
+    def __init__(self, run_id: str, cause: str) -> None:
+        self.run_id = run_id
+        self.cause = cause
+        super().__init__(
+            f"Run {run_id} 尚未完成：{cause}；请执行 resume {run_id}"
+        )

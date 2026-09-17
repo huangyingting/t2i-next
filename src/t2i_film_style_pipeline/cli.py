@@ -1,4 +1,4 @@
-"""CLI for work-specific film-style profile generation."""
+"""CLI for one-command, resumable film-style prompt generation."""
 
 from __future__ import annotations
 
@@ -8,25 +8,44 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
+from t2i_film_style_pipeline.authoring_rules import resolve_film_style_rules
 from t2i_film_style_pipeline.config import load_film_style_provider_settings
-from t2i_film_style_pipeline.errors import FilmStylePipelineError
+from t2i_film_style_pipeline.errors import (
+    FilmStyleConfigurationError,
+    FilmStylePipelineError,
+    FilmStyleRunIncompleteError,
+)
 from t2i_film_style_pipeline.models import (
     FilmStyleRequest,
     parse_work_reference,
 )
-from t2i_film_style_pipeline.provider import OpenAIFilmStyleModel
-from t2i_film_style_pipeline.service import FilmStyleStudio
+from t2i_film_style_pipeline.pipeline import (
+    CompletedFilmStylePromptRun,
+    FilmStylePipelineSettings,
+    FilmStylePromptRequest,
+    FilmStylePromptStudio,
+    LocalFilmStyleRunStore,
+)
+from t2i_film_style_pipeline.provider import (
+    FilmStyleProviderSettings,
+    film_style_model,
+)
+from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.errors import StoryPipelineError
+from t2i_story_pipeline.models import ContentLevel, OutputLanguage, StoryRuleSet
+from t2i_story_pipeline.provider import StoryProviderSettings, story_model
+from t2i_story_pipeline.run_store import StoryRunSettings
 
 app = typer.Typer(
     name="t2i-film-style",
-    help="从导演的具体作品集合提炼可执行视觉档案并编译 Story Description。",
+    help="从具体作品集合生成可恢复的最终电影静帧提示词。",
     no_args_is_help=True,
 )
 
 
 @app.callback()
 def main() -> None:
-    """Compile work-specific film language for the story pipeline."""
+    """Generate final prompts from work-specific film language."""
 
 
 @app.command("generate")
@@ -37,51 +56,123 @@ def generate_command(
         "--work",
         help="具体作品，可重复；支持 TITLE 或 TITLE (YEAR)。",
     ),
-    brief_file: Path = typer.Option(
-        ...,
-        "--brief-file",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        readable=True,
-        resolve_path=True,
-        help="以 BRIEF 开头的基础 Story Description。",
+    scene: str | None = typer.Option(
+        None,
+        "--scene",
+        help="可选场景方向；省略时自动创作原创电影场景。",
     ),
-    output_language: str = typer.Option(
-        "chinese",
+    themes: int = typer.Option(
+        1,
+        "--themes",
+        min=1,
+        max=100,
+        help="微型故事主题数。",
+    ),
+    frames: int = typer.Option(
+        6,
+        "--frames",
+        min=1,
+        max=6,
+        help="每个主题的平行画面数。",
+    ),
+    female_count: int | None = typer.Option(
+        None,
+        "--female-count",
+        min=0,
+        max=8,
+        help="可选女性人数约束；默认由场景需要决定。",
+    ),
+    male_count: int | None = typer.Option(
+        None,
+        "--male-count",
+        min=0,
+        max=8,
+        help="可选男性人数约束；默认由场景需要决定。",
+    ),
+    concurrency: int = typer.Option(
+        8,
+        "--concurrency",
+        min=1,
+        max=32,
+        help="并行生成主题画面序列的数量。",
+    ),
+    content_level: ContentLevel = typer.Option(
+        ContentLevel.AESTHETIC,
+        "--content-level",
+        help="内容尺度：aesthetic、erotic 或 hardcore。",
+    ),
+    output_language: OutputLanguage = typer.Option(
+        OutputLanguage.CHINESE,
         "--language",
-        help="视觉档案语言：chinese 或 english。",
+        help="视觉档案与最终提示词语言。",
     ),
-    output_dir: Path = typer.Option(
-        Path("film-style-inputs"),
-        "--output-dir",
+    prompts_dir: Path = typer.Option(
+        Path("prompts"),
+        "--prompts-dir",
         file_okay=False,
-        help="保存可直接传给 t2i-story 的编译后 Story Description。",
+        help="按运行日期保存最终 TXT 提示词的根目录。",
     ),
     runs_dir: Path = typer.Option(
         Path("runs") / "film-style",
         "--runs-dir",
         file_okay=False,
-        help="保存请求、结构化视觉档案和完整结果。",
+        help="保存顶层进度及 profile、Theme、Frame checkpoints。",
+    ),
+    rules_dir: Path | None = typer.Option(
+        None,
+        "--rules-dir",
+        file_okay=False,
+        help="可选 story 用户规则目录；默认使用 story-inputs/rules/。",
     ),
 ) -> None:
-    """Generate one reusable style profile and compile a story input."""
+    """Generate the profile and final prompts in one resumable command."""
     try:
-        base_brief = brief_file.read_text(encoding="utf-8").strip()
-        request = FilmStyleRequest(
-            director=director,
-            works=tuple(parse_work_reference(item) for item in work),
-            base_brief=base_brief,
+        request = FilmStylePromptRequest(
+            film_style=FilmStyleRequest(
+                director=director,
+                works=tuple(parse_work_reference(item) for item in work),
+                output_language=output_language.value,
+            ),
+            scene_direction=scene,
+            theme_count=themes,
+            frames_per_theme=frames,
+            female_count=female_count,
+            male_count=male_count,
+            content_level=content_level,
             output_language=output_language,
         )
-        settings = load_film_style_provider_settings()
+        default_rules_directory = Path("story-inputs") / "rules"
+        user_rules_directory = (
+            rules_dir
+            if rules_dir is not None
+            else (
+                default_rules_directory
+                if default_rules_directory.is_dir()
+                else None
+            )
+        )
+        rules = resolve_film_style_rules(
+            request.story_request(
+                "BRIEF\n\nDirector-work film scene generation."
+            ),
+            user_directory=user_rules_directory,
+        )
+        film_provider = load_film_style_provider_settings()
+        story_provider = load_story_provider_settings()
+        settings = FilmStylePipelineSettings(
+            film_provider=film_provider,
+            story=StoryRunSettings(
+                provider=story_provider,
+                concurrency=concurrency,
+            ),
+        )
         completed = asyncio.run(
             _generate(
                 request,
-                source_stem=brief_file.stem,
-                settings=settings,
+                settings,
+                rules,
                 runs_directory=runs_dir,
-                output_directory=output_dir,
+                prompts_directory=prompts_dir,
             )
         )
     except (
@@ -89,25 +180,119 @@ def generate_command(
         UnicodeError,
         ValidationError,
         FilmStylePipelineError,
+        StoryPipelineError,
     ) as exc:
-        typer.secho(str(exc), fg=typer.colors.RED, err=True)
-        raise typer.Exit(code=1) from exc
-    typer.echo(f"Run：{completed.result.run_id}")
-    typer.echo(f"视觉档案：{completed.published.profile_file}")
-    typer.echo(f"Story Description：{completed.published.prompt_file}")
+        _exit_for_error(exc, runs_dir)
+    _print_completed(completed)
+
+
+@app.command("resume")
+def resume_command(
+    run_id: str = typer.Argument(..., help="需要继续的 film-style run ID。"),
+    runs_dir: Path = typer.Option(
+        Path("runs") / "film-style",
+        "--runs-dir",
+        file_okay=False,
+        help="保存顶层进度及 profile、Theme、Frame checkpoints。",
+    ),
+) -> None:
+    """Continue the missing profile, Theme, or Frame stages."""
+    try:
+        store = LocalFilmStyleRunStore(runs_dir)
+        snapshot = store.inspect(run_id)
+        if snapshot.completed is not None:
+            _print_completed(snapshot.completed)
+            return
+        film_provider = load_film_style_provider_settings()
+        story_provider = load_story_provider_settings()
+        if film_provider != snapshot.settings.film_provider:
+            raise FilmStyleConfigurationError(
+                "当前 film-style provider 配置与 run checkpoint 不一致"
+            )
+        if story_provider != snapshot.settings.story.provider:
+            raise FilmStyleConfigurationError(
+                "当前 story provider 配置与 run checkpoint 不一致"
+            )
+        completed = asyncio.run(
+            _resume(
+                run_id,
+                film_provider,
+                story_provider,
+                snapshot.settings,
+                snapshot.rules,
+                store,
+            )
+        )
+    except (
+        ValidationError,
+        FilmStylePipelineError,
+        StoryPipelineError,
+    ) as exc:
+        _exit_for_error(exc, runs_dir)
+    _print_completed(completed)
 
 
 async def _generate(
-    request: FilmStyleRequest,
+    request: FilmStylePromptRequest,
+    settings: FilmStylePipelineSettings,
+    rules: StoryRuleSet,
     *,
-    source_stem: str,
-    settings,
     runs_directory: Path,
-    output_directory: Path,
-):
-    async with OpenAIFilmStyleModel(settings) as model:
-        return await FilmStyleStudio(
-            model,
-            runs_directory=runs_directory,
-            output_directory=output_directory,
-        ).run(request, source_stem=source_stem)
+    prompts_directory: Path,
+) -> CompletedFilmStylePromptRun:
+    store = LocalFilmStyleRunStore(runs_directory)
+    async with (
+        film_style_model(settings.film_provider) as film_model,
+        story_model(settings.story.provider) as story_author,
+    ):
+        return await FilmStylePromptStudio(
+            film_model,
+            story_author,
+            store,
+            settings,
+            rules,
+            on_progress=typer.echo,
+        ).run(
+            request,
+            prompts_directory=prompts_directory,
+        )
+
+
+async def _resume(
+    run_id: str,
+    film_provider: FilmStyleProviderSettings,
+    story_provider: StoryProviderSettings,
+    settings: FilmStylePipelineSettings,
+    rules: StoryRuleSet,
+    store: LocalFilmStyleRunStore,
+) -> CompletedFilmStylePromptRun:
+    async with (
+        film_style_model(film_provider) as film_model,
+        story_model(story_provider) as story_author,
+    ):
+        return await FilmStylePromptStudio(
+            film_model,
+            story_author,
+            store,
+            settings,
+            rules,
+            on_progress=typer.echo,
+        ).resume(run_id)
+
+
+def _print_completed(completed: CompletedFilmStylePromptRun) -> None:
+    typer.secho("生成完成。", fg=typer.colors.GREEN)
+    typer.echo(f"Run：{completed.run_id}")
+    typer.echo(f"视觉档案：{completed.profile_file}")
+    typer.echo(f"叙事提示词：{completed.prompt_file}")
+
+
+def _exit_for_error(error: Exception, runs_dir: Path) -> None:
+    typer.secho(f"生成失败：{error}", fg=typer.colors.RED, err=True)
+    if isinstance(error, FilmStyleRunIncompleteError):
+        typer.echo(
+            f"继续命令：uv run t2i-film-style resume {error.run_id} "
+            f"--runs-dir {runs_dir}",
+            err=True,
+        )
+    raise typer.Exit(code=2) from error

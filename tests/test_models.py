@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
+from t2i_model_provider import ModelBackend
 from t2i_prompt_pipeline.errors import ConfigurationError
 from t2i_prompt_pipeline.models import (
     ContentLevel,
@@ -153,6 +154,9 @@ def test_provider_signature_tracks_generation_behavior_not_token_cap() -> None:
     ).signature()
     assert provider.signature() != provider.model_copy(
         update={"model": "model-b"}
+    ).signature()
+    assert provider.signature() != provider.model_copy(
+        update={"backend": ModelBackend.COPILOT}
     ).signature()
     assert reasoning_provider.signature() == reasoning_provider.model_copy(
         update={"temperature": 1.2}

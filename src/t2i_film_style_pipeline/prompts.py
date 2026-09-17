@@ -26,11 +26,10 @@ requested output language.
 
 The profile must be concrete enough to compile into a Story Description. Every
 field must describe visible choices, not praise, biography, symbolism,
-audience reaction, or vague adjectives. Create an original profile name that
-does not contain the director name or a film title. The aggregate style summary
-must concisely name the profile's visible palette, composition, blocking,
-lighting, motion, and finish identity. Refusal rules must prevent generic genre
-drift and literal copying of source material.
+audience reaction, invented style names, or vague adjectives. The aggregate
+style summary must state the profile's visible palette, composition, blocking,
+lighting, motion, and finish identity in direct language. Refusal rules must
+prevent generic genre drift and literal copying of source material.
 """
 
 
@@ -48,7 +47,7 @@ def profile_messages(request: FilmStyleRequest) -> list[ChatMessage]:
                     "output_language": request.output_language,
                     "task": (
                         "Create one work-specific visual profile that can govern "
-                        "Theme and Frame generation for the supplied base brief."
+                        "subsequent Theme and Frame generation."
                     ),
                 },
                 ensure_ascii=False,

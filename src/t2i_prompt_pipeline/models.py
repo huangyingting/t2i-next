@@ -21,6 +21,7 @@ from pydantic import (
     model_validator,
 )
 
+from t2i_model_provider import ModelBackend
 from t2i_prompt_pipeline.errors import ConfigurationError
 
 
@@ -587,6 +588,7 @@ class RunSummary(Model):
 
 
 class ProviderSettings(Model):
+    backend: ModelBackend = ModelBackend.OPENAI
     base_url: Text = "https://api.openai.com/v1"
     api_key_env: Text = "OPENAI_API_KEY"
     auth_mode: ProviderAuthMode = ProviderAuthMode.BEARER
@@ -614,29 +616,34 @@ class ProviderSettings(Model):
         return self
 
     def signature(self) -> str:
-        return _json_fingerprint(
-            {
-                "base_url": self.base_url.rstrip("/"),
-                "model": self.model,
-                "structured_output_mode": self.structured_output_mode.value,
-                "thinking_mode": (
-                    self.thinking_mode.value
-                    if self.thinking_mode is not None
-                    else None
-                ),
-                "reasoning_effort": (
-                    self.reasoning_effort.value
-                    if self.reasoning_effort is not None
-                    else None
-                ),
-                "temperature": (
-                    self.temperature
-                    if self.thinking_mode is None
-                    and self.reasoning_effort is None
-                    else None
-                ),
-            }
-        )
+        values = {
+            "backend": self.backend.value,
+            "model": self.model,
+            "thinking_mode": (
+                self.thinking_mode.value
+                if self.thinking_mode is not None
+                else None
+            ),
+            "reasoning_effort": (
+                self.reasoning_effort.value
+                if self.reasoning_effort is not None
+                else None
+            ),
+        }
+        if self.backend == ModelBackend.OPENAI:
+            values.update(
+                {
+                    "base_url": self.base_url.rstrip("/"),
+                    "structured_output_mode": self.structured_output_mode.value,
+                    "temperature": (
+                        self.temperature
+                        if self.thinking_mode is None
+                        and self.reasoning_effort is None
+                        else None
+                    ),
+                }
+            )
+        return _json_fingerprint(values)
 
 
 class AppConfig(Model):

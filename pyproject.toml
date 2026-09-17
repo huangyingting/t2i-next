@@ -9,6 +9,7 @@ description = "基于 brief 风格约束、自适应 Theme 和当前 Frame 的�
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "github-copilot-sdk>=1.0.14,<2",
   "httpx>=0.28,<1",
   "pydantic>=2.10,<3",
   "python-dotenv>=1.0,<2",
@@ -31,6 +32,7 @@ t2i-film-style = "t2i_film_style_pipeline.cli:app"
 [tool.hatch.build.targets.wheel]
 packages = [
   "src/t2i_film_style_pipeline",
+  "src/t2i_model_provider",
   "src/t2i_prompt_pipeline",
   "src/t2i_spatial_pipeline",
   "src/t2i_story_pipeline",
@@ -57,6 +59,7 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.isort]
 known-first-party = [
   "t2i_film_style_pipeline",
+  "t2i_model_provider",
   "t2i_prompt_pipeline",
   "t2i_spatial_pipeline",
   "t2i_story_pipeline",
