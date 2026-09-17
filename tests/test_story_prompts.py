@@ -81,6 +81,39 @@ def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
     assert "If semantic_name is supplied, return it exactly" in prompt
 
 
+def test_prompt_can_delegate_theme_ids_to_program() -> None:
+    request = make_story_request(theme_count=3)
+    messages = theme_messages(
+        request,
+        start_index=1,
+        count=3,
+        existing_themes=[],
+        program_assigns_ids=True,
+    )
+
+    payload = json.loads(messages[1].content)
+    assert payload["theme_count"] == 3
+    assert payload["program_assigns_theme_ids"] is True
+    assert "theme_ids" not in payload
+
+
+def test_prompt_can_request_one_plain_text_frame() -> None:
+    request = make_story_request(frames_per_theme=2)
+    messages = compile_frame_messages(
+        request,
+        make_theme(),
+        resolve_story_rules(request),
+        frame_id="F02",
+        existing_frames=["先前完成的画面。"],
+    )
+
+    payload = json.loads(messages[1].content)
+    assert payload["current_frame_id"] == "F02"
+    assert payload["program_assigns_frame_id"] is True
+    assert payload["existing_frame_prose"] == ["先前完成的画面。"]
+    assert "frame_ids" not in payload
+
+
 def test_prompts_compile_exact_cast_constraints() -> None:
     request = make_story_request(female_count=2, male_count=1)
 

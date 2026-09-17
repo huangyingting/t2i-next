@@ -64,6 +64,14 @@ class CopilotResponse:
     total_tokens: int
 
 
+@dataclass(frozen=True, slots=True)
+class CopilotTextResponse:
+    text: str
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+
+
 class CopilotStructuredModel:
     """Use a terminal custom tool as the structured-output boundary."""
 
@@ -271,6 +279,106 @@ class CopilotStructuredModel:
             total_tokens=prompt_tokens + completion_tokens,
         )
 
+    async def generate_text(
+        self,
+        *,
+        messages: Sequence[Message],
+        max_output_tokens: int,
+    ) -> CopilotTextResponse:
+        usages: list[AssistantUsageData] = []
+        assistant_messages: list[str] = []
+        session_error: list[str] = []
+        idle = asyncio.Event()
+
+        def on_event(event) -> None:
+            match event.data:
+                case AssistantUsageData() as data:
+                    usages.append(data)
+                case AssistantMessageData() as data:
+                    assistant_messages.append(data.content)
+                case SessionErrorData() as data:
+                    session_error.append(data.message or "Copilot session failed")
+                    idle.set()
+                case SessionIdleData():
+                    idle.set()
+
+        system_content, prompt = _compile_text_messages(
+            messages,
+            max_output_tokens=min(
+                max_output_tokens,
+                self._settings.output_token_limit,
+            ),
+        )
+        reasoning_effort = (
+            self._settings.reasoning_effort.value
+            if self._settings.reasoning_effort is not None
+            else None
+        )
+        try:
+            session = await self._client.create_session(
+                model=self._settings.model,
+                reasoning_effort=reasoning_effort,
+                tools=[],
+                available_tools=ToolSet(),
+                system_message={"mode": "replace", "content": system_content},
+                infinite_sessions={"enabled": False},
+                on_event=on_event,
+            )
+        except RuntimeError as exc:
+            raise CopilotGenerationError(
+                "Copilot text session could not be created"
+            ) from exc
+        try:
+            try:
+                await session.send(prompt)
+            except RuntimeError as exc:
+                raise CopilotGenerationError(
+                    "Copilot text request could not be sent"
+                ) from exc
+            try:
+                await asyncio.wait_for(
+                    idle.wait(),
+                    timeout=self._settings.timeout_seconds,
+                )
+            except TimeoutError as exc:
+                raise CopilotGenerationError(
+                    "Copilot text generation timed out"
+                ) from exc
+        finally:
+            await session.disconnect()
+
+        prompt_tokens = sum(item.input_tokens or 0 for item in usages)
+        completion_tokens = sum(item.output_tokens or 0 for item in usages)
+        raw_content = "\n".join(assistant_messages).strip()
+        if session_error:
+            raise CopilotGenerationError(
+                f"Copilot session failed: {session_error[-1]}",
+                raw_content=raw_content,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+            )
+        if any(item.finish_reason == "length" for item in usages):
+            raise CopilotGenerationError(
+                "Copilot output reached its token limit",
+                raw_content=raw_content,
+                validation_issues=("finish_reason=length",),
+                truncated=True,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+            )
+        if not raw_content:
+            raise CopilotGenerationError(
+                "Copilot returned empty text",
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+            )
+        return CopilotTextResponse(
+            text=raw_content,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=prompt_tokens + completion_tokens,
+        )
+
 
 def _compile_messages(
     messages: Sequence[Message],
@@ -295,6 +403,31 @@ def _compile_messages(
                 "Do not use any other tool and do not return the result as prose.",
                 f"The response type is {response_model.__name__}.",
                 f"Keep the result within approximately {max_output_tokens} tokens.",
+            )
+        )
+    )
+    return "\n\n".join(system_messages), "\n\n".join(transcript)
+
+
+def _compile_text_messages(
+    messages: Sequence[Message],
+    *,
+    max_output_tokens: int,
+) -> tuple[str, str]:
+    system_messages = [
+        message.content for message in messages if message.role == "system"
+    ]
+    transcript = [
+        f"{message.role.upper()} MESSAGE:\n{message.content}"
+        for message in messages
+        if message.role != "system"
+    ]
+    system_messages.append(
+        "\n".join(
+            (
+                "Return only the requested final prose.",
+                "Do not return JSON, Markdown fences, a title, an ID, or commentary.",
+                f"Keep the response within approximately {max_output_tokens} tokens.",
             )
         )
     )

@@ -25,6 +25,8 @@ from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_story_pipeline.errors import StoryProviderResponseError
 from t2i_story_pipeline.models import (
     NarrativeFrameSequence,
+    NarrativeThemeBatch,
+    NarrativeThemeDraftBatch,
     StoryStage,
     TokenUsage,
 )
@@ -33,8 +35,13 @@ from t2i_story_pipeline.provider import (
 )
 from t2i_story_pipeline.provider import (
     StoryProviderSettings,
+    TextModelResponse,
 )
-from t2i_story_pipeline.run_store import StoryRunSettings
+from t2i_story_pipeline.run_store import (
+    FrameOutputMode,
+    StoryRunSettings,
+    ThemeOutputMode,
+)
 from tests.story_factories import make_frame_sequence, make_theme_batch
 from tests.test_film_style_pipeline import make_profile, make_request
 
@@ -68,8 +75,39 @@ class FakeStoryModel:
         value = next(self._values)
         if isinstance(value, Exception):
             raise value
+        if (
+            isinstance(value, NarrativeThemeBatch)
+            and issubclass(response_model, NarrativeThemeDraftBatch)
+        ):
+            value = response_model.model_validate(
+                {
+                    "semantic_name": value.semantic_name,
+                    "themes": [
+                        theme.model_dump(exclude={"theme_id"})
+                        for theme in value.themes
+                    ],
+                }
+            )
         return StoryModelResponse(
             value=value,
+            usage=TokenUsage(total_tokens=10),
+        )
+
+    async def generate_text(
+        self,
+        *,
+        stage,
+        messages,
+        max_output_tokens,
+    ) -> TextModelResponse:
+        self.stages.append(stage)
+        value = next(self._values)
+        if isinstance(value, Exception):
+            raise value
+        if not isinstance(value, str):
+            raise TypeError("fake text response must be a string")
+        return TextModelResponse(
+            text=value,
             usage=TokenUsage(total_tokens=10),
         )
 
@@ -82,18 +120,34 @@ def make_pipeline_request() -> FilmStylePromptRequest:
     )
 
 
+def make_film_theme_batch():
+    batch = make_theme_batch()
+    for theme in batch.themes:
+        theme.premise = (
+            f"原作成年人物无名与飞雪位于秦宫大殿。{theme.premise}"
+        )
+    return batch
+
+
 def make_film_frame_sequence() -> NarrativeFrameSequence:
     sequence = make_frame_sequence()
     source_sentence = frame_source_sentence(make_request())
     for frame in sequence.frames:
         frame.prose = (
-            f"{source_sentence}中国古代的雨夜，两名成年人物在庭院灯下"
-            "相互注视，前景帘幕与背景砖墙建立纵深，中景人物的克制动作由"
-            "平视中景记录，暖灯和冷雨形成清楚反差。灰砖、旧木和粗布分别"
+            f"{source_sentence}战国秦宫大殿的雨夜，原作成年人物无名与飞雪"
+            "站在深远中轴两侧，黑色殿柱与石质地面向后延伸，长剑横放在"
+            "两人之间；无名穿深色战国长袍与黑色束冠，飞雪穿单色交领长袍"
+            "与宽大衣袖。两人在庭院灯下"
+            "相互注视，前景帘幕与背景砖墙建立纵深。摄影机机位设在两人"
+            "正面约三米处，以眼平高度和轻微三分之二侧前角度平视，使用"
+            "五十毫米标准镜头拍摄中景，自然透视保持人物与庭院尺度，"
+            "主焦点落在成熟面容和相触的手部，前景帘幕略微柔化形成框景，"
+            "背景砖墙在中等景深内仍清晰可辨。暖灯和冷雨形成清楚反差。"
+            "灰砖、旧木和粗布分别"
             "吸收来自左侧的暖色灯光，右后方冷色天光沿人物肩线形成清楚轮廓，"
             "两人都以稳固站姿承担自身重量，手臂保持自然放松，视线持续回应，"
             "门洞、廊柱与后窗组成三层空间，焦点落在成熟面容和相触的手部，"
-            "前景帘幕略微柔化，背景纹理仍然可辨。低饱和灰黑环境只以深红"
+            "背景纹理仍然可辨。低饱和灰黑环境只以深红"
             "灯笼形成色彩重音，潮湿地面留下有限反光，细密颗粒和柔和高光"
             "保持真实、克制、自然可信且可以直接摄影执行的长片质感。"
         )
@@ -107,6 +161,8 @@ def make_settings(*, generation_retries: int = 0) -> FilmStylePipelineSettings:
             provider=StoryProviderSettings(model="test-model"),
             concurrency=1,
             generation_retries=generation_retries,
+            theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
+            frame_output_mode=FrameOutputMode.INDIVIDUAL_TEXT,
         ),
     )
 
@@ -120,9 +176,10 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
     )
     story_model = FakeStoryModel(
         [
-            make_theme_batch(),
-            bad_sequence,
-            make_film_frame_sequence(),
+            make_film_theme_batch(),
+            bad_sequence.frames[0].prose,
+            make_film_frame_sequence().frames[0].prose,
+            make_film_frame_sequence().frames[1].prose,
         ]
     )
 
@@ -141,6 +198,7 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
         StoryStage.THEMES,
         StoryStage.FRAMES,
         StoryStage.FRAMES,
+        StoryStage.FRAMES,
     ]
 
 
@@ -155,7 +213,7 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     film_model = FakeFilmModel()
     first_story_model = FakeStoryModel(
         [
-            make_theme_batch(),
+            make_film_theme_batch(),
             StoryProviderResponseError("temporary frame failure"),
         ]
     )
@@ -181,7 +239,10 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     assert failed.manifest.story_run_id is not None
     assert film_model.calls == 1
 
-    resumed_story_model = FakeStoryModel([make_film_frame_sequence()])
+    resumed_sequence = make_film_frame_sequence()
+    resumed_story_model = FakeStoryModel(
+        [frame.prose for frame in resumed_sequence.frames]
+    )
     completed = await FilmStylePromptStudio(
         film_model,
         resumed_story_model,
@@ -196,7 +257,10 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     assert completed.compiled_story_file.name == "compiled-story.txt"
     assert completed.compiled_story_file.is_file()
     assert film_model.calls == 1
-    assert resumed_story_model.stages == [StoryStage.FRAMES]
+    assert resumed_story_model.stages == [
+        StoryStage.FRAMES,
+        StoryStage.FRAMES,
+    ]
     assert store.inspect(run_id).manifest.status == FilmStyleRunStatus.COMPLETED
 
 
@@ -234,8 +298,11 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
         FakeFilmModel(),
         FakeStoryModel(
             [
-                make_theme_batch(),
-                make_film_frame_sequence(),
+                make_film_theme_batch(),
+                *[
+                    frame.prose
+                    for frame in make_film_frame_sequence().frames
+                ],
             ]
         ),
         store,

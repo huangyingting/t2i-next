@@ -485,7 +485,8 @@ class FilmStylePromptStudio:
                     frames=snapshot.rules.frames,
                 )
                 content_validator = FilmStyleContentValidator(
-                    snapshot.request.film_style
+                    snapshot.request.film_style,
+                    film_result.profile,
                 )
                 if story_run_id is None:
                     story_snapshot = story_store.create(

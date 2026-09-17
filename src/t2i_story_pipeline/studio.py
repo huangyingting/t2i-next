@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from time import perf_counter
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from t2i_story_pipeline.errors import (
     StoryContractError,
@@ -20,9 +20,11 @@ from t2i_story_pipeline.errors import (
 )
 from t2i_story_pipeline.models import (
     NarrativeFrame,
+    NarrativeFrameDraft,
     NarrativeFrameSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
+    NarrativeThemeDraftBatch,
     NarrativeThemeResult,
     StoryRequest,
     StoryResult,
@@ -31,21 +33,28 @@ from t2i_story_pipeline.models import (
     TokenUsage,
     exact_frame_sequence_model,
     exact_theme_batch_model,
+    exact_theme_draft_batch_model,
 )
 from t2i_story_pipeline.prompts import frame_messages, theme_messages
-from t2i_story_pipeline.provider import ChatMessage, StoryModel
+from t2i_story_pipeline.provider import ChatMessage, ModelResponse, StoryModel
 from t2i_story_pipeline.run_store import (
     CompletedStoryRun,
+    FrameOutputMode,
     LocalStoryRunStore,
     StoryAttempt,
     StoryAttemptOutcome,
     StoryRunSettings,
     StoryRunSnapshot,
+    ThemeOutputMode,
 )
 
 ProgressCallback = Callable[[str], None]
 ThemeValidator = Callable[[StoryRequest, NarrativeTheme], None]
 FrameValidator = Callable[[StoryRequest, NarrativeTheme, NarrativeFrame], None]
+GenerateResponse = Callable[
+    [list[ChatMessage], int],
+    Awaitable[ModelResponse],
+]
 
 class StoryStudio:
     """Turn one story request directly into final prose image prompts."""
@@ -197,16 +206,21 @@ class StoryStudio:
                 count=count,
                 existing_themes=themes,
                 semantic_name=semantic_name,
+                program_assigns_ids=(
+                    self._settings.theme_output_mode
+                    == ThemeOutputMode.STRUCTURED_WITHOUT_IDS
+                ),
             )
+            generated_themes: list[NarrativeTheme] = []
+            generated_themes_target = generated_themes
 
             def validate(
                 value: BaseModel,
                 expected_start: int = start_index,
                 expected_count: int = count,
                 expected_semantic_name: str | None = semantic_name,
+                target: list[NarrativeTheme] = generated_themes_target,
             ) -> None:
-                if not isinstance(value, NarrativeThemeBatch):
-                    raise StoryContractError("provider 返回了错误的主题类型")
                 expected = [
                     f"T{index:03d}"
                     for index in range(
@@ -214,11 +228,38 @@ class StoryStudio:
                         expected_start + expected_count,
                     )
                 ]
+                if not isinstance(
+                    value,
+                    (NarrativeThemeBatch, NarrativeThemeDraftBatch),
+                ):
+                    raise StoryContractError("provider 返回了错误的主题类型")
                 if len(value.themes) != len(expected):
                     raise StoryContractError(
                         "主题数量不符合请求："
                         f"expected={len(expected)}, actual={len(value.themes)}"
                     )
+                if isinstance(value, NarrativeThemeDraftBatch):
+                    candidate_themes = [
+                        NarrativeTheme(
+                            theme_id=theme_id,
+                            title=draft.title,
+                            premise=draft.premise,
+                            style=draft.style,
+                        )
+                        for draft, theme_id in zip(
+                            value.themes,
+                            expected,
+                            strict=True,
+                        )
+                    ]
+                else:
+                    candidate_themes = value.themes
+                    for theme, theme_id in zip(
+                        candidate_themes,
+                        expected,
+                        strict=True,
+                    ):
+                        theme.theme_id = theme_id
                 if (
                     expected_semantic_name is not None
                     and value.semantic_name != expected_semantic_name
@@ -228,14 +269,10 @@ class StoryStudio:
                         f"expected={expected_semantic_name}, "
                         f"actual={value.semantic_name}"
                     )
-                for theme, theme_id in zip(
-                    value.themes,
-                    expected,
-                    strict=True,
-                ):
-                    theme.theme_id = theme_id
+                for theme in candidate_themes:
                     if self._theme_validator is not None:
                         self._theme_validator(request, theme)
+                target[:] = candidate_themes
 
             operation_id = f"themes-T{start_index:03d}-T{start_index + count - 1:03d}"
             requested_ids = tuple(
@@ -247,21 +284,30 @@ class StoryStudio:
                 requested_ids=requested_ids,
                 stage=StoryStage.THEMES,
                 messages=messages,
-                response_model=exact_theme_batch_model(count),
+                response_model=(
+                    exact_theme_draft_batch_model(count)
+                    if self._settings.theme_output_mode
+                    == ThemeOutputMode.STRUCTURED_WITHOUT_IDS
+                    else exact_theme_batch_model(count)
+                ),
                 max_output_tokens=self._settings.theme_output_tokens,
                 validate=validate,
             )
-            if not isinstance(value, NarrativeThemeBatch):
+            if not isinstance(
+                value,
+                (NarrativeThemeBatch, NarrativeThemeDraftBatch),
+            ):
                 raise AssertionError("validated theme response changed type")
             self._store.checkpoint_themes(
                 run_id,
-                value.themes,
+                generated_themes,
                 value.semantic_name,
             )
             semantic_name = value.semantic_name
-            themes.extend(value.themes)
+            themes.extend(generated_themes)
             self._emit(
-                f"{value.themes[0].theme_id}–{value.themes[-1].theme_id} Theme 已保存"
+                f"{generated_themes[0].theme_id}–"
+                f"{generated_themes[-1].theme_id} Theme 已保存"
             )
         return themes
 
@@ -272,6 +318,13 @@ class StoryStudio:
         theme: NarrativeTheme,
         rules: StoryRuleSet,
     ) -> NarrativeFrameSequence:
+        if self._settings.frame_output_mode == FrameOutputMode.INDIVIDUAL_TEXT:
+            return await self._generate_text_frames(
+                run_id,
+                request,
+                theme,
+                rules,
+            )
         expected = [f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)]
 
         def validate_ids(
@@ -311,6 +364,82 @@ class StoryStudio:
             raise AssertionError("validated frame response changed type")
         return value
 
+    async def _generate_text_frames(
+        self,
+        run_id: str,
+        request: StoryRequest,
+        theme: NarrativeTheme,
+        rules: StoryRuleSet,
+    ) -> NarrativeFrameSequence:
+        frames: list[NarrativeFrame] = []
+        for index in range(1, request.frames_per_theme + 1):
+            frame_id = f"F{index:02d}"
+            validated_frame: list[NarrativeFrame] = []
+            validated_frame_target = validated_frame
+            messages = frame_messages(
+                request,
+                theme,
+                rules,
+                frame_id=frame_id,
+                existing_frames=[frame.prose for frame in frames],
+            )
+
+            async def generate_text_response(
+                current_messages: list[ChatMessage],
+                budget: int,
+            ) -> ModelResponse:
+                response = await self._model.generate_text(
+                    stage=StoryStage.FRAMES,
+                    messages=current_messages,
+                    max_output_tokens=budget,
+                )
+                try:
+                    value = NarrativeFrameDraft(prose=response.text)
+                except ValidationError as exc:
+                    issues = tuple(
+                        f"{'.'.join(str(part) for part in error['loc'])}: "
+                        f"{error['msg']}"
+                        for error in exc.errors()
+                    )
+                    raise StoryStructuredOutputError(
+                        "frames 返回的纯文本不符合单段画面正文契约",
+                        raw_content=response.text,
+                        usage=response.usage,
+                        validation_issues=issues,
+                    ) from exc
+                return ModelResponse(value=value, usage=response.usage)
+
+            def validate_text(
+                value: BaseModel,
+                expected_frame_id: str = frame_id,
+                target: list[NarrativeFrame] = validated_frame_target,
+            ) -> None:
+                if not isinstance(value, NarrativeFrameDraft):
+                    raise StoryContractError("provider 返回了错误的纯文本画面类型")
+                frame = NarrativeFrame(
+                    frame_id=expected_frame_id,
+                    prose=value.prose,
+                )
+                if self._frame_validator is not None:
+                    self._frame_validator(request, theme, frame)
+                target[:] = [frame]
+
+            await self._generate_validated(
+                run_id=run_id,
+                operation_id=f"frames-{theme.theme_id}-{frame_id}",
+                requested_ids=(f"{theme.theme_id}-{frame_id}",),
+                stage=StoryStage.FRAMES,
+                messages=messages,
+                response_model=NarrativeFrameDraft,
+                max_output_tokens=self._settings.frame_output_tokens,
+                validate=validate_text,
+                generate_response=generate_text_response,
+            )
+            if len(validated_frame) != 1:
+                raise AssertionError("validated text frame was not captured")
+            frames.extend(validated_frame)
+        return NarrativeFrameSequence(frames=frames)
+
     async def _generate_validated(
         self,
         *,
@@ -322,6 +451,7 @@ class StoryStudio:
         response_model: type[BaseModel],
         max_output_tokens: int,
         validate: Callable[[BaseModel], None],
+        generate_response: GenerateResponse | None = None,
     ) -> tuple[BaseModel, TokenUsage]:
         base_messages = messages
         usage = TokenUsage()
@@ -333,10 +463,12 @@ class StoryStudio:
                 requested_ids,
             )
         )
+        expects_plain_text = generate_response is not None
         if feedback_issues:
             messages = self._retry_messages(
                 base_messages,
                 tuple(feedback_issues[-3:]),
+                expects_plain_text=expects_plain_text,
             )
         attempt_offset = sum(
             attempt.operation_id == operation_id for attempt in prior_attempts
@@ -366,11 +498,15 @@ class StoryStudio:
             attempt_issues: tuple[str, ...]
             started = perf_counter()
             try:
-                response = await self._model.generate(
-                    stage=stage,
-                    messages=messages,
-                    response_model=response_model,
-                    max_output_tokens=budget,
+                response = (
+                    await generate_response(messages, budget)
+                    if generate_response is not None
+                    else await self._model.generate(
+                        stage=stage,
+                        messages=messages,
+                        response_model=response_model,
+                        max_output_tokens=budget,
+                    )
                 )
                 attempt_usage = response.usage
                 usage += attempt_usage
@@ -460,6 +596,7 @@ class StoryStudio:
                 base_messages,
                 tuple(feedback_issues[-3:]),
                 rejected_value,
+                expects_plain_text=expects_plain_text,
             )
         raise AssertionError("unreachable")
 
@@ -502,22 +639,36 @@ class StoryStudio:
         base_messages: list[ChatMessage],
         issues: tuple[str, ...],
         rejected_value: BaseModel | None = None,
+        *,
+        expects_plain_text: bool = False,
     ) -> list[ChatMessage]:
         messages = list(base_messages)
         if rejected_value is not None:
+            rejected_content = (
+                rejected_value.prose
+                if expects_plain_text
+                and isinstance(rejected_value, NarrativeFrameDraft)
+                else rejected_value.model_dump_json(ensure_ascii=False)
+            )
             messages.append(
                 ChatMessage(
                     role="assistant",
-                    content=rejected_value.model_dump_json(ensure_ascii=False),
+                    content=rejected_content,
                 )
             )
+        return_instruction = (
+            "不要解释，只返回一段完整的纯自然语言画面正文；"
+            "不要返回 JSON、ID、Markdown 或说明。"
+            if expects_plain_text
+            else "不要解释，只返回完整 schema 数据。"
+        )
         messages.append(
             ChatMessage(
                 role="user",
                 content=(
-                    "上一份输出未满足基本结构契约。"
+                    "上一份输出未满足发布契约。"
                     f"问题：{'; '.join(issues)}。"
-                    "不要解释，只返回完整 schema 数据。"
+                    f"{return_instruction}"
                 ),
             )
         )

@@ -12,9 +12,12 @@ from t2i_film_style_pipeline.compiler import (
 )
 from t2i_film_style_pipeline.errors import FilmStyleStorageError
 from t2i_film_style_pipeline.models import (
+    FilmCharacterAnchor,
+    FilmSceneAnchor,
     FilmStyleProfile,
     FilmStyleRequest,
     FilmStyleResult,
+    FilmWorkAnchors,
     FilmWorkReference,
     TokenUsage,
     parse_work_reference,
@@ -45,6 +48,80 @@ def make_profile() -> FilmStyleProfile:
         work_style_summaries=(
             "用饱和单色章节、纪念碑式空间和书法性运动组织人物冲突。",
             "用纯化自然色块、流动衣料和纵深调度组织浪漫武侠动作。",
+        ),
+        work_anchors=(
+            FilmWorkAnchors(
+                adult_characters=(
+                    FilmCharacterAnchor(
+                        canonical_name="无名",
+                        identity_and_appearance=(
+                            "成年秦国刺客，黑发束冠，神态克制。"
+                        ),
+                        canonical_costume="深色战国交领长袍与黑色束冠。",
+                        costume_features=("深色战国长袍", "黑色束冠"),
+                    ),
+                    FilmCharacterAnchor(
+                        canonical_name="飞雪",
+                        identity_and_appearance=(
+                            "成年赵国剑客，长黑发，姿态冷峻。"
+                        ),
+                        canonical_costume="具有单色章节特征的交领长袍。",
+                        costume_features=("单色交领长袍", "宽大衣袖"),
+                    ),
+                ),
+                scenes=(
+                    FilmSceneAnchor(
+                        canonical_name="秦宫大殿",
+                        narrative_context="秦王在大殿尽端接受无名觐见。",
+                        environment="战国秦宫的深远中轴殿堂，以黑色殿柱和石质地面建立秩序。",
+                        environment_features=("深远中轴", "黑色殿柱", "石质地面"),
+                        canonical_props=("长剑", "烛台"),
+                    ),
+                    FilmSceneAnchor(
+                        canonical_name="棋馆",
+                        narrative_context="剑客在静止棋局旁以意念交锋。",
+                        environment="雨幕包围木构棋馆，棋台位于人物之间。",
+                        environment_features=("雨幕", "木构棋馆", "棋台"),
+                        canonical_props=("围棋棋子", "长剑"),
+                    ),
+                ),
+            ),
+            FilmWorkAnchors(
+                adult_characters=(
+                    FilmCharacterAnchor(
+                        canonical_name="小妹",
+                        identity_and_appearance=(
+                            "成年舞伎与武者，长黑发，动作轻盈。"
+                        ),
+                        canonical_costume="层叠彩色舞衣与长袖。",
+                        costume_features=("层叠彩色舞衣", "舞袖"),
+                    ),
+                    FilmCharacterAnchor(
+                        canonical_name="金捕头",
+                        identity_and_appearance=(
+                            "成年捕快，束发，神态警觉。"
+                        ),
+                        canonical_costume="唐代深色官差服装与革带。",
+                        costume_features=("深色官差服", "革带"),
+                    ),
+                ),
+                scenes=(
+                    FilmSceneAnchor(
+                        canonical_name="牡丹坊",
+                        narrative_context="小妹在宾客与捕快面前表演击鼓舞。",
+                        environment="唐代歌舞空间，以层叠帘幕、鼓阵和环形观演关系组织。",
+                        environment_features=("层叠帘幕", "鼓阵", "环形观演席"),
+                        canonical_props=("彩鼓", "长袖"),
+                    ),
+                    FilmSceneAnchor(
+                        canonical_name="竹林",
+                        narrative_context="人物在追捕中穿行并交锋。",
+                        environment="高密度青竹形成垂直纵深，地面覆盖竹叶。",
+                        environment_features=("高密度青竹", "竹叶地面", "垂直纵深"),
+                        canonical_props=("长竹", "佩刀"),
+                    ),
+                ),
+            ),
         ),
         palette="让一种主色控制服装、环境和光线。",
         composition="使用中轴、对称和巨大留白。",
@@ -129,9 +206,14 @@ def test_compile_story_description_injects_profile_after_brief_header() -> None:
     assert "逐部作品视觉证据" in compiled
     assert "《英雄》（2002）：用饱和单色章节" in compiled
     assert (
-        "这是一个采用张艺谋导演的《英雄》（2002）、"
-        "《十面埋伏》（2004）视觉风格的原创电影场景。"
+        "这是一个基于张艺谋导演的《英雄》（2002）、"
+        "《十面埋伏》（2004）原作人物与场景重新构图的电影画面。"
     ) in compiled
+    assert "原作人物与场景锚点" in compiled
+    assert "- 无名：成年秦国刺客" in compiled
+    assert "- 秦宫大殿：原作情境：秦王在大殿尽端接受无名觐见" in compiled
+    assert "环境短语：深远中轴、黑色殿柱、石质地面" in compiled
+    assert "道具短语：长剑、烛台" in compiled
     assert "只生成雨夜室内场景。" in compiled
     assert "生成与输出规则" not in compiled
     assert "母风格名称" not in compiled
@@ -169,9 +251,40 @@ def test_director_rules_own_theme_and_frame_workflow() -> None:
         for rule in rules.themes
     )
     assert any("通常写四至八句" in rule for rule in rules.themes)
-    assert any("八项中的六项" in rule for rule in rules.themes)
+    assert any(
+        "镜头策略与透视倾向是不可省略的必选项" in rule
+        and "七项中的至少五项" in rule
+        for rule in rules.themes
+    )
     assert any("固定的主题编号菜单" in rule for rule in rules.themes)
     assert any("完全独立的图像提示词" in rule for rule in rules.frames)
+    assert any(
+        "每个画面必须明确写出完整摄影方案" in rule
+        for rule in rules.frames
+    )
+    assert any(
+        "天气、温度、服装、裸露程度" in rule
+        for rule in rules.themes
+    )
+    assert any(
+        "国籍、成年身份、关系和其他共同属性" in rule
+        for rule in rules.frames
+    )
+    assert any(
+        "使用该片 work_anchors 中至少一名原作成年人物" in rule
+        for rule in rules.themes
+    )
+    assert any(
+        "当前关系与互动不要求忠于原作" in rule
+        for rule in rules.themes
+    )
+    assert any(
+        "必须明确写出 Theme 选定的全部原作成年人物 canonical_name" in rule
+        and "costume_features" in rule
+        and "environment_features" in rule
+        and "canonical_props" in rule
+        for rule in rules.frames
+    )
     assert any(
         "画幅比例" in rule and "图像尺寸" in rule
         for rule in rules.frames
@@ -298,6 +411,7 @@ async def test_single_work_uses_complete_per_film_summary(tmp_path) -> None:
             "work_style_summaries": (
                 "单色章节、对称构图与书法性动作形成完整风格总结。",
             ),
+            "work_anchors": make_profile().work_anchors[:1],
         }
     )
 
@@ -329,6 +443,7 @@ async def test_single_work_opening_summary_uses_complete_first_sentence(
             "work_style_summaries": (
                 "单色章节与中轴构图建立视觉秩序。后续分析保留在档案中。",
             ),
+            "work_anchors": make_profile().work_anchors[:1],
         }
     )
 
@@ -354,8 +469,8 @@ def test_compiler_requires_one_direct_source_sentence() -> None:
     compiled = compile_story_description(make_request(), make_profile())
 
     source_sentence = (
-        "这是一个采用张艺谋导演的《英雄》（2002）、"
-        "《十面埋伏》（2004）视觉风格的原创电影场景。"
+        "这是一个基于张艺谋导演的《英雄》（2002）、"
+        "《十面埋伏》（2004）原作人物与场景重新构图的电影画面。"
     )
     assert compiled.count(source_sentence) == 1
 

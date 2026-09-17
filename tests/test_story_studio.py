@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -8,24 +9,29 @@ import pytest
 
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import (
+    StoryContractError,
     StoryProviderResponseError,
     StoryProviderTruncatedOutputError,
     StoryRunIncompleteError,
     StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
+    NarrativeThemeDraftBatch,
     StoryStage,
     TokenUsage,
 )
 from t2i_story_pipeline.provider import (
     ModelResponse,
     StoryProviderSettings,
+    TextModelResponse,
 )
 from t2i_story_pipeline.run_store import (
+    FrameOutputMode,
     LocalStoryRunStore,
     StoryAttemptOutcome,
     StoryRunSettings,
     StoryRunStatus,
+    ThemeOutputMode,
 )
 from t2i_story_pipeline.studio import StoryStudio
 from tests.story_factories import (
@@ -65,10 +71,35 @@ class FakeStoryModel:
             ),
         )
 
+    async def generate_text(
+        self,
+        *,
+        stage,
+        messages,
+        max_output_tokens,
+    ) -> TextModelResponse:
+        self.stages.append(stage)
+        self.messages.append(messages)
+        self.max_output_tokens.append(max_output_tokens)
+        value = next(self._values)
+        if isinstance(value, Exception):
+            raise value
+        if not isinstance(value, str):
+            raise TypeError("fake text response must be a string")
+        return TextModelResponse(
+            text=value,
+            usage=TokenUsage(
+                prompt_tokens=10,
+                completion_tokens=5,
+                total_tokens=15,
+            ),
+        )
+
 
 def make_studio(
     model: FakeStoryModel,
     directory: Path,
+    frame_validator=None,
     **setting_changes,
 ) -> StoryStudio:
     settings = StoryRunSettings(
@@ -83,6 +114,7 @@ def make_studio(
         ),
         settings,
         resolve_story_rules(make_story_request()),
+        frame_validator=frame_validator,
     )
 
 
@@ -90,6 +122,120 @@ def test_story_studio_defaults_to_eight_concurrent_frame_sequences() -> None:
     settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
 
     assert settings.concurrency == 8
+
+
+@pytest.mark.asyncio
+async def test_studio_assigns_ids_and_wraps_individual_text_frames(
+    tmp_path,
+) -> None:
+    source_theme = make_theme_batch().themes[0]
+    frame_sequence = make_frame_sequence()
+    model = FakeStoryModel(
+        [
+            NarrativeThemeDraftBatch(
+                semantic_name="lost_luggage_reunion",
+                themes=[
+                    {
+                        "title": source_theme.title,
+                        "premise": source_theme.premise,
+                        "style": source_theme.style,
+                    }
+                ],
+            ),
+            *(frame.prose for frame in frame_sequence.frames),
+        ]
+    )
+
+    completed = await make_studio(
+        model,
+        tmp_path,
+        concurrency=1,
+        theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
+        frame_output_mode=FrameOutputMode.INDIVIDUAL_TEXT,
+    ).run(make_story_request())
+
+    result = completed.result
+    assert result.themes[0].theme.theme_id == "T001"
+    assert [frame.frame_id for frame in result.themes[0].frames] == [
+        "F01",
+        "F02",
+    ]
+    assert [frame.prose for frame in result.themes[0].frames] == [
+        frame.prose for frame in frame_sequence.frames
+    ]
+    assert model.stages == [
+        StoryStage.THEMES,
+        StoryStage.FRAMES,
+        StoryStage.FRAMES,
+    ]
+
+
+@pytest.mark.asyncio
+async def test_individual_text_frames_retry_only_current_frame(
+    tmp_path,
+) -> None:
+    source_theme = make_theme_batch().themes[0]
+    frame_sequence = make_frame_sequence()
+    model = FakeStoryModel(
+        [
+            NarrativeThemeDraftBatch(
+                semantic_name="lost_luggage_reunion",
+                themes=[
+                    {
+                        "title": source_theme.title,
+                        "premise": source_theme.premise,
+                        "style": source_theme.style,
+                    }
+                ],
+            ),
+            frame_sequence.frames[0].prose,
+            "需要重试的第二帧。",
+            frame_sequence.frames[1].prose,
+        ]
+    )
+
+    def reject_one_frame(_request, _theme, frame) -> None:
+        if frame.prose == "需要重试的第二帧。":
+            raise StoryContractError("第二帧缺少摄影证据")
+
+    completed = await make_studio(
+        model,
+        tmp_path,
+        frame_validator=reject_one_frame,
+        concurrency=1,
+        theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
+        frame_output_mode=FrameOutputMode.INDIVIDUAL_TEXT,
+    ).run(make_story_request())
+
+    assert model.stages == [
+        StoryStage.THEMES,
+        StoryStage.FRAMES,
+        StoryStage.FRAMES,
+        StoryStage.FRAMES,
+    ]
+    second_frame_payload = json.loads(model.messages[2][1].content)
+    assert second_frame_payload["current_frame_id"] == "F02"
+    assert second_frame_payload["existing_frame_prose"] == [
+        frame_sequence.frames[0].prose
+    ]
+    retry_messages = model.messages[3]
+    assert retry_messages[-2].content == "需要重试的第二帧。"
+    assert "纯自然语言画面正文" in retry_messages[-1].content
+    assert "schema" not in retry_messages[-1].content
+    store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
+    frame_attempts = [
+        attempt
+        for attempt in store.attempts(completed.run_id)
+        if attempt.stage == StoryStage.FRAMES
+    ]
+    assert [
+        (attempt.operation_id, attempt.outcome)
+        for attempt in frame_attempts
+    ] == [
+        ("frames-T001-F01", StoryAttemptOutcome.ACCEPTED),
+        ("frames-T001-F02", StoryAttemptOutcome.REJECTED),
+        ("frames-T001-F02", StoryAttemptOutcome.ACCEPTED),
+    ]
 
 
 @pytest.mark.asyncio

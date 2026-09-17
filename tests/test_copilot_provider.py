@@ -37,27 +37,30 @@ class FakeSession:
         finish_reason: str = "stop",
         session_error: str | None = None,
         emit_idle: bool = True,
+        assistant_message: str = "ordinary prose",
     ) -> None:
         self.options = options
         self.payloads = payloads
         self.finish_reason = finish_reason
         self.session_error = session_error
         self.emit_idle = emit_idle
+        self.assistant_message = assistant_message
         self.disconnected = False
 
     async def send(self, _prompt: str) -> None:
-        tool = self.options["tools"][0]
-        for payload in self.payloads:
-            result = await tool.handler(
-                ToolInvocation(
-                    session_id="test",
-                    tool_call_id="call",
-                    tool_name=tool.name,
-                    arguments=payload,
+        if self.options["tools"]:
+            tool = self.options["tools"][0]
+            for payload in self.payloads:
+                result = await tool.handler(
+                    ToolInvocation(
+                        session_id="test",
+                        tool_call_id="call",
+                        tool_name=tool.name,
+                        arguments=payload,
+                    )
                 )
-            )
-            if result.result_type == "success":
-                break
+                if result.result_type == "success":
+                    break
         self.options["on_event"](
             SimpleNamespace(
                 data=AssistantUsageData(
@@ -71,7 +74,7 @@ class FakeSession:
         self.options["on_event"](
             SimpleNamespace(
                 data=AssistantMessageData(
-                    content="ordinary prose",
+                    content=self.assistant_message,
                     message_id="message",
                 )
             )
@@ -155,6 +158,30 @@ async def test_copilot_uses_only_terminal_typed_submission_tool() -> None:
     tool = client.options["tools"][0]
     assert tool.is_terminal is True
     assert tool.skip_permission is True
+    assert client.session.disconnected is True
+
+
+@pytest.mark.asyncio
+async def test_copilot_generates_plain_text_without_tools() -> None:
+    client = FakeClient([], assistant_message="完整的纯文本画面。")
+    settings = StoryProviderSettings(
+        backend=ModelBackend.COPILOT,
+        model="grok-4.6",
+    )
+    model = CopilotStructuredModel(settings, client=client)
+
+    response = await model.generate_text(
+        messages=[
+            ChatMessage(role="system", content="Return plain text."),
+            ChatMessage(role="user", content="Create one frame."),
+        ],
+        max_output_tokens=1000,
+    )
+
+    assert response.text == "完整的纯文本画面。"
+    assert response.total_tokens == 18
+    assert client.options["tools"] == []
+    assert list(client.options["available_tools"]) == []
     assert client.session.disconnected is True
 
 

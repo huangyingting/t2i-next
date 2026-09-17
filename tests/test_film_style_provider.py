@@ -73,6 +73,7 @@ async def test_provider_sends_strict_profile_schema(monkeypatch) -> None:
     assert set(schema["required"]) == {
         "style_summary",
         "work_style_summaries",
+        "work_anchors",
         "palette",
         "composition",
         "blocking",

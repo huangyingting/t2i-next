@@ -47,21 +47,22 @@ uv run python scripts/refine-text-file.py \
 `t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
 视觉档案，并在同一命令中生成最终提示词。它自带完整、独立的 Profile、common、
 Theme、Frame 和 content-level 规则，不加载 `t2i_story_pipeline` 的规则，也不依赖
-`story-inputs/film.txt` 或 `story-inputs/rules/`。它只建立作品级来源关系，不把
-结果扩展为对导演全部个人风格的模仿，也不复制原作人物、演员肖像、对白、剧情、
-独特道具或具体镜头。
+`story-inputs/film.txt` 或 `story-inputs/rules/`。它为每部输入电影提取原作成年人物
+与实际场景锚点，Theme 和 Frame 必须使用同一部电影的原作人物与场景，不得跨片
+拼接或使用演员姓名代替角色。每个 Frame 还必须命中所选人物的原作服装短语，以及
+所选场景的环境与道具短语；人物之间的当前关系与互动可以按场景方向和内容等级
+重新创作，不要求忠于原作关系。
 
 ```bash
 uv run t2i-film-style generate "张艺谋" \
-  --work "英雄 (2002)" \
-  --work "十面埋伏 (2004)" \
-  --scene "雨夜室内，两名成年人隔着长桌交谈" \
+  --work "大红灯笼高高挂 (1991)" \
+  --scene "颂莲与卓云在陈府院落点灯后相遇" \
   --themes 8 \
   --frames 1 \
   --content-level aesthetic
 ```
 
-`--scene` 可省略，省略时自动创作原创电影场景。顶层进度、结构化档案、内部动态
+`--scene` 可省略，省略时自动选择原作成年人物与实际场景。顶层进度、结构化档案、内部动态
 视觉上下文及 Theme/Frame checkpoint 全部写入 `runs/film-style/<run-id>/`；
 最终提示词写入 `prompts/`。不再创建 `film-style-inputs/`。中断后只需顶层 run ID：
 
@@ -70,8 +71,15 @@ uv run t2i-film-style resume RUN_ID
 ```
 
 恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
+Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构，由程序分配
+`theme_id`；每个 Frame 单独返回纯自然语言正文，由程序分配 `frame_id`，避免模型
+因 JSON wrapper 或工具提交失败而丢弃有效画面。
 发布前会验证指定来源句、内容等级、拒绝文本和图像几何禁项；不合格 Theme 或 Frame
-进入有界重试，不会作为成功结果写入 checkpoint。
+进入有界重试，不会作为成功结果写入 checkpoint。每个 Theme 必须建立可执行的
+镜头策略；每个 Frame 还必须明确景别、机位方位与距离、高度、水平与俯仰角度、
+镜头或焦段、透视、焦点、景深及前景框景关系。时代一致性同时约束灯具技术、
+服装材料、天气、温度、裸露与身体状态；安全边界必须用可见动作表达，不得写成
+合规说明。
 最终提示词使用简短导演署名作为文件名，例如 `张艺谋_0001.txt`；内容等级由父目录
 表示，不在文件名中重复。
 详细接口见

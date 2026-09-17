@@ -35,7 +35,11 @@ from t2i_story_pipeline.config import load_story_provider_settings
 from t2i_story_pipeline.errors import StoryPipelineError
 from t2i_story_pipeline.models import ContentLevel, OutputLanguage
 from t2i_story_pipeline.provider import StoryProviderSettings, story_model
-from t2i_story_pipeline.run_store import StoryRunSettings
+from t2i_story_pipeline.run_store import (
+    FrameOutputMode,
+    StoryRunSettings,
+    ThemeOutputMode,
+)
 
 app = typer.Typer(
     name="t2i-film-style",
@@ -60,7 +64,7 @@ def generate_command(
     scene: str | None = typer.Option(
         None,
         "--scene",
-        help="可选场景方向；省略时自动创作原创电影场景。",
+        help="可选原作人物与场景方向；省略时从作品锚点自动选择。",
     ),
     themes: int = typer.Option(
         1,
@@ -156,6 +160,8 @@ def generate_command(
                 provider=story_provider,
                 concurrency=concurrency,
                 theme_output_tokens=12000,
+                theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
+                frame_output_mode=FrameOutputMode.INDIVIDUAL_TEXT,
             ),
         )
         completed = asyncio.run(

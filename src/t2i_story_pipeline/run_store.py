@@ -147,6 +147,16 @@ class StoryAttemptOutcome(StrEnum):
     TRUNCATED = "truncated"
 
 
+class ThemeOutputMode(StrEnum):
+    STRUCTURED_WITH_IDS = "structured_with_ids"
+    STRUCTURED_WITHOUT_IDS = "structured_without_ids"
+
+
+class FrameOutputMode(StrEnum):
+    STRUCTURED_SEQUENCE = "structured_sequence"
+    INDIVIDUAL_TEXT = "individual_text"
+
+
 class StoryRunSettings(_Model):
     provider: StoryProviderSettings
     concurrency: int = Field(default=8, ge=1, le=32)
@@ -154,6 +164,8 @@ class StoryRunSettings(_Model):
     theme_batch_size: int = Field(default=10, ge=1, le=10)
     theme_output_tokens: int = Field(default=6000, ge=512, le=65536)
     frame_output_tokens: int = Field(default=32768, ge=512, le=65536)
+    theme_output_mode: ThemeOutputMode = ThemeOutputMode.STRUCTURED_WITH_IDS
+    frame_output_mode: FrameOutputMode = FrameOutputMode.STRUCTURED_SEQUENCE
 
 
 class StoryRunManifest(_Model):

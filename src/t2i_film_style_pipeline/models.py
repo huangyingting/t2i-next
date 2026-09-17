@@ -93,6 +93,32 @@ class FilmStyleRequest(Model):
         return self
 
 
+class FilmCharacterAnchor(Model):
+    canonical_name: ShortText
+    identity_and_appearance: TraitText
+    canonical_costume: TraitText
+    costume_features: tuple[ShortText, ...] = Field(min_length=1, max_length=8)
+
+
+class FilmSceneAnchor(Model):
+    canonical_name: ShortText
+    narrative_context: TraitText
+    environment: TraitText
+    environment_features: tuple[ShortText, ...] = Field(
+        min_length=2,
+        max_length=8,
+    )
+    canonical_props: tuple[ShortText, ...] = Field(min_length=1, max_length=8)
+
+
+class FilmWorkAnchors(Model):
+    adult_characters: tuple[FilmCharacterAnchor, ...] = Field(
+        min_length=1,
+        max_length=12,
+    )
+    scenes: tuple[FilmSceneAnchor, ...] = Field(min_length=1, max_length=12)
+
+
 class FilmStyleRuleSet(Model):
     profile: tuple[FilmRuleText, ...] = Field(min_length=1)
     themes: tuple[FilmRuleText, ...] = Field(min_length=1)
@@ -102,6 +128,10 @@ class FilmStyleRuleSet(Model):
 class FilmStyleProfile(Model):
     style_summary: StyleSummaryText
     work_style_summaries: tuple[StyleSummaryText, ...] = Field(
+        min_length=1,
+        max_length=12,
+    )
+    work_anchors: tuple[FilmWorkAnchors, ...] = Field(
         min_length=1,
         max_length=12,
     )
@@ -121,6 +151,42 @@ class FilmStyleProfile(Model):
         strings = (
             self.style_summary,
             *self.work_style_summaries,
+            *(
+                value
+                for anchors in self.work_anchors
+                for value in (
+                    *(
+                        item.canonical_name
+                        for item in anchors.adult_characters
+                    ),
+                    *(
+                        item.identity_and_appearance
+                        for item in anchors.adult_characters
+                    ),
+                    *(
+                        item.canonical_costume
+                        for item in anchors.adult_characters
+                    ),
+                    *(
+                        feature
+                        for item in anchors.adult_characters
+                        for feature in item.costume_features
+                    ),
+                    *(item.canonical_name for item in anchors.scenes),
+                    *(item.narrative_context for item in anchors.scenes),
+                    *(item.environment for item in anchors.scenes),
+                    *(
+                        feature
+                        for item in anchors.scenes
+                        for feature in item.environment_features
+                    ),
+                    *(
+                        prop
+                        for item in anchors.scenes
+                        for prop in item.canonical_props
+                    ),
+                )
+            ),
             self.palette,
             self.composition,
             self.blocking,
@@ -163,6 +229,13 @@ def exact_film_style_profile_model(count: int) -> type[FilmStyleProfile]:
         work_style_summaries=(
             Annotated[
                 tuple[StyleSummaryText, ...],
+                Field(min_length=count, max_length=count),
+            ],
+            ...,
+        ),
+        work_anchors=(
+            Annotated[
+                tuple[FilmWorkAnchors, ...],
                 Field(min_length=count, max_length=count),
             ],
             ...,

@@ -45,6 +45,50 @@ def test_story_provider_defaults_to_32768_output_tokens() -> None:
 
 
 @pytest.mark.asyncio
+async def test_story_provider_returns_plain_text_without_schema(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+    captured = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured.update(json.loads(request.content))
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {"content": "完整的单段画面正文。"},
+                    }
+                ],
+                "usage": {"total_tokens": 12},
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+        ),
+        client=client,
+    )
+
+    response = await provider.generate_text(
+        stage=StoryStage.FRAMES,
+        messages=frame_messages(make_story_request(), make_theme()),
+        max_output_tokens=10000,
+    )
+    await client.aclose()
+
+    assert response.text == "完整的单段画面正文。"
+    assert response.usage.total_tokens == 12
+    assert "response_format" not in captured
+
+
+@pytest.mark.asyncio
 async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     captured = {}

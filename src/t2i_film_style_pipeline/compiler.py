@@ -36,8 +36,8 @@ def source_attribution(request: FilmStyleRequest) -> str:
 def frame_source_sentence(request: FilmStyleRequest) -> str:
     source = source_attribution(request)
     if request.output_language == "chinese":
-        return f"这是一个采用{source}视觉风格的原创电影场景。"
-    return f"This is an original film scene using the visual style of {source}."
+        return f"这是一个基于{source}原作人物与场景重新构图的电影画面。"
+    return f"This film image recomposes characters and settings from {source}."
 
 
 def compile_story_description(
@@ -69,19 +69,49 @@ def _compile_chinese(
             strict=True,
         )
     )
+    work_anchors = "\n\n".join(
+        "\n".join(
+            (
+                f"### {_work_label(work, chinese=True)}",
+                "原作成年人物",
+                *(
+                    f"- {character.canonical_name}："
+                    f"{character.identity_and_appearance}；"
+                    f"原作服装：{character.canonical_costume}；"
+                    f"服装短语：{'、'.join(character.costume_features)}"
+                    for character in anchors.adult_characters
+                ),
+                "原作场景",
+                *(
+                    f"- {scene.canonical_name}："
+                    f"原作情境：{scene.narrative_context}；"
+                    f"环境：{scene.environment}；"
+                    f"环境短语：{'、'.join(scene.environment_features)}；"
+                    f"道具短语：{'、'.join(scene.canonical_props)}"
+                    for scene in anchors.scenes
+                ),
+            )
+        )
+        for work, anchors in zip(
+            request.works,
+            profile.work_anchors,
+            strict=True,
+        )
+    )
     devices = "\n".join(f"- {item}" for item in profile.signature_devices)
     refusals = "\n".join(f"- {item}" for item in profile.refusal_rules)
     direction = scene_direction or (
-        "生成原创、可直接用于图像生成的电影场景。每个 Theme 使用不同的具体地点、"
-        "人物关系、活动和视觉重点。场景必须像真实长片中的一个完整瞬间，不是海报、"
-        "广告、拼贴或调色演示。"
+        "从下列作品锚点中选择原作成年人物与实际场景，生成可直接用于图像生成的"
+        "电影画面。每个 Theme 优先使用不同的原作场景、人物组合、活动瞬间和视觉"
+        "重点。画面必须像原作长片中的一个完整瞬间，不是海报、广告、拼贴或调色演示。"
     )
     return f"""WORK-SPECIFIC VISUAL CONTEXT
 
 作品来源
 
-只把{source}作为作品层面的视觉参考。不得扩大为对导演全部个人风格的模仿，
-也不得复制原作人物、演员肖像、对白、剧情、标志性服装、独特道具或具体镜头。
+只使用{source}提供的作品事实和视觉语言，不得扩大为对导演全部个人风格的模仿。
+必须使用下列原作成年人物与实际场景；不得虚构或跨作品拼接，不得使用演员姓名、
+逐字对白或逐镜复制原作具体镜头。
 
 每个 Frame 必须准确且只在第一句使用以下来源说明：
 “{source_sentence}”
@@ -97,6 +127,10 @@ def _compile_chinese(
 逐部作品视觉证据
 
 {work_summaries}
+
+原作人物与场景锚点
+
+{work_anchors}
 
 色彩
 
@@ -155,22 +189,55 @@ def _compile_english(
             strict=True,
         )
     )
+    work_anchors = "\n\n".join(
+        "\n".join(
+            (
+                f"### {_work_label(work, chinese=False)}",
+                "Adult characters from the film",
+                *(
+                    f"- {character.canonical_name}: "
+                    f"{character.identity_and_appearance}; "
+                    f"canonical costume: {character.canonical_costume}; "
+                    f"required costume phrases: "
+                    f"{', '.join(character.costume_features)}"
+                    for character in anchors.adult_characters
+                ),
+                "Settings from the film",
+                *(
+                    f"- {scene.canonical_name}: "
+                    f"source context: {scene.narrative_context}; "
+                    f"environment: {scene.environment}; "
+                    f"required environment phrases: "
+                    f"{', '.join(scene.environment_features)}; "
+                    f"required prop phrases: {', '.join(scene.canonical_props)}"
+                    for scene in anchors.scenes
+                ),
+            )
+        )
+        for work, anchors in zip(
+            request.works,
+            profile.work_anchors,
+            strict=True,
+        )
+    )
     devices = "\n".join(f"- {item}" for item in profile.signature_devices)
     refusals = "\n".join(f"- {item}" for item in profile.refusal_rules)
     direction = scene_direction or (
-        "Create original, directly imageable film scenes. Give every Theme a "
-        "different specific location, relationship, activity, and visual focus. "
-        "Each scene must be one complete feature-film instant, not a poster, "
-        "advertisement, collage, or grading demonstration."
+        "Select adult characters and an actual setting from the work anchors "
+        "below to create directly imageable film scenes. Prefer a different "
+        "canonical setting, character combination, activity instant, and visual "
+        "focus for each Theme. Each image must feel like one complete instant "
+        "from the source feature, not a poster, advertisement, collage, or "
+        "grading demonstration."
     )
     return f"""WORK-SPECIFIC VISUAL CONTEXT
 
 SOURCE
 
-Use only {source} as work-specific visual references. Do not broaden the source
-into imitation of the director's unrestricted personal style. Do not copy
-characters, actor likenesses, dialogue, plots, signature costumes, unique props,
-or exact shots.
+Use only facts and visual language from {source}. Do not broaden the source into
+imitation of the director's unrestricted personal style. Use the canonical adult
+characters and actual settings listed below. Do not invent or mix anchors across
+works, use actor names, reproduce dialogue verbatim, or copy an exact shot.
 
 Every Frame must use this source sentence exactly once as its first sentence:
 "{source_sentence}"
@@ -186,6 +253,10 @@ WORK-SET VISUAL SUMMARY
 PER-WORK VISUAL EVIDENCE
 
 {work_summaries}
+
+CHARACTER AND SETTING ANCHORS
+
+{work_anchors}
 
 PALETTE
 

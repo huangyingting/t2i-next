@@ -102,6 +102,12 @@ class ModelResponse:
     usage: TokenUsage
 
 
+@dataclass(frozen=True, slots=True)
+class TextModelResponse:
+    text: str
+    usage: TokenUsage
+
+
 class StoryModel(Protocol):
     async def generate(
         self,
@@ -111,6 +117,14 @@ class StoryModel(Protocol):
         response_model: type[ResponseT],
         max_output_tokens: int,
     ) -> ModelResponse: ...
+
+    async def generate_text(
+        self,
+        *,
+        stage: StoryStage,
+        messages: list[ChatMessage],
+        max_output_tokens: int,
+    ) -> TextModelResponse: ...
 
 
 _SCHEMA_MAP_KEYS = frozenset(
@@ -260,6 +274,59 @@ class OpenAIStoryModel(StoryModel):
             ) from exc
         return ModelResponse(value=value, usage=usage)
 
+    async def generate_text(
+        self,
+        *,
+        stage: StoryStage,
+        messages: list[ChatMessage],
+        max_output_tokens: int,
+    ) -> TextModelResponse:
+        payload = {
+            "model": self._settings.model,
+            "messages": [
+                {"role": message.role, "content": message.content}
+                for message in messages
+            ],
+            "max_tokens": min(
+                max_output_tokens,
+                self._settings.output_token_limit,
+            ),
+        }
+        if (
+            self._settings.thinking_mode is None
+            and self._settings.reasoning_effort is None
+        ):
+            payload["temperature"] = self._settings.temperature
+        if self._settings.thinking_mode is not None:
+            payload["thinking"] = {"type": self._settings.thinking_mode.value}
+        if self._settings.reasoning_effort is not None:
+            payload["reasoning_effort"] = self._settings.reasoning_effort.value
+        response = await self._post(payload)
+        usage = self._parse_usage(response)
+        try:
+            body = response.json()
+            choice = body["choices"][0]
+            finish_reason = choice.get("finish_reason")
+            content = choice["message"]["content"]
+        except (ValueError, KeyError, IndexError, TypeError) as exc:
+            raise StoryProviderResponseError(
+                f"{stage.value} 返回了不支持的响应结构",
+                usage=usage,
+            ) from exc
+        if not isinstance(content, str) or not content.strip():
+            raise StoryProviderResponseError(
+                f"{stage.value} 返回了空内容",
+                usage=usage,
+            )
+        if finish_reason == "length":
+            raise StoryProviderTruncatedOutputError(
+                f"{stage.value} 输出达到 token 上限",
+                raw_content=content,
+                usage=usage,
+                validation_issues=(),
+            )
+        return TextModelResponse(text=content.strip(), usage=usage)
+
     async def _post(self, payload: dict[str, Any]) -> httpx.Response:
         url = f"{self._settings.base_url.rstrip('/')}/chat/completions"
         for attempt in range(self._settings.transport_retries + 1):
@@ -390,6 +457,46 @@ class CopilotStoryModel(StoryModel):
             raise StoryProviderError(str(exc)) from exc
         return ModelResponse(
             value=response.value,
+            usage=TokenUsage(
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+            ),
+        )
+
+    async def generate_text(
+        self,
+        *,
+        stage: StoryStage,
+        messages: list[ChatMessage],
+        max_output_tokens: int,
+    ) -> TextModelResponse:
+        try:
+            response = await self._model.generate_text(
+                messages=messages,
+                max_output_tokens=max_output_tokens,
+            )
+        except CopilotGenerationError as exc:
+            usage = TokenUsage(
+                prompt_tokens=exc.prompt_tokens,
+                completion_tokens=exc.completion_tokens,
+                total_tokens=exc.total_tokens,
+            )
+            if exc.truncated:
+                raise StoryProviderTruncatedOutputError(
+                    f"{stage.value} 输出达到 Copilot token 上限",
+                    raw_content=exc.raw_content,
+                    usage=usage,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            if exc.raw_content:
+                raise StoryProviderResponseError(
+                    f"{stage.value} Copilot 文本生成失败",
+                    usage=usage,
+                ) from exc
+            raise StoryProviderError(str(exc)) from exc
+        return TextModelResponse(
+            text=response.text,
             usage=TokenUsage(
                 prompt_tokens=response.prompt_tokens,
                 completion_tokens=response.completion_tokens,
