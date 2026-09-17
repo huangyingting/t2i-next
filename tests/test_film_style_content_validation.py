@@ -62,21 +62,15 @@ def complete_camera_frame(film_request: FilmStyleRequest) -> NarrativeFrame:
     )
 
 
-def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
+def test_hardcore_theme_can_be_broad_but_frame_requires_explicit_evidence() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
     request = make_prompt_request(ContentLevel.HARDCORE)
 
-    with pytest.raises(FilmStyleContractError, match="不得降级"):
-        validator.validate_theme(
-            request,
-            make_theme("两名成年人在房间里拥抱和亲吻。"),
-        )
-    with pytest.raises(FilmStyleContractError, match="不得降级"):
-        validator.validate_theme(
-            request,
-            make_theme("两名成年人开始成人私会，但不展示具体性交过程。"),
-        )
+    validator.validate_theme(
+        request,
+        make_theme("两名成年人在房间里探索多种明确的成人亲密互动。"),
+    )
 
     explicit_theme = make_theme("两名成年人正在自愿进行口交。")
     validator.validate_theme(request, explicit_theme)
@@ -110,6 +104,61 @@ def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "premise",
+    [
+        "两名成年人正在进行明确的阴蒂摩擦与刺激行为。",
+        "一名成年人的手指正在直接抚触另一名成年人的外阴。",
+        "两名成年人正在进行生殖器摩擦。",
+        "Two adults are engaged in clitoral stimulation.",
+        "One adult is performing manual genital stimulation on another adult.",
+    ],
+)
+def test_hardcore_accepts_contextual_manual_stimulation(
+    premise: str,
+) -> None:
+    validator = FilmStyleContentValidator(
+        make_film_request(),
+        make_validation_profile(),
+    )
+
+    validator.validate_theme(
+        make_prompt_request(ContentLevel.HARDCORE),
+        make_theme(premise),
+    )
+
+
+@pytest.mark.parametrize(
+    "premise",
+    [
+        "两名成年人亲吻，但不展示阴蒂摩擦与刺激。",
+        "画面不得呈现手指直接抚触外阴。",
+        "Two adults embrace without clitoral stimulation.",
+    ],
+)
+def test_hardcore_frame_rejects_negated_manual_stimulation(
+    premise: str,
+) -> None:
+    validator = FilmStyleContentValidator(
+        make_film_request(),
+        make_validation_profile(),
+    )
+
+    film_request = make_film_request()
+    source = frame_source_sentence(film_request)
+    with pytest.raises(FilmStyleContractError, match="不得降级"):
+        validator.validate_frame(
+            make_prompt_request(ContentLevel.HARDCORE),
+            make_theme("两名成年人探索多种明确的成人亲密互动。"),
+            make_frame(
+                source
+                + premise
+                + "画面补充足够长的环境、人物与摄影描述，但不改变上述行为。"
+                * 20
+            ),
+        )
+
+
 def test_frame_rejects_refusal_missing_source_and_image_geometry() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
@@ -138,7 +187,18 @@ def test_frame_rejects_refusal_missing_source_and_image_geometry() -> None:
 
 
 @pytest.mark.parametrize("level", [ContentLevel.AESTHETIC, ContentLevel.EROTIC])
-def test_non_explicit_levels_reject_explicit_sex(level: ContentLevel) -> None:
+@pytest.mark.parametrize(
+    "premise",
+    [
+        "两名成年人正在进行口交。",
+        "一名成年人的手指正在直接抚触另一名成年人的外阴。",
+        "Two adults are engaged in genital rubbing.",
+    ],
+)
+def test_non_explicit_levels_reject_explicit_sex(
+    level: ContentLevel,
+    premise: str,
+) -> None:
     validator = FilmStyleContentValidator(
         make_film_request(),
         make_validation_profile(),
@@ -147,7 +207,7 @@ def test_non_explicit_levels_reject_explicit_sex(level: ContentLevel) -> None:
     with pytest.raises(FilmStyleContractError, match="超出当前内容级别"):
         validator.validate_theme(
             make_prompt_request(level),
-            make_theme("两名成年人正在进行口交。"),
+            make_theme(premise),
         )
 
 

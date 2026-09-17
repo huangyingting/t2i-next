@@ -114,6 +114,16 @@ def generate_command(
         "--content-level",
         help="内容尺度：aesthetic、erotic 或 hardcore。",
     ),
+    validate_themes: bool = typer.Option(
+        False,
+        "--validate-themes",
+        help="启用 Theme 的拒绝文本、原作锚点和内容等级语义验证。",
+    ),
+    validate_frames: bool = typer.Option(
+        False,
+        "--validate-frames",
+        help="启用 Frame 的来源、内容、锚点、摄影和感官语义验证。",
+    ),
     output_language: OutputLanguage = typer.Option(
         OutputLanguage.CHINESE,
         "--language",
@@ -171,6 +181,8 @@ def generate_command(
                 theme_output_tokens=12000,
                 theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
             ),
+            validate_themes=validate_themes,
+            validate_frames=validate_frames,
         )
         completed = asyncio.run(
             _generate(

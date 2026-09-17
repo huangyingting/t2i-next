@@ -221,17 +221,6 @@ class StoryRequest(Model):
         return self
 
 
-class NarrativeTheme(Model):
-    theme_id: ThemeId
-    title: Text = Field(description="简洁自然的主题标题")
-    premise: PremiseText = Field(
-        description="完整的人物、地点与当前情境前提，不包含写作指令"
-    )
-    style: StyleText = Field(
-        description="完整、具体、可执行的视觉方案，不包含写作指令或内部字段"
-    )
-
-
 class NarrativeThemeDraft(Model):
     title: Text = Field(description="简洁自然的主题标题")
     premise: PremiseText = Field(
@@ -242,12 +231,11 @@ class NarrativeThemeDraft(Model):
     )
 
 
+class NarrativeTheme(NarrativeThemeDraft):
+    theme_id: ThemeId
+
+
 class NarrativeThemeBatch(Model):
-    semantic_name: SemanticName
-    themes: list[NarrativeTheme] = Field(min_length=1, max_length=10)
-
-
-class NarrativeThemeDraftBatch(Model):
     semantic_name: SemanticName
     themes: list[NarrativeThemeDraft] = Field(min_length=1, max_length=10)
 
@@ -257,10 +245,6 @@ class NarrativeFrame(Model):
     prose: NarrativeProse = Field(
         description="只含最终画面正文的单段自然语言，不包含内部编号或写作指令"
     )
-
-
-class NarrativeFrameDraft(Model):
-    prose: NarrativeProse
 
 
 class NarrativeFrameSequence(Model):
@@ -303,43 +287,7 @@ def exact_theme_batch_model(count: int) -> type[NarrativeThemeBatch]:
         __base__=NarrativeThemeBatch,
         themes=(
             Annotated[
-                list[NarrativeTheme],
-                Field(min_length=count, max_length=count),
-            ],
-            ...,
-        ),
-    )
-
-
-@lru_cache(maxsize=10)
-def exact_theme_draft_batch_model(
-    count: int,
-) -> type[NarrativeThemeDraftBatch]:
-    if not 1 <= count <= 10:
-        raise ValueError("主题批次大小必须介于 1 和 10")
-    return create_model(
-        f"NarrativeThemeDraftBatch{count}",
-        __base__=NarrativeThemeDraftBatch,
-        themes=(
-            Annotated[
                 list[NarrativeThemeDraft],
-                Field(min_length=count, max_length=count),
-            ],
-            ...,
-        ),
-    )
-
-
-@lru_cache(maxsize=6)
-def exact_frame_sequence_model(count: int) -> type[NarrativeFrameSequence]:
-    if not 1 <= count <= 6:
-        raise ValueError("画面数量必须介于 1 和 6")
-    return create_model(
-        f"NarrativeFrameSequence{count}",
-        __base__=NarrativeFrameSequence,
-        frames=(
-            Annotated[
-                list[NarrativeFrame],
                 Field(min_length=count, max_length=count),
             ],
             ...,

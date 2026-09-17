@@ -47,14 +47,42 @@ completed = await StoryStudio(
 
 ## 生成流程
 
-1. `themes`：每批最多十个，生成 `title`、最多三百字的 `premise` 和简短
-   `style`。差异必须来自事件、人物互动和决定性瞬间，不是道具、色调或镜头替换。
-2. `frames`：每个主题一次生成完整的一至六帧 Narrative Sequence。
-   不存在本地拼接或二次 renderer。
+1. `themes`：每批最多十个，结构化返回 `semantic_name` 及每个主题的 `title`、
+   `premise`、`style`，不提交 ID。程序按响应顺序分配连续 `T001` 等 ID。
+   premise 建立足够完整的稳定事实，style 提供适合当前媒介的可执行视觉方向，
+   不再机械限制成两句前提或一句风格。更具体的 Story Description 要求优先。
+2. `frames`：一次请求当前主题所有缺失帧，模型仅返回对应数量的
+   `<FRAME>完整单段正文</FRAME>` 文本块。程序按请求槽位顺序分配 `F01` 等 ID、
+   去除传输标签并构造领域对象；模型不提交 Frame JSON 或工具参数。
+   不存在本地正文拼接或二次 renderer。
 
 100 themes × 6 frames 的基础调用量是十次 theme batch 加一百次 frame sequence，
 共 110 次 provider 调用。`StoryStudio` 默认最多并发生成八个 frame sequences。
-resume 只调用缺失的 Theme batch 和 Frame Sequence。
+resume 只调用缺失的 Theme batch 与各主题尚未保存的 Frame。
+
+批量文本保持 110 次无错误基础调用，不采用逐帧调用所需的 610 次请求。
+这只是请求数量对比，不等于模型质量、实际 token 或费用评测。
+批次必须返回准确数量，且标签外不能有正文、标签不能嵌套；数量或边界不明确时
+拒绝整个批次，不猜测段落对应哪个槽位。边界明确后逐帧执行结构契约和所选质量检查。
+
+## 架构边界
+
+Story 只有一条当前执行路径，不通过 output-mode 开关维护多套生成实现，
+也不通过 YAML 声明任意步骤、可执行代码或插件：
+
+| 层 | 职责 |
+|---|---|
+| `documents.py` / `models.py` | 严格解析文档和定义请求、模型草稿、最终对象、质量策略 |
+| `authoring_rules.py` / `prompts.py` | 冻结创作指令、序列化阶段上下文，不混入执行策略 |
+| `provider.py` | 结构化或文本传输、transport 重试、截断与 usage，不判断故事质量 |
+| `frame_batches.py` / `quality_validation.py` | 纯文本边界解析与纯函数检查，不进行 I/O 或模型调用 |
+| `studio.py` | 编排两个固定阶段，分配 ID，决定接受、缺失帧重试和完成 |
+| `run_store.py` / `persistence.py` / `storage.py` | 原子 checkpoint、锁、恢复完整性验证与发布 |
+
+结构化 Theme 与文本 Frame 使用各自明确的接受逻辑，共享 attempt 记录及错误反馈
+机制；不为两个固定阶段引入通用 workflow 框架。创作、验证和执行设置互不冒充。
+公共接口不接收无法冻结的 validator 回调；额外检查统一来自声明式质量策略。
+仅保存当前目录和数据结构，不提供旧整组 JSON checkpoint 或旧输出模式的回退路径。
 
 ## Content Level
 
@@ -203,9 +231,10 @@ resume 不读当前 YAML 或规则文件，也不接受切换质量策略。
 CLI 明确输出 `skipped` / `passed` / `warnings` 和报告路径；`report` 告警也会
 出现在进度输出中。最终 TXT 保持每帧一行纯正文，不混入报告。
 
-默认仍按完整 Frame Sequence 生成、验证和保存，因此 `enforce` 下的质量失败会
-重试当前主题的整组 Frame，而不是已经成功保存的其他主题。不新增 Profile 或
-模型评审调用，也没有把 Story 改成逐帧生成。
+每个 Frame 独立接受与保存。一个批次只有部分帧违反结构或 `enforce` 质量检查时，
+通过的帧立即保留，下一次请求只包含失败槽位，并携带已经保存的帧作为上下文。
+`report` 的告警帧仍会被接受，不引起额外调用。单主题的总 attempt 次数仍有界，
+不会因为每次有部分进展而重置重试预算。不新增 Profile 或模型评审调用。
 
 ## 运行记录与恢复
 
@@ -221,13 +250,18 @@ runs/<run-id>/
 ├── themes/
 │   └── T001.json
 ├── frames/
-│   └── T001.json
+│   └── T001/
+│       ├── F01.json
+│       └── F03.json
 └── result.json
 ```
 
 `manifest.json` 冻结 provider、并发数、generation retry、theme batch size、
-theme/frame token 上限、完整质量策略和发布目录。每个成功 Theme 和每个 Theme 的完整 Frame
-Sequence 都独立原子写入并 fsync；attempt 文件保存结果、错误和 token usage。
+theme/frame token 上限、完整质量策略和发布目录。每个成功 Theme 和每个 Frame
+都独立原子写入并 fsync；例如只有 F02 失败时，上图的 F01 和 F03 保留，恢复只请求 F02。
+attempt 在对应 Frame checkpoint 之前保存接受/拒绝信息与 usage。若在多帧落盘
+期间中断，以已经完成原子写入的 Frame 文件为恢复依据，不把未落盘的 accepted ID
+当作已完成内容。
 checkpoint 文件名、内容 ID、顺序、数量或 schema 不一致时会明确报告损坏，不会
 静默跳过。
 
@@ -242,12 +276,13 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
 
 1. provider transport 层默认额外重试两次。timeout、transport error、HTTP 429
    和 5xx 使用有界退避；429 优先遵循 `Retry-After`。401/403 立即报告认证错误。
-2. generation 层对每个 Theme batch 或 Frame Sequence 默认额外重试两次。
-   空响应和不支持的 provider 响应记录为 provider error；JSON/schema 错误记录
-   为 structured-output rejection；无效且 `finish_reason=length` 的响应单独记录
-   为 truncated output。截断 Theme 响应后，下一次 attempt 从初始 6,000-token
-   预算提升到 manifest 冻结的 provider 上限；Frame Sequence 当前初始上限已经是
-   32,768。truncated outcome 会持久化，因此进程重启后的第一次 resume attempt
+2. generation 层对每个 Theme batch 或单主题的缺失 Frame batch 默认额外重试两次。
+   空响应和不支持的 provider 响应记录为 provider error；Theme JSON/schema 错误、
+   Frame 文本边界错误或逐帧拒绝记录为 rejected。文本响应若
+   `finish_reason=length`，不把可能截断的内容作为成功批次；无效的截断 Theme
+   同样记录为 truncated。下一次 attempt 提升到 manifest 冻结的 provider 上限；
+   Theme 初始预算为 6,000 tokens，Frame batch 为 32,768 tokens。
+   truncated outcome 会持久化，因此进程重启后的第一次 resume attempt
    也直接使用提升后的预算。
 
 每个 attempt 保存 stage、operation、requested IDs、accepted IDs、具体 issues、
@@ -256,9 +291,9 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
 三条 issues 反馈给模型。认证失败和 transport 层耗尽后的不可恢复 provider error
 不会在 generation 层盲目循环。
 
-Theme batch 和 Frame Sequence 的 schema 都要求完整返回，因此 story pipeline 不
-引入旧管线面向 partial-ID batch 的 salvage/no-progress 循环；每个 operation 的
-flat retry 次数本身严格有界。取消运行时 `asyncio` 会取消所有在途 Frame task，
+Theme batch 要求完整的结构化响应；Frame batch 在文本边界明确后允许部分接受。
+缺失帧集合只能缩小，不会重新请求已保存的帧，也没有无限 salvage/no-progress 循环。
+取消运行时 `asyncio` 会取消所有在途 Frame task，
 已落盘 checkpoint 保留，run 锁释放，manifest 保持可 resume。
 
 ## 时间、地点与时代一致性
@@ -373,8 +408,8 @@ attempt 和完整 result JSON 只保存在 `runs/`，不会复制到 `prompts/`�
 同一天、同一 content level 下完整名称重名时，序号按 `_0001`、`_0002` 递增
 分配。
 每条 prose 最多 32,768 个字符；frame sequence 请求和 provider 缺省输出上限
-也都是 32,768 tokens。该 token 上限由同一次调用中的全部 frames 和 JSON
-结构共同使用，不是每帧单独分配。
+也都是 32,768 tokens。该 token 上限由同一次调用中的全部缺失 frames 与传输标签
+共同使用，不是每帧单独分配。
 
 Provider 使用共享的 `OPENAI_*` 环境变量。凭证只从配置的环境变量读取，
 不会写入产物或日志。

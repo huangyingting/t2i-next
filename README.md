@@ -62,6 +62,8 @@ uv run t2i-film-style generate "张艺谋" \
   --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
+  --validate-themes \
+  --validate-frames \
   --content-level aesthetic
 ```
 
@@ -81,8 +83,24 @@ Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构�
 `frame_id`，避免逐帧调用开销以及 JSON wrapper 或工具提交失败。批次中验证通过的
 Frame 会被保留，后续只重新生成失败槽位。
 通过验证的 Frame 会立即单独写入 checkpoint，因此中断恢复也不会重做已通过画面。
-发布前会验证指定来源句、内容等级、拒绝文本和图像几何禁项；不合格 Theme 或 Frame
-进入有界重试，不会作为成功结果写入 checkpoint。每个 Theme 必须建立可执行的
+每个 Frame 还要求为每名入画人物分别写出具体可见表情，以至少两项面部状态和明确
+视线落点落实，不能使用群体共同表情或抽象情绪标签。
+为减少肢体错乱，Frame 按支撑面、躯干朝向、四肢唯一职责、明确接触链和衣物最终
+状态的固定顺序构造；每帧只保留一个核心互动，每人最多一个辅助接触，并禁止无承重
+悬空、贴合与夹手冲突、遮脸与表情冲突以及互斥衣物状态。
+Theme 只锁定人物、场景、关系与内容方向；每个 Frame 自由设计姿态和核心接触链，并
+闭合自身的承重、四肢和衣物拓扑。批次同时变化姿态类别、高低关系、核心接触与摄影
+方案，冲突时优先删除辅助动作和服装花样。
+Hardcore Frame 只保留一个主动接触并描述动作完成后的静态受力结果，避免连续运动、
+袖口束缚和面部遮挡；Theme 不提前固定动作主客体。
+每帧还需为核心接触保留可见进入路径，保持头颈与胸骨方向一致，并从完整穿着、前开
+上衣加腰部固定下装、完全脱衣三种互斥衣物状态中选择一种。
+姿态不使用固定菜单或模板分配；站、坐、跪、蹲和卧姿均可使用，只要求每个人的承重
+链闭合且重心落在自己的支撑多边形内。
+Theme 与 Frame 语义发布验证默认关闭；分别使用 `--validate-themes` 和
+`--validate-frames` 启用。启用后会验证指定来源句、内容等级、拒绝文本和图像几何
+禁项；不合格 Theme 或 Frame 进入有界重试，不会作为成功结果写入 checkpoint。
+每个 Theme 必须建立可执行的
 镜头策略；每个 Frame 还必须明确景别、机位方位与距离、高度、水平与俯仰角度、
 镜头或焦段、透视、焦点、景深及前景框景关系。时代一致性同时约束灯具技术、
 服装材料、天气、温度、裸露与身体状态；安全边界必须用可见动作表达，不得写成
@@ -200,8 +218,11 @@ manifest 记录其 SHA-256 指纹，resume 始终使用冻结版本而不重新�
 特定人物组合或内容等级声明严格前置条件，但不得增删请求人物，也不得把多个 Frame
 改写成跨 Frame 的连续剧情。多个 Frame 始终是同一 Theme 的平行视觉方案。
 
-每个 run 在首次 provider 调用前创建。每批 Theme 和每个 Theme 的完整 Frame
-Sequence 都会原子保存；失败或进程退出后，只重新生成缺失部分：
+Story 使用唯一的当前输出路径：Theme 返回不含 ID 的结构化草稿，Frame 按主题
+批量返回 `<FRAME>...</FRAME>` 纯文本块，所有 ID 由程序分配。正常的
+100 themes × 6 frames 仍为 110 次基础调用，不增加逐帧模型调用。
+每个 run 在首次 provider 调用前创建。每个 Theme 和每个 Frame 都会原子保存；
+同一批次部分帧失败时保留成功帧，重试或进程退出后的恢复只请求缺失槽位：
 
 ```bash
 uv run t2i-story runs --runs-dir runs
@@ -212,7 +233,7 @@ uv run t2i-story resume RUN_ID --runs-dir runs
 usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
 网络 timeout、transport error、429 和 5xx 默认在 provider 层额外重试两次；
 空响应、schema 错误和截断输出在 generation 层分类记录并进行有界重试。截断
-Theme 输出会把下一次请求预算提升到 run 冻结的 provider token 上限，并在
+Theme 或 Frame batch 输出会把下一次请求预算提升到 run 冻结的 provider token 上限，并在
 resume 后保持该预算。attempt
 记录保存请求/接受 ID、具体 issues、耗时和 usage；resume 会把最近三条相关
 issues 继续反馈给模型。认证错误不会盲目重试。

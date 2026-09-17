@@ -67,6 +67,63 @@ def test_film_style_content_levels_define_clear_visual_bounds(
     assert "自愿" in text
 
 
+def test_frame_rules_require_specific_expression_for_every_character() -> None:
+    rules = resolve_film_style_rules(make_prompt_request())
+    text = "\n".join(rules.frames)
+
+    assert "每个入画人物都必须分别写出一个具体、可见" in text
+    assert "至少用眉眼、眼睑、嘴角、嘴唇、下颌、面颊或额头中的两项" in text
+    assert "明确其视线落点" in text
+    assert "不得只为群体提供一个共同表情" in text
+    assert "不得让不同人物复制相同表情" in text
+
+
+def test_frame_rules_define_low_complexity_body_topology() -> None:
+    rules = resolve_film_style_rules(make_prompt_request())
+    text = "\n".join(rules.frames)
+
+    assert "主要支撑面和承重部位" in text
+    assert "骨盆、躯干和头部各自唯一的朝向与高度" in text
+    assert "每条可见手臂和腿分配一个且仅一个作用" in text
+    assert "谁的哪个部位接触谁的哪个部位或哪件物体" in text
+    assert "每个人最多增加一个无动作含义的辅助接触" in text
+    assert "扶膝、握腕或环颈不能被写成全身支撑" in text
+    assert "不得先写该区域完全贴合或没有缝隙" in text
+    assert "不得在仍穿上衣或下装时写“完全赤裸”" in text
+    assert "每个 Frame 的姿态设计保持开放，不使用固定姿势菜单" in text
+    assert "必须为每个人分别写清一条闭合承重链" in text
+    assert "为呈现面部而调整摄影机" in text
+    assert "不得让衣袖、衣襟或肩带滑落、褪至或堆在手臂" in text
+    assert "身体拓扑和动作可读性优先于" in text
+    assert "不得把两个方案混入同一画面" in text
+    assert "当前 Frame 专属的“核心接触链”句" in text
+    assert "画面是动作完成后的一个静态受力瞬间" in text
+    assert "每张脸与对方的颈侧、胸前、肩后和头发之间保留可见间隔" in text
+    assert "每人的重心落在自己的支撑多边形内" in text
+    assert "不得使用悬空骨盆、无支点深度俯折" in text
+    assert "其他手臂必须放在自己的身体或主要支撑面上" in text
+    assert "核心接触所需的手、手臂、腿或物体必须具有可见的进入路径" in text
+    assert "头颈方向必须与胸骨朝向自然一致" in text
+    assert "必须为每个人分别用一句话选定以下一种完整衣物状态" in text
+    assert "核心接触部位及其进入路径不得被仍穿着的衣物覆盖" in text
+    assert "每人至多一只手接触对方" in text
+    assert "人物朝向与高低关系" in text
+
+
+def test_hardcore_rules_keep_theme_open_and_close_each_frame_topology() -> None:
+    rules = resolve_film_style_rules(
+        make_prompt_request(ContentLevel.HARDCORE)
+    )
+    text = "\n".join((*rules.themes, *rules.frames))
+
+    assert "不得固定动作发起者、具体接触部位" in text
+    assert "不同 Frame 可以改变行为类别、动作发起者和基础姿态" in text
+    assert "每个 Frame 只能有一处带有性动作含义的主动接触" in text
+    assert "胸部、肩背、大腿或腰部的抓握不能单独充当本级核心行为" in text
+    assert "批次应同时探索不同的姿态类别、核心接触链" in text
+    assert "每个 Frame 的内部拓扑必须独立闭合" in text
+
+
 @pytest.mark.parametrize("output_language", ["chinese", "english"])
 def test_every_builtin_film_style_rule_is_written_in_chinese(
     output_language,

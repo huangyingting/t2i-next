@@ -7,7 +7,7 @@ import pytest
 
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.documents import load_story_document
-from t2i_story_pipeline.models import ContentLevel
+from t2i_story_pipeline.models import ContentLevel, NarrativeFrame
 from t2i_story_pipeline.prompts import (
     frame_messages as compile_frame_messages,
 )
@@ -17,7 +17,6 @@ from t2i_story_pipeline.prompts import (
 from tests.story_factories import (
     make_story_request,
     make_theme,
-    make_theme_batch,
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +35,10 @@ def frame_messages(request, theme):
         request,
         theme,
         resolve_story_rules(request),
+        requested_frame_ids=[
+            f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
+        ],
+        accepted_frames=[],
     )
 
 
@@ -43,7 +46,6 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     request = make_story_request(theme_count=100, frames_per_theme=6)
     messages = theme_messages(
         request,
-        start_index=1,
         count=10,
         existing_themes=[],
     )
@@ -51,7 +53,7 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     payload = json.loads(messages[1].content)
 
     assert payload["story"] == request.story
-    assert payload["theme_ids"] == [f"T{index:03d}" for index in range(1, 11)]
+    assert payload["theme_count"] == 10
     assert payload["content_level"] == "aesthetic"
     assert payload["semantic_name"] is None
     assert "concise lowercase English snake_case name" in prompt
@@ -70,9 +72,8 @@ def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
 
     messages = theme_messages(
         request,
-        start_index=11,
         count=10,
-        existing_themes=make_theme_batch(count=10).themes,
+        existing_themes=[make_theme(index) for index in range(1, 11)],
         semantic_name="lost_luggage_reunion",
     )
 
@@ -86,10 +87,8 @@ def test_prompt_can_delegate_theme_ids_to_program() -> None:
     request = make_story_request(theme_count=3)
     messages = theme_messages(
         request,
-        start_index=1,
         count=3,
         existing_themes=[],
-        program_assigns_ids=True,
     )
 
     payload = json.loads(messages[1].content)
@@ -104,14 +103,16 @@ def test_prompt_can_request_one_plain_text_frame() -> None:
         request,
         make_theme(),
         resolve_story_rules(request),
-        frame_id="F02",
-        existing_frames=["先前完成的画面。"],
+        requested_frame_ids=["F02"],
+        accepted_frames=[NarrativeFrame(frame_id="F01", prose="先前完成的画面。")],
     )
 
     payload = json.loads(messages[1].content)
-    assert payload["current_frame_id"] == "F02"
-    assert payload["program_assigns_frame_id"] is True
-    assert payload["existing_frame_prose"] == ["先前完成的画面。"]
+    assert payload["requested_frame_slots"] == ["F02"]
+    assert payload["program_assigns_frame_ids"] is True
+    assert payload["accepted_frames"] == [
+        {"frame_id": "F01", "prose": "先前完成的画面。"}
+    ]
     assert "frame_ids" not in payload
 
 
@@ -121,7 +122,6 @@ def test_prompts_compile_exact_cast_constraints() -> None:
     for messages in (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         ),
@@ -146,7 +146,6 @@ def test_prompts_preserve_unspecified_cast_from_story() -> None:
     for messages in (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         ),
@@ -167,7 +166,6 @@ def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
     for messages in (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         ),
@@ -190,7 +188,7 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
 
     assert payload["story"] == request.story
     assert payload["theme"]["theme_id"] == "T001"
-    assert payload["frame_ids"] == [
+    assert payload["requested_frame_slots"] == [
         "F01",
         "F02",
         "F03",
@@ -234,7 +232,6 @@ def test_prompt_compiler_does_not_encode_story_input_archetypes() -> None:
     prompts = (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         )[0].content,
@@ -272,7 +269,6 @@ def test_chinese_prompts_allow_story_required_english_labels_and_copy() -> None:
 
     theme_prompt = theme_messages(
         request,
-        start_index=1,
         count=1,
         existing_themes=[],
     )[0].content
@@ -293,7 +289,6 @@ def test_system_instructions_keep_shared_rule_language_across_output_languages(
     prompts = (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         )[0].content,
@@ -344,7 +339,6 @@ def test_prompts_compile_only_selected_content_level(
     for messages in (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         ),
@@ -415,7 +409,6 @@ def test_prompts_express_era_consistency_holistically() -> None:
     for messages in (
         theme_messages(
             request,
-            start_index=1,
             count=1,
             existing_themes=[],
         ),

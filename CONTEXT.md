@@ -139,8 +139,9 @@ _Avoid_: Exact-date invention, silent modernization
 
 **Narrative Theme**:
 One micro-story concept derived from the Story Description. It owns a short
-title, premise, and concise style phrase that identifies the event, character
-tension, decisive moment, and visual mode. Differences between Narrative
+title, a complete stable premise, and an actionable visual direction appropriate
+to its medium, without a fixed sentence quota. The model submits these fields
+without an ID; the program assigns the Narrative Theme ID. Differences between Narrative
 Themes come from story events rather than prop, color, or camera substitutions.
 The premise is a bounded story seed, not a scene-by-scene action list.
 _Avoid_: Legacy Theme, variant label
@@ -156,9 +157,17 @@ _Avoid_: Narrative Scene, Story Shot, structured prompt
 
 **Narrative Sequence**:
 The ordered one-to-six Narrative Frames belonging to one Narrative Theme.
-Together they form a micro-story while each frame remains independently
-understandable.
+They share stable Theme facts as parallel visual alternatives, rather than an
+implicit chronological progression; each remains independently understandable.
 _Avoid_: Review cycle, storyboard schema
+
+**Story Frame Batch**:
+One model text response containing exactly one `<FRAME>...</FRAME>` block for
+each requested missing slot. The program owns IDs, validates each paragraph,
+and checkpoints accepted frames individually. Retry and resume request only
+missing slots with accepted frames as context. Ambiguous boundaries or a wrong
+block count reject the whole response rather than guessing slot ownership.
+_Avoid_: Structured Frame output, per-frame model call, renderer
 
 ## Standalone Spatial Pipeline
 

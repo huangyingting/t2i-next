@@ -104,6 +104,8 @@ def _short_filename_stem(value: str) -> str:
 class FilmStylePipelineSettings(_Model):
     film_provider: FilmStyleProviderSettings
     prompt: FilmPromptRunSettings
+    validate_themes: bool
+    validate_frames: bool
 
 
 class FilmStyleRunManifest(_Model):
@@ -492,9 +494,16 @@ class FilmStylePromptStudio:
                     themes=snapshot.rules.themes,
                     frames=snapshot.rules.frames,
                 )
-                content_validator = FilmStyleContentValidator(
-                    snapshot.request.film_style,
-                    film_result.profile,
+                content_validator = (
+                    FilmStyleContentValidator(
+                        snapshot.request.film_style,
+                        film_result.profile,
+                    )
+                    if (
+                        snapshot.settings.validate_themes
+                        or snapshot.settings.validate_frames
+                    )
+                    else None
                 )
                 if prompt_run_id is None:
                     prompt_snapshot = prompt_store.create(
@@ -513,8 +522,22 @@ class FilmStylePromptStudio:
                     snapshot.settings.prompt,
                     prompt_rules,
                     on_progress=self._on_progress,
-                    theme_validator=content_validator.validate_theme,
-                    frame_validator=content_validator.validate_frame,
+                    theme_validator=(
+                        content_validator.validate_theme
+                        if (
+                            content_validator is not None
+                            and snapshot.settings.validate_themes
+                        )
+                        else None
+                    ),
+                    frame_validator=(
+                        content_validator.validate_frame
+                        if (
+                            content_validator is not None
+                            and snapshot.settings.validate_frames
+                        )
+                        else None
+                    ),
                 ).resume(prompt_run_id)
                 return self._store.complete(
                     run_id,

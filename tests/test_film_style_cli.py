@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+from typer.main import get_command
 from typer.testing import CliRunner
 
 import t2i_film_style_pipeline.cli as film_style_cli
@@ -17,6 +18,14 @@ def test_film_style_cli_exposes_generate_command() -> None:
     assert "generate" in result.stdout
     assert "resume" in result.stdout
     assert "具体作品集合" in result.stdout
+
+
+def test_generate_defaults_semantic_validation_off() -> None:
+    command = get_command(app).commands["generate"]
+    defaults = {parameter.name: parameter.default for parameter in command.params}
+
+    assert defaults["validate_themes"] is False
+    assert defaults["validate_frames"] is False
 
 
 def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
@@ -84,6 +93,8 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
             "4",
             "--frames",
             "1",
+            "--validate-themes",
+            "--validate-frames",
             "--prompts-dir",
             str(tmp_path / "prompts"),
             "--runs-dir",
@@ -101,6 +112,8 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     assert captured["request"].theme_count == 4
     assert captured["request"].frames_per_theme == 1
     assert captured["settings"].prompt.theme_output_tokens == 12000
+    assert captured["settings"].validate_themes is True
+    assert captured["settings"].validate_frames is True
     assert any(
         "每个画面都是完全独立的图像提示词" in rule
         for rule in captured["rules"].frames

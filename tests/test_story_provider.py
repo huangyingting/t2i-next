@@ -16,17 +16,18 @@ from t2i_story_pipeline.errors import (
 )
 from t2i_story_pipeline.models import (
     StoryStage,
-    exact_frame_sequence_model,
+    exact_theme_batch_model,
 )
 from t2i_story_pipeline.prompts import frame_messages as compile_frame_messages
+from t2i_story_pipeline.prompts import theme_messages as compile_theme_messages
 from t2i_story_pipeline.provider import (
     OpenAIStoryModel,
     StoryProviderSettings,
 )
 from tests.story_factories import (
-    make_frame_sequence,
     make_story_request,
     make_theme,
+    make_theme_batch,
 )
 
 
@@ -35,6 +36,18 @@ def frame_messages(request, theme):
         request,
         theme,
         resolve_story_rules(request),
+        requested_frame_ids=[
+            f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
+        ],
+        accepted_frames=[],
+    )
+
+
+def theme_messages():
+    request = make_story_request(theme_count=2)
+    return compile_theme_messages(
+        request, resolve_story_rules(request),
+        count=2, existing_themes=[],
     )
 
 
@@ -129,7 +142,7 @@ async def test_story_provider_rejects_truncated_plain_text(monkeypatch) -> None:
 async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     captured = {}
-    sequence = make_frame_sequence()
+    sequence = make_theme_batch(count=2)
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["authorization"] = request.headers["Authorization"]
@@ -159,11 +172,11 @@ async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     )
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     provider = OpenAIStoryModel(settings, client=client)
-    response_model = exact_frame_sequence_model(2)
+    response_model = exact_theme_batch_model(2)
 
     response = await provider.generate(
-        stage=StoryStage.FRAMES,
-        messages=frame_messages(make_story_request(), make_theme()),
+        stage=StoryStage.THEMES,
+        messages=theme_messages(),
         response_model=response_model,
         max_output_tokens=10000,
     )
@@ -176,7 +189,8 @@ async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     assert "temperature" not in captured
     schema = captured["response_format"]["json_schema"]["schema"]
     assert schema["additionalProperties"] is False
-    assert set(schema["required"]) == {"frames"}
+    assert set(schema["required"]) == {"semantic_name", "themes"}
+    assert "theme_id" not in json.dumps(schema)
 
 
 @pytest.mark.asyncio
@@ -184,7 +198,7 @@ async def test_story_provider_accepts_valid_json_at_length_limit(
     monkeypatch,
 ) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
-    sequence = make_frame_sequence()
+    sequence = make_theme_batch(count=2)
 
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(
@@ -211,9 +225,9 @@ async def test_story_provider_accepts_valid_json_at_length_limit(
     )
 
     response = await provider.generate(
-        stage=StoryStage.FRAMES,
-        messages=frame_messages(make_story_request(), make_theme()),
-        response_model=exact_frame_sequence_model(2),
+        stage=StoryStage.THEMES,
+        messages=theme_messages(),
+        response_model=exact_theme_batch_model(2),
         max_output_tokens=10000,
     )
     await client.aclose()
@@ -228,7 +242,7 @@ async def test_story_provider_retries_rate_limit_with_retry_after(
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     sleep = AsyncMock()
     monkeypatch.setattr("t2i_story_pipeline.provider.asyncio.sleep", sleep)
-    sequence = make_frame_sequence()
+    sequence = make_theme_batch(count=2)
     calls = 0
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -265,9 +279,9 @@ async def test_story_provider_retries_rate_limit_with_retry_after(
     )
 
     response = await provider.generate(
-        stage=StoryStage.FRAMES,
-        messages=frame_messages(make_story_request(), make_theme()),
-        response_model=exact_frame_sequence_model(2),
+        stage=StoryStage.THEMES,
+        messages=theme_messages(),
+        response_model=exact_theme_batch_model(2),
         max_output_tokens=10000,
     )
     await client.aclose()
@@ -284,7 +298,7 @@ async def test_story_provider_supports_http_date_retry_after(
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     sleep = AsyncMock()
     monkeypatch.setattr("t2i_story_pipeline.provider.asyncio.sleep", sleep)
-    sequence = make_frame_sequence()
+    sequence = make_theme_batch(count=2)
     calls = 0
     retry_at = format_datetime(
         datetime.now(UTC) + timedelta(seconds=30),
@@ -325,9 +339,9 @@ async def test_story_provider_supports_http_date_retry_after(
     )
 
     await provider.generate(
-        stage=StoryStage.FRAMES,
-        messages=frame_messages(make_story_request(), make_theme()),
-        response_model=exact_frame_sequence_model(2),
+        stage=StoryStage.THEMES,
+        messages=theme_messages(),
+        response_model=exact_theme_batch_model(2),
         max_output_tokens=10000,
     )
     await client.aclose()
@@ -364,9 +378,9 @@ async def test_story_provider_does_not_restart_exhausted_http_retries(
 
     with pytest.raises(StoryProviderHTTPError) as error:
         await provider.generate(
-            stage=StoryStage.FRAMES,
-            messages=frame_messages(make_story_request(), make_theme()),
-            response_model=exact_frame_sequence_model(2),
+            stage=StoryStage.THEMES,
+            messages=theme_messages(),
+            response_model=exact_theme_batch_model(2),
             max_output_tokens=10000,
         )
     await client.aclose()
@@ -389,7 +403,7 @@ async def test_story_provider_preserves_usage_on_invalid_output(
                 "choices": [
                     {
                         "finish_reason": "stop",
-                        "message": {"content": '{"frames":[]}'},
+                        "message": {"content": '{"themes":[]}'},
                     }
                 ],
                 "usage": {
@@ -411,15 +425,15 @@ async def test_story_provider_preserves_usage_on_invalid_output(
 
     with pytest.raises(StoryStructuredOutputError) as error:
         await provider.generate(
-            stage=StoryStage.FRAMES,
-            messages=frame_messages(make_story_request(), make_theme()),
-            response_model=exact_frame_sequence_model(2),
+            stage=StoryStage.THEMES,
+            messages=theme_messages(),
+            response_model=exact_theme_batch_model(2),
             max_output_tokens=10000,
         )
     await client.aclose()
 
     assert error.value.usage.total_tokens == 30
-    assert error.value.raw_content == '{"frames":[]}'
+    assert error.value.raw_content == '{"themes":[]}'
     assert error.value.validation_issues
 
 
@@ -437,7 +451,7 @@ async def test_story_provider_classifies_invalid_truncated_output(
                 "choices": [
                     {
                         "finish_reason": "length",
-                        "message": {"content": '{"frames":['},
+                        "message": {"content": '{"themes":['},
                     }
                 ],
                 "usage": {"total_tokens": 40},
@@ -455,13 +469,13 @@ async def test_story_provider_classifies_invalid_truncated_output(
 
     with pytest.raises(StoryProviderTruncatedOutputError) as error:
         await provider.generate(
-            stage=StoryStage.FRAMES,
-            messages=frame_messages(make_story_request(), make_theme()),
-            response_model=exact_frame_sequence_model(2),
+            stage=StoryStage.THEMES,
+            messages=theme_messages(),
+            response_model=exact_theme_batch_model(2),
             max_output_tokens=10000,
         )
     await client.aclose()
 
     assert error.value.usage.total_tokens == 40
-    assert error.value.raw_content == '{"frames":['
+    assert error.value.raw_content == '{"themes":['
     assert error.value.validation_issues

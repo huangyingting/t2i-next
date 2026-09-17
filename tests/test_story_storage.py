@@ -19,7 +19,7 @@ from tests.story_factories import (
     make_frame_sequence,
     make_story_request,
     make_story_result,
-    make_theme_batch,
+    make_theme,
 )
 
 
@@ -192,7 +192,7 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
     )
     rules = resolve_story_rules(request)
     snapshot = store.create(request, settings, rules)
-    themes = make_theme_batch().themes
+    themes = [make_theme()]
     frames = make_frame_sequence()
 
     store.checkpoint_themes(
@@ -200,7 +200,8 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
         themes,
         "lost_luggage_reunion",
     )
-    store.checkpoint_frames(snapshot.run_id, "T001", frames)
+    for frame in frames.frames:
+        store.checkpoint_frame(snapshot.run_id, "T001", frame)
     store.record_attempt(
         snapshot.run_id,
         StoryAttempt(
@@ -271,7 +272,7 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
     assert listing.runs[0].status == StoryRunStatus.COMPLETED
 
     (tmp_path / "runs" / snapshot.run_id / "themes" / "T001.json").write_text(
-        make_theme_batch(start=2).themes[0].model_dump_json(),
+        make_theme(2).model_dump_json(),
         encoding="utf-8",
     )
     with pytest.raises(StoryStorageError, match="文件名与内容不匹配"):
@@ -291,7 +292,7 @@ def test_story_run_store_rejects_corrupt_checkpoint(tmp_path) -> None:
     )
     theme_path = tmp_path / "runs" / snapshot.run_id / "themes" / "T001.json"
     theme_path.write_text(
-        make_theme_batch(start=2).themes[0].model_dump_json(),
+        make_theme(2).model_dump_json(),
         encoding="utf-8",
     )
 
@@ -335,3 +336,60 @@ def test_story_run_listing_ignores_prompt_pipeline_runs(tmp_path) -> None:
 
     assert listing.runs == ()
     assert listing.unreadable == ()
+
+
+@pytest.fixture
+def partial_story_store(tmp_path):
+    request = make_story_request(frames_per_theme=2)
+    store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
+    snapshot = store.create(
+        request,
+        StoryRunSettings(provider=StoryProviderSettings(model="test-model")),
+        resolve_story_rules(request),
+    )
+    store.checkpoint_themes(snapshot.run_id, [make_theme()], "lost_luggage_reunion")
+    frame = make_frame_sequence().frames[0]
+    store.checkpoint_frame(snapshot.run_id, "T001", frame)
+    return store, snapshot, frame
+
+
+def test_partial_checkpoints_are_idempotent_and_cannot_be_replaced(partial_story_store):
+    store, snapshot, frame = partial_story_store
+    store.checkpoint_frame(snapshot.run_id, "T001", frame)
+    assert store.inspect(snapshot.run_id).frames["T001"].frames == [frame]
+    with pytest.raises(StoryStorageError, match="已存在且内容不同"):
+        store.checkpoint_frame(
+            snapshot.run_id, "T001", frame.model_copy(update={"prose": "different"})
+        )
+
+
+def test_partial_sequences_cannot_be_published(partial_story_store):
+    store, snapshot, _ = partial_story_store
+    result = make_story_result().model_copy(update={
+        "run_id": snapshot.run_id,
+        "request": snapshot.request,
+        "usage": TokenUsage(),
+    })
+    with pytest.raises(StoryStorageError, match="Frame checkpoint 尚未完整"):
+        store.complete(snapshot.run_id, result)
+
+
+@pytest.mark.parametrize("corruption", ["id", "unexpected_file", "sequence_file"])
+def test_frame_checkpoint_corruption_is_never_silently_skipped(
+    tmp_path, partial_story_store, corruption
+):
+    store, snapshot, frame = partial_story_store
+    frames = tmp_path / "runs" / snapshot.run_id / "frames"
+    if corruption == "id":
+        (frames / "T001" / "F01.json").write_text(
+            frame.model_copy(update={"frame_id": "F02"}).model_dump_json(),
+            encoding="utf-8",
+        )
+    elif corruption == "unexpected_file":
+        (frames / "T001" / "notes.txt").write_text("unexpected", encoding="utf-8")
+    else:
+        (frames / "T001.json").write_text(
+            make_frame_sequence().model_dump_json(), encoding="utf-8"
+        )
+    with pytest.raises(StoryStorageError):
+        store.inspect(snapshot.run_id)

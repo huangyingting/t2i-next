@@ -6,6 +6,7 @@ from t2i_story_pipeline.models import (
     NarrativeFrameSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
+    NarrativeThemeDraft,
     NarrativeThemeResult,
     OutputLanguage,
     StoryQualityReport,
@@ -58,7 +59,12 @@ def make_theme_batch(
 ) -> NarrativeThemeBatch:
     return NarrativeThemeBatch(
         semantic_name=semantic_name,
-        themes=[make_theme(index) for index in range(start, start + count)]
+        themes=[
+            NarrativeThemeDraft.model_validate(
+                make_theme(index).model_dump(exclude={"theme_id"})
+            )
+            for index in range(start, start + count)
+        ],
     )
 
 

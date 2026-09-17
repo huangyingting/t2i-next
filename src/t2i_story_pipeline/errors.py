@@ -91,5 +91,5 @@ class StoryRunIncompleteError(StoryPipelineError):
         self.causes = causes
         super().__init__(
             f"Run {run_id} 尚未完成：缺少 {missing_themes} 个 Theme、"
-            f"{missing_frames} 个 Frame Sequence；请执行 resume {run_id}"
+            f"{missing_frames} 个 Frame；请执行 resume {run_id}"
         )

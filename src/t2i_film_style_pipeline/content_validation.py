@@ -30,9 +30,15 @@ _EXPLICIT_SEX = re.compile(
     r"(?:插入|进入).{0,16}(?:阴道|肛门)|"
     r"(?:口|口舌|舌头|嘴唇).{0,20}(?:阴茎|外阴|阴蒂|生殖器|性器官)|"
     r"(?:阴茎|外阴|阴蒂|生殖器|性器官).{0,20}(?:口|口舌|舌头|嘴唇)|"
+    r"(?:外阴|阴蒂|阴道|生殖器|性器官).{0,24}"
+    r"(?:直接)?(?:刺激|摩擦|揉按|抚弄|抚触)|"
+    r"(?:手指|指尖).{0,24}(?:外阴|阴蒂|阴道|生殖器|性器官)|"
+    r"(?:外阴|阴蒂|阴道|生殖器|性器官).{0,24}(?:手指|指尖)|"
     r"自慰|手淫|指交|乳交|性交|肛交|口交|"
     r"\b(?:penetrat(?:e|es|ed|ing|ion)|oral sex|fellatio|cunnilingus|"
-    r"masturbat(?:e|es|ed|ing|ion)|anal sex|vaginal sex)\b",
+    r"masturbat(?:e|es|ed|ing|ion)|anal sex|vaginal sex|fingering|"
+    r"(?:clitoral|genital|vaginal) (?:stimulation|rubbing)|"
+    r"manual (?:genital|clitoral|vaginal) stimulation)\b",
     re.IGNORECASE,
 )
 _NEGATED_CONTENT = re.compile(
@@ -294,6 +300,7 @@ class FilmStyleContentValidator:
             request,
             theme.premise,
             label=f"{theme.theme_id} premise",
+            require_hardcore_explicit=False,
         )
 
     def validate_frame(
@@ -491,10 +498,11 @@ class FilmStyleContentValidator:
         value: str,
         *,
         label: str,
+        require_hardcore_explicit: bool = True,
     ) -> None:
         contains_explicit_sex = _contains_explicit_sex(value)
         if request.content_level == ContentLevel.HARDCORE:
-            if not contains_explicit_sex:
+            if require_hardcore_explicit and not contains_explicit_sex:
                 raise FilmStyleContractError(
                     f"{label} 未直接写出可见的明确性行为及其身体接触，"
                     "不得降级为普通亲密互动"

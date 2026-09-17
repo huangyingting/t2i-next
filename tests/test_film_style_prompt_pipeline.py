@@ -161,7 +161,12 @@ def make_film_frame_sequence() -> NarrativeFrameSequence:
     return sequence
 
 
-def make_settings(*, generation_retries: int = 0) -> FilmStylePipelineSettings:
+def make_settings(
+    *,
+    generation_retries: int = 0,
+    validate_themes: bool = True,
+    validate_frames: bool = True,
+) -> FilmStylePipelineSettings:
     return FilmStylePipelineSettings(
         film_provider=FilmStyleProviderSettings(model="test-model"),
         prompt=FilmPromptRunSettings(
@@ -170,7 +175,47 @@ def make_settings(*, generation_retries: int = 0) -> FilmStylePipelineSettings:
             generation_retries=generation_retries,
             theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
         ),
+        validate_themes=validate_themes,
+        validate_frames=validate_frames,
     )
+
+
+@pytest.mark.asyncio
+async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
+    request = make_pipeline_request()
+    theme_batch = make_film_theme_batch()
+    theme_batch.themes[0].premise = (
+        "这是一段不包含原作人物、场景或内容证据的普通主题描述。"
+    )
+    sequence = make_film_frame_sequence()
+    for index, frame in enumerate(sequence.frames, start=1):
+        frame.prose = f"第 {index} 个没有来源、锚点或摄影证据的未验证画面正文。"
+    prompt_model = FakePromptModel(
+        [theme_batch, frame_batch_text(sequence)]
+    )
+    store = LocalFilmStyleRunStore(tmp_path / "runs")
+
+    completed = await FilmStylePromptStudio(
+        FakeFilmModel(),
+        prompt_model,
+        store,
+        make_settings(
+            validate_themes=False,
+            validate_frames=False,
+        ),
+        resolve_film_style_rules(
+            request.prompt_request("BRIEF\n\nDirector scene context.")
+        ),
+    ).run(request, prompts_directory=tmp_path / "prompts")
+
+    snapshot = store.inspect(completed.run_id)
+    assert completed.prompt_file.exists()
+    assert snapshot.settings.validate_themes is False
+    assert snapshot.settings.validate_frames is False
+    assert prompt_model.stages == [
+        FilmPromptStage.THEMES,
+        FilmPromptStage.FRAMES,
+    ]
 
 
 @pytest.mark.asyncio
