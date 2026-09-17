@@ -52,6 +52,7 @@ provider 配置。
 uv run t2i-film-style generate "张艺谋" \
   --work "大红灯笼高高挂 (1991)" \
   --scene "颂莲与卓云在陈府院落点灯后相遇" \
+  --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
   --female-count 1 \
@@ -66,6 +67,8 @@ uv run t2i-film-style generate "张艺谋" \
 `--work` 可以重复，支持 `TITLE` 和 `TITLE (YEAR)` 两种格式。`--scene` 是可选
 的原作人物与场景方向；省略时，系统从 Profile 提取的锚点中自动选择。输入多部
 作品时，每个 Theme 只能选择其中一部，Frame 必须延续相同人物与场景，不能跨片混合。
+`--filename-stem` 可单独指定英文输出文件名前缀，不改变导演署名、作品来源句或
+原作锚点；只允许 ASCII 字母、数字、下划线和连字符。
 
 完成后 CLI 输出：
 
@@ -120,10 +123,12 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
 
 模型输出边界按阶段区分：Profile 的人物、服装、场景、环境和道具档案继续使用严格
 结构化提交；Theme 只提交 `semantic_name`、`title`、`premise` 和 `style`，不再让
-模型生成 `theme_id`；Frame 按 `F01`、`F02` 顺序逐张请求纯自然语言正文，不提交
-JSON 或工具参数。程序负责分配 Theme/Frame ID、构造 Pydantic 领域对象并写入
-checkpoint。纯文本 Frame 仍须通过全部语义发布门槛，失败时只重试当前 Frame。
-这些输出模式由 film-style run settings 显式启用并冻结。
+模型生成 `theme_id`；Frame 不提交 JSON 或工具参数。每个 Theme 只调用模型一次，
+使用 `<FRAME>...</FRAME>` 标签批量返回该 Theme 的全部纯自然语言正文；程序拆分
+批次、按顺序分配 `F01`、`F02` 等 Frame ID、构造 Pydantic 领域对象并写入
+checkpoint。每个纯文本 Frame 仍须通过全部语义发布门槛；任一 Frame 失败时重试
+时立即逐帧 checkpoint 同批次中已通过的画面，只把失败槽位组成较小批次重新生成；
+run 中断后恢复也只请求尚未通过的槽位。
 
 三个内容等级都采用相同结构：先定义视觉目标与每帧必须达到的可见下限，再规定
 增强皮肤、接触、材质、姿态、表情和环境触觉的具体方法，最后给出不可越过的上限
@@ -192,6 +197,9 @@ runs/film-style/<run-id>/
         ├── manifest.json
         ├── themes/
         ├── frames/
+        │   └── T001/
+        │       ├── F01.json
+        │       └── F02.json
         └── attempts/
 ```
 
@@ -199,9 +207,9 @@ runs/film-style/<run-id>/
 时发生中断，resume 也会继续使用创建 run 时冻结的 Profile 规则，不会重新读取
 后来修改的规则文件。
 
-如果 profile、Theme 批次或某个 Theme 的 Frame Sequence 已保存，恢复时不会重新
-生成。只有通过结构与语义验证的结果才会保存 checkpoint；重试耗尽后会保留失败
-记录并打印可直接执行的命令：
+如果 profile、Theme 批次或单个 Frame 已保存，恢复时不会重新生成。只有通过结构
+与语义验证的结果才会保存 checkpoint；重试耗尽后会保留已通过的 Frame、失败记录
+并打印可直接执行的命令：
 
 ```bash
 uv run t2i-film-style resume RUN_ID --runs-dir runs/film-style

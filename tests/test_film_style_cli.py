@@ -78,6 +78,8 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
             "十面埋伏 (2004)",
             "--scene",
             "只生成雨夜室内场景。",
+            "--filename-stem",
+            "Zhang_Yimou",
             "--themes",
             "4",
             "--frames",
@@ -95,6 +97,7 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
         work.year for work in captured["request"].film_style.works
     ] == [2002, 2004]
     assert captured["request"].scene_direction == "只生成雨夜室内场景。"
+    assert captured["request"].output_filename_stem == "Zhang_Yimou"
     assert captured["request"].theme_count == 4
     assert captured["request"].frames_per_theme == 1
     assert captured["settings"].prompt.theme_output_tokens == 12000

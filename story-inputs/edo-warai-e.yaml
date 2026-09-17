@@ -1,0 +1,502 @@
+id: edo-warai-e
+description: |
+  BRIEF
+
+  Create varied, historically grounded theatrical Themes that stage Edo-period
+  Japanese scenes through the playful visual language of ukiyo-e warai-e.
+  Combine real adult performers, sumptuous clothing, intimate companionship,
+  theatrical exaggeration, everyday humor, and the graphic discipline of
+  masterful nishiki-e design. Every result first reads as a flat, borderless
+  nishiki-e theatrical picture plane enacted by adult performers, not a literal
+  woodblock print, conventional naturalistic editorial image, anime frame, CGI
+  render, museum reproduction, or copy of an identifiable historical work.
+
+  ADULT CAST, CONSENT, AND CONTENT LEVEL
+
+  Every depicted person must be an unmistakably mature Japanese adult aged
+  twenty-five or older. Use exactly the requested adult cast and give
+  each recurring person a stable face, build, hairstyle, social role, and kimono.
+  All interaction must read as mutual, alert, warm, and freely chosen.
+
+  Honor the exact requested content level in every Theme and every Frame. Do
+  not silently average, postpone, sanitize, intensify, or relabel it.
+
+  - aesthetic: keep every adult fully dressed in layered period clothing. Bodies
+    may lean together, embrace, exchange teasing glances, adjust robes, or share
+    a private joke, but garments and composition fully conceal breasts, buttocks,
+    and genitals. Show no sexual act or erotic self-touch.
+  - erotic: make unmistakable adult sensuality visible through loosened or partly
+    removed robes, exposed breasts or buttocks, intimate reciprocal touch,
+    sensual self-touch, close body pressure, or another clearly erotic but
+    non-explicit interaction. Do not depict penetration, oral sex, genital
+    contact, sexual fluids, or pornographic anatomical emphasis.
+  - hardcore: show an explicit, consensual adult sexual act already occurring in
+    every Theme and Frame. Establish the act through action-level language,
+    aligned pelvises, pose geometry, visible contact, relevant physical outcome,
+    and both adults' reciprocal response without directly naming or describing
+    male reproductive anatomy. Keep faces, agency, period setting, textile design,
+    humor, and ukiyo-e art direction as important as the act.
+
+  At erotic and hardcore levels, do not hide the defining content behind screens,
+  fans, quilts, sleeves, furniture, strategic cropping, a distant silhouette, or
+  the comic interruption. Every adult remains alert, willing, responsive, and
+  able to stop. Do not depict coercion, distress, intoxication, sleep, violence,
+  non-consensual voyeurism, fetishized age ambiguity, or animals participating in
+  sexual contact.
+
+  MALE BODY VOCABULARY GATE
+
+  When referring to the man's body, use only neutral external terms from this
+  allowlist: body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+  chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands,
+  fingers, thighs, knees, legs, calves, ankles, feet, and toes. Inflected singular
+  or plural forms of these allowed terms are acceptable. Do not directly name any
+  male reproductive body part, physiological state specific to it, slang term,
+  erotic nickname, coy synonym, or object metaphor. This applies
+  case-insensitively to every Theme title, premise, style field, Frame prose,
+  rendered text, and drafting note.
+
+  Do not evade the gate with coy object metaphors, anatomical measurements,
+  color, veins, surface description, or indirect wordplay. At hardcore level,
+  remain visually unambiguous by naming the act rather than restricted anatomy:
+  penetration is already occurring, oral contact is already occurring, manual
+  stimulation is already occurring, or the adults maintain direct aligned pelvic
+  contact. Identify the man through his age, face, build, hair, pose, gaze,
+  pelvis, limbs, support, and response. The lexical restriction changes only the
+  wording, not the requested content level, consent, action, visibility, or
+  spatial precision. Never explain or quote this vocabulary rule in generated
+  output.
+
+  HISTORICAL WORLD
+
+  Set each Theme in Japan during the Edo period, between 1603 and 1868. Name a
+  specific year or sub-period, season, time of day, and plausible place such as a
+  merchant townhouse in Edo, a Kyoto teahouse room, an Osaka bookseller's upper
+  floor, an inn beside the Tokaido, a pleasure-district dressing room, or a
+  festival-night riverside pavilion. Architecture, tatami layout, shoji, lamps,
+  bedding, lacquerware, ceramics, hairstyles, textiles, household objects, and
+  social roles must fit the selected time and place. Do not mix in Meiji,
+  contemporary, Chinese, or generalized fantasy elements.
+
+  The set, garments, props, hair, and makeup are physically performed and built,
+  but no modern object may appear inside the depicted world. Production hardware,
+  electrical cables, contemporary closures, synthetic-looking props, and the
+  off-set environment remain outside the image.
+
+  LEVEL-AWARE CLOTHING AND BODY
+
+  Make lavish clothing the primary sensual and graphic device. Preserve layered
+  kosode or kimono, obi, under-robes, patterned hems, long sleeves, and elaborate
+  period hairstyles as clearly readable forms according to the selected level.
+  Render textile patterns with controlled variety: seasonal blossoms, flowing
+  water, clouds, fans, cranes, geometric checks, or auspicious motifs appropriate
+  to the character and season.
+
+  At aesthetic level, preserve the complete layered ensemble and use loosened
+  collars, overlapping folds, compressed cushions, tangled sleeves, displaced
+  hair ornaments, and close body spacing without revealing intimate anatomy. At
+  erotic level, robes may fall open, slide from shoulders or hips, or lie nearby
+  while enough period textile, obi, sleeve, hair ornament, or patterned under-robe
+  remains visible to anchor the scene. At hardcore level, adults may be partly or
+  fully nude, but retained or nearby garments must remain compositionally
+  important and historically specific rather than becoming generic discarded
+  fabric.
+
+  AGENCY AND RELATIONSHIP RANGE
+
+  Do not default to one active figure and one passive decorative figure. Give
+  every adult a readable intention and response through hands, posture, gaze, and
+  control of an object or garment. When a woman appears, make her pleasure,
+  wit, and agency visually unmistakable: she may initiate the embrace, redirect
+  the joke, rescue the falling screen, hide a love letter, reclaim her sash, or
+  meet another adult's gaze on equal terms.
+
+  Vary adult relationships according to the requested cast: an established
+  married couple sharing a private joke, long-separated lovers at an inn, two
+  women exchanging festival gifts, two men laughing over a wardrobe mishap, or a
+  small circle of trusted companions. These are open-ended examples, not fixed
+  templates. Never infer dominance, profession, or social rank solely from
+  gender, and never make unequal status substitute for visible mutuality.
+
+  WARAI-E HUMOR
+
+  Build every Theme around one affectionate comic interruption that changes the
+  composition: a cat steals a sash, a dog noses through a screen, a pet mouse
+  escapes a box, a servant announces tea from outside the room, a paper lantern
+  tilts at the wrong moment, a folding screen begins to topple, a sleeve catches
+  on a hairpin, or another original period-plausible mishap. The adults should
+  respond with distinct amused expressions, gestures, and eye lines. Humor must
+  humanize the scene rather than humiliate anyone.
+
+  Do not use a non-consensual hidden watcher. If an onlooker appears, that person
+  must belong to the requested adult cast, be openly acknowledged, and take part
+  in the shared joke.
+
+  VISUAL STORYTELLING
+
+  The image must communicate a precise present-tense story without relying on a
+  caption. Use converging eye lines, interrupted gestures, a displaced object,
+  fabric tension, compressed cushions, footprints, spilled tea, or a moving
+  screen to connect cause and reaction. Every visible hand must have a clear
+  anatomically plausible task. Keep faces distinct and expressive rather than
+  using identical masks, generic smiles, or vacant glamour poses.
+
+  Compose exactly three shallow strips parallel to the image surface: a cropped
+  lower prop strip, the adult interaction in the dominant central picture band,
+  and a sparse upper architectural or seasonal strip that completes the joke.
+  Keep scale nearly uniform across strips and use crisp overlap rather than
+  recession. Use partial occlusion deliberately, never as accidental anatomical
+  confusion.
+  Avoid generic reclining figures who merely display clothing without a shared
+  action, decision, or comic consequence.
+
+  SPATIAL AND CONTACT GEOMETRY
+
+  Build every Frame as one physically plausible but visually flattened
+  arrangement before adding decorative detail. Establish a fixed
+  composition-relative map using image-left, center, image-right, and the lower,
+  central, or upper picture band; reserve anatomical left and right only for a
+  named person's own limbs. State each major position once and never contradict
+  it later in the prose.
+
+  Anchor every adult and furnishing to named surfaces while all adults remain in
+  the central picture band. Keep torsos, pelvises, and major limbs broadly
+  parallel to the image surface. For each adult, specify the direction the face
+  turns, the broad surface carrying body weight, and which knee, foot, forearm,
+  hand, hip, back, or shoulder provides secondary support. Every center of mass
+  must fall over a credible base of support. Tatami, futon, floor, wall, bench,
+  or another sturdy period surface may carry weight; loose robes, screens,
+  lanterns, animals, and handheld props may not.
+
+  Keep each body singular and traceable: one head, two arms, two hands, two legs,
+  and two feet per adult, with every visible limb following an uninterrupted path
+  from its shoulder or hip to its endpoint. Identify hands by owner and
+  anatomical side whenever bodies overlap. Give every visible hand and foot one
+  compatible task; never let a limb support weight while also reaching through
+  another body, garment, or solid object.
+
+  For any intimate or explicit contact, align both adults at compatible heights,
+  distances, joint ranges, pelvis angles, and contact axes. Describe the complete
+  visible contact path through action, pelvis alignment, limb placement, and
+  supports without naming male reproductive anatomy. Do not use a pose that depends on
+  unseen levitation, impossible spinal rotation, dislocated hips or shoulders,
+  reversed knees or elbows, intersecting pelvises, compressed solid furniture, or
+  anatomy bending through fabric.
+
+  Use occlusion only when the hidden continuation remains obvious from the
+  visible source body. Robes must wrap, bunch, stretch, hang, and compress around
+  bodies rather than pass through them. Cushions and futons deform under actual
+  weight; tatami and wood remain rigid. Pets, screens, fans, lanterns, hair ornaments, and lacquerware must retain
+  separate bounded silhouettes without intersecting people or obscuring the
+  decisive contact.
+
+  OPTIONAL FOLKLORE PLAY
+
+  Some Themes may replace the pet or household accident with one gentle
+  period-appropriate folklore disruption: a fox mask appears in the wrong chest,
+  a painted paper ghost droops from a screen, a tiny umbrella spirit tugs a
+  sleeve, or a tanuki-shaped kettle seems to wink. Keep it ambiguous whether the
+  event is supernatural or part of a prank. Folklore must remain humorous,
+  non-threatening, and visually subordinate to the adult cast; do not introduce
+  horror, monsters touching bodies, tentacles, possession, or bodily
+  transformation.
+
+  PERFORMED UKIYO-E TRANSLATION
+
+  The result is a full-scale theatrical tableau enacted by real adult performers,
+  with nishiki-e graphic design controlling the entire first read. Build
+  keyblock-like contour separation from dark garment piping, crisp silhouette
+  edges, lacquer borders, hair masses, and sharply divided matte zones. Compress
+  performers, textiles, tatami, shoji, furniture, and props into broad flat color
+  fields. Use a frontal or high-oblique ukiyo-e arrangement, parallel stacked
+  strips, cropped shapes, patterned negative space, rhythmic diagonals, and
+  overlapping robes rather than naturalistic editorial coverage.
+
+  No near-far scale change or projecting foreshortened limbs may break the flat
+  surface. Keep hands, feet, faces, torsos, and pelvises near the image plane;
+  recognizable adult anatomy comes from mature facial structure, proportion,
+  joint placement, expression, and visible hand tasks rather than rounded light,
+  skin texture, or optical depth.
+
+  Adopt a chūban-like compact vertical proportion, an ōban-like vertical or
+  horizontal proportion, or another historically credible ukiyo-e image ratio.
+  Name the format and orientation at the beginning of every Frame, but fill the
+  image with the performed tableau itself: no print border, framed artwork,
+  book mockup, gallery display, contact sheet, or photographed historical image.
+
+  Do not add technical capture specifications, studio-production jargon, beauty
+  treatment, or modern grading language. Describe framing through image
+  proportion, viewpoint, crop, overlap, negative space, dominant diagonal, and
+  color-block hierarchy. Describe illumination only as the visible Edo source and
+  the graphic zones of light and shadow it creates.
+
+  DISTANCE-READ FLATNESS GATE
+
+  At thumbnail size and viewing distance, every Frame must read as a flat
+  nishiki-e composition before the adult performers become apparent. Organize
+  the image into exactly three shallow stacked bands parallel to the picture
+  plane: one cropped lower prop strip, the adult interaction as the dominant
+  central band, and one sparse upper shoji, wall, screen, or architectural strip.
+  Do not create deep recession between them.
+
+  Build dominant flat silhouettes from hair masses, garment edges, limbs,
+  furniture rails, screens, and broad shadow boundaries. Keep each major skin,
+  textile, tatami, lacquer, paper, and architecture field inside one or two
+  closely related values, separated by dark piping, crisp overlap, or bounded
+  graphic shadow. Human anatomy remains coherent, but silhouettes and color
+  fields carry form instead of rounded shading.
+
+  Use no volumetric light-and-shadow modeling, realistic cast shadows, optical
+  depth blur, atmospheric perspective, converging room perspective, glossy skin
+  highlights, or light wrapping around bodies. Represent the Edo light source as
+  one pale ground zone and one dark graphic zone, not as naturalistic illumination.
+
+  Bokashi belongs to one background plane only, meaning the upper shoji, wall,
+  sky, or screen strip. It must not model the adults' skin, furniture, lower
+  strip, central tableau, or spatial depth. All other major areas remain flat
+  separated color blocks at distance.
+
+  Close inspection may reveal live performers through individualized mature
+  face shapes, coherent outer joint contours, supported poses, unambiguous hand
+  ownership, contact alignment, bounded garment seams, and registered textile
+  patterns. These close-read clues must never overturn the flat distance read,
+  introduce photographic beauty rendering, or break the three-band nishiki-e
+  composition. Do not add microscopic body detail, continuous surface texture, or
+  any close-read cue outside this bounded list.
+
+  UKIYO-E COLOR GATE
+
+  Every Theme style and every Frame must explicitly name an Edo nishiki-e palette
+  and make it visible through flat separated color blocks. Use four to six colors
+  total: one dark anchor such as ai indigo or sumi black; one or two warm pigments
+  such as beni red, vermilion, persimmon, saffron, or orpiment; one pale
+  unbleached-washi or warm-cream ground; and at most one cool mineral accent such
+  as malachite. Prussian blue is permitted only for settings from the 1820s
+  onward; earlier settings must use period-plausible ai indigo.
+
+  Every Frame must describe one bokashi-style gradient across the upper shoji,
+  wall, sky, or screen strip. Arrange wardrobe, lacquer, paper, tatami, and
+  architecture as large flat separated color blocks that remain legible at
+  thumbnail size. One pale matte zone establishes the ground, dark edges protect
+  the indigo or sumi anchor, and one small bounded highlight shape activates the
+  warm pigment or mineral accent. Do not use teal-orange,
+  generic amber-and-blue contrast, pastel lifestyle color, beige neutrality,
+  broad rainbow color, or an unrelated modern palette.
+
+  Skin uses one warm matte base plus at most one bounded blush accent inside the
+  nishiki-e color hierarchy. Faces, exposed skin, and decisive contact remain
+  readable through contour and overlap, never gradual tonal modeling.
+
+  Do not render readable Japanese, pseudo-calligraphy, subtitles, speech
+  balloons, modern labels, signatures, publisher marks, or imitation artist
+  seals. If a cartouche-like shape strengthens the composition, construct it as a
+  blank physical paper panel or an unlettered patch of negative space within the
+  set.
+
+  LIVE-ACTION MATERIAL EVIDENCE
+
+  Close inspection confirms adult performers through mature face-shape
+  differences, coherent outer joint contours, supported poses, visible hand
+  ownership, aligned contact, garment seams, and registered textile patterns.
+  Render each cue as a bounded matte detail subordinate to the broad flat color
+  design, never as microscopic anatomy, continuous texture, rounded shading,
+  optical reflection, or synthetic 3D surface.
+
+  Carry print-craft character through physical objects rather than an all-over
+  filter: visible washi fibers in screens and blank cartouches, mica-like shimmer
+  in mineral makeup or textile thread, burnished lacquer, blind-embossed paper,
+  and baren-like pressure patterns translated into brocade relief or compressed
+  fabric. The overall image is not a literal woodblock print; do not add global
+  paper grain, ink bleed, registration errors across skin, foxing, deckled
+  borders, or a scanned-sheet appearance.
+
+  EDO MATERIAL PATINA
+
+  Give every Theme and Frame restrained Edo-period material patina on physical
+  costumes, props, and set surfaces. Use three to five specific signs of ordinary
+  age and handling across different materials: vegetable-dyed ai indigo, beni, or
+  persimmon lightly faded on exposed folds while protected seams remain richer;
+  frequently touched lacquer edges polished smooth with a few fine scratches;
+  subtle oxidation on bronze or copper fittings; smoke-darkened timber or shoji
+  frames; compressed, slightly uneven tatami; softened and carefully mended
+  kimono hems; abraded silk pile, loose threads, waxed wood, or locally yellowed
+  washi in an actual screen or blank paper panel.
+
+  Keep the room inhabited, maintained, and historically credible rather than
+  derelict. Distribute wear according to touch, friction, smoke, moisture, and
+  sun exposure instead of distressing every surface equally. Preserve the clear
+  nishiki-e pigment hierarchy: patina may soften selected material surfaces but
+  must not turn the whole image brown, beige, gray, or desaturated.
+
+  This is Edo-period material patina, not an aged-image filter. Do not use a
+  global sepia or yellow cast, photographic grain, scratches across the image,
+  vignetting, faded-film effects, paper cracks, mildew, water stains, wormholes,
+  foxing, generalized grime, artificial ink bleed, registration errors, or
+  scanned-print damage. Keep adult skin as a warm, bounded matte field with crisp
+  contour edges and at most one blush accent, never papery, cracked, stained,
+  artificially weathered, glossy, or volumetrically shaded.
+
+  Allow playful exaggeration in billowing sleeves, cascading fabric, oversized
+  fans, leaning screens, startled pets, and theatrical expressions, but keep
+  human anatomy coherent and coverage exact for the selected content level. At
+  hardcore level, make the explicit act visually unambiguous without naming,
+  enlarging, measuring, or separately describing male reproductive anatomy. Do not
+  imitate, name, sign, or reproduce a composition by a known ukiyo-e artist.
+
+  THEME CONTRACT
+
+  Each Theme must establish:
+
+  - a precise Edo-period date, Japanese location, season, hour, and social world;
+  - the exact recurring adult cast with stable visual identities and relationship;
+  - body coverage, garment state, current interaction, and visible content-level
+    proof that directly establish the requested content level;
+  - one private, mutually affectionate situation in which every adult visibly
+    initiates or responds;
+  - one internally consistent composition-relative body map with credible support,
+    reach, occlusion, contact alignment, and unambiguous limb ownership;
+  - one period-plausible comic interruption with a visible cause and reaction;
+  - one decisive action in which each adult has agency and a necessary role;
+  - one textile motif and one household object that organize the composition; and
+  - one period-correct Edo nishiki-e palette with its pigment hierarchy,
+    flat-color-block plan, bokashi-style plane, ukiyo-e image proportion,
+    keyblock-like contour plan, exactly three shallow stacked bands, dominant
+    flat silhouettes, focal hierarchy, and graphic light-dark design;
+    plus three to five localized, material-specific patina cues whose physical
+    causes are evident without weakening the palette.
+
+  Vary Themes in class setting, room type, season, comic mechanism, emotional
+  temperature, relationship, dominant textile pattern, palette, frame proportion,
+  picture-band arrangement, crop, light-dark pattern, and composition. Rotate among domestic,
+  travel, festival, artistic, commercial, theatrical, and literary social worlds
+  without stereotyping their occupants. Do not repeat the same bedroom, cat gag,
+  embracing pose, falling screen, lower-strip object, or dominant body
+  arrangement. Vary the dominant pigment and accent relationship inside the
+  ukiyo-e color gate rather than abandoning that shared color language.
+
+  FRAME CONTRACT
+
+  Every Frame is one standalone performed ukiyo-e theatrical tableau from the
+  same Theme, not a storyboard, contact sheet, collage, split screen, conventional
+  naturalistic image, literal woodblock print, anime frame, CGI render, or museum
+  reproduction. Begin every Frame with exactly these four sentences, replacing
+  only the bracketed choices:
+  "Flat, borderless nishiki-e theatrical picture plane in a [chūban-like or
+  ōban-like] [vertical or horizontal] proportion, enacted by real adult
+  performers. Exactly three shallow stacked picture bands: a lower prop strip, a
+  central adult tableau, and an upper architectural strip, all parallel to the
+  image surface. Adult faces, limbs, garments, and furniture read as
+  contour-enclosed matte color shapes with crisp overlaps and two-step values;
+  contour and flat shadow shapes carry all form. Edo-period material patina
+  appears only as bounded wear on physical costumes, props, and set surfaces."
+
+  Do not place scene detail between or before those four sentences. Immediately
+  follow them with one spatial-map sentence of at most 70 English words. Place
+  every adult at image-left, center, or image-right; all adults remain in the
+  central picture band. Name the support surface, torso and pelvis direction,
+  secondary support limb, and visible hand tasks. Keep major limbs parallel to
+  the picture plane and do not rely on a pose name alone.
+
+  Immediately after the spatial map, write one standalone present-action sentence
+  that starts with the exact phrase required by the selected level:
+
+  - aesthetic: "The current fully clothed non-erotic interaction is"
+  - erotic: "The current erotic but non-explicit interaction is"
+  - hardcore: "The current explicit consensual adult sexual act is"
+
+  Complete that sentence with the visible action, garment state, contact geometry,
+  and reciprocal response that prove the selected level. At hardcore level, name
+  the occurring act directly rather than substituting generic closeness, aligned
+  pelvises, suggestive pressure, preparation, or implied escalation. Keep this
+  present-action sentence at or below 70 English words.
+
+  Repeat this exact flat-medium lock immediately after the present-action
+  sentence: "All visible bodies, garments, props, and room planes return
+  immediately to contour-enclosed matte color shapes on the same flat three-band
+  nishiki-e surface." Do not insert detail before this repeated lock.
+
+  After the repeated lock, write exactly six descriptive sentences:
+
+  1. combine the precise date, place, season, hour, complete adult cast, mature
+     facial differences, period hair, level-appropriate garment state,
+     expressions, eye lines, and remaining visible hand tasks;
+  2. combine the comic interruption, cropped lower prop strip, central adult
+     tableau, sparse upper architectural strip, and each strip's necessary
+     objects;
+  3. combine dominant flat silhouettes, contour sources, crisp overlap,
+     near-uniform scale, parallel major limbs, negative space, crop, and one
+     graphic diagonal;
+  4. combine the named four-to-six-color Edo pigment hierarchy, contour-enclosed
+     matte fields, one warm skin base plus one bounded blush accent, and exactly
+     one bokashi-style gradient confined to the upper strip;
+  5. combine exactly two close-read performer cues chosen only from mature face
+     shape, coherent outer joint contour, visible hand ownership, garment seam,
+     or registered textile pattern, plus physical set craft and exactly three to
+     five localized material-patina cues with plausible causes; and
+  6. end with this exact sentence: "The complete image remains a flat,
+     borderless, three-band nishiki-e theatrical picture plane; adult performers
+     are recognizable only through mature faces, coherent joints, hand tasks,
+     support, and contact, while every form stays within matte contour fields on
+     one shallow picture surface."
+
+  No descriptive sentence may exceed 85 English words; semicolon-separated
+  clauses still count toward that sentence limit. Use one decisive example for
+  each required object, contour source, and patina material instead of catalogues,
+  backstory, biographies, or repeated anatomy.
+
+  Every Frame must function independently as an image-generation prompt while
+  remaining concise. Target 700 to 900 English words and never exceed 1000 English
+  words, or use equivalent information density in another requested language.
+  Count before returning. If a draft exceeds the limit, rewrite it by removing
+  secondary decor, backstory, repeated spatial facts, repeated anatomy, and
+  redundant material explanation while preserving cast, action, flat
+  picture-plane structure, palette, humor, and patina.
+
+  Begin every Frame with the selected level's defining state already visible. Do
+  not substitute preparation, undressing in progress, anticipated escalation,
+  aftermath, concealment, a distant establishing view, or a milder interaction.
+  For hardcore output, preserve the Theme's explicit act in every Frame while
+  varying pose geometry, picture-band arrangement, fabric rhythm, and comic
+  reaction.
+
+  Change the decisive instant and graphic arrangement between Frames: discovery,
+  suppressed laughter, coordinated recovery, playful blame, or calm aftermath.
+  Preserve identities and setting while varying body geometry, eye lines, fabric
+  rhythm, crop, dominant diagonal, negative space, lower-strip clue, and the
+  interruption's state. At least one Frame must make the humor legible through
+  gesture alone, and at least one must make the clothing pattern the dominant
+  graphic structure without reducing the adults to decoration.
+
+  Before returning, verify that aesthetic output is fully clothed and
+  non-explicit, erotic output is visibly sensual but non-explicit, and hardcore
+  output contains a current explicit consensual adult act. Also verify that no
+  Frame looks like an ordinary editorial shoot, literal woodblock print, ink
+  drawing, anime frame, CGI render, photographed printed artwork, or generic
+  studio set. Adult performers remain recognizable through mature facial
+  structure, coherent joints, hand tasks, support, and contact while nishiki-e
+  design dominates color, contour, proportion, overlap, and negative space.
+  Reject any Frame that omits the named nishiki-e palette, period-correct pigment
+  families, flat separated color blocks, one bokashi-style gradient, or
+  keyblock-like contour separation, or that replaces them with generic modern
+  naturalism.
+  Reject any Frame whose distance read uses rounded volumetric bodies, realistic
+  cast shadows, deep room recession, atmospheric perspective, glossy beauty
+  highlights, or bokashi gradients across skin.
+  Reject any Frame that omits localized Edo material patina or replaces it with a
+  global aged-image, old-photograph, distressed-paper, or scanned-print effect.
+  Reject any Frame whose spatial-map sentence lacks literal image-left, center,
+  or image-right placement for every adult, central-band placement, named support
+  surfaces, or torso and pelvis directions. Also reject random
+  pseudo-Japanese text, a copied historical composition, malformed or surplus
+  limbs, ambiguous limb ownership, contradictory left-right directions,
+  unsupported weight, intersecting bodies or props, impossible contact axes, a
+  decontextualized pin-up pose, or humor unrelated to the visible action.
+  Finally, scan every output field case-insensitively and rewrite it if it
+  uses a male-body term outside the male body vocabulary gate.
+
+  Return only positive prose describing the depicted scene. Enforce every rule
+  silently: never discuss instructions, rules, gates, validation, compliance,
+  requested cast, internal content levels, vocabulary restrictions, or what the
+  output does not contain. Every word must belong to the image-generation
+  description, and every natural-language word must use the requested output
+  language except established Japanese names and art terms.

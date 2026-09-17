@@ -36,7 +36,6 @@ from t2i_film_style_pipeline.prompt_provider import (
 )
 from t2i_film_style_pipeline.prompt_run_store import (
     FilmPromptRunSettings,
-    FrameOutputMode,
     ThemeOutputMode,
 )
 from t2i_film_style_pipeline.provider import (
@@ -69,6 +68,11 @@ def generate_command(
         None,
         "--scene",
         help="可选原作人物与场景方向；省略时从作品锚点自动选择。",
+    ),
+    filename_stem: str | None = typer.Option(
+        None,
+        "--filename-stem",
+        help="可选英文输出文件名前缀，仅允许 ASCII 字母、数字、下划线和连字符。",
     ),
     themes: int = typer.Option(
         1,
@@ -143,6 +147,7 @@ def generate_command(
                 output_language=output_language.value,
             ),
             scene_direction=scene,
+            output_filename_stem=filename_stem,
             theme_count=themes,
             frames_per_theme=frames,
             female_count=female_count,
@@ -165,7 +170,6 @@ def generate_command(
                 concurrency=concurrency,
                 theme_output_tokens=12000,
                 theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
-                frame_output_mode=FrameOutputMode.INDIVIDUAL_TEXT,
             ),
         )
         completed = asyncio.run(

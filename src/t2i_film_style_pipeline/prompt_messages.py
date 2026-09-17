@@ -8,6 +8,7 @@ from t2i_film_style_pipeline.prompt_models import (
     FilmPromptRequest,
     FilmPromptRuleSet,
     FilmPromptStage,
+    NarrativeFrame,
     NarrativeTheme,
 )
 from t2i_film_style_pipeline.prompt_provider import ChatMessage
@@ -67,19 +68,9 @@ def frame_messages(
     theme: NarrativeTheme,
     rules: FilmPromptRuleSet,
     *,
-    frame_id: str | None = None,
-    existing_frames: list[str] | None = None,
+    requested_frame_ids: list[str],
+    accepted_frames: list[NarrativeFrame],
 ) -> list[ChatMessage]:
-    frame_ids = [f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)]
-    frame_payload = (
-        {
-            "current_frame_id": frame_id,
-            "program_assigns_frame_id": True,
-            "existing_frame_prose": existing_frames or [],
-        }
-        if frame_id is not None
-        else {"frame_ids": frame_ids}
-    )
     return [
         ChatMessage(
             role="system",
@@ -95,7 +86,15 @@ def frame_messages(
                     "output_language": request.output_language.value,
                     "theme": theme.model_dump(mode="json"),
                     "frames_per_theme": request.frames_per_theme,
-                    **frame_payload,
+                    "requested_frame_slots": requested_frame_ids,
+                    "program_assigns_frame_ids": True,
+                    "accepted_frame_prose": [
+                        frame.prose for frame in accepted_frames
+                    ],
+                    "frame_batch_format": (
+                        "Return exactly one <FRAME>...</FRAME> block for each "
+                        "requested_frame_slots item, in the listed order."
+                    ),
                 },
                 ensure_ascii=False,
             ),

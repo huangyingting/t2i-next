@@ -39,7 +39,7 @@ Theme 相似度检查仍使用 embeddings API。Copilot 模式若同时设置
 ```bash
 uv run python scripts/refine-text-file.py \
   --instruction "Improve clarity while preserving all requirements and structure." \
-  story-inputs/miniature-fantasy-v2.txt
+  draft.txt
 ```
 
 ## 作品集合电影风格编译器
@@ -59,6 +59,7 @@ Theme、Frame、模型、provider、checkpoint 和发布实现，不 import 或�
 uv run t2i-film-style generate "张艺谋" \
   --work "大红灯笼高高挂 (1991)" \
   --scene "颂莲与卓云在陈府院落点灯后相遇" \
+  --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
   --content-level aesthetic
@@ -66,7 +67,9 @@ uv run t2i-film-style generate "张艺谋" \
 
 `--scene` 可省略，省略时自动选择原作成年人物与实际场景。顶层进度、结构化档案、内部动态
 视觉上下文及 Theme/Frame checkpoint 全部写入 `runs/film-style/<run-id>/`；
-最终提示词写入 `prompts/`。不再创建 `film-style-inputs/`。中断后只需顶层 run ID：
+最终提示词写入 `prompts/`。不再创建 `film-style-inputs/`。
+`--filename-stem` 可指定仅含 ASCII 字母、数字、下划线和连字符的英文文件名前缀，
+且不会改变中文导演署名和作品锚点。中断后只需顶层 run ID：
 
 ```bash
 uv run t2i-film-style resume RUN_ID
@@ -74,8 +77,10 @@ uv run t2i-film-style resume RUN_ID
 
 恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
 Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构，由程序分配
-`theme_id`；每个 Frame 单独返回纯自然语言正文，由程序分配 `frame_id`，避免模型
-因 JSON wrapper 或工具提交失败而丢弃有效画面。
+`theme_id`；每个 Theme 的全部 Frame 在一次纯文本调用中批量返回，由程序拆分并分配
+`frame_id`，避免逐帧调用开销以及 JSON wrapper 或工具提交失败。批次中验证通过的
+Frame 会被保留，后续只重新生成失败槽位。
+通过验证的 Frame 会立即单独写入 checkpoint，因此中断恢复也不会重做已通过画面。
 发布前会验证指定来源句、内容等级、拒绝文本和图像几何禁项；不合格 Theme 或 Frame
 进入有界重试，不会作为成功结果写入 checkpoint。每个 Theme 必须建立可执行的
 镜头策略；每个 Frame 还必须明确景别、机位方位与距离、高度、水平与俯仰角度、
@@ -105,26 +110,55 @@ uv run t2i-story generate \
   --concurrency 8
 ```
 
-也可以把完整 Story Description 保存为 UTF-8 文本文件，用文件代替位置参数：
+也可以把 Story Description 和执行配置保存为 UTF-8 YAML Story Document：
 
 ```bash
 uv run t2i-story generate \
-  --prompt-file story.txt \
+  --input story-inputs/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic
 ```
 
-故事位置参数与 `--prompt-file` 必须且只能提供一个。文件首尾空白会被移除，
-内部换行会原样保留。`--female-count` 和 `--male-count` 可以分别约束每个主题
-及每帧中的成年女性和成年男性人数；省略时遵循 Story Description 明示的人物。
+故事位置参数与 `--input` 必须且只能提供一个；不再支持 TXT 文件输入。
+最小文档包含 `id` 和多行 `description`，还可声明 `generation`、`authoring`、
+`validation`、`runtime`。配置优先级为程序默认值 < 文档 < 显式 CLI 参数；
+未提供的 CLI 选项不会覆盖文档，数值 `0` 也能正确覆盖。
+`--female-count` 和 `--male-count` 可以分别约束每个主题及每帧的人数。
+
+```yaml
+id: station-reunion
+description: |
+  秋夜，两名成年旅人在旧车站重逢。
+generation:
+  theme_count: 12
+  frames_per_theme: 3
+authoring:
+  frames:
+    - 每帧明确描述景别、视角和焦点。
+validation:
+  quality:
+    mode: report
+    checks:
+      - type: camera_evidence
+runtime:
+  concurrency: 8
+  generation_retries: 2
+```
+
+质量模式支持 `off`（跳过可选检查）、`report`（记录告警但不重试）和 `enforce`
+（拒绝并有界重试）；可用 `--quality-mode` 覆盖。默认检查列表为空，只验证基础
+契约。可选检查包括摄影文字证据、字符长度、必含原文和禁止原文；它们不是模型
+评审，也不保证叙事语义或摄影物理正确。结构与安全契约不受开关影响。
+质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 明确显示检查状态。
+完整字段与示例见 [Story pipeline 文档](docs/story-pipeline.md)。
 
 story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在运行时加载
 `t2i_prompt_pipeline` 的规则。两个流水线的三个 content-level 文件采用相同契约
 并由测试保证逐字一致，其他阶段规则保持独立。story 内置规则位于
 `src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
 schema、人物一致性和内容等级。媒介、版式、区域、视图、比例关系及其他特定视觉
-行为由 Story Description 自己定义，Python 不识别具体 `story-inputs/*.txt`
+行为由 Story Description 自己定义，Python 不识别具体 `story-inputs/*.yaml`
 类型。
 
 `story-inputs/` 同时承载具体输入和可复用项目规则。可以通过 `--rules-dir`
@@ -133,9 +167,9 @@ schema、人物一致性和内容等级。媒介、版式、区域、视图、�
 
 ```text
 story-inputs/
-├── creative.txt
-├── edo-warai-e.txt
-├── ming-gongbi-mixi-tu.txt
+├── creative.yaml
+├── edo-warai-e.yaml
+├── ming-gongbi-mixi-tu.yaml
 ├── ...
 └── rules/
     ├── common.rules
@@ -147,21 +181,22 @@ story-inputs/
         └── hardcore.rules
 ```
 
-每个文件一行一条规则，空行和 `#` 注释会被忽略；缺失的用户规则文件不会报错。
+每个 `.rules` 文件一行一条规则，空行和 `#` 注释会被忽略；缺失的用户规则文件不会报错。
 加载顺序是内置 `common → stage → selected content level`，然后按相同顺序追加
-用户规则，最后追加输出语言规则。解析后的规则保存在 run 的 `rules.json`，
+用户规则，然后追加文档对应阶段的 `authoring`，最后追加输出语言规则。
+解析后的规则保存在 run 的 `rules.json`，
 manifest 记录其 SHA-256 指纹，resume 始终使用冻结版本而不重新读取规则目录。
 
 只服务于一个输入的主题、媒介、版式、区域、镜头和词汇约束继续写在对应
-`story-inputs/*.txt` 中。默认 `story-inputs/rules/` 中的项目规则会应用于从该
+`story-inputs/*.yaml` 的正文或对应阶段 `authoring` 中。默认 `story-inputs/rules/`
+中的项目规则会应用于从该
 项目启动的所有 story；只被部分输入共享的规则不能放进默认规则目录，可以保留在
 对应输入中，或放入显式选择的规则 profile 并通过 `--rules-dir` 使用。所有 story
 都必须遵守的阶段、schema、安全和一致性规则才属于包内 system rules。不要按文件名
 在 Python 中增加分支。
 
-`story-inputs/*.txt` 只描述当前 Story Description 契约，不保留旧格式或传输层
-术语。每个文件以 `BRIEF` 开始，并直接描述其 Theme、Frame、媒介、布局、领域池、
-变化轴和拒绝条件；它不重复请求中的 Theme/Frame 数量，也不引用 CLI。输入可以为
+`story-inputs/*.yaml` 使用唯一的当前文档格式；正文直接描述 Theme、Frame、媒介、
+布局、领域池、变化轴和拒绝条件，执行控制单独放在结构化字段中。输入可以为
 特定人物组合或内容等级声明严格前置条件，但不得增删请求人物，也不得把多个 Frame
 改写成跨 Frame 的连续剧情。多个 Frame 始终是同一 Theme 的平行视觉方案。
 
@@ -173,7 +208,7 @@ uv run t2i-story runs --runs-dir runs
 uv run t2i-story resume RUN_ID --runs-dir runs
 ```
 
-`request.json`、provider/并发/retry/token 配置、generation attempts 和 token
+`request.json`、provider/并发/retry/token/质量配置、generation attempts 和 token
 usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
 网络 timeout、transport error、429 和 5xx 默认在 provider 层额外重试两次；
 空响应、schema 错误和截断输出在 generation 层分类记录并进行有界重试。截断
@@ -186,19 +221,21 @@ issues 继续反馈给模型。认证错误不会盲目重试。
 （1男1女、2女、3女、1男2女、2男1女），每组 100 themes × 6 frames：
 
 ```bash
-./scripts/generate-story-cast-matrix.sh story-inputs/example.txt
+./scripts/generate-story-cast-matrix.sh story-inputs/motion-blur-photography.yaml
 ```
 
 最终 TXT 默认统一写入 `prompts/YYYY-MM-DD/hardcore/`，所有可恢复 run 记录在
 `runs/`。也可以把第二、第三个位置参数分别用于覆盖
 prompts root 和 runs directory。
+脚本用正式 YAML loader 做共享输入预检，并保留上述显式阵容、语言、内容等级、
+主题数和帧数覆盖；文档中的并发、重试、authoring 和质量策略仍会生效。
 
 输出按 `prompts/YYYY-MM-DD/aesthetic|erotic|hardcore/` 分类：
 
-- 使用 `--prompt-file` 时：
+- 使用 `--input` 时：
   `<prompt-stem>_<content-level>_<female-count>_<male-count>_NNNN.txt`，例如
-  `3-view_hardcore_1_woman_0_men_0001.txt`。文件 stem 会转为小写，空格和不适合
-  文件名的标点归一化为下划线；女性、男性人数和四位冲突序号始终明确写出。
+  `3-view_hardcore_1_woman_0_men_0001.txt`。`prompt-stem` 来自文档显式 `id`，
+  不受 YAML 文件改名影响；女性、男性人数和四位冲突序号始终明确写出。
 - 直接传入 Story Description 时：
   `<semantic-name>_<cast-slug>_NNNN.txt`，继续使用模型生成的小写英文 snake_case
   语义名称和现有 cast slug。

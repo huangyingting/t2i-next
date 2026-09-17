@@ -17,7 +17,7 @@ resolve_executable() {
 }
 
 if (($# < 1 || $# > 3)); then
-  printf 'Usage: %s STORY_FILE [PROMPTS_ROOT] [RUNS_DIR]\n' "$0" >&2
+  printf 'Usage: %s STORY_YAML [PROMPTS_ROOT] [RUNS_DIR]\n' "$0" >&2
   exit 2
 fi
 
@@ -69,34 +69,26 @@ fi
 
 if [[ -x "$repo_root/.venv/bin/python" ]]; then
   story_python=("$repo_root/.venv/bin/python")
-elif command -v python3 >/dev/null 2>&1; then
-  story_python=("$(resolve_executable "$(command -v python3)")")
-elif command -v python >/dev/null 2>&1; then
-  story_python=("$(resolve_executable "$(command -v python)")")
 elif [[ -n "$uv_executable" ]]; then
   story_python=("$uv_executable" run python)
 else
-  story_python=()
+  printf 'Cannot find repository .venv/bin/python or uv to validate the story document.\n' >&2
+  exit 2
 fi
 
 cd -- "$repo_root"
 
-if ((${#story_python[@]} > 0)) && ! "${story_python[@]}" - "$story_file" <<'PY'
+if ! "${story_python[@]}" - "$story_file" <<'PY'
 import sys
 from pathlib import Path
 
-path = Path(sys.argv[1])
-try:
-    text = path.read_text(encoding="utf-8")
-except UnicodeError:
-    print(f"Story file must be valid UTF-8 text: {path}", file=sys.stderr)
-    raise SystemExit(2)
-except OSError as exc:
-    print(f"Cannot read story file {path}: {exc}", file=sys.stderr)
-    raise SystemExit(2)
+from t2i_story_pipeline.documents import load_story_document
+from t2i_story_pipeline.errors import StoryConfigurationError
 
-if not text.strip():
-    print(f"Story file must not be empty: {path}", file=sys.stderr)
+try:
+    load_story_document(Path(sys.argv[1]))
+except StoryConfigurationError as exc:
+    print(f"Invalid story document: {exc}", file=sys.stderr)
     raise SystemExit(2)
 PY
 then
@@ -124,7 +116,7 @@ for index in "${!labels[@]}"; do
   printf '\nGenerating %s: female=%s, male=%s\n' \
     "$label" "$female_count" "$male_count"
   if "${story_cli[@]}" generate \
-    --prompt-file "$story_file" \
+    --input "$story_file" \
     --female-count "$female_count" \
     --male-count "$male_count" \
     --content-level hardcore \

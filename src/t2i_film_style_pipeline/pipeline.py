@@ -64,6 +64,12 @@ class FilmStyleRunStatus(StrEnum):
 class FilmStylePromptRequest(_Model):
     film_style: FilmStyleRequest
     scene_direction: SceneDirectionText | None = None
+    output_filename_stem: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=80,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$",
+    )
     theme_count: int = Field(default=1, ge=1, le=100)
     frames_per_theme: int = Field(default=6, ge=1, le=6)
     female_count: int | None = Field(default=None, ge=0, le=8)
@@ -77,8 +83,9 @@ class FilmStylePromptRequest(_Model):
     ) -> FilmPromptRequest:
         return FilmPromptRequest(
             context=context,
-            prompt_filename_stem=_short_filename_stem(
-                self.film_style.director,
+            prompt_filename_stem=(
+                self.output_filename_stem
+                or _short_filename_stem(self.film_style.director)
             ),
             theme_count=self.theme_count,
             frames_per_theme=self.frames_per_theme,

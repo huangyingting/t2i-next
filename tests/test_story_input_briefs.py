@@ -1,16 +1,30 @@
 from pathlib import Path
 
+from t2i_story_pipeline.documents import load_story_document
+
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_story_inputs_are_yaml_documents_with_matching_ids() -> None:
+    story_inputs_dir = REPOSITORY_ROOT / "story-inputs"
+    story_inputs = sorted(story_inputs_dir.glob("*.yaml"))
+
+    assert len(story_inputs) == 48
+    assert not list(story_inputs_dir.glob("*.txt"))
+    for story_input in story_inputs:
+        document = load_story_document(story_input)
+        assert document.id == story_input.stem
+        assert document.description.strip()
+
+
 def test_story_inputs_use_only_the_current_authoring_contract() -> None:
-    story_inputs = sorted((REPOSITORY_ROOT / "story-inputs").glob("*.txt"))
+    story_inputs = sorted((REPOSITORY_ROOT / "story-inputs").glob("*.yaml"))
 
     assert story_inputs
-    assert not (REPOSITORY_ROOT / "story-inputs" / "multi-view-scenes.txt").exists()
+    assert not (REPOSITORY_ROOT / "story-inputs" / "multi-view-scenes.yaml").exists()
 
     for story_input in story_inputs:
-        brief = story_input.read_text(encoding="utf-8")
+        brief = load_story_document(story_input).description
 
         assert brief.startswith("BRIEF\n\n"), story_input.name
         assert "Theme" in brief, story_input.name
@@ -27,11 +41,11 @@ def test_story_inputs_use_only_the_current_authoring_contract() -> None:
 
 
 def test_lifestyle_story_is_social_photography_not_ui() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "lifestyle-story.txt"
-    ).read_text(encoding="utf-8")
+        / "lifestyle-story.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -139,27 +153,27 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
 
 
 def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "intimate-liquid-editorial.txt"
-    ).read_text(encoding="utf-8")
+        / "intimate-liquid-editorial.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert not (
         REPOSITORY_ROOT
         / "story-inputs"
-        / "overhead-radial-splash-fashion.txt"
+        / "overhead-radial-splash-fashion.yaml"
     ).exists()
     assert not (
         REPOSITORY_ROOT
         / "story-inputs"
-        / "overhead-intimate-liquid-editorial.txt"
+        / "overhead-intimate-liquid-editorial.yaml"
     ).exists()
     assert not (
         REPOSITORY_ROOT
         / "story-inputs"
-        / "high-angle-intimate-liquid-editorial.txt"
+        / "high-angle-intimate-liquid-editorial.yaml"
     ).exists()
     assert "成人亲密液体动势时尚编辑摄影" in normalized
     assert "多样且符合场景的拍摄视点" in normalized
@@ -447,11 +461,11 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 
 
 def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "indoor-pure-desire-editorial.txt"
-    ).read_text(encoding="utf-8")
+        / "indoor-pure-desire-editorial.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -514,9 +528,9 @@ def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
 
 
 def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "piss.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "piss.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "骨盆居中、双腿紧凑且趋于并拢但不互相接触的低位蹲姿" in normalized
@@ -595,9 +609,9 @@ def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
 
 
 def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "piss.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "piss.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "手机不是必需品" in normalized
@@ -664,11 +678,11 @@ def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
 
 
 def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "confined-exhibition-fantasy.txt"
-    ).read_text(encoding="utf-8")
+        / "confined-exhibition-fantasy.yaml"
+    ).description
     normalized = " ".join(brief.split())
     scenes = [
         line
@@ -812,10 +826,10 @@ def test_rebuilt_legacy_inputs_are_complete_story_descriptions() -> None:
         "VARIATION AND REJECTION RULES",
     )
 
-    for filename in ("avantgarde.txt", "snofs.txt", "tentacle.txt"):
-        brief = (REPOSITORY_ROOT / "story-inputs" / filename).read_text(
-            encoding="utf-8"
-        )
+    for filename in ("avantgarde.yaml", "snofs.yaml", "tentacle.yaml"):
+        brief = load_story_document(
+            REPOSITORY_ROOT / "story-inputs" / filename
+        ).description
 
         assert all(section in brief for section in required_sections), filename
         assert "At aesthetic level" in brief, filename
@@ -824,12 +838,12 @@ def test_rebuilt_legacy_inputs_are_complete_story_descriptions() -> None:
 
 
 def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> None:
-    film_post = (REPOSITORY_ROOT / "story-inputs" / "film-post.txt").read_text(
-        encoding="utf-8"
-    )
-    zero_gravity = (
-        REPOSITORY_ROOT / "story-inputs" / "zero-gravity-intimacy.txt"
-    ).read_text(encoding="utf-8")
+    film_post = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "film-post.yaml"
+    ).description
+    zero_gravity = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "zero-gravity-intimacy.yaml"
+    ).description
 
     assert "Use the exact requested cast and no additional people" in film_post
     assert "must appear clearly in every Theme premise and every poster" in film_post
@@ -839,9 +853,9 @@ def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> Non
 
 
 def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "intimate-lifestyle-portrait.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "intimate-lifestyle-portrait.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "Every Frame is one finished full-bleed photograph" in normalized
@@ -1033,9 +1047,9 @@ def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
 
 
 def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "miniature-fantasy-v2.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "miniature-fantasy-v2.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert len(brief) < 9_500
@@ -1329,9 +1343,9 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
 
 
 def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "giant-country-fantasy.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "giant-country-fantasy.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -1574,9 +1588,9 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
 
 
 def test_furry_mythic_interactions_uses_original_live_action_characters() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "furry-mythic-interactions.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "furry-mythic-interactions.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "DETERMINISTIC CAST ALLOCATION" in brief
@@ -1786,7 +1800,9 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
 
 
 def test_dress_board_region_names_are_layout_only() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "dress.txt").read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "dress.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "Do not render the Theme title or region names as visible text." in brief
@@ -1932,9 +1948,9 @@ def test_dress_board_region_names_are_layout_only() -> None:
 
 
 def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "post-layout.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "post-layout.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "tactile mid-century cinematic photomontage" in normalized
@@ -1991,16 +2007,16 @@ def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
 
 
 def test_post_briefs_isolate_text_without_removing_poster_copy() -> None:
-    film_post = (
-        REPOSITORY_ROOT / "story-inputs" / "film-post.txt"
-    ).read_text(encoding="utf-8")
-    post_layout = (
-        REPOSITORY_ROOT / "story-inputs" / "post-layout.txt"
-    ).read_text(encoding="utf-8")
+    film_post = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "film-post.yaml"
+    ).description
+    post_layout = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "post-layout.yaml"
+    ).description
 
     for filename, brief in (
-        ("film-post.txt", film_post),
-        ("post-layout.txt", post_layout),
+        ("film-post.yaml", film_post),
+        ("post-layout.yaml", post_layout),
     ):
         normalized = " ".join(brief.split())
 
@@ -2052,9 +2068,9 @@ def test_post_briefs_isolate_text_without_removing_poster_copy() -> None:
 
 
 def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "jav-dvd-wrap.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "jav-dvd-wrap.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -2096,9 +2112,9 @@ def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
 
 
 def _legacy_everyday_social_caricature_contract() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "EAST ASIAN CAST AND SETTING LOCK" in normalized
@@ -2339,9 +2355,9 @@ def _legacy_everyday_social_caricature_contract() -> None:
 
 
 def test_everyday_social_caricature_centers_women_and_lived_interaction() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert len(brief.splitlines()) <= 150
@@ -2501,9 +2517,9 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
 
 
 def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "creative.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "creative.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "PLAN THE WHOLE BATCH FIRST" in normalized
@@ -2602,9 +2618,9 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
 
 
 def test_edo_warai_e_brief_respects_all_content_levels() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "ADULT CAST, CONSENT, AND CONTENT LEVEL" in normalized
@@ -2627,9 +2643,9 @@ def test_edo_warai_e_brief_respects_all_content_levels() -> None:
 
 
 def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "PERFORMED UKIYO-E TRANSLATION" in brief
@@ -2710,9 +2726,9 @@ def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
 
 
 def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "ming-gongbi-mixi-tu.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "ming-gongbi-mixi-tu.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -2799,7 +2815,9 @@ def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
 
 
 def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "pose.txt").read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "pose.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "RANDOM POSE-GROUP SELECTION" in normalized
@@ -2917,9 +2935,9 @@ def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
 
 
 def test_threshold_emergence_brief_locks_cast_geometry_and_batch_variety() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "threshold-emergence.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "threshold-emergence.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "EMERGING WOMEN + WITNESS WOMEN = REQUESTED WOMEN" in normalized
@@ -2954,9 +2972,9 @@ def test_threshold_emergence_brief_locks_cast_geometry_and_batch_variety() -> No
 
 
 def test_magazine_cover_brief_builds_a_finished_newsstand_cover() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "magazine-cover.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "magazine-cover.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "MAGAZINE, NOT POSTER" in normalized
@@ -3019,9 +3037,9 @@ def test_magazine_cover_brief_builds_a_finished_newsstand_cover() -> None:
 
 
 def test_extreme_absurdity_requires_visible_human_prop_contact_chain() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "extreme-absurdity.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "extreme-absurdity.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert "HUMAN-TO-PROP CONTACT CHAIN" in normalized
@@ -3064,9 +3082,9 @@ def test_extreme_absurdity_requires_visible_human_prop_contact_chain() -> None:
 
 
 def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
-    brief = (
-        REPOSITORY_ROOT / "story-inputs" / "near-future-intimacy-realism.txt"
-    ).read_text(encoding="utf-8")
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "near-future-intimacy-realism.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     headings = (
@@ -3301,11 +3319,11 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
 
 
 def test_precise_intimate_activity_geometry_has_explicit_spatial_contract() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "precise-intimate-activity-geometry.txt"
-    ).read_text(encoding="utf-8")
+        / "precise-intimate-activity-geometry.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -3459,11 +3477,11 @@ def test_precise_intimate_activity_geometry_has_explicit_spatial_contract() -> N
 
 
 def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "surreal-conceptual-portrait.txt"
-    ).read_text(encoding="utf-8")
+        / "surreal-conceptual-portrait.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -3560,9 +3578,9 @@ def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() ->
 
 
 def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "demon-lord.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "demon-lord.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -3752,9 +3770,9 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
 
 
 def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "angel.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "angel.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -3892,11 +3910,11 @@ def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
 
 
 def _legacy_motion_blur_photography_contract() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "motion-blur-photography.txt"
-    ).read_text(encoding="utf-8")
+        / "motion-blur-photography.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
@@ -4155,11 +4173,11 @@ def _legacy_motion_blur_photography_contract() -> None:
 
 
 def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
-    brief = (
+    brief = load_story_document(
         REPOSITORY_ROOT
         / "story-inputs"
-        / "motion-blur-photography.txt"
-    ).read_text(encoding="utf-8")
+        / "motion-blur-photography.yaml"
+    ).description
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")

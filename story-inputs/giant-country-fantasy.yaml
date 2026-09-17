@@ -1,0 +1,213 @@
+id: giant-country-fantasy
+description: |
+  BRIEF
+
+  RUN-LEVEL ROUTING: Read request.content_level before creation; that value is immutable across every Theme and Frame in the batch. If it is erotic, ignore every hardcore permission and never output oral sex, masturbation, penetration, explicit manual genital contact, or sexual fluids. If it is hardcore, ignore erotic limits and require one explicit direct act in every Theme and Frame. Variation never comes from switching branches. Reject the whole batch if an item uses inactive branch. Themes and Frames are incoming parameters, not fixed lists.
+
+  female_count 和 male_count 只约束从正常人类世界来到巨人国的成年访客。每帧画面总人数严格等于 1 + female_count + male_count：指定数量的正常人类访客，加一名巨人国原住民，不得出现额外脸、头、躯干、肢体或局部人物。系统为唯一巨人原住民选择成年男人或成年女人；该 Theme 全部 Frame 固定此选择。
+  所有人物均为自愿互动的多元东亚成年人。访客主动进入巨人国并清楚理解尺度差；访客或巨人均可发起、回应或引导，Theme 锁定发起方。
+  GLOBAL GARMENT LOCK：下装始终是 one pair of trousers；lower-body target 时降低到双侧大腿，nipple target 时保持扣好。禁止 swimsuit、sarong、skirt、shorts、underwear 或替代下装。
+  GLOBAL GIANT ACTION LOCK：巨人不得 passive、immobile、motionless 或 frozen。S5 与 S6 必须写同一个由访客信号触发的骨盆、承重、控制件或支撑调整，并明确它改变接触。
+
+  GIANT-COUNTRY WORLD
+
+  每个 Theme 使用一个具体、可理解、可拍摄的巨人国日常地点。城市室内、城市户外和半开放空间只是默认方向，不是硬边界；住宅、酒店、餐厅、零售、办公室、医疗、交通、市政、文化场馆、娱乐场所、运动空间、度假设施、乡村服务点、园林和自然边缘地点都可使用，只要环境、人物身份和互动具有生活逻辑。公寓、洗衣店、健身房、办公室、诊所、便利店、酒店、市场街、车站、停车楼、屋顶、温室、剧院、画廊、泳池、花园、海滨设施和农庄建筑全部只是启发性例子，不是允许列表、固定菜单、配额或轮换表。
+  场景只需选择足以让地点一眼可辨的两至四种环境线索，不强制固定基础设施清单。材料、家具、标识、植物、天气、道路、设备和使用痕迹按地点自然选择；不要为了满足清单把排水沟、脚手架、监控、卷帘门和工业管线塞进每个场景。所有巨人国原生建筑、家具、车辆、机器和日用品仍按巨人居民的统一日常比例制造，并明确标为 giant-scale 或 colossal giant-country。除指定访客与唯一巨人外不得出现额外人物，但可通过空餐具、亮灯房间、停放车辆、正在运行的设施和使用痕迹表现世界有人生活。
+  住宅与家务、零售与餐饮、办公室与医疗、交通与停车、市政与公共休闲、文化与娱乐、酒店与度假、运动与健康、园林与自然边缘、建筑与工业、街道与社区服务只是批量多样性轴。优先避免连续重复同一地点和同一装置，但不要求先用完固定类别，也不强制工业场景占比。
+  巨人不得拥有年轻、健美、无瑕或模特化的完美身材。每个 Theme 明确选择一种非理想化成人身体：肥胖并有自然腹部与皮肤褶皱，苍老并有皱纹、松弛皮肤与老年斑，瘦削并有突出的锁骨、肋骨与关节，或兼具粗壮、下垂、疤痕、静脉、妊娠纹、色斑和左右轻微不对称。所有特征保持写实、尊重且不影响自愿能力；同一 Theme 全部 Frame 固定年龄层、体型和皮肤特征。
+  每个 Frame 分开描述：先写正常人类访客人数、性别和身份，再写巨人国原住民性别及压倒访客的体量。始终使用“finger-length miniature-scale normal-world adult woman/man visitor”与“giant-country native giant woman/man”。finger-length miniature-scale 只描述进入巨人国后的画面相对尺度，访客仍有写实成年人比例，不得写成天生微型种族、玩偶、模型、克隆人或儿童。禁止输出 normal-human-sized、tiny without finger-length 或 ordinary-sized visitor。
+  所有访客使用完全相同的头身比、肩宽尺度和四肢长度，只用脸、发型、服装和颜色区分身份；不得用不同身高或骨架制造假尺度。需要比较访客时，将他们置于相同或相近的相机距离。
+
+  FINGER-LENGTH VISITOR SCALE AND EVERYDAY OBJECT PROOF
+
+  finger-length 是访客的唯一文字尺度等级：每名访客从头到脚只有巨人普通一根食指那么长，始终称 finger-length miniature-scale normal-world adult visitor。该比较只用于生成器理解尺寸，不在画面中安排测量动作。禁止把巨人手掌或手指伸到访客旁边作标尺，禁止 extended index finger、pointing finger、dangling finger、measuring finger、finger beside visitors、孤立手指或前景手指。
+  巨人的两只手保持普通自然任务姿势，位于身体两侧或巨人国支撑面上，与访客群保持清楚距离；所有手指放松自然，不单独伸直、不指向人物、不遮挡访客。两只手仍须同深度、自然等大并完整连接肩臂。
+  每个 Frame 必须逐字写：“Every visitor has an unmistakable finger-length miniature scale from head to foot, while both fully connected giant hands stay in natural task or support poses away from the visitor group, with relaxed fingers and no measuring gesture.”不得加入可见食指对齐。
+  日用品证明只允许 travel mug、coffee mug、beverage can、beverage bottle、smartphone 或 remote control，这是封闭列表；它只证明巨人国物件而不是人物身高。禁止鞋、安全帽、衣物、梯子、椅子、手电筒、工具或机器零件。物件独立竖放在互动台旁的场景适配 giant-scale 表面上，整体清楚可见并显著高过 finger-length visitors。
+
+  IMAGE-SCALE COMPOSITION GATE
+
+  尺度是每帧最高优先级，必须用真实并排轮廓而非形容词证明：
+  1. 访客层：finger-length miniature-scale 是整段最高频尺度词，每个访客称谓和姿势句都重复。每名访客从头到脚完整可见并保留写实成人比例，完整身体只有一根巨人食指长；不得达到巨人的手掌、前臂、膝盖、大腿、腰、胸或肩部高度。
+  2. 日用品层：完整 giant-scale 日用品在同焦平面明显高过全部 finger-length visitors，最低台阶或家具部件也像建筑结构般压倒访客。通过日用品和环境后果表达尺寸，不使用可见手指测量。
+  3. 身体层：两只巨人手处于同一深度、具有相同自然尺寸并分别连续连接双肩；两手保持自然支撑或任务姿势并远离访客群，所有手指放松。禁止手掌或手指朝镜头、指向访客、单独放大、复制或断开。巨人的头、双肩、胸腹、骨盆、双大腿、双膝和至少一只完整脚同时入镜。
+  4. 世界层：至少两件额外 giant-scale 原生物件和一个最低台阶、门槛或底座与访客同焦；每件都显著高过访客完整身体。巨人国门、家具、机器、车辆和结构必须匹配巨人正常使用比例，不能出现为普通人制造的椅子、梯子、控制台或平台。
+  所有属于巨人国原住民、巨人国建筑或当地环境的可见物件都必须按巨人居民的统一日常比例制造，并远大于其正常人类世界版本。常用容器、鞋、手机、工具、家具、机器、车辆和建筑构件必须至少达到访客完整身体的高度或表现出更大的清楚跨度；衣扣、钥匙齿、梳齿和鞋底等较小部件可以低于访客身高，但必须以异常厚度、宽度或重量继续显出巨人尺度。每次命名原生家具、工具、容器、服装配件、门、楼梯、栏杆、绳索、桥、车辆、机械、植物构件或日用品时，英文名称前必须明确写“giant-scale”或“colossal giant-country”，例如 giant-scale cup、giant-scale door hinge、colossal giant-country pulley；禁止只写普通 cup、chair、door、rope、lever、bucket 或 platform 而不标示巨大尺度。只有访客自带的衣物、手持工具、安全装备及为访客临时搭建的支撑可以保持正常人类尺寸，并必须明确写“visitor-scale”；不得把巨人国原生物件误写成 visitor-scale。
+  全部访客共同使用一个 single miniature visitor interaction deck，互动台严格分成与访客人数相等的独立工位，从画面左到右编号，每个工位只有一人并以栏杆和背景缝隙分隔。互动台外观必须适配场景与风格，可像酒店服务托盘、餐桌边台、剧院小阳台、花园步道、泳池平台、画廊展台或简洁广告展示台，不得默认工业脚手架。禁止多套平台、ordinary stepladder、office chair、rolling chair、full-size ladder、full-size platform 或普通座椅。
+  尺度关系必须在每个 Frame 开头首先成立：身份之后立即写“the finger-length miniature-scale normal-world adult visitors occupy one separated interaction-deck bay each, every complete visitor having an unmistakable finger-length scale from head to foot”。不得写可见食指、fingertip 对齐或 measuring gesture，不得把访客放在前景。全部关键参照处于同一横向画面层。
+
+  BODY AND TARGET CONTRACT
+
+  每个 Theme 先锁定 GIANT SEX、TARGET_ID、TARGET STATE 和 RELEASE STATE。giant man 只选 penis 或 anus；giant woman 只选 vaginal opening、anus 或 selected nipple。nipple 要求明确为 consenting lactating adult giant woman。
+
+  GENITAL STATE LOCK：
+  - penis 从 flaccid、semi-erect、fully erect 中只选一种。必须显示 pubic arch 上的 root、upper inner thighs 之间连续的 shaft、清楚 glans、glans 下方唯一 scrotum 和相对骨盆的轴向。Hardcore oral/manual stimulation 通常使用 semi-erect 或 fully erect；Erotic 按作用强度选择 flaccid 或 semi-erect。接触面不得遮住全部 root、shaft 和 glans。
+  - vaginal opening 必须显示 lower pelvis 正中连续的 labia majora、labia minora、clitoral hood 和 opening，位于 pubic mound 下方、perineum 前方和 upper inner thighs 之间；不得出现 shaft、glans 或 scrotum。
+  - anus 必须显示 gluteal cleft 正中的 external anal opening，位于 sacrum 下方、perineum 后方和两侧 buttocks 之间；不得新增 vaginal opening、penis 或 scrotum。
+  - selected nipple 从 left 或 right 只选一个；显示连续 chest、breast mound、areola 和 nipple。巨人保持正常两侧 breast 与两个 nipple，只有所选 nipple 是接触和流体中心，不得新增第三乳房或第三乳头。
+
+  RELEASE STATE LOCK：
+  - Erotic 固定 no ejaculation、no urination、no milk release、no sexual fluid release；只允许装置水、护理液或润滑剂。
+  - Hardcore 每 Theme 只选 no release、pre-ejaculate、ejaculation、urination、vaginal lubrication、lactation 或 enema/lubricant flow。ejaculation 要求 erect penis，semen 只从 urethra 到 assigned mouth 或 collector；urination 只配 flaccid/partial erection，且不得与 semen 同帧。lactation 只配 selected nipple，milk 只从该 nipple 到 assigned mouth 或 collector；其他目标不得产 milk。
+  - 所有流体必须显示 source、trajectory、受力面和 landing；未选择 release 时不得出现喷射、液滴或湿痕。
+
+  第二句命名目标与状态。lower-body target 包含“the lower abdomen is visibly above the target”和“both thighs continue toward the knees”；nipple 包含“the neck is visibly above the target”和“the ribcage and abdomen continue below toward the pelvis and thighs”。目标保持自然成人比例。
+  每名访客必须从头顶到双脚全身可见，完整位于巨人身体外部。巨人身体、手指、组织、道具、衣物、绳索和液体不得遮断访客的头—颈—躯干—骨盆—四肢链，也不得只露局部。组织只在唯一外部接触点受压变形，任何访客的头、躯干、骨盆、手臂、腿或脚都不得进入体内。
+  Erotic 中，访客的头部、胸廓、腹部和骨盆四周必须由可见空气、背景空隙或刚性平台边界与巨人身体分隔，姿势句逐字写“a visible air gap separates the visitor's head, torso, abdomen, and pelvis from the giant's skin”。Hardcore 直接接触中，每名参与者除被明确分配的嘴、一只手或单一玩具之外，躯干、腹部、骨盆、双臂和双腿都必须与巨人皮肤分离，姿势句逐字写“a visible air gap separates each visitor's torso, abdomen, pelvis, arms, and legs from the giant's skin, with only the assigned mouth, hand, or toy reaching the contact point”。除一个明确命名的局部接触面外，访客轮廓不得贴住或覆盖巨人皮肤；禁止整名访客横跨、趴伏或贴伏在巨人的胸部、腹部、阴阜、骨盆或大腿表面。俯卧访客只能位于与巨人皮肤分离的刚性平台上。
+  每个人拥有独立头部、胸廓、骨盆和四肢。除唯一接触点外，轮廓不重叠、不融合、不共享肢体；多个访客之间保留可见背景空隙并位于不同空间槽位和支撑面。访客性器官由服装遮住或位于画外。
+  每具身体必须通过 SILHOUETTE LIMB INVENTORY：双肩各连一条手臂和一只手，骨盆连接左右大腿、膝、小腿和脚；lower target 位于两腿之间，selected nipple 属于连续胸部，均不得代替肢体或形成额外身体。每名访客的肩、手臂、手、骨盆、腿和脚可独立追踪，不得从工具或他人长出、消失进物件、互相承重或共享肢体，并保留背景缝隙。
+  S5A：lower-body target 逐字输出“Both giant shoulders visibly connect through two separate arms to two naturally equal-sized hands at one depth, the giant pelvis visibly connects to two separate thighs, knees, lower legs, and feet, and the contact point lies between rather than replacing the thighs; every visitor has two independently traceable arms, hands, legs, and feet with a background gap around each limb.”nipple target 改用“Both giant shoulders visibly connect through two separate arms to two naturally equal-sized hands at one depth, the selected nipple visibly belongs to one breast on the continuous chest, and the giant pelvis connects to two separate thighs, knees, lower legs, and feet; every visitor has two independently traceable arms, hands, legs, and feet with a background gap around each limb.”
+  巨人必须保持一条无遮挡、不可分割的完整身体外轮廓：头、颈、双肩、胸腹、腰、单一骨盆、左右大腿、双膝、小腿和双脚连续相连。柜台、桌面、床沿、推车、互动台、机器面板、墙洞、窗框或广告边框不得横穿腰腹、骨盆或大腿，也不得把骨盆包进展示窗口。巨人只能站、坐或躺在这些物件前方或侧方，不能让身体穿过家具或建筑。
+  每个 Frame 在四肢拓扑句后必须逐字输出：“The giant has one unbroken body silhouette from head through torso and a single pelvis into two thighs, knees, lower legs, and feet; no counter, table, bed edge, cart, interaction deck, machine panel, wall opening, or frame crosses, hides, encloses, or duplicates the waist, pelvis, or legs.”
+  画面显示目标部位到所属巨人骨盆，再到胸腹、左右大腿、双膝和至少一只完整脚的连续轮廓。裁切不得切过巨人头部、肩、肘、手腕、骨盆、膝、踝、访客身体或接触点。
+  装置接触只能在身体定位后描述。空间词必须以 giant pubic arch、abdomen、perineum、gluteal cleft、thighs，或 nipple target 的 sternum、ribcage、breast mound 为参照。
+
+  GLOBAL ENTITY-STATE AND TOPOLOGY INVARIANTS
+
+  在写 Theme 和 Frame 前建立一个不输出的 Entity-State Ledger。为每个 actor、body part、garment、prop、support 和 mechanism 分配唯一 entity_id、owner、parent connection、current state、support surface、depth layer、spatial slot 和 task。每个字段只能有一个值；任何句子改变已有值、增加第二所有者、让实体同时处于两个位置或让一个任务由两个不兼容动作组成，都必须重写整个 Frame。
+  身体使用单一有根拓扑图：head 连接 neck，neck 连接 torso，torso 连接 single pelvis，pelvis 分叉为 exactly two thighs，再连接 two knees、two lower legs 和 two feet；每个 shoulder 只连接一条 arm 和一只 hand。器官只能挂接到 single pelvis，不能创建第二身体组件、替代腿或出现在家具窗口中。所有可见身体区域必须能沿图连续追踪到同一人物。
+  衣物使用互斥状态机：worn closed、opened in place、lowered as one continuous garment 或 removed off-body 只能四选一。一件衣物只有一个 owner、一个 waistband、一个 closure 和对应数量的 sleeves 或 pant legs；后文只能逐字复制已选状态。禁止将 opened、lowered、removed、held 和 lying 同时用于同一衣物，也禁止为了露出身体而生成第二件衣物或第二身体表面。
+  所有非身体实体使用唯一占位规则：held、worn、standing、resting、mounted 或 suspended 只能选一个；一个 prop 不能同时在手中、桌上和背景，一个 support 不能同时承托不同空间槽位的人物。装置末端、软管和织物必须从已命名 parent mechanism 连续连接到唯一作用点，不能从人物身体长出或悬空。
+  遮挡使用 parent-chain rule：任何前景物、家具、建筑边框、互动台或装置都不得切断必须可见的 parent-to-child 解剖链。允许局部遮挡衣物和背景，但若遮挡使 torso-to-pelvis、pelvis-to-thighs、shoulder-to-hand 或 visitor head-to-feet 无法连续追踪，就必须移动物体、人物或相机，而不是在遮挡另一侧重新生成身体部位。
+  景深和空间使用 single-slot rule：每个人只占一个左中右或前中后槽位，并固定 foreground、midground 或 background 中一层；不得跨层复制、穿过家具、同时出现在物体上方与下方，或被透视重建成第二尺寸。人数、工位数和可见身体数必须一致。
+  接受 Frame 前内部执行六项闭合检查但不输出报告：所有人物是否各为一个连通身体图；每件衣物是否只有一个互斥状态；每个道具是否只有一个位置和所有者；每条装置链是否有来源、连接和落点；每个槽位是否只有一人；所有 S1–S6 状态是否逐字一致。任一答案为否就整帧重写。
+
+  IDENTITY AND LIMB CLARITY
+
+  每人只用一个固定英文称谓：巨人使用“the giant-country native giant woman/man”；访客按画面从左到右固定为“the first/second/third miniature-scale normal-world adult woman/man visitor”。禁止中途改称 operator、worker、partner 或 figure。
+  每人只承担一个任务。全部访客位于同一个 miniature visitor interaction deck 的独立编号工位，每个工位只有一人，栏杆与背景缝隙明确分隔。Erotic 只允许 Signature Mechanism 的单一软垫末端、气流、水流或织物到达接触点，访客身体不得直接接触。Hardcore 允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官，其余身体由对应工位承重并保持空气间隙。禁止 full-body direct contact、body-weight contact、访客鞋底直接压住接触点，以及一个人同时承担直接行为和机械控制。每条手臂和腿只分配一次位置与动作。
+  每名攀爬者的支撑手脚只列一次，接触点数量与列出的手脚一致。人物、绳索、工具和机械不得悬浮、穿透或融合。工具只有一个作用面，每人只握一件工具或控制器。
+
+  SEXUAL INTERACTION
+
+  全部性行为只发生在一个或多个正常人类访客与唯一巨人国原住民之间，画面开始时主要行为已经发生。禁止访客彼此、巨人独自或第三方性活动。每帧只有一个连续主要行为、目标器官和接触中心；所有访客必须围绕该行为承担不同但互补的任务，不得旁观、另开动作或重复占据同一解剖位置。访客、巨人或双方均可发起，须明确发起与回应。巨人主动时只用一只手、一件工具或目标部位完成一个动作；巨大手指不得遮住访客头部、躯干或主要接触。
+
+  NECESSITY-DRIVEN INTERACTION DESIGN
+
+  每个 Theme 必须先建立一条不可替代的 Necessity Chain，不得从随机装置或性行为反推借口。严格按顺序锁定：LOCATION TRIGGER，当前地点与巨人正在进行的普通活动自然产生一个即时需求；GIANT NEED，巨人明确、自愿地请求一种护理、清洁、放松、检查、角色服务或亲密结果；VISIBLE CONSTRAINT，巨人的体型、姿势、家具关系或必要任务使其无法独自精确完成；SCALE ADVANTAGE，只有 finger-length visitors 能进入、观察或操作精细作用区；LOCATION AFFORDANCE，当前地点已有的物件、材料或系统恰好提供所需承重、触感、流体、节奏或定位；EXPOSURE NECESSITY，声明为什么解决需求必须直接接触当前目标、为什么隔着闭合衣物无法完成；PRIVACY CONDITION，声明可见且可信的私密或受控访问条件；ROLE DEPENDENCY，每名访客承担一个前后相接且不可省略的角色；CONTENT-LEVEL SOLUTION，亲密行为是双方事先理解并主动选择的解决方式；VISIBLE RESULT AND RECIPROCAL RESPONSE，画面显示结果、巨人对指定访客的回应和访客间反馈。
+  GIANT NEED 必须明确针对当前目标的局部护理、直接触感或约定亲密服务，不能只是全身炎热、疲劳、压力、普通清洁或任何隔衣也能解决的泛化需求。SCALE ADVANTAGE 必须说明作用区过于精细、位置狭窄或需要多点同步，巨人自己的宽大手指和常规巨人尺寸工具无法安全精确完成，而 finger-length visitors 可以分别观察、定位和作用；若巨人单手或普通尺寸人物也能完成，就重写。
+  LOCATION TRIGGER 必须是 TARGET_ID 本身的自然局部状态或预先约定的成人服务，例如运动或演出后的汗液与安全化妆残留、泳浴后的清洁护理、皮肤干燥需要润滑、预约的私密按摩或双方约定角色仪式；这些只是建议。禁止用设备故障、堵塞、卡住、错位座椅、挤压、麻木、疼痛、损伤或器官进入设备来制造需求。场所设施只能提供解决资源，不能先伤害或困住目标再成为解决方案。
+  LOCATION TRIGGER 还必须通过 Trigger Source Path 到达 TARGET_ID：明确写出 source、transport or contact medium 和 TARGET_ID，例如泳水经湿泳装滞留在目标、舞台安全化妆材料实际涂在目标、预约服务直接以目标为服务区域。若 source 在物理上只接触脚、头发、手、背部、家具或其他远离目标的区域，就不能声称它造成目标需求；禁止紧鞋导致肛门或外阴擦伤、理发导致骨盆护理、握工具导致目标皮肤问题等无接触路径关联。
+  为每个 Theme 建立唯一 TARGET_ID，并执行 Need-Target Identity Lock：trigger、need、exposure、机制输出、solution 和 result 全部作用于同一 penis、vaginal opening、anus 或 selected nipple，不得漂移到邻近皮肤。
+  TARGET_ID 服务必须同位：penis、vaginal opening、external anus 或 selected nipple 只接受其表面的清洁、护理、按摩、约定刺激，nipple 还可接受约定 lactation service。S2 后统一称 the contact point itself；禁止用 near、around、adjacent、tailbone、lower back、groin crease、inner thigh、perineum 或 garment seam 替代。
+  禁止 instrumental exposure：不得把目标器官或裸露骨盆当作无关维修、服装调整、承重、粘附、固定、开关、支点或进入其他设备的工具。地点普通任务可以触发局部不适或提供私密服务资源，但主要互动必须解决目标本身的需求；若移除目标暴露后原来的维修、园艺、演出、清洁或运输任务仍可完成，不能以该任务证明暴露必然。
+  互动必须同时回答七个问题并写入 Theme premise：why now，why here，why this scale，why this cast，why this content-level action，why direct exposure is physically necessary，why this location is private enough。仅写双手忙碌、够不到、设备在场或为了刺激而脱裤子不算答案。
+  内部执行 Counterfactual Necessity Test，不输出过程：替换地点、移除尺度差、Signature Mechanism、任一访客、GIANT NEED，或让下装保持 closed，分别检查主要互动和需求结果是否还能原样成立。任一答案为是，就说明地点、尺度、装置、人物、需求或暴露只是装饰，必须重写。每名访客的作用形成接力链，移除任何一人都会使定位、动力、材料传递、节奏、观察、安全或回应中的一环中断；不得让三人只是并排按可互换按钮。
+  限制必须临时、无伤害且不影响同意能力，不得来自受伤、瘫痪、昏迷、醉酒、恐惧、受困或胁迫。互动开始前巨人已经以明确请求、指向装置、主动调整姿势或约定角色仪式表达意图；画面开始时解决方案已经运作，不写准备、偶然误触或未经同意的意外刺激。
+  VISIBLE CONSTRAINT 必须先在 S5 以一个具体姿势或双手任务完整可见，再在 S6 逐字复制该事实；禁止 S5 写双手撑桌而 S6 改成卸妆，禁止因果句临时新增持物、工作或受限动作。
+
+  EXPOSURE NECESSITY AND PRIVACY
+
+  目标暴露是最小充分访问。lower-body target 时巨人明确请求并先解开 trousers，访客可用 rope、pulley、winch 或多人拉拽费力地将同一裤子降到双侧大腿并持续固定；nipple target 时 trousers 保持扣好，访客按巨人请求掀起或撑开一件 upper garment。衣物必须连续、受力可见并锚在硬结构；若隔衣也能完成就重写。
+  地点必须具有画面内可见的隐私条件，例如锁闭的私人房间、预约治疗室、酒店套房、后台更衣区、关闭营业的员工空间、带遮挡帘的 cabana、封闭花园或明确受控访问区。公共柜台、开放站台、市场摊位、人行道、开放屋顶或人群可进入的空间不能仅因“无人出现”就视为私密；必须显示关闭标识、锁门、隐私帘、屏风或其他物理访问控制。
+  所有脱衣、掀衣与“偷看”都是巨人预先同意的 private reveal roleplay；禁止偷拍、偶然走光、撕衣或公开暴露。S5 显示衣物受力、巨人主动姿势和隐私边界，S6 写 direct exposure necessity。
+
+  IF AND ONLY IF request.content_level IS erotic：选择一种明确非插入式亲密行为。只有 Signature Mechanism 的单一软垫末端、织物、气流或水流直接接触目标并造成压痕、体毛分开、液体位移或肌肉反应；访客身体不得直接接触。
+  IF AND ONLY IF request.content_level IS hardcore：选择口交、手交、玩具插入、直接外阴刺激、direct nipple suckling 或自愿 BDSM。至少一名访客以 mouth、one hand 或 one toy 已接触目标；其他人负责承重、衣物牵引、定位、润滑、节奏、观察或承接。直接参与者不操作控制器。
+  CONTACT-FIRST GATE：S2 后的物理第三句必须立即写正在发生的接触。Erotic 写“The single [mechanism end, fabric, airflow, or water stream] is already pressing or flowing directly on the contact point, visibly [deformation].”Hardcore 写“The [named visitor]'s [mouth, one hand, or toy] is already in direct contact with the contact point, visibly [deformation].”禁止 approaching、hovering、poised、near、just above 或 waiting。
+  approaching、within reach、alignment、readiness、waiting、traverse toward、approach、hover、hovers、hovering、just above 等准备词无效；纯观看、纯展示、摆姿、拥抱、只有机械背景动作或画外行为不满足。
+
+  FLUID AND BDSM SYSTEMS
+
+  Hardcore 每帧最多一种主要体液，显示唯一 source、trajectory、surface 和 landing。semen 只来自 penis urethra，milk 只来自 selected nipple，vaginal fluid 只来自 vaginal opening；anus 只允许 lubricant、water 或 enema fluid。BDSM 器具有刚性锚点、软垫和快速释放。
+
+  SIGNATURE MECHANISM AND IMAGINATION
+
+  Signature Mechanism 必须从已锁定的 LOCATION TRIGGER、GIANT NEED、VISIBLE CONSTRAINT 和 SCALE ADVANTAGE 推导出来，不能先随机选择设备。它可以是简单日用品、柔性材料、家具、服务设施或机械系统；对巨人保持普通日用比例，对访客形成可操作的巨大结构。内部至少构思三个候选，并按 necessity、location specificity、scale exclusivity、role dependency、physical clarity 和 visual surprise 六项评分；只有同时通过全部 Counterfactual Necessity Test 的候选才能使用，不输出候选和评分过程。
+  CREATIVE INTERACTION SUGGESTIONS：以下只用于启发，不是清单、配额或模板。每个 Theme 内部构思至少三种不同原理，再选最符合地点、尺度与目标的一种。
+
+  - 攀爬绳索：harness、belay、pulley、winch、吊篮、索道或滑降；锚在硬结构，direct participant 接触目标，队友放绳、稳定和回收。
+  - 阴毛维护：梳理、修剪、编辫、染色、珠饰、清洁、除湿、润滑或造型；可导向工具和分流液体，不得承重。
+  - 流体：mist、滴灌、虹吸、泵、喷泉、气泡、泡沫、润滑通道、脉冲水流、重力瀑布或回收槽；显示 source、pressure、path 和 landing。
+  - 气流吸力：bellows、HVAC、风管、真空杯、负压软罩、涡流或压力脉冲；软边贴合目标并产生压痕或毛发偏转。
+  - 振动共振：按摩床、扬声器膜、偏心轮、弹性绳、振动刷、节拍器或往复机构，把频率传到唯一接触端。
+  - 织物循环：silk ribbon、毛巾、床单、窗帘带、looped strap 或软滚带形成拉锯、环绕、擦拭、收紧与释放。
+  - 软刷滚轮：刷阵列、海绵滚轮、抛光垫、柔性拍片、旋转环、凸轮或滑轨末端，由不同访客控制速度、方向和压力。
+  - 温度材质：温热毛巾、冷雾、凝胶、温水、冷却辊或相变垫；表现蒸汽、冷凝、潮红或收紧，不造成伤害。
+  - 毛细吸附：wick、吸水线、海绵格、微纤维束或多孔陶瓷通过毛细作用输送、吸收或均匀涂布液体。
+  - 充气软体：air bladder、peristaltic sleeve、软气囊环或波浪气垫产生顺序压力、包覆和释放。
+  - 浮力波浪：pool float、水床、摇椅、秋千、pendulum 或浮动平台把摆动和水波传给接触端。
+  - 连杆滑车：cam、crank、pantograph、scissor linkage、magnetic carriage 或 turntable 转换访客输入与往复、旋转和升降。
+  - 光学反馈：mirror、prism、反光板或放大观察窗帮助瞄准、观察和传递信号，只用于反馈，不代替接触。
+  - 静电织物：安全低静电仅驱动轻丝带、薄膜或毛发方向，不直接电击身体。
+  - 尺度地形：衣缝、饰品、床品褶皱、家具和设施作为路线或导轨；可攀爬、滑降、摆荡、划行或接力。
+  - 多人角色：climber、direct participant、belayer、pump operator、rhythm controller、lubrication handler、spotter、signal leader、collector；每人必须改变因果链。
+  - 衣物揭示：巨人先请求并授权；访客用 capstan、pulley、rope、夹具或多人拉拽降低 trousers、掀起 shirt hem、撑开衣摆或维持窥视窗口。可加入 consensual peek game、mirror 或 periscope，但不得偷拍、撕裂衣物或让布料悬浮。
+  - 喝奶：仅 Hardcore 的 lactating adult giant woman + selected nipple；一名访客 mouth 直接吸吮，队友控制衣物、支撑和 collector，milk 只沿 nipple-to-mouth 或 nipple-to-cup 单一路径。
+  - 吸精与承接：仅 Hardcore 的 erect penis + ejaculation；mouth、collector cup、funnel 或软管沿 urethra-to-landing 单一路径承接，禁止与 urine 同帧，禁止 semen 来自 anus。
+  - Hardcore：mouth、one hand 或 toy 直接作用；队友调高度角度、润滑、节奏、harness 或流体。cooperative oral 可作用同一器官的不重叠区域。
+  - Erotic：访客留在平台，通过唯一 soft end、fabric、airflow 或 water 接触，可结合护理、造型、角色服务、仪式或 spa。
+  Signature Mechanism 必须是地点原生设施或其合理延伸；场所例子只是建议。禁止无法解释来源的临时专业设备。全部承重、锚点和传力部件属于同一功能链并固定在地面、家具或其他硬结构上，不得用皮肤、阴毛或柔软组织承重，也不得遮住访客。
+  机制必须已经运转，把所有人连接到同一接触中心。Erotic 中，S1 命名的 Signature Mechanism 必须直接作用于接触点，在 S5 和因果句中逐段写出“visitor-scale control input → giant-scale force transmission → single padded mechanical end, airflow, water, or fabric strap → contact point visible response”；只有该输出端可以跨过空气间隙。Hardcore 中，S1 命名的 Signature Mechanism 必须直接承托、定位、稳定、驱动节奏或承接体液，在 S5 和因果句中逐段写出“visitor-scale support or control input → giant-scale positioning or rhythm transmission → assigned visitor mouth, hand, or toy at the contact point → visible direct-contact result”；被分配直接接触的嘴、手或玩具可以跨过空气间隙，其他身体和其他访客不得跨过。禁止装置只在背景正常运转而不改变承重、位置、节奏、接触压力或流体落点，这属于装饰性假机制。若正常尺寸人物之间也能原样成立，或只是拥抱、坐腿、手抱和无支撑触碰，必须重写。批量生成不得重复“内容等级 + 因果前提 + 巨人国系统 + 物理原理 + 直接行为 + 发起方 + 场景类型 + 支撑面”的组合。
+
+  BODY HAIR AND WARDROBE
+
+  所有人物穿衣或半裸，不得全裸。巨人穿两至四件正常衣物及一件配饰；lower-body target 显示连续阴毛边界且 trousers 降至双侧大腿，nipple target 则 trousers 扣好且只掀一件上衣。closure 只选 zipper、buttons、drawstring 或 elastic。禁止替代下装、第二条 trousers、裤子消失或单腿穿裤。访客各穿高对比纯色连体工作服和鞋。
+  S4 写出的每件衣物、鞋履和头饰状态必须逐字约束 S5：写了 shoes、boots 或 sandals 就必须保持穿在对应双脚，后文不得写 bare feet；写了 hat、cap 或 safety helmet 就必须保持戴在头上，后文不得写 bare head 或把它放在手中；写了 holding、wearing、open、rolled 或 removed 就不得在后文改成另一状态。
+  巨人体毛匹配年龄体型；lower-body target 清楚显示阴毛，nipple target 清楚显示胸部皮肤与所选 nipple。另显示至少两处自然体毛，保持真实密度、方向、灰白变化和皮肤连接。
+  阴毛可自然生长，也可局部修剪成几何边界、分区或渐变，安全染色，编成短辫，加入轻质环、珠、丝带或金属线，或因体液形成湿润聚束和导流纹路。每个 Theme 只选一种主造型并在全部 Frame 固定；不得完全剃除、延伸成触手或额外肢体、遮住目标与骨盆连接，也不得作为访客唯一承重支撑。
+  巨人需要完整人物造型：发型、自然真人妆容或面部质感、服装轮廓、两种主色、两种真实材质、鞋履和一件配饰。miniature-scale visitors 不描述眼妆品牌、首饰、精细材质或复杂时装剪裁，但必须拥有海报级可读的夸张成人表情：wide eyes、raised brows、open-mouthed surprise、mischievous grin、strained effort、delighted laughter、breathless excitement 或 shocked amusement 中各选一种，不得重复。
+  巨人拥有与互动一致的明确表情和视线。每名访客必须同时用脸、头部朝向和全身姿态表达不同情绪；夸张表情通过清楚眼睛、眉毛和嘴形读取，但不得放大访客身体或改成卡通脸。
+  每人的动作必须是一个稳定、可拍摄的当前动作：写清躯干朝向、重心、主要支撑面、双手唯一任务、双腿位置和动作造成的身体张力。人物从头到脚轮廓清楚，服装、长发和配饰不得伪装成额外肢体或遮住脸、手、承重点和接触中心。同一 Theme 的全部 Frame 固定每人的造型、妆容、表情角色、动作、支撑与四肢位置，只改变相机。
+
+  SOCIAL INTERACTION AND EXPRESSION
+
+  每帧形成双向动作回路：一名访客与巨人对视，第二名向同伴发信号，第三名回应；巨人随后必须执行一个会改变接触压力、角度、节奏、流量或位置的可见动作，例如调整骨盆、移动承重、操作巨人侧控制件或收紧/放松自身支撑。只微笑、点头或被动躺着不算巨人互动。
+  访客表情各不相同并夸张可读；至少两张脸朝向人物而非设备。访客身体之间始终有空气间隙，手脚不得触碰另一访客；可共同操作同一软管、绳索、织物或杠杆，但每只手保持独立可见。S4 写表情，S5 写信号与巨人动作，S6 写该动作如何改变接触并得到访客反馈。
+
+  CAMERA AND ART DIRECTION
+
+  每个 Theme 选择并轮换一种开放摄影风格：Wes Anderson-inspired symmetrical pastel deadpan tableau、high-end commercial poster、luxury fashion editorial、minimalist product campaign、retro mid-century advertising、architectural editorial、nightlife color-gel、bright lifestyle advertising、restrained documentary location photography，或其他清楚命名的实拍风格。风格可改变对称性、色彩、布景、光比和留白，但不得改变尺度、解剖、接触或因果。
+  先按巨人姿势选择最能表现压倒体量的构图并在 Theme 内锁定：站立或直跪使用 visitor-deck eye-level slightly low three-quarter portrait full-body view；坐姿使用 deck-height frontal 或 three-quarter full-body view；侧卧或仰卧使用 slightly high three-quarter view 沿身体长轴铺满横向或对角线。Wes Anderson 风格仅在尺度仍清楚时使用 centered frontal symmetry。不得为轮换而选较弱视角。
+  GIANT DOMINANCE GATE：唯一巨人必须是画面最大视觉质量，其完整头脚跨度沿画面最长轴接近两端但保留边缘空间；全部访客与互动台只是目标旁的小型次级群组，整组小于巨人的头，每名访客全身明显短于巨人从下巴到发际线的脸长。巨人必须第一眼巨大，而不是普通人与稍小人物同框。
+  使用足够拍下完整巨人的 35–50 mm 正常视角和中深景深。互动台、访客、完整日用品证明与巨人处于同一登记平面；日用品压过访客但对巨人仍是普通物件。禁止前景放大访客、巨人在远处、极端仰俯拍、鱼眼、超广角、微距、器官特写、手脚伸向镜头或裁掉巨人头脚。
+  整体是 live-action photorealistic location or constructed-set photography：真实成年演员、皮肤毛孔与体毛、布料、实体道具、可信光学和一致阴影。允许广告级布光、粉彩、奢华材质与彩色灯光；禁止 magic、levitation、illustration、painting、anime、comic、CGI look、3D render、塑料皮肤和镜像、复制或融合身体。
+
+  THEME CONTRACT
+
+  Theme premise 简短写明：具体日常地点和可见 PRIVACY CONDITION；选定摄影风格；finger-length miniature-scale 访客人数和性别；巨人身份和体型；纯文字 finger-length 尺度；日用品证明；LOCATION TRIGGER、GIANT NEED、VISIBLE CONSTRAINT、SCALE ADVANTAGE、LOCATION AFFORDANCE、EXPOSURE NECESSITY、逐人 ROLE DEPENDENCY、CONTENT-LEVEL SOLUTION、VISIBLE RESULT 和 RECIPROCAL RESPONSE；并回答全部七个 why。超自然地点仅在输入主题明确要求时使用。
+  同一 Theme 的多个 Frame 是同一个已发生主要行为在不同机位下的独立重演，不是前后发展的故事。每帧开场直接处于接触之中。
+  同一 Theme 的全部 Frame 锁定巨人的支撑姿势、骨盆旋转、双腿位置、目标器官轴向、访客姿势、装置位置和接触方向；只能改变摄像机高度、方位和构图，不能把站、坐、跪、躺互换。
+  先为每个 Theme 写一次不可变的 S2–S6 subject block，再复制到全部 Frame；食指参照手侧、fingertip-to-base-knuckle 身高关系、日用品证明、内容等级、因果前提、访客工位、行为和巨人回应都属于不可变 block。配对 Frame 只改变相机方位和最终镜头句。
+
+  FRAME CONTRACT
+
+  严格按以下物理句序写，任何顺序变化都重写：
+  S1 CAST + EARLY SCALE + INTERACTION + MECHANISM + CAMERA：一个句号内只写具体 setting、阿拉伯数字总人数、finger-length miniature-scale normal-world 访客身份、每人一个编号工位、纯文字 finger-length 尺度、巨人身份、内容等级行为、地点原生机制及符合风格的 35–50 mm 机位。
+  S1 必须逐字套用以下单句骨架：“At [specific real-world giant-country setting], exactly [total] separate adult bodies are visible in total: [visitor count and finger-length miniature-scale normal-world adult identities] occupy one separated bay each on a single miniature visitor interaction deck, every complete visitor having an unmistakable finger-length scale from head to foot, plus one giant-country native giant [woman/man], while the visitors carry out [one content-level interaction] using [location-native Signature Mechanism], viewed in a [pose-appropriate scale-dominance camera and portrait or landscape orientation] with a 35–50 mm normal perspective in [selected photographic style].”在 perspective 之前不得出现句号或分号。
+  S2 TARGET MAP：写 TARGET_ID、TARGET STATE、RELEASE STATE 和完整解剖。lower-body target 使用 lower-abdomen/thighs 固定定位；nipple 使用 neck/ribcage/abdomen 固定定位。
+  S2B ACTIVE CONTACT：紧接 S2 的第三句写接触已发生。Erotic 使用“The single [soft end, fabric, airflow, or water stream] is already pressing or flowing directly on the contact point, visibly [deformation].”Hardcore 使用“The [named visitor]'s [mouth, one hand, or toy] is already in direct contact with the contact point, visibly [deformation].”这里命名的接触者、身体部位或 toy 必须在 S5 和 S6 完全相同；其他访客不得新增直接身体接触。禁止 approaching、hovering、poised、near、just above 或 waiting。
+  S3 FOUR SCALE PROOFS：以“Four simultaneous scale proofs share one clear focal plane:”开头。完整日用品与互动台并排同平面，其全高以明显视觉差高过每名访客，且一个可识别 feature 也大于访客；另写两件原生物件、一个高过整组访客的台阶或门槛，以及唯一巨人的连续全身。禁止透视假尺度、测量手指或第二巨人。
+  S3 描述锚点时只能逐字写“the selected giant-scale everyday anchor functions as an ordinary everyday object for the giant”，不得在 S3 使用 held、worn、lying、resting、remains 或其他位置状态词；锚点的唯一位置状态只在 S3A 和 S5 写。S3 必须明确包含一个最低台阶、门槛、路缘或支撑底座高过访客全身，不得用家具或第二件日用品替代环境高度证明。
+  S3A FINGER-LENGTH SIZE：必须作为 S3 后的独立新句，只使用固定句式“Every visitor has an unmistakable finger-length miniature scale from head to foot, while both fully connected giant hands stay in natural task or support poses away from the visitor group, with relaxed fingers and no measuring gesture.”不得增加 extended、pointing、dangling 或 measuring finger。
+  S3B EVERYDAY OBJECT PROOF：写“The fully visible giant-scale [whole object] stands beside the interaction deck on the same picture plane, its full height clearly towering over every visitor, and its [recognizable feature] alone larger than one visitor.”物件不得与访客等高。
+  S3C GIANT DOMINANCE：紧接 S3B 逐字写“The sole giant is the frame's overwhelmingly largest visual mass from head to feet along its longest axis, the complete visitor group and interaction deck form a secondary cluster smaller than the giant's head, and each visitor's full height is visibly shorter than the giant's face from chin to hairline.”
+  S4 CHARACTER DESIGN：一个物理句子先详细写巨人造型，服装必须包含 one pair of trousers，禁止 sarong、skirt、shorts、underwear 或第二下装；随后每名 visitor 写成年身份、不同发型、高对比纯色连体工作服、鞋和互不重复的夸张成人表情。
+  S4A GARMENT STATE：lower-body target 写“The giant's trousers are fully lowered as one continuous garment, with one waistband, one [zipper, button, drawstring, or elastic] closure, and both pant legs visibly bunched around both upper thighs.”nipple target 写“The giant's one pair of trousers stays fully fastened at the waist, while the [upper garment] is lifted above the selected breast as one continuous garment.”后文不得改变。
+  S5 POSE AND ACTION：一个物理句子写巨人姿势和全部访客工位。巨人位于设备前方或侧方，完整身体不被横切；不得重写衣物，并用可逐字复制的短语锁定 VISIBLE CONSTRAINT。互动台按访客人数设置左到右编号工位，每工位一人且位于巨人轮廓之外。逐人写完整四肢；两只巨人手同深度、自然等大并连接手臂。写明访客信号，以及巨人调整骨盆、移动承重、操作控制件或调整支撑之一的主动动作。
+  S5A LIMB TOPOLOGY：紧接 S5 逐字粘贴指定的“Both giant shoulders visibly connect...”完整句，禁止在它之前进入 S6。
+  S5B UNBROKEN BODY AND CLOTHING：紧接 S5A 逐字粘贴指定的“The giant has one unbroken body silhouette...”完整句，禁止在它之前进入 S6。
+  Erotic 的 S5 必须逐字包含且只写一次“a visible air gap separates the visitor's head, torso, abdomen, and pelvis from the giant's skin”，即使有多个访客也不得改成 each visitor's、every visitor's 或 visitors' heads，并只让 Signature Mechanism 的单一输出端跨过该空隙。Hardcore 的 S5 必须改为逐字包含且只写一次“a visible air gap separates each visitor's torso, abdomen, pelvis, arms, and legs from the giant's skin, with only the assigned mouth, hand, or toy reaching the contact point”，只允许逐人分配的嘴、一只手或单一玩具跨过空隙；不得在 Hardcore 复用 Erotic 空隙句。禁止 visitor against giant torso、visitor against giant pelvis、visitor body against、pressed body、body weight on the contact point 和 visitor foot on the contact point。
+  S6 NECESSITY CHAIN：紧接 S5B 用一个英文句子连接“Because [trigger at TARGET_ID] creates [need at the contact point itself] requiring direct exposure because closed clothing blocks it, but [visible constraint] prevents self-action, the consenting giant [requests and opens the target-specific garment with visitor assistance] inside [privacy condition], and the visitors use [location affordance], with [each role enabling next], to perform [solution and signal] at the contact point itself, which [result resolving need], while the giant [active movement] changes [pressure, angle, rhythm, flow, or position] after [signal].”至少四次写 the contact point itself；禁止被动回应或目标漂移。
+  后续句只补体毛、流体与环境，最后以指定真人实拍镜头句结束。
+
+  每个 Frame 组成一个英文段落。物理第一句必须点名具体 real-world giant-country setting，并以“At [specific real-world giant-country setting], exactly [total] separate adult bodies are visible in total:”开头，不能只写 generic interior、outdoors 或 giant country。total = 1 + female_count + male_count。随后写 finger-length miniature-scale 访客人数、左到右工位、纯文字 finger-length 尺度、巨人身份、地点原生机制、35–50 mm 机位和选定摄影风格。
+  紧接句号后的第二句以“The single penis...”“The single vaginal opening...”“The single anus...”或“The selected left/right nipple...”开头，只命名目标一次并完成对应身体定位；第三句起只称“the contact point”。
+  主要篇幅用于尺度、完整身体、社交、肢体、互动台和因果。最后镜头句以“The camera uses a full-body scale-dominance composition”开头，写适配姿势的机位与画幅方向、35–50 mm、巨人沿最长轴主导画面、微小访客群、同平面锚点、背景纵深、色彩和主光。
+  最后镜头句还必须逐字复制“live-action photorealistic location photography captured from sufficient distance with a real 35–50 mm camera”，并写真实演员、皮肤毛孔、布料、实景道具、自然曝光与一致阴影中的至少三项。
+  只用自然英文简单现在时。NEVER OUTPUT THESE TOKENS IN ANY CONTEXT: previous frame, same, identical, unchanged, still, again, now, remains, then, afterward, next, about to, will, normal-human-sized, open palm, open-palm, extended index finger, pointing finger, dangling finger, measuring finger. 每帧独立重述锁定事实。正文只用英文标点。最终扫描：U+2019 改为 ASCII apostrophe，U+2010、U+2011 和 U+2012 改为 ASCII hyphen，U+2014 改为逗号，除精确“35–50 mm”外的 U+2013 改为逗号；任何 CJK 词完整改写为英文。输出前确认 S2、S3、S3A、S3B、S3C、S4、S4A、S5、S5A、S5B、S6 顺序正确，最后写“The visitors retain an unmistakable finger-length miniature scale without any measuring hand or finger in the composition, while both giant hands share one natural size and depth plane.”再写最终摄影句。
+
+  VARIATION AND REJECTION RULES
+
+  发现以下任一问题就简化并重写，不要解释：
+  0. Ledger 任一实体缺少唯一 owner、parent、state、support、depth、slot 或 task，或跨句改变状态。
+  1. 人数、性别、成人身份或工位数错误；出现额外人物、第二巨人、玩偶、儿童或人物融合。
+  2. 巨人不是最大视觉质量；访客群不小于巨人头、访客不短于巨人脸、物件与访客等高、透视假尺度、两手异尺或第二巨人。
+  3. 身体图不连通、器官不属于 single pelvis、出现第三条腿、第二骨盆或混合器官；GENITAL/RELEASE STATE 改变、不兼容或流体来自错误器官；家具切断身体链；缺少 S5A/S5B。
+  4. 缺少唯一 S4A；衣物拥有两个状态、裤腰、closure 或位置；closure 类型改变；裤子消失；暴露不是最小必要访问；缺少可见 privacy condition；发生偶然或公开暴露。
+  5. Necessity Chain 缺任一环，无法回答七个 why，限制损害同意能力，或未通过 Counterfactual Necessity Test；VISIBLE CONSTRAINT 未在 S5 可见或 S6 改写；Trigger Source Path 缺少 source、medium 或 target，或触发源从未物理接触目标；trigger 来自设备故障、损伤或器官进入设备；Need-Target Identity Lock 断裂；S6 少于四次 the contact point itself；需求、作用或结果转移到相邻区域；出现 instrumental exposure；或任一因果环节可删除。
+  6. Signature Mechanism 无地点来源、传力链、承重、唯一输出端或可见结果；三名访客角色可互换；体液无来源与落点；BDSM 缺安全释放或形成第二行为。
+  7. 内容等级错误、行为停在准备、出现未分配接触、第二行为、访客彼此性活动或有人旁观。
+  8. 缺少夸张表情、访客信号或会改变接触的巨人动作；巨人被动旁观，或访客互相身体接触。
+  9. 地点不可识别、风格重复；机位不适配姿势、巨人不主导最长轴、裁掉身体链、极端透视或失去实拍质感。
+  10. 未按 S1–S5A–S5B–S6 句序，缺少固定句，出现禁词、CJK、非法 Unicode、数字倍率或错误摄影短语。

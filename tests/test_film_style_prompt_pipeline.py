@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from t2i_film_style_pipeline.compiler import frame_source_sentence
 from t2i_film_style_pipeline.errors import (
     FilmStyleProviderError,
-    FilmStyleProviderResponseError,
     FilmStyleRunIncompleteError,
 )
 from t2i_film_style_pipeline.models import TokenUsage as FilmTokenUsage
@@ -32,7 +33,6 @@ from t2i_film_style_pipeline.prompt_provider import (
 )
 from t2i_film_style_pipeline.prompt_run_store import (
     FilmPromptRunSettings,
-    FrameOutputMode,
     ThemeOutputMode,
 )
 from t2i_film_style_pipeline.provider import (
@@ -62,6 +62,7 @@ class FakePromptModel:
     def __init__(self, values: list[object]) -> None:
         self._values = iter(values)
         self.stages: list[FilmPromptStage] = []
+        self.messages = []
 
     async def generate(
         self,
@@ -72,6 +73,7 @@ class FakePromptModel:
         max_output_tokens,
     ):
         self.stages.append(stage)
+        self.messages.append(messages)
         value = next(self._values)
         if isinstance(value, Exception):
             raise value
@@ -101,6 +103,7 @@ class FakePromptModel:
         max_output_tokens,
     ) -> TextModelResponse:
         self.stages.append(stage)
+        self.messages.append(messages)
         value = next(self._values)
         if isinstance(value, Exception):
             raise value
@@ -110,6 +113,10 @@ class FakePromptModel:
             text=value,
             usage=TokenUsage(total_tokens=10),
         )
+
+
+def frame_batch_text(sequence: NarrativeFrameSequence) -> str:
+    return "\n".join(f"<FRAME>{frame.prose}</FRAME>" for frame in sequence.frames)
 
 
 def make_pipeline_request() -> FilmStylePromptRequest:
@@ -162,7 +169,6 @@ def make_settings(*, generation_retries: int = 0) -> FilmStylePipelineSettings:
             concurrency=1,
             generation_retries=generation_retries,
             theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
-            frame_output_mode=FrameOutputMode.INDIVIDUAL_TEXT,
         ),
     )
 
@@ -177,9 +183,12 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
     prompt_model = FakePromptModel(
         [
             make_film_theme_batch(),
-            bad_sequence.frames[0].prose,
-            make_film_frame_sequence().frames[0].prose,
-            make_film_frame_sequence().frames[1].prose,
+            frame_batch_text(bad_sequence),
+            frame_batch_text(
+                NarrativeFrameSequence(
+                    frames=[make_film_frame_sequence().frames[0]]
+                )
+            ),
         ]
     )
 
@@ -198,7 +207,14 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
         FilmPromptStage.THEMES,
         FilmPromptStage.FRAMES,
         FilmPromptStage.FRAMES,
-        FilmPromptStage.FRAMES,
+    ]
+    initial_payload = json.loads(prompt_model.messages[1][1].content)
+    retry_payload = json.loads(prompt_model.messages[2][1].content)
+    assert initial_payload["requested_frame_slots"] == ["F01", "F02"]
+    assert initial_payload["accepted_frame_prose"] == []
+    assert retry_payload["requested_frame_slots"] == ["F01"]
+    assert retry_payload["accepted_frame_prose"] == [
+        make_film_frame_sequence().frames[1].prose
     ]
 
 
@@ -211,11 +227,12 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     )
     store = LocalFilmStyleRunStore(tmp_path / "runs")
     film_model = FakeFilmModel()
+    partial_sequence = make_film_frame_sequence()
+    partial_sequence.frames[1].prose = (
+        f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
+    )
     first_prompt_model = FakePromptModel(
-        [
-            make_film_theme_batch(),
-            FilmStyleProviderResponseError("temporary frame failure"),
-        ]
+        [make_film_theme_batch(), frame_batch_text(partial_sequence)]
     )
     studio = FilmStylePromptStudio(
         film_model,
@@ -238,10 +255,19 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     assert failed.manifest.profile_run_id is not None
     assert failed.manifest.prompt_run_id is not None
     assert film_model.calls == 1
+    prompt_run = next(
+        (tmp_path / "runs" / run_id / "prompt-runs").iterdir()
+    )
+    assert (prompt_run / "frames/T001/F01.json").is_file()
+    assert not (prompt_run / "frames/T001/F02.json").exists()
 
     resumed_sequence = make_film_frame_sequence()
     resumed_prompt_model = FakePromptModel(
-        [frame.prose for frame in resumed_sequence.frames]
+        [
+            frame_batch_text(
+                NarrativeFrameSequence(frames=[resumed_sequence.frames[1]])
+            )
+        ]
     )
     completed = await FilmStylePromptStudio(
         film_model,
@@ -259,7 +285,11 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     assert film_model.calls == 1
     assert resumed_prompt_model.stages == [
         FilmPromptStage.FRAMES,
-        FilmPromptStage.FRAMES,
+    ]
+    resumed_payload = json.loads(resumed_prompt_model.messages[0][1].content)
+    assert resumed_payload["requested_frame_slots"] == ["F02"]
+    assert resumed_payload["accepted_frame_prose"] == [
+        resumed_sequence.frames[0].prose
     ]
     assert store.inspect(run_id).manifest.status == FilmStyleRunStatus.COMPLETED
 
@@ -299,10 +329,7 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
         FakePromptModel(
             [
                 make_film_theme_batch(),
-                *[
-                    frame.prose
-                    for frame in make_film_frame_sequence().frames
-                ],
+                frame_batch_text(make_film_frame_sequence()),
             ]
         ),
         store,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import Awaitable, Callable
 from time import perf_counter
 
@@ -25,14 +26,12 @@ from t2i_film_style_pipeline.prompt_models import (
     FilmPromptRuleSet,
     FilmPromptStage,
     NarrativeFrame,
-    NarrativeFrameDraft,
     NarrativeFrameSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
     NarrativeThemeDraftBatch,
     NarrativeThemeResult,
     TokenUsage,
-    exact_frame_sequence_model,
     exact_theme_batch_model,
     exact_theme_draft_batch_model,
 )
@@ -47,7 +46,6 @@ from t2i_film_style_pipeline.prompt_run_store import (
     FilmPromptAttemptOutcome,
     FilmPromptRunSettings,
     FilmPromptRunSnapshot,
-    FrameOutputMode,
     LocalFilmPromptRunStore,
     ThemeOutputMode,
 )
@@ -145,16 +143,12 @@ class FilmPromptStudio:
             theme: NarrativeTheme,
         ) -> None:
             async with semaphore:
-                sequence = await self._generate_frames(
+                await self._generate_frames(
                     snapshot.run_id,
                     request,
                     theme,
                     rules,
-                )
-                self._store.checkpoint_frames(
-                    snapshot.run_id,
-                    theme.theme_id,
-                    sequence,
+                    snapshot.frames.get(theme.theme_id),
                 )
                 self._emit(f"{theme.theme_id} Frame Sequence 已保存")
 
@@ -162,7 +156,11 @@ class FilmPromptStudio:
             *(
                 generate_theme(theme)
                 for theme in themes
-                if theme.theme_id not in snapshot.frames
+                if (
+                    theme.theme_id not in snapshot.frames
+                    or len(snapshot.frames[theme.theme_id].frames)
+                    != request.frames_per_theme
+                )
             ),
             return_exceptions=True,
         )
@@ -170,7 +168,13 @@ class FilmPromptStudio:
             str(outcome) for outcome in outcomes if isinstance(outcome, Exception)
         )
         snapshot = self._store.inspect(snapshot.run_id)
-        if len(snapshot.frames) != request.theme_count:
+        if (
+            len(snapshot.frames) != request.theme_count
+            or any(
+                len(sequence.frames) != request.frames_per_theme
+                for sequence in snapshot.frames.values()
+            )
+        ):
             self._store.fail(
                 snapshot.run_id,
                 "; ".join(causes) or "Frame Sequence 尚未完整",
@@ -325,128 +329,233 @@ class FilmPromptStudio:
         request: FilmPromptRequest,
         theme: NarrativeTheme,
         rules: FilmPromptRuleSet,
+        existing_sequence: NarrativeFrameSequence | None,
     ) -> NarrativeFrameSequence:
-        if self._settings.frame_output_mode == FrameOutputMode.INDIVIDUAL_TEXT:
-            return await self._generate_text_frames(
-                run_id,
-                request,
-                theme,
-                rules,
+        expected_ids = [
+            f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
+        ]
+        accepted = {
+            frame.frame_id: frame
+            for frame in (
+                existing_sequence.frames if existing_sequence is not None else []
             )
-        expected = [f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)]
-
-        def validate_ids(
-            value: BaseModel,
-            expected_ids: list[str] = expected,
-        ) -> None:
-            if not isinstance(value, NarrativeFrameSequence):
-                raise FilmStyleContractError("provider 返回了错误的画面类型")
-            if len(value.frames) != len(expected_ids):
-                raise FilmStyleContractError(
-                    "画面数量不符合请求："
-                    f"expected={len(expected_ids)}, "
-                    f"actual={len(value.frames)}"
-                )
-            for frame, frame_id in zip(
-                value.frames,
-                expected_ids,
-                strict=True,
-            ):
-                frame.frame_id = frame_id
-                if self._frame_validator is not None:
-                    self._frame_validator(request, theme, frame)
-
-        value, _ = await self._generate_validated(
-            run_id=run_id,
-            operation_id=f"frames-{theme.theme_id}",
-            requested_ids=tuple(
-                f"{theme.theme_id}-{frame_id}" for frame_id in expected
-            ),
-            stage=FilmPromptStage.FRAMES,
-            messages=frame_messages(request, theme, rules),
-            response_model=exact_frame_sequence_model(request.frames_per_theme),
-            max_output_tokens=self._settings.frame_output_tokens,
-            validate=validate_ids,
+        }
+        remaining_ids = list(expected_ids)
+        remaining_ids = [
+            frame_id for frame_id in remaining_ids if frame_id not in accepted
+        ]
+        operation_id = f"frames-{theme.theme_id}"
+        prior_attempts = tuple(self._store.attempts(run_id))
+        attempt_offset = sum(
+            attempt.operation_id == operation_id for attempt in prior_attempts
         )
-        if not isinstance(value, NarrativeFrameSequence):
-            raise AssertionError("validated frame response changed type")
-        return value
-
-    async def _generate_text_frames(
-        self,
-        run_id: str,
-        request: FilmPromptRequest,
-        theme: NarrativeTheme,
-        rules: FilmPromptRuleSet,
-    ) -> NarrativeFrameSequence:
-        frames: list[NarrativeFrame] = []
-        for index in range(1, request.frames_per_theme + 1):
-            frame_id = f"F{index:02d}"
-            validated_frame: list[NarrativeFrame] = []
-            validated_frame_target = validated_frame
-            messages = frame_messages(
+        budget = (
+            self._settings.provider.output_token_limit
+            if any(
+                attempt.stage == FilmPromptStage.FRAMES
+                and attempt.outcome == FilmPromptAttemptOutcome.TRUNCATED
+                and any(
+                    requested_id.startswith(f"{theme.theme_id}-")
+                    for requested_id in attempt.requested_ids
+                )
+                for attempt in prior_attempts
+            )
+            else min(
+                self._settings.frame_output_tokens,
+                self._settings.provider.output_token_limit,
+            )
+        )
+        feedback_issues = list(
+            self._recent_attempt_issues(
+                prior_attempts,
+                FilmPromptStage.FRAMES,
+                tuple(f"{theme.theme_id}-{item}" for item in remaining_ids),
+            )
+        )
+        for attempt in range(self._settings.generation_retries + 1):
+            requested_ids = tuple(
+                f"{theme.theme_id}-{frame_id}" for frame_id in remaining_ids
+            )
+            base_messages = frame_messages(
                 request,
                 theme,
                 rules,
-                frame_id=frame_id,
-                existing_frames=[frame.prose for frame in frames],
+                requested_frame_ids=remaining_ids,
+                accepted_frames=[
+                    accepted[frame_id]
+                    for frame_id in expected_ids
+                    if frame_id in accepted
+                ],
             )
-
-            async def generate_text_response(
-                current_messages: list[ChatMessage],
-                budget: int,
-            ) -> ModelResponse:
+            messages = (
+                self._retry_messages(
+                    base_messages,
+                    tuple(feedback_issues[-3:]),
+                    expects_plain_text=True,
+                )
+                if feedback_issues
+                else base_messages
+            )
+            started = perf_counter()
+            attempt_usage = TokenUsage()
+            accepted_this_attempt: tuple[str, ...] = ()
+            try:
                 response = await self._model.generate_text(
                     stage=FilmPromptStage.FRAMES,
-                    messages=current_messages,
+                    messages=messages,
                     max_output_tokens=budget,
                 )
-                try:
-                    value = NarrativeFrameDraft(prose=response.text)
-                except ValidationError as exc:
-                    issues = tuple(
-                        f"{'.'.join(str(part) for part in error['loc'])}: "
-                        f"{error['msg']}"
-                        for error in exc.errors()
-                    )
-                    raise FilmStyleStructuredOutputError(
-                        "frames 返回的纯文本不符合单段画面正文契约",
-                        raw_content=response.text,
-                        usage=response.usage,
-                        validation_issues=issues,
-                    ) from exc
-                return ModelResponse(value=value, usage=response.usage)
-
-            def validate_text(
-                value: BaseModel,
-                expected_frame_id: str = frame_id,
-                target: list[NarrativeFrame] = validated_frame_target,
-            ) -> None:
-                if not isinstance(value, NarrativeFrameDraft):
-                    raise FilmStyleContractError("provider 返回了错误的纯文本画面类型")
-                frame = NarrativeFrame(
-                    frame_id=expected_frame_id,
-                    prose=value.prose,
+                attempt_usage = response.usage
+                frame_prose = self._split_frame_batch(
+                    response.text,
+                    len(remaining_ids),
                 )
-                if self._frame_validator is not None:
-                    self._frame_validator(request, theme, frame)
-                target[:] = [frame]
+                rejected_ids: list[str] = []
+                validation_issues: list[str] = []
+                accepted_ids: list[str] = []
+                for frame_id, prose in zip(
+                    remaining_ids,
+                    frame_prose,
+                    strict=True,
+                ):
+                    try:
+                        frame = NarrativeFrame(frame_id=frame_id, prose=prose)
+                        if self._frame_validator is not None:
+                            self._frame_validator(request, theme, frame)
+                    except (FilmStyleContractError, ValidationError) as exc:
+                        rejected_ids.append(frame_id)
+                        frame_issues = (
+                            "; ".join(
+                                f"{'.'.join(str(part) for part in issue['loc'])}: "
+                                f"{issue['msg']}"
+                                for issue in exc.errors()
+                            )
+                            if isinstance(exc, ValidationError)
+                            else str(exc)
+                        )
+                        validation_issues.append(
+                            f"{theme.theme_id}-{frame_id}: {frame_issues}"
+                        )
+                    else:
+                        accepted[frame_id] = frame
+                        self._store.checkpoint_frame(
+                            run_id,
+                            theme.theme_id,
+                            frame,
+                        )
+                        accepted_ids.append(f"{theme.theme_id}-{frame_id}")
+                accepted_this_attempt = tuple(accepted_ids)
+                if rejected_ids:
+                    raise FilmStyleContractError("; ".join(validation_issues))
+            except FilmStyleProviderTruncatedOutputError as exc:
+                attempt_usage = exc.usage
+                error: Exception = exc
+                outcome = FilmPromptAttemptOutcome.TRUNCATED
+                issues = (str(exc), *exc.validation_issues)
+                budget = self._settings.provider.output_token_limit
+            except FilmStyleStructuredOutputError as exc:
+                attempt_usage = exc.usage
+                error = exc
+                outcome = FilmPromptAttemptOutcome.REJECTED
+                issues = (str(exc), *exc.validation_issues)
+            except FilmStyleProviderResponseError as exc:
+                attempt_usage = exc.usage
+                error = exc
+                outcome = FilmPromptAttemptOutcome.PROVIDER_ERROR
+                issues = (str(exc),)
+            except (FilmStyleContractError, ValidationError) as exc:
+                error = exc
+                outcome = FilmPromptAttemptOutcome.REJECTED
+                issues = (
+                    tuple(
+                        f"{'.'.join(str(part) for part in issue['loc'])}: "
+                        f"{issue['msg']}"
+                        for issue in exc.errors()
+                    )
+                    if isinstance(exc, ValidationError)
+                    else (str(exc),)
+                )
+                if accepted_this_attempt:
+                    remaining_ids = [
+                        frame_id
+                        for frame_id in remaining_ids
+                        if f"{theme.theme_id}-{frame_id}"
+                        not in accepted_this_attempt
+                    ]
+            except FilmStyleProviderError as exc:
+                self._record_attempt(
+                    run_id=run_id,
+                    operation_id=operation_id,
+                    requested_ids=requested_ids,
+                    stage=FilmPromptStage.FRAMES,
+                    attempt=attempt_offset + attempt + 1,
+                    max_output_tokens=budget,
+                    outcome=FilmPromptAttemptOutcome.PROVIDER_ERROR,
+                    accepted_ids=accepted_this_attempt,
+                    issues=(str(exc),),
+                    duration_ms=self._elapsed_ms(started),
+                    usage=attempt_usage,
+                    error=str(exc),
+                )
+                raise
+            else:
+                self._record_attempt(
+                    run_id=run_id,
+                    operation_id=operation_id,
+                    requested_ids=requested_ids,
+                    stage=FilmPromptStage.FRAMES,
+                    attempt=attempt_offset + attempt + 1,
+                    max_output_tokens=budget,
+                    outcome=FilmPromptAttemptOutcome.ACCEPTED,
+                    accepted_ids=requested_ids,
+                    issues=(),
+                    duration_ms=self._elapsed_ms(started),
+                    usage=attempt_usage,
+                    error=None,
+                )
+                return NarrativeFrameSequence(
+                    frames=[accepted[frame_id] for frame_id in expected_ids]
+                )
 
-            await self._generate_validated(
+            self._record_attempt(
                 run_id=run_id,
-                operation_id=f"frames-{theme.theme_id}-{frame_id}",
-                requested_ids=(f"{theme.theme_id}-{frame_id}",),
+                operation_id=operation_id,
+                requested_ids=requested_ids,
                 stage=FilmPromptStage.FRAMES,
-                messages=messages,
-                response_model=NarrativeFrameDraft,
-                max_output_tokens=self._settings.frame_output_tokens,
-                validate=validate_text,
-                generate_response=generate_text_response,
+                attempt=attempt_offset + attempt + 1,
+                max_output_tokens=budget,
+                outcome=outcome,
+                accepted_ids=accepted_this_attempt,
+                issues=issues,
+                duration_ms=self._elapsed_ms(started),
+                usage=attempt_usage,
+                error=str(error),
             )
-            if len(validated_frame) != 1:
-                raise AssertionError("validated text frame was not captured")
-            frames.extend(validated_frame)
-        return NarrativeFrameSequence(frames=frames)
+            feedback_issues.extend(issues)
+            if attempt >= self._settings.generation_retries:
+                raise error
+        raise AssertionError("unreachable")
+
+    @staticmethod
+    def _split_frame_batch(
+        text: str,
+        expected_count: int,
+    ) -> list[str]:
+        pattern = re.compile(r"<FRAME>\s*(.*?)\s*</FRAME>", re.DOTALL)
+        matches = list(pattern.finditer(text))
+        cursor = 0
+        for match in matches:
+            if text[cursor : match.start()].strip():
+                raise FilmStyleContractError("Frame 批次包含标签之外的正文")
+            cursor = match.end()
+        if text[cursor:].strip():
+            raise FilmStyleContractError("Frame 批次包含标签之外的正文")
+        if len(matches) != expected_count:
+            raise FilmStyleContractError(
+                "Frame 批次数量不符合请求："
+                f"expected={expected_count}, actual={len(matches)}"
+            )
+        return [match.group(1) for match in matches]
 
     async def _generate_validated(
         self,
@@ -659,8 +768,9 @@ class FilmPromptStudio:
                 )
             )
         return_instruction = (
-            "不要解释，只返回一段完整的纯自然语言画面正文；"
-            "不要返回 JSON、ID、Markdown 或说明。"
+            "不要解释，只返回请求数量的完整 Frame；每个 Frame 严格写成"
+            "<FRAME>单段纯自然语言画面正文</FRAME>，不要返回 JSON、ID、"
+            "Markdown 或标签之外的说明。"
             if expects_plain_text
             else "不要解释，只返回完整 schema 数据。"
         )
@@ -704,7 +814,13 @@ class FilmPromptStudio:
         return FilmPromptRunIncompleteError(
             snapshot.run_id,
             missing_themes=(snapshot.request.theme_count - len(snapshot.themes)),
-            missing_frames=(snapshot.request.theme_count - len(snapshot.frames)),
+            missing_frames=(
+                snapshot.request.theme_count
+                - sum(
+                    len(sequence.frames) == snapshot.request.frames_per_theme
+                    for sequence in snapshot.frames.values()
+                )
+            ),
             causes=causes,
         )
 

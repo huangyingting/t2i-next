@@ -54,12 +54,36 @@ The user's prose account of time, place, adult characters, relationships,
 interaction, action, emotion, environment, camera intent, and lighting intent.
 _Avoid_: Brief, configuration
 
+**Story Document**:
+The sole file-input format for Story Generation: a UTF-8 `.yaml` document
+containing an explicit ID, a natural-language Story Description, and optional
+generation settings, stage authoring rules, quality policy, and runtime settings.
+Explicit CLI options override document settings; omitted options do not.
+Only the resolved request, rules, and settings are used on resume.
+_Avoid_: Plain-text input, visual specification, executable workflow
+
 **Story Rule Set**:
 The immutable ordered authoring rules compiled for the Theme and Frame stages
 of one story run. Built-in rules define only stage semantics and universal
 contracts; optional rules from `story-inputs/rules/` add reusable project
-policy. The resolved set is frozen with the run and reused on resume.
+policy. Story Document authoring rules are appended for their selected stage,
+before the output-language rule. The resolved set is frozen with the run and
+reused on resume.
 _Avoid_: Story Description, Prompt Generation rules, per-input special case
+
+**Story Quality Policy**:
+An opt-in set of local Frame evidence checks, frozen in run settings.
+`off` skips these checks, `report` records warnings without quality retries,
+and `enforce` rejects failed output with bounded generation retries.
+Basic schema, count, persistence, and safety contracts remain independent.
+Checks do not add authoring instructions or call a model evaluator.
+_Avoid_: Safety switch, semantic guarantee, automatic review stage
+
+**Story Quality Report**:
+The result's policy mode, `skipped`, `passed`, or `warnings` status, and
+structured issues identifying the check and Theme/Frame. Attempt records keep
+historical issues; the final report describes only accepted checkpoints.
+_Avoid_: Hidden warnings, model score
 
 **Story Description Authority**:
 The rule that medium, layout, regions, views, scale systems, visual hierarchy,
@@ -90,19 +114,19 @@ _Avoid_: Foreign setting invention, location inference
 **Story Semantic Name**:
 A short lowercase English snake_case name summarizing the whole Story
 Description. It identifies published prompt files for direct Story Description
-input; prompt-file runs retain it as generation metadata but name output from
+input; document runs retain it as generation metadata but name output from
 the Source Prompt Stem.
 _Avoid_: Run name, Theme title, source prompt stem
 
 **Source Prompt Stem**:
-The input prompt filename without its extension, frozen in the Story Request.
-For prompt-file runs it is the first part of the published filename, before
-content level and numeric female and male counts.
-_Avoid_: Full prompt path, Story Semantic Name
+The Story Document's explicit `id`, frozen as `source_prompt_stem` in the Story
+Request. It is the first part of the published filename, before content level
+and numeric female and male counts. Renaming the YAML file does not change it.
+_Avoid_: Input filename, full prompt path, Story Semantic Name
 
 **Cast Slug**:
 A deterministic lowercase English snake_case rendering of the requested
-female and male totals for direct Story Description input. Prompt-file outputs
+female and male totals for direct Story Description input. Document outputs
 instead include explicit numeric female and male count segments.
 _Avoid_: Model-generated cast name, inferred cast
 

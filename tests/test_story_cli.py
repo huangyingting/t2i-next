@@ -1,19 +1,46 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from types import SimpleNamespace
 
+import pytest
 from typer.testing import CliRunner
 
 import t2i_story_pipeline.cli as story_cli
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.cli import app
 from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.models import StoryQualityPolicy
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
     LocalStoryRunStore,
     StoryRunSettings,
 )
-from tests.story_factories import make_story_request
+from tests.story_factories import (
+    make_frame_sequence,
+    make_story_request,
+    make_story_result,
+    make_theme_batch,
+)
+from tests.test_story_studio import FakeStoryModel
+
+
+@pytest.fixture(autouse=True)
+def fake_provider_settings(monkeypatch):
+    monkeypatch.setattr(
+        story_cli,
+        "load_story_provider_settings",
+        lambda: StoryProviderSettings(model="test-model"),
+    )
+
+
+def completed_run(directory, run_id="test-run"):
+    return SimpleNamespace(
+        run_id=run_id,
+        published=SimpleNamespace(prompt_file=directory / "story.txt"),
+        result=make_story_result(),
+        result_file=directory / "result.json",
+    )
 
 
 def test_story_settings_reuse_shared_environment(monkeypatch, tmp_path) -> None:
@@ -48,27 +75,46 @@ def test_story_generate_exposes_only_generation_controls() -> None:
     assert "--female-count" in result.stdout
     assert "--male-count" in result.stdout
     assert "--concurrency" in result.stdout
-    assert "--prompt-file" in result.stdout
+    assert "--input" in result.stdout
+    assert "--prompt-file" not in result.stdout
+    assert "--quality-mode" in result.stdout
+    assert "--generation-retries" in result.stdout
     assert "--prompts-dir" in result.stdout
     assert "--rules-dir" in result.stdout
     assert "story-inputs/rules/" in result.stdout
     assert "--output-dir" not in result.stdout
-    assert "[default: 8]" in result.stdout
     assert "--content-level" in result.stdout
     assert "内容尺度" in result.stdout
-    assert "[default: aesthetic]" in result.stdout
+    assert "aesthetic" in result.stdout
     assert "--max-revisions" not in result.stdout
     assert "--scenes" not in result.stdout
     assert "--shots" not in result.stdout
 
 
-def test_story_generate_reads_story_description_from_prompt_file(
+def test_story_generate_reads_story_document(
     tmp_path,
     monkeypatch,
 ) -> None:
-    prompt_file = tmp_path / "story.txt"
+    prompt_file = tmp_path / "renamed.yaml"
     prompt_file.write_text(
-        "\n1930年代秋夜，两个成年人在旧车站重逢。\n他们共同寻找遗失的行李。\n",
+        "id: story\n"
+        "description: |\n"
+        "  1930年代秋夜，两个成年人在旧车站重逢。\n"
+        "  他们共同寻找遗失的行李。\n"
+        "generation:\n"
+        "  theme_count: 7\n"
+        "  frames_per_theme: 3\n"
+        "  output_language: english\n"
+        "  cast: {female_count: 1, male_count: 2}\n"
+        "runtime: {concurrency: 3, generation_retries: 0}\n"
+        "authoring:\n"
+        "  themes: [Custom theme rule.]\n"
+        "  frames: [Custom frame rule.]\n"
+        "validation:\n"
+        "  quality:\n"
+        "    mode: report\n"
+        "    checks:\n"
+        "      - type: camera_evidence\n",
         encoding="utf-8",
     )
     captured = {}
@@ -78,34 +124,23 @@ def test_story_generate_reads_story_description_from_prompt_file(
         settings,
         rules,
         *,
-        concurrency,
         runs_directory,
         prompts_directory,
     ):
         captured["request"] = request
         captured["rules"] = rules
-        captured["concurrency"] = concurrency
+        captured["settings"] = settings
         captured["runs_directory"] = runs_directory
         captured["prompts_directory"] = prompts_directory
-        return SimpleNamespace(
-            run_id="test-run",
-            published=SimpleNamespace(
-                prompt_file=prompts_directory / "story.txt",
-            ),
-        )
+        return completed_run(prompts_directory)
 
-    monkeypatch.setattr(
-        story_cli,
-        "load_story_provider_settings",
-        lambda: object(),
-    )
     monkeypatch.setattr(story_cli, "_generate", fake_generate)
 
     result = CliRunner().invoke(
         app,
         [
             "generate",
-            "--prompt-file",
+            "--input",
             str(prompt_file),
             "--female-count",
             "2",
@@ -128,7 +163,16 @@ def test_story_generate_reads_story_description_from_prompt_file(
     assert "The Story Description is authoritative" in "\n".join(
         captured["rules"].themes
     )
-    assert captured["concurrency"] == 8
+    assert captured["request"].theme_count == 7
+    assert captured["request"].frames_per_theme == 3
+    assert captured["request"].output_language == "english"
+    assert captured["settings"].concurrency == 3
+    assert captured["settings"].generation_retries == 0
+    assert captured["settings"].quality.mode == "report"
+    assert captured["settings"].quality.checks[0].type == "camera_evidence"
+    assert "Custom theme rule." in captured["rules"].themes
+    assert "Custom theme rule." not in captured["rules"].frames
+    assert "Custom frame rule." in captured["rules"].frames
     assert captured["runs_directory"] == tmp_path / "runs"
     assert captured["prompts_directory"] == tmp_path / "prompts"
     assert "Run：test-run" in result.output
@@ -138,7 +182,7 @@ def test_story_generate_rejects_missing_story_input() -> None:
     result = CliRunner().invoke(app, ["generate"])
 
     assert result.exit_code != 0
-    assert "故事描述或 --prompt-file" in result.output
+    assert "故事描述或 --input" in result.output
 
 
 def test_story_generate_direct_input_has_no_source_prompt_stem(
@@ -151,29 +195,26 @@ def test_story_generate_direct_input_has_no_source_prompt_stem(
         settings,
         rules,
         *,
-        concurrency,
         runs_directory,
         prompts_directory,
     ):
         captured["request"] = request
-        return SimpleNamespace(
-            run_id="test-run",
-            published=SimpleNamespace(
-                prompt_file=prompts_directory / "story.txt",
-            ),
-        )
+        captured["settings"] = settings
+        return completed_run(prompts_directory)
 
-    monkeypatch.setattr(
-        story_cli,
-        "load_story_provider_settings",
-        lambda: object(),
-    )
     monkeypatch.setattr(story_cli, "_generate", fake_generate)
 
     result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
 
     assert result.exit_code == 0
     assert captured["request"].source_prompt_stem is None
+    assert captured["request"].theme_count == 1
+    assert captured["request"].frames_per_theme == 6
+    assert captured["request"].content_level == "aesthetic"
+    assert captured["settings"].concurrency == 8
+    assert captured["settings"].generation_retries == 2
+    assert captured["settings"].quality.checks == ()
+    assert "skipped" in result.output
 
 
 def test_story_generate_loads_custom_rules(tmp_path, monkeypatch) -> None:
@@ -190,23 +231,12 @@ def test_story_generate_loads_custom_rules(tmp_path, monkeypatch) -> None:
         settings,
         rules,
         *,
-        concurrency,
         runs_directory,
         prompts_directory,
     ):
         captured["rules"] = rules
-        return SimpleNamespace(
-            run_id="test-run",
-            published=SimpleNamespace(
-                prompt_file=prompts_directory / "story.txt",
-            ),
-        )
+        return completed_run(prompts_directory)
 
-    monkeypatch.setattr(
-        story_cli,
-        "load_story_provider_settings",
-        lambda: object(),
-    )
     monkeypatch.setattr(story_cli, "_generate", fake_generate)
 
     result = CliRunner().invoke(
@@ -243,24 +273,13 @@ def test_story_generate_discovers_rules_inside_story_inputs(
         settings,
         rules,
         *,
-        concurrency,
         runs_directory,
         prompts_directory,
     ):
         captured["rules"] = rules
-        return SimpleNamespace(
-            run_id="test-run",
-            published=SimpleNamespace(
-                prompt_file=prompts_directory / "story.txt",
-            ),
-        )
+        return completed_run(prompts_directory)
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(
-        story_cli,
-        "load_story_provider_settings",
-        lambda: object(),
-    )
     monkeypatch.setattr(story_cli, "_generate", fake_generate)
 
     result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
@@ -270,51 +289,51 @@ def test_story_generate_discovers_rules_inside_story_inputs(
     assert "Shared story-input rule." in captured["rules"].frames
 
 
-def test_story_generate_rejects_story_and_prompt_file_together(
+def test_story_generate_rejects_story_and_document_together(
     tmp_path,
 ) -> None:
-    prompt_file = tmp_path / "story.txt"
-    prompt_file.write_text("另一个故事描述", encoding="utf-8")
+    prompt_file = tmp_path / "story.yaml"
+    prompt_file.write_text("id: story\ndescription: 另一个故事描述", encoding="utf-8")
 
     result = CliRunner().invoke(
         app,
-        ["generate", "命令行故事描述", "--prompt-file", str(prompt_file)],
+        ["generate", "命令行故事描述", "--input", str(prompt_file)],
     )
 
     assert result.exit_code != 0
     assert "不能同时提供" in result.output
 
 
-def test_story_generate_rejects_empty_prompt_file(tmp_path) -> None:
-    prompt_file = tmp_path / "empty.txt"
+def test_story_generate_rejects_empty_document(tmp_path) -> None:
+    prompt_file = tmp_path / "empty.yaml"
     prompt_file.write_text(" \n\t", encoding="utf-8")
 
     result = CliRunner().invoke(
         app,
-        ["generate", "--prompt-file", str(prompt_file)],
+        ["generate", "--input", str(prompt_file)],
     )
 
     assert result.exit_code != 0
     assert "不能为空" in result.output
 
 
-def test_story_generate_rejects_missing_prompt_file(tmp_path) -> None:
+def test_story_generate_rejects_missing_document(tmp_path) -> None:
     result = CliRunner().invoke(
         app,
-        ["generate", "--prompt-file", str(tmp_path / "missing.txt")],
+        ["generate", "--input", str(tmp_path / "missing.yaml")],
     )
 
     assert result.exit_code != 0
     assert "does not exist" in result.output
 
 
-def test_story_generate_rejects_non_utf8_prompt_file(tmp_path) -> None:
-    prompt_file = tmp_path / "invalid.txt"
+def test_story_generate_rejects_non_utf8_document(tmp_path) -> None:
+    prompt_file = tmp_path / "invalid.yaml"
     prompt_file.write_bytes(b"\xff\xfe")
 
     result = CliRunner().invoke(
         app,
-        ["generate", "--prompt-file", str(prompt_file)],
+        ["generate", "--input", str(prompt_file)],
     )
 
     assert result.exit_code != 0
@@ -329,7 +348,13 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
     )
     snapshot = store.create(
         (request := make_story_request()),
-        StoryRunSettings(provider=provider, concurrency=3),
+        StoryRunSettings(
+            provider=provider,
+            concurrency=3,
+            quality=StoryQualityPolicy(
+                mode="enforce", checks=[{"type": "camera_evidence"}]
+            ),
+        ),
         resolve_story_rules(request),
     )
     captured = {}
@@ -339,12 +364,7 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
         captured["provider"] = current_provider
         captured["settings"] = settings
         captured["store"] = current_store
-        return SimpleNamespace(
-            run_id=run_id,
-            published=SimpleNamespace(
-                prompt_file=tmp_path / "prompts" / "story.txt",
-            ),
-        )
+        return completed_run(tmp_path / "prompts", run_id)
 
     monkeypatch.setattr(
         story_cli,
@@ -366,6 +386,7 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
     assert result.exit_code == 0
     assert captured["run_id"] == snapshot.run_id
     assert captured["settings"].concurrency == 3
+    assert captured["settings"].quality.mode == "enforce"
     assert captured["provider"] == provider
     assert isinstance(captured["store"], LocalStoryRunStore)
 
@@ -389,3 +410,160 @@ def test_story_runs_lists_resumable_command(tmp_path) -> None:
     assert result.exit_code == 0
     assert snapshot.run_id in result.output
     assert f"t2i-story resume {snapshot.run_id}" in result.output
+
+
+def test_explicit_cli_options_override_document_and_preserve_zero(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "story.yaml"
+    path.write_text(
+        "id: story\ndescription: Story.\n"
+        "generation:\n"
+        "  theme_count: 7\n"
+        "  frames_per_theme: 3\n"
+        "  content_level: erotic\n"
+        "  output_language: english\n"
+        "  cast: {female_count: 2, male_count: 1}\n"
+        "runtime: {concurrency: 3, generation_retries: 2}\n"
+        "validation:\n"
+        "  quality:\n"
+        "    mode: enforce\n"
+        "    checks: [{type: camera_evidence}]\n",
+        encoding="utf-8",
+    )
+    captured = {}
+
+    async def fake_generate(request, settings, rules, **kwargs):
+        captured["request"] = request
+        captured["settings"] = settings
+        return completed_run(tmp_path)
+
+    monkeypatch.setattr(story_cli, "_generate", fake_generate)
+    result = CliRunner().invoke(app, [
+        "generate", "--input", str(path), "--themes", "1", "--frames", "6",
+        "--female-count", "0", "--content-level", "aesthetic",
+        "--language", "chinese", "--concurrency", "8",
+        "--generation-retries", "0", "--quality-mode", "off",
+    ])
+    assert result.exit_code == 0, result.output
+    request = captured["request"]
+    assert request.theme_count == 1
+    assert request.frames_per_theme == 6
+    assert request.female_count == 0
+    assert request.male_count == 1
+    assert request.content_level == "aesthetic"
+    assert request.output_language == "chinese"
+    assert captured["settings"].concurrency == 8
+    assert captured["settings"].generation_retries == 0
+    assert captured["settings"].quality.mode == "off"
+    assert captured["settings"].quality.checks[0].type == "camera_evidence"
+
+
+def test_invalid_document_fails_before_provider_configuration(tmp_path, monkeypatch):
+    path = tmp_path / "story.yaml"
+    path.write_text("id: story\ndescription: Story.\nunknown: 1", encoding="utf-8")
+
+    def fail_if_provider_loaded():
+        pytest.fail("invalid document must not reach provider configuration")
+
+    monkeypatch.setattr(
+        story_cli, "load_story_provider_settings", fail_if_provider_loaded
+    )
+    result = CliRunner().invoke(app, ["generate", "--input", str(path)])
+    assert result.exit_code == 2
+    assert "unknown" in result.output
+
+
+def test_resume_freezes_document_rules_and_quality_without_reading_source(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "source.yaml"
+    path.write_text(
+        "id: stable-name\ndescription: An old station.\n"
+        "generation: {frames_per_theme: 1}\n"
+        "runtime: {generation_retries: 0}\n"
+        "authoring:\n  frames: [Keep the station clock visible.]\n"
+        "validation:\n"
+        "  quality:\n"
+        "    mode: enforce\n"
+        "    checks: [{type: required_text, values: [station clock]}]\n",
+        encoding="utf-8",
+    )
+    model = FakeStoryModel([make_theme_batch(), make_frame_sequence(frame_count=1)])
+
+    @asynccontextmanager
+    async def fake_model(_settings):
+        yield model
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(story_cli, "story_model", fake_model)
+    result = CliRunner().invoke(app, ["generate", "--input", str(path)])
+    assert result.exit_code == 1, result.output
+    store = LocalStoryRunStore(tmp_path / "runs")
+    run_id = store.list_runs().runs[0].run_id
+    snapshot = store.inspect(run_id)
+    assert snapshot.request.source_prompt_stem == "stable-name"
+    assert snapshot.manifest.settings.quality.mode == "enforce"
+    assert snapshot.manifest.settings.generation_retries == 0
+    assert "Keep the station clock visible." in snapshot.rules.frames
+
+    path.unlink()
+    failed_again = FakeStoryModel([make_frame_sequence(frame_count=1)])
+    model = failed_again
+    result = CliRunner().invoke(app, ["resume", run_id])
+    assert result.exit_code == 1, result.output
+    assert len(failed_again.stages) == 1
+    assert "station clock" in failed_again.messages[0][-1].content
+    assert "Keep the station clock visible." in failed_again.messages[0][0].content
+
+    sequence = make_frame_sequence(frame_count=1)
+    sequence.frames[0].prose += " A station clock."
+    model = FakeStoryModel([sequence])
+    result = CliRunner().invoke(app, ["resume", run_id])
+    assert result.exit_code == 0, result.output
+    assert "passed" in result.output
+    completed = store.inspect(run_id).completed
+    assert completed is not None
+    assert completed.result.request.story == "An old station."
+    assert completed.result.quality.mode == "enforce"
+    assert completed.published.prompt_file.name.startswith("stable-name_")
+    result = CliRunner().invoke(app, ["resume", run_id])
+    assert result.exit_code == 0, result.output
+    assert len(model.stages) == 1
+
+
+def test_report_mode_publishes_plain_prose_and_displays_quality_warnings(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "report.yaml"
+    path.write_text(
+        "id: report\ndescription: An old station.\n"
+        "generation: {frames_per_theme: 1}\n"
+        "validation:\n"
+        "  quality:\n"
+        "    mode: report\n"
+        "    checks: [{type: required_text, values: [station clock]}]\n",
+        encoding="utf-8",
+    )
+    sequence = make_frame_sequence(frame_count=1)
+    model = FakeStoryModel([make_theme_batch(), sequence])
+
+    @asynccontextmanager
+    async def fake_model(_settings):
+        yield model
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(story_cli, "story_model", fake_model)
+    result = CliRunner().invoke(app, ["generate", "--input", str(path)])
+    assert result.exit_code == 0, result.output
+    assert "warnings" in result.output
+    assert "1 条质量告警" in result.output
+    assert "station clock" in result.output
+    assert len(model.stages) == 2
+    store = LocalStoryRunStore(tmp_path / "runs")
+    completed = store.inspect(store.list_runs().runs[0].run_id).completed
+    assert completed is not None
+    assert completed.published.prompt_file.read_text(encoding="utf-8").strip() == (
+        sequence.frames[0].prose
+    )
+    assert completed.result.quality.issues[0].check == "required_text"

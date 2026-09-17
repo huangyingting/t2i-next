@@ -1,0 +1,868 @@
+id: intimate-lifestyle-portrait
+description: |
+  BRIEF
+
+  Create varied, polished, hyper-realistic lifestyle-glamour portraits
+  of the exact requested adult East Asian cast in a believable everyday location. The
+  result should resemble an intimate photograph made by a nearby friend or a
+  small commercial crew, not a character sheet, collage, fashion illustration,
+  fantasy scene, cinematic still, or generic studio portrait.
+
+  Every Frame is one finished full-bleed photograph. Aspect ratio and canvas
+  dimensions are controlled outside this brief. Do not declare, request, prefer,
+  or reject any aspect ratio. Do not create a multi-panel board, contact sheet,
+  split screen, border, caption, logo, watermark, or readable brand name.
+
+  HIGHEST PRIORITY OUTPUT CHECK
+
+  Use English only. Write only positive visible image content. Never echo
+  instructions or state absences with "no," "without," or "not"; silently omit
+  forbidden elements and negative checklist phrases.
+
+  Within IDENTITY AND LOOK, write one explicit `MAKEUP —` sentence for each
+  woman covering base, exact blush hue and placement, brow, eyeshadow, eyeliner,
+  lashes, highlight, and lips. Write one `GROOMING —` sentence for each man.
+  These sentences and every person's accessories are mandatory in every Frame,
+  never implied by adjectives.
+
+  VISUAL STYLE TARGET
+
+  Use a bright, polished East Asian social-media lifestyle-glamour aesthetic:
+  softly luminous skin, clear expressive eyes, refined feminine styling, clean
+  real locations, airy depth, and the approachable intimacy of a beautifully
+  made candid portrait. The result should feel fresh, gentle, sunlit, colorful,
+  and immediately attractive rather than gritty, dark, severe, melancholic,
+  documentary, avant-garde, or cinematic.
+
+  Beauty remains photographic but intentionally polished. Favor clear skin with
+  fine natural texture, smooth tonal transitions, soft facial contours, neat
+  makeup, glossy separated hair strands, bright catchlights, and flattering
+  highlight roll-off. Do not emphasize veins, blemishes, age marks, sweat,
+  grime, rust, damaged surfaces, or harsh texture strongly enough to become the
+  visual concept.
+
+  Every Frame must place this exact style anchor immediately after the required
+  photography opening:
+  "bright high-key East Asian lifestyle beauty portrait, soft feminine
+  social-media glamour, luminous ivory skin, clear large almond eyes, clean
+  modern digital-camera realism." The anchor outranks location texture, realism
+  defects, mood, and prop description.
+
+  CAST AND ADULTHOOD
+
+  Use exactly `female_count` adult women and exactly `male_count` adult men;
+  these run parameters are the sole authority for visible human count. Never
+  infer, add, remove, replace, or duplicate a person because of an example,
+  location, activity, content level, reflection, or shooting method. Every
+  requested person is unmistakably 25 or older, alert, consenting, and able to
+  stop any interaction. Do not add staff, customers, passersby, photographers,
+  reflected strangers, portraits, mannequins, dolls, disembodied hands, or faces
+  on screens.
+
+  In every Theme, designate one requested woman as the primary beauty-portrait
+  subject. For a two-person cast, the requested companion is equally complete,
+  identifiable, active, and sharply rendered rather than a blurred accessory or
+  anonymous body. Give every requested person a different original East Asian
+  adult identity. Never copy, name, or closely resemble a real person,
+  celebrity, influencer, model, or the person in a reference image.
+
+  Prefer adults aged 25–32 with refined beauty-portrait appearance. Every woman
+  has clear almond-shaped eyes that are large but anatomically plausible, a
+  delicate natural nose, softly full lips, an elegant jawline, and balanced
+  facial spacing. An adult man uses a distinct mature face, natural masculine
+  build, polished hair, and styling compatible with the Theme without
+  overpowering the primary woman. Define each person's stable age, face shape,
+  eye shape, nose, lips, skin tone, build, body proportions, hair length, hair
+  texture, and hairstyle. Preserve every identity and body proportion across all
+  Frames of that Theme.
+
+  Every person must read as an adult through mature facial structure, confident
+  body language, adult styling, and an adult location. Do not use school
+  uniforms, childlike proportions, childish behavior, age-regression language,
+  or youthful ambiguity.
+
+  BEAUTY AND BODY REALISM
+
+  Present every woman as an attractive adult with coherent anatomy; the primary
+  woman may have a curvy figure and naturally full bust. Vary face shape, adult
+  age, height, build, shoulder width, waist, hips, and bust proportions across
+  Themes rather than cloning one ideal body. Give an adult man coherent,
+  realistic proportions rather than an exaggerated bodybuilder physique. Keep
+  chests, breasts, shoulders, rib cages, waists, hands, knees, and limbs
+  physically connected and proportionate for every person.
+
+  Retain real skin through minute visible pores, soft facial peach fuzz, fine
+  body hair, subtle tonal variation, natural folds, mild asymmetry, and plausible
+  compression from garments or posture. Skin may look luminous in motivated
+  light but must not become porcelain, wax, plastic, airbrushed, translucent,
+  glitter-covered, or excessively smooth.
+
+  Favor long dark hair, a loose braid, soft ponytail, romantic updo, or glossy
+  bob, with face-framing wisps, a few flyaways, realistic weight, and backlit
+  edge detail. Avoid anime eyes, pinched doll noses, impossible facial symmetry,
+  heavy contour, smoky makeup, or a synthetic beauty-filter face.
+
+  MAKEUP AND GROOMING
+
+  Describe every woman's complete visible makeup design rather than writing only
+  "natural makeup." Include all of these:
+
+  - complexion finish and coverage, such as luminous sheer base, satin skin
+    tint, softly powdered T-zone, or dewy cheek perimeter;
+  - exact blush hue, placement, diffusion, and finish, such as peach cream blush
+    high on the cheekbones, rose blush across the apples, coral liquid blush
+    diffused toward the temples, or muted mauve powder below the cheek ridge;
+  - brow shape, hair direction, density, and product finish;
+  - eyeshadow colors and placement across lid, crease, inner corner, and lower
+    lash line;
+  - eyeliner color, thickness, and endpoint;
+  - separated eyelash shape and density;
+  - optional restrained highlight at the inner corner, cheekbone, cupid's bow,
+    or nose bridge;
+  - lip color, edge softness, moisture, gradient, gloss, or satin finish; and
+  - how real light changes blush, eye makeup, lip sheen, and skin finish.
+
+  Rotate makeup families across Themes before repeating: sunlit peach and gold,
+  soft rose and taupe, coral and warm brown, lavender and pearl, plum and mauve,
+  bronze and terracotta, celadon-accented neutral, berry and champagne, or an
+  equally coherent original palette. Coordinate makeup with outfit, light,
+  location, complexion, and emotion without matching every color literally.
+  Keep blush clearly visible but integrated into skin rather than painted as a
+  flat circle.
+
+  For multiple women, give each a visibly distinct but harmonious makeup design;
+  do not duplicate the same blush, eyeliner, and lip combination. For an adult
+  man, describe polished grooming—complexion texture, brows, facial hair or
+  clean shave, lips, and optional subtle camera-ready complexion correction—
+  without feminizing him by default or leaving his face undescribed.
+
+  ACCESSORIES AND HEADWEAR
+
+  Give the primary woman at least three coordinated accessories from different
+  categories. Name shape, material, color, scale, wear position, and relationship
+  to hair, skin, neckline, sleeve, or hand. Make one the visual centerpiece.
+
+  Rotate accessory categories and designs across Themes before repeating:
+
+  - headwear such as a wide-brim straw hat, structured beret, silk headscarf,
+    velvet pillbox, polished bucket hat, embellished cap, or sculptural hair
+    comb;
+  - eyewear such as cat-eye, slim oval, softly rectangular, rimless, or
+    translucent-gradient sunglasses;
+  - neckwear such as a fine pendant, pearl strand, velvet choker, layered chain,
+    lariat, collar necklace, silk scarf, or delicate body chain;
+  - earrings such as pearl drops, crystal studs, fine hoops, tassels, ear cuffs,
+    or small sculptural metal forms;
+  - wrist and hand details such as a charm bracelet, slim bangle stack, cuff,
+    polished watch, cocktail ring, signet ring, stacked fine rings, gloves, or
+    jeweled hand chain; and
+  - finishing pieces such as an anklet, waist belt, brooch, hair ribbon, floral
+    pin, compact handbag, mini shoulder bag, or unbranded camera strap.
+
+  Preserve the eye priority. Sunglasses may sit on the head or neckline, rest in an active hand, sit low, or
+  use pale lenses while preserving irises and catchlights. Never hide the eyes
+  behind dark opaque lenses or add impossible reflections. Hats reveal face,
+  eyes, and hairstyle without hard eye-socket shadow.
+
+  For multiple women, build distinct accessory sets with different centerpiece
+  categories, metals, and silhouettes. For a requested man, specify two or more
+  coherent accessories such as a watch, ring, chain, sunglasses, scarf, belt,
+  hat, cuff links, or bracelet; do not copy the primary woman's set. Every item
+  must remain in the same position in both Frames of one Theme unless the
+  captured action explicitly fixes a hand touching that item in the identical
+  instant.
+
+  LOCATION FAMILIES
+
+  Privately assign every Theme one distinct location family. Do not repeat a
+  family until the available families have been used:
+
+  - a bright neighborhood gym entrance or clean fitness studio beside cardio
+    equipment;
+  - a sunlit independent cafe or bakery with a dessert, cold drink, open window,
+    terrace plants, or a distant flower field;
+  - a bright apartment art corner with an easel, textured painting, houseplant,
+    soft rug, cushion, or plush decor;
+  - an outdoor market lounge, pedestrian arcade, or shaded courtyard seating
+    area with produce colors and softly blurred commerce behind;
+  - a vintage tea room or eclectic dining room with timber furniture,
+    blue-and-white porcelain, flowers, a mirror, and candlelight;
+  - a tidy brick-walled garage, townhouse driveway, or converted workshop beside
+    an unbranded polished classic sedan and a coffee cabinet;
+  - a private dressing room, loft bedroom, conservatory, bookstore corner,
+    rooftop breakfast table, record room, or equally specific lived-in place.
+
+  These are visual starting points, not scenes to copy. Transform the
+  architecture, season, palette, activity, furniture, and props. The location
+  must remain immediately recognizable and physically coherent. Show at least
+  three setting-specific details and one hero prop that the woman actively uses.
+  Keep the background inhabited through wear, objects, light, and arrangement
+  rather than extra people.
+
+  WARDROBE AND CONTENT LEVEL
+
+  Build one coherent adult glamour look from two to five visible garments.
+  Useful directions include fitted athletic wear, a crop top and
+  shorts, an off-shoulder embroidered blouse, a lace bodysuit with a loose robe,
+  a bikini under an open striped shirt, a floral wrap with denim shorts, or a
+  soft cardigan over a tied blouse. Invent equivalents rather than repeating
+  these combinations.
+
+  Use original, unbranded designs; never reproduce recognizable trademarks.
+
+  Wardrobe is a major visual attraction, not ordinary daywear. Every Theme must
+  give the primary woman at least three luxurious fashion materials or treatments, such as
+  silk satin, lace, velvet, brocade, embroidered mesh, beaded fringe, pearl
+  trim, crystal accents, metallic thread, appliqué flowers, jacquard, feather
+  edging, hand-painted fabric, corset seaming, scalloped hems, or fine pleating.
+  Use at least three coordinated accessories, including one hair ornament or
+  headpiece, one jewelry family, and one bag, glove, stocking, belt, or footwear
+  statement. Keep the result refined and editorial rather than costume-like,
+  overloaded, or cheap.
+
+  For a two-person Theme, coordinate rather than duplicate the outfits. A second
+  woman receives her own equally glamorous silhouette, palette, hairstyle, and
+  at least two luxury treatments. An adult man receives polished sensual styling
+  such as a partly open silk shirt, fine knit, brocade or velvet jacket, tailored
+  trousers, fitted dark denim, leather footwear, watch, ring, chain, or an
+  equally coherent original combination. Preserve distinct colors and garment
+  edges so bodies never visually merge.
+
+  At aesthetic level, use sensual but non-explicit styling: a sports bra,
+  off-shoulder blouse, fitted bodysuit, bikini top, deep neckline, open outer
+  layer, short skirt, shorts, or tailored sensual menswear. Every person remains
+  fully covered over nipples and genitals.
+
+  At aesthetic level, ordinary plain sportswear or a basic top-and-shorts
+  combination is insufficient. Build a glamorous, visibly sexy but fully covered
+  look around an embellished corset top, embroidered bustier, jeweled bodysuit,
+  off-shoulder lace blouse, sculpted satin crop top, ornate bikini-inspired top,
+  or an equally elaborate original centerpiece. Deep cleavage, side cutouts,
+  open backs, bare shoulders, high-cut legs, garter-inspired covered straps,
+  sheer sleeves, and transparent outer layers over opaque coverage are allowed.
+  Add a draped silk shirt, embroidered robe, cropped brocade jacket, feathered
+  wrap, or jeweled cardigan as a second layer. Coverage must remain stable and
+  opaque over nipples and genitals from the selected camera position.
+
+  At erotic level, use a clearly private or controlled editorial context.
+  Partial toplessness, bare breasts, and visible nipples are permitted, or the
+  woman may remain covered by a very low neckline, open robe, sheer lace, loose
+  wrap, or displaced outer layer. Choose one deliberate coverage state and keep
+  it stable within a Theme. An adult man may be bare-chested or wear an open
+  shirt while genitals remain covered. A two-person cast may share consensual
+  embracing, kissing, face or hair touch, handholding, lap sitting, or closely
+  coordinated posing, but do not show genital contact, penetration, toys, fluids,
+  or an explicit sexual act.
+
+  At hardcore level, retain the same high-key location-photography, beauty,
+  fashion, expression, and camera grammar while showing an unmistakable,
+  currently visible consensual adult sexual act appropriate to the exact cast.
+  A one-woman cast uses an explicit solo act; a woman-and-man or two-woman cast
+  uses an explicit mutually participatory act. State visible adult anatomy,
+  contact points, hand actions, body support, and agency clearly enough that the
+  level cannot be mistaken for erotic posing. Keep faces, emotions, complete
+  identities, glamorous clothing remnants, setting, and dreamy real light
+  important rather than reducing the Frame to an anatomical close-up. Do not add
+  an unrequested partner, body part, hidden participant, coercion, injury,
+  unconsciousness, intoxication, or age ambiguity.
+
+  The run's requested content level is the sole authority. Before writing,
+  select exactly one branch above and discard the other two. Never borrow
+  hardcore nudity or acts for aesthetic/erotic output, or weaken hardcore into
+  erotic posing. Aesthetic has no visible nipples, genitals, or sex act; erotic
+  has no genital contact or sex act; hardcore has the explicit act defined
+  above.
+
+  ACTIVITY AND POSE
+
+  Give the exact cast one natural, visually legible activity tied to the selected
+  place. Possibilities include taking a mirror selfie, reaching to adjust the
+  camera, presenting a dessert, lifting a cold drink, painting one stroke,
+  holding several brushes, pausing over tea, touching a fork to the lips,
+  holding a coffee cup, adjusting a bag strap, resting after exercise, or
+  looking toward movement outside the frame.
+
+  For one woman, give both hands clear tasks and keep her self-directed agency
+  visible. For a two-person cast, build one readable shared action with a clear
+  gaze relationship, separate support for each body, and a meaningful task for
+  every visible hand. Both adults actively contribute; do not make one person a
+  passive prop, background observer, cropped torso, or anonymous pair of hands.
+  At aesthetic or erotic level, the activity may be affectionate, collaborative,
+  playful, teasing, or quietly romantic. At hardcore level, the required
+  explicit act replaces the ordinary hero-prop action but retains exact hand,
+  support, gaze, emotion, and material-response detail.
+
+  The activity supports the portrait instead of dominating it. Keep the hero
+  prop smaller than the primary woman's head where physically plausible and
+  below roughly twenty percent of the frame. Faces, eyes, hairstyles,
+  upper-body gestures, and outfits remain the first read; a large watering can,
+  tool, machine, canvas, cup, or foreground hand must never become the main
+  subject.
+
+  Use a relaxed seated, kneeling, half-kneeling, leaning, or supported standing
+  pose. Build an elegant S-curve or diagonal through the shoulders, waist, and
+  hips without impossible spinal bends. For every person, one hand should
+  perform or respond to the activity; the other should touch a real support,
+  hold a prop, interact consensually, adjust clothing, or rest naturally. Show
+  five plausible fingers on each visible hand, sensible wrist angles, grounded
+  knees and feet, and truthful garment compression.
+
+  FACE, BODY, AND POSE DIRECTION
+
+  Treat face direction, torso direction, pelvis direction, and camera position as
+  four separate choices. Do not default to a front-facing head on a
+  three-quarter body in every Theme. Select distinct combinations across the
+  batch:
+
+  FACE DIRECTIONS
+
+  - face square to camera with level chin;
+  - face turned left or right in a gentle three-quarter view;
+  - clean left or right profile with one visible eye, nose, lips, and jawline
+    clearly separated;
+  - face turned back over one shoulder while the neck remains anatomically
+    relaxed;
+  - chin lowered slightly while the eyes look upward;
+  - chin raised slightly while the face turns toward side light; or
+  - face directed toward the active prop while the eyes briefly return toward
+    the lens, mirror, or phone screen.
+
+  In a profile or strong three-quarter view, render the visible eye sharply and
+  do not invent a second eye through the nose bridge. In front and gentle
+  three-quarter views, keep both eyes coherent and sharp.
+
+  BODY DIRECTIONS
+
+  - shoulders, rib cage, and pelvis facing mostly forward;
+  - the complete body turned three-quarters left or right;
+  - a clean side-facing body with face returning toward camera;
+  - back mostly toward camera with the face looking over one shoulder;
+  - shoulders and pelvis deliberately counter-rotated in a mild natural twist;
+  - seated diagonally across the frame with knees and torso pointing in
+    different but physically compatible directions; or
+  - kneeling or half-kneeling with hips angled away and upper body opening toward
+    the camera.
+
+  POSE FAMILIES
+
+  - relaxed standing contrapposto with one knee soft;
+  - supported standing lean against a doorway, vehicle, counter, or wall;
+  - seated upright on a chair, stool, bench, sofa, or table edge;
+  - side-sitting with both knees angled away from the torso;
+  - floor sitting with one knee raised and the other leg folded naturally;
+  - upright kneeling with grounded shins and balanced hips;
+  - half-kneeling with one planted foot and one grounded knee;
+  - side-kneeling with weight supported by one hand on furniture or floor;
+  - reclining diagonally on a sofa or chaise while the face remains unobscured;
+  - pausing mid-step with believable foot placement and garment movement; or
+  - leaning forward slightly from the hips while the spine remains long and the
+    face stays naturally proportioned.
+
+  For a batch of four or more Themes, use at least three face directions, three
+  body directions, and four pose families. For a batch of six or more Themes,
+  use at least four face directions, five body directions, and five pose
+  families. Do not mirror one pose and call it new. Vary actual support,
+  weight-bearing contacts, hip height, knee geometry, shoulder line, spine
+  direction, and hand placement.
+
+  Vary gaze between direct intimate eye contact, attention to the hero prop, and
+  a thoughtful look just outside the frame. Expressions should be quiet and
+  specific: self-possessed, curious, softly inviting, absorbed, slightly
+  surprised, contemplative, or relaxed after exertion. Avoid exaggerated smiles,
+  open-mouth performance, pornographic expressions, or vacant doll-like staring.
+
+  EYES, MICRO-EXPRESSION, ACTION, AND DETAIL
+
+  The eyes are the first focal priority in every Frame. Do not write only
+  "looking at the camera," "seductive gaze," or an emotion label. Name the exact
+  focus target and describe the visible eye mechanics: iris direction, degree of
+  eye convergence, upper- and lower-lid tension, brow height or asymmetry, and
+  the shape and position of the catchlight created by the real light source.
+  Both eyes must aim coherently at the same target and remain sharply resolved,
+  with a natural wet lower-lid line, separated eyelashes, detailed irises, and
+  no crossed, wandering, duplicated, clouded, glassy, or doll-like eyes.
+
+  Favor the reference mood: wide, clear, softly attentive eyes; relaxed upper
+  lids; gently engaged lower lids; smooth space between the brows; and one or
+  two large clean catchlights. Direct eye contact should feel warm, curious, or
+  quietly inviting, never predatory, confrontational, or brooding. Narrowed or
+  half-lidded eyes are valid only when the selected teasing, playful, languid, or
+  sensually relaxed expression keeps the irises focused and catchlights bright.
+  An off-camera gaze should feel briefly distracted by something pleasant or
+  interesting, not anxious or suspicious.
+
+  Allow a focused, luminous half-lidded gaze when the selected expression is
+  languid, teasing, sensually relaxed, or absorbed in a pleasant sensation. The
+  irises must remain deliberately aimed and the catchlights bright; do not turn
+  languor into vacant drowsiness, intoxication, distress, or unfocused eyes.
+
+  Build one precise micro-expression from at least four mutually consistent
+  signals selected from brow tension, eyelid openness, cheek lift, nostril
+  relaxation, lip-corner direction, lip separation, jaw tension, chin angle,
+  breath, or a faint flush. Connect those signals to what she is doing and
+  looking at. Replace vague words such as beautiful, sexy, seductive, alluring,
+  happy, or mysterious with visible facial evidence. Keep facial muscles subtle
+  and asymmetrical enough to feel observed rather than posed.
+
+  Every Theme must choose one primary emotion, one quieter secondary emotion,
+  and one concrete trigger in the current scene. Use nuanced combinations such
+  as gentle curiosity warmed by recognition, quiet confidence softened by
+  shyness, concentration touched by playful amusement, calm anticipation mixed
+  with contentment, or post-exertion relief with a trace of pride. Invent
+  scene-specific combinations instead of assigning emotions by location. Favor
+  soft positive or neutral emotions. Do not use a blank "sexy mood," generic
+  happiness, unexplained sadness, fear, distress, severity, suspicion, or an
+  emotion disconnected from the activity.
+
+  Make the emotional chain visually causal: a real trigger changes where her
+  irises focus; that appraisal changes brow and lid tension; cheek, nostril,
+  mouth, jaw, chin, and breath complete the micro-expression; the same emotion
+  changes her hand pressure, posture, or action timing. Describe visible evidence
+  instead of stating what she feels. A viewer should infer both emotions without
+  a caption.
+
+  Within one Theme, preserve the exact emotional baseline, trigger, appraisal,
+  and micro-expression. Every Frame captures the identical emotional instant
+  from a different camera position; do not progress from noticing to considering,
+  responding, or settling, and do not jump to a contradictory personality,
+  melodramatic performance, or unrelated emotion.
+
+  Capture an action at its most informative fraction of a second, not before it
+  starts or after it has ended. State the active hand's grip, fingertip pressure,
+  wrist angle, and travel direction; state how the support hand, hips, knees,
+  and feet carry her weight; and show one immediate physical consequence in the
+  hero prop, garment, hair, liquid, food, brush, bag strap, chair cushion, or
+  other contacted material. Examples include a tea surface tilting toward the
+  cup rim, icing yielding beneath a fork, paint collecting at the brush tip,
+  phone-case pressure whitening a fingertip, a bag strap indenting the shoulder,
+  or loose hair lifting in a doorway draft. Invent a consequence specific to the
+  chosen scene rather than copying these examples.
+
+  Every Frame must include a coherent micro-detail hierarchy:
+
+  1. eye moisture, iris fibers, eyelashes, brows, and source-matched catchlights;
+  2. facial skin pores, fine hair, lip texture, makeup edges, and small tonal
+     transitions;
+  3. finger joints, nails, contact pressure, and the active prop's material
+     response;
+  4. garment weave, seams, fasteners, folds, compression, and gravity;
+  5. separated hair strands, flyaways, accessory attachment, and movement; and
+  6. one or two clean location traces such as condensation, cake crumbs, flower
+     pollen, ceramic glaze, a tabletop water ring, soft textile weave, brushed
+     metal, polished wood grain, tidy tile grout, or window reflections.
+
+  Details must support the gaze, expression, action, and location instead of
+  becoming a disconnected inventory. Keep the eyes and action-driving hand as
+  the sharpest details; use softer detail farther from the focus plane. Keep
+  technical eye and muscle analysis private when possible: the final prose
+  should read as an elegant beauty photograph, not a clinical examination.
+  Choose only the most image-defining detail from each hierarchy level; do not
+  explain every possible detail.
+
+  EXPRESSION AND EMOTION VARIATION POOL
+
+  Treat these families as open-ended inspiration, not a fixed menu. Privately
+  assign every Theme a substantially different family, gaze pattern, brow
+  pattern, eyelid state, mouth behavior, chin angle, and posture response. Do
+  not repeat one construction while unused families remain:
+
+  warm recognition (soft eyes, beginning smile); affectionate attention (steady
+  eyes, relaxed brows); gentle curiosity (widened irises, raised brow, parted
+  lips); bashful pleasure (downward glance, warm cheeks); adult coyness
+  (sideways-upward glance, lowered chin); adult playful coquetry (luminous eyes,
+  soft pout, slight cheek puff, adult agency); mock sulking (level brows,
+  controlled pout); teasing invitation (direct gaze, lifted mouth corner, paused
+  hand); mischievous challenge (bright eye-smile, arched brow); secret amusement
+  (averted eyes, lifted cheeks, suppressed laugh); open delight (bright eyes,
+  visible breath); delighted surprise (wide lids, raised brows, parted lips);
+  flirtatious confidence (direct half-lidded gaze, asymmetric smile, open
+  posture); provocative teasing (focused eyes, slow lip part, delayed hand);
+  languid ease (luminous half-lidded eyes, dropped shoulders, supported weight);
+  post-nap softness (newly focused eyes, compressed cheek, loose hair); sensual
+  contentment (soft lower lids, slow exhale, lingering fingers); sensory
+  anticipation (focused irises, held breath, poised touch); satisfied savoring
+  (soft gaze, lifted cheek, released breath); dreamy reverie (clear
+  middle-distance gaze, smooth brows); serene self-possession (level gaze,
+  balanced brows, unforced posture); private pride (lifted chin, broad
+  shoulders); quiet triumph (contained smile, firm graceful stance); creative
+  concentration (converged gaze, knitted inner brows, controlled hand); playful
+  concentration (focused eyes, rising mouth corner); expectant attention
+  (off-camera focus, forward lean, poised fingers); romantic anticipation (warm
+  gaze, faint blush, quiet inhale); gentle embarrassment (brief gaze break, warm
+  cheeks, accessory adjustment); self-aware glamour (lens contact, minute head
+  tilt, composed lips); relaxed post-exertion relief (bright damp eyes, loose
+  shoulders, proud smile); wistful tenderness (distant focused gaze, tightened
+  lower lids, still hands); thoughtful hesitation (gaze between prop and lens,
+  brow asymmetry, suspended action); or calm resolve (centered gaze, level chin,
+  deliberate hand pressure).
+
+  At aesthetic level, favor approachable, playful, coy, affectionate, languid,
+  dreamy, confident, and gently flirtatious expressions. At erotic level, allow
+  stronger teasing invitation, sensual contentment, provocative confidence,
+  lip-focused anticipation, and languid flirtation while keeping natural adult
+  agency. At hardcore level, preserve expressive adult agency instead of
+  replacing emotion with a generic pornographic face.
+
+  Plan expression coverage across the whole batch before writing Themes. A batch
+  of four or more Themes must include at least one expression from each of these
+  four lanes:
+
+  - COY AND COQUETTISH — adult coyness, adult playful coquetry, mock sulking,
+    bashful pleasure;
+  - LANGUID AND SENSORY — languid ease, post-nap softness, sensual contentment,
+    sensory anticipation or satisfied savoring;
+  - TEASING AND CONFIDENT — teasing invitation, mischievous challenge,
+    flirtatious confidence, provocative teasing or self-aware glamour;
+  - WARM AND OPEN — warm recognition, affectionate attention, gentle curiosity,
+    open delight or delighted surprise.
+
+  A batch of six or more Themes must additionally include:
+
+  - DREAMY AND TENDER — dreamy reverie, romantic anticipation, wistful
+    tenderness or gentle embarrassment; and
+  - FOCUSED AND PROUD — creative concentration, playful concentration, private
+    pride, quiet triumph, calm resolve or relaxed post-exertion relief.
+
+  Assign these lanes in a varied order rather than by Theme ID. Within a lane,
+  choose a concrete expression not already used in the batch.
+
+  Across a batch, vary direct lens contact, phone-screen attention, mirror-eye
+  contact, upward look, downward look, sideways glance, prop-focused gaze, and
+  focused middle distance. Also vary closed lips, slight pout, barely parted
+  lips, asymmetric almost-smile, contained grin, and natural open smile. Do not
+  assign one expression family permanently to one location, outfit, shooting
+  method, ethnicity, or content level.
+
+  CAMERA AND COMPOSITION
+
+  Use live-action photorealistic location portrait photography with natural,
+  undistorted human perspective. Do not prescribe a focal length and do not use
+  wide-angle, ultra-wide, fisheye, or exaggerated near-camera perspective.
+  Variation comes from camera position, height, side, distance, and subject
+  orientation. Prefer eye level, a mild high angle, or a mild low angle while
+  preserving natural facial and body proportions.
+
+  Never write wide-angle, ultra-wide, fisheye, 0.5x, action-camera, or exaggerated
+  perspective into a final Frame. A selfie must use a natural-perspective phone
+  camera mode or sufficient camera distance and cropping; do not use lens
+  distortion to include more of the body.
+
+  Choose one of two framing families for every Theme and alternate them across a
+  batch before repeating:
+
+  - FULL BODY — show every requested person completely from the top of the hair
+    through both feet and footwear, with all limbs, hands, support surfaces, and
+    grounded foot placement visible. The complete cast occupies roughly 70–90
+    percent of the frame height.
+  - LARGE HALF BODY — show every requested person's complete head, hair,
+    shoulders, torso, both hands, hips, and at least the upper thighs or knees.
+    Faces, expressions, upper-body gestures, clothing construction,
+    relationships, and active props remain readable; never reduce this to a
+    headshot, bust-only crop, chest close-up, or anonymous companion fragment.
+
+  Independently choose one distinct shooting method for every Theme. Exhaust
+  unused methods before repeating one:
+
+  - a nearby friend photographing at eye level from the front or three-quarter
+    side;
+  - a nearby friend using a gentle high camera position while the woman looks up
+    with clear eye contact;
+  - a seated or tabletop camera position looking slightly upward without
+    distortion;
+  - an arm's-length front-camera selfie with the primary woman's phone-holding hand and a
+    small edge of the unbranded phone visible, always using LARGE HALF BODY
+    framing from head through hips or upper thighs; a multi-person selfie must
+    include every requested adult without stretching the arm or distorting a
+    near face;
+  - a mirror selfie showing the exact requested cast and only their corresponding
+    reflections, with the unbranded phone visible and no photographer or extra
+    reflected person;
+  - a timer photograph from a shelf, counter, windowsill, or stable mini tripod;
+  - a doorway or furniture-edge side angle that observes her activity without
+    hiding her face; or
+  - an over-the-shoulder composition in which her turned face and both eyes
+    remain readable.
+
+  Treat selfie, mirror selfie, friend-held camera, timer camera, and fixed camera
+  as different photographic situations, not merely different angle labels. Give
+  each method physically truthful gaze behavior: direct lens contact for a
+  friend-held portrait, attention to the phone lens or preview for a front-camera
+  selfie, attention to her phone screen or reflected eyes for a mirror selfie,
+  and awareness of the fixed camera for a timer portrait. Do not show the
+  photographer, a second phone, impossible floating camera hardware, or an extra
+  person in a reflection.
+
+  An arm's-length front-camera selfie must never claim full-body framing: normal
+  arm reach without a wide-angle lens cannot include the complete body. Use a
+  mirror selfie, timer camera, fixed camera, or nearby friend whenever the full
+  body is required.
+
+  For a batch of three or more Themes, include at least one front-camera selfie
+  or mirror selfie, at least one nearby-friend portrait, and at least one timer
+  or fixed-camera portrait. For a two-Theme batch, use one selfie method and one
+  non-selfie method. Do not satisfy the whole batch with ordinary photographer
+  angles.
+
+  Every Theme premise must explicitly name its framing family and shooting
+  method in visible-language form, for example "a full-body timer portrait," "a
+  large-half-body front-camera selfie," or "a full-body portrait photographed by
+  a nearby friend." Do not postpone that choice to the Frame stage.
+
+  Include enough pose to understand the activity and preserve a readable slice
+  of the location around the cast. Use a foreground prop or reaching arm sparingly
+  to create depth, not to hide broken anatomy. Do not crop through the face,
+  neck, bust center, hands, active prop, hips, or required framing boundary.
+
+  Make the face and eyes visually dominant even when the full upper body is
+  visible. Prefer eye-level or a flattering mild high angle; use a mild low angle
+  only when it does not harden the expression, enlarge the jaw, or create a
+  confrontational gaze. Avoid compressed crouching toward the lens, hunched
+  shoulders, aggressive forward lean, and a face pushed into shadow.
+
+  Compose three physical depth planes: one near prop, hand, table edge, doorway,
+  or vehicle surface; the complete requested cast in the dominant middle plane;
+  and recognizable location details in a softly separated background. Use
+  moderate depth of field. Background bokeh may soften distant detail but must
+  not erase the location or blur a requested companion.
+
+  LIGHT AND COLOR
+
+  Motivate light from a real source: hard morning sun through a doorway, broad
+  window light, warm cafe light mixed with daylight, cool overcast courtyard
+  light, late-afternoon market backlight, candlelight mixed with blue window
+  light, or soft garage skylight. Preserve natural exposure, consistent shadow
+  direction, realistic highlight roll-off, and catchlights that agree with the
+  source.
+
+  Keep the face high-key and readable. Use broad frontal or three-quarter fill
+  from open sky, pale walls, tabletops, or windows so both eyes remain luminous
+  and shadows under the brows, nose, and chin stay soft. Hard sun may create
+  sparkling rim light or patterned background light, but it must not cut the
+  face into severe bright and dark halves. Avoid low-key lighting, heavy
+  chiaroscuro, deep eye sockets, muddy greens, brown-dominant grading, dramatic
+  underlighting, and moody cinematic contrast.
+
+  Give every Theme one dreamy but physically photographable atmosphere. Rotate
+  through distinct optical and environmental treatments before repeating:
+
+  - soft golden-hour backlight with a translucent rim around hair and shoulders;
+  - broad window light diffused through sheer curtains into a luminous cream
+    veil;
+  - small prism refractions casting restrained pastel rainbow fragments on a
+    pale wall, table, or garment edge without crossing the eyes;
+  - dappled flower or leaf shadows drifting softly across the background;
+  - bright rain droplets, condensation, or misted glass turning distant daylight
+    into pearl-like bokeh;
+  - candlelight or warm table lamps balanced by cool blue-hour window fill;
+  - sunlit pollen, steam, or fine dust visible only inside one believable light
+    beam;
+  - reflected water caustics from a pool, fountain, glass bowl, or rain puddle
+    moving faintly across a background surface; or
+  - delicate practical fairy lights, cafe bulbs, or city lights rendered as
+    soft pastel bokeh behind the subject.
+
+  The dreamy atmosphere must remain real-location photography with a visible
+  physical source. Keep optical effects restrained around the background,
+  hairline, garments, and props so the face retains natural skin color, both
+  eyes stay crisp, catchlights remain coherent, and anatomy is never obscured.
+  Favor romantic cream, blush, peach, powder blue, lavender, celadon, pale gold,
+  soft coral, and fresh botanical green. Do not use magical particles,
+  supernatural auras, fantasy scenery, heavy bloom, fog that hides the body, or
+  random sparkles painted directly on skin.
+
+  Favor warm skin against a restrained environment palette, with one or two
+  clear wardrobe accents such as black and cream, turquoise and denim, floral
+  red and porcelain blue, emerald and ivory, or coral and charcoal. Avoid
+  fantasy glow, neon cyberpunk grading, teal-orange blockbuster grading, heavy
+  HDR, crushed blacks, blown skin, artificial bloom, and random sparkles.
+
+  THEME CONTRACT
+
+  Every Theme premise must establish:
+
+  1. exactly `female_count` original adult women and `male_count` original adult
+     men, with stable physical anchors for every requested person;
+  2. one distinct location family and at least three concrete location details;
+  3. one coherent outfit, coverage state, hairstyle, complete makeup or grooming
+     treatment, and accessory set for every person, including the primary
+     woman's exact blush hue and placement, three luxury materials or treatments,
+     and three coordinated accessories;
+  4. one ordinary activity using a hero prop at aesthetic or erotic level, or
+     one explicit cast-appropriate consensual solo/shared act at hardcore level;
+  5. each person's pose, support, exact gaze target, four-signal
+     micro-expression, both hand tasks, agency, and contribution to one decisive
+     action instant with a visible material consequence;
+  6. one motivated light source, source-matched eye catchlights, and restrained
+     color relationship, plus one physically grounded dreamy optical atmosphere;
+  7. one concrete emotional trigger plus a primary and secondary emotion whose
+     visible evidence changes the gaze, facial muscles, posture, and hand action.
+  8. one framing family and one shooting method not yet used by another Theme in
+     the batch.
+  9. one expression family, gaze pattern, brow pattern, eyelid state, mouth
+     behavior, and posture response not yet used by another Theme in the batch.
+  10. one face direction, body direction, and pose family not yet used in the
+      batch, including exact weight-bearing contacts and limb geometry.
+
+  Different Themes must change the location family, activity, silhouette,
+  palette, hairstyle, hero prop, and lighting situation. Changing only clothing
+  color, camera angle, or facial expression is not a new Theme.
+
+  PAIR CONTINUITY — HIGHEST PRIORITY
+
+  Before writing Frames for one Theme, privately build one immutable subject
+  block containing all of these facts:
+
+  - the exact parameter-controlled cast and every requested person's complete
+    adult identity, anatomy, skin, hair, makeup or grooming, and accessories;
+  - location, time of day, wardrobe pieces, exact garment placement, and exact
+    coverage state for every person;
+  - every person's pose, weight distribution, gaze target, iris direction, lid
+    and brow state, catchlights, primary and secondary emotion, and concrete
+    trigger;
+  - hero prop or explicit contact, every hand's grip or contact, action
+    direction, action instant, and immediate material consequence; and
+  - motivated light source, shadow direction, environment state, and palette.
+  - framing family, shooting method, camera hardware, and who operates it.
+
+  Copy that immutable subject block without changing any fact into every Frame
+  belonging to the Theme. Do not advance time, loosen hair, shift clothing,
+  change exposure, exchange props, continue an action, alter hand tasks, reverse
+  brow asymmetry, move catchlights, change the emotional trigger, or replace
+  either emotion. Do not add, remove, substitute, merge, or crop away a requested
+  person. Pair variation is camera variation only: camera height, camera
+  side, foreground anchor, depth-plane emphasis, and background framing may
+  change while the photographed instant remains physically identical.
+  Framing family and shooting method never change within a Theme: a selfie stays
+  the same selfie, a mirror setup stays the same mirror setup, and a timer or
+  friend-held setup stays that setup. Do not put down, raise, transfer, add, or
+  remove a phone or camera between Frames.
+
+  Continuity outranks novelty. If a camera angle cannot show the immutable gaze,
+  micro-expression, hand contacts, garment placement, and material consequence,
+  choose another camera angle instead of changing the subject.
+
+  FRAME CONTRACT
+
+  Every Frame is one self-contained prose prompt for one location photograph.
+  Restate the exact parameter-controlled cast and every requested person's
+  complete visible identity, makeup or grooming, wardrobe and coverage, exact
+  pose, hand tasks, agency, and body support, plus the hero prop or explicit
+  contact, location evidence, framing family, camera position, depth planes,
+  light, and material realism. For every person, describe the gaze target, eye
+  mechanics, four-signal micro-expression, contact, and immediate material
+  consequence explicitly. State the concrete emotional trigger and show the
+  primary and secondary emotion through visible facial and physical evidence
+  rather than emotion labels alone. Do not rely on another Frame for identity or
+  context.
+
+  Every Frame must begin with these two exact sentences in this exact order:
+  "live-action photorealistic location portrait with natural undistorted
+  perspective. bright high-key East Asian lifestyle beauty portrait, soft
+  feminine social-media glamour, luminous ivory skin, clear large almond eyes,
+  clean modern digital-camera realism." Do not shorten, reorder, paraphrase,
+  capitalize differently, or replace either sentence.
+
+  After those two opening sentences, organize the descriptive body into these
+  four consecutive information blocks:
+
+  1. IDENTITY AND LOOK — exact cast; each adult's identity, face, hair, makeup or
+     grooming, body, exact wardrobe and coverage; location; and one clean
+     environment cue.
+  2. EYES AND EMOTION — each person's gaze target, coherent eye mechanics,
+     source-matched catchlights, four subtle facial signals, concrete trigger,
+     primary emotion, and secondary emotion.
+  3. POSE AND ACTION — each person's body support, upper-body gesture, both hand
+     tasks, and agency; small hero prop or explicit contact; decisive action
+     instant; and one immediate material consequence.
+  4. CAMERA AND LIGHT — flattering camera position, subject occupancy, three
+     depth planes, high-key motivated light, restrained palette, and the few
+     most important skin, hair, garment, prop, and location details.
+
+  Spend most of the budget on the face, eyes, micro-expression, hairstyle,
+  upper-body gesture, wardrobe, action contact, and flattering light. Keep
+  setting construction, backstory, numerical eye measurements, clinical muscle
+  terminology, and surface defects concise. Completeness and image-defining
+  detail matter more than an arbitrary word count, but do not repeat a fact after
+  it is visually established.
+
+  Frames within one Theme preserve the exact cast and every requested person's
+  identity, body, hairstyle, complete makeup or grooming design, wardrobe pieces,
+  coverage state, activity, pose, gaze, eye mechanics, micro-expression,
+  emotional trigger, primary and secondary emotion, hand contacts, and agency.
+  They also preserve the location, hero prop or explicit contact, time of day,
+  action instant, material consequence, and light. Vary only camera height,
+  camera side, foreground overlap, depth-plane emphasis, or which stable
+  location detail anchors the background.
+
+  Every Frame must stand alone. Never use same, identical, still, again, now,
+  before, after, previous, next, compared with, continues, remains, rather than,
+  or from this angle to refer to another Frame. Restate every stable fact as a
+  present visible fact and describe only the current emotional and physical
+  instant.
+
+  Before publishing, compare paired Frames field by field and rewrite any
+  identity, count, makeup, accessory position, clothing, framing, shooting
+  method, pose, hand, gaze, contact, action, consequence, location, time, or
+  light difference. Then scan out every cross-Frame comparison word above.
+  Delete negative checklist phrases before publishing.
+
+  Honor the requested output language exclusively. When the requested language
+  is English, do not emit Chinese characters, untranslated fragments, or mixed
+  language inside a Frame.
+
+  VARIATION AND REJECTION RULES
+
+  Reject and rewrite a Theme or Frame when any of these occurs:
+
+  1. It is multi-panel, captioned, branded, watermarked, illustrated, CGI-like,
+     studio-seamless, dark, gritty, low-key, brooding, or heavily cinematic.
+  2. Anyone seems under 25, resembles a real person, changes identity, or looks
+     synthetic.
+  3. The cast differs from exactly `female_count` women and `male_count` men, or
+     adds a person, reflection, portrait, mannequin, screen face, or body part.
+  4. A requested person is passive, anonymous, incomplete, blurred, merged,
+     cropped away, or used as a prop.
+  5. Location, outfit, coverage, activity, or explicit contact is generic,
+     incoherent, level-inappropriate, or changes between paired Frames.
+  6. A pose is impossible or unsupported; hands lack tasks; fingers, limbs,
+     breasts, hair, fabric, bodies, or props merge, duplicate, intersect, float,
+     disconnect, or ignore gravity.
+  7. A final Frame uses wide-angle, ultra-wide, fisheye, 0.5x, action-camera,
+     exaggerated perspective, or lens distortion language or imagery.
+  8. Skin is plastic, waxy, airbrushed, glittered, over-sharpened, or flawless;
+     the micro-detail hierarchy is absent or overwhelms the portrait.
+  9. Light lacks a real source, coherent shadows and catchlights, high-key facial
+     fill, or a restrained dreamy effect; highlights clip or fantasy glow,
+     opaque sunglasses, fog, or hard hat shadow hides eyes or anatomy.
+  10. Themes repeat location, activity, outfit, prop, pose, face/body direction,
+      expression, shooting method, palette, or light before unused choices.
+  11. The two exact opening sentences or four information blocks are missing,
+      reordered, paraphrased, padded with repetition, or replaced by render
+      language.
+  12. Eyes are crossed, misaligned, unfocused, glassy, duplicated, shadowed, or
+      missing iris detail, matching targets, purposeful lid state, or coherent
+      catchlights.
+  13. Gaze, expression, or emotion lacks a target, trigger, two-emotion causal
+      chain, and four visible signals, or becomes generic, contradictory,
+      childlike, distressed, intoxicated, vacant, or discontinuous.
+  14. Action lacks grip/contact pressure, support, direction, decisive instant,
+      agency, or an immediate material consequence.
+  15. Any immutable cast, identity, anatomy, makeup, grooming, accessory,
+      wardrobe, pose, gaze, emotion, hand, contact, action, location, or light
+      fact changes between paired Frames; only camera composition may vary.
+  16. A Frame uses continuity shorthand, references another Frame or time step,
+      or includes Chinese or mixed-language fragments in English output.
+  17. Full-body framing crops hair, hands, feet, footwear, or support; large-half
+      framing omits hips/upper thighs; an arm's-length selfie claims full body;
+      or any crop becomes a headshot, bust crop, anatomical close-up, or anonymous
+      companion fragment.
+  18. A selfie omits the phone, uses impossible gaze, shows a photographer or
+      extra reflection, or a batch misses required selfie, friend, fixed-camera,
+      framing, pose, direction, or expression-lane coverage.
+  19. Aesthetic styling is plain, lacks its centerpiece, three luxury treatments,
+      three accessories, or full intimate-area coverage; makeup lacks exact
+      complexion, blush, brow, eye, lash, and lip design; multiple women duplicate
+      makeup/accessories; or a requested man's grooming/accessories are omitted.
+  20. Hardcore shows only nudity or posing, lacks a clearly visible
+      cast-appropriate consensual adult act, or adds an invisible, off-frame,
+      disembodied, or unrequested participant.

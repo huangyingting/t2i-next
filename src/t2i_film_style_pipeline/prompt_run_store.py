@@ -28,11 +28,11 @@ from t2i_film_style_pipeline.prompt_models import (
     FilmPromptResult,
     FilmPromptRuleSet,
     FilmPromptStage,
+    NarrativeFrame,
     NarrativeFrameSequence,
     NarrativeTheme,
     SemanticName,
     TokenUsage,
-    exact_frame_sequence_model,
 )
 from t2i_film_style_pipeline.prompt_persistence import durable_mkdir, fsync_directory
 from t2i_film_style_pipeline.prompt_provider import FilmPromptProviderSettings
@@ -157,11 +157,6 @@ class ThemeOutputMode(StrEnum):
     STRUCTURED_WITHOUT_IDS = "structured_without_ids"
 
 
-class FrameOutputMode(StrEnum):
-    STRUCTURED_SEQUENCE = "structured_sequence"
-    INDIVIDUAL_TEXT = "individual_text"
-
-
 class FilmPromptRunSettings(_Model):
     provider: FilmPromptProviderSettings
     concurrency: int = Field(default=8, ge=1, le=32)
@@ -170,7 +165,6 @@ class FilmPromptRunSettings(_Model):
     theme_output_tokens: int = Field(default=6000, ge=512, le=65536)
     frame_output_tokens: int = Field(default=32768, ge=512, le=65536)
     theme_output_mode: ThemeOutputMode = ThemeOutputMode.STRUCTURED_WITH_IDS
-    frame_output_mode: FrameOutputMode = FrameOutputMode.STRUCTURED_SEQUENCE
 
 
 class FilmPromptRunManifest(_Model):
@@ -456,11 +450,11 @@ class LocalFilmPromptRunStore:
             )
         self._touch_manifest(directory)
 
-    def checkpoint_frames(
+    def checkpoint_frame(
         self,
         run_id: str,
         theme_id: str,
-        sequence: NarrativeFrameSequence,
+        frame: NarrativeFrame,
     ) -> None:
         try:
             directory = self._run_directory(run_id)
@@ -471,26 +465,26 @@ class LocalFilmPromptRunStore:
                 raise FilmStyleStorageError(
                     f"Frame checkpoint 缺少 Theme checkpoint：{theme_id}"
                 )
-            expected_ids = [
+            expected_ids = {
                 f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
-            ]
-            actual_ids = [frame.frame_id for frame in sequence.frames]
-            if actual_ids != expected_ids:
+            }
+            if frame.frame_id not in expected_ids:
                 raise FilmStyleStorageError(
-                    f"{theme_id} Frame checkpoint ID 不匹配："
-                    f"expected={expected_ids}, actual={actual_ids}"
+                    f"{theme_id} Frame checkpoint ID 不匹配：{frame.frame_id}"
                 )
-            checkpoint = directory / "frames" / f"{theme_id}.json"
+            frame_directory = directory / "frames" / theme_id
+            durable_mkdir(frame_directory)
+            checkpoint = frame_directory / f"{frame.frame_id}.json"
             if checkpoint.exists():
-                persisted = NarrativeFrameSequence.model_validate_json(
+                persisted = NarrativeFrame.model_validate_json(
                     checkpoint.read_text(encoding="utf-8")
                 )
-                if persisted != sequence:
+                if persisted != frame:
                     raise FilmStyleStorageError(
-                        f"{theme_id} Frame checkpoint 已存在且内容不同"
+                        f"{theme_id}-{frame.frame_id} checkpoint 已存在且内容不同"
                     )
                 return
-            _write_json(checkpoint, sequence.model_dump(mode="json"))
+            _write_json(checkpoint, frame.model_dump(mode="json"))
             self._touch_manifest(directory)
         except FilmStyleStorageError:
             raise
@@ -689,25 +683,42 @@ class LocalFilmPromptRunStore:
         themes: tuple[NarrativeTheme, ...],
     ) -> dict[str, NarrativeFrameSequence]:
         theme_ids = {theme.theme_id for theme in themes}
-        expected_frame_ids = [
+        expected_frame_ids = {
             f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
-        ]
+        }
         frames: dict[str, NarrativeFrameSequence] = {}
-        response_model = exact_frame_sequence_model(request.frames_per_theme)
-        for path in sorted((directory / "frames").glob("T*.json")):
-            if path.stem not in theme_ids:
+        for theme_directory in sorted((directory / "frames").glob("T*")):
+            if not theme_directory.is_dir():
                 raise FilmStyleStorageError(
-                    f"Frame checkpoint 缺少 Theme checkpoint：{path.name}"
+                    f"Frame checkpoint 使用了已废弃的文件格式：{theme_directory.name}"
                 )
-            sequence = response_model.model_validate_json(
-                path.read_text(encoding="utf-8")
-            )
-            actual_ids = [frame.frame_id for frame in sequence.frames]
-            if actual_ids != expected_frame_ids:
+            if theme_directory.name not in theme_ids:
                 raise FilmStyleStorageError(
-                    f"{path.stem} Frame checkpoint ID 损坏：{actual_ids}"
+                    f"Frame checkpoint 缺少 Theme checkpoint：{theme_directory.name}"
                 )
-            frames[path.stem] = sequence
+            sequence_frames: list[NarrativeFrame] = []
+            for path in sorted(theme_directory.glob("F*.json")):
+                frame = NarrativeFrame.model_validate_json(
+                    path.read_text(encoding="utf-8")
+                )
+                if path.stem != frame.frame_id:
+                    raise FilmStyleStorageError(
+                        f"Frame checkpoint 文件名与内容不匹配：{path.name}"
+                    )
+                sequence_frames.append(frame)
+            actual_ids = [frame.frame_id for frame in sequence_frames]
+            if (
+                len(actual_ids) != len(set(actual_ids))
+                or not set(actual_ids).issubset(expected_frame_ids)
+                or actual_ids != sorted(actual_ids)
+            ):
+                raise FilmStyleStorageError(
+                    f"{theme_directory.name} Frame checkpoint ID 损坏：{actual_ids}"
+                )
+            if sequence_frames:
+                frames[theme_directory.name] = NarrativeFrameSequence(
+                    frames=sequence_frames
+                )
         return frames
 
     def _load_completed(
@@ -738,7 +749,14 @@ class LocalFilmPromptRunStore:
             raise FilmStyleStorageError(
                 "已完成 run 的 semantic_name 与 manifest 不匹配"
             )
-        if len(themes) != request.theme_count or len(frames) != request.theme_count:
+        if (
+            len(themes) != request.theme_count
+            or len(frames) != request.theme_count
+            or any(
+                len(sequence.frames) != request.frames_per_theme
+                for sequence in frames.values()
+            )
+        ):
             raise FilmStyleStorageError("已完成 run 的 checkpoint 不完整")
         expected_themes = [(theme, frames[theme.theme_id].frames) for theme in themes]
         actual_themes = [(item.theme, item.frames) for item in result.themes]

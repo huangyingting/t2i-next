@@ -185,6 +185,23 @@ def test_prompt_request_uses_short_director_filename() -> None:
     assert prompt_request.source_prompt_stem is None
 
 
+def test_prompt_request_accepts_explicit_english_filename() -> None:
+    request = FilmStylePromptRequest(
+        film_style=make_request(),
+        output_filename_stem="Zhang_Yimou",
+    )
+
+    prompt_request = request.prompt_request("BRIEF\n\nDirector scene context")
+
+    assert prompt_request.prompt_filename_stem == "Zhang_Yimou"
+
+    with pytest.raises(ValidationError, match="string_pattern_mismatch"):
+        FilmStylePromptRequest(
+            film_style=make_request(),
+            output_filename_stem="张艺谋",
+        )
+
+
 def test_profile_rejects_image_geometry() -> None:
     payload = make_profile().model_dump()
     payload["composition"] = "采用方形画幅和中轴对称。"

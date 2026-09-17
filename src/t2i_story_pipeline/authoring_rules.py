@@ -7,6 +7,7 @@ from pathlib import Path
 from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.models import (
     OutputLanguage,
+    StoryAuthoring,
     StoryRequest,
     StoryRuleSet,
     StoryStage,
@@ -23,6 +24,7 @@ def resolve_story_rules(
     request: StoryRequest,
     *,
     user_directory: Path | None = None,
+    authoring: StoryAuthoring | None = None,
 ) -> StoryRuleSet:
     """Compile the ordered system and optional user rules for a new run."""
     system_directory = _require_directory(
@@ -40,12 +42,14 @@ def resolve_story_rules(
             request,
             system_directory,
             resolved_user_directory,
+            authoring or StoryAuthoring(),
         ),
         frames=_compile(
             StoryStage.FRAMES,
             request,
             system_directory,
             resolved_user_directory,
+            authoring or StoryAuthoring(),
         ),
     )
 
@@ -55,6 +59,7 @@ def _compile(
     request: StoryRequest,
     system_directory: Path,
     user_directory: Path | None,
+    authoring: StoryAuthoring,
 ) -> tuple[str, ...]:
     rules = [
         rule
@@ -67,6 +72,9 @@ def _compile(
             for path in _selected_paths(user_directory, stage, request)
             for rule in _read_rule_file(path, required=False)
         )
+    rules.extend(
+        authoring.themes if stage == StoryStage.THEMES else authoring.frames
+    )
     rules.append(_output_language_rule(request))
     return tuple(rules)
 

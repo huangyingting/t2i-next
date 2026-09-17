@@ -8,6 +8,7 @@ from t2i_story_pipeline.models import (
     NarrativeThemeBatch,
     NarrativeThemeResult,
     OutputLanguage,
+    StoryQualityReport,
     StoryRequest,
     StoryResult,
     TokenUsage,
@@ -132,4 +133,5 @@ def make_story_result(
             for index in range(1, theme_count + 1)
         ],
         usage=TokenUsage(total_tokens=30),
+        quality=StoryQualityReport(mode="report", status="skipped", issues=[]),
     )

@@ -17,6 +17,7 @@ from t2i_story_pipeline.errors import (
 )
 from t2i_story_pipeline.models import (
     NarrativeThemeDraftBatch,
+    StoryQualityPolicy,
     StoryStage,
     TokenUsage,
 )
@@ -664,3 +665,105 @@ async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
     assert snapshot.frames == {}
     with store.lock(snapshot.run_id):
         pass
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["off", "report"])
+async def test_optional_quality_never_retries_in_off_or_report_mode(tmp_path, mode):
+    model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
+    policy = StoryQualityPolicy(
+        mode=mode, checks=[{"type": "required_text", "values": ["MISSING ANCHOR"]}]
+    )
+    completed = await make_studio(model, tmp_path, quality=policy).run(
+        make_story_request()
+    )
+    assert len(model.stages) == 2
+    assert completed.result.quality.status == (
+        "skipped" if mode == "off" else "warnings"
+    )
+    expected_count = 0 if mode == "off" else 2
+    assert len(completed.result.quality.issues) == expected_count
+    store = LocalStoryRunStore(tmp_path / "runs")
+    attempt = store.attempts(completed.run_id)[-1]
+    assert attempt.outcome == StoryAttemptOutcome.ACCEPTED
+    assert attempt.issues == []
+    assert len(attempt.quality_issues) == expected_count
+    assert store.inspect(completed.run_id).completed.result.quality == (
+        completed.result.quality
+    )
+    assert "MISSING ANCHOR" not in model.messages[1][1].content
+    assert "quality" not in json.loads(model.messages[1][1].content)
+
+
+@pytest.mark.asyncio
+async def test_enforced_quality_retries_with_evidence_and_saves_clean_report(tmp_path):
+    bad_sequence = make_frame_sequence()
+    good_sequence = make_frame_sequence()
+    for frame in good_sequence.frames:
+        frame.prose += " 银色站钟。"
+    model = FakeStoryModel([make_theme_batch(), bad_sequence, good_sequence])
+    policy = StoryQualityPolicy(
+        mode="enforce", checks=[{"type": "required_text", "values": ["银色站钟"]}]
+    )
+    completed = await make_studio(model, tmp_path, quality=policy).run(
+        make_story_request()
+    )
+    assert len(model.stages) == 3
+    assert "银色站钟" in model.messages[2][-1].content
+    assert "T001-F01" in model.messages[2][-1].content
+    assert completed.result.quality.status == "passed"
+    assert completed.result.quality.issues == []
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
+    assert attempts[1].outcome == StoryAttemptOutcome.REJECTED
+    assert len(attempts[1].quality_issues) == 2
+    assert attempts[2].quality_issues == []
+
+
+@pytest.mark.asyncio
+async def test_quality_enforcement_exhaustion_does_not_publish(tmp_path):
+    model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
+    policy = StoryQualityPolicy(
+        mode="enforce", checks=[{"type": "required_text", "values": ["absent"]}]
+    )
+    with pytest.raises(StoryRunIncompleteError):
+        await make_studio(
+            model, tmp_path, quality=policy, generation_retries=0
+        ).run(make_story_request())
+    store = LocalStoryRunStore(tmp_path / "runs")
+    run_id = store.list_runs().runs[0].run_id
+    snapshot = store.inspect(run_id)
+    assert snapshot.manifest.status == StoryRunStatus.FAILED
+    assert snapshot.manifest.settings.quality == policy
+    assert snapshot.frames == {}
+    assert not list((tmp_path / "prompts").rglob("*.txt"))
+
+
+@pytest.mark.asyncio
+async def test_quality_off_keeps_structured_output_contract_and_retry(tmp_path):
+    model = FakeStoryModel([
+        make_theme_batch(),
+        StoryStructuredOutputError(
+            "invalid schema", raw_content="{}", usage=TokenUsage(),
+            validation_issues=("frames missing",),
+        ),
+        make_frame_sequence(),
+    ])
+    completed = await make_studio(
+        model, tmp_path, quality=StoryQualityPolicy(mode="off")
+    ).run(make_story_request())
+    assert len(model.stages) == 3
+    assert completed.result.quality.status == "skipped"
+
+
+@pytest.mark.asyncio
+async def test_quality_report_tampering_is_a_storage_error(tmp_path):
+    from t2i_story_pipeline.errors import StoryStorageError
+
+    completed = await make_studio(
+        FakeStoryModel([make_theme_batch(), make_frame_sequence()]), tmp_path
+    ).run(make_story_request())
+    payload = json.loads(completed.result_file.read_text(encoding="utf-8"))
+    payload["quality"]["status"] = "passed"
+    completed.result_file.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(StoryStorageError, match="质量报告"):
+        LocalStoryRunStore(tmp_path / "runs").inspect(completed.run_id)

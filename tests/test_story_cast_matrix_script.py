@@ -2,15 +2,88 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
+
+
+@pytest.mark.parametrize("has_uv", [True, False])
+def test_preflight_uses_project_environment_not_path_python(tmp_path, has_uv):
+    project = tmp_path / "project"
+    scripts = project / "scripts"
+    scripts.mkdir(parents=True)
+    script = scripts / "generate-story-cast-matrix.sh"
+    shutil.copy2(
+        Path(__file__).resolve().parents[1] / "scripts" / script.name, script
+    )
+    document = tmp_path / "story.yaml"
+    document.write_text("id: story\ndescription: Story.\n", encoding="utf-8")
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    for name in ("dirname", "basename"):
+        executable = shutil.which(name)
+        assert executable is not None
+        (bin_dir / name).symlink_to(executable)
+    for name in ("python", "python3"):
+        executable = bin_dir / name
+        executable.write_text(
+            '#!/bin/sh\nprintf unexpected > "$SYSTEM_PYTHON_LOG"\nexit 91\n',
+            encoding="utf-8",
+        )
+        executable.chmod(0o755)
+    if has_uv:
+        uv = bin_dir / "uv"
+        uv.write_text(
+            '#!/bin/sh\n'
+            '[ "$1" = run ] && [ "$2" = python ] || exit 90\n'
+            'printf "%s" "$PWD" > "$PREFLIGHT_LOG"\n',
+            encoding="utf-8",
+        )
+        uv.chmod(0o755)
+    cli = bin_dir / "fake-story"
+    cli.write_text(
+        '#!/bin/sh\nprintf "run\\n" >> "$CALLS_FILE"\n', encoding="utf-8"
+    )
+    cli.chmod(0o755)
+    calls = tmp_path / "calls"
+    preflight = tmp_path / "preflight"
+    system_python = tmp_path / "system-python"
+    result = subprocess.run(
+        ["/bin/bash", str(script), str(document)],
+        cwd=tmp_path,
+        env={
+            **os.environ,
+            "PATH": str(bin_dir),
+            "T2I_STORY_CLI": str(cli),
+            "CALLS_FILE": str(calls),
+            "PREFLIGHT_LOG": str(preflight),
+            "SYSTEM_PYTHON_LOG": str(system_python),
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert not system_python.exists()
+    if has_uv:
+        assert result.returncode == 0, result.stderr
+        assert preflight.read_text(encoding="utf-8") == str(project)
+        assert calls.read_text(encoding="utf-8").splitlines() == ["run"] * 5
+    else:
+        assert result.returncode == 2
+        assert ".venv/bin/python or uv" in result.stderr
+        assert not calls.exists()
 
 
 def test_story_cast_matrix_script_runs_all_requested_casts(tmp_path) -> None:
     repo_root = Path(__file__).resolve().parents[1]
     script = repo_root / "scripts" / "generate-story-cast-matrix.sh"
-    story_file = tmp_path / "story input.txt"
-    story_file.write_text("A story description.", encoding="utf-8")
+    story_file = tmp_path / "story input.yaml"
+    story_file.write_text(
+        "id: story-input\ndescription: |\n  A story description.\n",
+        encoding="utf-8",
+    )
     calls_file = tmp_path / "calls.jsonl"
     fake_cli = tmp_path / "t2i-story"
     fake_cli.write_text(
@@ -72,7 +145,7 @@ def test_story_cast_matrix_script_runs_all_requested_casts(tmp_path) -> None:
     ):
         assert call == [
             "generate",
-            "--prompt-file",
+            "--input",
             str(story_file),
             "--female-count",
             str(female_count),
@@ -129,13 +202,88 @@ def test_story_cast_matrix_script_runs_all_requested_casts(tmp_path) -> None:
     assert len(calls_file.read_text(encoding="utf-8").splitlines()) == 5
 
 
-def test_story_cast_matrix_script_rejects_empty_input_before_generation(
+@pytest.mark.parametrize(
+    ("filename", "content"),
+    [
+        pytest.param("empty.yaml", b" \n", id="empty-document"),
+        pytest.param(
+            "empty-description.yaml",
+            b"id: empty-description\ndescription: '   '\n",
+            id="empty-description",
+        ),
+        pytest.param(
+            "missing-id.yaml",
+            b"description: A story description.\n",
+            id="missing-id",
+        ),
+        pytest.param(
+            "missing-description.yaml",
+            b"id: missing-description\n",
+            id="missing-description",
+        ),
+        pytest.param(
+            "invalid-id.yaml",
+            b"id: Invalid ID\ndescription: A story description.\n",
+            id="invalid-id",
+        ),
+        pytest.param(
+            "invalid-description.yaml",
+            b"id: invalid-description\ndescription: 42\n",
+            id="invalid-description-type",
+        ),
+        pytest.param(
+            "invalid-generation.yaml",
+            b"id: invalid-generation\ndescription: A story description.\n"
+            b"generation:\n  theme_count: 0\n",
+            id="invalid-generation-config",
+        ),
+        pytest.param(
+            "invalid-runtime.yaml",
+            b"id: invalid-runtime\ndescription: A story description.\n"
+            b"runtime:\n  concurrency: 0\n",
+            id="invalid-runtime-config",
+        ),
+        pytest.param(
+            "plain-prose.yaml",
+            b"A story description.\n",
+            id="non-mapping-document",
+        ),
+        pytest.param(
+            "malformed.yaml",
+            b"id: [\ndescription: A story description.\n",
+            id="malformed-yaml",
+        ),
+        pytest.param(
+            "invalid-encoding.yaml",
+            b"id: invalid-encoding\ndescription: \xff\n",
+            id="invalid-utf8",
+        ),
+        pytest.param(
+            "legacy.txt",
+            b"id: legacy\ndescription: A story description.\n",
+            id="legacy-txt-extension",
+        ),
+        pytest.param(
+            "unsupported.yml",
+            b"id: unsupported\ndescription: A story description.\n",
+            id="unsupported-yml-extension",
+        ),
+        pytest.param(
+            "uppercase.YAML",
+            b"id: uppercase\ndescription: A story description.\n",
+            id="uppercase-extension",
+        ),
+    ],
+)
+def test_story_cast_matrix_script_rejects_invalid_documents_before_generation(
     tmp_path,
+    filename: str,
+    content: bytes,
 ) -> None:
     repo_root = Path(__file__).resolve().parents[1]
     script = repo_root / "scripts" / "generate-story-cast-matrix.sh"
-    story_file = tmp_path / "empty.txt"
-    story_file.write_text(" \n\t", encoding="utf-8")
+    story_file = tmp_path / filename
+    story_file.write_bytes(content)
     calls_file = tmp_path / "calls.txt"
     fake_cli = tmp_path / "t2i-story"
     fake_cli.write_text(
@@ -159,5 +307,5 @@ def test_story_cast_matrix_script_rejects_empty_input_before_generation(
     )
 
     assert result.returncode == 2
-    assert "must not be empty" in result.stderr
+    assert "Invalid story document:" in result.stderr
     assert not calls_file.exists()

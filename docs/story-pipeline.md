@@ -13,17 +13,18 @@ store = LocalStoryRunStore(
     Path("runs"),
     Path("prompts"),
 )
+request = StoryRequest(
+    story="故事要求",
+    theme_count=100,
+    frames_per_theme=6,
+    female_count=1,
+    male_count=1,
+    content_level=ContentLevel.AESTHETIC,
+)
 settings = StoryRunSettings(provider=provider_settings)
-completed = await StoryStudio(model, store, settings).run(
-    StoryRequest(
-        story="故事要求",
-        source_prompt_stem=None,
-        theme_count=100,
-        frames_per_theme=6,
-        female_count=1,
-        male_count=1,
-        content_level=ContentLevel.EROTIC,
-    )
+rules = resolve_story_rules(request)
+completed = await StoryStudio(model, store, settings, rules).run(
+    request
 )
 ```
 
@@ -35,6 +36,7 @@ completed = await StoryStudio(
     model,
     LocalStoryRunStore(Path("runs")),
     snapshot.manifest.settings,
+    snapshot.rules,
 ).resume(run_id)
 ```
 
@@ -104,9 +106,106 @@ Theme premise 和每个最终 Frame 都必须逐人明确写出国籍，并明�
 微型故事中选出的不同静止画面，不机械套用建立、加压、发现、结果、余波六阶段。
 篇幅由人物和画面复杂度决定，不设目标字数。
 
-系统没有本地叙事质量门、关键词评分、相似度 gate、review 或 revision。provider
-第一次看到的就是完整创作方向；输出只经过结构契约，不因文风或词语触发额外
-生成调用。
+系统没有模型评审、关键词评分、相似度 gate 或 revision 阶段。默认不选择任何
+额外质量检查，因此仍只执行基础结构契约。Story Document 可以显式选择本地
+Frame 证据检查；这些检查不保证叙事语义正确，也不代替创作规则。
+
+## Story Document
+
+文件输入只接受 UTF-8 `.yaml`，不保留 TXT 解析或旧 CLI 入口。正文仍是自然语言，
+不是字段化视觉规格。最小文档只需要 `id` 和 `description`：
+
+```yaml
+id: rainy-station
+description: |
+  1930年代秋夜，两名成年旅人在旧车站重逢。
+  用克制的现实主义摄影描绘他们辨认彼此的瞬间。
+
+generation:
+  theme_count: 12
+  frames_per_theme: 3
+  content_level: aesthetic
+  output_language: chinese
+  cast:
+    female_count: 1
+    male_count: 1
+
+authoring:
+  themes:
+    - 主题差异来自事件与人物关系，而不是仅更换色调。
+  frames:
+    - 每帧独立描述景别、视角和焦点或景深。
+
+validation:
+  quality:
+    mode: report
+    checks:
+      - type: camera_evidence
+      - type: prose_length
+        min_chars: 100
+        max_chars: 2000
+
+runtime:
+  concurrency: 8
+  generation_retries: 2
+```
+
+`id` 只接受小写字母、数字及单个分隔用的 `-`、`_`，长度不超过 120。
+它作为 `source_prompt_stem` 冻结到请求，文件改名不改变发布名称。
+`description` 去除首尾空白，保留 YAML 多行字符串解析后的内部换行；建议使用 `|`。
+所有未知字段、非法枚举、重复键、anchors、aliases、merge keys、多个 YAML 文档、
+非标准对象标签、错误数值类型和越界参数都会在加载 provider 配置前明确报错。
+
+优先级为：程序默认值 < 文档配置 < **显式** CLI 参数。只覆盖已传入的字段，
+包括数值 `0`；未传的另一侧人物数仍采用文档配置。文档自身必须有效，不能靠 CLI
+修补非法文档。人数最终仍经过 StoryRequest 的总人数与非零阵容契约。
+
+缺省值：1 个主题、每主题 6 帧、aesthetic、chinese、不限定男女数量、8 个并发、
+2 次额外 generation retries。`authoring.themes` 和 `authoring.frames` 是逐条
+单行创作指令，按阶段追加到用户规则之后、输出语言规则之前。运行参数与质量策略
+不会被当成初始创作指令发给模型；若要求模型包含指定内容，也应在正文或 authoring
+中明确表达，而不是只配置检查器。
+
+## 可选质量检查
+
+`validation.quality.mode`（默认 `report`）只控制显式选中的 Frame 检查：
+
+| 模式 | 行为 |
+|---|---|
+| `off` | 跳过可选检查；仍验证配置、schema、数量、ID、非空单段正文和存储契约 |
+| `report` | 记录告警并发布，不因质量问题重试 |
+| `enforce` | 拒绝有问题的输出，反馈具体问题并有界重试；耗尽后保留 checkpoint，不发布 |
+
+`checks` 默认为空；此时状态是 `skipped`，不宣称通过了质量验证。每个检查用带
+`type` 的对象声明，同一种类型只能出现一次，未知类型即使在 `off` 下也会报错。
+当前提供：
+
+- `camera_evidence`：按输出语言检查景别、视角、焦点或景深的文字证据。中文匹配
+  “中景”“平视”“焦点”等词；英文匹配 `medium shot`、`eye-level`、`focus`
+  等表达。这只是启发式检查，不验证摄影方案是否物理成立，不建议对插画等题材
+  无差别启用。
+- `prose_length`：`min_chars` / `max_chars`（默认 1 / 32768）的闭区间；
+  按 Python Unicode 字符数计算，包含标点和空格，不是字节数、汉字数或 token 数。
+- `required_text`：非空 `values` 列表，要求每帧逐字包含每一项，区分大小写。
+- `forbidden_text`：非空 `values` 列表，要求每帧不包含任一项，区分大小写。
+
+例如 `checks: [{type: required_text, values: [车站时钟]}]`。这些通用检查不识别
+输入文件名，不加载 Film 的来源、人物或作品专属检查，也不提供关闭安全要求或
+绕过 provider 限制的能力。
+
+CLI 的 `--quality-mode off|report|enforce` 可以覆盖文档模式，不改变检查器列表。
+API 通过 `StoryRunSettings.quality` 设置同一策略。策略完整冻结在 manifest 中，
+resume 不读当前 YAML 或规则文件，也不接受切换质量策略。
+
+检查问题以 `theme_id`、`frame_id`、`check`、`message` 保存到 attempt 的
+`quality_issues`；强制拒绝同时进入现有错误反馈与重试链。最终 `result.json`
+的 `quality` 仅汇总已接受结果，包含 `mode`、`status` 和 `issues`。
+CLI 明确输出 `skipped` / `passed` / `warnings` 和报告路径；`report` 告警也会
+出现在进度输出中。最终 TXT 保持每帧一行纯正文，不混入报告。
+
+默认仍按完整 Frame Sequence 生成、验证和保存，因此 `enforce` 下的质量失败会
+重试当前主题的整组 Frame，而不是已经成功保存的其他主题。不新增 Profile 或
+模型评审调用，也没有把 Story 改成逐帧生成。
 
 ## 运行记录与恢复
 
@@ -115,6 +214,7 @@ Theme premise 和每个最终 Frame 都必须逐人明确写出国籍，并明�
 ```text
 runs/<run-id>/
 ├── request.json
+├── rules.json
 ├── manifest.json
 ├── attempts/
 │   └── <operation>-<attempt>.json
@@ -126,14 +226,14 @@ runs/<run-id>/
 ```
 
 `manifest.json` 冻结 provider、并发数、generation retry、theme batch size、
-theme/frame token 上限和发布目录。每个成功 Theme 和每个 Theme 的完整 Frame
+theme/frame token 上限、完整质量策略和发布目录。每个成功 Theme 和每个 Theme 的完整 Frame
 Sequence 都独立原子写入并 fsync；attempt 文件保存结果、错误和 token usage。
 checkpoint 文件名、内容 ID、顺序、数量或 schema 不一致时会明确报告损坏，不会
 静默跳过。
 
 同一 run 执行期间持有非阻塞文件锁，避免两个进程同时恢复。失败会保留全部成功
 checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 operation 的错误
-反馈给模型。全部 checkpoint 完成后才写入 `result.json` 并发布 JSON/TXT。
+反馈给模型。全部 checkpoint 完成后才写入 `result.json` 并发布 TXT。
 已完成 run 的 `resume` 直接返回已发布结果，不调用 provider。
 
 ## 错误分类与重试
@@ -184,8 +284,8 @@ theme 与 frame 的初始 prompt 同时要求建筑、室内陈设、家具、�
 - 非空单段 prose；
 - provider 结构错误的有界重试和 token usage 统计。
 
-因此 100 themes × 6 frames 在没有 provider/schema 错误时始终保持
-110 次基础调用。
+因此 100 themes × 6 frames 在没有 provider/schema 错误或强制质量拒绝时保持
+110 次基础调用；`report` 不增加质量重试调用。
 
 ## CLI
 
@@ -201,31 +301,35 @@ uv run t2i-story generate \
   --runs-dir runs
 ```
 
-或者从 UTF-8 文本文件读取完整 Story Description：
+或者读取 Story Document：
 
 ```bash
 uv run t2i-story generate \
-  --prompt-file story.txt \
+  --input story-inputs/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic \
   --concurrency 8
 ```
 
-故事位置参数与 `--prompt-file` 互斥，并且必须提供其中一个。文件首尾空白会被
-移除，内部换行会保留。空文件、目录、不可读文件和非 UTF-8 文件会在 provider
-调用前报错。使用文件时，其不含扩展名的文件名会作为 `source_prompt_stem`
-冻结到 `request.json`，供完成或 resume 时确定最终文件名。
+故事位置参数与 `--input` 互斥，并且必须提供其中一个。空文件、目录、不可读文件
+和非 UTF-8 文件会在 provider 调用前报错。输入错误退出码为 2；已创建但未完成
+的 run（包括强制质量检查耗尽）退出码为 1，并打印 resume 命令。批量脚本因此
+能区分共享输入无效与某个阵容生成失败。
+批量脚本的文档预检只使用仓库 `.venv/bin/python` 或仓库目录下的 `uv run python`，
+不会退回到可能缺少项目依赖的 PATH Python；两者都不可用时明确失败。
 
 主要选项：
 
 ```text
---prompt-file PATH     从 UTF-8 文本文件读取完整故事描述
+--input PATH           读取 UTF-8 YAML Story Document
 --themes INTEGER       主题数量，1 至 100
 --frames INTEGER       每个主题的画面数，1 至 6
 --female-count INTEGER 可选女性人数约束，0 至 8
 --male-count INTEGER   可选男性人数约束，0 至 8
 --concurrency INTEGER  frame sequence 并发数，1 至 32
+--generation-retries INTEGER 每个生成单元额外重试次数，0 至 5
+--quality-mode TEXT    off、report 或 enforce；不关闭基础契约
 --content-level TEXT   aesthetic、erotic 或 hardcore
 --language TEXT        chinese 或 english
 --prompts-dir DIRECTORY 按日期保存最终 TXT 的根目录
@@ -255,8 +359,8 @@ prompts/
 TXT 每帧一行，内容就是最终 prose，不含主题标题或 frame ID。
 `prompts/` 中只发布最终 TXT。用于恢复的 request、manifest、Theme、Frame、
 attempt 和完整 result JSON 只保存在 `runs/`，不会复制到 `prompts/`。
-使用 `--prompt-file` 时，`prompt-stem` 来自输入文件去掉扩展名后的名称，并归一化
-为安全的小写文件名；随后依次写入 content level、数字女性人数、数字男性人数和
+使用 `--input` 时，`prompt-stem` 来自文档显式 `id`；
+随后依次写入 content level、数字女性人数、数字男性人数和
 序号，例如 `3-view_hardcore_1_woman_0_men_0001.txt`。只约束一侧或未约束
 人数时，未知部分使用 `unspecified_women` 或 `unspecified_men`，不根据模型正文
 猜测。

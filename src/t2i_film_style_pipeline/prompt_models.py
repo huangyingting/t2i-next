@@ -186,10 +186,6 @@ class NarrativeFrame(Model):
     )
 
 
-class NarrativeFrameDraft(Model):
-    prose: NarrativeProse
-
-
 class NarrativeFrameSequence(Model):
     frames: list[NarrativeFrame] = Field(min_length=1, max_length=6)
 

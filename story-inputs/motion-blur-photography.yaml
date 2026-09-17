@@ -1,0 +1,750 @@
+id: motion-blur-photography
+description: |
+  BRIEF
+
+  Create varied, hyper-realistic cinematic motion photographs. Motion must be
+  obvious at first glance, but every moving element must be a necessary result of
+  the location and current activity. Never add a carrier, prop, person, light, or
+  gesture merely to make the image look kinetic.
+
+  HIGHEST PRIORITY
+
+  Apply this order when requirements compete:
+
+  1. everyday scene logic, anatomy, force, support, and photographic physics;
+  2. exact requested cast and content level;
+  3. one large, immediately readable motion event;
+  4. complete visible character, wardrobe, expression, population, and light
+     detail.
+
+  If the stated camera settings could not produce the described final image, or
+  if the motion exists only for spectacle, discard the concept and rewrite it.
+  Do not solve a conflict by adding another object, carrier, light, or exception.
+
+  OUTPUT CONTRACT
+
+  Return each Frame as one self-contained English paragraph of at least 700
+  words. Target 850-1200 words. Count before returning and silently rewrite text
+  below 700 words. Use one continuous paragraph without headings, labels, bullet
+  points, field names, or commentary.
+
+  Apply a final lexical render gate to the Frame, not merely to the Theme. The
+  returned paragraph must contain zero instances of camera body, camera mounted,
+  tripod, gimbal, flash head, flash unit, softbox, light stand, umbrella,
+  reflector, capture cable, shutter trigger, capture monitor, production crew,
+  photographer, lighting assistant, production personnel, or equipment outside
+  the frame.
+  Rewrite them as locked viewpoint, panned viewpoint, off-frame pulse, broad soft
+  incoming light, narrow hard incoming light, or exposure result. Do not output a
+  negative inventory of absent gear.
+
+  Write compact, high-density, telegraphic image-prompt prose. Favor short
+  subject-verb-object clauses joined by semicolons. State each fact once. Use
+  exact nouns, measurements, ownership, contact, depth, and direction. Remove
+  metaphor, backstory, suspense, filler, thematic interpretation, and repeated
+  summaries. Concision removes redundancy, never required information.
+
+  Order visible facts first: location and background population; selected motion
+  mode and visible carrier result; each primary adult dossier; wardrobe and item
+  states; pose and contact topology; practical scene light. Put the photographic
+  explanation in the final portion: invisible viewpoint geometry, lens and focus,
+  off-frame illumination, shutter and pulse timing, neutral-density filtration,
+  and how those choices record the stated sharpness, shallow depth, and motion.
+
+  Use only the present image. Every Frame is independently renderable. Never say
+  same, unchanged, previous, next, again, before this image, after this image, or
+  refer to another Theme or Frame. Render no readable sign, screen, label, logo,
+  watermark, number, clock, or caption.
+
+  RUNTIME INPUTS
+
+  Theme count, Frame count, female count, male count, content level, and Story
+  Description are runtime inputs. Never assume fixed counts, IDs, or a fixed
+  output order. Requested female and male counts apply exactly to primary adult
+  subjects; background adults follow the population rules below and do not alter
+  the requested primary count.
+
+  All depicted people are unmistakably mature adults aged 25 or older. Every
+  primary adult participates visibly. Add no foreground observer, disembodied
+  limb, reflected participant, or off-camera participant.
+
+  MULTI-ADULT ROLE AND DEPTH TOPOLOGY
+
+  When more than two primary adults are requested, build a private role ledger
+  before writing the Theme or Frame. For each named adult, record one current
+  explicit role, exact partner or partners, active or receiving anatomy, one
+  external contact boundary, left-hand task, right-hand task, body support,
+  weight path, and camera distance. Reconcile the complete ledger before prose.
+  Do not output the ledger.
+
+  At Hardcore level, every requested primary adult must directly perform or
+  receive a named explicit act at the photographed instant. Kissing, watching,
+  posing nearby, holding a shoulder, touching a back or thigh, stabilizing
+  another adult, or expressing consent does not by itself satisfy that role.
+  For three adults, use one connected explicit-contact topology in which all
+  three nodes have a direct explicit edge. For four or more adults, use either
+  one connected topology or clearly separated explicit pairs, but no primary
+  adult is an assistant, spectator, or support-only participant. One anatomical
+  part contacts only one receiving boundary at one screen position; never use
+  one penis, mouth, hand, or toy at two incompatible boundaries simultaneously.
+
+  Give each adult one mechanically stable current pose. Trace who supports whose
+  weight and ensure the supporting limbs are not also assigned to garments,
+  accessories, another contact, or a second body. Keep bodies spatially distinct;
+  name left-to-right and near-to-far order so limbs, ownership, and contacts
+  cannot merge. In a multi-pair composition, separate the pairs on screen while
+  keeping both inside the readable subject slab.
+
+  Large-aperture group scenes still require readable identity and contact for
+  every primary adult. Place all required faces and decisive boundaries within
+  the declared subject-depth slab by arranging the group broadly parallel to the
+  sensor plane. Do not place one pair meters behind another and claim all are
+  critical at f/1.4-f/2. For three or more adults, normally use a 35-50mm lens,
+  roughly f/2-f/2.8, and enough camera distance to cover the group while the
+  foreground and background remain strongly soft. A longer lens or wider
+  aperture is valid only when the stated near-to-far spread actually fits its
+  calculated depth of field. Flash freezes motion; it never expands depth of
+  field.
+
+  PRIMARY ADULT DOSSIER
+
+  Lock one dossier for each primary adult within a Theme and repeat it fully in
+  every Frame:
+
+  - exact age and height in centimeters;
+  - build, shoulders, torso, waist, hips, legs, and weight distribution;
+  - for women, natural breast size, shape, projection, and proportion;
+  - for men, chest breadth, pectoral build, waist, hips, and proportion;
+  - face shape; brow, eyes and color, nose, cheeks, lips, jaw, chin, and one
+    natural asymmetry;
+  - exact skin color and undertone, pores, texture, and motivated highlights;
+  - hair color, length, density, texture, part, hairline, and exact style;
+  - every garment, underwear layer, hosiery item, shoe, jewelry item, glasses,
+    scarf, and accessory;
+  - one precise expression using gaze target, eyelids, brows, nostrils, lips,
+    jaw, cheeks, chin, neck tension, alertness, agency, and consent;
+  - one current action phase tracing head, torso, pelvis, both arms, both hands,
+    both legs, both feet, support, balance, and contact.
+
+  Use original faces. Do not replace details with beautiful, attractive,
+  fashionable, sexy, muscular, cinematic, dramatic, intense, or similar generic
+  labels.
+
+  WARDROBE AND ITEM STATE
+
+  Give every primary adult a coherent inventory: upper and lower garments,
+  underwear, hosiery when used, one complete footwear pair, at least one jewelry
+  item, and at least one non-jewelry signature item chosen from eyeglasses,
+  sunglasses, or a silk scarf. Preserve ownership, construction, color, and
+  material within the Theme.
+
+  Give every inventory item its own exact visible color. For each garment,
+  underwear layer, and hosiery item, name base color, secondary color, trim, and
+  pattern placement when present. For footwear, name upper, sole, heel, hardware,
+  and lace or strap colors for both left and right shoe. For jewelry, name metal
+  color, gemstone color, and finish. For glasses or sunglasses, name frame,
+  temple, hardware, and lens colors. For a scarf, name ground color, motif
+  colors, border color, and weave sheen. Carry these colors unchanged through
+  worn, displaced, removed, held, and airborne states. Never use matching,
+  coordinated, dark, light, neutral, colorful, metallic, or same color as a
+  substitute for the actual color names.
+
+  Every item has exactly one visible current state: worn; coherently opened,
+  lifted, lowered, or pulled aside; partly removed from named limbs; held by its
+  owner in one assigned hand; fully removed at one exact, individually traceable
+  resting location; or airborne immediately after its owner releases it. Nothing
+  may be both worn and removed, held and airborne, or placed in two locations. A
+  nude adult still has a complete removed-clothing and footwear inventory.
+
+  Removed clothing must look recently and naturally discarded by the depicted
+  undressing, not folded or art-directed for display. Give each item an exact
+  footprint, orientation, gravity-supported shape, wrinkles, and removal evidence
+  such as a twisted waistband, partly inverted body, collapsed cup, trailing
+  sleeve, or uneven hem. Use casual separate drop zones near the path of its
+  owner. Limited partial overlap is allowed only when every participating item
+  and the overlap boundary remain explicitly identifiable. Never default to
+  neatly folded, laid flat, stacked, aligned, symmetrically arranged,
+  side-by-side, parallel, showroom-like, or color-coordinated placement. Do not
+  put underwear atop trousers, a shirt atop another garment, glasses on clothing,
+  or clothing on shoes. Shoes need not form a tidy pair: locate left and right
+  shoe separately, with credible kicked-off orientation and distance. Organized
+  packing is allowed only when it is the visible current activity, never during
+  an intimate act.
+
+  Garment construction must be real. A pullover has no placket; a button shirt
+  opens only along its placket; trousers open at waistband and fly; a slip dress
+  has straps and no invented front placket. Fabric follows gravity and the pose.
+  Any garment over active anatomy must be visibly moved clear of the exact
+  contact boundary; never describe penetration through intact or ambiguously
+  placed fabric.
+
+  Match footwear to support. Standing shoes contact through their soles.
+  Kneeling shoes may contact through toes, uppers, or side edges, not both flat
+  soles. If barefoot, locate the complete matching pair. Glasses cannot be both
+  on the face or head and removed.
+
+  One hand performs one task. A hand that braces, grips, touches, holds an item,
+  lifts a garment, or releases an item does nothing else. Audit all hands after
+  the full paragraph is written.
+
+  ONE NECESSARY MOTION SYSTEM
+
+  Choose exactly one motion mode and one carrier system per Theme. Natural fit
+  outranks variety; repeating a credible mode is better than forcing another.
+  Privately complete: "Because this visible current activity is happening, this
+  carrier must move this way." If deleting the carrier leaves the activity
+  unchanged, it is decorative; rewrite the premise.
+
+  Do not combine carrier classes. Never pair an action-caused carrier with an
+  independent environmental carrier, or combine two unrelated environmental
+  operations. Hair, hems, droplets, and reflections count with the carrier only
+  when they are direct physical or optical consequences of that same event.
+
+  Choose one:
+
+  SUBJECT MOTION BLUR
+
+  Use only for aesthetic or erotic content, not Hardcore. One primary subject or
+  a rigidly translating group moves through the scene; a smooth synchronized pan
+  tracks one face or torso plane. State real translation, direction, speed,
+  support, pan direction, and screen result. The tracked plane stays sharp;
+  stationary architecture and stationary background people streak opposite the
+  pan. A lean, rotation in place, facial reaction, or camera movement alone is
+  not translation. Never claim multiple people with different rotation, depth,
+  or velocity all remain critically sharp.
+
+  FLASH-FROZEN ACTION PEAK
+
+  Use a locked camera. One necessary action creates one garment, liquid, hair,
+  fabric, powder, or lightweight prop trajectory. A short flash freezes one
+  decisive position; ambient exposure records one attached trail from the same
+  carrier. Keep faces, identity, support, and decisive contact readable.
+
+  A flying garment is valid only when its owner has just finished removing that
+  same garment as a natural part of the visible undressing. State its prior worn
+  position, newly exposed area, removal path, owner, release hand, release point,
+  open silhouette, direction, rotation, current position, and credible landing
+  zone. The owner is the releaser. Show that person's release as a visible
+  current action in the same image: the named arm remains extended along the
+  path; the open releasing hand stays within plausible reach of the trajectory
+  origin; separated fingers, wrist angle, and arm follow-through agree with the
+  direction and rotation. The carrier trail starts at that hand. The person has
+  not already returned the arm to another pose or task. If no primary adult
+  visibly releases the garment, nothing is airborne; choose another carrier.
+  Never imply an unseen throw, an off-camera releaser, or a garment appearing in
+  midair between action phases. Do not add a scarf, shirt, jacket, underwear, or
+  stocking solely so it can fly.
+
+  Keep one unbroken visible causal chain from hand to trail to frozen garment.
+  The trail begins at the release point and reaches the garment's recorded
+  position without an unexplained clear-air gap. Release-to-position distance,
+  carrier speed, elapsed portion of the shutter, and stated trail length must
+  agree. A short trail cannot explain an object much farther from the hand. Match
+  the crisp end to first- or rear-curtain timing. If this geometry does not fit
+  inside one exposure, the object is not a valid frozen carrier.
+  Do not use required signature glasses, sunglasses, or a silk scarf as the
+  airborne item merely because it already exists in the inventory. Airborne
+  clothing must visibly advance current undressing; exposing only the neck,
+  collarbone, or an accessory position is insufficient.
+  If underwear or another lower garment becomes airborne during penetration, it
+  must use real side ties, side snaps, or another releasable construction and
+  must already be clear of both legs before contact begins; the photographed
+  motion is only the final hand release. Never pull ordinary closed-loop
+  underwear over occupied legs, stockings, or shoes during the active contact.
+  For any Hardcore airborne garment, its just-completed displacement must have
+  cleared the exact anatomy, contact, or support boundary used by the current
+  explicit act. Removing an upper garment merely to expose the torso during
+  lower-body contact does not qualify. If the explicit act proceeds unchanged
+  when the release is deleted, use a naturally connected carrier instead.
+
+  Liquid is valid only when pouring, washing, bathing, rainfall, a fountain, or
+  another existing scene activity requires it. Show source and destination. A
+  hand may pour roughly 250 milliliters to one liter from a manageable vessel.
+  A larger vessel remains supported while tilting. Never throw a filled bucket,
+  ten liters of water, glassware, furniture, or another dangerous mass during
+  intimate contact.
+  For Hardcore bathing scenes, prefer installed showerheads, faucets, or tub
+  spouts whose operation is already necessary. Do not add a portable pitcher,
+  bucket, or floating ceramic vessel solely to create a liquid arc.
+
+  STILL ANCHOR, MOVING WORLD
+
+  Use a locked camera. Primary adults hold one genuinely stable supported pose.
+  Exactly one nearby environmental operation supplies the carrier. Derive it
+  from the location's normal present-tense function, route, weather exposure,
+  fluid flow, or powered operation; do not choose a location because it matches
+  a familiar motion example. The carrier follows its real boundary, route, and
+  direction. When a vehicle or conveyance supplies motion, show its real path and
+  one continuous surrounding environment rather than merging incompatible
+  places.
+
+  Moving background adults use ordinary routes, clothing, and behavior. Do not
+  give them handheld objects or choreographed gestures to manufacture trails. A
+  broad moving field requires enough parallel paths to occupy that field; one
+  single-file line cannot fill a wide area. Lateral travel makes frame-parallel
+  trails. Travel toward or away from camera makes converging depth trails, never
+  a vertical curtain.
+
+  MOTION READABILITY
+
+  The single motion system is one of the two largest visual masses and occupies
+  roughly 30-70 percent of the frame. The viewer recognizes motion before
+  wardrobe detail. Put it in foreground or midground, or as a broad adjacent
+  background band. State start and end zones, screen direction, occupied region,
+  trail length, density, and edge character.
+
+  Reject faint blur, isolated bokeh, tiny distant traffic, a small prop, or
+  motion visible only after inspection. Also reject motion so large that it
+  hides faces, decisive anatomy, contact, support, or location.
+
+  SCENE GENERATION AND DIVERSITY
+
+  Build the scene before choosing the motion carrier. First derive a credible
+  place from independent dimensions: access condition, enclosure, real spatial
+  function, operating state, time, population density, available body support,
+  and the cast's current activity. These dimensions are generative constraints,
+  not a location menu. Do not copy a named place, room type, building type, or
+  carrier from this Brief as a default.
+
+  Across the runtime Theme set, maximize meaningful setting diversity before
+  repeating a site-function family, spatial layout, or carrier family. Avoid the
+  same family in adjacent Themes. When the Theme count exceeds the number of
+  credible distinct families, repeat only after changing the site's function,
+  access condition, enclosure, support geometry, population logic, and reason
+  the motion naturally exists. Never assign location categories to fixed Theme
+  IDs or assume a fixed Theme count. Natural fit still outranks diversity; reject
+  contrived novelty rather than adding an unrelated carrier.
+
+  Plan the complete Theme batch before writing individual Themes. For every pair
+  of Themes, make at least three of these materially different: access condition,
+  spatial function, enclosure or architecture, support geometry, population
+  logic, and native activity. A new city name, decorative style, furniture item,
+  or room label does not create a new setting family. Multiple rooms inside
+  ordinary private residences remain one residential family. Do not repeat that
+  family while another physically credible setting family remains unused.
+
+  Only after the scene and current activity pass ordinary-life logic, derive the
+  one motion that the activity or operating environment already causes. If the
+  location was selected merely to host a convenient blur effect, discard it and
+  generate a different scene.
+
+  SCENE AND MECHANICS
+
+  Close two physical loops:
+
+  - Scene loop: location, operating state, time, weather, population, clothing,
+    props, and activity commonly coexist. A closed room stays dry; rain outside
+    glass stays outside; wind-blown rain reaches a covered floor only through a
+    visible opening and leaves matching wetness.
+  - Mechanics loop: force has a visible source; mass suits the force; limbs
+    reach through normal joints; weight has enough support; released objects
+    start at the releasing hand and follow gravity after the apex; paths do not
+    cross faces or decisive contact.
+
+  Wet support requires visible non-slip texture, a fixed handhold, or a dry
+  load-bearing surface. Do not place kneeling knees, planted feet, or a
+  weight-bearing adult on slick wet tile without enough friction and support.
+  Keep every decisive contact boundary above opaque or agitated water and
+  visually unobstructed; do not claim a submerged boundary is clearly visible.
+
+  Do not call walking, cleanup, conversation, equipment handling, or garment
+  adjustment sharp during a long exposure. Those adults either hold one explicit
+  still pose or their movement is the selected carrier.
+
+  CAMERA, EXPOSURE, AND RECORDED RESULT
+
+  Close the imaging loop: camera support or pan, focal length, camera distance,
+  aperture, focus distance, shutter time, flash duration, curtain timing,
+  ambient-to-flash ratio, carrier speed, and light placement must produce the
+  claimed final sharpness and blur.
+
+  Capture technique is non-rendered metadata, never visible scene content.
+  Describe the complete visible scene first. In the final portion, use one
+  compact method sentence explaining only how the image was made. Use this
+  grammar: "Captured from a [height], [distance], [azimuth], [pitch] viewpoint
+  with a [focal length] lens at [aperture], focused at [distance]; a [shutter]
+  ambient exposure records [carrier path]; a [t.1 duration] off-frame pulse from
+  [screen direction] freezes [selected plane]; [ND strength when needed]
+  controls ambient exposure; no capture apparatus is visible." Adapt values, not
+  the structure.
+
+  Never give the capturing apparatus a visible location, material, support,
+  depth, silhouette, reflection, or shadow. In Frame prose, do not write camera
+  body, camera mounted, tripod, gimbal, flash head, flash unit, softbox, light
+  stand, umbrella, reflector, capture cable, shutter trigger, capture monitor,
+  production crew, photographer, lighting assistant, or equipment outside the
+  frame. Explain the viewpoint and incoming light, not where hardware stands.
+  A closed production does not justify production gear in the image. If the
+  Story Description explicitly depicts photography as the visible current
+  activity, any diegetic photographic object belongs to that activity and is
+  separate from the unseen system capturing this image.
+
+  State one exact virtual viewpoint for every Frame: sensor height above the
+  supporting floor, distance to the nearest primary, horizontal azimuth around
+  the cast, vertical pitch, level or intentional roll, landscape or portrait
+  orientation, lens-axis target, and crop from nearest visible body point to
+  farthest included scene boundary. Use concrete geometry such as centimeters,
+  meters, and degrees rather than low angle, eye level, close, or three-quarter
+  alone. This describes image geometry, not a visible object. The viewpoint must
+  reveal the nearest primary eye or face plane, body
+  support, decisive contact, motion origin, complete visible carrier path, and
+  landing or destination zone without one element hiding another. Avoid
+  foreshortening that collapses the hand-to-carrier distance or makes motion
+  direction ambiguous. Keep important anatomy away from frame-edge cuts and
+  avoid unintended foreground occlusion.
+
+  The invisible viewpoint must correspond to a real, safe, accessible volume and
+  stable support surface outside the frame. Never place it inside a wall,
+  beyond an unprotected facade, in a shaft or machinery clearance, through solid
+  glass, over unsupported open air, or where the cast or carrier physically
+  passes. A locked camera is locked relative to one declared reference frame. If
+  the room, cabin, lift, vessel, or vehicle carrying the cast moves, mount the
+  unseen capture system safely to that same structure so subject distance and
+  framing stay constant; an external stationary viewpoint records the cast
+  translating and cannot simultaneously behave as an interior locked viewpoint.
+  Viewpoint distance, sensor height, focal length, orientation, and crop must
+  geometrically fit the visible body extent and scene boundaries.
+
+  Match viewpoint to motion mode. For SUBJECT MOTION BLUR, place the lens axis
+  far enough from the travel direction that real translation and the opposite
+  background streak are visible; state pan pivot, start azimuth, end azimuth,
+  and tracked plane. For FLASH-FROZEN ACTION PEAK, view the release path from a
+  clear side or oblique angle so the releasing hand, trail, frozen object, and
+  destination occupy separate readable screen positions. For STILL ANCHOR,
+  compose the stable cast in one dominant depth layer and the environmental
+  carrier as a broad adjacent or framing layer with an unobstructed route. Do
+  not use a frontal position when bodies, limbs, furniture, or carrier geometry
+  would hide the decisive relationship.
+
+  Across Themes, vary camera height, azimuth, pitch, orientation, and framing
+  when the scene permits; do not default every image to a front-facing camera at
+  standing eye level. Viewpoint variety never overrides physical readability,
+  safe body support, or the selected motion logic.
+
+  Use plausible ranges:
+
+  - panned subject: about 1/15 to 1/4 second;
+  - flash-frozen action plus trail: about 1/15 to 1/2 second;
+  - still anchor with moving world: about 1/4 to 1 second.
+
+  Longer exposure requires an unusually slow carrier and a pose that can truly
+  remain still. Estimate displacement from speed and shutter time. Walking for
+  one second covers about one to one-and-a-half meters. Do not pair two seconds
+  with a three-centimeter trail or 1/30 second with a meter-long slow-walking
+  smear without a valid distance and speed explanation.
+
+  A tripod prevents camera shake; it does not freeze people. At shutter times
+  slower than 1/4 second, do not call faces critically sharp merely because the
+  camera is locked. Use a short flash with subdued ambient exposure on people,
+  shorten the shutter, or allow slight human motion.
+  At Hardcore level, a still-anchor shutter slower than 1/4 second must use a
+  short flash on every primary adult with continuous ambient on them at least
+  three stops lower. Without that flash, cap the shutter at 1/4 second and do not
+  claim pore-level or critically sharp human detail.
+
+  Shutter time and flash duration are different. Shutter controls ambient
+  accumulation. Flash duration freezes the flash-lit instant. For fast cloth,
+  droplets, hair, or limbs, use a plausible t.1 flash duration around 1/2000 to
+  1/10000 second. Never call 1/200 or 1/250 second a flash pulse.
+
+  Flash freezes only surfaces it illuminates strongly. If a moving primary adult
+  must appear as one crisp flash image during a slow shutter, continuous ambient
+  exposure on their skin and clothing stays at least three stops below flash
+  exposure; otherwise a ghost or smear must appear. Do not place a moving cast in
+  bright sun, skylight, or strong practical light and claim flash alone removes
+  ambient ghosting. Camera flash cannot freeze distant rain or crowds beyond its
+  useful range; light a distant carrier locally or record it as ambient blur.
+
+  First-curtain flash puts the crisp image at the beginning of a trail that
+  continues in the travel direction. Rear-curtain flash puts the crisp image at
+  the end of the preceding trail. Use one sharp position, not sharp copies at
+  both ends. Match release point, trail, frozen position, direction, and
+  destination to curtain timing.
+
+  For fixed-camera modes, architecture and stationary props remain free of
+  directional motion streaks. They may be optically soft when outside the shallow
+  depth of field. Blur belongs only to the selected carrier and its direct
+  reflection. A stationary lamp reflected on a stationary floor does not streak
+  merely because the shutter is slow. Depth softness, bokeh, fog, bloom, and
+  shallow focus are not motion blur.
+
+  For panning, the camera is not locked or fixed. The tracked subject translates
+  in the pan direction; stationary surroundings streak opposite it. Do not pan,
+  zoom, rotate, shake, and orbit together.
+
+  In STILL ANCHOR, every primary adult holds the single stated pose throughout
+  the ambient exposure. Do not use rocking, grinding, thrusting, pumping,
+  bouncing, repeated strokes, swaying hair, or repositioning language. Current
+  contact is visible as a held instant; only the selected environmental carrier
+  moves.
+
+  Claim sharpness only inside plausible depth of field for the stated lens,
+  aperture, focus distance, subject spacing, and camera distance. Do not call
+  near eyes, a distant crowd, and far architecture all critically sharp at a
+  wide aperture.
+
+  Use a large aperture and visibly shallow depth of field as the default visual
+  language. On full frame, prefer roughly f/1.4-f/2.8; use f/3.2-f/4 only when
+  the necessary subject planes cannot otherwise remain readable. Do not default
+  to f/5.6, f/8, or deeper focus merely to list every detail as sharp. On another
+  format, choose an aperture with comparably shallow full-frame depth-of-field
+  behavior. With bright ambient light, a slow shutter, and a large aperture,
+  state the required neutral-density filtration, base or low ISO, and flash
+  power relationship so the exposure remains possible.
+
+  Every Frame must state one shallow depth-of-field design: name the exact focal
+  plane, the nearest and farthest acceptably sharp subject features, the
+  foreground transition, and the background transition. Make the nearest
+  primary eye or shared face plane critically sharp. Align the second face,
+  supporting hands, and decisive contact as close to that plane as the pose
+  allows. The contact must remain anatomically readable, but it may enter a
+  gentle focus transition rather than being falsely called tack-sharp. At least
+  one substantial foreground or background plane is strongly optically soft;
+  never describe the entire scene as uniformly sharp. Change camera position,
+  subject alignment, or focal distance before stopping down. Describe optical
+  defocus separately from carrier motion; bokeh, depth softness, and motion
+  trails are not interchangeable.
+
+  Depth of field must actively stage the motion result. For SUBJECT MOTION BLUR,
+  put the tracked nearest-eye or face plane at focus; the already defocused
+  stationary surroundings must still form long directional streaks that prove
+  camera-relative displacement. For FLASH-FROZEN ACTION PEAK, keep the release
+  hand, trajectory origin, and frozen carrier position on or very near the focal
+  plane; the attached motion trail remains directional while its far edge may
+  transition gently out of focus. For STILL ANCHOR, focus on the nearest primary
+  eye or shared face plane. The environmental carrier may sit well outside the
+  depth of field and become optically soft, but its long coherent trajectory,
+  screen direction, contrast, and occupied region must remain unmistakably
+  motion-driven. Never call an out-of-focus environmental carrier crisp,
+  structurally resolved, or frozen. Place the strongest optical softness where
+  it separates layers without erasing the carrier route, body support, or scene
+  logic.
+
+  State the camera-to-carrier distance and compare it with the declared near and
+  far depth-of-field limits. An action carrier advertised as flash-frozen must
+  intersect the acceptable focus range. An environmental carrier outside that
+  range is described as optically soft directional motion, never as sharply
+  resolved structure. If a frozen action carrier and its releasing hand occupy
+  widely separated depths, align the composition or choose a different action;
+  do not stop down to deep focus or repair the contradiction with prose.
+
+  Describe displacement as a percentage of frame width or height, or in pixels
+  for a declared output; never claim a trail is centimeters long on a full-frame
+  sensor whose entire width is about 36 millimeters.
+
+  LIGHTING
+
+  For visible practical scene lights, state the exact number of real emitting
+  fixtures. A bank of four lamps counts as four sources; a wall, floor, or other
+  reflecting surface is not an emitter. For each visible practical, give fixture,
+  scene location, color temperature or hue, apparent size, hardness, intensity,
+  role, illuminated surfaces, highlights, and shadows.
+
+  Describe non-rendered capture illumination only as incoming light in the final
+  method sentence: number of off-frame pulses, screen direction, color,
+  broad or narrow illumination pattern, hardness, intensity relative to ambient,
+  illuminated plane, catchlights, highlights, and resulting shadows. Do not name
+  or locate hardware, a modifier, or an equivalent device. Visible practical
+  emitters belong to the environment; capture illumination does not. Do not add
+  handheld lights, hidden beams, moving signs, or projected effects only to
+  create trails. A continuous key keeps a person sharp only when that person
+  remains genuinely still. Use short-duration off-camera flash for moving
+  primary action and obey the ambient-under-flash rule.
+
+  BACKGROUND POPULATION
+
+  State one population condition in every Frame:
+
+  - private, residential, secured, closed, or after-hours: zero background
+    adults unless a controlled production requires extras;
+  - quiet public place: 2-5 background adults;
+  - ordinarily active public place: 6-15;
+  - crowded transit, market, festival, or event: 16-30.
+
+  For nonzero population, give approximate count, adult status, location, depth,
+  ordinary activity, clothing, direction, and sharp or carrier state. Extras stay
+  anonymous, subordinate, spatially separate, and do not touch or feature.
+
+  A normally operating public place in Beijing or any other stated city is not
+  empty when its present function ordinarily requires people. Use a credible
+  population unless visible closure, severe weather, secured production, or
+  after-hours status explains otherwise.
+
+  Erotic or Hardcore content in a public place requires a closed,
+  access-controlled production. Within the first 100 English words, state closure to
+  ordinary public access, informed consenting adult-extra status, and population
+  density. Extras never become unsuspecting witnesses.
+
+  CONTENT LEVEL
+
+  At aesthetic level, use pose, wardrobe, expression, and the necessary motion
+  event without sexualized exposure.
+
+  Separate Erotic from Hardcore by the visible action boundary, never by clothing
+  coverage. Full nudity can be Erotic; partial clothing can be Hardcore. Do not
+  reduce Erotic to fashion posing, and do not add clothing merely to label
+  Hardcore.
+
+  At erotic level, make the adult sexual charge unmistakable and high intensity.
+  Erotic may use coherent provocative clothing, partial nudity, or full nudity;
+  exposed breasts, buttocks, and external genitals; visible adult arousal; close
+  body pressure; sustained kissing; and deliberate non-penetrative touch. For one
+  adult, use an assertive sensual pose and non-genital self-touch. For multiple
+  adults, use reciprocal contact on breast, buttock, inner thigh, waist, back,
+  hip, or face. Name every hand and contact. The boundary is the depicted action,
+  not clothing coverage or amount of exposed skin. Do not show direct genital
+  stimulation, masturbation, penetration, oral sex, explicit toy use, or sexual
+  fluid.
+
+  At Hardcore level, show one unmistakable consensual explicit act already in
+  progress. State it near the beginning; name each adult's role, active anatomy
+  or body-safe toy, receiving anatomy, external contact boundary, alignment,
+  support, and reciprocal consent. Every requested adult has an active role.
+  An explicit act already in progress is mandatory; nudity, an erection,
+  suggestive posing, kissing, or non-genital touch alone remains Erotic and does
+  not qualify as Hardcore.
+  Undressing before a future act, preparing access, approaching anatomy, or
+  saying an act will happen next does not qualify. A Hardcore Theme premise and
+  every Frame must depict the explicit contact now, not merely promise it.
+
+  Hardcore uses only FLASH-FROZEN ACTION PEAK or STILL ANCHOR, MOVING WORLD.
+  Never use synchronized panning or long-exposure subject blur for multi-body
+  explicit contact. A flying garment is allowed only when its removal naturally
+  opens access during the depicted activity. Crowd blur is allowed only when
+  ordinary circulation belongs to that public location. Do not add rain, water,
+  powder, fans, loose paper, lights, or props just to create motion.
+
+  Do not enforce a clothing quota or clothing default at Hardcore level. Choose
+  full nudity, partial dress, or active undressing solely from the scene and
+  current act. Do not add garments to soften Hardcore content or distinguish it
+  from Erotic content. If an adult is nude, locate every removed garment,
+  underwear item, hosiery item, shoe, and accessory. If an adult is partly
+  dressed, keep every retained item mechanically compatible with support and
+  clear of the exact contact boundary. If undressing supplies the selected
+  carrier, obey the single-action and garment-construction rules above.
+
+  Use a mechanically supported seated, side-lying, supine, prone, broad-kneeling,
+  or firmly braced standing arrangement. Keep one current action phase. No
+  repeated thrust cycle, multiple pose phases, anatomical vibration, duplicate
+  limbs, or impossible balance.
+
+  For penetration, show only external anatomy from its owner to one receiving
+  boundary. The boundary encircles it at one screen position; everything beyond
+  is internal and omitted. Never say fully inserted, visibly inserted, fully
+  visible penis, fully visible externally, entire visible length, or show an
+  internal segment or glans beyond the boundary.
+
+  Sexual fluid or lubricant remains a small localized surface detail, never the
+  motion carrier. Every adult remains alert, willing, responsive, and able to
+  stop. Do not depict intoxication, unconsciousness, coercion, panic, injury,
+  distress, inescapable restraint, or non-consensual voyeurism.
+
+  THEMES AND FINAL AUDIT
+
+  Each Theme locks cast, location, wardrobe, population, motion mode, carrier,
+  exposure logic, and palette. Frames vary plausible pose, expression, framing,
+  light balance, and carrier placement without continuity language. Across
+  Themes, vary only where doing so remains natural.
+
+  Reject a Theme before generating any Frame unless its title, premise, and style
+  all name the same single mode and carrier. The title names one motion idea, not
+  "X and Y," "X with Y," or two motion nouns. The premise may contain only that
+  carrier in motion. The style may describe only the camera technique needed for
+  that carrier.
+
+  For Hardcore, also reject the Theme unless its premise states the explicit act
+  as current contact rather than future intent, preparation, or undressing alone.
+  When more than two primary adults are requested, reject the Theme unless every
+  adult has a named direct explicit role and the complete contact topology is
+  mechanically possible.
+  Reject any Theme whose wardrobe inventory uses a pile, heap, bundle, scattered
+  items, neatly folded garments, display-like alignment, unexplained overlap, or
+  an item resting on shoes or another garment; correct the inventory before
+  Frame generation.
+  Reject a Theme style when a still-anchor shutter slower than 1/4 second omits
+  the required short flash, when it defaults to f/5.6 or a smaller aperture
+  without a concrete focus-geometry reason, when a flash-frozen carrier falls
+  wholly outside its declared depth-of-field limits, or when an out-of-focus
+  environmental carrier is called crisp. Resolve these contradictions at Theme
+  time; do not defer them to Frame prose.
+
+  For a FLASH-FROZEN Theme, the cast and its one action-caused carrier move;
+  all unrelated people and environmental systems remain still or are absent. For
+  a STILL ANCHOR Theme, the cast, garments, hands, hair, props, and lights remain
+  still; only the selected environmental carrier moves. Every secondary route,
+  weather effect, fluid system, powered system, practical light, and movable item
+  remains still or is absent.
+
+  Do not mix a private interior with an ordinarily operating public exterior and
+  claim every distant passerby or vehicle is a consenting production extra. Use
+  either a fully controlled public set with one staged carrier, or a private
+  interior whose sexual activity is not visible to ordinary public space. Do not
+  call a constructed replica functioning public infrastructure with real
+  operations; use an authorized closed real site or keep the replica physically
+  self-contained.
+
+  Before returning, audit:
+
+  - one paragraph, 700+ words, exact cast, adult status, correct content level;
+  - full dossiers, expressions, wardrobe inventory, footwear, accessories, item
+    states, hand jobs, anatomy, support, and contact all reconcile;
+  - removed clothing is individually traceable, recently discarded, wrinkled,
+    gravity-shaped, and casually separated rather than folded, stacked, aligned,
+    paired, or arranged for display;
+  - every garment, underwear item, hosiery item, left and right shoe, jewelry
+    item, glasses component, scarf field, trim, and pattern has an explicit,
+    state-consistent color;
+  - content level is determined by the visible action rather than nudity or
+    clothing coverage;
+  - for more than two primaries, every adult has a direct explicit role, one
+    compatible contact boundary, distinct limbs, stable support, and a depth
+    position inside the readable group slab;
+  - one necessary motion mode and carrier, 30-70 percent of frame, no decorative
+    or competing motion;
+  - any airborne object has an on-screen releaser and one continuous,
+    distance-consistent hand-to-trail-to-object chain;
+  - scene loop and mechanics loop pass ordinary-life logic;
+  - camera, shutter, flash, ambient ratio, curtain, speed, trail, depth of field,
+    lights, and final recorded result agree;
+  - a large aperture, exact focal plane, shallow depth-of-field transitions, and
+    any needed neutral-density filtration are stated; the nearest primary eye is
+    critically sharp and at least one substantial plane is strongly soft;
+  - exact camera height, distance, azimuth, pitch, orientation, lens-axis target,
+    crop, stable support, reference frame, and mode-specific view of the motion
+    path are physically coherent;
+  - one final compact capture-method sentence explains viewpoint, lens, focus,
+    shutter, off-frame pulse, and filtration without describing capture
+    apparatus as an object;
+  - depth of field separates spatial layers while preserving the selected
+    carrier's directional trail, frozen position, route, and causal connection;
+  - population and public-production rules pass;
+  - no readable text, continuity reference, duplicated anatomy, missing item,
+    impossible garment, unsupported body, or hidden decisive boundary.
+
+  Finally search the draft for pile, heap, bundle, scattered, fully inserted,
+  visibly inserted, fully visible penis, and fully visible externally. Rewrite
+  any matching item placement or anatomy before returning.
+  For removed-item placement, also search for neatly folded, folded into a
+  rectangle, laid flat, stacked, evenly aligned, symmetrically arranged, paired
+  side-by-side, and display-like parallel placement. Unless deliberate packing
+  is the current visible activity, replace those states with exact, natural
+  post-removal positions. Do not reject a waistband folded over itself, fabric
+  collapsed into wrinkles, or one empty trouser leg folded naturally under the
+  other; those are physical post-removal shapes, not organized storage.
+  For capture wording, search for camera body, camera mounted, tripod, gimbal,
+  flash head, flash unit, softbox, light stand, umbrella, reflector, capture cable,
+  shutter trigger, capture monitor, production crew, photographer, lighting
+  assistant, production personnel, and equipment outside the frame. Replace
+  every match with virtual-viewpoint geometry, incoming-light direction, or
+  exposure result. A monitor, cable, or equipment rack remains valid when the
+  visible location's ordinary current function genuinely requires it; never
+  describe it as part of the unseen capture system. Crew cut and crew-neck remain
+  valid appearance and garment-construction terms.
+  For STILL ANCHOR, search for rocking, grinding, thrusting, pumping, bouncing,
+  stroke, sway, and reposition. Rewrite any primary-body motion as one held
+  instant or choose a different motion mode.
+  For Hardcore, also search the act description for before, preparing,
+  approaching, about to, will begin, will happen, and next. If such wording
+  replaces current explicit contact, rewrite the act and pose.
+
+  Silently reject and rewrite any Frame that fails one check.

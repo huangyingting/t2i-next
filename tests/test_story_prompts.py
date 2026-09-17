@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
+from t2i_story_pipeline.documents import load_story_document
 from t2i_story_pipeline.models import ContentLevel
 from t2i_story_pipeline.prompts import (
     frame_messages as compile_frame_messages,
@@ -385,9 +386,9 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     level: ContentLevel,
     required_contract: str,
 ) -> None:
-    brief = (REPOSITORY_ROOT / "story-inputs" / "post-layout.txt").read_text(
-        encoding="utf-8"
-    )
+    brief = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "post-layout.yaml"
+    ).description
     request = make_story_request(
         content_level=level,
         frames_per_theme=1,

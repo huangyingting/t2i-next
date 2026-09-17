@@ -1,0 +1,840 @@
+id: furry-mythic-interactions
+description: |
+  BRIEF
+
+  Create varied live-action fantasy photography Themes using exactly the adult
+  gender slots supplied by female_count and male_count. Allocate exactly one of
+  those requested adults as an intelligent anthropomorphic furry being drawn
+  from public-domain mythology or an original fantasy archetype; allocate every
+  remaining slot as a real-looking adult human. The furry being is a tangible
+  living character, never a mascot suit, cartoon, game render, pet, or
+  background decoration.
+
+  Every Theme must present an original situation with a clear action, conflict,
+  bargain, test, rescue, ritual, investigation, performance, journey, or
+  reversal. Designate one requested adult as the primary protagonist whose
+  decision starts, redirects, refuses, or resolves the action. In a one-person
+  run, the sole furry adult is the protagonist.
+
+  EXAMPLES ARE OPEN-ENDED
+
+  Lists of species, myths, roles, settings, garments, objects, interactions, and
+  visual treatments are inspiration rather than menus, presets, or Theme-ID
+  assignments. Combine compatible examples, transform them, or invent an
+  equivalent. Only statements using "must," "every," "exact," or "do not" are
+  mandatory.
+
+  DECISION ORDER
+
+  Resolve every Theme and Frame in this order: exact requested gender slots;
+  deterministic one-furry allocation; one primary protagonist; allowed source
+  material and original design; unmistakably adult and sapient furry cast;
+  anatomy compatible with each locked gender; selected content level;
+  protagonist agency; shared or solo action; live-action creature realism;
+  readable body and contact physics; setting and cultural register; wardrobe,
+  props, camera, and light. A later choice must never weaken an earlier one.
+
+  ORIGINALITY AND SOURCE-MATERIAL GATE
+
+  Use only:
+
+  - public-domain mythological, religious, folkloric, or literary figures;
+  - traditional archetypes with no single modern owner;
+  - completely original high-fantasy characters;
+  - completely original heroic, vigilante, cosmic, or superhuman archetypes.
+
+  Journey to the West figures such as Sun Wukong, Zhu Bajie, the Bull Demon
+  King, Princess Iron Fan, and traditional celestial or underworld officials
+  may be interpreted from the public-domain novel and older folklore. The
+  Eight Immortals may be interpreted from traditional legends. Traditional
+  angels, demons, djinn, oni, tengu, naga, yaksha, fauns, satyrs, sphinxes,
+  garudas, kitsune, werewolves, animal-headed deities, and comparable beings
+  may be used from their public-domain cultural sources.
+
+  Do not reproduce a character, costume, emblem, weapon, catchphrase, location,
+  actor likeness, silhouette, color scheme, or story event from Warcraft,
+  Marvel, DC, a modern game, a modern comic, a film, a television series, or
+  another copyrighted franchise. Do not disguise a protected character by
+  changing only the name, species, color, or one costume detail.
+
+  Do not name, imitate, evoke, combine, or transpose the style of any real
+  director, photographer, cinematographer, production designer, artist, actor,
+  studio, film, television series, comic, or game. Define every visual style
+  only through visible choices in composition, lens behavior, set construction,
+  material, palette, atmosphere, and motivated light.
+
+  When a Theme uses an original high-fantasy or heroic archetype, build it from
+  independent traits. For example, invent a crane archivist who stores broken
+  oaths in porcelain feathers, a snow-leopard bridge marshal who taxes
+  memories, a rhinoceros rescue engineer whose armor unfolds into scaffolding,
+  or a raven night courier who delivers sealed dreams. Never describe an
+  original figure as a substitute, counterpart, version, parody, or lookalike
+  of an existing franchise character.
+
+  When a public-domain figure has famous modern adaptations, return to the
+  older textual or folkloric attributes and invent a new garment, material,
+  palette, body design, and dramatic situation. Do not imitate a modern
+  adaptation or a living actor.
+
+  DETERMINISTIC CAST ALLOCATION
+
+  Calculate total_count = female_count + male_count from the run request. These
+  are the complete visible adult character slots across humans and furry beings,
+  not human-only counts. Preserve exactly female_count female slots and
+  male_count male slots in every Theme and Frame. Never add a character outside
+  those requested slots.
+
+  Set furry_count = 1 for every Theme and human_count = total_count - 1. If only
+  one requested gender has a positive count, the furry occupies one slot of
+  that gender. If female_count and male_count are both positive but unequal, the
+  lower positive count supplies the furry slot. If the two positive counts are
+  equal, the male slot is furry. Every remaining requested slot is human.
+
+  Therefore one woman and zero men becomes one female furry and zero humans; one
+  woman and one man becomes one human woman and one male furry; two women and
+  one man becomes two human women and one male furry; one woman and two men
+  becomes one female furry and two human men; and a same-gender group contains
+  one furry of that gender plus human adults of the same gender. These are
+  deterministic count mappings, not Theme presets: species, identity, role,
+  setting, action, wardrobe, and pose remain model-generated.
+
+  Preserve the exact human-versus-furry assignment, names, genders, species, and
+  identities through all Frames of the Theme. Do not use a Theme-ID mapping,
+  alternate the furry gender, or reinterpret the allocation from the selected
+  sexual act.
+
+  SINGLE-SLOT EXACT OPENING
+
+  For female_count = 1 and male_count = 0, begin every Theme premise and Frame
+  with this semantic cast declaration before adding the generated name, species,
+  or action: "exactly one requested adult woman and zero adult men, allocated as
+  exactly one visible adult body: [Name], one adult female sapient
+  anthropomorphic [species] furry, with zero humans and zero other furry beings".
+  For female_count = 0 and male_count = 1, use the exact gender-reversed
+  declaration with one adult male furry.
+
+  The one requested slot is one body, not one human plus one furry. In a
+  single-slot Theme or Frame, never write one human woman, one human man, a
+  human cast, a partner, a companion, another participant, or a second name.
+  Never use "along with", "alongside", "together with", or another phrase that
+  implies a second body.
+
+  COMMON CAST EXACT OPENINGS
+
+  For the following requested casts, put the matching allocation verbatim in
+  the first sentence of every Theme premise and Frame before naming the
+  participants:
+
+  - one woman and one man: "exactly two visible adult bodies, human_count = 1,
+    furry_count = 1: one named human woman and one named adult male
+    anthropomorphic [species] furry, zero other bodies";
+  - two women and zero men: "exactly two visible adult bodies, human_count = 1,
+    furry_count = 1: one named human woman and one named adult female
+    anthropomorphic [species] furry, zero other bodies";
+  - three women and zero men: "exactly three visible adult bodies, human_count =
+    2, furry_count = 1: two named human women and one named adult female
+    anthropomorphic [species] furry, zero other bodies";
+  - one woman and two men: "exactly three visible adult bodies, human_count = 2,
+    furry_count = 1: one named adult female anthropomorphic [species] furry and
+    two named human men, zero other bodies";
+  - two women and one man: "exactly three visible adult bodies, human_count = 2,
+    furry_count = 1, zero other bodies: two named human women and one named
+    adult male anthropomorphic [species] furry".
+
+  Replace each bracketed species and each "named" placeholder with an original
+  character identity while preserving every count, category, and gender word.
+  Do not paraphrase the allocation, split one count across clauses, or describe
+  one body and then add another body later.
+
+  Designate one allocated adult as the primary protagonist. Every requested
+  adult must be unmistakably mature and aged twenty-five or older. Give each one
+  a plausible fictional name in ASCII Latin letters, explicit gender, facial
+  structure, build, complete wardrobe state, stable identifying detail, concrete
+  motivation, and active role. Preserve those anchors throughout the Theme and
+  every Frame.
+
+  Every allocated human remains fully human. Do not add animal ears, muzzle,
+  fur, tail, paws, hooves, wings, scales, horns, or a transformation state to a
+  human body. Animal-inspired clothing does not change this rule. Do not use the
+  name, title, alias, face, biography, or identifying combination of a public
+  figure, religious leader, historical celebrity, actor, or other real person.
+
+  The primary protagonist must visibly initiate, choose, refuse, negotiate,
+  guide, rescue, challenge, trick, protect, release, or complete the central
+  action. Never reduce the protagonist to a spectator, trophy, captive, passive
+  recipient, anonymous camera viewpoint, or interchangeable adventurer.
+
+  Do not add a crowd, guard, worshipper, servant, victim, portrait, statue,
+  reflection, screen figure, corpse, or human-shaped background silhouette
+  outside the allocated requested slots. A public-domain mythic figure who is
+  traditionally fully human may appear only when assigned to an allocated human
+  slot; otherwise omit that figure or create an original furry interpretation.
+
+  FURRY CAST CONTRACT
+
+  Include exactly one furry being occupying the deterministically selected
+  requested slot. The furry being must be an alert,
+  intelligent, speaking or clearly reasoning adult with a mature social role,
+  individual name, species, face, body build, wardrobe, motivation, and active
+  part in the encounter.
+
+  Every furry being occupies one requested female or male slot. Describe furry
+  characters as adult anthropomorphic beings rather than humans, and never count
+  one slot as both human and furry.
+
+  FURRY GENDER CONTRACT
+
+  The furry character inherits the gender of the deterministically selected
+  requested slot. State "adult male anthropomorphic" or "adult female
+  anthropomorphic" with the species and name at first introduction in the Theme
+  and independently in every Frame.
+
+  If only female_count is nonzero, every furry being is female. If only
+  male_count is nonzero, every furry being is male. With a mixed cast, apply the
+  lower-count and male-tie rule exactly. Do not derive the slot selection from
+  species, role, anatomy, wardrobe, sexual position, Theme ID, or model
+  preference.
+
+  After choosing, keep name, gender, pronouns, and sexual anatomy consistent
+  through the complete Theme and all its Frames. Use he, him, and his for a male
+  furry being and she, her, and hers for a female furry being. Do not switch
+  gender, use it or they to avoid stating gender, infer gender only from
+  clothing, or combine contradictory sex anatomy in one character.
+
+  FURRY GENDER OVERRIDES ACT SELECTION
+
+  Apply the deterministic slot allocation before inventing any sexual act. A request
+  for one woman and zero men means one female furry adult and zero humans. A
+  request for zero women and one man means one male furry adult and zero humans.
+  For larger casts, use exactly the human and furry gender slots selected for
+  that Theme. Never change a participant's allocated species category, gender,
+  nationality, or count to make a preferred act easier to describe.
+
+  An all-female run contains no penis, scrotum, testicles, semen, male furry,
+  male human, or he, him, and his pronouns. Give every female furry ordinary
+  adult humanoid female anatomy consistent with her stated gender. At Hardcore
+  level, choose only an act compatible with the locked anatomy, such as direct
+  manual vulva or clitoris contact, cunnilingus when the head anatomy permits
+  it, or direct vulva-to-vulva contact. Do not add male anatomy merely to create
+  penetrative intercourse.
+
+  An all-male run contains no vagina, vulva, clitoris, female furry, female
+  human, or she, her, and hers pronouns. Give every male furry ordinary adult
+  humanoid male anatomy consistent with his stated gender. When both run-level
+  genders are available, choose each furry gender first and only then choose an
+  act compatible with every locked participant.
+
+  ALLOCATED BODY COUNT AND CONTACT LOCK
+
+  In every Frame, state the exact total number of visible adult bodies and split
+  that total into exact human_count and furry_count values. Name every human and
+  furry being individually in the first sentence. Attach "human woman" or
+  "human man" to each human name, and attach adult gender, species, and
+  "anthropomorphic furry" to each furry name. Do not introduce multiple
+  participants with only a collective phrase and defer an individual's name,
+  species category, gender, or role until later prose.
+
+  At Hardcore level with two or more participants, the first two sentences must
+  give every furry and human participant one current, willing, anatomically
+  explicit role in the same sexual action chain. State who touches which named
+  anatomy for each participant. Every body must touch or be touched by another
+  participant at that instant; do not rely on an intended future action, a
+  nonsexual prop task, or general proximity to count as participation. Choose an
+  act that includes the already allocated cast clearly and safely instead of
+  adding an observer.
+
+  With total_count equal to one, state exactly one visible adult body, identify
+  the sole furry protagonist by name, gender, and species, and show one explicit
+  adult solo sexual act with the furry protagonist's own hand and anatomy
+  clearly assigned. Do not invent a partner, observer, reflection, or second
+  body.
+
+  A second or later participant may not stand beside, watch, wait, hold
+  clothing, operate a background object, or perform an unrelated action while
+  others engage. Give one separate, unobscured body slot for each participant,
+  with a distinct head, torso, pelvis, two arms, two legs, support chain,
+  silhouette, name, and contact role. Keep all participating faces, pelvises,
+  and contact points in the same readable photographic composition without
+  merging bodies or hiding one participant behind another.
+
+  Self-touch may supplement but never replace contact with another participant
+  in a multi-person Hardcore Frame. Within the first two sentences, every named
+  participant must directly touch another named participant's anatomy or be
+  directly touched by another named participant. Reject a person who only
+  masturbates, poses, watches, or handles a prop beside the shared action.
+
+  Every furry being must be predominantly bipedal and humanoid in stance, with
+  an upright adult torso, two attached arms, two attached legs, articulate
+  hands or species-appropriate grasping forepaws, and a clearly animal head.
+  Wings, tails, horns, antlers, or a second pair of mythic arms may appear only
+  when traditional source material makes them essential and every attachment
+  remains anatomically traceable.
+
+  Do not depict an ordinary animal, feral quadruped, pet, livestock animal,
+  mount, zoo animal, animal-headed human mask, mascot performer, plush toy,
+  fursuit, taxidermy body, or human wearing glued-on ears and a tail. Do not
+  use cub, pup, kitten, hatchling, childlike proportions, juvenile behavior,
+  school-age coding, or age ambiguity.
+
+  Give each furry being one coherent species anatomy. Preserve muzzle length,
+  ear shape, eye color, fur pattern, tail, hands, feet, height, build, scars,
+  horns, and other anchors in every Frame. Do not mix random species parts or
+  change species between Frames.
+
+  FURRY WARDROBE FREEDOM
+
+  Every furry being wears at least one clearly visible, species-adapted garment
+  or designed wearable element that expresses the character's occupation,
+  culture, status, current task, and personal taste. The model freely invents
+  the outfit from the Theme rather than selecting from a preset costume list.
+  Do not assign a fixed outfit or garment family to a species, source lane,
+  Theme ID, gender presentation, or content level.
+
+  Allow practical workwear, tailored clothing, robes, coats, layered textiles,
+  ceremonial dress, travel clothing, uniforms, aprons, belts, harnesses,
+  jewelry, protective equipment, or an equally specific original design. These
+  are open examples, not required categories. Vary silhouette, coverage,
+  material, construction, fasteners, wear, color, and accessories according to
+  the generated character and environment.
+
+  At Erotic or Hardcore level, garments may be opened, loosened, lifted,
+  unfastened, or displaced only where the named contact requires it. Keep
+  another unmistakable part of the designed outfit visible and readable; never
+  leave the furry being as an entirely unclothed fur-only body. Clothing must
+  remain clear of joints, tails, wings, weight-bearing points, mouths, and the
+  sexual-contact path.
+
+  LIVE-ACTION FURRY REALISM
+
+  Render the human as a photographed adult performer and every furry being as a
+  physically present cinematic creature sharing the same set, lens, light,
+  gravity, and contact shadows.
+
+  Use individually visible fur strands with directional growth, denser guard
+  hair over a softer undercoat, natural clumping at joints, subtle variation in
+  length and color, dampness or dust only when the setting causes it, wet
+  reflective eyes, translucent ear edges, textured nose leather, believable
+  whisker roots, and species-appropriate teeth and tongue.
+
+  Build faces through plausible skull, muzzle, cheek, brow, eyelid, and jaw
+  structures. Expressions must remain readable through ear angle, eyelids,
+  brows, muzzle tension, lips, nostrils, whiskers, and head posture without
+  turning the face into a human face covered in fur.
+
+  Wardrobe must sit on the actual creature anatomy. Collars accommodate neck
+  fur; sleeves account for wrist and forepaw structure; trousers, robes, and
+  armor accommodate digitigrade or plantigrade legs and a tail opening; hats
+  and helmets accommodate ears, horns, or antlers. Show compression, displaced
+  fur, seams, buckles, weight, abrasion, and contact rather than floating
+  costume pieces.
+
+  Favor practical creature effects, prosthetic facial construction,
+  animatronic subtlety, real textiles, weathered metal, carved wood, leather,
+  ceramic, feathers, and on-set atmosphere. Digital enhancement may refine
+  eyes, mouth articulation, tail balance, or wings, but must remain subordinate
+  to photographed material reality.
+
+  Do not use anime, manga, cel shading, illustration, comic panels, concept
+  art, painterly rendering, mascot styling, plush softness, toy anatomy,
+  plastic skin, glossy game CGI, weightless digital fur, generic fantasy
+  wallpaper, or a screenshot interface.
+
+  PUBLIC-DOMAIN MYTHIC LANES
+
+  Vary among public-domain lanes while respecting each culture's source
+  material and avoiding a costume collage:
+
+  - Journey to the West encounters: a real human mediator bargains with Sun
+    Wukong at a celestial checkpoint, catches Zhu Bajie falsifying a feast
+    inventory, helps the Bull Demon King repair a cracked oath furnace, or
+    refuses an underworld official's impossible travel permit.
+  - Eight Immortals encounters: reinterpret one Immortal through an original
+    furry embodiment linked to a traditional attribute, such as a crane,
+    deer, fox, tiger, carp, bat, or tortoise, while retaining the legendary
+    object or moral tension without copying a modern depiction.
+  - Chinese myth and folklore: animal spirits, dragon-court envoys, moon
+    rabbits, fox spirits, qilin magistrates, guardian lions, ox-headed
+    underworld clerks, bird messengers, or mountain demons.
+  - Angels and demons: original lion, ram, raven, owl, serpent, or stag beings
+    negotiating judgment, temptation, confession, mercy, memory, or a broken
+    covenant. Avoid modern franchise cosmology and generic red-devil parody.
+  - Greek and Roman myth: satyrs, fauns, sphinxes, harpies, animal-aspected
+    messengers, underworld guides, or invented temple guardians.
+  - Egyptian and Mesopotamian myth: animal-headed divine envoys, sphinxes,
+    lamassu-derived guardians, jackal archivists, ibis judges, lioness
+    protectors, or bull gatekeepers, interpreted respectfully and originally.
+  - Norse and Northern European folklore: raven seers, wolf oath-keepers,
+    bear berserker spirits, fox tricksters, goat bridge wardens, or original
+    winter court beings without modern superhero styling.
+  - Japanese, Korean, South Asian, Southeast Asian, African, Oceanic, and
+    Indigenous American traditions when the Theme can identify a specific
+    public-domain source and avoid flattening distinct cultures into generic
+    exotic fantasy.
+
+  Do not combine unrelated sacred objects, garments, scripts, architecture, and
+  species merely for spectacle. One Theme must use one coherent cultural or
+  original-world register.
+
+  The requested themes and frames run parameters are the sole authority for how
+  many Themes and Frames to create. Do not assume a six-Theme batch, require a
+  minimum Theme count, invent missing Theme IDs, or stop after a preset catalog.
+  Do not assign T001, T002, or any other Theme ID to a predetermined source,
+  species, culture, occupation, or character family.
+
+  For each requested Theme, independently choose any compatible public-domain
+  lane or an original-world lane after considering what has already appeared in
+  the current batch. Keep every choice open-ended and model-generated. Across
+  the actual requested batch, avoid repeating a source tradition, species,
+  occupation, central object, encounter family, pose geometry, or visual
+  strategy until the available range has been substantially explored. This is
+  a diversity objective within the supplied Theme count, never a fixed sequence
+  or index-to-lane mapping.
+
+  ORIGINAL FANTASY AND HEROIC LANES
+
+  Original high-fantasy lanes may include a wolf border marshal, fox court
+  advocate, bear siege medic, hyena debt collector, otter canal engineer,
+  raven astronomer, tiger monastery cook, hare smuggler, crocodile harbor
+  judge, moth oracle, snow-leopard cartographer, or an equally specific role.
+
+  Original heroic lanes may include a rhinoceros disaster rescuer, cheetah
+  transit guardian, bat evidence hunter, owl rooftop negotiator, pangolin
+  tunnel defender, elephant memory investigator, or a cosmic animal-headed
+  arbiter. Their powers, equipment, emblems, silhouettes, and moral conflicts
+  must be newly invented and must not reproduce a modern comic character.
+
+  Give every original being an occupation or social duty, one private want,
+  one contradiction, one material vocabulary, and one limitation. A species
+  label plus armor or a cape is not a complete character.
+
+  INTERACTION DESIGN
+
+  Build one indivisible interaction in every Theme:
+
+  1. the primary protagonist wants one concrete outcome;
+  2. each other participant wants a different concrete outcome, or a solo
+     protagonist confronts one concrete physical obstacle or choice;
+  3. one physical object, structure, route, ritual, document, machine, meal,
+     performance, or natural force makes those wants collide;
+  4. the protagonist makes a visible, consequential decision that has already
+     taken effect in the depicted instant;
+  5. every other character physically responds;
+  6. the frozen image makes the changed balance of power readable.
+
+  Useful interaction families include bargaining over a magical toll, testing
+  an oath, repairing a mythic mechanism, sharing a dangerous meal, translating
+  a prophecy, exposing a forged miracle, conducting a rescue, refusing a
+  contract, returning a stolen name, staging a diplomatic portrait, crossing a
+  living bridge, settling a celestial labor dispute, or teaching a creature a
+  human craft while learning its nonhuman equivalent.
+
+  Prefer interaction over combat. If a Theme uses a fight, show one readable
+  decision point with stable support, clear weapon ownership, and reversible
+  stakes rather than gore, execution, torture, or anonymous battle spectacle.
+
+  Every participant must touch, carry, pull, brace, block, exchange, operate,
+  or be mechanically affected by the same central object or force. State
+  contact points, force directions, weight, balance, and immediate reactions.
+  Do not arrange characters as an unrelated lineup.
+
+  Do not end a Theme with the protagonist waiting, preparing, needing, trying,
+  considering, or being required to choose. Never write "must choose," "must
+  decide," "waits for a decision," "the decision to come," or an equivalent
+  future-facing dilemma. State what the protagonist chooses, show the physical
+  action that enacts it, and show the furry cast's immediate response.
+
+  TWO-WOMEN-ONE-MAN ABSOLUTE LOCK
+
+  When female_count = 2 and male_count = 1, this rule overrides every later
+  character, anatomy, and action choice. Use exactly three visible adult bodies:
+  two named human women and one named adult male anthropomorphic furry.
+  human_count = 2 and furry_count = 1. The phrases human man and female furry
+  are forbidden anywhere in the Theme or Frame, and no fourth body exists.
+
+  In the first sentence, name both human women and the male furry before stating
+  the act. Give the male furry direct sexual contact with the first human woman,
+  then give the second human woman direct contact with one of the other two in
+  the same sentence. The second woman may touch the first woman's named anatomy
+  or the male furry's named anatomy, but may not only touch herself, watch,
+  pose, hold clothing, or wait. Choose the act around this immutable three-body
+  chain; never change a participant's category or gender to obtain a preferred
+  act.
+
+  The cast declaration must continue in that same sentence with this explicit
+  contact grammar: "the male furry's penis is inside the first human woman's
+  vagina, while the second human woman's hand directly contacts either the first
+  woman's clitoris or the male furry's penis or scrotum". Replace role labels
+  with the three generated names. This contact grammar is fixed for count
+  reliability; species, identities, clothing, setting, support geometry, pose,
+  camera, lighting, and narrative context remain freely generated.
+
+  CONTENT LEVEL
+
+  Honor only the requested content level.
+
+  At aesthetic level, keep every requested adult fully dressed and make the
+  action non-erotic. Use adventure, humor, rivalry, diplomacy,
+  friendship, awe, suspicion, rescue, ritual, or social satire.
+
+  At erotic level, every participant must remain an unmistakably adult,
+  sapient, bipedal person with human-level agency and speech. Allow
+  consensual romantic tension, partial nudity, exposed adult skin or fur,
+  reciprocal embrace, kissing, sensual grooming, or non-explicit intimate
+  contact. Do not use feral posture, ownership language, breeding language,
+  heat or rut, coercion, penetration, genital contact, sexual fluids, or an
+  ordinary animal.
+
+  At hardcore level, every participant must remain an unmistakably adult,
+  sapient, bipedal person with human-level agency and the visible ability to
+  stop. Show one explicit consensual adult sexual act already occurring, not a
+  fight, ritual wound, handshake, rescue, object exchange, or merely intense
+  nonsexual encounter. Use direct literal sexual language with clear adult
+  anatomy, exact present contact, body orientation, support, reciprocal action,
+  and displaced clothing.
+
+  Within the first one hundred English words of every Hardcore Frame, state
+  total_count, the exact human_count and furry_count split, every participant's
+  human or furry category and gender, and the exact phrase "consensual and
+  willing". Name the exact sexual act and active anatomy. For total_count equal
+  to one, place the furry protagonist's explicit solo manual contact in the
+  first sentence. For larger casts, place every participant in the same direct
+  genital, oral, or manual sexual action chain within the first two sentences.
+  For intercourse, explicitly state whose penis is inside whose vagina or anus.
+  For oral or manual sex, state whose mouth, tongue, hand, or fingers contact
+  which named genitals. Vague phrases such as intimate contact, joined bodies,
+  explicit interaction, physical union, or point of contact do not satisfy
+  Hardcore.
+
+  At Hardcore level, the first sentence takes absolute priority over the general
+  location-first opening rule. Begin that sentence by calling the image a
+  "live-action fantasy photograph", stating the exact requested adult gender
+  totals, exact human_count, exact furry_count, and each named participant's
+  human or anthropomorphic furry category and gender. Name the explicit
+  consensual and willing solo or shared sexual act already in progress. Put the
+  direct anatomical contact in this same first sentence. Only after this
+  complete cast-and-contact declaration may the prose establish the precise
+  location, season, date, and current light. Never spend the opening sentence on
+  scenery, biography, wardrobe, mythology, a decision, or an object.
+
+  All sexual anatomy is ordinary adult humanoid anatomy appropriate to the
+  character. A furry adult may have visible fur, an animal head, digitigrade
+  legs, paws, claws, a tail, horns, or wings, but sexual contact uses only a
+  humanoid mouth, tongue, hands, fingers, penis, vagina, anus, vulva, or
+  clitoris. Never use a muzzle shape, beak, horn, claw, tail, wing, paw pad,
+  tentacle, weapon, magical effect, or environmental object for penetration or
+  stimulation. Keep claws retracted and teeth away from skin during intimacy.
+
+  Never involve a feral body, ordinary animal, pet relationship, captivity,
+  ownership, breeding, heat or rut, intoxication, coercion, violence, blood,
+  ritual cutting, injury, or age ambiguity. In a shared scene, every participant
+  actively touches or sexually engages another participant; no adult merely
+  watches from the background. In a solo scene, show only the furry protagonist
+  actively touching her or his own anatomy.
+
+  The selected level changes intimacy, clothing, contact, and staging; it does
+  not change the allocated cast, furry species, mythology, setting, central
+  goal, or character agency.
+
+  THEME CONTRACT
+
+  Each Theme must establish:
+
+  - exactly total_count requested adult character slots and gender totals;
+  - the deterministic human_count and furry_count allocation;
+  - one stable primary protagonist, who is furry when total_count equals one;
+  - every allocated furry being's stable adult species and identity anchors;
+  - one allowed public-domain source or one original-world premise;
+  - one precise country, location, era, season, time, and social occasion;
+  - one central interaction and incompatible set of wants;
+  - one protagonist decision and one reaction from every other participant, or
+    one visible bodily response to the completed action in a solo Theme;
+  - one physically important object, structure, route, or environmental force;
+  - one coherent wardrobe and material system for every character;
+  - one original cinematic style name and a concise visible definition;
+  - one emotional thesis that can be understood without franchise knowledge.
+
+  End every Theme premise with two concise proof clauses in this semantic order:
+  "Decision: [protagonist name] [completed physical action that enacts the
+  choice]. Immediate response: [every other participant's current physical
+  reaction, or the solo protagonist's visible bodily response]."
+  Both clauses must describe facts already visible in the proposed image. Do
+  not substitute a question, dilemma, future obligation, internal intention, or
+  list of alternatives.
+
+  The premise must end after the Immediate response clause. Put the visual style
+  only in the separate Theme style value. Do not append "Style:", repeat the
+  style value, or place camera and lighting instructions inside the premise.
+
+  Themes must differ in source lane, species, protagonist identity, setting,
+  relationship, objective, structure, action, palette, camera strategy, and
+  light. Do not create one repeated throne-room negotiation with renamed
+  animals.
+
+  FRAME CONTRACT
+
+  Each Frame is one standalone live-action photograph from its Theme. Restate
+  the exact requested gender totals, human_count, furry_count, primary
+  protagonist, every participant, source or original-world context, location,
+  current action, wardrobe state, body support, contact map, cinematic style,
+  camera, and lighting without relying on another Frame.
+
+  An English Frame is one ASCII-only natural-language paragraph containing a
+  hard minimum of 600 whitespace-delimited words. Target 750-950 words of concrete,
+  visible, imageable detail. Count silently before returning. If the paragraph
+  is below 600 words, add new spatial, anatomical, character, fur, wardrobe,
+  support, contact, environmental, camera, lighting, or material detail without
+  repeating established facts. Never mention a word count or length check in
+  the final prose.
+
+  Keep identity, species anatomy, motivation, central object, and dramatic
+  premise stable. Restage one equivalent decisive instant through different
+  participant blocking, gesture, contact geometry, foreground, viewpoint, shot
+  scale, focal hierarchy, and light direction. Keep the date, time window,
+  weather state, decision status, object state, and action phase fixed. Frames
+  are parallel alternatives, not a chronological transformation sequence.
+
+  Every Frame must show the protagonist's completed decision through a present
+  physical action and the furry cast's immediate physical response. Do not
+  depict the instant before a choice, an unresolved pause, an ambiguous
+  acceptance, or a possible future action. Do not use "same," "still,"
+  "earlier," "again," "later," "now," "before," "after," or another continuity
+  shortcut to make one Frame depend on another.
+
+  At Aesthetic and Erotic levels, begin every Frame by independently naming the
+  precise location, country, season or date, and current time or light
+  condition. At Hardcore level, use the mandatory cast-and-contact first
+  sentence, then independently name the precise location, country, season or
+  date, and current time or light condition immediately afterward. Within the
+  first third of the paragraph, show the protagonist physically enacting the
+  completed decision and show the central object changing in response. Write
+  the opening as a complete first presentation with no backward pointer or
+  reference to another Frame.
+
+  F02 is not later than F01, and no Frame occurs before or after another Frame.
+  Do not describe a person or object as having moved, descended, advanced,
+  remained, continued, changed, or become different relative to another
+  depiction. Every variation must read as a fresh staging of the shared
+  decisive instant rather than evidence of elapsed time.
+
+  Keep the primary protagonist unmistakably primary: the protagonist's face,
+  deciding hand or body action, and consequential contact must occupy the
+  clearest focal plane. Another participant may dominate physical scale but
+  must not displace the protagonist from narrative and optical priority.
+
+  Show complete, traceable bodies whenever contact or support depends on limbs,
+  tail, wings, or digitigrade legs. Close framing may crop only anatomy that is
+  irrelevant to the current action. Never hide the protagonist's decision,
+  the furry being's response, or the central contact behind fur, wings,
+  clothing, smoke, furniture, or cinematic darkness.
+
+  HARDCORE POSE GEOMETRY
+
+  At Hardcore level, choose a low-risk pose on one broad, dry, level,
+  room-temperature, non-slip support large enough for every participant. Use a
+  bed, padded dais, wide bench, carpeted floor, or similarly stable surface.
+  Do not select from or repeat a fixed catalog of named poses. For every Theme,
+  invent a new physically plausible pose from the participants' anatomy, scale,
+  current action, relationship, clothing state, nearby structure, and available
+  support. Let the model decide whether bodies recline, sit, kneel, crouch, lean,
+  turn, face, or offset from one another, provided every joint and support point
+  remains natural, visible, and mechanically credible.
+
+  Vary the relative pelvis angle, torso angle, facing direction, participant
+  height, front-to-back order, lateral offset, limb contacts, weight-bearing
+  points, negative space, and camera side. These are creative dimensions, not a
+  menu or required combination. There is no mandatory pose sequence, quota, or
+  four-pose cycle. Do not reuse the same body arrangement merely by changing
+  the location, species, wardrobe, or camera.
+
+  Do not use standing penetration, a wall-pressed body, one-foot balance,
+  tiptoe balance, lifted or carried sex, suspended bodies, a furry adult
+  standing on digitigrade feet while leaning over a kneeling human, or any pose
+  that requires the participants' pelvises to meet at incompatible heights.
+  Never solve a height difference by elongating a thigh, twisting a knee,
+  detaching a hip, bending a spine beyond a natural range, or hiding the lower
+  bodies.
+
+  Before describing wardrobe, environment, camera, light, fur, or atmosphere,
+  complete a silent limb ledger for every participant. Then state in the Frame:
+
+  - pelvis orientation and the surface supporting the pelvis or torso;
+  - the left arm, left hand, right arm, and right hand, each with one distinct
+    reachable contact or support;
+  - the left thigh, left knee, left lower leg, and left foot;
+  - the right thigh, right knee, right lower leg, and right foot; and
+  - which limbs bear weight and which remain relaxed.
+
+  Complete this side-specific limb map within the first three hundred English
+  words, before extended setting or cinematic detail. Use the literal side
+  labels "left arm", "left hand", "right arm", "right hand", "left thigh",
+  "left knee", "left lower leg", "left foot", "right thigh", "right knee",
+  "right lower leg", and "right foot" for the human and again for each furry
+  participant. Collective phrases such as both arms, both hands, both legs, both
+  knees, both feet, limbs, or lower body may summarize only after the separate
+  left and right chains are established; they never replace the side-specific
+  map.
+
+  Immediately after the mandatory Hardcore cast-and-contact sentence and the
+  single location sentence, describe pelvis support and the complete human limb
+  map, then the complete furry limb map. Do not insert face, hair, biography,
+  mythology, wardrobe, object, architecture, atmosphere, or lighting detail
+  between the location sentence and these two limb maps.
+
+  Keep human arms visually separate from furry forelimbs. Do not layer one
+  forearm directly over another, hide a wrist inside fur, merge a human hand
+  with a furry paw, place two hands at the same indistinguishable contact, or
+  let long fur conceal an elbow, knee, ankle, or hip transition. Every hand or
+  forepaw has exactly five readable digits unless the source tradition clearly
+  requires a different fixed count, and that count remains consistent.
+
+  Every furry being has exactly two arms and two legs. Keep shoulders, elbows,
+  wrists, pelvis, hips, knees, ankles, and feet in a coherent humanoid hierarchy.
+  For digitigrade legs, show both matching heel lifts, hocks, ankles, and
+  forefeet on the same support plane. Never add a third leg, duplicate a knee,
+  reverse a joint, fuse thighs, or let a bent tail resemble an unowned limb.
+
+  The tail is never load-bearing during intimacy. Place it inactive behind or
+  beside the furry pelvis, fully separated from all legs, arms, genitals, and
+  the human silhouette. Do not coil it around architecture, furniture, a limb,
+  or another body, and do not aim it toward the sexual-contact zone. Wings,
+  robes, blankets, and long fur also remain outside joint boundaries and
+  sexual-contact paths.
+
+  Match the sexual act to the visible head anatomy. A furry being with a beak,
+  bill, rigid muzzle, tusks, large fangs, or strongly projecting animal jaws
+  never performs oral-genital contact. Use intercourse with ordinary humanoid
+  genitals or manual contact with five-digited hands instead. Never describe a
+  crane, raven, eagle, boar, crocodile, or similarly headed being as having a
+  hidden humanoid mouth inside or beneath the visible animal head.
+
+  NON-ORAL MOUTH SAFETY
+
+  When the named act is intercourse or manual contact rather than oral contact,
+  keep every hand, finger, forepaw, claw, object, garment edge, and tail outside
+  the human and furry mouths. Keep lips, teeth, tongue, jawline, and muzzle
+  clearly separated from every hand and object. Do not cradle, cover, press,
+  pull, or stroke a face near the lips, and do not put a thumb, finger, paw, or
+  claw against the mouth. Instead, place supporting hands below the collarbones
+  or on the shared support, hips, waist, shoulder cap, upper arm, or outer
+  thigh, with each contact fully visible.
+
+  Do not add licking, sucking, biting, gagging, finger-sucking, a protruding
+  tongue, or an open mouth reaching toward a hand unless oral contact is the
+  single named act. In an oral-contact Frame, only the named adult humanoid
+  sexual anatomy may cross the lip line; all hands, claws, forepaws, tails,
+  clothing, and props stay away from the mouth. Preserve a natural jaw hinge,
+  undistorted lips, readable teeth, one tongue, and clear separation between
+  the mouth and nearby fingers.
+
+  Use a 35mm to 65mm three-quarter or full-body camera view that keeps every
+  weight-bearing hand, knee, lower leg, and foot inside the image. Position the
+  camera obliquely enough to separate overlapping limbs. Do not use frontal
+  silhouette stacking, extreme foreshortening, a cropped pelvis, or a close view
+  that hides the support chain. Keep the exact sexual contact readable without
+  sacrificing complete limb ownership.
+
+  PHYSICAL AND OPTICAL INTEGRITY
+
+  Keep every body anatomically traceable and grounded. Preserve one head, one
+  torso, two arms, and two legs unless a traditional mythic anatomy explicitly
+  requires otherwise. Keep hands, forepaws, claws, hooves, wings, horns, tails,
+  and clothing attachments consistent and assign every visible limb to one
+  owner.
+
+  Show believable height differences, center of gravity, foot placement,
+  digitigrade balance, furniture load, fur compression, cloth tension,
+  gripping, recoil, and cast shadows. Large wings or tails must affect balance
+  and nearby materials.
+
+  Use motivated practical light with readable eyes and faces. Preserve human
+  skin pores, fine hair, sweat, scars, and fabric response alongside creature
+  fur, scales, feathers, nose texture, eye moisture, and whiskers. Keep all
+  allocated humans and furry beings in one photographic reality.
+
+  Write only the finished scene description. Do not mention the brief, prompt,
+  request, model, generator, rule, requirement, compliance, content-level name,
+  reader, or viewer. Do not echo authoring language such as "the image reads
+  first as," "only afterward," "the frozen instant," "narrative priority," or
+  "optical priority." Express those qualities through visible action,
+  composition, focus, material, and light instead.
+
+  When the requested language is English, use only ASCII code points U+0020
+  through U+007E in every Theme and Frame. Transliterate personal and place
+  names into plausible ASCII Latin spelling, replace smart punctuation with
+  plain ASCII punctuation, and reject any non-ASCII glyph before returning.
+
+  Before submitting English Themes and Frames, scan every title, premise,
+  style, and prose value. Rewrite the value if it contains a non-ASCII code
+  point. Reject any Frame that refers to another Frame, presents itself as a
+  continuation, or advances the fixed time window.
+
+  VARIATION AND REJECTION RULES
+
+  Reject and rewrite any Theme or Frame containing:
+
+  - a visible adult count different from total_count;
+  - female or male character totals different from female_count or male_count;
+  - a furry_count other than one, a human_count inconsistent with total_count -
+    one, or a human in a total_count-one run;
+  - a single-slot Theme or Frame containing a human, partner, companion, second
+    name, second body, or wording that counts the sole slot once as human and
+    again as furry;
+  - a primary protagonist who is passive or visually secondary;
+  - a copyrighted franchise character or a disguised imitation;
+  - a named real creator's style or a real person's identifying name;
+  - an actor likeness or a copied modern adaptation;
+  - an ordinary, feral, juvenile, pet, livestock, or mascot-like animal;
+  - anime, illustration, comic art, game CGI, or fursuit appearance;
+  - inconsistent species anatomy or identity drift;
+  - an unspecified furry gender, collective gender ambiguity, pronoun drift, or
+    sexual anatomy that contradicts the furry being's stated male or female
+    gender;
+  - an extra, missing, duplicated, detached, fused, reversed, or unowned limb;
+  - a hidden hip, knee, ankle, elbow, wrist, weight-bearing hand, or supporting
+    foot in a Hardcore pose;
+  - collective "both legs", "both knees", "both feet", "limbs", or "lower
+    body" language used before separately tracing every left and right limb;
+  - standing, wall-pressed, lifted, suspended, one-foot, tiptoe, or
+    height-incompatible penetrative positioning;
+  - a tail used for leverage, wrapped around architecture or a body, merged with
+    a leg, or aimed toward sexual contact;
+  - a human arm merged with a furry forelimb, a human hand merged with a paw, or
+    multiple hands hidden at one indistinguishable contact;
+  - oral-genital contact performed by a furry being with a beak, bill, rigid
+    muzzle, tusks, large fangs, or projecting animal jaws;
+  - a non-oral act with a hand, finger, forepaw, claw, tail, garment, or object
+    touching or entering a mouth, or with a hand posed against the lips;
+  - a Hardcore camera outside 35mm through 65mm or a crop that hides the limb
+    and support chain;
+  - unrelated characters posing beside one another;
+  - hidden or contradictory contact and support;
+  - cultural elements mixed without a coherent source;
+  - generic armor, generic ruins, or generic magical glow replacing a story;
+  - unallocated background humans, furry beings, reflections, or human-shaped
+    decoration that create an extra visible body;
+  - content-level drift, ambiguous adulthood, impaired consent, or coercion;
+  - a Hardcore Frame without a clearly named adult sexual act and exact active
+    anatomy in the first two sentences and first one hundred English words;
+  - a Hardcore first sentence that does not contain "live-action fantasy
+    photograph", total_count, exact requested gender totals, human_count,
+    furry_count, every participant's category and gender, "consensual and
+    willing", and direct solo or shared anatomical sexual contact;
+  - a Hardcore Frame that uses "explicit interaction" for nonsexual ritual,
+    violence, injury, object handling, or an ordinary social encounter;
+  - a Hardcore participant who only observes instead of taking an active,
+    willing, physically traceable role;
+  - penetration or stimulation with a claw, horn, tail, wing, paw pad, beak,
+    muzzle shape, weapon, magical effect, or environmental object;
+  - blood, ritual cutting, injury, breeding language, heat, or rut in an Erotic
+    or Hardcore Frame;
+  - an English Frame below 600 whitespace-delimited words;
+  - a future-facing choice or unresolved protagonist decision;
+  - continuity shorthand or authoring instructions leaked into final prose;
+  - a Theme premise that repeats or labels its separate style value;
+  - any non-ASCII character in an English Theme or Frame;
+  - Frames that merely paraphrase one another.
+
+  Before returning, verify that the image would read first as a photograph of a
+  real adult protagonist making a consequential choice, with every allocated
+  human and intelligent furry body physically present, and only afterward as
+  mythology or fantasy.

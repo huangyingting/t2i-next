@@ -10,6 +10,12 @@ from pydantic import ValidationError
 
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.documents import (
+    StoryDocument,
+    StoryGeneration,
+    StoryRuntime,
+    load_story_document,
+)
 from t2i_story_pipeline.errors import (
     StoryConfigurationError,
     StoryPipelineError,
@@ -18,6 +24,8 @@ from t2i_story_pipeline.errors import (
 from t2i_story_pipeline.models import (
     ContentLevel,
     OutputLanguage,
+    QualityMode,
+    StoryQualityPolicy,
     StoryRequest,
     StoryRuleSet,
 )
@@ -52,29 +60,29 @@ def generate_command(
         None,
         help="包含时间、地点、人物、事件与氛围的故事描述。",
     ),
-    prompt_file: Path | None = typer.Option(
+    input_file: Path | None = typer.Option(
         None,
-        "--prompt-file",
+        "--input",
         exists=True,
         file_okay=True,
         dir_okay=False,
         readable=True,
         resolve_path=True,
-        help="从 UTF-8 文本文件读取完整故事描述。",
+        help="读取 UTF-8 YAML 故事文档（正文、生成参数、创作规则与质量策略）。",
     ),
-    themes: int = typer.Option(
-        1,
+    themes: int | None = typer.Option(
+        None,
         "--themes",
         min=1,
         max=100,
-        help="微型故事主题数。",
+        help="覆盖文档主题数；未配置时为 1。",
     ),
-    frames: int = typer.Option(
-        6,
+    frames: int | None = typer.Option(
+        None,
         "--frames",
         min=1,
         max=6,
-        help="每个主题的连续故事画面数。",
+        help="覆盖文档每主题帧数；未配置时为 6。",
     ),
     female_count: int | None = typer.Option(
         None,
@@ -90,22 +98,34 @@ def generate_command(
         max=8,
         help="可选男性人数约束；默认遵循 Story Description。",
     ),
-    concurrency: int = typer.Option(
-        8,
+    concurrency: int | None = typer.Option(
+        None,
         "--concurrency",
         min=1,
         max=32,
-        help="并行生成主题画面序列的数量。",
+        help="覆盖文档并发数；未配置时为 8。",
     ),
-    content_level: ContentLevel = typer.Option(
-        ContentLevel.AESTHETIC,
+    generation_retries: int | None = typer.Option(
+        None,
+        "--generation-retries",
+        min=0,
+        max=5,
+        help="覆盖文档生成重试次数；未配置时为 2。",
+    ),
+    quality_mode: QualityMode | None = typer.Option(
+        None,
+        "--quality-mode",
+        help="可选质量检查：off、report 或 enforce；不影响基础结构契约。",
+    ),
+    content_level: ContentLevel | None = typer.Option(
+        None,
         "--content-level",
-        help="内容尺度：aesthetic、erotic 或 hardcore。",
+        help="覆盖文档内容尺度；未配置时为 aesthetic。",
     ),
-    output_language: OutputLanguage = typer.Option(
-        OutputLanguage.CHINESE,
+    output_language: OutputLanguage | None = typer.Option(
+        None,
         "--language",
-        help="叙事正文语言。",
+        help="覆盖文档正文语言；未配置时为 chinese。",
     ),
     prompts_dir: Path = typer.Option(
         Path("prompts"),
@@ -128,15 +148,44 @@ def generate_command(
 ) -> None:
     """Generate themes and final narrative paragraphs from one story."""
     try:
-        request = StoryRequest(
-            story=_resolve_story_input(story, prompt_file),
-            source_prompt_stem=(prompt_file.stem if prompt_file is not None else None),
-            theme_count=themes,
-            frames_per_theme=frames,
-            female_count=female_count,
-            male_count=male_count,
-            content_level=content_level,
-            output_language=output_language,
+        document = _resolve_document(story, input_file)
+        generation = document.generation if document else StoryGeneration()
+        generation_overrides = {
+            key: value
+            for key, value in {
+                "theme_count": themes,
+                "frames_per_theme": frames,
+                "content_level": content_level,
+                "output_language": output_language,
+            }.items()
+            if value is not None
+        }
+        cast_overrides = {
+            key: value
+            for key, value in {
+                "female_count": female_count,
+                "male_count": male_count,
+            }.items()
+            if value is not None
+        }
+        generation = StoryGeneration.model_validate(
+            {
+                **generation.model_dump(),
+                **generation_overrides,
+                "cast": {**generation.cast.model_dump(), **cast_overrides},
+            }
+        )
+        description = document.description if document else story
+        if description is None:
+            raise AssertionError("story input resolution changed unexpectedly")
+        request = generation.request(description, document.id if document else None)
+        runtime = document.runtime if document else StoryRuntime()
+        quality = document.validation.quality if document else StoryQualityPolicy()
+        quality = StoryQualityPolicy.model_validate(
+            {
+                **quality.model_dump(),
+                **({"mode": quality_mode} if quality_mode is not None else {}),
+            }
         )
         default_rules_directory = Path("story-inputs") / "rules"
         user_rules_directory = (
@@ -147,14 +196,27 @@ def generate_command(
         rules = resolve_story_rules(
             request,
             user_directory=user_rules_directory,
+            authoring=document.authoring if document else None,
         )
-        settings = load_story_provider_settings()
+        settings = StoryRunSettings(
+            provider=load_story_provider_settings(),
+            concurrency=(
+                concurrency if concurrency is not None else runtime.concurrency
+            ),
+            generation_retries=(
+                generation_retries
+                if generation_retries is not None
+                else runtime.generation_retries
+            ),
+            quality=quality,
+        )
+        if not quality.checks and quality.mode != QualityMode.OFF:
+            typer.echo("未配置可选质量检查；仅执行基础结构契约。")
         completed = asyncio.run(
             _generate(
                 request,
                 settings,
                 rules,
-                concurrency=concurrency,
                 runs_directory=runs_dir,
                 prompts_directory=prompts_dir,
             )
@@ -230,65 +292,37 @@ def runs_command(
         )
 
 
-def _resolve_story_input(
+def _resolve_document(
     story: str | None,
-    prompt_file: Path | None,
-) -> str:
-    if story is not None and prompt_file is not None:
+    input_file: Path | None,
+) -> StoryDocument | None:
+    if story is not None and input_file is not None:
         raise typer.BadParameter(
-            "不能同时提供故事描述和 --prompt-file。",
-            param_hint="STORY/--prompt-file",
+            "不能同时提供故事描述和 --input。",
+            param_hint="STORY/--input",
         )
-    if story is None and prompt_file is None:
+    if story is None and input_file is None:
         raise typer.BadParameter(
-            "必须提供故事描述或 --prompt-file。",
-            param_hint="STORY/--prompt-file",
+            "必须提供故事描述或 --input。",
+            param_hint="STORY/--input",
         )
-    if story is not None:
-        return story
-
-    if prompt_file is None:
-        raise AssertionError("story input resolution changed unexpectedly")
-    try:
-        text = prompt_file.read_text(encoding="utf-8")
-    except UnicodeError as exc:
-        raise typer.BadParameter(
-            "提示词文件必须是有效的 UTF-8 文本。",
-            param_hint="--prompt-file",
-        ) from exc
-    except OSError as exc:
-        raise typer.BadParameter(
-            f"无法读取提示词文件：{exc}",
-            param_hint="--prompt-file",
-        ) from exc
-    text = text.strip()
-    if not text:
-        raise typer.BadParameter(
-            "提示词文件不能为空。",
-            param_hint="--prompt-file",
-        )
-    return text
+    return load_story_document(input_file) if input_file is not None else None
 
 
 async def _generate(
     request: StoryRequest,
-    settings: StoryProviderSettings,
+    settings: StoryRunSettings,
     rules: StoryRuleSet,
     *,
-    concurrency: int,
     runs_directory: Path = Path("runs"),
     prompts_directory: Path = Path("prompts"),
 ) -> CompletedStoryRun:
-    run_settings = StoryRunSettings(
-        provider=settings,
-        concurrency=concurrency,
-    )
     store = LocalStoryRunStore(runs_directory, prompts_directory)
-    async with story_model(settings) as model:
+    async with story_model(settings.provider) as model:
         return await StoryStudio(
             model,
             store,
-            run_settings,
+            settings,
             rules,
             on_progress=typer.echo,
         ).run(request)
@@ -315,6 +349,14 @@ def _print_completed(completed: CompletedStoryRun) -> None:
     typer.secho("生成完成。", fg=typer.colors.GREEN)
     typer.echo(f"Run：{completed.run_id}")
     typer.echo(f"叙事提示词：{completed.published.prompt_file}")
+    report = completed.result.quality
+    typer.echo(f"质量检查：{report.status}（{report.mode.value}）")
+    if report.issues:
+        typer.secho(
+            f"存在 {len(report.issues)} 条质量告警；结果按 report 策略发布。",
+            fg=typer.colors.YELLOW,
+        )
+    typer.echo(f"完整结果与质量报告：{completed.result_file}")
 
 
 def _print_run_summary(
@@ -356,4 +398,6 @@ def _exit_for_error(error: Exception, runs_dir: Path) -> None:
             f"继续命令：uv run t2i-story resume {error.run_id} --runs-dir {runs_dir}",
             err=True,
         )
-    raise typer.Exit(code=2) from error
+    raise typer.Exit(
+        code=1 if isinstance(error, StoryRunIncompleteError) else 2
+    ) from error

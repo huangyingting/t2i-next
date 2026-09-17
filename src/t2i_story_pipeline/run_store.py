@@ -27,6 +27,8 @@ from t2i_story_pipeline.models import (
     NarrativeFrameSequence,
     NarrativeTheme,
     SemanticName,
+    StoryQualityIssue,
+    StoryQualityPolicy,
     StoryRequest,
     StoryResult,
     StoryRuleSet,
@@ -36,6 +38,7 @@ from t2i_story_pipeline.models import (
 )
 from t2i_story_pipeline.persistence import durable_mkdir, fsync_directory
 from t2i_story_pipeline.provider import StoryProviderSettings
+from t2i_story_pipeline.quality_validation import StoryQualityError, quality_report
 from t2i_story_pipeline.storage import PublishedStory, publish_story
 
 _RUN_ID = re.compile(r"\d{8}T\d{6}Z-[a-f0-9]{8}")
@@ -166,6 +169,7 @@ class StoryRunSettings(_Model):
     frame_output_tokens: int = Field(default=32768, ge=512, le=65536)
     theme_output_mode: ThemeOutputMode = ThemeOutputMode.STRUCTURED_WITH_IDS
     frame_output_mode: FrameOutputMode = FrameOutputMode.STRUCTURED_SEQUENCE
+    quality: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
 
 
 class StoryRunManifest(_Model):
@@ -194,6 +198,7 @@ class StoryAttempt(_Model):
     duration_ms: int = Field(ge=0)
     error: str | None = None
     usage: TokenUsage = Field(default_factory=TokenUsage)
+    quality_issues: list[StoryQualityIssue] = Field(default_factory=list)
 
 
 @dataclass(frozen=True, slots=True)
@@ -584,6 +589,7 @@ class LocalStoryRunStore:
             raise StoryStorageError("完成结果与已保存 checkpoint 不匹配")
         if result.usage != self.total_usage(run_id):
             raise StoryStorageError("完成结果的 token usage 与运行记录不匹配")
+        self._validate_quality_result(result, snapshot.manifest.settings)
         directory = self._run_directory(run_id)
         result_file = directory / "result.json"
         completion_manifest = snapshot.manifest
@@ -739,6 +745,7 @@ class LocalStoryRunStore:
             raise StoryStorageError(
                 "已完成 run 的 result token usage 与 attempt 记录不匹配"
             )
+        self._validate_quality_result(result, manifest.settings)
         prompt_file = Path(manifest.prompt_file)
         if not prompt_file.is_file():
             raise StoryStorageError("已完成 run 的发布文件不存在")
@@ -751,6 +758,19 @@ class LocalStoryRunStore:
             ),
             result=result,
         )
+
+    @staticmethod
+    def _validate_quality_result(
+        result: StoryResult, settings: StoryRunSettings
+    ) -> None:
+        try:
+            expected = quality_report(
+                settings.quality, result.request.output_language, result.themes
+            )
+        except StoryQualityError as exc:
+            raise StoryStorageError(f"完成结果未通过冻结的质量检查：{exc}") from exc
+        if result.quality != expected:
+            raise StoryStorageError("完成结果的质量报告与冻结策略及 checkpoint 不匹配")
 
     def _allocate_prompt_path(
         self,

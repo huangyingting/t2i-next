@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
+from t2i_story_pipeline.documents import load_story_document
 from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.models import ContentLevel, StoryStage
 from tests.story_factories import make_story_request
@@ -112,27 +113,27 @@ def test_story_rules_fingerprint_changes_with_user_rules(tmp_path) -> None:
 
 def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
     required_contracts = {
-        "creative.txt": (
+        "creative.yaml": (
             "FRAME-STAGE GRID CONTRACT",
             "MINIATURE-WORLD CAMERA LANGUAGE",
             "THUMBNAIL SCALE HIERARCHY",
             "BRIGHT CLEAN COLOR STANDARD",
         ),
-        "multi-view.txt": (
+        "multi-view.yaml": (
             "FULL-BLEED MULTI-VIEW LAYOUT",
             "A full-bleed [two/three/four]-view hard-cut tiled composition",
         ),
-        "dress.txt": (
+        "dress.yaml": (
             "SIX-VIEW BOARD CONTRACT",
             "exactly six non-overlapping view regions",
         ),
-        "edo-warai-e.txt": (
+        "edo-warai-e.yaml": (
             "SPATIAL AND CONTACT GEOMETRY",
             "PERFORMED UKIYO-E TRANSLATION",
             "DISTANCE-READ FLATNESS GATE",
             "MALE BODY VOCABULARY GATE",
         ),
-        "ming-gongbi-mixi-tu.txt": (
+        "ming-gongbi-mixi-tu.yaml": (
             "GONGBI LINE DISCIPLINE",
             "LAYERED GONGBI COLOR",
             "AGED SILK AND PIGMENT PATINA",
@@ -140,7 +141,7 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
     }
 
     for filename, phrases in required_contracts.items():
-        story = (REPOSITORY_ROOT / "story-inputs" / filename).read_text(
-            encoding="utf-8"
-        )
+        story = load_story_document(
+            REPOSITORY_ROOT / "story-inputs" / filename
+        ).description
         assert all(phrase in story for phrase in phrases)

@@ -7,7 +7,7 @@ import json
 import re
 from enum import StrEnum
 from functools import lru_cache
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import (
     AfterValidator,
@@ -101,6 +101,79 @@ class ContentLevel(StrEnum):
 class StoryStage(StrEnum):
     THEMES = "themes"
     FRAMES = "frames"
+
+
+class StoryAuthoring(Model):
+    themes: tuple[RuleText, ...] = ()
+    frames: tuple[RuleText, ...] = ()
+
+
+class QualityMode(StrEnum):
+    OFF = "off"
+    REPORT = "report"
+    ENFORCE = "enforce"
+
+
+class CameraEvidenceCheck(Model):
+    type: Literal["camera_evidence"]
+
+
+class ProseLengthCheck(Model):
+    type: Literal["prose_length"]
+    min_chars: int = Field(default=1, ge=1, le=32768, strict=True)
+    max_chars: int = Field(default=32768, ge=1, le=32768, strict=True)
+
+    @model_validator(mode="after")
+    def ordered_bounds(self) -> ProseLengthCheck:
+        if self.min_chars > self.max_chars:
+            raise ValueError("min_chars 不能大于 max_chars")
+        return self
+
+
+class RequiredTextCheck(Model):
+    type: Literal["required_text"]
+    values: tuple[RuleText, ...] = Field(min_length=1)
+
+
+class ForbiddenTextCheck(Model):
+    type: Literal["forbidden_text"]
+    values: tuple[RuleText, ...] = Field(min_length=1)
+
+
+QualityCheck = Annotated[
+    CameraEvidenceCheck | ProseLengthCheck | RequiredTextCheck | ForbiddenTextCheck,
+    Field(discriminator="type"),
+]
+
+
+class StoryQualityPolicy(Model):
+    mode: QualityMode = QualityMode.REPORT
+    checks: tuple[QualityCheck, ...] = ()
+
+    @model_validator(mode="after")
+    def unique_checks(self) -> StoryQualityPolicy:
+        names = [check.type for check in self.checks]
+        if len(names) != len(set(names)):
+            raise ValueError("同一种质量检查只能配置一次")
+        return self
+
+
+class StoryQualityIssue(Model):
+    theme_id: ThemeId
+    frame_id: FrameId
+    check: Literal[
+        "camera_evidence", "prose_length", "required_text", "forbidden_text"
+    ]
+    message: RuleText
+
+    def feedback(self) -> str:
+        return f"{self.theme_id}-{self.frame_id} [{self.check}] {self.message}"
+
+
+class StoryQualityReport(Model):
+    mode: QualityMode
+    status: Literal["skipped", "passed", "warnings"]
+    issues: list[StoryQualityIssue]
 
 
 class StoryRuleSet(Model):
@@ -218,6 +291,7 @@ class StoryResult(Model):
     request: StoryRequest
     themes: list[NarrativeThemeResult] = Field(min_length=1, max_length=100)
     usage: TokenUsage
+    quality: StoryQualityReport
 
 
 @lru_cache(maxsize=10)
