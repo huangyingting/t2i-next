@@ -19,11 +19,13 @@ from t2i_film_style_pipeline.models import (
     TokenUsage,
     parse_work_reference,
 )
+from t2i_film_style_pipeline.pipeline import FilmStylePromptRequest
 from t2i_film_style_pipeline.profile_messages import profile_messages
 from t2i_film_style_pipeline.provider import ModelResponse
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_film_style_pipeline.service import FilmStyleStudio
 from t2i_film_style_pipeline.storage import publish_film_style
+from t2i_story_pipeline.models import ContentLevel
 
 
 def make_request() -> FilmStyleRequest:
@@ -92,6 +94,18 @@ def test_request_requires_unique_works() -> None:
                 FilmWorkReference(title="film", year=2000),
             ),
         )
+
+
+def test_prompt_request_uses_short_director_filename() -> None:
+    request = FilmStylePromptRequest(
+        film_style=make_request(),
+        content_level=ContentLevel.HARDCORE,
+    )
+
+    story_request = request.story_request("BRIEF\n\nDirector scene context")
+
+    assert story_request.prompt_filename_stem == "张艺谋"
+    assert story_request.source_prompt_stem is None
 
 
 def test_compile_story_description_injects_profile_after_brief_header() -> None:

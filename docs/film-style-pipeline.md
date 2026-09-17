@@ -52,6 +52,10 @@ uv run t2i-film-style generate "张艺谋" \
 - 结构化视觉档案路径；
 - 最终叙事提示词路径。
 
+最终提示词保存在内容等级目录中，文件名只使用清理后的导演署名和递增序号，例如
+`prompts/2026-09-17/hardcore/张艺谋_0001.txt`。内容等级、人物数量和
+`film_style` 等信息不再重复拼入文件名；完整请求仍保存在 run checkpoint 中。
+
 动态作品证据只作为 run 内部上下文保存。film-style 自己拥有完整规则集：
 
 ```text

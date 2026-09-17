@@ -128,6 +128,7 @@ class StoryRuleSet(Model):
 class StoryRequest(Model):
     story: StoryText
     source_prompt_stem: SourcePromptStem | None = None
+    prompt_filename_stem: SourcePromptStem | None = None
     theme_count: int = Field(default=1, ge=1, le=100)
     frames_per_theme: int = Field(default=6, ge=1, le=6)
     female_count: int | None = Field(default=None, ge=0, le=8)

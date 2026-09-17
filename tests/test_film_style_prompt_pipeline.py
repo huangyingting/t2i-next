@@ -136,6 +136,7 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
 
     assert completed.run_id == run_id
     assert completed.prompt_file.exists()
+    assert completed.prompt_file.name == "张艺谋_0001.txt"
     assert completed.compiled_story_file.name == "compiled-story.txt"
     assert completed.compiled_story_file.is_file()
     assert film_model.calls == 1

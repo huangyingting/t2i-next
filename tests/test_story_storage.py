@@ -88,6 +88,22 @@ def test_direct_story_output_stem_keeps_semantic_name_and_cast_slug() -> None:
     )
 
 
+def test_explicit_prompt_filename_stem_bypasses_generated_suffixes() -> None:
+    request = make_story_request(
+        female_count=1,
+        male_count=1,
+        content_level=ContentLevel.HARDCORE,
+    ).model_copy(update={"prompt_filename_stem": "张艺谋"})
+
+    assert (
+        run_store._prompt_filename_stem(
+            request,
+            semantic_name="ignored_for_explicit_name",
+        )
+        == "张艺谋"
+    )
+
+
 def test_prompt_file_output_stem_normalizes_filename_characters() -> None:
     request = make_story_request(
         female_count=1,

@@ -117,6 +117,8 @@ def _prompt_filename_stem(
     request: StoryRequest,
     semantic_name: str,
 ) -> str:
+    if request.prompt_filename_stem is not None:
+        return _normalize_source_prompt_stem(request.prompt_filename_stem)
     if request.source_prompt_stem is None:
         return f"{semantic_name}_{_cast_slug(request)}"
     return "_".join(

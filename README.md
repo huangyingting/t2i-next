@@ -70,6 +70,8 @@ uv run t2i-film-style resume RUN_ID
 ```
 
 恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
+最终提示词使用简短导演署名作为文件名，例如 `张艺谋_0001.txt`；内容等级由父目录
+表示，不在文件名中重复。
 详细接口见
 [`docs/film-style-pipeline.md`](docs/film-style-pipeline.md)。
 

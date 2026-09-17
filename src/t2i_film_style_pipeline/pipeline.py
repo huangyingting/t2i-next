@@ -77,7 +77,9 @@ class FilmStylePromptRequest(_Model):
     ) -> StoryRequest:
         return StoryRequest(
             story=story,
-            source_prompt_stem=f"film_{self.film_style.director[:80]}_film_style",
+            prompt_filename_stem=_short_filename_stem(
+                self.film_style.director,
+            ),
             theme_count=self.theme_count,
             frames_per_theme=self.frames_per_theme,
             female_count=self.female_count,
@@ -85,6 +87,11 @@ class FilmStylePromptRequest(_Model):
             content_level=self.content_level,
             output_language=self.output_language,
         )
+
+
+def _short_filename_stem(value: str) -> str:
+    normalized = re.sub(r"[^\w-]+", "_", value).strip("_-")
+    return normalized[:80] or "导演风格"
 
 
 class FilmStylePipelineSettings(_Model):
