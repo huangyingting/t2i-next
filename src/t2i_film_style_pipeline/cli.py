@@ -107,7 +107,14 @@ def generate_command(
         "--concurrency",
         min=1,
         max=32,
-        help="并行生成主题画面序列的数量。",
+        help="Theme 批次与 Frame 生成共享的最大模型调用并发数。",
+    ),
+    theme_batch_size: int = typer.Option(
+        10,
+        "--theme-batch-size",
+        min=1,
+        max=10,
+        help="每次模型调用批量生成的 Theme 数；每个 Theme 返回后独立进入 Frame 队列。",
     ),
     content_level: ContentLevel = typer.Option(
         ContentLevel.AESTHETIC,
@@ -178,6 +185,7 @@ def generate_command(
             prompt=FilmPromptRunSettings(
                 provider=prompt_provider,
                 concurrency=concurrency,
+                theme_batch_size=theme_batch_size,
                 theme_output_tokens=12000,
                 theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
             ),

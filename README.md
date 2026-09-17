@@ -62,6 +62,8 @@ uv run t2i-film-style generate "张艺谋" \
   --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
+  --theme-batch-size 4 \
+  --concurrency 8 \
   --validate-themes \
   --validate-frames \
   --content-level aesthetic
@@ -79,7 +81,11 @@ uv run t2i-film-style resume RUN_ID
 
 恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
 Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构，由程序分配
-`theme_id`；每个 Theme 的全部 Frame 在一次纯文本调用中批量返回，由程序拆分并分配
+`theme_id`。Theme producer 每次批量生成 `--theme-batch-size` 个 Theme；批次
+checkpoint 后，每个 Theme 独立进入有界 Frame queue，producer 随即生成下一批，
+因此上一批的 Frame 与下一批 Theme 可以并行。二者共同遵守 `--concurrency`
+全局模型调用上限；默认 Theme 批次大小为 10，可在 1–10 之间调整。
+每个 Theme 的全部 Frame 在一次纯文本调用中批量返回，由程序拆分并分配
 `frame_id`，避免逐帧调用开销以及 JSON wrapper 或工具提交失败。批次中验证通过的
 Frame 会被保留，后续只重新生成失败槽位。
 通过验证的 Frame 会立即单独写入 checkpoint，因此中断恢复也不会重做已通过画面。

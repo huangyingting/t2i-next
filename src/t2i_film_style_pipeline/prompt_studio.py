@@ -127,49 +127,90 @@ class FilmPromptStudio:
     ) -> CompletedFilmPromptRun:
         request = snapshot.request
         rules = snapshot.rules
-        themes = await self._generate_themes(
-            snapshot.run_id,
-            request,
-            rules,
-            list(snapshot.themes),
-            snapshot.manifest.semantic_name,
+        themes = list(snapshot.themes)
+        existing_frames = dict(snapshot.frames)
+        semaphore = asyncio.Semaphore(self._settings.concurrency)
+        queue: asyncio.Queue[NarrativeTheme | None] = asyncio.Queue(
+            maxsize=self._settings.concurrency
+        )
+        causes: list[str] = []
+
+        def needs_frames(theme: NarrativeTheme) -> bool:
+            sequence = existing_frames.get(theme.theme_id)
+            return (
+                sequence is None
+                or len(sequence.frames) != request.frames_per_theme
+            )
+
+        async def generate_theme_frames(theme: NarrativeTheme) -> None:
+            try:
+                async with semaphore:
+                    current = self._store.inspect(snapshot.run_id)
+                    await self._generate_frames(
+                        snapshot.run_id,
+                        request,
+                        theme,
+                        rules,
+                        current.frames.get(theme.theme_id),
+                    )
+                self._emit(f"{theme.theme_id} Frame Sequence 已保存")
+            except Exception as exc:
+                causes.append(str(exc))
+
+        async def frame_worker() -> None:
+            while True:
+                theme = await queue.get()
+                try:
+                    if theme is None:
+                        return
+                    await generate_theme_frames(theme)
+                finally:
+                    queue.task_done()
+
+        workers = [
+            asyncio.create_task(frame_worker())
+            for _ in range(self._settings.concurrency)
+        ]
+        for theme in themes:
+            if needs_frames(theme):
+                await queue.put(theme)
+
+        async def enqueue_theme(theme: NarrativeTheme) -> None:
+            if needs_frames(theme):
+                await queue.put(theme)
+
+        try:
+            await self._generate_themes(
+                snapshot.run_id,
+                request,
+                rules,
+                themes,
+                snapshot.manifest.semantic_name,
+                semaphore=semaphore,
+                on_theme=enqueue_theme,
+            )
+        except Exception as exc:
+            causes.append(str(exc))
+        finally:
+            for _ in workers:
+                await queue.put(None)
+
+        await queue.join()
+        worker_outcomes = await asyncio.gather(
+            *workers,
+            return_exceptions=True,
+        )
+        causes.extend(
+            str(outcome)
+            for outcome in worker_outcomes
+            if isinstance(outcome, Exception)
         )
         snapshot = self._store.inspect(snapshot.run_id)
         if snapshot.manifest.semantic_name is None:
-            raise FilmStyleStorageError("Film prompt run 缺少 semantic_name")
-        semaphore = asyncio.Semaphore(self._settings.concurrency)
-
-        async def generate_theme(
-            theme: NarrativeTheme,
-        ) -> None:
-            async with semaphore:
-                await self._generate_frames(
-                    snapshot.run_id,
-                    request,
-                    theme,
-                    rules,
-                    snapshot.frames.get(theme.theme_id),
-                )
-                self._emit(f"{theme.theme_id} Frame Sequence 已保存")
-
-        outcomes = await asyncio.gather(
-            *(
-                generate_theme(theme)
-                for theme in themes
-                if (
-                    theme.theme_id not in snapshot.frames
-                    or len(snapshot.frames[theme.theme_id].frames)
-                    != request.frames_per_theme
-                )
-            ),
-            return_exceptions=True,
-        )
-        causes = tuple(
-            str(outcome) for outcome in outcomes if isinstance(outcome, Exception)
-        )
-        snapshot = self._store.inspect(snapshot.run_id)
+            causes.append("Film prompt run 缺少 semantic_name")
         if (
-            len(snapshot.frames) != request.theme_count
+            len(snapshot.themes) != request.theme_count
+            or len(snapshot.frames) != request.theme_count
             or any(
                 len(sequence.frames) != request.frames_per_theme
                 for sequence in snapshot.frames.values()
@@ -177,9 +218,12 @@ class FilmPromptStudio:
         ):
             self._store.fail(
                 snapshot.run_id,
-                "; ".join(causes) or "Frame Sequence 尚未完整",
+                "; ".join(causes)
+                or "Theme 或 Frame Sequence 尚未完整",
             )
-            raise self._incomplete(snapshot, causes)
+            raise self._incomplete(snapshot, tuple(causes))
+        if snapshot.manifest.semantic_name is None:
+            raise FilmStyleStorageError("Film prompt run 缺少 semantic_name")
         result = FilmPromptResult(
             run_id=snapshot.run_id,
             semantic_name=snapshot.manifest.semantic_name,
@@ -204,6 +248,9 @@ class FilmPromptStudio:
         rules: FilmPromptRuleSet,
         themes: list[NarrativeTheme],
         semantic_name: str | None,
+        *,
+        semaphore: asyncio.Semaphore,
+        on_theme: Callable[[NarrativeTheme], Awaitable[None]],
     ) -> list[NarrativeTheme]:
         while len(themes) < request.theme_count:
             start_index = len(themes) + 1
@@ -290,21 +337,22 @@ class FilmPromptStudio:
             requested_ids = tuple(
                 f"T{index:03d}" for index in range(start_index, start_index + count)
             )
-            value, _ = await self._generate_validated(
-                run_id=run_id,
-                operation_id=operation_id,
-                requested_ids=requested_ids,
-                stage=FilmPromptStage.THEMES,
-                messages=messages,
-                response_model=(
-                    exact_theme_draft_batch_model(count)
-                    if self._settings.theme_output_mode
-                    == ThemeOutputMode.STRUCTURED_WITHOUT_IDS
-                    else exact_theme_batch_model(count)
-                ),
-                max_output_tokens=self._settings.theme_output_tokens,
-                validate=validate,
-            )
+            async with semaphore:
+                value, _ = await self._generate_validated(
+                    run_id=run_id,
+                    operation_id=operation_id,
+                    requested_ids=requested_ids,
+                    stage=FilmPromptStage.THEMES,
+                    messages=messages,
+                    response_model=(
+                        exact_theme_draft_batch_model(count)
+                        if self._settings.theme_output_mode
+                        == ThemeOutputMode.STRUCTURED_WITHOUT_IDS
+                        else exact_theme_batch_model(count)
+                    ),
+                    max_output_tokens=self._settings.theme_output_tokens,
+                    validate=validate,
+                )
             if not isinstance(
                 value,
                 (NarrativeThemeBatch, NarrativeThemeDraftBatch),
@@ -317,6 +365,8 @@ class FilmPromptStudio:
             )
             semantic_name = value.semantic_name
             themes.extend(generated_themes)
+            for theme in generated_themes:
+                await on_theme(theme)
             self._emit(
                 f"{generated_themes[0].theme_id}–"
                 f"{generated_themes[-1].theme_id} Theme 已保存"

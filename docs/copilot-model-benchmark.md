@@ -128,10 +128,15 @@ token/s 决定排名。
 
 速度排名不等于任务适配度：
 
-- `gpt-5.3-codex` 和 `gpt-5.6-luna` 都能完成 Profile、Theme、Frame checkpoint
-  和发布链路。
-- 在 hardcore 请求且 Frame 语义验证关闭时，两者都把 Frame 降级为普通身体接触，
-  离线检查均为 0/3 达到明确内容下限。
+- `gpt-5.3-codex`、`gpt-5.6-luna` 和 `gpt-5.4-mini` 都能完成 Profile、Theme、
+  Frame checkpoint 和发布链路。
+- 在相同的 1 Theme × 3 Frames hardcore 请求、`reasoning_effort=low` 且 Frame
+  语义验证关闭时，三者的离线明确内容检查均为 0/3。
+- 三次完整 film run 的耗时分别为：`gpt-5.6-luna` 87.6 秒、
+  `gpt-5.3-codex` 114.1 秒、`gpt-5.4-mini` 142.2 秒。短文本 benchmark 排名
+  不能直接预测包含结构化 Profile 和长上下文的完整 pipeline 耗时。
+- `gpt-5.4-mini` 的输出退化最明显，三帧均保持完整穿衣，并把人物与家具的接触
+  写成核心接触链。
 - `gpt-5.3-codex` 开启 Frame 验证后，连续三次返回标签外正文并耗尽重试。
 
 因此模型选择应同时考虑延迟、格式遵从和内容级别遵从，不能只采用速度排名。

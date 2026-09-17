@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 
 import pytest
@@ -33,6 +34,7 @@ from t2i_film_style_pipeline.prompt_provider import (
 )
 from t2i_film_style_pipeline.prompt_run_store import (
     FilmPromptRunSettings,
+    LocalFilmPromptRunStore,
     ThemeOutputMode,
 )
 from t2i_film_style_pipeline.provider import (
@@ -166,13 +168,16 @@ def make_settings(
     generation_retries: int = 0,
     validate_themes: bool = True,
     validate_frames: bool = True,
+    concurrency: int = 1,
+    theme_batch_size: int = 1,
 ) -> FilmStylePipelineSettings:
     return FilmStylePipelineSettings(
         film_provider=FilmStyleProviderSettings(model="test-model"),
         prompt=FilmPromptRunSettings(
             provider=FilmPromptProviderSettings(model="test-model"),
-            concurrency=1,
+            concurrency=concurrency,
             generation_retries=generation_retries,
+            theme_batch_size=theme_batch_size,
             theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
         ),
         validate_themes=validate_themes,
@@ -216,6 +221,140 @@ async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
         FilmPromptStage.THEMES,
         FilmPromptStage.FRAMES,
     ]
+
+
+@pytest.mark.asyncio
+async def test_pipeline_generates_frames_while_next_theme_is_in_flight(
+    tmp_path,
+) -> None:
+    request = FilmStylePromptRequest(
+        film_style=make_request(),
+        theme_count=4,
+        frames_per_theme=1,
+    )
+
+    class PipelinedPromptModel:
+        def __init__(self) -> None:
+            self.theme_calls = 0
+            self.active_calls = 0
+            self.max_active_calls = 0
+            self.second_theme_started = asyncio.Event()
+            self.first_frame_started = asyncio.Event()
+            self.overlap_recorded = asyncio.Event()
+            self.overlap_observed = False
+
+        def _start_call(self) -> None:
+            self.active_calls += 1
+            self.max_active_calls = max(
+                self.max_active_calls,
+                self.active_calls,
+            )
+
+        def _finish_call(self) -> None:
+            self.active_calls -= 1
+
+        async def generate(
+            self,
+            *,
+            stage,
+            messages,
+            response_model,
+            max_output_tokens,
+        ):
+            assert stage == FilmPromptStage.THEMES
+            self._start_call()
+            try:
+                self.theme_calls += 1
+                index = self.theme_calls
+                if index == 2:
+                    self.second_theme_started.set()
+                    await asyncio.wait_for(
+                        self.first_frame_started.wait(),
+                        timeout=1,
+                    )
+                    self.overlap_observed = self.active_calls == 2
+                    self.overlap_recorded.set()
+                start = 1 if index == 1 else 3
+                batch = make_theme_batch(start=start, count=2)
+                for theme in batch.themes:
+                    theme.premise = (
+                        f"原作成年人物无名与飞雪位于秦宫大殿。"
+                        f"{theme.premise}"
+                    )
+                value = response_model.model_validate(
+                    {
+                        "semantic_name": batch.semantic_name,
+                        "themes": [
+                            theme.model_dump(exclude={"theme_id"})
+                            for theme in batch.themes
+                        ],
+                    }
+                )
+                return PromptModelResponse(
+                    value=value,
+                    usage=TokenUsage(total_tokens=10),
+                )
+            finally:
+                self._finish_call()
+
+        async def generate_text(
+            self,
+            *,
+            stage,
+            messages,
+            max_output_tokens,
+        ) -> TextModelResponse:
+            assert stage == FilmPromptStage.FRAMES
+            self._start_call()
+            try:
+                await asyncio.wait_for(
+                    self.second_theme_started.wait(),
+                    timeout=1,
+                )
+                if not self.first_frame_started.is_set():
+                    self.first_frame_started.set()
+                    await asyncio.wait_for(
+                        self.overlap_recorded.wait(),
+                        timeout=1,
+                    )
+                sequence = make_film_frame_sequence()
+                return TextModelResponse(
+                    text=frame_batch_text(
+                        NarrativeFrameSequence(
+                            frames=[sequence.frames[0]]
+                        )
+                    ),
+                    usage=TokenUsage(total_tokens=10),
+                )
+            finally:
+                self._finish_call()
+
+    prompt_model = PipelinedPromptModel()
+    store = LocalFilmStyleRunStore(tmp_path / "runs")
+    completed = await FilmStylePromptStudio(
+        FakeFilmModel(),
+        prompt_model,
+        store,
+        make_settings(
+            concurrency=2,
+            theme_batch_size=2,
+            validate_themes=False,
+            validate_frames=False,
+        ),
+        resolve_film_style_rules(
+            request.prompt_request("BRIEF\n\nDirector scene context.")
+        ),
+    ).run(request, prompts_directory=tmp_path / "prompts")
+
+    assert completed.prompt_file.exists()
+    assert prompt_model.overlap_observed is True
+    assert prompt_model.max_active_calls == 2
+    snapshot = LocalFilmPromptRunStore(
+        store.prompt_runs_directory(completed.run_id)
+    ).inspect(completed.prompt_run_id)
+    assert len(snapshot.themes) == 4
+    assert set(snapshot.frames) == {"T001", "T002", "T003", "T004"}
+    assert all(len(sequence.frames) == 1 for sequence in snapshot.frames.values())
 
 
 @pytest.mark.asyncio

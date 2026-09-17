@@ -61,6 +61,7 @@ uv run t2i-film-style generate "张艺谋" \
   --validate-frames \
   --content-level aesthetic \
   --concurrency 8 \
+  --theme-batch-size 10 \
   --language chinese \
   --prompts-dir prompts \
   --runs-dir runs/film-style
@@ -71,6 +72,9 @@ uv run t2i-film-style generate "张艺谋" \
 作品时，每个 Theme 只能选择其中一部，Frame 必须延续相同人物与场景，不能跨片混合。
 `--filename-stem` 可单独指定英文输出文件名前缀，不改变导演署名、作品来源句或
 原作锚点；只允许 ASCII 字母、数字、下划线和连字符。
+`--theme-batch-size` 控制单次 Theme 模型调用批量返回的独立 Theme 数，范围为
+1–10，默认 10；`--concurrency` 是 Theme 批次与 Frame 调用共同遵守的全局并发
+上限。
 
 完成后 CLI 输出：
 
@@ -131,6 +135,15 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
 checkpoint。每个纯文本 Frame 仍须通过全部语义发布门槛；任一 Frame 失败时重试
 时立即逐帧 checkpoint 同批次中已通过的画面，只把失败槽位组成较小批次重新生成；
 run 中断后恢复也只请求尚未通过的槽位。
+
+Theme 与 Frame 使用流式 producer/consumer 调度，而不是两个完全分离的阶段。
+单个 Theme producer 按 `theme_batch_size` 顺序批量生成 Theme，使下一批可以看到
+此前已保存的 Theme 并避免重复；每个批次返回并 checkpoint 后，其中每个 Theme
+立即作为独立工作项进入有界 Frame queue。Frame workers 可以处理上一批 Theme，
+同时 producer 生成下一批，二者共享 `concurrency` 信号量，因此实际模型调用不会
+超过全局并发上限。保留单一 Theme producer 也保证 `semantic_name`、Theme ID 与
+checkpoint 顺序稳定。若 Theme 总数不超过一个批次，模型会在一次调用中返回全部
+Theme，随后并发生成各自的 Frame。
 
 三个内容等级都采用相同结构：先定义视觉目标与每帧必须达到的可见下限，再规定
 增强皮肤、接触、材质、姿态、表情和环境触觉的具体方法，最后给出不可越过的上限
@@ -232,7 +245,9 @@ runs/film-style/<run-id>/
 时发生中断，resume 也会继续使用创建 run 时冻结的 Profile 规则，不会重新读取
 后来修改的规则文件。
 
-如果 profile、Theme 批次或单个 Frame 已保存，恢复时不会重新生成。只有通过结构
+如果 profile、Theme 批次或单个 Frame 已保存，恢复时不会重新生成。已有但 Frame
+尚不完整的 Theme 会先进入 Frame queue，同时 Theme producer 继续补齐缺失 Theme。
+只有通过结构
 与语义验证的结果才会保存 checkpoint；重试耗尽后会保留已通过的 Frame、失败记录
 并打印可直接执行的命令：
 
