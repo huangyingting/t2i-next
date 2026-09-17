@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from t2i_film_style_pipeline.compiler import (
-    compile_story_description,
+    compile_film_context,
     source_attribution,
 )
 from t2i_film_style_pipeline.errors import FilmStyleStorageError
@@ -24,11 +24,11 @@ from t2i_film_style_pipeline.models import (
 )
 from t2i_film_style_pipeline.pipeline import FilmStylePromptRequest
 from t2i_film_style_pipeline.profile_messages import profile_messages
+from t2i_film_style_pipeline.prompt_models import ContentLevel
 from t2i_film_style_pipeline.provider import ModelResponse
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_film_style_pipeline.service import FilmStyleStudio
 from t2i_film_style_pipeline.storage import publish_film_style
-from t2i_story_pipeline.models import ContentLevel
 
 
 def make_request() -> FilmStyleRequest:
@@ -145,10 +145,10 @@ def make_profile() -> FilmStyleProfile:
 
 
 def make_profile_rules() -> tuple[str, ...]:
-    from t2i_story_pipeline.models import StoryRequest
+    from t2i_film_style_pipeline.prompt_models import FilmPromptRequest
 
     return resolve_film_style_rules(
-        StoryRequest(story="Director scene context")
+        FilmPromptRequest(context="Director scene context")
     ).profile
 
 
@@ -179,10 +179,10 @@ def test_prompt_request_uses_short_director_filename() -> None:
         content_level=ContentLevel.HARDCORE,
     )
 
-    story_request = request.story_request("BRIEF\n\nDirector scene context")
+    prompt_request = request.prompt_request("BRIEF\n\nDirector scene context")
 
-    assert story_request.prompt_filename_stem == "张艺谋"
-    assert story_request.source_prompt_stem is None
+    assert prompt_request.prompt_filename_stem == "张艺谋"
+    assert prompt_request.source_prompt_stem is None
 
 
 def test_profile_rejects_image_geometry() -> None:
@@ -193,9 +193,9 @@ def test_profile_rejects_image_geometry() -> None:
         FilmStyleProfile.model_validate(payload)
 
 
-def test_compile_story_description_injects_profile_after_brief_header() -> None:
+def test_compile_film_context_injects_profile_after_brief_header() -> None:
     request = make_request()
-    compiled = compile_story_description(
+    compiled = compile_film_context(
         request,
         make_profile(),
         scene_direction="只生成雨夜室内场景。",
@@ -233,11 +233,11 @@ def test_profile_prompt_uses_only_work_metadata() -> None:
 
 
 def test_director_rules_own_theme_and_frame_workflow() -> None:
-    from t2i_story_pipeline.models import ContentLevel, StoryRequest
+    from t2i_film_style_pipeline.prompt_models import ContentLevel, FilmPromptRequest
 
     rules = resolve_film_style_rules(
-        StoryRequest(
-            story="Director scene context",
+        FilmPromptRequest(
+            context="Director scene context",
             content_level=ContentLevel.HARDCORE,
         )
     )
@@ -303,7 +303,7 @@ def test_director_rules_own_theme_and_frame_workflow() -> None:
 
 
 @pytest.mark.asyncio
-async def test_studio_publishes_profile_run_and_compiled_story(tmp_path) -> None:
+async def test_studio_publishes_profile_run_and_compiled_context(tmp_path) -> None:
     profile = make_profile()
     captured = {}
 
@@ -325,20 +325,20 @@ async def test_studio_publishes_profile_run_and_compiled_story(tmp_path) -> None
     assert captured["messages"][0].content == "\n".join(profile_rules)
     assert completed.result.profile == profile
     assert completed.result.usage.total_tokens == 42
-    assert completed.published.compiled_story_file.exists()
-    assert completed.published.compiled_story_file.name == "compiled-story.txt"
+    assert completed.published.compiled_context_file.exists()
+    assert completed.published.compiled_context_file.name == "compiled-context.txt"
     assert (
-        completed.published.compiled_story_file.parent
+        completed.published.compiled_context_file.parent
         == completed.published.run_directory
     )
     assert completed.published.profile_file.exists()
     persisted = json.loads(completed.published.profile_file.read_text("utf-8"))
     assert persisted["style_summary"] == profile.style_summary
     assert "profile_name" not in persisted
-    assert completed.published.compiled_story_file.read_text("utf-8").startswith(
+    assert completed.published.compiled_context_file.read_text("utf-8").startswith(
         "BRIEF\n\nWORK-SPECIFIC VISUAL CONTEXT"
     )
-    assert "只生成雨夜室内场景。" in completed.result.compiled_story
+    assert "只生成雨夜室内场景。" in completed.result.compiled_context
 
 
 @pytest.mark.asyncio
@@ -466,7 +466,7 @@ async def test_single_work_opening_summary_uses_complete_first_sentence(
 
 
 def test_compiler_requires_one_direct_source_sentence() -> None:
-    compiled = compile_story_description(make_request(), make_profile())
+    compiled = compile_film_context(make_request(), make_profile())
 
     source_sentence = (
         "这是一个基于张艺谋导演的《英雄》（2002）、"
@@ -494,7 +494,7 @@ def test_publish_removes_staging_when_run_commit_fails(
         run_id="run",
         request=request,
         profile=make_profile(),
-        compiled_story=compile_story_description(request, make_profile()),
+        compiled_context=compile_film_context(request, make_profile()),
         usage=TokenUsage(),
     )
     def fail_commit(_staging, _destination):

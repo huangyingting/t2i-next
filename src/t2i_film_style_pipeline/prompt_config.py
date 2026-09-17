@@ -1,4 +1,4 @@
-"""Environment configuration for film-style profiling."""
+"""Environment configuration for the standalone film prompt model."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from pydantic import ValidationError
 
 from t2i_film_style_pipeline.errors import FilmStyleConfigurationError
-from t2i_film_style_pipeline.provider import FilmStyleProviderSettings
+from t2i_film_style_pipeline.prompt_provider import FilmPromptProviderSettings
 from t2i_model_provider.backend import selected_backend_values
 
 _ENV_FIELDS = {
@@ -25,12 +25,12 @@ _ENV_FIELDS = {
 }
 
 
-def load_film_style_provider_settings() -> FilmStyleProviderSettings:
+def load_film_prompt_provider_settings() -> FilmPromptProviderSettings:
     load_dotenv(Path.cwd() / ".env.film", override=False)
     values = selected_backend_values(_ENV_FIELDS)
     try:
-        return FilmStyleProviderSettings.model_validate(values)
+        return FilmPromptProviderSettings.model_validate(values)
     except ValidationError as exc:
         raise FilmStyleConfigurationError(
-            f"invalid film-style model configuration: {exc}"
+            f"film prompt provider 配置无效：{exc}"
         ) from exc

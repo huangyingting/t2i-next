@@ -4,13 +4,13 @@ import pytest
 
 from t2i_film_style_pipeline.compiler import frame_source_sentence
 from t2i_film_style_pipeline.content_validation import FilmStyleContentValidator
+from t2i_film_style_pipeline.errors import FilmStyleContractError
 from t2i_film_style_pipeline.models import FilmStyleRequest, FilmWorkReference
-from t2i_story_pipeline.errors import StoryContractError
-from t2i_story_pipeline.models import (
+from t2i_film_style_pipeline.prompt_models import (
     ContentLevel,
+    FilmPromptRequest,
     NarrativeFrame,
     NarrativeTheme,
-    StoryRequest,
 )
 from tests.test_film_style_pipeline import make_profile, make_request
 
@@ -22,8 +22,8 @@ def make_film_request() -> FilmStyleRequest:
     )
 
 
-def make_story_request(level: ContentLevel) -> StoryRequest:
-    return StoryRequest(story="电影场景上下文", content_level=level)
+def make_prompt_request(level: ContentLevel) -> FilmPromptRequest:
+    return FilmPromptRequest(context="电影场景上下文", content_level=level)
 
 
 def make_validation_profile():
@@ -65,14 +65,14 @@ def complete_camera_frame(film_request: FilmStyleRequest) -> NarrativeFrame:
 def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.HARDCORE)
+    request = make_prompt_request(ContentLevel.HARDCORE)
 
-    with pytest.raises(StoryContractError, match="不得降级"):
+    with pytest.raises(FilmStyleContractError, match="不得降级"):
         validator.validate_theme(
             request,
             make_theme("两名成年人在房间里拥抱和亲吻。"),
         )
-    with pytest.raises(StoryContractError, match="不得降级"):
+    with pytest.raises(FilmStyleContractError, match="不得降级"):
         validator.validate_theme(
             request,
             make_theme("两名成年人开始成人私会，但不展示具体性交过程。"),
@@ -81,7 +81,7 @@ def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
     explicit_theme = make_theme("两名成年人正在自愿进行口交。")
     validator.validate_theme(request, explicit_theme)
 
-    with pytest.raises(StoryContractError, match="不得降级"):
+    with pytest.raises(FilmStyleContractError, match="不得降级"):
         validator.validate_frame(
             request,
             explicit_theme,
@@ -89,7 +89,7 @@ def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
                 f"{frame_source_sentence(film_request)}两名成年人在房间里拥抱。"
             ),
         )
-    with pytest.raises(StoryContractError, match="不得降级"):
+    with pytest.raises(FilmStyleContractError, match="不得降级"):
         validator.validate_frame(
             request,
             explicit_theme,
@@ -99,7 +99,7 @@ def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
             ),
         )
 
-    with pytest.raises(StoryContractError, match="正文过短"):
+    with pytest.raises(FilmStyleContractError, match="正文过短"):
         validator.validate_frame(
             request,
             explicit_theme,
@@ -113,23 +113,23 @@ def test_hardcore_requires_explicit_evidence_in_theme_and_frame() -> None:
 def test_frame_rejects_refusal_missing_source_and_image_geometry() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = make_theme("两名成年人在房间里相互注视。")
     source = frame_source_sentence(film_request)
 
-    with pytest.raises(StoryContractError, match="拒绝"):
+    with pytest.raises(FilmStyleContractError, match="拒绝"):
         validator.validate_frame(
             request,
             theme,
             make_frame(f"{source}抱歉，我无法协助创作这个画面。"),
         )
-    with pytest.raises(StoryContractError, match="来源句"):
+    with pytest.raises(FilmStyleContractError, match="来源句"):
         validator.validate_frame(
             request,
             theme,
             make_frame("两名成年人在房间里相互注视。"),
         )
-    with pytest.raises(StoryContractError, match="画幅比例"):
+    with pytest.raises(FilmStyleContractError, match="画幅比例"):
         validator.validate_frame(
             request,
             theme,
@@ -144,9 +144,9 @@ def test_non_explicit_levels_reject_explicit_sex(level: ContentLevel) -> None:
         make_validation_profile(),
     )
 
-    with pytest.raises(StoryContractError, match="超出当前内容级别"):
+    with pytest.raises(FilmStyleContractError, match="超出当前内容级别"):
         validator.validate_theme(
-            make_story_request(level),
+            make_prompt_request(level),
             make_theme("两名成年人正在进行口交。"),
         )
 
@@ -154,7 +154,7 @@ def test_non_explicit_levels_reject_explicit_sex(level: ContentLevel) -> None:
 def test_frame_requires_complete_camera_evidence() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = make_theme("两名成年人在书房里相互注视。")
     complete = complete_camera_frame(film_request)
 
@@ -168,7 +168,7 @@ def test_frame_requires_complete_camera_evidence() -> None:
             )
         }
     )
-    with pytest.raises(StoryContractError, match="镜头或焦距"):
+    with pytest.raises(FilmStyleContractError, match="镜头或焦距"):
         validator.validate_frame(request, theme, incomplete)
 
     natural_height = complete.model_copy(
@@ -181,11 +181,24 @@ def test_frame_requires_complete_camera_evidence() -> None:
     )
     validator.validate_frame(request, theme, natural_height)
 
+    natural_distance_and_lens = complete.model_copy(
+        update={
+            "prose": complete.prose.replace(
+                "正面约三米处",
+                "正面两个身位外",
+            ).replace(
+                "五十毫米标准镜头",
+                "中焦镜头",
+            )
+        }
+    )
+    validator.validate_frame(request, theme, natural_distance_and_lens)
+
 
 def test_frame_rejects_compliance_boilerplate() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = make_theme("两名成年人在书房里相互注视。")
     complete = complete_camera_frame(film_request)
     boilerplate = complete.model_copy(
@@ -197,14 +210,14 @@ def test_frame_rejects_compliance_boilerplate() -> None:
         }
     )
 
-    with pytest.raises(StoryContractError, match="结论式合规话术"):
+    with pytest.raises(FilmStyleContractError, match="结论式合规话术"):
         validator.validate_frame(request, theme, boilerplate)
 
 
 def test_theme_requires_original_character_and_scene_anchors() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = NarrativeTheme(
         theme_id="T001",
         title="缺少锚点",
@@ -212,14 +225,14 @@ def test_theme_requires_original_character_and_scene_anchors() -> None:
         style="使用深景构图、方向性光线和真实材质。",
     )
 
-    with pytest.raises(StoryContractError, match="原作成年人物 canonical_name"):
+    with pytest.raises(FilmStyleContractError, match="原作成年人物 canonical_name"):
         validator.validate_theme(request, theme)
 
 
 def test_frame_cannot_switch_to_another_works_anchors() -> None:
     film_request = make_request()
     validator = FilmStyleContentValidator(film_request, make_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = make_theme("两名成年人在书房里相互注视。")
     complete = complete_camera_frame(film_request)
     cross_work = complete.model_copy(
@@ -231,14 +244,14 @@ def test_frame_cannot_switch_to_another_works_anchors() -> None:
         }
     )
 
-    with pytest.raises(StoryContractError, match="必须延续 Theme"):
+    with pytest.raises(FilmStyleContractError, match="必须延续 Theme"):
         validator.validate_frame(request, theme, cross_work)
 
 
 def test_frame_requires_original_costume_environment_and_props() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = make_theme("两名成年人在书房里相互注视。")
     complete = complete_camera_frame(film_request)
 
@@ -250,7 +263,7 @@ def test_frame_requires_original_costume_environment_and_props() -> None:
             )
         }
     )
-    with pytest.raises(StoryContractError, match="原作人物服装特征：无名"):
+    with pytest.raises(FilmStyleContractError, match="原作人物服装特征：无名"):
         validator.validate_frame(request, theme, missing_costume)
 
     missing_environment = complete.model_copy(
@@ -262,20 +275,20 @@ def test_frame_requires_original_costume_environment_and_props() -> None:
             )
         }
     )
-    with pytest.raises(StoryContractError, match="environment_features"):
+    with pytest.raises(FilmStyleContractError, match="environment_features"):
         validator.validate_frame(request, theme, missing_environment)
 
     missing_props = complete.model_copy(
         update={"prose": complete.prose.replace("长剑", "木尺")}
     )
-    with pytest.raises(StoryContractError, match="canonical_props"):
+    with pytest.raises(FilmStyleContractError, match="canonical_props"):
         validator.validate_frame(request, theme, missing_props)
 
 
 def test_aesthetic_frame_requires_strong_sensory_evidence() -> None:
     film_request = make_film_request()
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
-    request = make_story_request(ContentLevel.AESTHETIC)
+    request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = make_theme("两名成年人在书房里相互注视。")
     complete = complete_camera_frame(film_request)
     weak = complete.model_copy(
@@ -288,5 +301,5 @@ def test_aesthetic_frame_requires_strong_sensory_evidence() -> None:
         }
     )
 
-    with pytest.raises(StoryContractError, match="美学级感官证据不足"):
+    with pytest.raises(FilmStyleContractError, match="美学级感官证据不足"):
         validator.validate_frame(request, theme, weak)

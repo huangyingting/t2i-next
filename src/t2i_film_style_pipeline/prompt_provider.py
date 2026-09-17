@@ -1,0 +1,522 @@
+"""Independent OpenAI-compatible structured-output adapter."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
+from enum import StrEnum
+from typing import Any, Literal, Protocol, TypeVar
+
+import httpx
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    model_validator,
+)
+
+from t2i_film_style_pipeline.errors import (
+    FilmStyleConfigurationError,
+    FilmStyleProviderAuthenticationError,
+    FilmStyleProviderError,
+    FilmStyleProviderHTTPError,
+    FilmStyleProviderResponseError,
+    FilmStyleProviderTruncatedOutputError,
+    FilmStyleStructuredOutputError,
+)
+from t2i_film_style_pipeline.prompt_models import (
+    FilmPromptStage,
+    TokenUsage,
+    schema_name,
+)
+from t2i_model_provider import (
+    CopilotGenerationError,
+    CopilotStructuredModel,
+    ModelBackend,
+)
+
+
+class ChatMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    role: Literal["system", "user", "assistant"]
+    content: str
+
+
+class ProviderAuthMode(StrEnum):
+    BEARER = "bearer"
+    API_KEY = "api_key"
+
+
+class ThinkingMode(StrEnum):
+    ENABLED = "enabled"
+    DISABLED = "disabled"
+
+
+class ReasoningEffort(StrEnum):
+    NONE = "none"
+    MINIMAL = "minimal"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    XHIGH = "xhigh"
+
+
+class FilmPromptProviderSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    backend: ModelBackend = ModelBackend.OPENAI
+    base_url: str = "https://api.openai.com/v1"
+    api_key_env: str = "OPENAI_API_KEY"
+    auth_mode: ProviderAuthMode = ProviderAuthMode.BEARER
+    model: str
+    thinking_mode: ThinkingMode | None = None
+    reasoning_effort: ReasoningEffort | None = None
+    temperature: float = Field(default=0.5, ge=0, le=2)
+    output_token_limit: int = Field(default=32768, ge=512, le=65536)
+    timeout_seconds: float = Field(default=180, gt=0, le=600)
+    transport_retries: int = Field(default=2, ge=0, le=8)
+
+    @model_validator(mode="after")
+    def reasoning_controls_do_not_conflict(
+        self,
+    ) -> FilmPromptProviderSettings:
+        if self.thinking_mode is not None and self.reasoning_effort is not None:
+            raise ValueError("thinking_mode 与 reasoning_effort 不能同时配置")
+        return self
+
+
+ResponseT = TypeVar("ResponseT", bound=BaseModel)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelResponse:
+    value: BaseModel
+    usage: TokenUsage
+
+
+@dataclass(frozen=True, slots=True)
+class TextModelResponse:
+    text: str
+    usage: TokenUsage
+
+
+class FilmPromptModel(Protocol):
+    async def generate(
+        self,
+        *,
+        stage: FilmPromptStage,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+    ) -> ModelResponse: ...
+
+    async def generate_text(
+        self,
+        *,
+        stage: FilmPromptStage,
+        messages: list[ChatMessage],
+        max_output_tokens: int,
+    ) -> TextModelResponse: ...
+
+
+_SCHEMA_MAP_KEYS = frozenset(
+    {
+        "$defs",
+        "definitions",
+        "dependentSchemas",
+        "patternProperties",
+        "properties",
+    }
+)
+
+
+def strict_json_schema(value: Any, *, schema_map: bool = False) -> Any:
+    if isinstance(value, list):
+        return [strict_json_schema(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    if schema_map:
+        return {key: strict_json_schema(item) for key, item in value.items()}
+    normalized = {
+        key: strict_json_schema(
+            item,
+            schema_map=key in _SCHEMA_MAP_KEYS,
+        )
+        for key, item in value.items()
+        if key not in {"default", "title"}
+    }
+    properties = normalized.get("properties")
+    if isinstance(properties, dict):
+        normalized["required"] = list(properties)
+    return normalized
+
+
+class OpenAIFilmPromptModel(FilmPromptModel):
+    """Call one OpenAI-compatible chat-completions endpoint."""
+
+    def __init__(
+        self,
+        settings: FilmPromptProviderSettings,
+        *,
+        client: httpx.AsyncClient | None = None,
+    ) -> None:
+        api_key = os.environ.get(settings.api_key_env)
+        if not api_key:
+            raise FilmStyleConfigurationError(
+                f"环境变量 {settings.api_key_env} 未设置，无法调用电影提示模型"
+            )
+        auth_header = (
+            {"api-key": api_key}
+            if settings.auth_mode == ProviderAuthMode.API_KEY
+            else {"Authorization": f"Bearer {api_key}"}
+        )
+        self._settings = settings
+        self._headers = {
+            **auth_header,
+            "Content-Type": "application/json",
+        }
+        self._owns_client = client is None
+        self._client = client or httpx.AsyncClient(timeout=settings.timeout_seconds)
+
+    async def __aenter__(self) -> OpenAIFilmPromptModel:
+        return self
+
+    async def __aexit__(self, *_: object) -> None:
+        await self.aclose()
+
+    async def aclose(self) -> None:
+        if self._owns_client:
+            await self._client.aclose()
+
+    async def generate(
+        self,
+        *,
+        stage: FilmPromptStage,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+    ) -> ModelResponse:
+        schema = strict_json_schema(response_model.model_json_schema())
+        payload = {
+            "model": self._settings.model,
+            "messages": [
+                {"role": message.role, "content": message.content}
+                for message in messages
+            ],
+            "max_tokens": min(
+                max_output_tokens,
+                self._settings.output_token_limit,
+            ),
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema_name(response_model.__name__),
+                    "strict": True,
+                    "schema": schema,
+                },
+            },
+        }
+        if (
+            self._settings.thinking_mode is None
+            and self._settings.reasoning_effort is None
+        ):
+            payload["temperature"] = self._settings.temperature
+        if self._settings.thinking_mode is not None:
+            payload["thinking"] = {"type": self._settings.thinking_mode.value}
+        if self._settings.reasoning_effort is not None:
+            payload["reasoning_effort"] = self._settings.reasoning_effort.value
+        response = await self._post(payload)
+        usage = self._parse_usage(response)
+        try:
+            body = response.json()
+            choice = body["choices"][0]
+            finish_reason = choice.get("finish_reason")
+            content = choice["message"]["content"]
+        except (ValueError, KeyError, IndexError, TypeError) as exc:
+            raise FilmStyleProviderResponseError(
+                f"{stage.value} 返回了不支持的响应结构",
+                usage=usage,
+            ) from exc
+        if not isinstance(content, str) or not content.strip():
+            raise FilmStyleProviderResponseError(
+                f"{stage.value} 返回了空内容",
+                usage=usage,
+            )
+        try:
+            value = response_model.model_validate_json(content)
+        except ValidationError as exc:
+            validation_issues = tuple(
+                f"{'.'.join(str(part) for part in error['loc'])}: "
+                f"{error['msg']}"
+                for error in exc.errors()
+            )
+            if finish_reason == "length":
+                raise FilmStyleProviderTruncatedOutputError(
+                    f"{stage.value} 输出达到 token 上限",
+                    raw_content=content,
+                    usage=usage,
+                    validation_issues=validation_issues,
+                ) from exc
+            raise FilmStyleStructuredOutputError(
+                f"{stage.value} 返回内容不符合 {response_model.__name__}: "
+                f"{'; '.join(validation_issues)}",
+                raw_content=content,
+                usage=usage,
+                validation_issues=validation_issues,
+            ) from exc
+        return ModelResponse(value=value, usage=usage)
+
+    async def generate_text(
+        self,
+        *,
+        stage: FilmPromptStage,
+        messages: list[ChatMessage],
+        max_output_tokens: int,
+    ) -> TextModelResponse:
+        payload = {
+            "model": self._settings.model,
+            "messages": [
+                {"role": message.role, "content": message.content}
+                for message in messages
+            ],
+            "max_tokens": min(
+                max_output_tokens,
+                self._settings.output_token_limit,
+            ),
+        }
+        if (
+            self._settings.thinking_mode is None
+            and self._settings.reasoning_effort is None
+        ):
+            payload["temperature"] = self._settings.temperature
+        if self._settings.thinking_mode is not None:
+            payload["thinking"] = {"type": self._settings.thinking_mode.value}
+        if self._settings.reasoning_effort is not None:
+            payload["reasoning_effort"] = self._settings.reasoning_effort.value
+        response = await self._post(payload)
+        usage = self._parse_usage(response)
+        try:
+            body = response.json()
+            choice = body["choices"][0]
+            finish_reason = choice.get("finish_reason")
+            content = choice["message"]["content"]
+        except (ValueError, KeyError, IndexError, TypeError) as exc:
+            raise FilmStyleProviderResponseError(
+                f"{stage.value} 返回了不支持的响应结构",
+                usage=usage,
+            ) from exc
+        if not isinstance(content, str) or not content.strip():
+            raise FilmStyleProviderResponseError(
+                f"{stage.value} 返回了空内容",
+                usage=usage,
+            )
+        if finish_reason == "length":
+            raise FilmStyleProviderTruncatedOutputError(
+                f"{stage.value} 输出达到 token 上限",
+                raw_content=content,
+                usage=usage,
+                validation_issues=(),
+            )
+        return TextModelResponse(text=content.strip(), usage=usage)
+
+    async def _post(self, payload: dict[str, Any]) -> httpx.Response:
+        url = f"{self._settings.base_url.rstrip('/')}/chat/completions"
+        for attempt in range(self._settings.transport_retries + 1):
+            try:
+                response = await self._client.post(
+                    url,
+                    headers=self._headers,
+                    content=json.dumps(payload, ensure_ascii=False),
+                )
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                if attempt >= self._settings.transport_retries:
+                    raise FilmStyleProviderError(
+                        f"电影提示模型请求失败：{exc}"
+                    ) from exc
+                await asyncio.sleep(0.25 * (2**attempt))
+                continue
+            if response.status_code in {401, 403}:
+                raise FilmStyleProviderAuthenticationError(
+                    "电影提示模型拒绝了当前凭据"
+                )
+            if response.status_code == 429:
+                if attempt < self._settings.transport_retries:
+                    await asyncio.sleep(
+                        self._rate_limit_retry_delay(response, attempt)
+                    )
+                    continue
+            if response.status_code >= 500:
+                if attempt < self._settings.transport_retries:
+                    await asyncio.sleep(0.25 * (2**attempt))
+                    continue
+            if response.is_error:
+                raise FilmStyleProviderHTTPError(
+                    response.status_code,
+                    response.text,
+                )
+            return response
+        raise FilmStyleProviderError("电影提示模型请求未完成")
+
+    @staticmethod
+    def _rate_limit_retry_delay(
+        response: httpx.Response,
+        attempt: int,
+    ) -> float:
+        retry_after = response.headers.get("Retry-After")
+        if retry_after is not None:
+            try:
+                return max(0.25, min(float(retry_after), 120.0))
+            except ValueError:
+                try:
+                    retry_at = parsedate_to_datetime(retry_after)
+                    if retry_at.tzinfo is None:
+                        retry_at = retry_at.replace(tzinfo=UTC)
+                    delay = (
+                        retry_at.astimezone(UTC) - datetime.now(UTC)
+                    ).total_seconds()
+                    return max(0.25, min(delay, 120.0))
+                except (TypeError, ValueError, OverflowError):
+                    pass
+        return min(2.0**attempt, 60.0)
+
+    @staticmethod
+    def _parse_usage(response: httpx.Response) -> TokenUsage:
+        try:
+            usage = response.json().get("usage", {})
+        except (ValueError, TypeError):
+            return TokenUsage()
+        if not isinstance(usage, dict):
+            return TokenUsage()
+        values = {
+            key: value
+            for key, value in {
+                "prompt_tokens": usage.get("prompt_tokens"),
+                "completion_tokens": usage.get("completion_tokens"),
+                "total_tokens": usage.get("total_tokens"),
+            }.items()
+            if isinstance(value, int) and not isinstance(value, bool) and value >= 0
+        }
+        return TokenUsage.model_validate(values)
+
+
+class CopilotFilmPromptModel(FilmPromptModel):
+    """Generate typed film prompt objects through GitHub Copilot."""
+
+    def __init__(self, settings: FilmPromptProviderSettings) -> None:
+        self._model = CopilotStructuredModel(settings)
+
+    async def __aenter__(self) -> CopilotFilmPromptModel:
+        try:
+            await self._model.__aenter__()
+        except CopilotGenerationError as exc:
+            raise FilmStyleProviderError(str(exc)) from exc
+        return self
+
+    async def __aexit__(self, *args: object) -> None:
+        await self._model.__aexit__(*args)
+
+    async def generate(
+        self,
+        *,
+        stage: FilmPromptStage,
+        messages: list[ChatMessage],
+        response_model: type[ResponseT],
+        max_output_tokens: int,
+    ) -> ModelResponse:
+        try:
+            response = await self._model.generate(
+                messages=messages,
+                response_model=response_model,
+                max_output_tokens=max_output_tokens,
+            )
+        except CopilotGenerationError as exc:
+            usage = TokenUsage(
+                prompt_tokens=exc.prompt_tokens,
+                completion_tokens=exc.completion_tokens,
+                total_tokens=exc.total_tokens,
+            )
+            if exc.truncated:
+                raise FilmStyleProviderTruncatedOutputError(
+                    f"{stage.value} 输出达到 Copilot token 上限",
+                    raw_content=exc.raw_content,
+                    usage=usage,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            if exc.raw_content or exc.validation_issues:
+                raise FilmStyleStructuredOutputError(
+                    f"{stage.value} Copilot 返回内容不符合 "
+                    f"{response_model.__name__}",
+                    raw_content=exc.raw_content,
+                    usage=usage,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            raise FilmStyleProviderError(str(exc)) from exc
+        return ModelResponse(
+            value=response.value,
+            usage=TokenUsage(
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+            ),
+        )
+
+    async def generate_text(
+        self,
+        *,
+        stage: FilmPromptStage,
+        messages: list[ChatMessage],
+        max_output_tokens: int,
+    ) -> TextModelResponse:
+        try:
+            response = await self._model.generate_text(
+                messages=messages,
+                max_output_tokens=max_output_tokens,
+            )
+        except CopilotGenerationError as exc:
+            usage = TokenUsage(
+                prompt_tokens=exc.prompt_tokens,
+                completion_tokens=exc.completion_tokens,
+                total_tokens=exc.total_tokens,
+            )
+            if exc.truncated:
+                raise FilmStyleProviderTruncatedOutputError(
+                    f"{stage.value} 输出达到 Copilot token 上限",
+                    raw_content=exc.raw_content,
+                    usage=usage,
+                    validation_issues=exc.validation_issues,
+                ) from exc
+            if exc.raw_content:
+                raise FilmStyleProviderResponseError(
+                    f"{stage.value} Copilot 文本生成失败",
+                    usage=usage,
+                ) from exc
+            raise FilmStyleProviderError(str(exc)) from exc
+        return TextModelResponse(
+            text=response.text,
+            usage=TokenUsage(
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+            ),
+        )
+
+
+@asynccontextmanager
+async def film_prompt_model(
+    settings: FilmPromptProviderSettings,
+) -> AsyncIterator[FilmPromptModel]:
+    model = (
+        CopilotFilmPromptModel(settings)
+        if settings.backend == ModelBackend.COPILOT
+        else OpenAIFilmPromptModel(settings)
+    )
+    async with model:
+        yield model

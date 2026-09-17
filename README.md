@@ -46,8 +46,10 @@ uv run python scripts/refine-text-file.py \
 
 `t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
 视觉档案，并在同一命令中生成最终提示词。它自带完整、独立的 Profile、common、
-Theme、Frame 和 content-level 规则，不加载 `t2i_story_pipeline` 的规则，也不依赖
-`story-inputs/film.txt` 或 `story-inputs/rules/`。它为每部输入电影提取原作成年人物
+Theme、Frame、模型、provider、checkpoint 和发布实现，不 import 或调用
+`t2i_story_pipeline`，也不依赖 `story-inputs/film.txt` 或 `story-inputs/rules/`。
+它只加载仓库根目录的 `.env.film`，不会读取通用 `.env`。该配置文件仅保留 film
+所需的后端、模型、认证、推理、token、超时和重试项。它为每部输入电影提取原作成年人物
 与实际场景锚点，Theme 和 Frame 必须使用同一部电影的原作人物与场景，不得跨片
 拼接或使用演员姓名代替角色。每个 Frame 还必须命中所选人物的原作服装短语，以及
 所选场景的环境与道具短语；人物之间的当前关系与互动可以按场景方向和内容等级

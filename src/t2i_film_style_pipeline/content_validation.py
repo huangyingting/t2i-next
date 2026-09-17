@@ -6,17 +6,17 @@ import re
 from dataclasses import dataclass
 
 from t2i_film_style_pipeline.compiler import frame_source_sentence
+from t2i_film_style_pipeline.errors import FilmStyleContractError
 from t2i_film_style_pipeline.models import (
     FilmStyleProfile,
     FilmStyleRequest,
     contains_image_geometry,
 )
-from t2i_story_pipeline.errors import StoryContractError
-from t2i_story_pipeline.models import (
+from t2i_film_style_pipeline.prompt_models import (
     ContentLevel,
+    FilmPromptRequest,
     NarrativeFrame,
     NarrativeTheme,
-    StoryRequest,
 )
 
 _REFUSAL = re.compile(
@@ -137,6 +137,8 @@ _CAMERA_EVIDENCE = {
             re.compile(
                 r"距离人物|距(?:离)?(?:人物|主体)|"
                 r"约\s*[一二三四五六七八九十\d.]+\s*米|"
+                r"[一二两三四五六七八九十\d.]+(?:个)?身位|"
+                r"[一二两三四五六七八九十\d.]+步(?:外|远)?|"
                 r"近距离|中等距离|中距离|远距离|贴近人物|远离人物"
             ),
         ),
@@ -158,7 +160,7 @@ _CAMERA_EVIDENCE = {
         (
             "镜头或焦距",
             re.compile(
-                r"(?:超广角|广角|标准|中长焦|长焦|微距|移轴)"
+                r"(?:超广角|广角|标准|中焦|中长焦|长焦|微距|移轴)"
                 r"(?:镜头|焦段)|\d{2,3}\s*(?:毫米|mm)|焦距",
                 re.IGNORECASE,
             ),
@@ -280,7 +282,7 @@ class FilmStyleContentValidator:
 
     def validate_theme(
         self,
-        request: StoryRequest,
+        request: FilmPromptRequest,
         theme: NarrativeTheme,
     ) -> None:
         self._validate_output(theme.premise, label=f"{theme.theme_id} premise")
@@ -296,7 +298,7 @@ class FilmStyleContentValidator:
 
     def validate_frame(
         self,
-        request: StoryRequest,
+        request: FilmPromptRequest,
         theme: NarrativeTheme,
         frame: NarrativeFrame,
     ) -> None:
@@ -305,15 +307,15 @@ class FilmStyleContentValidator:
         self._validate_output(prose, label=label)
         source_sentence = frame_source_sentence(self.film_request)
         if not prose.startswith(source_sentence) or prose.count(source_sentence) != 1:
-            raise StoryContractError(
-                f"{label} 必须且只能以指定作品来源句开头一次"
+            raise FilmStyleContractError(
+                f"{label} 必须且只能以这句作品来源句原文开头一次：{source_sentence}"
             )
         if contains_image_geometry(prose):
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 不得包含画幅比例、横竖方向或图像尺寸"
             )
         if _COMPLIANCE_BOILERPLATE.search(prose):
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 使用了结论式合规话术；必须改为主动回握、"
                 "回应式视线、双向施力和各自支撑等可见事实"
             )
@@ -322,7 +324,7 @@ class FilmStyleContentValidator:
             300 if self.film_request.output_language == "chinese" else 600
         )
         if len(prose) < minimum_length:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 画面正文过短，无法完整覆盖环境、人物、互动、"
                 "摄影和光线"
             )
@@ -336,8 +338,13 @@ class FilmStyleContentValidator:
             or frame_anchors.scene_name != theme_anchors.scene_name
             or frame_anchors.character_names != theme_anchors.character_names
         ):
-            raise StoryContractError(
-                f"{label} 必须延续 Theme 选定的同一部电影、全部人物和场景锚点"
+            required_characters = "、".join(
+                sorted(theme_anchors.character_names)
+            )
+            raise FilmStyleContractError(
+                f"{label} 必须延续 Theme，并逐字包含其选定的全部人物 canonical_name"
+                f"（{required_characters}）与场景 canonical_name"
+                f"（{theme_anchors.scene_name}），且不得加入其他电影的人物或场景"
             )
         self._validate_anchor_details(prose, frame_anchors, label=label)
         missing_camera_evidence = [
@@ -348,9 +355,21 @@ class FilmStyleContentValidator:
             if pattern.search(prose) is None
         ]
         if missing_camera_evidence:
-            raise StoryContractError(
+            camera_example = (
+                "请明确写成类似“中景；摄影机置于两人侧前方、距主要人物约两米；"
+                "保持眼平高度，以三分之二侧前角度平视；使用五十毫米标准镜头，"
+                "形成自然透视；主焦点落在面孔，浅景深，前景门框形成框景”。"
+                if self.film_request.output_language == "chinese"
+                else "Use explicit wording such as: medium shot; the camera is "
+                "placed two meters from the main figures at eye level in a "
+                "three-quarter frontal position; a 50 mm standard lens creates "
+                "natural perspective; primary focus on the faces, shallow depth "
+                "of field, with a foreground doorway framing them."
+            )
+            raise FilmStyleContractError(
                 f"{label} 缺少强制摄影证据："
                 + "、".join(missing_camera_evidence)
+                + f"。{camera_example}"
             )
         if request.content_level == ContentLevel.AESTHETIC:
             evidence = _AESTHETIC_EVIDENCE[self.film_request.output_language]
@@ -360,7 +379,7 @@ class FilmStyleContentValidator:
             required_names = {evidence[0][0], evidence[-1][0]}
             if len(present) < 4 or not required_names.issubset(present):
                 missing = [name for name, _ in evidence if name not in present]
-                raise StoryContractError(
+                raise FilmStyleContractError(
                     f"{label} 美学级感官证据不足：已满足 {len(present)}/5，"
                     "必须至少满足 4/5 且包含皮肤或贴身轮廓与身体明暗塑形；"
                     "缺少" + "、".join(missing)
@@ -396,17 +415,17 @@ class FilmStyleContentValidator:
             if characters and scenes:
                 matches.append((index, characters, scenes))
         if not matches:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 必须使用同一部输入电影的原作成年人物 canonical_name "
                 "与原作场景 canonical_name"
             )
         if len(matches) > 1:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 不得跨电影混合原作人物与场景锚点"
             )
         work_index, character_names, scene_names = matches[0]
         if len(scene_names) != 1:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 必须选择且只选择一个原作场景 canonical_name"
             )
         return _AnchorSelection(
@@ -434,7 +453,7 @@ class FilmStyleContentValidator:
             )
         ]
         if missing_costumes:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 缺少原作人物服装特征："
                 + "、".join(missing_costumes)
             )
@@ -448,27 +467,27 @@ class FilmStyleContentValidator:
             for feature in scene.environment_features
         )
         if environment_count < 2:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 必须逐字使用至少两个原作场景 environment_features"
             )
         if not any(
             prop.casefold() in normalized
             for prop in scene.canonical_props
         ):
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 必须逐字使用至少一个原作场景 canonical_props"
             )
 
     @staticmethod
     def _validate_output(value: str, *, label: str) -> None:
         if _REFUSAL.search(value):
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 返回了拒绝或无法协助文本，必须改写为有效画面内容"
             )
 
     @staticmethod
     def _validate_content_level(
-        request: StoryRequest,
+        request: FilmPromptRequest,
         value: str,
         *,
         label: str,
@@ -476,12 +495,12 @@ class FilmStyleContentValidator:
         contains_explicit_sex = _contains_explicit_sex(value)
         if request.content_level == ContentLevel.HARDCORE:
             if not contains_explicit_sex:
-                raise StoryContractError(
+                raise FilmStyleContractError(
                     f"{label} 未直接写出可见的明确性行为及其身体接触，"
                     "不得降级为普通亲密互动"
                 )
             return
         if contains_explicit_sex:
-            raise StoryContractError(
+            raise FilmStyleContractError(
                 f"{label} 超出当前内容级别，不得出现明确性行为"
             )

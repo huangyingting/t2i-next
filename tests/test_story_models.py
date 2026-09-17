@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from pydantic import ValidationError
 
 from t2i_story_pipeline.models import (
     ContentLevel,
     NarrativeFrame,
+    NarrativeFrameDraft,
     NarrativeTheme,
     NarrativeThemeBatch,
     StoryRequest,
     exact_frame_sequence_model,
     exact_theme_batch_model,
+    exact_theme_draft_batch_model,
 )
 from tests.story_factories import make_frame_sequence, make_theme_batch
 
@@ -20,6 +24,13 @@ def test_exact_theme_batch_schema_requires_requested_count() -> None:
 
     with pytest.raises(ValidationError):
         response_model.model_validate(make_theme_batch(count=1).model_dump())
+
+
+def test_theme_draft_schema_omits_program_assigned_ids() -> None:
+    response_model = exact_theme_draft_batch_model(1)
+    schema = response_model.model_json_schema()
+
+    assert "theme_id" not in json.dumps(schema)
 
 
 def test_theme_batch_requires_lowercase_snake_case_semantic_name() -> None:
@@ -42,6 +53,14 @@ def test_exact_frame_schema_requires_requested_count() -> None:
 def test_narrative_frame_is_one_final_prose_paragraph() -> None:
     with pytest.raises(ValidationError, match="换行"):
         NarrativeFrame(frame_id="F01", prose="第一段。\n第二段。")
+
+
+def test_narrative_frame_draft_contains_only_one_prose_paragraph() -> None:
+    assert NarrativeFrameDraft(prose="完整画面正文。").model_dump() == {
+        "prose": "完整画面正文。"
+    }
+    with pytest.raises(ValidationError, match="换行"):
+        NarrativeFrameDraft(prose="第一段。\n第二段。")
 
 
 def test_narrative_frame_allows_up_to_32768_characters() -> None:

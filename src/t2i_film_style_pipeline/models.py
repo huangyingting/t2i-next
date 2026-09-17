@@ -215,7 +215,7 @@ class FilmStyleResult(Model):
     run_id: ShortText
     request: FilmStyleRequest
     profile: FilmStyleProfile
-    compiled_story: CompiledBriefText
+    compiled_context: CompiledBriefText
     usage: TokenUsage
 
 

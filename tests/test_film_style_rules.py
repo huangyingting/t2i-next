@@ -5,22 +5,22 @@ import re
 import pytest
 
 from t2i_film_style_pipeline.errors import FilmStyleConfigurationError
+from t2i_film_style_pipeline.prompt_models import ContentLevel, FilmPromptRequest
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
-from t2i_story_pipeline.models import ContentLevel, StoryRequest
 
 
-def make_rule_request(
+def make_prompt_request(
     content_level: ContentLevel = ContentLevel.AESTHETIC,
-) -> StoryRequest:
-    return StoryRequest(
-        story="BRIEF\n\nDirector-work film scene generation.",
+) -> FilmPromptRequest:
+    return FilmPromptRequest(
+        context="BRIEF\n\nDirector-work film scene generation.",
         content_level=content_level,
     )
 
 
 def test_film_style_rules_select_only_the_requested_content_level() -> None:
     rules = resolve_film_style_rules(
-        make_rule_request(ContentLevel.EROTIC),
+        make_prompt_request(ContentLevel.EROTIC),
     )
 
     for stage_rules in (rules.themes, rules.frames):
@@ -56,7 +56,7 @@ def test_film_style_content_levels_define_clear_visual_bounds(
     forbidden_rule,
 ) -> None:
     rules = resolve_film_style_rules(
-        make_rule_request(content_level),
+        make_prompt_request(content_level),
     )
     text = "\n".join(rules.frames)
 
@@ -72,8 +72,8 @@ def test_every_builtin_film_style_rule_is_written_in_chinese(
     output_language,
 ) -> None:
     rules = resolve_film_style_rules(
-        StoryRequest(
-            story="BRIEF\n\nDirector-work film scene generation.",
+        FilmPromptRequest(
+            context="BRIEF\n\nDirector-work film scene generation.",
             output_language=output_language,
         )
     )
@@ -108,7 +108,7 @@ def test_film_style_rules_append_optional_user_files_in_stage_order(
     )
 
     rules = resolve_film_style_rules(
-        make_rule_request(),
+        make_prompt_request(),
         user_directory=tmp_path,
     )
 
@@ -133,6 +133,6 @@ def test_film_style_rules_reject_missing_user_directory(tmp_path) -> None:
         match="film-style user rules directory does not exist",
     ):
         resolve_film_style_rules(
-            make_rule_request(),
+            make_prompt_request(),
             user_directory=tmp_path / "missing",
         )

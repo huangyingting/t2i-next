@@ -89,6 +89,43 @@ async def test_story_provider_returns_plain_text_without_schema(
 
 
 @pytest.mark.asyncio
+async def test_story_provider_rejects_truncated_plain_text(monkeypatch) -> None:
+    monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "length",
+                        "message": {"content": "未完成的画面正文"},
+                    }
+                ],
+                "usage": {"total_tokens": 100},
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIStoryModel(
+        StoryProviderSettings(
+            model="story-model",
+            api_key_env="STORY_TEST_API_KEY",
+        ),
+        client=client,
+    )
+
+    with pytest.raises(StoryProviderTruncatedOutputError):
+        await provider.generate_text(
+            stage=StoryStage.FRAMES,
+            messages=frame_messages(make_story_request(), make_theme()),
+            max_output_tokens=10000,
+        )
+    await client.aclose()
+
+
+@pytest.mark.asyncio
 async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     captured = {}

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from t2i_film_style_pipeline.compiler import compile_story_description
+from t2i_film_style_pipeline.compiler import compile_film_context
 from t2i_film_style_pipeline.models import (
     FilmStyleProfile,
     FilmStyleRequest,
@@ -59,7 +59,7 @@ class FilmStyleStudio:
             raise TypeError("film-style model returned an unexpected value")
         profile = _normalize_source_labels(response.value, request)
         run_id = _new_run_id()
-        compiled = compile_story_description(
+        compiled = compile_film_context(
             request,
             profile,
             scene_direction=scene_direction,
@@ -68,7 +68,7 @@ class FilmStyleStudio:
             run_id=run_id,
             request=request,
             profile=profile,
-            compiled_story=compiled,
+            compiled_context=compiled,
             usage=response.usage,
         )
         published = publish_film_style(

@@ -1,4 +1,4 @@
-"""Compile work-specific visual evidence into dynamic story context."""
+"""Compile work-specific visual evidence into dynamic film context."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ def frame_source_sentence(request: FilmStyleRequest) -> str:
     return f"This film image recomposes characters and settings from {source}."
 
 
-def compile_story_description(
+def compile_film_context(
     request: FilmStyleRequest,
     profile: FilmStyleProfile,
     *,

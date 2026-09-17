@@ -26,20 +26,24 @@ from t2i_film_style_pipeline.pipeline import (
     FilmStylePromptStudio,
     LocalFilmStyleRunStore,
 )
+from t2i_film_style_pipeline.prompt_config import (
+    load_film_prompt_provider_settings,
+)
+from t2i_film_style_pipeline.prompt_models import ContentLevel, OutputLanguage
+from t2i_film_style_pipeline.prompt_provider import (
+    FilmPromptProviderSettings,
+    film_prompt_model,
+)
+from t2i_film_style_pipeline.prompt_run_store import (
+    FilmPromptRunSettings,
+    FrameOutputMode,
+    ThemeOutputMode,
+)
 from t2i_film_style_pipeline.provider import (
     FilmStyleProviderSettings,
     film_style_model,
 )
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
-from t2i_story_pipeline.config import load_story_provider_settings
-from t2i_story_pipeline.errors import StoryPipelineError
-from t2i_story_pipeline.models import ContentLevel, OutputLanguage
-from t2i_story_pipeline.provider import StoryProviderSettings, story_model
-from t2i_story_pipeline.run_store import (
-    FrameOutputMode,
-    StoryRunSettings,
-    ThemeOutputMode,
-)
 
 app = typer.Typer(
     name="t2i-film-style",
@@ -71,7 +75,7 @@ def generate_command(
         "--themes",
         min=1,
         max=100,
-        help="微型故事主题数。",
+        help="电影画面主题数。",
     ),
     frames: int = typer.Option(
         6,
@@ -147,17 +151,17 @@ def generate_command(
             output_language=output_language,
         )
         rules = resolve_film_style_rules(
-            request.story_request(
+            request.prompt_request(
                 "BRIEF\n\nDirector-work film scene generation."
             ),
             user_directory=rules_dir,
         )
         film_provider = load_film_style_provider_settings()
-        story_provider = load_story_provider_settings()
+        prompt_provider = load_film_prompt_provider_settings()
         settings = FilmStylePipelineSettings(
             film_provider=film_provider,
-            story=StoryRunSettings(
-                provider=story_provider,
+            prompt=FilmPromptRunSettings(
+                provider=prompt_provider,
                 concurrency=concurrency,
                 theme_output_tokens=12000,
                 theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
@@ -178,7 +182,6 @@ def generate_command(
         UnicodeError,
         ValidationError,
         FilmStylePipelineError,
-        StoryPipelineError,
     ) as exc:
         _exit_for_error(exc, runs_dir)
     _print_completed(completed)
@@ -202,20 +205,20 @@ def resume_command(
             _print_completed(snapshot.completed)
             return
         film_provider = load_film_style_provider_settings()
-        story_provider = load_story_provider_settings()
+        prompt_provider = load_film_prompt_provider_settings()
         if film_provider != snapshot.settings.film_provider:
             raise FilmStyleConfigurationError(
                 "当前 film-style provider 配置与 run checkpoint 不一致"
             )
-        if story_provider != snapshot.settings.story.provider:
+        if prompt_provider != snapshot.settings.prompt.provider:
             raise FilmStyleConfigurationError(
-                "当前 story provider 配置与 run checkpoint 不一致"
+                "当前 film prompt provider 配置与 run checkpoint 不一致"
             )
         completed = asyncio.run(
             _resume(
                 run_id,
                 film_provider,
-                story_provider,
+                prompt_provider,
                 snapshot.settings,
                 snapshot.rules,
                 store,
@@ -224,7 +227,6 @@ def resume_command(
     except (
         ValidationError,
         FilmStylePipelineError,
-        StoryPipelineError,
     ) as exc:
         _exit_for_error(exc, runs_dir)
     _print_completed(completed)
@@ -241,11 +243,11 @@ async def _generate(
     store = LocalFilmStyleRunStore(runs_directory)
     async with (
         film_style_model(settings.film_provider) as film_model,
-        story_model(settings.story.provider) as story_author,
+        film_prompt_model(settings.prompt.provider) as prompt_author,
     ):
         return await FilmStylePromptStudio(
             film_model,
-            story_author,
+            prompt_author,
             store,
             settings,
             rules,
@@ -259,18 +261,18 @@ async def _generate(
 async def _resume(
     run_id: str,
     film_provider: FilmStyleProviderSettings,
-    story_provider: StoryProviderSettings,
+    prompt_provider: FilmPromptProviderSettings,
     settings: FilmStylePipelineSettings,
     rules: FilmStyleRuleSet,
     store: LocalFilmStyleRunStore,
 ) -> CompletedFilmStylePromptRun:
     async with (
         film_style_model(film_provider) as film_model,
-        story_model(story_provider) as story_author,
+        film_prompt_model(prompt_provider) as prompt_author,
     ):
         return await FilmStylePromptStudio(
             film_model,
-            story_author,
+            prompt_author,
             store,
             settings,
             rules,
@@ -282,7 +284,7 @@ def _print_completed(completed: CompletedFilmStylePromptRun) -> None:
     typer.secho("生成完成。", fg=typer.colors.GREEN)
     typer.echo(f"Run：{completed.run_id}")
     typer.echo(f"视觉档案：{completed.profile_file}")
-    typer.echo(f"叙事提示词：{completed.prompt_file}")
+    typer.echo(f"电影提示词：{completed.prompt_file}")
 
 
 def _exit_for_error(error: Exception, runs_dir: Path) -> None:

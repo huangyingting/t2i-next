@@ -8,17 +8,22 @@ from time import perf_counter
 
 from pydantic import BaseModel, ValidationError
 
-from t2i_story_pipeline.errors import (
-    StoryContractError,
-    StoryPipelineError,
-    StoryProviderError,
-    StoryProviderResponseError,
-    StoryProviderTruncatedOutputError,
-    StoryRunIncompleteError,
-    StoryStorageError,
-    StoryStructuredOutputError,
+from t2i_film_style_pipeline.errors import (
+    FilmPromptRunIncompleteError,
+    FilmStyleContractError,
+    FilmStylePipelineError,
+    FilmStyleProviderError,
+    FilmStyleProviderResponseError,
+    FilmStyleProviderTruncatedOutputError,
+    FilmStyleStorageError,
+    FilmStyleStructuredOutputError,
 )
-from t2i_story_pipeline.models import (
+from t2i_film_style_pipeline.prompt_messages import frame_messages, theme_messages
+from t2i_film_style_pipeline.prompt_models import (
+    FilmPromptRequest,
+    FilmPromptResult,
+    FilmPromptRuleSet,
+    FilmPromptStage,
     NarrativeFrame,
     NarrativeFrameDraft,
     NarrativeFrameSequence,
@@ -26,45 +31,44 @@ from t2i_story_pipeline.models import (
     NarrativeThemeBatch,
     NarrativeThemeDraftBatch,
     NarrativeThemeResult,
-    StoryRequest,
-    StoryResult,
-    StoryRuleSet,
-    StoryStage,
     TokenUsage,
     exact_frame_sequence_model,
     exact_theme_batch_model,
     exact_theme_draft_batch_model,
 )
-from t2i_story_pipeline.prompts import frame_messages, theme_messages
-from t2i_story_pipeline.provider import ChatMessage, ModelResponse, StoryModel
-from t2i_story_pipeline.run_store import (
-    CompletedStoryRun,
+from t2i_film_style_pipeline.prompt_provider import (
+    ChatMessage,
+    FilmPromptModel,
+    ModelResponse,
+)
+from t2i_film_style_pipeline.prompt_run_store import (
+    CompletedFilmPromptRun,
+    FilmPromptAttempt,
+    FilmPromptAttemptOutcome,
+    FilmPromptRunSettings,
+    FilmPromptRunSnapshot,
     FrameOutputMode,
-    LocalStoryRunStore,
-    StoryAttempt,
-    StoryAttemptOutcome,
-    StoryRunSettings,
-    StoryRunSnapshot,
+    LocalFilmPromptRunStore,
     ThemeOutputMode,
 )
 
 ProgressCallback = Callable[[str], None]
-ThemeValidator = Callable[[StoryRequest, NarrativeTheme], None]
-FrameValidator = Callable[[StoryRequest, NarrativeTheme, NarrativeFrame], None]
+ThemeValidator = Callable[[FilmPromptRequest, NarrativeTheme], None]
+FrameValidator = Callable[[FilmPromptRequest, NarrativeTheme, NarrativeFrame], None]
 GenerateResponse = Callable[
     [list[ChatMessage], int],
     Awaitable[ModelResponse],
 ]
 
-class StoryStudio:
-    """Turn one story request directly into final prose image prompts."""
+class FilmPromptStudio:
+    """Turn one film context directly into final prose image prompts."""
 
     def __init__(
         self,
-        model: StoryModel,
-        store: LocalStoryRunStore,
-        settings: StoryRunSettings,
-        rules: StoryRuleSet,
+        model: FilmPromptModel,
+        store: LocalFilmPromptRunStore,
+        settings: FilmPromptRunSettings,
+        rules: FilmPromptRuleSet,
         *,
         on_progress: ProgressCallback | None = None,
         theme_validator: ThemeValidator | None = None,
@@ -78,47 +82,51 @@ class StoryStudio:
         self._theme_validator = theme_validator
         self._frame_validator = frame_validator
 
-    async def run(self, request: StoryRequest) -> CompletedStoryRun:
+    async def run(self, request: FilmPromptRequest) -> CompletedFilmPromptRun:
         snapshot = self._store.create(request, self._settings, self._rules)
         self._emit(f"Run 已创建：{snapshot.run_id}")
         return await self._drive(snapshot, restarting=False)
 
-    async def resume(self, run_id: str) -> CompletedStoryRun:
+    async def resume(self, run_id: str) -> CompletedFilmPromptRun:
         snapshot = self._store.inspect(run_id)
         if snapshot.completed is not None:
             self._emit(f"Run 已完成：{run_id}")
             return snapshot.completed
         if snapshot.manifest.settings != self._settings:
-            raise StoryStorageError("当前生成配置与 story run manifest 不一致")
+            raise FilmStyleStorageError(
+                "当前生成配置与 film prompt run manifest 不一致"
+            )
         if snapshot.rules != self._rules:
-            raise StoryStorageError("当前 story rules 与 run 冻结规则不一致")
+            raise FilmStyleStorageError(
+                "当前 film prompt rules 与 run 冻结规则不一致"
+            )
         self._emit(f"继续 Run：{run_id}")
         return await self._drive(snapshot, restarting=True)
 
     async def _drive(
         self,
-        snapshot: StoryRunSnapshot,
+        snapshot: FilmPromptRunSnapshot,
         *,
         restarting: bool,
-    ) -> CompletedStoryRun:
+    ) -> CompletedFilmPromptRun:
         with self._store.lock(snapshot.run_id):
             if restarting:
                 snapshot = self._store.start(snapshot.run_id)
             try:
                 return await self._continue(snapshot)
-            except StoryRunIncompleteError:
+            except FilmPromptRunIncompleteError:
                 raise
-            except StoryStorageError:
+            except FilmStyleStorageError:
                 raise
-            except StoryPipelineError as exc:
+            except FilmStylePipelineError as exc:
                 self._store.fail(snapshot.run_id, str(exc))
                 current = self._store.inspect(snapshot.run_id)
                 raise self._incomplete(current, (str(exc),)) from exc
 
     async def _continue(
         self,
-        snapshot: StoryRunSnapshot,
-    ) -> CompletedStoryRun:
+        snapshot: FilmPromptRunSnapshot,
+    ) -> CompletedFilmPromptRun:
         request = snapshot.request
         rules = snapshot.rules
         themes = await self._generate_themes(
@@ -130,7 +138,7 @@ class StoryStudio:
         )
         snapshot = self._store.inspect(snapshot.run_id)
         if snapshot.manifest.semantic_name is None:
-            raise StoryStorageError("Story run 缺少 semantic_name")
+            raise FilmStyleStorageError("Film prompt run 缺少 semantic_name")
         semaphore = asyncio.Semaphore(self._settings.concurrency)
 
         async def generate_theme(
@@ -168,7 +176,7 @@ class StoryStudio:
                 "; ".join(causes) or "Frame Sequence 尚未完整",
             )
             raise self._incomplete(snapshot, causes)
-        result = StoryResult(
+        result = FilmPromptResult(
             run_id=snapshot.run_id,
             semantic_name=snapshot.manifest.semantic_name,
             request=request,
@@ -182,14 +190,14 @@ class StoryStudio:
             usage=self._store.total_usage(snapshot.run_id),
         )
         completed = self._store.complete(snapshot.run_id, result)
-        self._emit("全部 checkpoint 已完成，故事提示词已发布")
+        self._emit("全部 checkpoint 已完成，电影提示词已发布")
         return completed
 
     async def _generate_themes(
         self,
         run_id: str,
-        request: StoryRequest,
-        rules: StoryRuleSet,
+        request: FilmPromptRequest,
+        rules: FilmPromptRuleSet,
         themes: list[NarrativeTheme],
         semantic_name: str | None,
     ) -> list[NarrativeTheme]:
@@ -232,9 +240,9 @@ class StoryStudio:
                     value,
                     (NarrativeThemeBatch, NarrativeThemeDraftBatch),
                 ):
-                    raise StoryContractError("provider 返回了错误的主题类型")
+                    raise FilmStyleContractError("provider 返回了错误的主题类型")
                 if len(value.themes) != len(expected):
-                    raise StoryContractError(
+                    raise FilmStyleContractError(
                         "主题数量不符合请求："
                         f"expected={len(expected)}, actual={len(value.themes)}"
                     )
@@ -264,7 +272,7 @@ class StoryStudio:
                     expected_semantic_name is not None
                     and value.semantic_name != expected_semantic_name
                 ):
-                    raise StoryContractError(
+                    raise FilmStyleContractError(
                         "semantic_name 与 run 不一致："
                         f"expected={expected_semantic_name}, "
                         f"actual={value.semantic_name}"
@@ -282,7 +290,7 @@ class StoryStudio:
                 run_id=run_id,
                 operation_id=operation_id,
                 requested_ids=requested_ids,
-                stage=StoryStage.THEMES,
+                stage=FilmPromptStage.THEMES,
                 messages=messages,
                 response_model=(
                     exact_theme_draft_batch_model(count)
@@ -314,9 +322,9 @@ class StoryStudio:
     async def _generate_frames(
         self,
         run_id: str,
-        request: StoryRequest,
+        request: FilmPromptRequest,
         theme: NarrativeTheme,
-        rules: StoryRuleSet,
+        rules: FilmPromptRuleSet,
     ) -> NarrativeFrameSequence:
         if self._settings.frame_output_mode == FrameOutputMode.INDIVIDUAL_TEXT:
             return await self._generate_text_frames(
@@ -332,9 +340,9 @@ class StoryStudio:
             expected_ids: list[str] = expected,
         ) -> None:
             if not isinstance(value, NarrativeFrameSequence):
-                raise StoryContractError("provider 返回了错误的画面类型")
+                raise FilmStyleContractError("provider 返回了错误的画面类型")
             if len(value.frames) != len(expected_ids):
-                raise StoryContractError(
+                raise FilmStyleContractError(
                     "画面数量不符合请求："
                     f"expected={len(expected_ids)}, "
                     f"actual={len(value.frames)}"
@@ -354,7 +362,7 @@ class StoryStudio:
             requested_ids=tuple(
                 f"{theme.theme_id}-{frame_id}" for frame_id in expected
             ),
-            stage=StoryStage.FRAMES,
+            stage=FilmPromptStage.FRAMES,
             messages=frame_messages(request, theme, rules),
             response_model=exact_frame_sequence_model(request.frames_per_theme),
             max_output_tokens=self._settings.frame_output_tokens,
@@ -367,9 +375,9 @@ class StoryStudio:
     async def _generate_text_frames(
         self,
         run_id: str,
-        request: StoryRequest,
+        request: FilmPromptRequest,
         theme: NarrativeTheme,
-        rules: StoryRuleSet,
+        rules: FilmPromptRuleSet,
     ) -> NarrativeFrameSequence:
         frames: list[NarrativeFrame] = []
         for index in range(1, request.frames_per_theme + 1):
@@ -389,7 +397,7 @@ class StoryStudio:
                 budget: int,
             ) -> ModelResponse:
                 response = await self._model.generate_text(
-                    stage=StoryStage.FRAMES,
+                    stage=FilmPromptStage.FRAMES,
                     messages=current_messages,
                     max_output_tokens=budget,
                 )
@@ -401,7 +409,7 @@ class StoryStudio:
                         f"{error['msg']}"
                         for error in exc.errors()
                     )
-                    raise StoryStructuredOutputError(
+                    raise FilmStyleStructuredOutputError(
                         "frames 返回的纯文本不符合单段画面正文契约",
                         raw_content=response.text,
                         usage=response.usage,
@@ -415,7 +423,7 @@ class StoryStudio:
                 target: list[NarrativeFrame] = validated_frame_target,
             ) -> None:
                 if not isinstance(value, NarrativeFrameDraft):
-                    raise StoryContractError("provider 返回了错误的纯文本画面类型")
+                    raise FilmStyleContractError("provider 返回了错误的纯文本画面类型")
                 frame = NarrativeFrame(
                     frame_id=expected_frame_id,
                     prose=value.prose,
@@ -428,7 +436,7 @@ class StoryStudio:
                 run_id=run_id,
                 operation_id=f"frames-{theme.theme_id}-{frame_id}",
                 requested_ids=(f"{theme.theme_id}-{frame_id}",),
-                stage=StoryStage.FRAMES,
+                stage=FilmPromptStage.FRAMES,
                 messages=messages,
                 response_model=NarrativeFrameDraft,
                 max_output_tokens=self._settings.frame_output_tokens,
@@ -446,7 +454,7 @@ class StoryStudio:
         run_id: str,
         operation_id: str,
         requested_ids: tuple[str, ...],
-        stage: StoryStage,
+        stage: FilmPromptStage,
         messages: list[ChatMessage],
         response_model: type[BaseModel],
         max_output_tokens: int,
@@ -484,7 +492,7 @@ class StoryStudio:
         budget = (
             self._settings.provider.output_token_limit
             if any(
-                attempt.outcome == StoryAttemptOutcome.TRUNCATED
+                attempt.outcome == FilmPromptAttemptOutcome.TRUNCATED
                 for attempt in relevant_attempts
             )
             else min(
@@ -512,35 +520,35 @@ class StoryStudio:
                 usage += attempt_usage
                 rejected_value = response.value
                 validate(response.value)
-            except StoryProviderTruncatedOutputError as exc:
+            except FilmStyleProviderTruncatedOutputError as exc:
                 attempt_usage = exc.usage
                 usage += attempt_usage
                 error: Exception = exc
-                outcome = StoryAttemptOutcome.TRUNCATED
+                outcome = FilmPromptAttemptOutcome.TRUNCATED
                 attempt_issues = (
                     str(exc),
                     *exc.validation_issues,
                 )
-            except StoryStructuredOutputError as exc:
+            except FilmStyleStructuredOutputError as exc:
                 attempt_usage = exc.usage
                 usage += attempt_usage
                 error = exc
-                outcome = StoryAttemptOutcome.REJECTED
+                outcome = FilmPromptAttemptOutcome.REJECTED
                 attempt_issues = (
                     str(exc),
                     *exc.validation_issues,
                 )
-            except StoryProviderResponseError as exc:
+            except FilmStyleProviderResponseError as exc:
                 attempt_usage = exc.usage
                 usage += attempt_usage
                 error = exc
-                outcome = StoryAttemptOutcome.PROVIDER_ERROR
+                outcome = FilmPromptAttemptOutcome.PROVIDER_ERROR
                 attempt_issues = (str(exc),)
-            except StoryContractError as exc:
+            except FilmStyleContractError as exc:
                 error = exc
-                outcome = StoryAttemptOutcome.REJECTED
+                outcome = FilmPromptAttemptOutcome.REJECTED
                 attempt_issues = (str(exc),)
-            except StoryProviderError as exc:
+            except FilmStyleProviderError as exc:
                 self._record_attempt(
                     run_id=run_id,
                     operation_id=operation_id,
@@ -548,7 +556,7 @@ class StoryStudio:
                     stage=stage,
                     attempt=attempt_offset + attempt + 1,
                     max_output_tokens=budget,
-                    outcome=StoryAttemptOutcome.PROVIDER_ERROR,
+                    outcome=FilmPromptAttemptOutcome.PROVIDER_ERROR,
                     accepted_ids=(),
                     issues=(str(exc),),
                     duration_ms=self._elapsed_ms(started),
@@ -564,7 +572,7 @@ class StoryStudio:
                     stage=stage,
                     attempt=attempt_offset + attempt + 1,
                     max_output_tokens=budget,
-                    outcome=StoryAttemptOutcome.ACCEPTED,
+                    outcome=FilmPromptAttemptOutcome.ACCEPTED,
                     accepted_ids=requested_ids,
                     issues=(),
                     duration_ms=self._elapsed_ms(started),
@@ -590,7 +598,7 @@ class StoryStudio:
             feedback_issues.extend(attempt_issues)
             if attempt >= self._settings.generation_retries:
                 raise error
-            if isinstance(error, StoryProviderTruncatedOutputError):
+            if isinstance(error, FilmStyleProviderTruncatedOutputError):
                 budget = self._settings.provider.output_token_limit
             messages = self._retry_messages(
                 base_messages,
@@ -606,10 +614,10 @@ class StoryStudio:
         run_id: str,
         operation_id: str,
         requested_ids: tuple[str, ...],
-        stage: StoryStage,
+        stage: FilmPromptStage,
         attempt: int,
         max_output_tokens: int,
-        outcome: StoryAttemptOutcome,
+        outcome: FilmPromptAttemptOutcome,
         accepted_ids: tuple[str, ...],
         issues: tuple[str, ...],
         duration_ms: int,
@@ -618,7 +626,7 @@ class StoryStudio:
     ) -> None:
         self._store.record_attempt(
             run_id,
-            StoryAttempt(
+            FilmPromptAttempt(
                 occurred_at=self._store.now(),
                 stage=stage,
                 operation_id=operation_id,
@@ -670,8 +678,8 @@ class StoryStudio:
 
     @staticmethod
     def _recent_attempt_issues(
-        attempts: tuple[StoryAttempt, ...],
-        stage: StoryStage,
+        attempts: tuple[FilmPromptAttempt, ...],
+        stage: FilmPromptStage,
         requested_ids: tuple[str, ...],
     ) -> tuple[str, ...]:
         requested = set(requested_ids)
@@ -690,10 +698,10 @@ class StoryStudio:
 
     @staticmethod
     def _incomplete(
-        snapshot: StoryRunSnapshot,
+        snapshot: FilmPromptRunSnapshot,
         causes: tuple[str, ...],
-    ) -> StoryRunIncompleteError:
-        return StoryRunIncompleteError(
+    ) -> FilmPromptRunIncompleteError:
+        return FilmPromptRunIncompleteError(
             snapshot.run_id,
             missing_themes=(snapshot.request.theme_count - len(snapshot.themes)),
             missing_frames=(snapshot.request.theme_count - len(snapshot.frames)),

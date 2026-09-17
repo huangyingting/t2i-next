@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from t2i_film_style_pipeline.prompt_models import TokenUsage
+
 
 class FilmStylePipelineError(Exception):
     """Base class for failures callers may present to users."""
@@ -11,12 +13,29 @@ class FilmStyleConfigurationError(FilmStylePipelineError):
     """Provider or request configuration is invalid."""
 
 
+class FilmStyleContractError(FilmStylePipelineError):
+    """Generated film prompt data violates its publication contract."""
+
+
 class FilmStyleProviderError(FilmStylePipelineError):
     """The configured model could not complete a request."""
 
 
+class FilmStyleProviderAuthenticationError(FilmStyleProviderError):
+    """The configured model rejected the current credentials."""
+
+
 class FilmStyleProviderResponseError(FilmStyleProviderError):
     """The model returned an unsupported response."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        usage: TokenUsage | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.usage = usage or TokenUsage()
 
 
 class FilmStyleStructuredOutputError(FilmStyleProviderResponseError):
@@ -27,9 +46,10 @@ class FilmStyleStructuredOutputError(FilmStyleProviderResponseError):
         message: str,
         *,
         raw_content: str,
+        usage: TokenUsage | None = None,
         validation_issues: tuple[str, ...] = (),
     ) -> None:
-        super().__init__(message)
+        super().__init__(message, usage=usage)
         self.raw_content = raw_content
         self.validation_issues = validation_issues
 
@@ -49,7 +69,32 @@ class FilmStyleProviderHTTPError(FilmStyleProviderError):
 
 
 class FilmStyleStorageError(FilmStylePipelineError):
-    """A run record or compiled story description could not be persisted."""
+    """A run record or compiled film context could not be persisted."""
+
+
+class FilmPromptRunNotFoundError(FilmStyleStorageError):
+    """The requested film prompt run does not exist."""
+
+
+class FilmPromptRunIncompleteError(FilmStylePipelineError):
+    """A resumable film prompt run stopped before all checkpoints completed."""
+
+    def __init__(
+        self,
+        run_id: str,
+        *,
+        missing_themes: int,
+        missing_frames: int,
+        causes: tuple[str, ...],
+    ) -> None:
+        self.run_id = run_id
+        self.missing_themes = missing_themes
+        self.missing_frames = missing_frames
+        self.causes = causes
+        super().__init__(
+            f"Run {run_id} 尚未完成：缺少 {missing_themes} 个 Theme、"
+            f"{missing_frames} 个 Frame Sequence；请执行 resume {run_id}"
+        )
 
 
 class FilmStyleRunIncompleteError(FilmStylePipelineError):

@@ -6,8 +6,8 @@ from typer.testing import CliRunner
 
 import t2i_film_style_pipeline.cli as film_style_cli
 from t2i_film_style_pipeline.cli import app
+from t2i_film_style_pipeline.prompt_provider import FilmPromptProviderSettings
 from t2i_film_style_pipeline.provider import FilmStyleProviderSettings
-from t2i_story_pipeline.provider import StoryProviderSettings
 
 
 def test_film_style_cli_exposes_generate_command() -> None:
@@ -46,7 +46,7 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
         return SimpleNamespace(
             run_id="film-run",
             profile_file=runs_directory / "film-run" / "profile.json",
-            compiled_story_file=runs_directory / "film-run" / "compiled-story.txt",
+            compiled_context_file=runs_directory / "film-run" / "compiled-context.txt",
             prompt_file=prompts_directory / "prompts.txt",
         )
 
@@ -57,8 +57,8 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     )
     monkeypatch.setattr(
         film_style_cli,
-        "load_story_provider_settings",
-        lambda: StoryProviderSettings(model="test-model"),
+        "load_film_prompt_provider_settings",
+        lambda: FilmPromptProviderSettings(model="test-model"),
     )
     monkeypatch.setattr(
         film_style_cli,
@@ -97,7 +97,7 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     assert captured["request"].scene_direction == "只生成雨夜室内场景。"
     assert captured["request"].theme_count == 4
     assert captured["request"].frames_per_theme == 1
-    assert captured["settings"].story.theme_output_tokens == 12000
+    assert captured["settings"].prompt.theme_output_tokens == 12000
     assert any(
         "每个画面都是完全独立的图像提示词" in rule
         for rule in captured["rules"].frames
@@ -105,7 +105,7 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     assert captured["rules_user_directory"] is None
     assert captured["prompts_directory"] == tmp_path / "prompts"
     assert "Run：film-run" in result.output
-    assert "叙事提示词：" in result.output
+    assert "电影提示词：" in result.output
 
 
 def test_generate_no_longer_accepts_brief_file() -> None:

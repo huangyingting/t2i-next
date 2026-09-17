@@ -219,9 +219,12 @@ async def test_individual_text_frames_retry_only_current_frame(
         frame_sequence.frames[0].prose
     ]
     retry_messages = model.messages[3]
-    assert retry_messages[-2].content == "需要重试的第二帧。"
     assert "纯自然语言画面正文" in retry_messages[-1].content
     assert "schema" not in retry_messages[-1].content
+    assert all(
+        message.content != "需要重试的第二帧。"
+        for message in retry_messages
+    )
     store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
     frame_attempts = [
         attempt

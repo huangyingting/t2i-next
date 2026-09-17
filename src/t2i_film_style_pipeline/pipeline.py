@@ -29,24 +29,23 @@ from t2i_film_style_pipeline.models import (
     FilmStyleRuleSet,
     SceneDirectionText,
 )
+from t2i_film_style_pipeline.prompt_models import (
+    ContentLevel,
+    FilmPromptRequest,
+    FilmPromptRuleSet,
+    OutputLanguage,
+)
+from t2i_film_style_pipeline.prompt_provider import FilmPromptModel
+from t2i_film_style_pipeline.prompt_run_store import (
+    FilmPromptRunSettings,
+    LocalFilmPromptRunStore,
+)
+from t2i_film_style_pipeline.prompt_studio import FilmPromptStudio
 from t2i_film_style_pipeline.provider import (
     FilmStyleModel,
     FilmStyleProviderSettings,
 )
 from t2i_film_style_pipeline.service import FilmStyleStudio
-from t2i_story_pipeline.errors import StoryPipelineError
-from t2i_story_pipeline.models import (
-    ContentLevel,
-    OutputLanguage,
-    StoryRequest,
-    StoryRuleSet,
-)
-from t2i_story_pipeline.provider import StoryModel
-from t2i_story_pipeline.run_store import (
-    LocalStoryRunStore,
-    StoryRunSettings,
-)
-from t2i_story_pipeline.studio import StoryStudio
 
 ProgressCallback = Callable[[str], None]
 _RUN_ID = re.compile(r"\d{8}T\d{6}Z-[a-f0-9]{8}")
@@ -72,12 +71,12 @@ class FilmStylePromptRequest(_Model):
     content_level: ContentLevel = ContentLevel.AESTHETIC
     output_language: OutputLanguage = OutputLanguage.CHINESE
 
-    def story_request(
+    def prompt_request(
         self,
-        story: str,
-    ) -> StoryRequest:
-        return StoryRequest(
-            story=story,
+        context: str,
+    ) -> FilmPromptRequest:
+        return FilmPromptRequest(
+            context=context,
             prompt_filename_stem=_short_filename_stem(
                 self.film_style.director,
             ),
@@ -97,7 +96,7 @@ def _short_filename_stem(value: str) -> str:
 
 class FilmStylePipelineSettings(_Model):
     film_provider: FilmStyleProviderSettings
-    story: StoryRunSettings
+    prompt: FilmPromptRunSettings
 
 
 class FilmStyleRunManifest(_Model):
@@ -107,9 +106,9 @@ class FilmStyleRunManifest(_Model):
     updated_at: str
     prompts_directory: str
     profile_run_id: str | None = None
-    story_run_id: str | None = None
+    prompt_run_id: str | None = None
     profile_file: str | None = None
-    compiled_story_file: str | None = None
+    compiled_context_file: str | None = None
     prompt_file: str | None = None
     error: str | None = None
 
@@ -118,9 +117,9 @@ class FilmStyleRunManifest(_Model):
 class CompletedFilmStylePromptRun:
     run_id: str
     profile_run_id: str
-    story_run_id: str
+    prompt_run_id: str
     profile_file: Path
-    compiled_story_file: Path
+    compiled_context_file: Path
     prompt_file: Path
 
 
@@ -164,7 +163,7 @@ class LocalFilmStyleRunStore:
                 tempfile.mkdtemp(prefix=f".{run_id}-", dir=self._runs_root)
             )
             (staging / "profile-runs").mkdir()
-            (staging / "story-runs").mkdir()
+            (staging / "prompt-runs").mkdir()
             _write_json(staging / "request.json", request)
             _write_json(staging / "settings.json", settings)
             _write_json(staging / "rules.json", rules)
@@ -258,7 +257,7 @@ class LocalFilmStyleRunStore:
         profile_run_id: str,
         *,
         profile_file: Path,
-        compiled_story_file: Path,
+        compiled_context_file: Path,
     ) -> FilmStyleRunSnapshot:
         snapshot = self.inspect(run_id)
         self._update_manifest(
@@ -266,23 +265,23 @@ class LocalFilmStyleRunStore:
                 update={
                     "profile_run_id": profile_run_id,
                     "profile_file": str(profile_file.resolve()),
-                    "compiled_story_file": str(compiled_story_file.resolve()),
+                    "compiled_context_file": str(compiled_context_file.resolve()),
                     "updated_at": _now(),
                 }
             )
         )
         return self.inspect(run_id)
 
-    def checkpoint_story(
+    def checkpoint_prompt(
         self,
         run_id: str,
-        story_run_id: str,
+        prompt_run_id: str,
     ) -> FilmStyleRunSnapshot:
         snapshot = self.inspect(run_id)
         self._update_manifest(
             snapshot.manifest.model_copy(
                 update={
-                    "story_run_id": story_run_id,
+                    "prompt_run_id": prompt_run_id,
                     "updated_at": _now(),
                 }
             )
@@ -299,9 +298,9 @@ class LocalFilmStyleRunStore:
         manifest = snapshot.manifest
         if (
             manifest.profile_run_id is None
-            or manifest.story_run_id is None
+            or manifest.prompt_run_id is None
             or manifest.profile_file is None
-            or manifest.compiled_story_file is None
+            or manifest.compiled_context_file is None
         ):
             raise FilmStyleStorageError(
                 f"Run {run_id} cannot complete before both child runs"
@@ -363,29 +362,31 @@ class LocalFilmStyleRunStore:
             raise FilmStyleStorageError(
                 f"Run {run_id} profile child ID does not match its manifest"
             )
-        compiled_story_file = candidates[0].parent / "compiled-story.txt"
+        compiled_context_file = candidates[0].parent / "compiled-context.txt"
         try:
-            compiled_story = compiled_story_file.read_text(encoding="utf-8").rstrip()
+            compiled_context = compiled_context_file.read_text(
+                encoding="utf-8"
+            ).rstrip()
         except (OSError, UnicodeError) as exc:
             raise FilmStyleStorageError(
-                f"Run {run_id} cannot read its compiled Story Description"
+                f"Run {run_id} cannot read its compiled film context"
             ) from exc
-        if compiled_story != result.compiled_story.rstrip():
+        if compiled_context != result.compiled_context.rstrip():
             raise FilmStyleStorageError(
-                f"Run {run_id} compiled Story Description does not match its result"
+                f"Run {run_id} compiled film context does not match its result"
             )
-        return result, candidates[0].parent / "profile.json", compiled_story_file
+        return result, candidates[0].parent / "profile.json", compiled_context_file
 
-    def discover_story_run_id(self, run_id: str) -> str | None:
-        root = self.story_runs_directory(run_id)
-        listing = LocalStoryRunStore(root).list_runs()
+    def discover_prompt_run_id(self, run_id: str) -> str | None:
+        root = self.prompt_runs_directory(run_id)
+        listing = LocalFilmPromptRunStore(root).list_runs()
         if listing.unreadable:
             raise FilmStyleStorageError(
-                f"Run {run_id} contains unreadable story checkpoints"
+                f"Run {run_id} contains unreadable prompt checkpoints"
             )
         if len(listing.runs) > 1:
             raise FilmStyleStorageError(
-                f"Run {run_id} contains multiple story child runs"
+                f"Run {run_id} contains multiple prompt child runs"
             )
         return listing.runs[0].run_id if listing.runs else None
 
@@ -400,8 +401,8 @@ class LocalFilmStyleRunStore:
     def profile_runs_directory(self, run_id: str) -> Path:
         return self.run_directory(run_id) / "profile-runs"
 
-    def story_runs_directory(self, run_id: str) -> Path:
-        return self.run_directory(run_id) / "story-runs"
+    def prompt_runs_directory(self, run_id: str) -> Path:
+        return self.run_directory(run_id) / "prompt-runs"
 
     def _update_manifest(self, manifest: FilmStyleRunManifest) -> None:
         _atomic_write_json(
@@ -411,12 +412,12 @@ class LocalFilmStyleRunStore:
 
 
 class FilmStylePromptStudio:
-    """Drive the profile and story stages behind one resumable run ID."""
+    """Drive the profile and prompt stages behind one resumable run ID."""
 
     def __init__(
         self,
         film_model: FilmStyleModel,
-        story_model: StoryModel,
+        prompt_model: FilmPromptModel,
         store: LocalFilmStyleRunStore,
         settings: FilmStylePipelineSettings,
         rules: FilmStyleRuleSet,
@@ -424,7 +425,7 @@ class FilmStylePromptStudio:
         on_progress: ProgressCallback | None = None,
     ) -> None:
         self._film_model = film_model
-        self._story_model = story_model
+        self._prompt_model = prompt_model
         self._store = store
         self._settings = settings
         self._rules = rules
@@ -467,20 +468,20 @@ class FilmStylePromptStudio:
             if snapshot.completed is not None:
                 return snapshot.completed
             try:
-                film_result, compiled_story_file = await self._profile(snapshot)
+                film_result, compiled_context_file = await self._profile(snapshot)
                 snapshot = self._store.inspect(run_id)
-                story_store = LocalStoryRunStore(
-                    self._store.story_runs_directory(run_id),
+                prompt_store = LocalFilmPromptRunStore(
+                    self._store.prompt_runs_directory(run_id),
                     Path(snapshot.manifest.prompts_directory),
                 )
-                story_run_id = (
-                    snapshot.manifest.story_run_id
-                    or self._store.discover_story_run_id(run_id)
+                prompt_run_id = (
+                    snapshot.manifest.prompt_run_id
+                    or self._store.discover_prompt_run_id(run_id)
                 )
-                story_request = snapshot.request.story_request(
-                    film_result.compiled_story
+                prompt_request = snapshot.request.prompt_request(
+                    film_result.compiled_context
                 )
-                story_rules = StoryRuleSet(
+                prompt_rules = FilmPromptRuleSet(
                     themes=snapshot.rules.themes,
                     frames=snapshot.rules.frames,
                 )
@@ -488,31 +489,31 @@ class FilmStylePromptStudio:
                     snapshot.request.film_style,
                     film_result.profile,
                 )
-                if story_run_id is None:
-                    story_snapshot = story_store.create(
-                        story_request,
-                        snapshot.settings.story,
-                        story_rules,
+                if prompt_run_id is None:
+                    prompt_snapshot = prompt_store.create(
+                        prompt_request,
+                        snapshot.settings.prompt,
+                        prompt_rules,
                     )
-                    story_run_id = story_snapshot.run_id
-                    self._store.checkpoint_story(run_id, story_run_id)
-                    self._emit(f"Story checkpoint 已创建：{story_run_id}")
-                elif snapshot.manifest.story_run_id is None:
-                    self._store.checkpoint_story(run_id, story_run_id)
-                completed_story = await StoryStudio(
-                    self._story_model,
-                    story_store,
-                    snapshot.settings.story,
-                    story_rules,
+                    prompt_run_id = prompt_snapshot.run_id
+                    self._store.checkpoint_prompt(run_id, prompt_run_id)
+                    self._emit(f"Prompt checkpoint 已创建：{prompt_run_id}")
+                elif snapshot.manifest.prompt_run_id is None:
+                    self._store.checkpoint_prompt(run_id, prompt_run_id)
+                completed_prompt = await FilmPromptStudio(
+                    self._prompt_model,
+                    prompt_store,
+                    snapshot.settings.prompt,
+                    prompt_rules,
                     on_progress=self._on_progress,
                     theme_validator=content_validator.validate_theme,
                     frame_validator=content_validator.validate_frame,
-                ).resume(story_run_id)
+                ).resume(prompt_run_id)
                 return self._store.complete(
                     run_id,
-                    prompt_file=completed_story.published.prompt_file,
+                    prompt_file=completed_prompt.published.prompt_file,
                 )
-            except (FilmStylePipelineError, StoryPipelineError) as exc:
+            except FilmStylePipelineError as exc:
                 self._store.fail(run_id, str(exc))
                 raise FilmStyleRunIncompleteError(run_id, str(exc)) from exc
 
@@ -534,18 +535,18 @@ class FilmStylePromptStudio:
             )
             result = completed.result
             profile_file = completed.published.profile_file
-            compiled_story_file = completed.published.compiled_story_file
+            compiled_context_file = completed.published.compiled_context_file
             self._emit(f"视觉档案已保存：{profile_file}")
         else:
-            result, profile_file, compiled_story_file = discovered
+            result, profile_file, compiled_context_file = discovered
         if snapshot.manifest.profile_run_id is None:
             self._store.checkpoint_profile(
                 snapshot.manifest.run_id,
                 result.run_id,
                 profile_file=profile_file,
-                compiled_story_file=compiled_story_file,
+                compiled_context_file=compiled_context_file,
             )
-        return result, compiled_story_file
+        return result, compiled_context_file
 
     def _emit(self, message: str) -> None:
         if self._on_progress is not None:
@@ -557,9 +558,9 @@ def _completed_from_manifest(
 ) -> CompletedFilmStylePromptRun:
     if (
         manifest.profile_run_id is None
-        or manifest.story_run_id is None
+        or manifest.prompt_run_id is None
         or manifest.profile_file is None
-        or manifest.compiled_story_file is None
+        or manifest.compiled_context_file is None
         or manifest.prompt_file is None
     ):
         raise FilmStyleStorageError(
@@ -568,9 +569,9 @@ def _completed_from_manifest(
     return CompletedFilmStylePromptRun(
         run_id=manifest.run_id,
         profile_run_id=manifest.profile_run_id,
-        story_run_id=manifest.story_run_id,
+        prompt_run_id=manifest.prompt_run_id,
         profile_file=Path(manifest.profile_file),
-        compiled_story_file=Path(manifest.compiled_story_file),
+        compiled_context_file=Path(manifest.compiled_context_file),
         prompt_file=Path(manifest.prompt_file),
     )
 

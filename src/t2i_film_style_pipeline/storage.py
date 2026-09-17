@@ -16,7 +16,7 @@ from t2i_film_style_pipeline.models import FilmStyleResult
 class PublishedFilmStyle:
     run_directory: Path
     profile_file: Path
-    compiled_story_file: Path
+    compiled_context_file: Path
 
 
 def publish_film_style(
@@ -26,7 +26,7 @@ def publish_film_style(
 ) -> PublishedFilmStyle:
     run_directory = (runs_directory / result.run_id).resolve()
     profile_file = run_directory / "profile.json"
-    compiled_story_file = run_directory / "compiled-story.txt"
+    compiled_context_file = run_directory / "compiled-context.txt"
     staging_directory: Path | None = None
     try:
         runs_directory = runs_directory.resolve()
@@ -53,8 +53,8 @@ def publish_film_style(
             result.model_dump_json(indent=2) + "\n",
         )
         _write_file(
-            staging_directory / "compiled-story.txt",
-            result.compiled_story.rstrip() + "\n",
+            staging_directory / "compiled-context.txt",
+            result.compiled_context.rstrip() + "\n",
         )
         _fsync_directory(staging_directory)
         _commit_run_directory(staging_directory, run_directory)
@@ -68,7 +68,7 @@ def publish_film_style(
     return PublishedFilmStyle(
         run_directory=run_directory,
         profile_file=profile_file,
-        compiled_story_file=compiled_story_file,
+        compiled_context_file=compiled_context_file,
     )
 
 

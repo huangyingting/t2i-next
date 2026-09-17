@@ -2,12 +2,28 @@
 
 `t2i_film_style_pipeline` 是一个独立的一站式子模块。它接收导演署名、一个或多个
 具体作品及可选的场景方向，通过一次结构化模型调用生成可复用视觉档案，再用包内
-导演 Profile/Theme/Frame workflow 生成最终提示词。它不依赖外部 `film.txt`，也不加载
-`t2i_story_pipeline` 或 `story-inputs/rules/` 的规则。
+导演 Profile/Theme/Frame workflow 生成最终提示词。模型、消息、checkpoint、发布器、
+错误类型和规则解析都由 `t2i_film_style_pipeline` 自己实现，不 import 或调用其他
+生成 pipeline，也不加载外部 `film.txt` 或 `story-inputs/rules/`。
 
-模型调用遵循仓库统一配置：`T2I_MODEL_BACKEND=openai` 使用直接
+模型配置只从仓库根目录的 `.env.film` 加载：
+`T2I_MODEL_BACKEND=openai` 使用直接
 OpenAI-compatible HTTP，`T2I_MODEL_BACKEND=copilot` 使用 GitHub Copilot SDK。
-顶层 run 同时冻结 film-style 与 story 两个阶段的 backend 配置。
+该文件只保留 film 所需的后端、模型、认证变量名、推理级别、token 上限、超时和
+重试配置，不读取通用 `.env`。顶层 run 同时冻结 Profile 与 Theme/Frame 两组
+provider 配置。
+
+`.env.film` 只应包含当前后端实际需要的以下变量：
+
+- 通用：`T2I_MODEL_BACKEND`；
+- Copilot：`COPILOT_MODEL`、`COPILOT_REASONING_EFFORT`、
+  `COPILOT_OUTPUT_TOKEN_LIMIT`、`COPILOT_TIMEOUT_SECONDS`，以及实际使用的
+  `COPILOT_GITHUB_TOKEN`、`GH_TOKEN` 或 `GITHUB_TOKEN`；
+- OpenAI-compatible：`OPENAI_BASE_URL`、`OPENAI_API_KEY_ENV`、
+  `OPENAI_AUTH_MODE`、`OPENAI_MODEL`、`OPENAI_THINKING_MODE`、
+  `OPENAI_REASONING_EFFORT`、`OPENAI_TEMPERATURE`、
+  `OPENAI_OUTPUT_TOKEN_LIMIT`、`OPENAI_TIMEOUT_SECONDS`、
+  `OPENAI_TRANSPORT_RETRIES`，以及 `OPENAI_API_KEY_ENV` 指向的认证变量。
 
 结构化档案同时包含：
 
@@ -55,7 +71,7 @@ uv run t2i-film-style generate "张艺谋" \
 
 - 顶层 film-style run ID；
 - 结构化视觉档案路径；
-- 最终叙事提示词路径。
+- 最终电影提示词路径。
 
 最终提示词保存在内容等级目录中，文件名只使用清理后的导演署名和递增序号，例如
 `prompts/2026-09-17/hardcore/张艺谋_0001.txt`。内容等级、人物数量和
@@ -96,16 +112,18 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
 - `content_validation.py`：验证拒绝文本、来源句、内容等级和图像几何禁项；只定义
   可确定判断的发布门槛，不承担创作规则。
 - `pipeline.py`：负责阶段编排、checkpoint 和恢复。顶层 `rules.json` 同时冻结
-  Profile、Theme、Frame 三组规则；Story child run 只接收执行 Theme/Frame 所需
+  Profile、Theme、Frame 三组规则；film prompt 子运行只接收执行 Theme/Frame 所需
   的两组规则。
+- `prompt_models.py`、`prompt_messages.py`、`prompt_provider.py`、
+  `prompt_run_store.py` 和 `prompt_studio.py`：film 自有的 Theme/Frame 生成核心，
+  不复用其他 pipeline 的模型、provider、storage 或 studio。
 
 模型输出边界按阶段区分：Profile 的人物、服装、场景、环境和道具档案继续使用严格
 结构化提交；Theme 只提交 `semantic_name`、`title`、`premise` 和 `style`，不再让
 模型生成 `theme_id`；Frame 按 `F01`、`F02` 顺序逐张请求纯自然语言正文，不提交
 JSON 或工具参数。程序负责分配 Theme/Frame ID、构造 Pydantic 领域对象并写入
 checkpoint。纯文本 Frame 仍须通过全部语义发布门槛，失败时只重试当前 Frame。
-独立 Story pipeline 默认仍使用原有结构化 Theme/Frame 序列；该分层模式由
-film-style run settings 显式启用并冻结。
+这些输出模式由 film-style run settings 显式启用并冻结。
 
 三个内容等级都采用相同结构：先定义视觉目标与每帧必须达到的可见下限，再规定
 增强皮肤、接触、材质、姿态、表情和环境触觉的具体方法，最后给出不可越过的上限
@@ -143,18 +161,17 @@ canonical_name，依次描述环境、人物、动作与互动、镜头、光线
 
 Theme 和 Frame 在保存 checkpoint 前会经过 film-style 专用语义验证。拒绝或无法协助
 文本、缺失或重复的指定来源句、内容等级越界或降级、画幅与尺寸信息都会被拒绝，并
-通过 Story pipeline 的有界重试把具体问题反馈给模型。Frame 缺少上述任一强制摄影
+通过 film 自有的有界重试把具体问题反馈给模型。Frame 缺少上述任一强制摄影
 证据、美学级感官证据不足或出现结论式合规话术时同样拒绝。Theme 必须选择一部
 作品中的人物和一个场景；Frame 若切换作品、人物或场景，缺少任一入画人物的
 costume_features、少于两个 environment_features，或没有 canonical_props，也会被
 拒绝。中文 Frame 通常控制在六百至一千二百个中文字符，共同国籍、成年身份和关系
-只写一次组级说明。验证只挂载在 film-style 编排中，不改变独立 Story pipeline 的
-默认行为。
+只写一次组级说明。
 
 ## Checkpoint 与恢复
 
 顶层 run 在第一次模型调用之前创建。每次运行使用一个对用户可见的 run ID，并在
-其下保存 profile 与 story 两个子运行：
+其下保存 profile 与 prompt 两个子运行：
 
 ```text
 runs/film-style/<run-id>/
@@ -166,10 +183,10 @@ runs/film-style/<run-id>/
 │   └── <profile-run-id>/
 │       ├── request.json
 │       ├── profile.json
-│       ├── compiled-story.txt
+│       ├── compiled-context.txt
 │       └── result.json
-└── story-runs/
-    └── <story-run-id>/
+└── prompt-runs/
+    └── <prompt-run-id>/
         ├── request.json
         ├── rules.json
         ├── manifest.json

@@ -5,6 +5,7 @@ import pytest
 from t2i_film_style_pipeline.compiler import frame_source_sentence
 from t2i_film_style_pipeline.errors import (
     FilmStyleProviderError,
+    FilmStyleProviderResponseError,
     FilmStyleRunIncompleteError,
 )
 from t2i_film_style_pipeline.models import TokenUsage as FilmTokenUsage
@@ -15,6 +16,25 @@ from t2i_film_style_pipeline.pipeline import (
     FilmStyleRunStatus,
     LocalFilmStyleRunStore,
 )
+from t2i_film_style_pipeline.prompt_models import (
+    FilmPromptStage,
+    NarrativeFrameSequence,
+    NarrativeThemeBatch,
+    NarrativeThemeDraftBatch,
+    TokenUsage,
+)
+from t2i_film_style_pipeline.prompt_provider import (
+    FilmPromptProviderSettings,
+    TextModelResponse,
+)
+from t2i_film_style_pipeline.prompt_provider import (
+    ModelResponse as PromptModelResponse,
+)
+from t2i_film_style_pipeline.prompt_run_store import (
+    FilmPromptRunSettings,
+    FrameOutputMode,
+    ThemeOutputMode,
+)
 from t2i_film_style_pipeline.provider import (
     FilmStyleProviderSettings,
 )
@@ -22,27 +42,7 @@ from t2i_film_style_pipeline.provider import (
     ModelResponse as FilmModelResponse,
 )
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
-from t2i_story_pipeline.errors import StoryProviderResponseError
-from t2i_story_pipeline.models import (
-    NarrativeFrameSequence,
-    NarrativeThemeBatch,
-    NarrativeThemeDraftBatch,
-    StoryStage,
-    TokenUsage,
-)
-from t2i_story_pipeline.provider import (
-    ModelResponse as StoryModelResponse,
-)
-from t2i_story_pipeline.provider import (
-    StoryProviderSettings,
-    TextModelResponse,
-)
-from t2i_story_pipeline.run_store import (
-    FrameOutputMode,
-    StoryRunSettings,
-    ThemeOutputMode,
-)
-from tests.story_factories import make_frame_sequence, make_theme_batch
+from tests.film_prompt_factories import make_frame_sequence, make_theme_batch
 from tests.test_film_style_pipeline import make_profile, make_request
 
 
@@ -58,10 +58,10 @@ class FakeFilmModel:
         )
 
 
-class FakeStoryModel:
+class FakePromptModel:
     def __init__(self, values: list[object]) -> None:
         self._values = iter(values)
-        self.stages: list[StoryStage] = []
+        self.stages: list[FilmPromptStage] = []
 
     async def generate(
         self,
@@ -88,7 +88,7 @@ class FakeStoryModel:
                     ],
                 }
             )
-        return StoryModelResponse(
+        return PromptModelResponse(
             value=value,
             usage=TokenUsage(total_tokens=10),
         )
@@ -157,8 +157,8 @@ def make_film_frame_sequence() -> NarrativeFrameSequence:
 def make_settings(*, generation_retries: int = 0) -> FilmStylePipelineSettings:
     return FilmStylePipelineSettings(
         film_provider=FilmStyleProviderSettings(model="test-model"),
-        story=StoryRunSettings(
-            provider=StoryProviderSettings(model="test-model"),
+        prompt=FilmPromptRunSettings(
+            provider=FilmPromptProviderSettings(model="test-model"),
             concurrency=1,
             generation_retries=generation_retries,
             theme_output_mode=ThemeOutputMode.STRUCTURED_WITHOUT_IDS,
@@ -174,7 +174,7 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
     bad_sequence.frames[0].prose = (
         f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
     )
-    story_model = FakeStoryModel(
+    prompt_model = FakePromptModel(
         [
             make_film_theme_batch(),
             bad_sequence.frames[0].prose,
@@ -185,41 +185,41 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
 
     completed = await FilmStylePromptStudio(
         FakeFilmModel(),
-        story_model,
+        prompt_model,
         LocalFilmStyleRunStore(tmp_path / "runs"),
         make_settings(generation_retries=1),
         resolve_film_style_rules(
-            request.story_request("BRIEF\n\nDirector scene context.")
+            request.prompt_request("BRIEF\n\nDirector scene context.")
         ),
     ).run(request, prompts_directory=tmp_path / "prompts")
 
     assert completed.prompt_file.exists()
-    assert story_model.stages == [
-        StoryStage.THEMES,
-        StoryStage.FRAMES,
-        StoryStage.FRAMES,
-        StoryStage.FRAMES,
+    assert prompt_model.stages == [
+        FilmPromptStage.THEMES,
+        FilmPromptStage.FRAMES,
+        FilmPromptStage.FRAMES,
+        FilmPromptStage.FRAMES,
     ]
 
 
 @pytest.mark.asyncio
-async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> None:
+async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) -> None:
     request = make_pipeline_request()
     settings = make_settings()
     rules = resolve_film_style_rules(
-        request.story_request("BRIEF\n\nDirector scene context.")
+        request.prompt_request("BRIEF\n\nDirector scene context.")
     )
     store = LocalFilmStyleRunStore(tmp_path / "runs")
     film_model = FakeFilmModel()
-    first_story_model = FakeStoryModel(
+    first_prompt_model = FakePromptModel(
         [
             make_film_theme_batch(),
-            StoryProviderResponseError("temporary frame failure"),
+            FilmStyleProviderResponseError("temporary frame failure"),
         ]
     )
     studio = FilmStylePromptStudio(
         film_model,
-        first_story_model,
+        first_prompt_model,
         store,
         settings,
         rules,
@@ -236,16 +236,16 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     assert failed.manifest.status == FilmStyleRunStatus.FAILED
     assert failed.rules.profile == rules.profile
     assert failed.manifest.profile_run_id is not None
-    assert failed.manifest.story_run_id is not None
+    assert failed.manifest.prompt_run_id is not None
     assert film_model.calls == 1
 
     resumed_sequence = make_film_frame_sequence()
-    resumed_story_model = FakeStoryModel(
+    resumed_prompt_model = FakePromptModel(
         [frame.prose for frame in resumed_sequence.frames]
     )
     completed = await FilmStylePromptStudio(
         film_model,
-        resumed_story_model,
+        resumed_prompt_model,
         store,
         settings,
         rules,
@@ -254,12 +254,12 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     assert completed.run_id == run_id
     assert completed.prompt_file.exists()
     assert completed.prompt_file.name == "张艺谋_0001.txt"
-    assert completed.compiled_story_file.name == "compiled-story.txt"
-    assert completed.compiled_story_file.is_file()
+    assert completed.compiled_context_file.name == "compiled-context.txt"
+    assert completed.compiled_context_file.is_file()
     assert film_model.calls == 1
-    assert resumed_story_model.stages == [
-        StoryStage.FRAMES,
-        StoryStage.FRAMES,
+    assert resumed_prompt_model.stages == [
+        FilmPromptStage.FRAMES,
+        FilmPromptStage.FRAMES,
     ]
     assert store.inspect(run_id).manifest.status == FilmStyleRunStatus.COMPLETED
 
@@ -269,7 +269,7 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
     request = make_pipeline_request()
     settings = make_settings()
     rules = resolve_film_style_rules(
-        request.story_request("BRIEF\n\nDirector scene context.")
+        request.prompt_request("BRIEF\n\nDirector scene context.")
     )
     store = LocalFilmStyleRunStore(tmp_path / "runs")
 
@@ -280,7 +280,7 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
     with pytest.raises(FilmStyleRunIncompleteError) as caught:
         await FilmStylePromptStudio(
             FailingFilmModel(),
-            FakeStoryModel([]),
+            FakePromptModel([]),
             store,
             settings,
             rules,
@@ -296,7 +296,7 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
 
     completed = await FilmStylePromptStudio(
         FakeFilmModel(),
-        FakeStoryModel(
+        FakePromptModel(
             [
                 make_film_theme_batch(),
                 *[
