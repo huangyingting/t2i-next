@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 
-from t2i_film_style_pipeline.authoring_rules import resolve_film_style_rules
 from t2i_film_style_pipeline.errors import (
     FilmStyleProviderError,
     FilmStyleRunIncompleteError,
@@ -21,6 +20,7 @@ from t2i_film_style_pipeline.provider import (
 from t2i_film_style_pipeline.provider import (
     ModelResponse as FilmModelResponse,
 )
+from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_story_pipeline.errors import StoryProviderResponseError
 from t2i_story_pipeline.models import StoryStage, TokenUsage
 from t2i_story_pipeline.provider import (
@@ -120,6 +120,7 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     run_id = caught.value.run_id
     failed = store.inspect(run_id)
     assert failed.manifest.status == FilmStyleRunStatus.FAILED
+    assert failed.rules.profile == rules.profile
     assert failed.manifest.profile_run_id is not None
     assert failed.manifest.story_run_id is not None
     assert film_model.calls == 1

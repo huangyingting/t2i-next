@@ -21,6 +21,14 @@ def test_film_style_cli_exposes_generate_command() -> None:
 
 def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     captured = {}
+    original_resolve_rules = film_style_cli.resolve_film_style_rules
+
+    def capture_rules(request, *, user_directory=None):
+        captured["rules_user_directory"] = user_directory
+        return original_resolve_rules(
+            request,
+            user_directory=user_directory,
+        )
 
     async def fake_generate(
         request,
@@ -51,6 +59,11 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
         film_style_cli,
         "load_story_provider_settings",
         lambda: StoryProviderSettings(model="test-model"),
+    )
+    monkeypatch.setattr(
+        film_style_cli,
+        "resolve_film_style_rules",
+        capture_rules,
     )
     monkeypatch.setattr(film_style_cli, "_generate", fake_generate)
 
@@ -84,10 +97,12 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     assert captured["request"].scene_direction == "只生成雨夜室内场景。"
     assert captured["request"].theme_count == 4
     assert captured["request"].frames_per_theme == 1
+    assert captured["settings"].story.theme_output_tokens == 12000
     assert any(
-        "completely standalone image prompt" in rule
+        "每个画面都是完全独立的图像提示词" in rule
         for rule in captured["rules"].frames
     )
+    assert captured["rules_user_directory"] is None
     assert captured["prompts_directory"] == tmp_path / "prompts"
     assert "Run：film-run" in result.output
     assert "叙事提示词：" in result.output
@@ -117,3 +132,5 @@ def test_generate_help_exposes_scene_not_intermediate_output() -> None:
     assert "--scene" in result.output
     assert "--brief-file" not in result.output
     assert "--output-dir" not in result.output
+    assert "可选 film-style" in result.output
+    assert "story-inputs/rules/" not in result.output

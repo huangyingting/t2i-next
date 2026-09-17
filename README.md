@@ -45,9 +45,10 @@ uv run python scripts/refine-text-file.py \
 ## 作品集合电影风格编译器
 
 `t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
-视觉档案，并在同一命令中生成最终提示词。它自带导演场景的 Theme/Frame 系统
-workflow，不依赖 `story-inputs/film.txt`。它只建立作品级来源关系，不把结果
-扩展为对导演全部个人风格的模仿，也不复制原作人物、演员肖像、对白、剧情、
+视觉档案，并在同一命令中生成最终提示词。它自带完整、独立的 Profile、common、
+Theme、Frame 和 content-level 规则，不加载 `t2i_story_pipeline` 的规则，也不依赖
+`story-inputs/film.txt` 或 `story-inputs/rules/`。它只建立作品级来源关系，不把
+结果扩展为对导演全部个人风格的模仿，也不复制原作人物、演员肖像、对白、剧情、
 独特道具或具体镜头。
 
 ```bash

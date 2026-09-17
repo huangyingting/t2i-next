@@ -149,12 +149,12 @@ class StoryRequest(Model):
 
 class NarrativeTheme(Model):
     theme_id: ThemeId
-    title: Text = Field(description="简洁自然的中文主题标题")
+    title: Text = Field(description="简洁自然的主题标题")
     premise: PremiseText = Field(
-        description="至多两句的完整人物故事前提，不包含写作指令"
+        description="完整的人物、地点与当前情境前提，不包含写作指令"
     )
     style: StyleText = Field(
-        description="一句完整简洁的视觉风格描述，不包含写作指令或内部字段"
+        description="完整、具体、可执行的视觉方案，不包含写作指令或内部字段"
     )
 
 

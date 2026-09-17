@@ -7,12 +7,16 @@ import pytest
 
 from t2i_film_style_pipeline.errors import FilmStyleProviderResponseError
 from t2i_film_style_pipeline.models import FilmStyleProfile
-from t2i_film_style_pipeline.prompts import profile_messages
+from t2i_film_style_pipeline.profile_messages import profile_messages
 from t2i_film_style_pipeline.provider import (
     FilmStyleProviderSettings,
     OpenAIFilmStyleModel,
 )
-from tests.test_film_style_pipeline import make_profile, make_request
+from tests.test_film_style_pipeline import (
+    make_profile,
+    make_profile_rules,
+    make_request,
+)
 
 
 @pytest.mark.asyncio
@@ -53,7 +57,7 @@ async def test_provider_sends_strict_profile_schema(monkeypatch) -> None:
     )
 
     response = await provider.generate(
-        messages=profile_messages(make_request()),
+        messages=profile_messages(make_request(), make_profile_rules()),
         response_model=FilmStyleProfile,
         max_output_tokens=6000,
     )
@@ -103,7 +107,7 @@ async def test_provider_rejects_non_object_json(monkeypatch) -> None:
         match="non-object response",
     ):
         await provider.generate(
-            messages=profile_messages(make_request()),
+            messages=profile_messages(make_request(), make_profile_rules()),
             response_model=FilmStyleProfile,
             max_output_tokens=6000,
         )

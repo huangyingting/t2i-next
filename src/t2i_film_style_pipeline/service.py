@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import secrets
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -15,7 +16,7 @@ from t2i_film_style_pipeline.models import (
     FilmStyleResult,
     exact_film_style_profile_model,
 )
-from t2i_film_style_pipeline.prompts import profile_messages
+from t2i_film_style_pipeline.profile_messages import profile_messages
 from t2i_film_style_pipeline.provider import FilmStyleModel
 from t2i_film_style_pipeline.storage import (
     PublishedFilmStyle,
@@ -33,10 +34,14 @@ class FilmStyleStudio:
     def __init__(
         self,
         model: FilmStyleModel,
+        profile_rules: Sequence[str],
         *,
         runs_directory: Path = Path("runs") / "film-style",
     ) -> None:
+        if not profile_rules:
+            raise ValueError("profile_rules must not be empty")
         self._model = model
+        self._profile_rules = tuple(profile_rules)
         self._runs_directory = runs_directory
 
     async def run(
@@ -46,7 +51,7 @@ class FilmStyleStudio:
         scene_direction: str | None = None,
     ) -> CompletedFilmStyleRun:
         response = await self._model.generate(
-            messages=profile_messages(request),
+            messages=profile_messages(request, self._profile_rules),
             response_model=exact_film_style_profile_model(len(request.works)),
             max_output_tokens=8000,
         )

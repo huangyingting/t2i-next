@@ -50,6 +50,11 @@ CompiledBriefText = Annotated[
     str,
     StringConstraints(min_length=1, max_length=100000, strip_whitespace=True),
 ]
+FilmRuleText = Annotated[
+    str,
+    StringConstraints(min_length=1, strip_whitespace=True),
+    AfterValidator(_single_line),
+]
 
 
 class FilmWorkReference(Model):
@@ -71,6 +76,12 @@ class FilmStyleRequest(Model):
         if len(normalized) != len(self.works):
             raise ValueError("works must be unique")
         return self
+
+
+class FilmStyleRuleSet(Model):
+    profile: tuple[FilmRuleText, ...] = Field(min_length=1)
+    themes: tuple[FilmRuleText, ...] = Field(min_length=1)
+    frames: tuple[FilmRuleText, ...] = Field(min_length=1)
 
 
 class FilmStyleProfile(Model):

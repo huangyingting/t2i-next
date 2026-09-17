@@ -8,7 +8,6 @@ from pathlib import Path
 import typer
 from pydantic import ValidationError
 
-from t2i_film_style_pipeline.authoring_rules import resolve_film_style_rules
 from t2i_film_style_pipeline.config import load_film_style_provider_settings
 from t2i_film_style_pipeline.errors import (
     FilmStyleConfigurationError,
@@ -17,6 +16,7 @@ from t2i_film_style_pipeline.errors import (
 )
 from t2i_film_style_pipeline.models import (
     FilmStyleRequest,
+    FilmStyleRuleSet,
     parse_work_reference,
 )
 from t2i_film_style_pipeline.pipeline import (
@@ -30,9 +30,10 @@ from t2i_film_style_pipeline.provider import (
     FilmStyleProviderSettings,
     film_style_model,
 )
+from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_story_pipeline.config import load_story_provider_settings
 from t2i_story_pipeline.errors import StoryPipelineError
-from t2i_story_pipeline.models import ContentLevel, OutputLanguage, StoryRuleSet
+from t2i_story_pipeline.models import ContentLevel, OutputLanguage
 from t2i_story_pipeline.provider import StoryProviderSettings, story_model
 from t2i_story_pipeline.run_store import StoryRunSettings
 
@@ -122,7 +123,7 @@ def generate_command(
         None,
         "--rules-dir",
         file_okay=False,
-        help="可选 story 用户规则目录；默认使用 story-inputs/rules/。",
+        help="可选 film-style 用户规则目录；默认只使用包内导演规则。",
     ),
 ) -> None:
     """Generate the profile and final prompts in one resumable command."""
@@ -141,21 +142,11 @@ def generate_command(
             content_level=content_level,
             output_language=output_language,
         )
-        default_rules_directory = Path("story-inputs") / "rules"
-        user_rules_directory = (
-            rules_dir
-            if rules_dir is not None
-            else (
-                default_rules_directory
-                if default_rules_directory.is_dir()
-                else None
-            )
-        )
         rules = resolve_film_style_rules(
             request.story_request(
                 "BRIEF\n\nDirector-work film scene generation."
             ),
-            user_directory=user_rules_directory,
+            user_directory=rules_dir,
         )
         film_provider = load_film_style_provider_settings()
         story_provider = load_story_provider_settings()
@@ -164,6 +155,7 @@ def generate_command(
             story=StoryRunSettings(
                 provider=story_provider,
                 concurrency=concurrency,
+                theme_output_tokens=12000,
             ),
         )
         completed = asyncio.run(
@@ -235,7 +227,7 @@ def resume_command(
 async def _generate(
     request: FilmStylePromptRequest,
     settings: FilmStylePipelineSettings,
-    rules: StoryRuleSet,
+    rules: FilmStyleRuleSet,
     *,
     runs_directory: Path,
     prompts_directory: Path,
@@ -263,7 +255,7 @@ async def _resume(
     film_provider: FilmStyleProviderSettings,
     story_provider: StoryProviderSettings,
     settings: FilmStylePipelineSettings,
-    rules: StoryRuleSet,
+    rules: FilmStyleRuleSet,
     store: LocalFilmStyleRunStore,
 ) -> CompletedFilmStylePromptRun:
     async with (

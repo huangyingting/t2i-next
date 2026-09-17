@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from t2i_film_style_pipeline.authoring_rules import resolve_film_style_rules
 from t2i_film_style_pipeline.compiler import (
     compile_story_description,
     source_attribution,
@@ -20,8 +19,9 @@ from t2i_film_style_pipeline.models import (
     TokenUsage,
     parse_work_reference,
 )
-from t2i_film_style_pipeline.prompts import profile_messages
+from t2i_film_style_pipeline.profile_messages import profile_messages
 from t2i_film_style_pipeline.provider import ModelResponse
+from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_film_style_pipeline.service import FilmStyleStudio
 from t2i_film_style_pipeline.storage import publish_film_style
 
@@ -63,6 +63,14 @@ def make_profile() -> FilmStyleProfile:
             "拒绝逐镜复制来源作品。",
         ),
     )
+
+
+def make_profile_rules() -> tuple[str, ...]:
+    from t2i_story_pipeline.models import StoryRequest
+
+    return resolve_film_style_rules(
+        StoryRequest(story="Director scene context")
+    ).profile
 
 
 def test_parse_work_reference_accepts_optional_year() -> None:
@@ -110,44 +118,73 @@ def test_compile_story_description_injects_profile_after_brief_header() -> None:
 
 
 def test_profile_prompt_uses_only_work_metadata() -> None:
-    messages = profile_messages(make_request())
+    messages = profile_messages(make_request(), make_profile_rules())
     payload = json.loads(messages[1].content)
 
     assert payload["director"] == "张艺谋"
     assert payload["works"][0] == {"title": "英雄", "year": 2002}
-    assert set(payload) == {"director", "works", "output_language", "task"}
-    assert "unrestricted personal style" in messages[0].content
-    assert "invented style names" in messages[0].content
+    assert set(payload) == {"director", "works", "output_language"}
+    assert "不得扩展为对导演全部个人风格的概括或模仿" in messages[0].content
+    assert "不得写入导演生平、电影史、剧情解析" in messages[0].content
 
 
 def test_director_rules_own_theme_and_frame_workflow() -> None:
-    from t2i_story_pipeline.models import StoryRequest
+    from t2i_story_pipeline.models import ContentLevel, StoryRequest
 
-    rules = resolve_film_style_rules(StoryRequest(story="Director scene context"))
+    rules = resolve_film_style_rules(
+        StoryRequest(
+            story="Director scene context",
+            content_level=ContentLevel.HARDCORE,
+        )
+    )
 
-    assert any("fixed Theme-ID menu" in rule for rule in rules.themes)
-    assert any("completely standalone image prompt" in rule for rule in rules.frames)
-    assert any("aspect ratio, resolution" in rule for rule in rules.frames)
-    assert any("Never expose internal terms" in rule for rule in rules.frames)
+    assert any(
+        "电影场景上下文是唯一依据" in rule
+        for rule in rules.themes
+    )
+    assert any(
+        "premise 使用一个不换行的完整段落" in rule
+        for rule in rules.themes
+    )
+    assert any("通常写四至八句" in rule for rule in rules.themes)
+    assert any("八项中的六项" in rule for rule in rules.themes)
+    assert any("固定的主题编号菜单" in rule for rule in rules.themes)
+    assert any("完全独立的图像提示词" in rule for rule in rules.frames)
+    assert any("画幅比例、分辨率" in rule for rule in rules.frames)
+    assert any("不得暴露母风格" in rule for rule in rules.frames)
+    assert any("内容级别：赤裸明确级" in rule for rule in rules.frames)
+    assert not any(
+        "The Story Description is authoritative" in rule
+        for rule in rules.themes
+    )
+    assert not any(
+        "The Story Description is authoritative" in rule
+        for rule in rules.frames
+    )
     assert not (Path(__file__).parents[1] / "story-inputs" / "film.txt").exists()
 
 
 @pytest.mark.asyncio
 async def test_studio_publishes_profile_run_and_compiled_story(tmp_path) -> None:
     profile = make_profile()
+    captured = {}
 
     class FakeModel:
-        async def generate(self, **_kwargs):
+        async def generate(self, **kwargs):
+            captured.update(kwargs)
             return ModelResponse(
                 value=profile,
                 usage=TokenUsage(total_tokens=42),
             )
 
+    profile_rules = make_profile_rules()
     completed = await FilmStyleStudio(
         FakeModel(),
+        profile_rules,
         runs_directory=tmp_path / "runs",
     ).run(make_request(), scene_direction="只生成雨夜室内场景。")
 
+    assert captured["messages"][0].content == "\n".join(profile_rules)
     assert completed.result.profile == profile
     assert completed.result.usage.total_tokens == 42
     assert completed.published.compiled_story_file.exists()
@@ -184,6 +221,7 @@ async def test_studio_strips_repeated_source_labels_from_summaries(tmp_path) -> 
 
     completed = await FilmStyleStudio(
         FakeModel(),
+        make_profile_rules(),
         runs_directory=tmp_path / "runs",
     ).run(make_request())
 
@@ -212,6 +250,7 @@ async def test_studio_replaces_meta_summary_with_visual_work_summary(
 
     completed = await FilmStyleStudio(
         FakeModel(),
+        make_profile_rules(),
         runs_directory=tmp_path / "runs",
     ).run(make_request())
 
@@ -243,6 +282,7 @@ async def test_single_work_uses_complete_per_film_summary(tmp_path) -> None:
 
     completed = await FilmStyleStudio(
         FakeModel(),
+        make_profile_rules(),
         runs_directory=tmp_path / "runs",
     ).run(request)
 
@@ -273,6 +313,7 @@ async def test_single_work_opening_summary_uses_complete_first_sentence(
 
     completed = await FilmStyleStudio(
         FakeModel(),
+        make_profile_rules(),
         runs_directory=tmp_path / "runs",
     ).run(request)
 

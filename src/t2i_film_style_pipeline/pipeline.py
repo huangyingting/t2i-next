@@ -25,6 +25,7 @@ from t2i_film_style_pipeline.errors import (
 from t2i_film_style_pipeline.models import (
     FilmStyleRequest,
     FilmStyleResult,
+    FilmStyleRuleSet,
     SceneDirectionText,
 )
 from t2i_film_style_pipeline.provider import (
@@ -119,7 +120,7 @@ class CompletedFilmStylePromptRun:
 class FilmStyleRunSnapshot:
     request: FilmStylePromptRequest
     settings: FilmStylePipelineSettings
-    rules: StoryRuleSet
+    rules: FilmStyleRuleSet
     manifest: FilmStyleRunManifest
     completed: CompletedFilmStylePromptRun | None = None
 
@@ -134,7 +135,7 @@ class LocalFilmStyleRunStore:
         self,
         request: FilmStylePromptRequest,
         settings: FilmStylePipelineSettings,
-        rules: StoryRuleSet,
+        rules: FilmStyleRuleSet,
         *,
         prompts_directory: Path,
     ) -> FilmStyleRunSnapshot:
@@ -184,7 +185,7 @@ class LocalFilmStyleRunStore:
             settings = FilmStylePipelineSettings.model_validate_json(
                 (directory / "settings.json").read_text(encoding="utf-8")
             )
-            rules = StoryRuleSet.model_validate_json(
+            rules = FilmStyleRuleSet.model_validate_json(
                 (directory / "rules.json").read_text(encoding="utf-8")
             )
             manifest = FilmStyleRunManifest.model_validate_json(
@@ -410,7 +411,7 @@ class FilmStylePromptStudio:
         story_model: StoryModel,
         store: LocalFilmStyleRunStore,
         settings: FilmStylePipelineSettings,
-        rules: StoryRuleSet,
+        rules: FilmStyleRuleSet,
         *,
         on_progress: ProgressCallback | None = None,
     ) -> None:
@@ -447,7 +448,7 @@ class FilmStylePromptStudio:
             )
         if snapshot.rules != self._rules:
             raise FilmStyleStorageError(
-                "current story rules do not match the frozen film-style run rules"
+                "current film-style rules do not match the frozen run rules"
             )
         self._emit(f"继续 Run：{run_id}")
         return await self._drive(run_id)
@@ -471,11 +472,15 @@ class FilmStylePromptStudio:
                 story_request = snapshot.request.story_request(
                     film_result.compiled_story
                 )
+                story_rules = StoryRuleSet(
+                    themes=snapshot.rules.themes,
+                    frames=snapshot.rules.frames,
+                )
                 if story_run_id is None:
                     story_snapshot = story_store.create(
                         story_request,
                         snapshot.settings.story,
-                        snapshot.rules,
+                        story_rules,
                     )
                     story_run_id = story_snapshot.run_id
                     self._store.checkpoint_story(run_id, story_run_id)
@@ -486,7 +491,7 @@ class FilmStylePromptStudio:
                     self._story_model,
                     story_store,
                     snapshot.settings.story,
-                    snapshot.rules,
+                    story_rules,
                     on_progress=self._on_progress,
                 ).resume(story_run_id)
                 return self._store.complete(
@@ -505,6 +510,7 @@ class FilmStylePromptStudio:
         if discovered is None:
             completed = await FilmStyleStudio(
                 self._film_model,
+                snapshot.rules.profile,
                 runs_directory=self._store.profile_runs_directory(
                     snapshot.manifest.run_id
                 ),
