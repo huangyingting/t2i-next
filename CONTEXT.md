@@ -72,17 +72,21 @@ reused on resume.
 _Avoid_: Story Description, Prompt Generation rules, per-input special case
 
 **Story Quality Policy**:
-An opt-in set of local Frame evidence checks, frozen in run settings.
-`off` skips these checks, `report` records warnings without quality retries,
-and `enforce` rejects failed output with bounded generation retries.
+An opt-in set of local Theme and Frame evidence checks, frozen in run settings.
+Each stage independently selects `off` to skip checks, `report` to record warnings
+without quality retries, or `enforce` to reject failed output with bounded retries.
+Theme checks target a named title, premise, or style field before the batch is
+checkpointed or queued for Frame generation; Frame checks target final prose.
 Basic schema, count, persistence, and safety contracts remain independent.
 Checks do not add authoring instructions or call a model evaluator.
 _Avoid_: Safety switch, semantic guarantee, automatic review stage
 
 **Story Quality Report**:
-The result's policy mode, `skipped`, `passed`, or `warnings` status, and
-structured issues identifying the check and Theme/Frame. Attempt records keep
-historical issues; the final report describes only accepted checkpoints.
+The result's separate Theme and Frame policy modes, `skipped`, `passed`, or
+`warnings` statuses, and structured issues identifying the stage, field, check,
+and Theme/Frame. Theme issues have no Frame ID. Attempt records keep historical
+issues; the final report describes only accepted checkpoints and is verified
+against the frozen policy on publication and completed-run loading.
 _Avoid_: Hidden warnings, model score
 
 **Story Description Authority**:

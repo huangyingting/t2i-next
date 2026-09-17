@@ -85,6 +85,10 @@ Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构�
 checkpoint 后，每个 Theme 独立进入有界 Frame queue，producer 随即生成下一批，
 因此上一批的 Frame 与下一批 Theme 可以并行。二者共同遵守 `--concurrency`
 全局模型调用上限；默认 Theme 批次大小为 10，可在 1–10 之间调整。
+后续 Theme 批次使用紧凑的全局多样性账本，而不是重复传入全部既有 Theme 全文；
+账本保留已用标题和 premise/style 短摘要，并为当前输出位置轮换指定两个优先变化
+维度。模型在同一次调用内避开已用的作品场景、人物组合、内容路径、空间调度和
+摄影光线骨架，因此不需要额外的多样性验证调用。
 每个 Theme 的全部 Frame 在一次纯文本调用中批量返回，由程序拆分并分配
 `frame_id`，避免逐帧调用开销以及 JSON wrapper 或工具提交失败。批次中验证通过的
 Frame 会被保留，后续只重新生成失败槽位。
@@ -97,8 +101,14 @@ Frame 会被保留，后续只重新生成失败槽位。
 Theme 只锁定人物、场景、关系与内容方向；每个 Frame 自由设计姿态和核心接触链，并
 闭合自身的承重、四肢和衣物拓扑。批次同时变化姿态类别、高低关系、核心接触与摄影
 方案，冲突时优先删除辅助动作和服装花样。
-Hardcore Frame 只保留一个主动接触并描述动作完成后的静态受力结果，避免连续运动、
-袖口束缚和面部遮挡；Theme 不提前固定动作主客体。
+Hardcore Frame 只保留一条核心互动链，可以是明确性行为，也可以是无插入但具有
+同等可见强度的 BDSM 支配互动。BDSM 路径必须写清控制者、器具两端、牵引方向、
+被控制者主动维持的姿态、承重链和具体欲望表情；项圈、牵引链、腕带或绳索不能
+承担体重或压迫气道。画面描述动作完成后的静态受力结果，避免连续运动、袖口束缚
+和面部遮挡；Theme 不提前固定动作主客体。
+Erotic 与 Hardcore 的皮肤、表情、呼吸、材质和重量感都保持最高强度；Erotic
+停留在非生殖器亲密接触，不能形成完整器具控制链或命令式色情展示，Hardcore
+则必须形成明确性行为、器具支配链或命令式开放展示中的一种不可误读的色情事实。
 每帧还需为核心接触保留可见进入路径，保持头颈与胸骨方向一致，并从完整穿着、前开
 上衣加腰部固定下装、完全脱衣三种互斥衣物状态中选择一种。
 姿态不使用固定菜单或模板分配；站、坐、跪、蹲和卧姿均可使用，只要求每个人的承重
@@ -161,20 +171,33 @@ authoring:
   frames:
     - 每帧明确描述景别、视角和焦点。
 validation:
-  quality:
+  themes:
+    mode: report
+    checks:
+      - type: required_text
+        field: premise
+        values: [旧车站]
+  frames:
     mode: report
     checks:
       - type: camera_evidence
 runtime:
   concurrency: 8
   generation_retries: 2
+  theme_batch_size: 3
+  theme_output_tokens: 12000
+  frame_output_tokens: 32768
 ```
 
 质量模式支持 `off`（跳过可选检查）、`report`（记录告警但不重试）和 `enforce`
-（拒绝并有界重试）；可用 `--quality-mode` 覆盖。默认检查列表为空，只验证基础
-契约。可选检查包括摄影文字证据、字符长度、必含原文和禁止原文；它们不是模型
+（拒绝并有界重试）；两阶段分别用 `--theme-quality-mode`、`--frame-quality-mode`
+覆盖。默认检查列表为空，只验证基础契约。Theme 可以对 `title`、`premise`、
+`style` 分别检查长度、必含和禁止原文，在通过检查后才保存主题并开始生成 Frame。
+Frame 可选检查包括摄影文字证据、字符长度、必含原文和禁止原文；它们不是模型
 评审，也不保证叙事语义或摄影物理正确。结构与安全契约不受开关影响。
-质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 明确显示检查状态。
+质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
+批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、
+`--frame-output-tokens` 覆盖；预算针对整个批次，实际请求受 provider 上限约束。
 完整字段与示例见 [Story pipeline 文档](docs/story-pipeline.md)。
 
 story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在运行时加载
@@ -226,7 +249,10 @@ manifest 记录其 SHA-256 指纹，resume 始终使用冻结版本而不重新�
 
 Story 使用唯一的当前输出路径：Theme 返回不含 ID 的结构化草稿，Frame 按主题
 批量返回 `<FRAME>...</FRAME>` 纯文本块，所有 ID 由程序分配。正常的
-100 themes × 6 frames 仍为 110 次基础调用，不增加逐帧模型调用。
+100 themes × 6 frames 在默认 Theme batch size 10 下仍为 110 次基础调用，
+不增加逐帧模型调用。一个顺序 Theme producer 每保存一批主题就交付给有界
+Frame queue，固定数量的 workers 与后续主题生成重叠执行；两阶段共用一个
+并发上限。恢复时先排队已有主题的缺失帧，同时继续生成缺失主题。
 每个 run 在首次 provider 调用前创建。每个 Theme 和每个 Frame 都会原子保存；
 同一批次部分帧失败时保留成功帧，重试或进程退出后的恢复只请求缺失槽位：
 

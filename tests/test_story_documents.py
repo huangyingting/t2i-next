@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 import pytest
 
 from t2i_story_pipeline.documents import load_story_document
@@ -25,8 +28,13 @@ def test_document_keeps_prose_and_defaults(tmp_path):
     assert document.generation.frames_per_theme == 6
     assert document.runtime.concurrency == 8
     assert document.runtime.generation_retries == 2
-    assert document.validation.quality.mode == "report"
-    assert document.validation.quality.checks == ()
+    assert document.runtime.theme_batch_size == 10
+    assert document.runtime.theme_output_tokens == 6000
+    assert document.runtime.frame_output_tokens == 32768
+    assert document.validation.themes.mode == "report"
+    assert document.validation.themes.checks == ()
+    assert document.validation.frames.mode == "report"
+    assert document.validation.frames.checks == ()
     assert document.authoring.themes == ()
 
 
@@ -35,7 +43,7 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
     path.write_text(
         "id: story\ndescription: Story.\n"
         "validation:\n"
-        "  quality:\n"
+        "  frames:\n"
         "    mode: off\n"
         "    checks:\n"
         "      - type: prose_length\n"
@@ -43,7 +51,7 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
         "        max_chars: 20\n",
         encoding="utf-8",
     )
-    assert load_story_document(path).validation.quality.mode == "off"
+    assert load_story_document(path).validation.frames.mode == "off"
 
 
 @pytest.mark.parametrize(
@@ -55,22 +63,38 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
         "runtime: {concurrency: '3'}",
         "runtime: {concurrency: 0}",
         "runtime: {generation_retries: -1}",
+        "runtime: {theme_batch_size: 0}",
+        "runtime: {theme_batch_size: 11}",
+        "runtime: {theme_batch_size: '2'}",
+        "runtime: {theme_output_tokens: 511}",
+        "runtime: {frame_output_tokens: 65537}",
+        "runtime: {frame_output_tokens: true}",
         "generation: {theme_count: 101}",
         "generation: {frames_per_theme: 7}",
         "generation: {content_level: unknown}",
         "generation: {cast: {female_count: 0, male_count: 0}}",
         "generation: {cast: {female_count: 8, male_count: 1}}",
-        "validation: {quality: {mode: false}}",
-        "validation: {quality: {mode: unknown}}",
-        "validation: {quality: {checks: [camera_evidence]}}",
-        "validation: {quality: {mode: off, checks: [{type: unknown}]}}",
-        "validation: {quality: {checks: [{type: prose_length, min_chars: 0}]}}",
-        "validation: {quality: {checks: [{type: prose_length, min_chars: '3'}]}}",
-        "validation:\n  quality:\n    checks:\n"
+        "validation: {quality: {mode: off}}",
+        "validation: {frames: {mode: false}}",
+        "validation: {frames: {mode: unknown}}",
+        "validation: {frames: {checks: [camera_evidence]}}",
+        "validation: {frames: {mode: off, checks: [{type: unknown}]}}",
+        "validation: {frames: {checks: [{type: prose_length, min_chars: 0}]}}",
+        "validation: {frames: {checks: [{type: prose_length, min_chars: '3'}]}}",
+        "validation:\n  frames:\n    checks:\n"
         "      - {type: prose_length, min_chars: 10, max_chars: 5}",
-        "validation: {quality: {checks: [{type: required_text, values: []}]}}",
-        "validation:\n  quality:\n    checks:\n"
+        "validation: {frames: {checks: [{type: required_text, values: []}]}}",
+        "validation:\n  frames:\n    checks:\n"
         "      - {type: camera_evidence}\n      - {type: camera_evidence}",
+        "validation: {themes: {mode: off, checks: [{type: camera_evidence}]}}",
+        "validation: {themes: {checks: [{type: required_text, values: [clock]}]}}",
+        "validation: {themes: {checks: "
+        "[{type: required_text, field: prose, values: [clock]}]}}",
+        "validation: {themes: {checks: "
+        "[{type: text_length, field: premise, min_chars: 10, max_chars: 2}]}}",
+        "validation: {themes: {checks: "
+        "[{type: required_text, field: title, values: [one]}, "
+        "{type: required_text, field: title, values: [two]}]}}",
         "authoring: {frames: ['']}",
         'authoring: {themes: ["two\\nlines"]}',
         "generation:\n  theme_count: 2\n  theme_count: 3",
@@ -122,3 +146,21 @@ def test_io_errors_are_configuration_errors(tmp_path):
     path.mkdir()
     with pytest.raises(StoryConfigurationError, match="无法读取"):
         load_story_document(path)
+
+
+@pytest.mark.parametrize("document", ["README.md", "docs/story-pipeline.md"])
+def test_documented_yaml_examples_use_the_current_contract(tmp_path, document):
+    root = Path(__file__).resolve().parents[1]
+    blocks = re.findall(
+        r"```yaml\n(.*?)```", (root / document).read_text(encoding="utf-8"), re.DOTALL
+    )
+    examples = [block for block in blocks if block.startswith("id:")]
+    assert examples
+    for example in examples:
+        path = tmp_path / "example.yaml"
+        path.write_text(example, encoding="utf-8")
+        loaded = load_story_document(path)
+        assert loaded.validation.themes.checks
+        assert loaded.validation.frames.checks
+        assert loaded.runtime.theme_batch_size == 3
+        assert loaded.runtime.theme_output_tokens == 12000

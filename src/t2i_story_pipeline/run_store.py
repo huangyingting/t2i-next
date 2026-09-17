@@ -33,6 +33,7 @@ from t2i_story_pipeline.models import (
     StoryRequest,
     StoryResult,
     StoryRuleSet,
+    StoryRuntime,
     StoryStage,
     TokenUsage,
 )
@@ -150,13 +151,8 @@ class StoryAttemptOutcome(StrEnum):
     TRUNCATED = "truncated"
 
 
-class StoryRunSettings(_Model):
+class StoryRunSettings(StoryRuntime):
     provider: StoryProviderSettings
-    concurrency: int = Field(default=8, ge=1, le=32)
-    generation_retries: int = Field(default=2, ge=0, le=5)
-    theme_batch_size: int = Field(default=10, ge=1, le=10)
-    theme_output_tokens: int = Field(default=6000, ge=512, le=65536)
-    frame_output_tokens: int = Field(default=32768, ge=512, le=65536)
     quality: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
 
 

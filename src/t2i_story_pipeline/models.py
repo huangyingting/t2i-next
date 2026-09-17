@@ -108,6 +108,14 @@ class StoryAuthoring(Model):
     frames: tuple[RuleText, ...] = ()
 
 
+class StoryRuntime(Model):
+    concurrency: int = Field(default=8, ge=1, le=32, strict=True)
+    generation_retries: int = Field(default=2, ge=0, le=5, strict=True)
+    theme_batch_size: int = Field(default=10, ge=1, le=10, strict=True)
+    theme_output_tokens: int = Field(default=6000, ge=512, le=65536, strict=True)
+    frame_output_tokens: int = Field(default=32768, ge=512, le=65536, strict=True)
+
+
 class QualityMode(StrEnum):
     OFF = "off"
     REPORT = "report"
@@ -118,16 +126,19 @@ class CameraEvidenceCheck(Model):
     type: Literal["camera_evidence"]
 
 
-class ProseLengthCheck(Model):
-    type: Literal["prose_length"]
+class TextLengthBounds(Model):
     min_chars: int = Field(default=1, ge=1, le=32768, strict=True)
     max_chars: int = Field(default=32768, ge=1, le=32768, strict=True)
 
     @model_validator(mode="after")
-    def ordered_bounds(self) -> ProseLengthCheck:
+    def ordered_bounds(self) -> TextLengthBounds:
         if self.min_chars > self.max_chars:
             raise ValueError("min_chars 不能大于 max_chars")
         return self
+
+
+class ProseLengthCheck(TextLengthBounds):
+    type: Literal["prose_length"]
 
 
 class RequiredTextCheck(Model):
@@ -146,34 +157,109 @@ QualityCheck = Annotated[
 ]
 
 
-class StoryQualityPolicy(Model):
+class FrameQualityPolicy(Model):
     mode: QualityMode = QualityMode.REPORT
     checks: tuple[QualityCheck, ...] = ()
 
     @model_validator(mode="after")
-    def unique_checks(self) -> StoryQualityPolicy:
+    def unique_checks(self) -> FrameQualityPolicy:
         names = [check.type for check in self.checks]
         if len(names) != len(set(names)):
             raise ValueError("同一种质量检查只能配置一次")
         return self
 
 
+ThemeTextField = Literal["title", "premise", "style"]
+
+
+class ThemeRequiredTextCheck(RequiredTextCheck):
+    field: ThemeTextField
+
+
+class ThemeForbiddenTextCheck(ForbiddenTextCheck):
+    field: ThemeTextField
+
+
+class ThemeTextLengthCheck(TextLengthBounds):
+    type: Literal["text_length"]
+    field: ThemeTextField
+
+
+ThemeQualityCheck = Annotated[
+    ThemeRequiredTextCheck | ThemeForbiddenTextCheck | ThemeTextLengthCheck,
+    Field(discriminator="type"),
+]
+
+
+class ThemeQualityPolicy(Model):
+    mode: QualityMode = QualityMode.REPORT
+    checks: tuple[ThemeQualityCheck, ...] = ()
+
+    @model_validator(mode="after")
+    def unique_checks(self) -> ThemeQualityPolicy:
+        keys = [(check.type, check.field) for check in self.checks]
+        if len(keys) != len(set(keys)):
+            raise ValueError("同一 Theme 字段的同一种质量检查只能配置一次")
+        return self
+
+
+class StoryQualityPolicy(Model):
+    themes: ThemeQualityPolicy = Field(default_factory=ThemeQualityPolicy)
+    frames: FrameQualityPolicy = Field(default_factory=FrameQualityPolicy)
+
+
 class StoryQualityIssue(Model):
+    stage: StoryStage
     theme_id: ThemeId
-    frame_id: FrameId
+    frame_id: FrameId | None = None
+    field: Literal["title", "premise", "style", "prose"]
     check: Literal[
-        "camera_evidence", "prose_length", "required_text", "forbidden_text"
+        "camera_evidence",
+        "prose_length",
+        "text_length",
+        "required_text",
+        "forbidden_text",
     ]
     message: RuleText
 
+    @model_validator(mode="after")
+    def stage_matches_target(self) -> StoryQualityIssue:
+        if self.stage == StoryStage.FRAMES:
+            if self.frame_id is None or self.field != "prose":
+                raise ValueError("Frame 质量问题必须指定 frame_id 和 prose 字段")
+        elif self.frame_id is not None or self.field == "prose":
+            raise ValueError("Theme 质量问题只能指向 Theme 字段")
+        return self
+
     def feedback(self) -> str:
-        return f"{self.theme_id}-{self.frame_id} [{self.check}] {self.message}"
+        target = (
+            f"{self.theme_id}-{self.frame_id}"
+            if self.frame_id is not None
+            else f"{self.theme_id}.{self.field}"
+        )
+        return f"{target} [{self.check}] {self.message}"
 
 
-class StoryQualityReport(Model):
+class StageQualityReport(Model):
     mode: QualityMode
     status: Literal["skipped", "passed", "warnings"]
     issues: list[StoryQualityIssue]
+
+
+class StoryQualityReport(Model):
+    themes: StageQualityReport
+    frames: StageQualityReport
+
+    @property
+    def status(self) -> Literal["skipped", "passed", "warnings"]:
+        statuses = {self.themes.status, self.frames.status}
+        if "warnings" in statuses:
+            return "warnings"
+        return "passed" if "passed" in statuses else "skipped"
+
+    @property
+    def issues(self) -> list[StoryQualityIssue]:
+        return [*self.themes.issues, *self.frames.issues]
 
 
 class StoryRuleSet(Model):

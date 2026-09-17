@@ -104,6 +104,78 @@ def test_hardcore_theme_can_be_broad_but_frame_requires_explicit_evidence() -> N
         )
 
 
+def test_hardcore_accepts_visible_nonpenetrative_bdsm_evidence() -> None:
+    film_request = make_film_request()
+    validator = FilmStyleContentValidator(
+        film_request,
+        make_validation_profile(),
+    )
+    base = complete_camera_frame(film_request).prose
+    frame = make_frame(
+        base
+        + "核心互动链：飞雪以双膝和前臂稳定支撑在石质地面，主动抬高"
+        "骨盆并回望无名；她颈部的皮革项圈连接一条牵引链，链条另一端"
+        "由无名右手握住并向后牵引。飞雪眼睑半垂、嘴角上扬，媚眼中带着"
+        "清晰欲望，主动保持跪姿并抬高臀部回应这条控制关系。"
+    )
+
+    validator.validate_frame(
+        make_prompt_request(ContentLevel.HARDCORE),
+        make_theme("两名成年人探索明确性互动与无插入支配互动。"),
+        frame,
+    )
+
+
+def test_hardcore_accepts_commanded_explicit_display_without_contact() -> None:
+    film_request = make_film_request()
+    validator = FilmStyleContentValidator(
+        film_request,
+        make_validation_profile(),
+    )
+    base = complete_camera_frame(film_request).prose
+    frame = make_frame(
+        base
+        + "无名站在飞雪侧前方，以右手向外展开的手势明确命令她展示。"
+        "飞雪双膝稳定跪地并主动张开双腿，以开放姿态直接暴露外阴，"
+        "性器官清楚可见；她眼睑半垂、嘴角上扬，以媚眼主动回望无名，"
+        "带着清晰欲望维持这项展示指令。"
+    )
+
+    validator.validate_frame(
+        make_prompt_request(ContentLevel.HARDCORE),
+        make_theme("两名成年人探索明确性互动与命令式色情展示。"),
+        frame,
+    )
+
+
+@pytest.mark.parametrize(
+    "content_level",
+    [ContentLevel.AESTHETIC, ContentLevel.EROTIC],
+)
+def test_lower_levels_reject_high_intensity_bdsm_evidence(
+    content_level: ContentLevel,
+) -> None:
+    film_request = make_film_request()
+    validator = FilmStyleContentValidator(
+        film_request,
+        make_validation_profile(),
+    )
+    base = complete_camera_frame(film_request).prose
+    frame = make_frame(
+        base
+        + "飞雪跪地并以双膝稳定支撑，主动抬高臀部；无名握住连接她"
+        "皮革项圈的牵引链向后牵引。飞雪眼睑半垂、嘴角上扬，以媚眼"
+        "主动回望并表达清晰欲望。"
+    )
+
+    with pytest.raises(FilmStyleContractError, match="高强度 BDSM"):
+        validator.validate_frame(
+            make_prompt_request(content_level),
+            make_theme("两名成年人探索亲密关系。"),
+            frame,
+        )
+
+
 @pytest.mark.parametrize(
     "premise",
     [

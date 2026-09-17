@@ -18,6 +18,7 @@ from t2i_story_pipeline.models import (
     StoryAuthoring,
     StoryQualityPolicy,
     StoryRequest,
+    StoryRuntime,
     StoryText,
 )
 
@@ -47,15 +48,6 @@ class StoryGeneration(Model):
         )
 
 
-class StoryRuntime(Model):
-    concurrency: int = Field(default=8, ge=1, le=32, strict=True)
-    generation_retries: int = Field(default=2, ge=0, le=5, strict=True)
-
-
-class StoryValidation(Model):
-    quality: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
-
-
 class StoryDocument(Model):
     id: Annotated[
         str,
@@ -66,7 +58,7 @@ class StoryDocument(Model):
     description: StoryText
     generation: StoryGeneration = Field(default_factory=StoryGeneration)
     authoring: StoryAuthoring = Field(default_factory=StoryAuthoring)
-    validation: StoryValidation = Field(default_factory=StoryValidation)
+    validation: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
     runtime: StoryRuntime = Field(default_factory=StoryRuntime)
 
     @model_validator(mode="after")

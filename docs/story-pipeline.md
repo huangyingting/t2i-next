@@ -57,8 +57,15 @@ completed = await StoryStudio(
    不存在本地正文拼接或二次 renderer。
 
 100 themes × 6 frames 的基础调用量是十次 theme batch 加一百次 frame batch，
-共 110 次 provider 调用。`StoryStudio` 默认最多并发生成八个 frame batches。
-resume 只调用缺失的 Theme batch 与各主题尚未保存的 Frame。
+共 110 次 provider 调用（默认 Theme batch size 为 10）。
+`StoryStudio` 使用一个顺序 Theme producer、有界 Frame queue 和固定数量的
+Frame workers。每批 Theme 保存后立即入队，Frame 生成与后续 Theme 批次重叠，
+不等待全部 Theme 完成。两类调用共用 `concurrency` 信号量，默认合计最多八个
+在途生成操作；队列容量也等于该值。
+
+Theme producer 始终看到之前已保存的完整主题列表，保持语义名称、ID 和去重上下文
+顺序稳定。后续 Theme 批次失败不会放弃已排队的 Frame 工作。resume 优先排队已有
+主题的缺失帧，同时补齐缺失 Theme；全部请求内容完成后才发布。
 
 批量文本保持 110 次无错误基础调用，不采用逐帧调用所需的 610 次请求。
 这只是请求数量对比，不等于模型质量、实际 token 或费用评测。
@@ -80,7 +87,8 @@ Story 只有一条当前执行路径，不通过 output-mode 开关维护多套�
 | `run_store.py` / `persistence.py` / `storage.py` | 原子 checkpoint、锁、恢复完整性验证与发布 |
 
 结构化 Theme 与文本 Frame 使用各自明确的接受逻辑，共享 attempt 记录及错误反馈
-机制；不为两个固定阶段引入通用 workflow 框架。创作、验证和执行设置互不冒充。
+机制；Theme 通过 async iterator 交付已保存主题，不引入业务 validator 回调或
+通用 workflow 框架。创作、验证和执行设置互不冒充。
 公共接口不接收无法冻结的 validator 回调；额外检查统一来自声明式质量策略。
 仅保存当前目录和数据结构，不提供旧整组 JSON checkpoint 或旧输出模式的回退路径。
 
@@ -165,7 +173,13 @@ authoring:
     - 每帧独立描述景别、视角和焦点或景深。
 
 validation:
-  quality:
+  themes:
+    mode: report
+    checks:
+      - type: required_text
+        field: premise
+        values: [旧车站]
+  frames:
     mode: report
     checks:
       - type: camera_evidence
@@ -176,6 +190,9 @@ validation:
 runtime:
   concurrency: 8
   generation_retries: 2
+  theme_batch_size: 3
+  theme_output_tokens: 12000
+  frame_output_tokens: 32768
 ```
 
 `id` 只接受小写字母、数字及单个分隔用的 `-`、`_`，长度不超过 120。
@@ -194,9 +211,28 @@ runtime:
 不会被当成初始创作指令发给模型；若要求模型包含指定内容，也应在正文或 authoring
 中明确表达，而不是只配置检查器。
 
+### 批次与输出预算
+
+`runtime` 的整数配置与运行 API 共用 `StoryRuntime`，只保留一份默认值和边界：
+
+| 字段 | 默认值 | 范围 |
+|---|---|---|
+| `concurrency` | 8 | 1–32，Theme 与 Frame 共用 |
+| `generation_retries` | 2 | 0–5 次额外生成重试 |
+| `theme_batch_size` | 10 | 1–10 |
+| `theme_output_tokens` | 6000 | 512–65536 |
+| `frame_output_tokens` | 32768 | 512–65536 |
+
+输出预算针对整个批次，不是每个 Theme 或 Frame。实际初始请求使用配置预算与
+provider 上限的较小值；不会改写 manifest 中冻结的配置。截断后按既有机制提升到
+冻结的 provider 上限。较复杂的主题可以显式选用更小批次和更高预算，不自动扩大
+所有请求。无错误调用量为 `ceil(theme_count / theme_batch_size) + theme_count`。
+
 ## 可选质量检查
 
-`validation.quality.mode`（默认 `report`）只控制显式选中的 Frame 检查：
+`validation.themes` 与 `validation.frames` 分别声明本阶段的 `mode` 和 `checks`。
+两者默认均为 `report`、空检查列表；可以只启用一个阶段，也可以使用不同模式。
+不保留旧 `validation.quality`、扁平策略或旧报告结构的解析入口。
 
 | 模式 | 行为 |
 |---|---|
@@ -204,9 +240,22 @@ runtime:
 | `report` | 记录告警并发布，不因质量问题重试 |
 | `enforce` | 拒绝有问题的输出，反馈具体问题并有界重试；耗尽后保留 checkpoint，不发布 |
 
-`checks` 默认为空；此时状态是 `skipped`，不宣称通过了质量验证。每个检查用带
-`type` 的对象声明，同一种类型只能出现一次，未知类型即使在 `off` 下也会报错。
-当前提供：
+某阶段的 `checks` 为空或模式为 `off` 时，该阶段状态是 `skipped`，不宣称通过
+了质量验证。每个检查用带 `type` 的对象声明；未知类型即使在 `off` 下也会报错。
+
+Theme 检查必须显式指定 `field: title | premise | style`，只检查该字段，不拼接
+其他字段来凑证据。同一种类型可以用于不同字段，但同一字段不能重复配置：
+
+- `required_text`：`values` 中每项必须逐字出现在指定字段，区分大小写。
+- `forbidden_text`：指定字段不能包含 `values` 中任一原文，区分大小写。
+- `text_length`：指定字段的 Unicode 字符长度必须位于 `min_chars` / `max_chars`
+  闭区间，默认 1 / 32768；检查参数范围为 1–32768，不改变 Theme 基础 schema。
+
+Theme 批次在 checkpoint 和 Frame 入队之前执行检查。`enforce` 失败时有界重试
+整个 Theme 批次，不生成该批次的 Frame；`report` 保存告警后继续。之前批次已经
+通过的 Theme 和 Frame 不受后续主题拒绝影响。
+
+Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
 
 - `camera_evidence`：按输出语言检查景别、视角、焦点或景深的文字证据。中文匹配
   “中景”“平视”“焦点”等词；英文匹配 `medium shot`、`eye-level`、`focus`
@@ -221,15 +270,19 @@ runtime:
 输入文件名，不加载 Film 的来源、人物或作品专属检查，也不提供关闭安全要求或
 绕过 provider 限制的能力。
 
-CLI 的 `--quality-mode off|report|enforce` 可以覆盖文档模式，不改变检查器列表。
-API 通过 `StoryRunSettings.quality` 设置同一策略。策略完整冻结在 manifest 中，
-resume 不读当前 YAML 或规则文件，也不接受切换质量策略。
+CLI 的 `--theme-quality-mode` 和 `--frame-quality-mode` 分别覆盖对应阶段的模式，
+不改变检查器列表或另一阶段的设置；不保留旧 `--quality-mode`。
+API 通过 `StoryRunSettings.quality.themes` / `.frames` 设置同一策略。两阶段策略
+完整冻结在 manifest 中，resume 不读当前 YAML 或规则文件，也不接受切换策略。
 
-检查问题以 `theme_id`、`frame_id`、`check`、`message` 保存到 attempt 的
-`quality_issues`；强制拒绝同时进入现有错误反馈与重试链。最终 `result.json`
-的 `quality` 仅汇总已接受结果，包含 `mode`、`status` 和 `issues`。
-CLI 明确输出 `skipped` / `passed` / `warnings` 和报告路径；`report` 告警也会
-出现在进度输出中。最终 TXT 保持每帧一行纯正文，不混入报告。
+检查问题以 `stage`、`theme_id`、`frame_id`、`field`、`check`、`message` 保存到
+attempt 的 `quality_issues`。Theme 问题的 `frame_id` 为 null，Frame 问题指向
+具体 Frame ID 和 `prose` 字段。强制拒绝进入现有错误反馈与重试链。
+最终 `result.json` 的 `quality.themes` 和 `quality.frames` 分别包含
+`mode`、`status`、`issues`，只汇总已接受结果，不复制历史拒绝问题。
+发布和读取完成结果时都会按冻结策略重新计算两阶段报告并核验一致性。
+CLI 分别输出两阶段的 `skipped` / `passed` / `warnings` 和报告路径；
+`report` 告警也出现在进度输出中。最终 TXT 保持每帧一行纯正文，不混入报告。
 
 每个 Frame 独立接受与保存。一个批次只有部分帧违反结构或 `enforce` 质量检查时，
 通过的帧立即保留，下一次请求只包含失败槽位，并携带已经保存的帧作为上下文。
@@ -278,11 +331,12 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
 1. provider transport 层默认额外重试两次。timeout、transport error、HTTP 429
    和 5xx 使用有界退避；429 优先遵循 `Retry-After`。401/403 立即报告认证错误。
 2. generation 层对每个 Theme batch 或单主题的缺失 Frame batch 默认额外重试两次。
-   空响应和不支持的 provider 响应记录为 provider error；Theme JSON/schema 错误、
+   空响应和不支持的 provider 响应记录为 provider error；Theme JSON/schema 或质量错误、
    Frame 文本边界错误或逐帧拒绝记录为 rejected。文本响应若
    `finish_reason=length`，不把可能截断的内容作为成功批次；无效的截断 Theme
    同样记录为 truncated。下一次 attempt 提升到 manifest 冻结的 provider 上限；
-   Theme 初始预算为 6,000 tokens，Frame batch 为 32,768 tokens。
+   Theme 默认初始预算为 6,000 tokens，Frame batch 为 32,768 tokens，
+   可通过文档和显式 CLI 参数配置。
    truncated outcome 会持久化，因此进程重启后的第一次 resume attempt
    也直接使用提升后的预算。
 
@@ -294,8 +348,9 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
 
 Theme batch 要求完整的结构化响应；Frame batch 在文本边界明确后允许部分接受。
 缺失帧集合只能缩小，不会重新请求已保存的帧，也没有无限 salvage/no-progress 循环。
-取消运行时 `asyncio` 会取消所有在途 Frame task，
-已落盘 checkpoint 保留，run 锁释放，manifest 保持可 resume。
+取消运行或发生未预期异常时，会取消并等待 Theme producer 与所有 Frame workers，
+包括正在等待队列空间或并发额度的任务。已落盘 checkpoint 保留，run 锁释放，
+manifest 保持可 resume，不留下继续调用模型的后台任务。
 
 ## 时间、地点与时代一致性
 
@@ -320,8 +375,8 @@ theme 与 frame 的初始 prompt 同时要求建筑、室内陈设、家具、�
 - 非空单段 prose；
 - provider 结构错误的有界重试和 token usage 统计。
 
-因此 100 themes × 6 frames 在没有 provider/schema 错误或强制质量拒绝时保持
-110 次基础调用；`report` 不增加质量重试调用。
+因此默认 Theme batch size 10 下，100 themes × 6 frames 在没有 provider/schema
+错误或强制质量拒绝时保持 110 次基础调用；`report` 不增加质量重试调用。
 
 ## CLI
 
@@ -363,9 +418,13 @@ uv run t2i-story generate \
 --frames INTEGER       每个主题的画面数，1 至 6
 --female-count INTEGER 可选女性人数约束，0 至 8
 --male-count INTEGER   可选男性人数约束，0 至 8
---concurrency INTEGER  frame batch 并发数，1 至 32
+---concurrency INTEGER  Theme/Frame 共用并发上限，1 至 32
 --generation-retries INTEGER 每个生成单元额外重试次数，0 至 5
---quality-mode TEXT    off、report 或 enforce；不关闭基础契约
+--theme-batch-size INTEGER 每批 Theme 数量，1 至 10
+--theme-output-tokens INTEGER Theme 批次初始预算，512 至 65536
+--frame-output-tokens INTEGER Frame 批次初始预算，512 至 65536
+--theme-quality-mode TEXT Theme 的 off、report 或 enforce
+--frame-quality-mode TEXT Frame 的 off、report 或 enforce
 --content-level TEXT   aesthetic、erotic 或 hardcore
 --language TEXT        chinese 或 english
 --prompts-dir DIRECTORY 按日期保存最终 TXT 的根目录

@@ -18,7 +18,9 @@ from t2i_film_style_pipeline.pipeline import (
     FilmStyleRunStatus,
     LocalFilmStyleRunStore,
 )
+from t2i_film_style_pipeline.prompt_messages import theme_messages
 from t2i_film_style_pipeline.prompt_models import (
+    FilmPromptRuleSet,
     FilmPromptStage,
     NarrativeFrameSequence,
     NarrativeThemeBatch,
@@ -183,6 +185,44 @@ def make_settings(
         validate_themes=validate_themes,
         validate_frames=validate_frames,
     )
+
+
+def test_theme_messages_use_compact_global_diversity_ledger() -> None:
+    request = make_pipeline_request().prompt_request(
+        "BRIEF\n\nDirector scene context."
+    )
+    existing = make_theme_batch(start=1, count=2).themes
+    existing[0].premise = "甲" * 400
+    existing[0].style = "乙" * 400
+    resolved_rules = resolve_film_style_rules(request)
+    rules = FilmPromptRuleSet(
+        themes=resolved_rules.themes,
+        frames=resolved_rules.frames,
+    )
+
+    payload = json.loads(
+        theme_messages(
+            request,
+            rules,
+            start_index=3,
+            count=2,
+            existing_themes=existing,
+            semantic_name="film_run",
+            program_assigns_ids=True,
+        )[1].content
+    )
+
+    assert "existing_themes" not in payload
+    assert payload["diversity_ledger"]["used_titles"] == [
+        theme.title for theme in existing
+    ]
+    signatures = payload["diversity_ledger"]["used_theme_signatures"]
+    assert [item["theme_id"] for item in signatures] == ["T001", "T002"]
+    assert len(signatures[0]["premise_excerpt"]) == 180
+    assert len(signatures[0]["style_excerpt"]) == 140
+    targets = payload["current_batch_novelty_targets"]
+    assert [target["output_position"] for target in targets] == [1, 2]
+    assert all(len(target["novelty_priorities"]) == 2 for target in targets)
 
 
 @pytest.mark.asyncio

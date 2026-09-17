@@ -41,6 +41,58 @@ _EXPLICIT_SEX = re.compile(
     r"manual (?:genital|clitoral|vaginal) stimulation)\b",
     re.IGNORECASE,
 )
+_HARDCORE_DESIRE_RESPONSE = re.compile(
+    r"媚眼|欲望|愉悦|潮红|喘息|迷离|兴奋|享受|"
+    r"主动.{0,12}(?:迎合|回望|配合|抬高|展示|维持)|"
+    r"(?:挑逗|顺从).{0,8}(?:目光|眼神|表情)|"
+    r"\b(?:desirous|pleasured|teasing) (?:gaze|look)|"
+    r"actively (?:arches|responds|looks back|displays)\b",
+    re.IGNORECASE,
+)
+_HARDCORE_BDSM_EVIDENCE = (
+    re.compile(
+        r"项圈|颈圈|狗链|牵引链|链条|束缚带|腕带|手铐|绳索|"
+        r"\b(?:collar|leash|chain|restraint|wrist cuffs?|rope)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"握住|握紧|攥住|牵引|牵住|拉住|拉紧|收紧|持链|扣住|拴住|束缚|"
+        r"一端.{0,12}(?:手中|手里)|"
+        r"\b(?:holds?|grips?|guides?|pulls?|controls?|restrains?)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"跪地|跪姿|跪在|跪伏|双膝.{0,12}支撑|四肢着地|"
+        r"前臂.{0,12}支撑|俯伏|伏身|弯腰|前倾|"
+        r"臀部.{0,12}(?:抬高|翘起)|骨盆.{0,12}(?:抬高|上提)|"
+        r"\b(?:kneels?|kneeling|on all fours|hips? raised|bent over)\b",
+        re.IGNORECASE,
+    ),
+    _HARDCORE_DESIRE_RESPONSE,
+)
+_HARDCORE_DISPLAY_EVIDENCE = (
+    re.compile(
+        r"(?:命令|指令|指示|手势|示意|要求).{0,20}"
+        r"(?:展示|张开|分开|抬高|转身)|"
+        r"\b(?:commands?|directs?|signals?)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"(?:分开|张开)双腿|双腿.{0,8}(?:分开|张开)|"
+        r"抬高臀部|翘起臀部|开放姿态|暴露姿态|"
+        r"\b(?:legs spread|hips? raised|open display pose)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"(?:直接|完全|清楚)?(?:暴露|展示).{0,16}"
+        r"(?:外阴|生殖器|性器官|胯下)|"
+        r"(?:外阴|生殖器|性器官|胯下).{0,16}"
+        r"(?:直接暴露|完全暴露|清楚可见|无遮挡)|"
+        r"\b(?:genitals?|vulva).{0,16}(?:exposed|clearly visible)\b",
+        re.IGNORECASE,
+    ),
+    _HARDCORE_DESIRE_RESPONSE,
+)
 _NEGATED_CONTENT = re.compile(
     r"(?:不(?:再)?(?:出现|包含|呈现|展示|描写|描绘|涉及)|"
     r"不得(?:出现|包含|呈现|展示|描写|描绘|涉及)|没有|并无)"
@@ -274,6 +326,20 @@ def _contains_explicit_sex(value: str) -> bool:
     return _EXPLICIT_SEX.search(affirmative_content) is not None
 
 
+def _contains_hardcore_bdsm(value: str) -> bool:
+    affirmative_content = _NEGATED_CONTENT.sub(" ", value)
+    return any(
+        all(
+            pattern.search(affirmative_content) is not None
+            for pattern in evidence
+        )
+        for evidence in (
+            _HARDCORE_BDSM_EVIDENCE,
+            _HARDCORE_DISPLAY_EVIDENCE,
+        )
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class _AnchorSelection:
     work_index: int
@@ -500,15 +566,20 @@ class FilmStyleContentValidator:
         label: str,
         require_hardcore_explicit: bool = True,
     ) -> None:
-        contains_explicit_sex = _contains_explicit_sex(value)
+        contains_hardcore_content = (
+            _contains_explicit_sex(value)
+            or _contains_hardcore_bdsm(value)
+        )
         if request.content_level == ContentLevel.HARDCORE:
-            if require_hardcore_explicit and not contains_explicit_sex:
+            if require_hardcore_explicit and not contains_hardcore_content:
                 raise FilmStyleContractError(
-                    f"{label} 未直接写出可见的明确性行为及其身体接触，"
+                    f"{label} 未直接写出可见的明确性行为，或具体可见的"
+                    "高强度 BDSM 支配互动，"
                     "不得降级为普通亲密互动"
                 )
             return
-        if contains_explicit_sex:
+        if contains_hardcore_content:
             raise FilmStyleContractError(
-                f"{label} 超出当前内容级别，不得出现明确性行为"
+                f"{label} 超出当前内容级别，不得出现明确性行为或"
+                "高强度 BDSM 支配互动"
             )

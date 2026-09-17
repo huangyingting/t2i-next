@@ -40,12 +40,12 @@ def test_film_style_rules_select_only_the_requested_content_level() -> None:
         ),
         (
             ContentLevel.EROTIC,
-            "把裸露、欲望、身体接近和双向触碰推到最高可见强度",
+            "把裸露、欲望、身体接近、双向触碰",
             "允许直接呈现自慰、口部性行为、插入",
         ),
         (
             ContentLevel.HARDCORE,
-            "正在发生的具体性行为、性器官及其接触方式",
+            "高强度无插入 BDSM",
             "不得出现明确性行为",
         ),
     ],
@@ -118,10 +118,40 @@ def test_hardcore_rules_keep_theme_open_and_close_each_frame_topology() -> None:
 
     assert "不得固定动作发起者、具体接触部位" in text
     assert "不同 Frame 可以改变行为类别、动作发起者和基础姿态" in text
-    assert "每个 Frame 只能有一处带有性动作含义的主动接触" in text
-    assert "胸部、肩背、大腿或腰部的抓握不能单独充当本级核心行为" in text
-    assert "批次应同时探索不同的姿态类别、核心接触链" in text
+    assert "每个 Frame 只能有一条带有性动作、器具控制或命令展示含义" in text
+    assert "胸部、肩背、大腿或腰部的抓握不能单独充当该路径的核心行为" in text
+    assert "批次应同时探索不同的内容路径、姿态类别、核心互动链" in text
     assert "每个 Frame 的内部拓扑必须独立闭合" in text
+    assert "可以独立构成本级，不强制同时出现插入" in text
+    assert "项圈、牵引链、腕带或绳索不得承担身体重量" in text
+    assert "不得让所有 Theme 或 Frame 都收敛为插入、手部刺激或跪姿牵引链" in text
+    assert "开放类别而非固定模板或分配表" in text
+
+
+def test_erotic_and_hardcore_share_sensory_intensity_but_not_evidence() -> None:
+    erotic = "\n".join(
+        resolve_film_style_rules(
+            make_prompt_request(ContentLevel.EROTIC)
+        ).frames
+    )
+    hardcore = "\n".join(
+        resolve_film_style_rules(
+            make_prompt_request(ContentLevel.HARDCORE)
+        ).frames
+    )
+
+    assert "同等精细、浓烈的感官描写" in erotic
+    assert "同等精细、浓烈的皮肤、表情、材质" in hardcore
+    assert "不得形成完整的色情控制链" in erotic
+    assert "极致感官强度必须来自非生殖器接触" in erotic
+    assert "以下是开放式边界例子" in erotic
+    assert "松散项圈作为造型" in erotic
+    assert "不可误读的明确色情事实" in hardcore
+    assert "命令式色情展示" in hardcore
+    assert "以下是开放式内容路径例子" in hardcore
+    assert "不要把“无插入 BDSM”自动等同于跪姿、狗链" in hardcore
+    assert "输出前必须在当前调用内完成路径完整性自检" in hardcore
+    assert "不能把无插入当作降低色情强度" in hardcore
 
 
 @pytest.mark.parametrize("output_language", ["chinese", "english"])

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
 from time import perf_counter
 
 from pydantic import BaseModel, ValidationError
@@ -39,6 +39,7 @@ from t2i_story_pipeline.provider import ChatMessage, StoryModel
 from t2i_story_pipeline.quality_validation import (
     StoryQualityError,
     check_frame_quality,
+    check_theme_quality,
     quality_report,
 )
 from t2i_story_pipeline.run_store import (
@@ -114,62 +115,84 @@ class StoryStudio:
     ) -> CompletedStoryRun:
         request = snapshot.request
         rules = snapshot.rules
-        themes = await self._generate_themes(
-            snapshot.run_id,
-            request,
-            rules,
-            list(snapshot.themes),
-            snapshot.manifest.semantic_name,
-        )
-        snapshot = self._store.inspect(snapshot.run_id)
-        if snapshot.manifest.semantic_name is None:
-            raise StoryStorageError("Story run 缺少 semantic_name")
         semaphore = asyncio.Semaphore(self._settings.concurrency)
+        queue: asyncio.Queue[NarrativeTheme | None] = asyncio.Queue(
+            maxsize=self._settings.concurrency
+        )
+        causes: list[str] = []
 
-        async def generate_theme(
-            theme: NarrativeTheme,
-        ) -> None:
-            async with semaphore:
-                await self._generate_frames(
+        async def produce_themes() -> None:
+            for theme in snapshot.themes:
+                sequence = snapshot.frames.get(theme.theme_id)
+                if sequence is None or len(sequence.frames) != request.frames_per_theme:
+                    await queue.put(theme)
+            try:
+                async for theme in self._generate_themes(
                     snapshot.run_id,
                     request,
-                    theme,
                     rules,
-                    snapshot.frames.get(theme.theme_id),
-                )
-                self._emit(f"{theme.theme_id} Frame Sequence 已保存")
+                    list(snapshot.themes),
+                    snapshot.manifest.semantic_name,
+                    semaphore,
+                ):
+                    await queue.put(theme)
+            except StoryPipelineError as exc:
+                causes.append(str(exc))
+            for _ in range(self._settings.concurrency):
+                await queue.put(None)
 
-        outcomes = await asyncio.gather(
+        async def frame_worker() -> None:
+            while (theme := await queue.get()) is not None:
+                try:
+                    async with semaphore:
+                        await self._generate_frames(
+                            snapshot.run_id,
+                            request,
+                            theme,
+                            rules,
+                            snapshot.frames.get(theme.theme_id),
+                        )
+                    self._emit(f"{theme.theme_id} Frame Sequence 已保存")
+                except StoryPipelineError as exc:
+                    causes.append(str(exc))
+
+        tasks = [
+            asyncio.create_task(produce_themes()),
             *(
-                generate_theme(theme)
-                for theme in themes
-                if (
-                    theme.theme_id not in snapshot.frames
-                    or len(snapshot.frames[theme.theme_id].frames)
-                    != request.frames_per_theme
-                )
+                asyncio.create_task(frame_worker())
+                for _ in range(self._settings.concurrency)
             ),
-            return_exceptions=True,
-        )
-        causes = tuple(
-            str(outcome) for outcome in outcomes if isinstance(outcome, Exception)
-        )
+        ]
+        try:
+            await asyncio.gather(*tasks)
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+
         snapshot = self._store.inspect(snapshot.run_id)
-        if len(snapshot.frames) != request.theme_count or any(
-            len(sequence.frames) != request.frames_per_theme
-            for sequence in snapshot.frames.values()
+        if (
+            len(snapshot.themes) != request.theme_count
+            or len(snapshot.frames) != request.theme_count
+            or any(
+                len(sequence.frames) != request.frames_per_theme
+                for sequence in snapshot.frames.values()
+            )
         ):
             self._store.fail(
                 snapshot.run_id,
                 "; ".join(causes) or "Frame Sequence 尚未完整",
             )
-            raise self._incomplete(snapshot, causes)
+            raise self._incomplete(snapshot, tuple(causes))
+        if snapshot.manifest.semantic_name is None:
+            raise StoryStorageError("Story run 缺少 semantic_name")
         theme_results = [
             NarrativeThemeResult(
                 theme=theme,
                 frames=snapshot.frames[theme.theme_id].frames,
             )
-            for theme in themes
+            for theme in snapshot.themes
         ]
         result = StoryResult(
             run_id=snapshot.run_id,
@@ -192,7 +215,8 @@ class StoryStudio:
         rules: StoryRuleSet,
         themes: list[NarrativeTheme],
         semantic_name: str | None,
-    ) -> list[NarrativeTheme]:
+        semaphore: asyncio.Semaphore,
+    ) -> AsyncIterator[NarrativeTheme]:
         while len(themes) < request.theme_count:
             start_index = len(themes) + 1
             count = min(
@@ -210,13 +234,14 @@ class StoryStudio:
             requested_ids = tuple(
                 f"T{index:03d}" for index in range(start_index, start_index + count)
             )
-            value = await self._generate_theme_batch(
-                run_id=run_id,
-                operation_id=operation_id,
-                requested_ids=requested_ids,
-                messages=messages,
-                semantic_name=semantic_name,
-            )
+            async with semaphore:
+                value = await self._generate_theme_batch(
+                    run_id=run_id,
+                    operation_id=operation_id,
+                    requested_ids=requested_ids,
+                    messages=messages,
+                    semantic_name=semantic_name,
+                )
             generated_themes = [
                 NarrativeTheme(theme_id=theme_id, **draft.model_dump())
                 for draft, theme_id in zip(value.themes, requested_ids, strict=True)
@@ -232,7 +257,8 @@ class StoryStudio:
                 f"{generated_themes[0].theme_id}–"
                 f"{generated_themes[-1].theme_id} Theme 已保存"
             )
-        return themes
+            for theme in generated_themes:
+                yield theme
 
     async def _generate_frames(
         self,
@@ -242,6 +268,7 @@ class StoryStudio:
         rules: StoryRuleSet,
         existing_sequence: NarrativeFrameSequence | None,
     ) -> NarrativeFrameSequence:
+        policy = self._settings.quality.frames
         expected = [f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)]
         accepted = {
             frame.frame_id: frame
@@ -309,13 +336,13 @@ class StoryStudio:
                     try:
                         frame = NarrativeFrame(frame_id=frame_id, prose=prose)
                         found = check_frame_quality(
-                            self._settings.quality,
+                            policy,
                             request.output_language,
                             theme.theme_id,
                             frame,
                         )
                         quality_issues.extend(found)
-                        if found and self._settings.quality.mode == QualityMode.ENFORCE:
+                        if found and policy.mode == QualityMode.ENFORCE:
                             raise StoryQualityError(found)
                     except (StoryContractError, ValidationError) as exc:
                         issues.append(f"{theme.theme_id}-{frame_id}: {exc}")
@@ -368,7 +395,7 @@ class StoryStudio:
             for frame in candidates:
                 self._store.checkpoint_frame(run_id, theme.theme_id, frame)
                 accepted[frame.frame_id] = frame
-            if self._settings.quality.mode == QualityMode.REPORT:
+            if policy.mode == QualityMode.REPORT:
                 for issue in quality_issues:
                     self._emit(f"质量告警（仅记录）：{issue.feedback()}")
             remaining = [item for item in expected if item not in accepted]
@@ -395,6 +422,7 @@ class StoryStudio:
         semantic_name: str | None,
     ) -> NarrativeThemeBatch:
         stage = StoryStage.THEMES
+        policy = self._settings.quality.themes
         response_model = exact_theme_batch_model(len(requested_ids))
         base_messages = messages
         prior_attempts = tuple(attempt for attempt in self._store.attempts(run_id))
@@ -435,6 +463,7 @@ class StoryStudio:
         for attempt in range(self._settings.generation_retries + 1):
             rejected_value: BaseModel | None = None
             attempt_usage = TokenUsage()
+            quality_issues: tuple[StoryQualityIssue, ...] = ()
             attempt_issues: tuple[str, ...]
             started = perf_counter()
             try:
@@ -459,6 +488,13 @@ class StoryStudio:
                         "semantic_name 与 run 不一致："
                         f"expected={semantic_name}, actual={value.semantic_name}"
                     )
+                quality_issues = tuple(
+                    issue
+                    for theme_id, draft in zip(requested_ids, value.themes, strict=True)
+                    for issue in check_theme_quality(policy, theme_id, draft)
+                )
+                if quality_issues and policy.mode == QualityMode.ENFORCE:
+                    raise StoryQualityError(quality_issues)
             except StoryProviderTruncatedOutputError as exc:
                 attempt_usage = exc.usage
                 error: Exception = exc
@@ -514,7 +550,11 @@ class StoryStudio:
                     duration_ms=self._elapsed_ms(started),
                     usage=attempt_usage,
                     error=None,
+                    quality_issues=quality_issues,
                 )
+                if policy.mode == QualityMode.REPORT:
+                    for issue in quality_issues:
+                        self._emit(f"质量告警（仅记录）：{issue.feedback()}")
                 return value
 
             self._record_attempt(
@@ -530,6 +570,7 @@ class StoryStudio:
                 duration_ms=self._elapsed_ms(started),
                 usage=attempt_usage,
                 error=str(error),
+                quality_issues=quality_issues,
             )
             feedback_issues.extend(attempt_issues)
             if attempt >= self._settings.generation_retries:

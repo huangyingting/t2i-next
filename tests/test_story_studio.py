@@ -15,10 +15,12 @@ from t2i_story_pipeline.errors import (
     StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
+    FrameQualityPolicy,
     NarrativeFrameSequence,
     NarrativeThemeBatch,
     StoryQualityPolicy,
     StoryStage,
+    ThemeQualityPolicy,
     TokenUsage,
 )
 from t2i_story_pipeline.provider import (
@@ -84,9 +86,7 @@ class FakeStoryModel:
         if isinstance(value, Exception):
             raise value
         if isinstance(value, NarrativeFrameSequence):
-            value = "\n".join(
-                f"<FRAME>{frame.prose}</FRAME>" for frame in value.frames
-            )
+            value = "\n".join(f"<FRAME>{frame.prose}</FRAME>" for frame in value.frames)
         if not isinstance(value, str):
             raise TypeError("fake text response must be a string")
         return TextModelResponse(
@@ -97,6 +97,42 @@ class FakeStoryModel:
                 total_tokens=15,
             ),
         )
+
+
+class RoutedStoryModel(FakeStoryModel):
+    def __init__(self) -> None:
+        super().__init__([])
+
+    async def generate(self, **kwargs):
+        payload = json.loads(kwargs["messages"][1].content)
+        self._values = iter(
+            [
+                make_theme_batch(
+                    start=len(payload["existing_themes"]) + 1,
+                    count=payload["theme_count"],
+                )
+            ]
+        )
+        return await super().generate(**kwargs)
+
+    async def generate_text(self, **kwargs):
+        payload = json.loads(kwargs["messages"][1].content)
+        sequence = make_frame_sequence(
+            frame_count=payload["frames_per_theme"],
+            theme_index=int(payload["theme"]["theme_id"][1:]),
+        )
+        self._values = iter(
+            [
+                NarrativeFrameSequence(
+                    frames=[
+                        frame
+                        for frame in sequence.frames
+                        if frame.frame_id in payload["requested_frame_slots"]
+                    ]
+                )
+            ]
+        )
+        return await super().generate_text(**kwargs)
 
 
 def make_studio(
@@ -196,8 +232,10 @@ async def test_batched_text_retries_only_rejected_frames(
         model,
         tmp_path,
         quality=StoryQualityPolicy(
-            mode="enforce",
-            checks=[{"type": "forbidden_text", "values": ["需要重试"]}],
+            frames=FrameQualityPolicy(
+                mode="enforce",
+                checks=[{"type": "forbidden_text", "values": ["需要重试"]}],
+            )
         ),
         concurrency=1,
     ).run(make_story_request())
@@ -215,20 +253,14 @@ async def test_batched_text_retries_only_rejected_frames(
     retry_messages = model.messages[2]
     assert "纯自然语言画面正文" in retry_messages[-1].content
     assert "schema" not in retry_messages[-1].content
-    assert all(
-        message.content != "需要重试的第二帧。"
-        for message in retry_messages
-    )
+    assert all(message.content != "需要重试的第二帧。" for message in retry_messages)
     store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
     frame_attempts = [
         attempt
         for attempt in store.attempts(completed.run_id)
         if attempt.stage == StoryStage.FRAMES
     ]
-    assert [
-        (attempt.operation_id, attempt.outcome)
-        for attempt in frame_attempts
-    ] == [
+    assert [(attempt.operation_id, attempt.outcome) for attempt in frame_attempts] == [
         ("frames-T001", StoryAttemptOutcome.REJECTED),
         ("frames-T001", StoryAttemptOutcome.ACCEPTED),
     ]
@@ -284,13 +316,7 @@ async def test_studio_accepts_prose_without_quality_template(tmp_path) -> None:
 async def test_studio_generates_one_hundred_themes_and_six_hundred_frames(
     tmp_path,
 ) -> None:
-    values: list[object] = [
-        make_theme_batch(start=start, count=10) for start in range(1, 101, 10)
-    ]
-    values.extend(
-        make_frame_sequence(frame_count=6, theme_index=index) for index in range(1, 101)
-    )
-    model = FakeStoryModel(values)
+    model = RoutedStoryModel()
 
     completed = await make_studio(model, tmp_path, concurrency=1).run(
         make_story_request(theme_count=100, frames_per_theme=6)
@@ -307,25 +333,18 @@ async def test_studio_generates_one_hundred_themes_and_six_hundred_frames(
         if stage == StoryStage.FRAMES
     ]
     assert all(
-        payload["requested_frame_slots"]
-        == [f"F{index:02d}" for index in range(1, 7)]
+        payload["requested_frame_slots"] == [f"F{index:02d}" for index in range(1, 7)]
         for payload in frame_payloads
     )
-    assert sum(
-        len(payload["requested_frame_slots"]) for payload in frame_payloads
-    ) == 600
+    assert (
+        sum(len(payload["requested_frame_slots"]) for payload in frame_payloads) == 600
+    )
     assert len(model.stages) == 110
 
 
 @pytest.mark.asyncio
 async def test_studio_supports_smaller_theme_batches(tmp_path) -> None:
-    model = FakeStoryModel(
-        [
-            make_theme_batch(start=1, count=3),
-            make_theme_batch(start=4, count=3),
-            *[make_frame_sequence(theme_index=index) for index in range(1, 7)],
-        ]
-    )
+    model = RoutedStoryModel()
 
     completed = await make_studio(
         model,
@@ -341,14 +360,7 @@ async def test_studio_supports_smaller_theme_batches(tmp_path) -> None:
 
 @pytest.mark.asyncio
 async def test_studio_assigns_contiguous_theme_ids_across_batches(tmp_path) -> None:
-    duplicate_batch = make_theme_batch(start=6, count=5)
-    model = FakeStoryModel(
-        [
-            make_theme_batch(count=5),
-            duplicate_batch,
-            *[make_frame_sequence(theme_index=index) for index in range(1, 11)],
-        ]
-    )
+    model = RoutedStoryModel()
 
     completed = await make_studio(
         model,
@@ -527,9 +539,9 @@ async def test_studio_does_not_branch_on_story_description_phrases(tmp_path) -> 
     theme_batch = make_theme_batch()
     theme_batch.themes[0].premise = "An em dash — remains valid model output."
     sequence = make_frame_sequence()
-    sequence.frames[1].prose = (
-        "At Beijing station in autumn, the same wet platform remains visible."
-    )
+    sequence.frames[
+        1
+    ].prose = "At Beijing station in autumn, the same wet platform remains visible."
     request = make_story_request().model_copy(
         update={
             "story": (
@@ -624,7 +636,9 @@ class CancellableStoryModel:
     ) -> ModelResponse:
         if stage == StoryStage.THEMES:
             return ModelResponse(
-                value=make_theme_batch(count=2),
+                value=make_theme_batch(
+                    count=json.loads(messages[1].content)["theme_count"]
+                ),
                 usage=TokenUsage(total_tokens=10),
             )
         raise AssertionError("structured generation is only used for themes")
@@ -644,7 +658,10 @@ class CancellableStoryModel:
 
 
 @pytest.mark.asyncio
-async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
+@pytest.mark.parametrize("theme_count", [2, 10])
+async def test_cancelling_story_run_cleans_up_frame_tasks(
+    tmp_path, theme_count
+) -> None:
     model = CancellableStoryModel()
     store = LocalStoryRunStore(
         tmp_path / "runs",
@@ -660,7 +677,7 @@ async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
             store,
             settings,
             resolve_story_rules(make_story_request()),
-        ).run(make_story_request(theme_count=2))
+        ).run(make_story_request(theme_count=theme_count))
     )
     await asyncio.wait_for(model.all_frames_started.wait(), timeout=1)
 
@@ -672,7 +689,7 @@ async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
     snapshot = store.inspect(summary.run_id)
     assert model.cancelled_frames == 2
     assert snapshot.manifest.status == StoryRunStatus.RUNNING
-    assert len(snapshot.themes) == 2
+    assert len(snapshot.themes) == theme_count
     assert snapshot.frames == {}
     with store.lock(snapshot.run_id):
         pass
@@ -683,7 +700,9 @@ async def test_cancelling_story_run_cleans_up_frame_tasks(tmp_path) -> None:
 async def test_optional_quality_never_retries_in_off_or_report_mode(tmp_path, mode):
     model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
     policy = StoryQualityPolicy(
-        mode=mode, checks=[{"type": "required_text", "values": ["MISSING ANCHOR"]}]
+        frames=FrameQualityPolicy(
+            mode=mode, checks=[{"type": "required_text", "values": ["MISSING ANCHOR"]}]
+        )
     )
     completed = await make_studio(model, tmp_path, quality=policy).run(
         make_story_request()
@@ -714,7 +733,9 @@ async def test_enforced_quality_retries_with_evidence_and_saves_clean_report(tmp
         frame.prose += " 银色站钟。"
     model = FakeStoryModel([make_theme_batch(), bad_sequence, good_sequence])
     policy = StoryQualityPolicy(
-        mode="enforce", checks=[{"type": "required_text", "values": ["银色站钟"]}]
+        frames=FrameQualityPolicy(
+            mode="enforce", checks=[{"type": "required_text", "values": ["银色站钟"]}]
+        )
     )
     completed = await make_studio(model, tmp_path, quality=policy).run(
         make_story_request()
@@ -734,12 +755,14 @@ async def test_enforced_quality_retries_with_evidence_and_saves_clean_report(tmp
 async def test_quality_enforcement_exhaustion_does_not_publish(tmp_path):
     model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
     policy = StoryQualityPolicy(
-        mode="enforce", checks=[{"type": "required_text", "values": ["absent"]}]
+        frames=FrameQualityPolicy(
+            mode="enforce", checks=[{"type": "required_text", "values": ["absent"]}]
+        )
     )
     with pytest.raises(StoryRunIncompleteError):
-        await make_studio(
-            model, tmp_path, quality=policy, generation_retries=0
-        ).run(make_story_request())
+        await make_studio(model, tmp_path, quality=policy, generation_retries=0).run(
+            make_story_request()
+        )
     store = LocalStoryRunStore(tmp_path / "runs")
     run_id = store.list_runs().runs[0].run_id
     snapshot = store.inspect(run_id)
@@ -751,27 +774,32 @@ async def test_quality_enforcement_exhaustion_does_not_publish(tmp_path):
 
 @pytest.mark.asyncio
 async def test_quality_off_keeps_text_batch_contract_and_retry(tmp_path):
-    model = FakeStoryModel([
-        make_theme_batch(),
-        "<FRAME>only one of two requested slots</FRAME>",
-        make_frame_sequence(),
-    ])
+    model = FakeStoryModel(
+        [
+            make_theme_batch(),
+            "<FRAME>only one of two requested slots</FRAME>",
+            make_frame_sequence(),
+        ]
+    )
     completed = await make_studio(
-        model, tmp_path, quality=StoryQualityPolicy(mode="off")
+        model,
+        tmp_path,
+        quality=StoryQualityPolicy(frames=FrameQualityPolicy(mode="off")),
     ).run(make_story_request())
     assert len(model.stages) == 3
     assert completed.result.quality.status == "skipped"
 
 
 @pytest.mark.asyncio
-async def test_quality_report_tampering_is_a_storage_error(tmp_path):
+@pytest.mark.parametrize("stage", ["themes", "frames"])
+async def test_quality_report_tampering_is_a_storage_error(tmp_path, stage):
     from t2i_story_pipeline.errors import StoryStorageError
 
     completed = await make_studio(
         FakeStoryModel([make_theme_batch(), make_frame_sequence()]), tmp_path
     ).run(make_story_request())
     payload = json.loads(completed.result_file.read_text(encoding="utf-8"))
-    payload["quality"]["status"] = "passed"
+    payload["quality"][stage]["status"] = "passed"
     completed.result_file.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(StoryStorageError, match="质量报告"):
         LocalStoryRunStore(tmp_path / "runs").inspect(completed.run_id)
@@ -807,9 +835,9 @@ async def test_partial_frames_survive_restart_and_only_missing_slots_are_request
     assert last_attempt.outcome == StoryAttemptOutcome.REJECTED
 
     resumed_model = FakeStoryModel([f"<FRAME>{sequence.frames[1].prose}</FRAME>"])
-    result = await make_studio(
-        resumed_model, tmp_path, generation_retries=0
-    ).resume(run_id)
+    result = await make_studio(resumed_model, tmp_path, generation_retries=0).resume(
+        run_id
+    )
     assert resumed_model.stages == [StoryStage.FRAMES]
     payload = json.loads(resumed_model.messages[0][1].content)
     assert payload["requested_frame_slots"] == ["F02"]
@@ -822,8 +850,9 @@ async def test_partial_frames_survive_restart_and_only_missing_slots_are_request
 
 @pytest.mark.asyncio
 async def test_malformed_batch_retries_whole_batch_with_bounded_attempts(tmp_path):
-    model = FakeStoryModel([make_theme_batch(), "<FRAME>only one</FRAME>",
-                            make_frame_sequence()])
+    model = FakeStoryModel(
+        [make_theme_batch(), "<FRAME>only one</FRAME>", make_frame_sequence()]
+    )
     completed = await make_studio(model, tmp_path).run(make_story_request())
     attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
     assert len(model.stages) == 3
@@ -834,13 +863,17 @@ async def test_malformed_batch_retries_whole_batch_with_bounded_attempts(tmp_pat
 
 @pytest.mark.asyncio
 async def test_frame_truncation_budget_is_frozen_across_resume(tmp_path):
-    model = FakeStoryModel([
-        make_theme_batch(),
-        StoryProviderTruncatedOutputError(
-            "truncated frame batch", raw_content="<FRAME>partial",
-            usage=TokenUsage(total_tokens=100), validation_issues=(),
-        ),
-    ])
+    model = FakeStoryModel(
+        [
+            make_theme_batch(),
+            StoryProviderTruncatedOutputError(
+                "truncated frame batch",
+                raw_content="<FRAME>partial",
+                usage=TokenUsage(total_tokens=100),
+                validation_issues=(),
+            ),
+        ]
+    )
     with pytest.raises(StoryRunIncompleteError) as failure:
         await make_studio(
             model, tmp_path, frame_output_tokens=512, generation_retries=0
@@ -887,11 +920,13 @@ async def test_interrupted_frame_writes_preserve_usage_and_only_committed_frames
 
 @pytest.mark.asyncio
 async def test_partial_progress_never_resets_the_retry_budget(tmp_path):
-    model = FakeStoryModel([
-        make_theme_batch(),
-        "<FRAME>first</FRAME><FRAME></FRAME><FRAME></FRAME>",
-        "<FRAME>second</FRAME><FRAME></FRAME>",
-    ])
+    model = FakeStoryModel(
+        [
+            make_theme_batch(),
+            "<FRAME>first</FRAME><FRAME></FRAME><FRAME></FRAME>",
+            "<FRAME>second</FRAME><FRAME></FRAME>",
+        ]
+    )
     with pytest.raises(StoryRunIncompleteError) as failure:
         await make_studio(model, tmp_path, generation_retries=1).run(
             make_story_request(frames_per_theme=3)
@@ -901,3 +936,146 @@ async def test_partial_progress_never_resets_the_retry_budget(tmp_path):
     store = LocalStoryRunStore(tmp_path / "runs")
     frames = store.inspect(failure.value.run_id).frames["T001"].frames
     assert [frame.frame_id for frame in frames] == ["F01", "F02"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["off", "report"])
+async def test_theme_quality_off_and_report_do_not_retry(tmp_path, mode):
+    policy = StoryQualityPolicy(
+        themes=ThemeQualityPolicy(
+            mode=mode,
+            checks=[
+                {"type": "required_text", "field": "premise", "values": ["missing"]}
+            ],
+        )
+    )
+    model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
+    completed = await make_studio(model, tmp_path, quality=policy).run(
+        make_story_request()
+    )
+    assert len(model.stages) == 2
+    report = completed.result.quality
+    assert report.themes.status == ("skipped" if mode == "off" else "warnings")
+    assert report.frames.status == "skipped"
+    attempt = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)[0]
+    assert attempt.outcome == StoryAttemptOutcome.ACCEPTED
+    assert len(attempt.quality_issues) == (0 if mode == "off" else 1)
+    assert "missing" not in model.messages[0][1].content
+
+
+@pytest.mark.asyncio
+async def test_theme_enforcement_retries_before_any_frame_generation(tmp_path):
+    policy = StoryQualityPolicy(
+        themes=ThemeQualityPolicy(
+            mode="enforce",
+            checks=[
+                {
+                    "type": "required_text",
+                    "field": "premise",
+                    "values": ["station clock"],
+                }
+            ],
+        )
+    )
+    good = make_theme_batch()
+    good.themes[0].premise += " A station clock."
+    model = FakeStoryModel([make_theme_batch(), good, make_frame_sequence()])
+    completed = await make_studio(model, tmp_path, quality=policy).run(
+        make_story_request()
+    )
+    assert model.stages == [StoryStage.THEMES, StoryStage.THEMES, StoryStage.FRAMES]
+    assert "T001.premise" in model.messages[1][-1].content
+    assert "station clock" in model.messages[1][-1].content
+    assert completed.result.themes[0].theme.premise == good.themes[0].premise
+    assert completed.result.quality.themes.status == "passed"
+    assert completed.result.quality.issues == []
+    store = LocalStoryRunStore(tmp_path / "runs")
+    first, second, _ = store.attempts(completed.run_id)
+    assert first.accepted_ids == []
+    assert first.quality_issues[0].stage == StoryStage.THEMES
+    assert first.quality_issues[0].frame_id is None
+    assert second.accepted_ids == ["T001"]
+    assert store.inspect(completed.run_id).completed.result.quality == (
+        completed.result.quality
+    )
+
+
+@pytest.mark.asyncio
+async def test_theme_quality_exhaustion_keeps_frames_unstarted(tmp_path):
+    policy = StoryQualityPolicy(
+        themes=ThemeQualityPolicy(
+            mode="enforce",
+            checks=[{"type": "required_text", "field": "style", "values": ["missing"]}],
+        )
+    )
+    model = FakeStoryModel([make_theme_batch()])
+    with pytest.raises(StoryRunIncompleteError) as failure:
+        await make_studio(
+            model,
+            tmp_path,
+            quality=policy,
+            generation_retries=0,
+        ).run(make_story_request())
+    assert model.stages == [StoryStage.THEMES]
+    assert failure.value.missing_themes == 1
+    assert failure.value.missing_frames == 2
+    snapshot = LocalStoryRunStore(tmp_path / "runs").inspect(failure.value.run_id)
+    assert snapshot.themes == ()
+    assert snapshot.frames == {}
+    assert snapshot.completed is None
+
+
+@pytest.mark.asyncio
+async def test_configured_budgets_are_capped_without_changing_frozen_settings(tmp_path):
+    request = make_story_request()
+    model = FakeStoryModel([make_theme_batch(), make_frame_sequence()])
+    settings = StoryRunSettings(
+        provider=StoryProviderSettings(model="test-model", output_token_limit=4096),
+        theme_output_tokens=12000,
+        frame_output_tokens=20000,
+    )
+    store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
+    completed = await StoryStudio(
+        model,
+        store,
+        settings,
+        resolve_story_rules(request),
+    ).run(request)
+    assert model.max_output_tokens == [4096, 4096]
+    assert [
+        attempt.max_output_tokens for attempt in store.attempts(completed.run_id)
+    ] == [4096, 4096]
+    assert store.inspect(completed.run_id).manifest.settings == settings
+
+
+@pytest.mark.asyncio
+async def test_theme_enforcement_rejects_the_batch_before_checkpointing(tmp_path):
+    policy = StoryQualityPolicy(
+        themes=ThemeQualityPolicy(
+            mode="enforce",
+            checks=[{"type": "required_text", "field": "title", "values": ["clock"]}],
+        )
+    )
+    bad = make_theme_batch(count=2)
+    bad.themes[0].title += " clock"
+    good = bad.model_copy(deep=True)
+    good.themes[1].title += " clock"
+    model = FakeStoryModel(
+        [
+            bad,
+            good,
+            make_frame_sequence(theme_index=1),
+            make_frame_sequence(theme_index=2),
+        ]
+    )
+    completed = await make_studio(model, tmp_path, quality=policy, concurrency=1).run(
+        make_story_request(theme_count=2)
+    )
+    attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
+    assert attempts[0].accepted_ids == []
+    assert attempts[0].quality_issues[0].theme_id == "T002"
+    assert attempts[1].accepted_ids == ["T001", "T002"]
+    assert model.stages[:2] == [StoryStage.THEMES, StoryStage.THEMES]
+    assert [item.theme.title for item in completed.result.themes] == [
+        theme.title for theme in good.themes
+    ]

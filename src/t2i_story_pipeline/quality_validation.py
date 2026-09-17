@@ -9,15 +9,20 @@ from t2i_story_pipeline.errors import StoryContractError
 from t2i_story_pipeline.models import (
     CameraEvidenceCheck,
     ForbiddenTextCheck,
+    FrameQualityPolicy,
     NarrativeFrame,
+    NarrativeThemeDraft,
     NarrativeThemeResult,
     OutputLanguage,
-    ProseLengthCheck,
     QualityMode,
     RequiredTextCheck,
+    StageQualityReport,
     StoryQualityIssue,
     StoryQualityPolicy,
     StoryQualityReport,
+    StoryStage,
+    TextLengthBounds,
+    ThemeQualityPolicy,
 )
 
 _CAMERA_EVIDENCE = {
@@ -56,8 +61,47 @@ class StoryQualityError(StoryContractError):
         super().__init__("；".join(issue.feedback() for issue in issues))
 
 
+def _text_check_messages(
+    check: TextLengthBounds | RequiredTextCheck | ForbiddenTextCheck,
+    text: str,
+) -> list[str]:
+    if isinstance(check, TextLengthBounds):
+        length = len(text)
+        return (
+            [
+                f"正文长度为 {length} 字符，要求 "
+                f"{check.min_chars} 至 {check.max_chars} 字符"
+            ]
+            if not check.min_chars <= length <= check.max_chars
+            else []
+        )
+    if isinstance(check, RequiredTextCheck):
+        return [f"缺少指定原文：{value}" for value in check.values if value not in text]
+    return [f"出现禁止原文：{value}" for value in check.values if value in text]
+
+
+def check_theme_quality(
+    policy: ThemeQualityPolicy,
+    theme_id: str,
+    theme: NarrativeThemeDraft,
+) -> tuple[StoryQualityIssue, ...]:
+    if policy.mode == QualityMode.OFF:
+        return ()
+    return tuple(
+        StoryQualityIssue(
+            stage=StoryStage.THEMES,
+            theme_id=theme_id,
+            field=check.field,
+            check=check.type,
+            message=message,
+        )
+        for check in policy.checks
+        for message in _text_check_messages(check, getattr(theme, check.field))
+    )
+
+
 def check_frame_quality(
-    policy: StoryQualityPolicy,
+    policy: FrameQualityPolicy,
     language: OutputLanguage,
     theme_id: str,
     frame: NarrativeFrame,
@@ -75,29 +119,14 @@ def check_frame_quality(
             ]
             if missing:
                 messages.append("缺少摄影文字证据：" + "、".join(missing))
-        elif isinstance(check, ProseLengthCheck):
-            length = len(frame.prose)
-            if not check.min_chars <= length <= check.max_chars:
-                messages.append(
-                    f"正文长度为 {length} 字符，要求 "
-                    f"{check.min_chars} 至 {check.max_chars} 字符"
-                )
-        elif isinstance(check, RequiredTextCheck):
-            messages.extend(
-                f"缺少指定原文：{value}"
-                for value in check.values
-                if value not in frame.prose
-            )
-        elif isinstance(check, ForbiddenTextCheck):
-            messages.extend(
-                f"出现禁止原文：{value}"
-                for value in check.values
-                if value in frame.prose
-            )
+        else:
+            messages = _text_check_messages(check, frame.prose)
         issues.extend(
             StoryQualityIssue(
+                stage=StoryStage.FRAMES,
                 theme_id=theme_id,
                 frame_id=frame.frame_id,
+                field="prose",
                 check=check.type,
                 message=message,
             )
@@ -111,15 +140,32 @@ def quality_report(
     language: OutputLanguage,
     themes: Sequence[NarrativeThemeResult],
 ) -> StoryQualityReport:
-    issues = [
+    theme_issues = [
+        issue
+        for item in themes
+        for issue in check_theme_quality(policy.themes, item.theme.theme_id, item.theme)
+    ]
+    frame_issues = [
         issue
         for item in themes
         for frame in item.frames
-        for issue in check_frame_quality(policy, language, item.theme.theme_id, frame)
+        for issue in check_frame_quality(
+            policy.frames, language, item.theme.theme_id, frame
+        )
     ]
+    return StoryQualityReport(
+        themes=_stage_report(policy.themes, theme_issues),
+        frames=_stage_report(policy.frames, frame_issues),
+    )
+
+
+def _stage_report(
+    policy: ThemeQualityPolicy | FrameQualityPolicy,
+    issues: list[StoryQualityIssue],
+) -> StageQualityReport:
     if issues and policy.mode == QualityMode.ENFORCE:
         raise StoryQualityError(issues)
-    return StoryQualityReport(
+    return StageQualityReport(
         mode=policy.mode,
         status=(
             "skipped"

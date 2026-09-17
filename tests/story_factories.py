@@ -74,18 +74,14 @@ def make_frame_sequence(
     theme_index: int = 1,
 ) -> NarrativeFrameSequence:
     actions = (
-        "左侧人物正在握紧旧皮箱提手，右侧人物保持俯身姿态，"
-        "指节与皮革受力处清晰可见",
-        "右侧人物正在掀起旧皮箱搭扣，左侧人物保持半蹲姿态，"
-        "铜扣与指腹接触处清晰可见",
+        "左侧人物正在握紧旧皮箱提手，右侧人物保持俯身姿态，指节与皮革受力处清晰可见",
+        "右侧人物正在掀起旧皮箱搭扣，左侧人物保持半蹲姿态，铜扣与指腹接触处清晰可见",
         "左侧人物正在按住皮箱上的行李标签，右侧人物保持直立姿态，"
         "纸张边缘因压力贴紧皮革",
         "右侧人物正在指向箱角的新鲜裂痕，左侧人物保持俯身姿态，"
         "裂口纤维与指尖处于同一焦点",
-        "左侧人物正在托住皮箱下沉的箱底，右侧人物保持屈膝姿态，"
-        "皮革底面因承重形成浅凹",
-        "右侧人物正在扣合皮箱锁舌，左侧人物保持直立姿态，"
-        "锁舌与锁孔在指尖下准确咬合",
+        "左侧人物正在托住皮箱下沉的箱底，右侧人物保持屈膝姿态，皮革底面因承重形成浅凹",
+        "右侧人物正在扣合皮箱锁舌，左侧人物保持直立姿态，锁舌与锁孔在指尖下准确咬合",
     )
     return NarrativeFrameSequence(
         frames=[
@@ -139,5 +135,8 @@ def make_story_result(
             for index in range(1, theme_count + 1)
         ],
         usage=TokenUsage(total_tokens=30),
-        quality=StoryQualityReport(mode="report", status="skipped", issues=[]),
+        quality=StoryQualityReport(
+            themes={"mode": "report", "status": "skipped", "issues": []},
+            frames={"mode": "report", "status": "skipped", "issues": []},
+        ),
     )

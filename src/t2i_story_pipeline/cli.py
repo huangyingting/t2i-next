@@ -13,7 +13,6 @@ from t2i_story_pipeline.config import load_story_provider_settings
 from t2i_story_pipeline.documents import (
     StoryDocument,
     StoryGeneration,
-    StoryRuntime,
     load_story_document,
 )
 from t2i_story_pipeline.errors import (
@@ -28,6 +27,7 @@ from t2i_story_pipeline.models import (
     StoryQualityPolicy,
     StoryRequest,
     StoryRuleSet,
+    StoryRuntime,
 )
 from t2i_story_pipeline.provider import (
     StoryProviderSettings,
@@ -103,7 +103,7 @@ def generate_command(
         "--concurrency",
         min=1,
         max=32,
-        help="覆盖文档并发数；未配置时为 8。",
+        help="Theme 与 Frame 共用的并发上限；未配置时为 8。",
     ),
     generation_retries: int | None = typer.Option(
         None,
@@ -112,10 +112,36 @@ def generate_command(
         max=5,
         help="覆盖文档生成重试次数；未配置时为 2。",
     ),
-    quality_mode: QualityMode | None = typer.Option(
+    theme_batch_size: int | None = typer.Option(
         None,
-        "--quality-mode",
-        help="可选质量检查：off、report 或 enforce；不影响基础结构契约。",
+        "--theme-batch-size",
+        min=1,
+        max=10,
+        help="每批 Theme 数量；未配置时为 10。",
+    ),
+    theme_output_tokens: int | None = typer.Option(
+        None,
+        "--theme-output-tokens",
+        min=512,
+        max=65536,
+        help="Theme 批次初始输出预算；未配置时为 6000，受 provider 上限约束。",
+    ),
+    frame_output_tokens: int | None = typer.Option(
+        None,
+        "--frame-output-tokens",
+        min=512,
+        max=65536,
+        help="Frame 批次初始输出预算；未配置时为 32768，受 provider 上限约束。",
+    ),
+    theme_quality_mode: QualityMode | None = typer.Option(
+        None,
+        "--theme-quality-mode",
+        help="Theme 可选质量检查：off、report 或 enforce。",
+    ),
+    frame_quality_mode: QualityMode | None = typer.Option(
+        None,
+        "--frame-quality-mode",
+        help="Frame 可选质量检查：off、report 或 enforce。",
     ),
     content_level: ContentLevel | None = typer.Option(
         None,
@@ -180,11 +206,33 @@ def generate_command(
             raise AssertionError("story input resolution changed unexpectedly")
         request = generation.request(description, document.id if document else None)
         runtime = document.runtime if document else StoryRuntime()
-        quality = document.validation.quality if document else StoryQualityPolicy()
+        runtime = StoryRuntime.model_validate(
+            {
+                **runtime.model_dump(),
+                **{
+                    key: value
+                    for key, value in {
+                        "concurrency": concurrency,
+                        "generation_retries": generation_retries,
+                        "theme_batch_size": theme_batch_size,
+                        "theme_output_tokens": theme_output_tokens,
+                        "frame_output_tokens": frame_output_tokens,
+                    }.items()
+                    if value is not None
+                },
+            }
+        )
+        quality = document.validation if document else StoryQualityPolicy()
         quality = StoryQualityPolicy.model_validate(
             {
-                **quality.model_dump(),
-                **({"mode": quality_mode} if quality_mode is not None else {}),
+                stage: {
+                    **policy.model_dump(),
+                    **({"mode": mode} if mode is not None else {}),
+                }
+                for stage, policy, mode in (
+                    ("themes", quality.themes, theme_quality_mode),
+                    ("frames", quality.frames, frame_quality_mode),
+                )
             }
         )
         default_rules_directory = Path("story-inputs") / "rules"
@@ -200,18 +248,14 @@ def generate_command(
         )
         settings = StoryRunSettings(
             provider=load_story_provider_settings(),
-            concurrency=(
-                concurrency if concurrency is not None else runtime.concurrency
-            ),
-            generation_retries=(
-                generation_retries
-                if generation_retries is not None
-                else runtime.generation_retries
-            ),
+            **runtime.model_dump(),
             quality=quality,
         )
-        if not quality.checks and quality.mode != QualityMode.OFF:
-            typer.echo("未配置可选质量检查；仅执行基础结构契约。")
+        if not any(
+            policy.checks and policy.mode != QualityMode.OFF
+            for policy in (quality.themes, quality.frames)
+        ):
+            typer.echo("未启用可选质量检查；仅执行基础结构契约。")
         completed = asyncio.run(
             _generate(
                 request,
@@ -350,7 +394,10 @@ def _print_completed(completed: CompletedStoryRun) -> None:
     typer.echo(f"Run：{completed.run_id}")
     typer.echo(f"叙事提示词：{completed.published.prompt_file}")
     report = completed.result.quality
-    typer.echo(f"质量检查：{report.status}（{report.mode.value}）")
+    for label, stage_report in (("Theme", report.themes), ("Frame", report.frames)):
+        typer.echo(
+            f"{label} 质量检查：{stage_report.status}（{stage_report.mode.value}）"
+        )
     if report.issues:
         typer.secho(
             f"存在 {len(report.issues)} 条质量告警；结果按 report 策略发布。",
