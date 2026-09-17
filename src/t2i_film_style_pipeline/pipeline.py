@@ -17,6 +17,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from t2i_film_style_pipeline.content_validation import FilmStyleContentValidator
 from t2i_film_style_pipeline.errors import (
     FilmStylePipelineError,
     FilmStyleRunIncompleteError,
@@ -483,6 +484,9 @@ class FilmStylePromptStudio:
                     themes=snapshot.rules.themes,
                     frames=snapshot.rules.frames,
                 )
+                content_validator = FilmStyleContentValidator(
+                    snapshot.request.film_style
+                )
                 if story_run_id is None:
                     story_snapshot = story_store.create(
                         story_request,
@@ -500,6 +504,8 @@ class FilmStylePromptStudio:
                     snapshot.settings.story,
                     story_rules,
                     on_progress=self._on_progress,
+                    theme_validator=content_validator.validate_theme,
+                    frame_validator=content_validator.validate_frame,
                 ).resume(story_run_id)
                 return self._store.complete(
                     run_id,

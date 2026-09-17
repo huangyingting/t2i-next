@@ -21,6 +21,7 @@ OpenAI-compatible HTTP，`T2I_MODEL_BACKEND=copilot` 使用 GitHub Copilot SDK�
 - 输出描述作品中可观察、可摄影控制的色彩、构图、调度、镜头、光线、运动、
   场景、美术、材质和成片特征。
 - 来源署名不能代替视觉描述。
+- Profile 和最终提示词都不得包含画幅比例、图像方向、分辨率或尺寸。
 - 不生成导演个人风格的泛化标签。
 - 不复制角色、演员外貌、对白、剧情、标志性服装、独特道具或具体镜头。
 - Python 不按导演名或作品名增加分支；差异全部来自请求与结构化视觉档案。
@@ -87,7 +88,9 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
 - `compiler.py`：把已经生成的结构化视觉档案与可选场景方向编译为当前 run 的动态
   电影场景上下文；中英文模板属于输出数据格式，不属于模型行为规则。
 - `models.py`：只定义输入、输出和 `FilmStyleRuleSet` 的结构与硬验证约束。
-- `pipeline.py`：只负责阶段编排、checkpoint 和恢复。顶层 `rules.json` 同时冻结
+- `content_validation.py`：验证拒绝文本、来源句、内容等级和图像几何禁项；只定义
+  可确定判断的发布门槛，不承担创作规则。
+- `pipeline.py`：负责阶段编排、checkpoint 和恢复。顶层 `rules.json` 同时冻结
   Profile、Theme、Frame 三组规则；Story child run 只接收执行 Theme/Frame 所需
   的两组规则。
 
@@ -96,6 +99,9 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
 以及成年人、自愿、清醒和可退出要求。美学级以人体造型和克制接触为上限；极致
 情色级把裸露和非露骨亲密互动推到最高强度；赤裸明确级要求当前画面直接呈现明确
 性行为，同时继续保留完整的电影空间、人物关系和导演作品视觉特征。
+Theme 阶段必须把当前等级的核心互动类别、参与关系和发生状态确立为稳定事实；
+Frame 阶段只能具体化姿态、肢体分工、接触细节和摄影方案，不得降低、替换或升级
+Theme 的核心互动。
 
 Theme 不再压缩成一句风格总结。`premise` 通常使用三至五句完整说明稳定的人物、
 地点、关系、事件和关键环境；`style` 通常使用四至八句，把作品级证据转化为当前
@@ -108,6 +114,11 @@ Theme 不再压缩成一句风格总结。`premise` 通常使用三至五句完�
 风格的原创电影场景。”随后依次描述环境、人物、动作与互动、镜头、光线和成片质感。
 最终提示词不输出母风格、Theme 风格、视觉档案等内部术语，也不输出由 App 决定的
 画幅比例、分辨率或横竖方向。
+
+Theme 和 Frame 在保存 checkpoint 前会经过 film-style 专用语义验证。拒绝或无法协助
+文本、缺失或重复的指定来源句、内容等级越界或降级、画幅与尺寸信息都会被拒绝，并
+通过 Story pipeline 的有界重试把具体问题反馈给模型。验证只挂载在 film-style
+编排中，不改变独立 Story pipeline 的默认行为。
 
 ## Checkpoint 与恢复
 
@@ -141,12 +152,13 @@ runs/film-style/<run-id>/
 后来修改的规则文件。
 
 如果 profile、Theme 批次或某个 Theme 的 Frame Sequence 已保存，恢复时不会重新
-生成。失败输出会打印可直接执行的命令：
+生成。只有通过结构与语义验证的结果才会保存 checkpoint；重试耗尽后会保留失败
+记录并打印可直接执行的命令：
 
 ```bash
 uv run t2i-film-style resume RUN_ID --runs-dir runs/film-style
 ```
 
 恢复使用 run 中冻结的 provider 配置、并发设置和 film-style rules；当前 provider 配置
-不一致时会明确拒绝继续，避免同一 run 混用生成条件。发布文件名包含子运行 ID，
-因此重复使用同一基础 brief 与作品集合不会覆盖既有结果。
+不一致时会明确拒绝继续，避免同一 run 混用生成条件。发布文件使用导演署名和安全
+递增序号，因此重复使用同一基础 brief 与作品集合不会覆盖既有结果。

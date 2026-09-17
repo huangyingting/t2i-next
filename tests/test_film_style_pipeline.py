@@ -108,6 +108,14 @@ def test_prompt_request_uses_short_director_filename() -> None:
     assert story_request.source_prompt_stem is None
 
 
+def test_profile_rejects_image_geometry() -> None:
+    payload = make_profile().model_dump()
+    payload["composition"] = "采用方形画幅和中轴对称。"
+
+    with pytest.raises(ValidationError, match="aspect ratio"):
+        FilmStyleProfile.model_validate(payload)
+
+
 def test_compile_story_description_injects_profile_after_brief_header() -> None:
     request = make_request()
     compiled = compile_story_description(
@@ -164,7 +172,10 @@ def test_director_rules_own_theme_and_frame_workflow() -> None:
     assert any("八项中的六项" in rule for rule in rules.themes)
     assert any("固定的主题编号菜单" in rule for rule in rules.themes)
     assert any("完全独立的图像提示词" in rule for rule in rules.frames)
-    assert any("画幅比例、分辨率" in rule for rule in rules.frames)
+    assert any(
+        "画幅比例" in rule and "图像尺寸" in rule
+        for rule in rules.frames
+    )
     assert any("不得暴露母风格" in rule for rule in rules.frames)
     assert any("内容级别：赤裸明确级" in rule for rule in rules.frames)
     assert not any(

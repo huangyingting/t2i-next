@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from t2i_film_style_pipeline.compiler import frame_source_sentence
 from t2i_film_style_pipeline.errors import (
     FilmStyleProviderError,
     FilmStyleRunIncompleteError,
@@ -22,7 +23,11 @@ from t2i_film_style_pipeline.provider import (
 )
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from t2i_story_pipeline.errors import StoryProviderResponseError
-from t2i_story_pipeline.models import StoryStage, TokenUsage
+from t2i_story_pipeline.models import (
+    NarrativeFrameSequence,
+    StoryStage,
+    TokenUsage,
+)
 from t2i_story_pipeline.provider import (
     ModelResponse as StoryModelResponse,
 )
@@ -77,15 +82,66 @@ def make_pipeline_request() -> FilmStylePromptRequest:
     )
 
 
-def make_settings() -> FilmStylePipelineSettings:
+def make_film_frame_sequence() -> NarrativeFrameSequence:
+    sequence = make_frame_sequence()
+    source_sentence = frame_source_sentence(make_request())
+    for frame in sequence.frames:
+        frame.prose = (
+            f"{source_sentence}中国古代的雨夜，两名成年人物在庭院灯下"
+            "相互注视，前景帘幕与背景砖墙建立纵深，中景人物的克制动作由"
+            "平视中景记录，暖灯和冷雨形成清楚反差。灰砖、旧木和粗布分别"
+            "吸收来自左侧的暖色灯光，右后方冷色天光沿人物肩线形成清楚轮廓，"
+            "两人都以稳固站姿承担自身重量，手臂保持自然放松，视线持续回应，"
+            "门洞、廊柱与后窗组成三层空间，焦点落在成熟面容和相触的手部，"
+            "前景帘幕略微柔化，背景纹理仍然可辨。低饱和灰黑环境只以深红"
+            "灯笼形成色彩重音，潮湿地面留下有限反光，细密颗粒和柔和高光"
+            "保持真实、克制、自然可信且可以直接摄影执行的长片质感。"
+        )
+    return sequence
+
+
+def make_settings(*, generation_retries: int = 0) -> FilmStylePipelineSettings:
     return FilmStylePipelineSettings(
         film_provider=FilmStyleProviderSettings(model="test-model"),
         story=StoryRunSettings(
             provider=StoryProviderSettings(model="test-model"),
             concurrency=1,
-            generation_retries=0,
+            generation_retries=generation_retries,
         ),
     )
+
+
+@pytest.mark.asyncio
+async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
+    request = make_pipeline_request()
+    bad_sequence = make_film_frame_sequence()
+    bad_sequence.frames[0].prose = (
+        f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
+    )
+    story_model = FakeStoryModel(
+        [
+            make_theme_batch(),
+            bad_sequence,
+            make_film_frame_sequence(),
+        ]
+    )
+
+    completed = await FilmStylePromptStudio(
+        FakeFilmModel(),
+        story_model,
+        LocalFilmStyleRunStore(tmp_path / "runs"),
+        make_settings(generation_retries=1),
+        resolve_film_style_rules(
+            request.story_request("BRIEF\n\nDirector scene context.")
+        ),
+    ).run(request, prompts_directory=tmp_path / "prompts")
+
+    assert completed.prompt_file.exists()
+    assert story_model.stages == [
+        StoryStage.THEMES,
+        StoryStage.FRAMES,
+        StoryStage.FRAMES,
+    ]
 
 
 @pytest.mark.asyncio
@@ -125,7 +181,7 @@ async def test_pipeline_resumes_story_without_regenerating_profile(tmp_path) -> 
     assert failed.manifest.story_run_id is not None
     assert film_model.calls == 1
 
-    resumed_story_model = FakeStoryModel([make_frame_sequence()])
+    resumed_story_model = FakeStoryModel([make_film_frame_sequence()])
     completed = await FilmStylePromptStudio(
         film_model,
         resumed_story_model,
@@ -179,7 +235,7 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
         FakeStoryModel(
             [
                 make_theme_batch(),
-                make_frame_sequence(),
+                make_film_frame_sequence(),
             ]
         ),
         store,

@@ -33,6 +33,13 @@ def source_attribution(request: FilmStyleRequest) -> str:
     return f"{labels}, directed by {request.director}"
 
 
+def frame_source_sentence(request: FilmStyleRequest) -> str:
+    source = source_attribution(request)
+    if request.output_language == "chinese":
+        return f"这是一个采用{source}视觉风格的原创电影场景。"
+    return f"This is an original film scene using the visual style of {source}."
+
+
 def compile_story_description(
     request: FilmStyleRequest,
     profile: FilmStyleProfile,
@@ -53,6 +60,7 @@ def _compile_chinese(
     scene_direction: str | None,
 ) -> str:
     source = source_attribution(request)
+    source_sentence = frame_source_sentence(request)
     work_summaries = "\n".join(
         f"- {_work_label(work, chinese=True)}：{summary}"
         for work, summary in zip(
@@ -76,7 +84,7 @@ def _compile_chinese(
 也不得复制原作人物、演员肖像、对白、剧情、标志性服装、独特道具或具体镜头。
 
 每个 Frame 必须准确且只在第一句使用以下来源说明：
-“这是一个采用{source}视觉风格的原创电影场景。”
+“{source_sentence}”
 
 场景要求
 
@@ -138,6 +146,7 @@ def _compile_english(
     scene_direction: str | None,
 ) -> str:
     source = source_attribution(request)
+    source_sentence = frame_source_sentence(request)
     work_summaries = "\n".join(
         f"- {_work_label(work, chinese=False)}: {summary}"
         for work, summary in zip(
@@ -164,7 +173,7 @@ characters, actor likenesses, dialogue, plots, signature costumes, unique props,
 or exact shots.
 
 Every Frame must use this source sentence exactly once as its first sentence:
-"This is an original film scene using the visual style of {source}."
+"{source_sentence}"
 
 SCENE DIRECTION
 

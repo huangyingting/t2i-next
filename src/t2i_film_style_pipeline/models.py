@@ -23,6 +23,21 @@ def _single_line(value: str) -> str:
     return value.strip()
 
 
+_IMAGE_GEOMETRY = re.compile(
+    r"画幅|宽高比|宽银幕|横幅画面|竖幅画面|"
+    r"(?:接近|近似)方形|方形(?:构图|画面|格式)|"
+    r"\b(?:aspect ratio|widescreen|square (?:frame|framing|composition|format)|"
+    r"portrait orientation|"
+    r"landscape orientation)\b|"
+    r"\b(?:1\.33|1\.37|1\.66|1\.85|2\.35|2\.39)\s*:\s*1\b",
+    re.IGNORECASE,
+)
+
+
+def contains_image_geometry(value: str) -> bool:
+    return _IMAGE_GEOMETRY.search(value) is not None
+
+
 class Model(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -100,6 +115,28 @@ class FilmStyleProfile(Model):
     material_and_finish: TraitText
     signature_devices: tuple[TraitText, ...] = Field(min_length=3, max_length=8)
     refusal_rules: tuple[TraitText, ...] = Field(min_length=3, max_length=8)
+
+    @model_validator(mode="after")
+    def omits_image_geometry(self) -> FilmStyleProfile:
+        strings = (
+            self.style_summary,
+            *self.work_style_summaries,
+            self.palette,
+            self.composition,
+            self.blocking,
+            self.camera,
+            self.lighting,
+            self.movement,
+            self.production_design,
+            self.material_and_finish,
+            *self.signature_devices,
+            *self.refusal_rules,
+        )
+        if any(contains_image_geometry(value) for value in strings):
+            raise ValueError(
+                "profile must not contain aspect ratio, image orientation, or size"
+            )
+        return self
 
 
 class TokenUsage(Model):

@@ -19,6 +19,7 @@ from t2i_story_pipeline.errors import (
     StoryStructuredOutputError,
 )
 from t2i_story_pipeline.models import (
+    NarrativeFrame,
     NarrativeFrameSequence,
     NarrativeTheme,
     NarrativeThemeBatch,
@@ -43,6 +44,8 @@ from t2i_story_pipeline.run_store import (
 )
 
 ProgressCallback = Callable[[str], None]
+ThemeValidator = Callable[[StoryRequest, NarrativeTheme], None]
+FrameValidator = Callable[[StoryRequest, NarrativeTheme, NarrativeFrame], None]
 
 class StoryStudio:
     """Turn one story request directly into final prose image prompts."""
@@ -55,12 +58,16 @@ class StoryStudio:
         rules: StoryRuleSet,
         *,
         on_progress: ProgressCallback | None = None,
+        theme_validator: ThemeValidator | None = None,
+        frame_validator: FrameValidator | None = None,
     ) -> None:
         self._model = model
         self._store = store
         self._settings = settings
         self._rules = rules
         self._on_progress = on_progress
+        self._theme_validator = theme_validator
+        self._frame_validator = frame_validator
 
     async def run(self, request: StoryRequest) -> CompletedStoryRun:
         snapshot = self._store.create(request, self._settings, self._rules)
@@ -227,6 +234,8 @@ class StoryStudio:
                     strict=True,
                 ):
                     theme.theme_id = theme_id
+                    if self._theme_validator is not None:
+                        self._theme_validator(request, theme)
 
             operation_id = f"themes-T{start_index:03d}-T{start_index + count - 1:03d}"
             requested_ids = tuple(
@@ -283,6 +292,8 @@ class StoryStudio:
                 strict=True,
             ):
                 frame.frame_id = frame_id
+                if self._frame_validator is not None:
+                    self._frame_validator(request, theme, frame)
 
         value, _ = await self._generate_validated(
             run_id=run_id,
