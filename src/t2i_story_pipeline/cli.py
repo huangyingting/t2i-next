@@ -237,7 +237,7 @@ def resume_command(
         help="增量 checkpoint 和运行记录目录。",
     ),
 ) -> None:
-    """Continue only missing themes and frame sequences."""
+    """Continue only missing themes and frames."""
     try:
         store = LocalStoryRunStore(runs_dir)
         snapshot = store.inspect(run_id)

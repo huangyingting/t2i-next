@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from t2i_story_pipeline.documents import load_story_document
+from t2i_story_pipeline.documents import StoryDocument, load_story_document
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
@@ -17,27 +17,29 @@ def test_story_inputs_are_yaml_documents_with_matching_ids() -> None:
         assert document.description.strip()
 
 
-def test_story_inputs_use_only_the_current_authoring_contract() -> None:
+def test_story_inputs_preserve_description_in_generation_requests() -> None:
     story_inputs = sorted((REPOSITORY_ROOT / "story-inputs").glob("*.yaml"))
 
     assert story_inputs
     assert not (REPOSITORY_ROOT / "story-inputs" / "multi-view-scenes.yaml").exists()
 
     for story_input in story_inputs:
-        brief = load_story_document(story_input).description
+        document = load_story_document(story_input)
+        assert isinstance(document, StoryDocument), story_input.name
+        request = document.generation.request(document.description, document.id)
 
-        assert brief.startswith("BRIEF\n\n"), story_input.name
-        assert "Theme" in brief, story_input.name
-        assert "Frame" in brief, story_input.name
-        assert "CLI" not in brief, story_input.name
-        assert "Generate exactly the Theme count" not in brief, story_input.name
-        assert "Generate exactly the Theme and Frames-per-Theme counts" not in brief, (
-            story_input.name
-        )
-        assert "cast as a creative seed" not in brief, story_input.name
-        assert "time advances through causally connected beats" not in brief, (
-            story_input.name
-        )
+        assert request.story == document.description, story_input.name
+        assert request.source_prompt_stem == document.id, story_input.name
+        assert request.theme_count == document.generation.theme_count, story_input.name
+        assert (
+            request.frames_per_theme == document.generation.frames_per_theme
+        ), story_input.name
+        assert (
+            request.content_level == document.generation.content_level
+        ), story_input.name
+        assert (
+            request.output_language == document.generation.output_language
+        ), story_input.name
 
 
 def test_lifestyle_story_is_social_photography_not_ui() -> None:
@@ -49,12 +51,18 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
     normalized = " ".join(brief.split())
 
     assert brief.startswith("BRIEF\n\n")
-    assert "RUN-LEVEL ROUTING: Read request.content_level before creation" in normalized
-    assert "that value is immutable across every Theme and Frame in the batch" in normalized
-    assert "If it is erotic, ignore every hardcore permission and never output oral sex" in normalized
-    assert "If it is hardcore, ignore erotic limits and require one explicit direct act in every Theme and Frame" in normalized
-    assert "Reject the whole batch if an item uses inactive branch" in normalized
-    assert "Themes and Frames are incoming parameters, not fixed lists" in normalized
+    assert (
+        "Follow the requested content level while retaining the same polished "
+        "social-lifestyle photographic language."
+    ) in normalized
+    assert (
+        "Each Frame must independently restate the full cast, identities, styling, "
+        "location, activity, camera method, light, and all visible content required "
+        "to render it."
+    ) in normalized
+    assert (
+        "Never refer to another Frame, a previous image, or what happened before."
+    ) in normalized
     assert "Instagram and Xiaohongshu" in normalized
     assert "not a literal screen capture of either application" in normalized
     assert "INSTAGRAM EDITORIAL" in brief
@@ -1364,7 +1372,7 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "同一 Theme 全部 Frame 固定年龄层、体型和皮肤特征" in normalized
     assert "IMAGE-SCALE COMPOSITION GATE" in normalized
     assert "访客层" in normalized
-    assert "食指层" in normalized
+    assert "日用品层" in normalized
     assert "身体层" in normalized
     assert "世界层" in normalized
     assert "所有属于巨人国原住民、巨人国建筑或当地环境的可见物件都必须按巨人居民的统一日常比例制造" in normalized
@@ -1372,139 +1380,197 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "较小部件可以低于访客身高，但必须以异常厚度、宽度或重量继续显出巨人尺度" in normalized
     assert "英文名称前必须明确写“giant-scale”或“colossal giant-country”" in normalized
     assert "禁止只写普通 cup、chair、door、rope、lever、bucket 或 platform" in normalized
-    assert "compact miniature visitor-built workbridge" in normalized
-    assert "具体、普通、可实地拍摄的巨人国城市生活场景" in normalized
-    assert "不得连续两个 Theme 使用同一场景类型" in normalized
-    assert "人行道、后巷、十字路口、公交维修场、市场街、建筑工地" in normalized
-    assert "城市公寓、社区洗衣店、健身房、办公室、诊所、便利店或超市后场" in normalized
-    assert "画面的唯一异常是巨人国居民、建筑与物件相对正常人类访客的极端尺度" in normalized
-    assert "环境本身必须像现实城市" in normalized
-    assert "混凝土、沥青、瓷砖、排水沟、斑马线、交通灯、路牌、广告牌" in normalized
-    assert "至少四种" in normalized
-    assert "除指定访客与唯一巨人外不得出现路人、司机、乘客、店员" in normalized
-    assert "互不重复的城市生活类别" in normalized
+    assert "single miniature visitor interaction deck" in normalized
+    assert "每个 Theme 使用一个具体、可理解、可拍摄的巨人国日常地点" in normalized
+    assert "城市室内、城市户外和半开放空间只是默认方向，不是硬边界" in normalized
+    assert (
+        "园林和自然边缘地点都可使用，只要环境、人物身份和互动具有生活逻辑"
+    ) in normalized
+    assert "场景只需选择足以让地点一眼可辨的两至四种环境线索" in normalized
+    assert "不强制固定基础设施清单" in normalized
+    assert "除指定访客与唯一巨人外不得出现额外人物" in normalized
+    assert "优先避免连续重复同一地点和同一装置" in normalized
     assert "住宅与家务、零售与餐饮、办公室与医疗、交通与停车" in normalized
-    assert "市政与公共休闲、建筑与工业、街道与社区服务" in normalized
-    assert "即使只有两个 Theme，也必须来自两个不同类别" in normalized
-    assert "例子只用于打开想象，不得照抄为固定清单" in normalized
+    assert "市政与公共休闲、文化与娱乐、酒店与度假、运动与健康" in normalized
+    assert "不要求先用完固定类别，也不强制工业场景占比" in normalized
+    assert "只是启发性例子，不是允许列表、固定菜单、配额或轮换表" in normalized
     assert "FINGER-LENGTH VISITOR SCALE AND EVERYDAY OBJECT PROOF" in normalized
-    assert "所有巨人国原生事物都巨大无比" in normalized
-    assert "它们彼此保持普通现实世界中人与物的比例" in normalized
-    assert "不能只有一个道具巨大而其余门、桌椅、设备和基础设施接近正常人尺寸" in normalized
+    assert (
+        "所有巨人国原生建筑、家具、车辆、机器和日用品仍按巨人居民的统一日常比例制造"
+    ) in normalized
+    assert "对巨人保持普通日用比例，对访客形成可操作的巨大结构" in normalized
+    assert (
+        "至少两件额外 giant-scale 原生物件和一个最低台阶、门槛或底座与访客同焦"
+    ) in normalized
     assert "只允许 travel mug、coffee mug、beverage can、beverage bottle、smartphone 或 remote control" in normalized
     assert "这是封闭列表" in normalized
     assert "禁止鞋、安全帽、衣物、梯子、椅子、手电筒、工具" in normalized
-    assert "巨人一根完整食指是唯一访客身高锚点" in normalized
-    assert "每名访客从脚底到头顶只等于该食指从 fingertip 到 base knuckle crease 的完整长度" in normalized
+    assert "finger-length 是访客的唯一文字尺度等级" in normalized
+    assert "每名访客从头到脚只有巨人普通一根食指那么长" in normalized
     assert "finger-length miniature-scale normal-world adult visitor" in normalized
-    assert "食指竖直向下伸展" in normalized
-    assert "脚底与 fingertip 水平对齐，头顶与 base knuckle crease 水平对齐" in normalized
-    assert "The giant's fully connected [left or right] hand hangs naturally beside the workbridge at torso depth" in normalized
-    assert "one standing visitor's feet align with the fingertip" in normalized
-    assert "that visitor's head aligns with the base knuckle crease" in normalized
+    assert "该比较只用于生成器理解尺寸，不在画面中安排测量动作" in normalized
+    assert "禁止把巨人手掌或手指伸到访客旁边作标尺" in normalized
+    assert (
+        "Every visitor has an unmistakable finger-length miniature scale "
+        "from head to foot"
+    ) in normalized
+    assert (
+        "both fully connected giant hands stay in natural task or support poses "
+        "away from the visitor group, with relaxed fingers and no measuring gesture"
+    ) in normalized
     assert "它只证明巨人国物件而不是人物身高" in normalized
     assert "finger-length miniature-scale 是整段最高频尺度词" in normalized
     assert "不得达到巨人的手掌、前臂、膝盖、大腿、腰、胸或肩部高度" in normalized
-    assert "两只巨人手必须处于同一深度、具有相同自然尺寸并分别连续连接双肩" in normalized
-    assert "禁止任何手掌朝镜头、伸向访客背后、单独放大、复制或断开" in normalized
+    assert "两只巨人手处于同一深度、具有相同自然尺寸并分别连续连接双肩" in normalized
+    assert "禁止手掌或手指朝镜头、指向访客、单独放大、复制或断开" in normalized
     assert "巨人的头、双肩、胸腹、骨盆、双大腿、双膝和至少一只完整脚" in normalized
     assert "不能出现为普通人制造的椅子、梯子、控制台或平台" in normalized
     assert "ordinary stepladder、office chair、rolling chair、full-size ladder、full-size platform" in normalized
-    assert "the finger-length miniature-scale normal-world adult visitors occupy one separated workbridge bay each" in normalized
-    assert "不得让手、脚、器官、日用品或访客伸向镜头" in normalized
+    assert (
+        "the finger-length miniature-scale normal-world adult visitors "
+        "occupy one separated interaction-deck bay each"
+    ) in normalized
+    assert (
+        "禁止前景放大访客、巨人在远处、极端仰俯拍、鱼眼、超广角、微距、器官特写、"
+        "手脚伸向镜头或裁掉巨人头脚"
+    ) in normalized
     assert "每名访客必须从头顶到双脚全身可见" in normalized
     assert "完整位于巨人身体外部" in normalized
     assert "访客的头部、胸廓、腹部和骨盆四周" in normalized
     assert "可见空气、背景空隙或刚性平台边界" in normalized
     assert "除一个明确命名的局部接触面外" in normalized
     assert "禁止整名访客横跨、趴伏或贴伏在巨人的胸部、腹部、阴阜、骨盆或大腿表面" in normalized
-    assert "全部访客位于同一个 miniature visitor-built workbridge 的独立编号工位" in normalized
-    assert "Erotic 只允许 Signature Mechanism 的单一软垫机械末端、气流、水流或织物束带到达接触点" in normalized
+    assert (
+        "全部访客位于同一个 miniature visitor interaction deck 的独立编号工位"
+    ) in normalized
+    assert (
+        "Erotic 只允许 Signature Mechanism 的单一软垫末端、气流、水流或织物到达接触点"
+    ) in normalized
     assert "Hardcore 允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官" in normalized
     assert "a visible air gap separates the visitor's head, torso, abdomen, and pelvis from the giant's skin" in normalized
     assert "a visible air gap separates each visitor's torso, abdomen, pelvis, arms, and legs from the giant's skin, with only the assigned mouth, hand, or toy reaching the contact point" in normalized
     assert "禁止 visitor against giant torso" in normalized
     assert "禁止 full-body direct contact、body-weight contact" in normalized
-    assert "penis 的根部固定在下腹之下的 pubic arch" in normalized
-    assert "shaft 从根部到 glans 的连续轴线" in normalized
-    assert "vaginal opening 位于 lower pelvis 正中" in normalized
-    assert "pubic mound 下方和 perineum 前方" in normalized
-    assert "anus 必须写位于臀沟正中、骶骨下方" in normalized
-    assert "目标上方的下腹、左右两侧的 upper inner thighs" in normalized
+    assert (
+        "pubic arch 上的 root、upper inner thighs 之间连续的 shaft、清楚 glans"
+    ) in normalized
+    assert "glans 下方唯一 scrotum 和相对骨盆的轴向" in normalized
+    assert (
+        "lower pelvis 正中连续的 labia majora、labia minora、clitoral hood"
+    ) in normalized
+    assert (
+        "位于 pubic mound 下方、perineum 前方和 upper inner thighs 之间"
+    ) in normalized
+    assert "gluteal cleft 正中的 external anal opening，位于 sacrum 下方" in normalized
+    assert "perineum 后方和两侧 buttocks 之间" in normalized
     assert "the lower abdomen is visibly above the target" in normalized
     assert "both thighs continue toward the knees" in normalized
-    assert "目标不得出现在胸部、上腹、肚脐或平坦躯干表面" in normalized
+    assert "lower-body target 使用 lower-abdomen/thighs 固定定位" in normalized
+    assert "nipple 使用 neck/ribcage/abdomen 固定定位" in normalized
+    assert "giant man 只选 penis 或 anus" in normalized
+    assert "giant woman 只选 vaginal opening、anus 或 selected nipple" in normalized
     assert "SILHOUETTE LIMB INVENTORY" in normalized
-    assert "目标器官位于两条大腿之间，绝不能代替大腿、膝或脚形成第三条腿" in normalized
-    assert "penis 或 vaginal opening 使用前侧三分之四视角" in normalized
-    assert "anus 使用后侧三分之四视角" in normalized
-    assert "禁止从正面通过裤门襟显示臀沟和 anus" in normalized
-    assert "手臂不得从软管、控制器或另一人物躯干长出" in normalized
-    assert "腿不得消失进椅子、梯子、平台或巨人皮肤" in normalized
-    assert "访客不得互相搭肩、交叉躯干、共享扶手或用另一人的身体承重" in normalized
-    assert "人物之间和每条肢体内侧至少保留一条可见背景缝隙" in normalized
+    assert "lower target 位于两腿之间，selected nipple 属于连续胸部" in normalized
+    assert "均不得代替肢体或形成额外身体" in normalized
+    assert "先按巨人姿势选择最能表现压倒体量的构图并在 Theme 内锁定" in normalized
+    assert (
+        "不得从工具或他人长出、消失进物件、互相承重或共享肢体，并保留背景缝隙"
+    ) in normalized
+    assert "访客身体之间始终有空气间隙，手脚不得触碰另一访客" in normalized
+    assert "每只手保持独立可见" in normalized
     assert "Both giant shoulders visibly connect through two separate arms to two naturally equal-sized hands at one depth" in normalized
     assert "the contact point lies between rather than replacing the thighs" in normalized
     assert "every visitor has two independently traceable arms, hands, legs, and feet" in normalized
-    assert "只写“continuous with the pelvis”不算定位完成" in normalized
-    assert "禁止用 lower surface、one side、lower rim" in normalized
-    assert "必须以巨人的耻骨、下腹、会阴、臀沟或大腿为参照" in normalized
+    assert "画面显示目标部位到所属巨人骨盆，再到胸腹、左右大腿、双膝" in normalized
+    assert "至少一只完整脚的连续轮廓" in normalized
+    assert (
+        "空间词必须以 giant pubic arch、abdomen、perineum、gluteal cleft、thighs"
+    ) in normalized
+    assert "nipple target 的 sternum、ribcage、breast mound 为参照" in normalized
     assert "全部性行为只发生在一个或多个正常人类访客" in normalized
     assert "与唯一巨人国原住民之间" in normalized
-    assert "每个 Theme 必须先锁定一个 CONTENT-LEVEL CAUSAL PREMISE" in normalized
-    assert "画面必须同时显示原因、访客协作、物理结果和巨人自愿回应" in normalized
-    assert "原因必须逐字兼容 S5 已写出的巨人姿势、支撑和双手任务" in normalized
-    assert "Because [visible temporary circumstance], the visitors coordinate to [perform the content-level action]" in normalized
-    assert "IF AND ONLY IF request.content_level IS erotic：互动核心是挑逗、护理、清洁、按摩、角色扮演" in normalized
-    assert "不得只是裸露程度变化" in normalized
-    assert "IF AND ONLY IF request.content_level IS hardcore：互动核心必须是访客与巨人之间已经发生的直接露骨性行为" in normalized
-    assert "从口交、手交、玩具插入、直接外阴刺激或自愿 BDSM 刺激中只选择一种" in normalized
-    assert "若有两名或更多访客，至少一名访客必须直接参与主要性行为" in normalized
-    assert "多人协作口交的主要行为名称只能是“cooperative oral stimulation”或“coordinated oral sex”" in normalized
-    assert "一名访客在龟头或外阴接触中心使用嘴" in normalized
-    assert "每名直接参与者只允许一种接触面" in normalized
-    assert "禁止两颗头占据同一位置" in normalized
-    assert "大量且清晰可见的精液、尿液喷射、阴道液体或灌肠喷射" in normalized
-    assert "自愿 BDSM 系统" in normalized
-    assert "可把城市洗衣、升降、清洁、通风、排水、交通维修或屋顶设施改成承重、定位、节奏或流体机制" in normalized
-    assert "不得把乳头、阴毛或柔软组织作为唯一锚点" in normalized
-    assert "显示自然阴毛及其与皮肤、骨盆的连续边界" in normalized
-    assert "所有人物都必须穿衣或半裸露，不得全身裸体" in normalized
-    assert "巨人国原住民穿着两至四件符合场景的正常衣物及一件配饰" in normalized
-    assert "只局部打开当前动作所需区域" in normalized
-    assert "visibly bunched around the upper thighs" in normalized
-    assert "不得一边写穿裤子一边让下装从画面消失" in normalized
+    assert "每个 Theme 必须先建立一条不可替代的 Necessity Chain" in normalized
+    assert "画面显示结果、巨人对指定访客的回应和访客间反馈" in normalized
+    assert (
+        "VISIBLE CONSTRAINT 必须先在 S5 以一个具体姿势或双手任务完整可见，"
+        "再在 S6 逐字复制该事实"
+    ) in normalized
+    assert (
+        "Because [trigger at TARGET_ID] creates [need at the contact point itself]"
+    ) in normalized
+    assert "Counterfactual Necessity Test" in normalized
+    assert "Trigger Source Path" in normalized
+    assert "Need-Target Identity Lock" in normalized
+    assert "每名访客承担一个前后相接且不可省略的角色" in normalized
+    assert "禁止 instrumental exposure" in normalized
+    assert "目标暴露是最小充分访问" in normalized
+    assert "地点必须具有画面内可见的隐私条件" in normalized
+    assert "限制必须临时、无伤害且不影响同意能力" in normalized
+    assert (
+        "IF AND ONLY IF request.content_level IS erotic：选择一种明确非插入式亲密行为"
+    ) in normalized
+    assert "CONTACT-FIRST GATE" in normalized
+    assert (
+        "IF AND ONLY IF request.content_level IS hardcore：选择口交、手交、玩具插入"
+    ) in normalized
+    assert "至少一名访客以 mouth、one hand 或 one toy 已接触目标" in normalized
+    assert "其他人负责承重、衣物牵引、定位、润滑、节奏、观察或承接" in normalized
+    assert "直接参与者不操作控制器" in normalized
+    assert "不得旁观、另开动作或重复占据同一解剖位置" in normalized
+    assert (
+        "Hardcore 每帧最多一种主要体液，显示唯一 source、trajectory、surface 和 landing"
+    ) in normalized
+    assert "未选择 release 时不得出现喷射、液滴或湿痕" in normalized
+    assert "BDSM 器具有刚性锚点、软垫和快速释放" in normalized
+    assert "它可以是简单日用品、柔性材料、家具、服务设施或机械系统" in normalized
+    assert "不得用皮肤、阴毛或柔软组织承重，也不得遮住访客" in normalized
+    assert "lower-body target 显示连续阴毛边界" in normalized
+    assert "所有人物穿衣或半裸，不得全裸" in normalized
+    assert "巨人穿两至四件正常衣物及一件配饰" in normalized
+    assert "nipple target 则 trousers 扣好且只掀一件上衣" in normalized
+    assert "visibly bunched around both upper thighs" in normalized
+    assert "禁止替代下装、第二条 trousers、裤子消失或单腿穿裤" in normalized
     assert "S4 写出的每件衣物、鞋履和头饰状态必须逐字约束 S5" in normalized
     assert "写了 shoes、boots 或 sandals 就必须保持穿在对应双脚" in normalized
-    assert "miniature-scale visitors 各穿一种高对比纯色连体工作服和清楚鞋履" in normalized
-    assert "衣物不得遮住肢体和接触点" in normalized
+    assert "访客各穿高对比纯色连体工作服和鞋" in normalized
+    assert (
+        "服装、长发和配饰不得伪装成额外肢体或遮住脸、手、承重点和接触中心"
+    ) in normalized
     assert "巨人需要完整人物造型" in normalized
-    assert "miniature-scale visitors 不描述眼妆、唇色、首饰、面部微表情、精细材质或时装剪裁" in normalized
-    assert "只写成年脸部存在、不同发型外轮廓、单一服装色和任务姿势" in normalized
+    assert (
+        "miniature-scale visitors 不描述眼妆品牌、首饰、精细材质或复杂时装剪裁"
+    ) in normalized
+    assert "必须拥有海报级可读的夸张成人表情" in normalized
     assert "巨人拥有与互动一致的明确表情和视线" in normalized
-    assert "访客只以头部朝向和身体动作表达专注" in normalized
+    assert "每名访客必须同时用脸、头部朝向和全身姿态表达不同情绪" in normalized
+    assert "不得放大访客身体或改成卡通脸" in normalized
     assert "每人的动作必须是一个稳定、可拍摄的当前动作" in normalized
     assert "躯干朝向、重心、主要支撑面、双手唯一任务" in normalized
     assert "固定每人的造型、妆容、表情角色、动作、支撑与四肢位置" in normalized
-    assert "巨人必须具有与年龄和体型一致的自然体毛" in normalized
-    assert "胸毛、腹毛、腋毛、手臂毛、腿毛或背毛中的至少两处" in normalized
+    assert "巨人体毛匹配年龄体型" in normalized
+    assert "另显示至少两处自然体毛，保持真实密度、方向" in normalized
     assert "灰白变化和皮肤连接" in normalized
-    assert "At [specific real-world urban giant-country setting]" in normalized
+    assert "At [specific real-world giant-country setting]" in normalized
     assert "exactly [total] separate adult bodies are visible in total:" in normalized
-    assert "不能只写 generic interior、street、city、outdoors 或 giant country" in normalized
+    assert "不能只写 generic interior、outdoors 或 giant country" in normalized
     assert "plus one giant-country native giant [woman/man]" in normalized
-    assert "像普通摄影师在真实地点使用真实相机完成的真人外景或室内拍摄" in normalized
+    assert "每个 Theme 选择并轮换一种开放摄影风格" in normalized
     assert "live-action photorealistic location photography" in normalized
-    assert "真实成年演员、真实皮肤毛孔与体毛" in normalized
-    assert "可信镜头光学、自然曝光、物理景深和一致阴影" in normalized
-    assert "高预算实拍比例特效、实体布景、外景摄影与无缝合成" in normalized
-    assert "最终画面仍像未经夸张美术化的现场照片" in normalized
-    assert "禁止 illustration、painting、anime、comic、CGI look、3D render" in normalized
-    assert "塑料皮肤、蜡像人物和过度磨皮" in normalized
-    assert "室内外环境必须具有使用、风化和维护痕迹" in normalized
-    assert "不得像空布景或刚搭建的主题乐园" in normalized
-    assert "不得默认哥特、腐朽、毒性、恐怖" in normalized
-    assert "照明必须清楚显示完整访客、唯一接触点、体毛及全部尺度参照" in normalized
+    assert "live-action photorealistic location or constructed-set photography" in (
+        normalized
+    )
+    assert (
+        "真实成年演员、皮肤毛孔与体毛、布料、实体道具、可信光学和一致阴影"
+    ) in normalized
+    assert "允许广告级布光、粉彩、奢华材质与彩色灯光" in normalized
+    assert (
+        "禁止 magic、levitation、illustration、painting、anime、comic、"
+        "CGI look、3D render"
+    ) in normalized
+    assert "塑料皮肤和镜像、复制或融合身体" in normalized
+    assert "使用痕迹表现世界有人生活" in normalized
+    assert "风格可改变对称性、色彩、布景、光比和留白" in normalized
+    assert "不得改变尺度、解剖、接触或因果" in normalized
     assert "同一 Theme 的全部 Frame 锁定巨人的支撑姿势、骨盆旋转" in normalized
     assert "不能把站、坐、跪、躺互换" in normalized
     assert "不可变的 S2–S6 subject block" in normalized
@@ -1513,72 +1579,115 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "严格按以下物理句序写，任何顺序变化都重写" in normalized
     assert "S1 CAST + EARLY SCALE + INTERACTION + MECHANISM + CAMERA" in normalized
     assert "必须逐字套用以下单句骨架" in normalized
-    assert "occupy one separated bay each on a single miniature visitor-built workbridge" in normalized
-    assert "while the visitors carry out [one content-level interaction] using [colossal giant-country location-native Signature Mechanism]" in normalized
+    assert (
+        "occupy one separated bay each on a single miniature visitor interaction deck"
+    ) in normalized
+    assert (
+        "while the visitors carry out [one content-level interaction] "
+        "using [location-native Signature Mechanism]"
+    ) in normalized
     assert "在 perspective 之前不得出现句号或分号" in normalized
     assert "S2 TARGET MAP" in normalized
-    assert "两个短语缺少任意一个就重写整个 Frame" in normalized
-    assert "S2 只写解剖定位，不得插入 Chinese、Asian、年龄、体型、身份、服装、表情" in normalized
+    assert (
+        "S2 TARGET MAP：写 TARGET_ID、TARGET STATE、RELEASE STATE 和完整解剖"
+    ) in normalized
+    assert "S2B ACTIVE CONTACT：紧接 S2 的第三句写接触已发生" in normalized
+    assert "这里命名的接触者、身体部位或 toy 必须在 S5 和 S6 完全相同" in normalized
     assert "S3 FOUR SCALE PROOFS" in normalized
     assert "Four simultaneous scale proofs share one clear focal plane:" in normalized
-    assert "禁止把手掌作为尺度证明" in normalized
-    assert "S3 必须以句号结束" in normalized
+    assert "禁止透视假尺度、测量手指或第二巨人" in normalized
+    assert "必须作为 S3 后的独立新句" in normalized
     assert "the selected giant-scale everyday anchor functions as an ordinary everyday object for the giant" in normalized
     assert "不得在 S3 使用 held、worn、lying、resting、remains 或其他位置状态词" in normalized
     assert "S3 必须明确包含一个最低台阶、门槛、路缘或支撑底座高过访客全身" in normalized
-    assert "S3A FINGER-LENGTH HEIGHT" in normalized
-    assert "不得省略 fully connected、torso depth、fingertip 或 base knuckle crease" in normalized
+    assert "S3A FINGER-LENGTH SIZE" in normalized
+    assert "不得增加 extended、pointing、dangling 或 measuring finger" in normalized
     assert "S3B EVERYDAY OBJECT PROOF" in normalized
-    assert "clearly towers above the finger-length visitors as an ordinary object made for the giant" in normalized
-    assert "Signature Mechanism 必须是当前地点本来就会安装、存放或使用的原生系统" in normalized
-    assert "为什么这个装置会在这里" in normalized
-    assert "所有锚点、滑轮、缆线、支架和承重结构都必须属于同一地点功能链" in normalized
+    assert "its full height clearly towering over every visitor" in normalized
+    assert "its [recognizable feature] alone larger than one visitor" in normalized
+    assert "Signature Mechanism 必须是地点原生设施或其合理延伸" in normalized
+    assert "禁止无法解释来源的临时专业设备" in normalized
+    assert (
+        "全部承重、锚点和传力部件属于同一功能链并固定在地面、家具或其他硬结构上"
+    ) in normalized
+    assert "S3C GIANT DOMINANCE" in normalized
+    assert (
+        "The sole giant is the frame's overwhelmingly largest visual mass"
+    ) in normalized
+    assert (
+        "the complete visitor group and interaction deck form a secondary cluster "
+        "smaller than the giant's head"
+    ) in normalized
+    assert (
+        "each visitor's full height is visibly shorter than the giant's face "
+        "from chin to hairline"
+    ) in normalized
     assert "Erotic 中，S1 命名的 Signature Mechanism 必须直接作用于接触点" in normalized
     assert "visitor-scale control input → giant-scale force transmission" in normalized
     assert "Hardcore 中，S1 命名的 Signature Mechanism 必须直接承托、定位、稳定、驱动节奏或承接体液" in normalized
     assert "assigned visitor mouth, hand, or toy at the contact point" in normalized
     assert "这属于装饰性假机制" in normalized
-    assert "作业桥严格具有与访客人数相等的左到右编号工位" in normalized
+    assert "互动台严格分成与访客人数相等的独立工位，从画面左到右编号" in normalized
     assert "每个工位只有一人并以栏杆和背景缝隙分隔" in normalized
     assert "U+2019 改为 ASCII apostrophe" in normalized
     assert "S4 CHARACTER DESIGN" in normalized
     assert "一个物理句子先详细写巨人造型" in normalized
+    assert "S4A GARMENT STATE" in normalized
+    assert "one continuous garment, with one waistband" in normalized
+    assert "一件衣物只有一个 owner、一个 waistband、一个 closure" in normalized
+    assert "GLOBAL ENTITY-STATE AND TOPOLOGY INVARIANTS" in normalized
+    assert "一个 prop 不能同时在手中、桌上和背景" in normalized
+    assert "parent-chain rule" in normalized
+    assert "single-slot rule" in normalized
     assert "S5 POSE AND ACTION" in normalized
     assert "S5A LIMB TOPOLOGY" in normalized
     assert "一个物理句子写巨人姿势和全部访客工位" in normalized
-    assert "逐人写双臂、双手、双腿和双脚的无遮挡路径" in normalized
-    assert "必须逐字复制 S3A 的“the giant's fully connected [side] hand hangs naturally beside the workbridge at torso depth" in normalized
-    assert "参照手不得改成 raised、braced、busy、holding、pressing 或 gripping" in normalized
-    assert "S6 CONTENT-LEVEL CAUSAL INTERACTION" in normalized
-    assert "原因只能来自另一只手的任务或身体姿势" in normalized
-    assert "不能写 both hands、hands are occupied" in normalized
-    assert "S6 不得新增人物、工位或巨人动作" in normalized
-    assert "物理第一句必须点名具体 real-world urban setting" in normalized
-    assert "紧接句号后的物理第二句必须以" in normalized
-    assert "任何人物介绍、服装、妆容、机制解释或环境句都不得出现在它之前" in normalized
-    assert "live-action photorealistic location photography captured from a distance with a real 35–50 mm camera" in normalized
+    assert "逐人写完整四肢；两只巨人手同深度、自然等大并连接手臂" in normalized
+    assert "S5B UNBROKEN BODY AND CLOTHING" in normalized
+    assert "The giant has one unbroken body silhouette" in normalized
+    assert (
+        "no counter, table, bed edge, cart, interaction deck, machine panel"
+    ) in normalized
+    assert (
+        "crosses, hides, encloses, or duplicates the waist, pelvis, or legs"
+    ) in normalized
+    assert "S6 NECESSITY CHAIN" in normalized
+    assert "禁止因果句临时新增持物、工作或受限动作" in normalized
+    assert (
+        "巨人随后必须执行一个会改变接触压力、角度、节奏、流量或位置的可见动作"
+    ) in normalized
+    assert "S6 写该动作如何改变接触并得到访客反馈" in normalized
+    assert "至少四次写 the contact point itself；禁止被动回应或目标漂移" in normalized
+    assert "物理第一句必须点名具体 real-world giant-country setting" in normalized
+    assert "紧接句号后的第二句以" in normalized
+    assert (
+        "只命名目标一次并完成对应身体定位；第三句起只称“the contact point”"
+    ) in normalized
+    assert (
+        "live-action photorealistic location photography captured from sufficient "
+        "distance with a real 35–50 mm camera"
+    ) in normalized
     assert "previous frame, same, identical, unchanged, still, again, now, remains, then, afterward, next, about to, will, normal-human-sized" in normalized
     assert "NEVER OUTPUT THESE TOKENS IN ANY CONTEXT" in normalized
     assert "U+2010、U+2011 和 U+2012 改为 ASCII hyphen" in normalized
-    assert "The finger-length miniature-scale visitors are each only as long as one fully connected giant index finger" in normalized
-    assert "both giant hands share one natural scale and depth" in normalized
-    assert "The camera uses a distant environment-scale wide establishing shot" in normalized
+    assert (
+        "The visitors retain an unmistakable finger-length miniature scale "
+        "without any measuring hand or finger in the composition"
+    ) in normalized
+    assert "both giant hands share one natural size and depth plane" in normalized
+    assert "The camera uses a full-body scale-dominance composition" in normalized
     assert "live-action photorealistic location photography" in normalized
-    assert "纪实摄影、生活方式摄影或克制的商业外景摄影观感" in normalized
-    assert "不使用 fantasy、epic、mythic、enchanted、otherworldly" in normalized
-    assert "真实材料的接缝、磨损、灰尘、湿气和受力" in normalized
-    assert "可信地质、普通植物、天气方向" in normalized
-    assert "风对头发和衣物的影响，以及自然大气透视" in normalized
-    assert "绝对禁止 magic、spell、sorcery、enchantment、rune power、portal" in normalized
-    assert "teleportation、levitation、floating island" in normalized
-    assert "无支撑悬浮" in normalized
-    assert "禁止满画面霓虹、自发光轮廓、无来源光、过饱和糖果色" in normalized
-    assert "调色保持中性、自然、略微克制" in normalized
-    assert "强制使用距离主体较远的 35–50 mm 等效正常视角" in normalized
-    assert "镜头光轴近似垂直于食指与登记访客形成的并排平面" in normalized
-    assert "巨人的头、双肩、双臂、两只自然等大的手、胸腹、骨盆、双腿和至少一只完整脚处于画框内" in normalized
-    assert "urban indoor、urban outdoor 或 semi-open urban location" in normalized
-    assert "不得包含乡村、荒野、魔法、天文奇观、发光森林、晶体宫殿或史诗化环境" in normalized
+    assert "restrained documentary location photography" in normalized
+    assert "high-end commercial poster、luxury fashion editorial" in normalized
+    assert "nightlife color-gel、bright lifestyle advertising" in normalized
+    assert (
+        "材料、家具、标识、植物、天气、道路、设备和使用痕迹按地点自然选择"
+    ) in normalized
+    assert "人物、绳索、工具和机械不得悬浮、穿透或融合" in normalized
+    assert "使用足够拍下完整巨人的 35–50 mm 正常视角和中深景深" in normalized
+    assert "互动台、访客、完整日用品证明与巨人处于同一登记平面" in normalized
+    assert "完整头脚跨度沿画面最长轴接近两端但保留边缘空间" in normalized
+    assert "超自然地点仅在输入主题明确要求时使用" in normalized
     assert "THEME CONTRACT" in brief
     assert "FRAME CONTRACT" in brief
     assert "VARIATION AND REJECTION RULES" in brief
@@ -3489,12 +3598,21 @@ def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() ->
     assert "ABSOLUTE OUTPUT PRIORITY" in brief
     assert "at least 600 whitespace-delimited words" in normalized
     assert "Target 650-900 words" in normalized
-    assert 'call the image a "live-action dark-fantasy feature-film frame"' in (
-        normalized
-    )
-    assert "do not substitute cinematic, photorealistic" in normalized
-    assert "ASCII is an absolute publication requirement" in normalized
-    assert "final character-by-character ASCII sweep" in normalized
+    assert (
+        "Combine restrained fashion photography, practical installation art, "
+        "deadpan theatrical staging"
+    ) in normalized
+    assert (
+        "quiet, precise, uncanny, and emotionally legible rather than spectacular"
+    ) in normalized
+    assert (
+        "including straight quotation marks and ordinary hyphens instead of "
+        "smart punctuation"
+    ) in normalized
+    assert (
+        "replace any Chinese character, accented letter, smart punctuation, or other "
+        "non-ASCII symbol with plain English ASCII"
+    ) in normalized
     assert "This minimum overrides every later request for brevity" in normalized
     assert "museum-caliber surreal conceptual portraits" in normalized
     assert "one impossible but visually coherent metaphor" in normalized

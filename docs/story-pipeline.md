@@ -56,8 +56,8 @@ completed = await StoryStudio(
    去除传输标签并构造领域对象；模型不提交 Frame JSON 或工具参数。
    不存在本地正文拼接或二次 renderer。
 
-100 themes × 6 frames 的基础调用量是十次 theme batch 加一百次 frame sequence，
-共 110 次 provider 调用。`StoryStudio` 默认最多并发生成八个 frame sequences。
+100 themes × 6 frames 的基础调用量是十次 theme batch 加一百次 frame batch，
+共 110 次 provider 调用。`StoryStudio` 默认最多并发生成八个 frame batches。
 resume 只调用缺失的 Theme batch 与各主题尚未保存的 Frame。
 
 批量文本保持 110 次无错误基础调用，不采用逐帧调用所需的 610 次请求。
@@ -233,8 +233,9 @@ CLI 明确输出 `skipped` / `passed` / `warnings` 和报告路径；`report` �
 
 每个 Frame 独立接受与保存。一个批次只有部分帧违反结构或 `enforce` 质量检查时，
 通过的帧立即保留，下一次请求只包含失败槽位，并携带已经保存的帧作为上下文。
-`report` 的告警帧仍会被接受，不引起额外调用。单主题的总 attempt 次数仍有界，
-不会因为每次有部分进展而重置重试预算。不新增 Profile 或模型评审调用。
+`report` 的告警帧仍会被接受，不引起额外调用。单次执行中，每个主题的 attempt
+次数仍有界，不会因为每次有部分进展而重置重试预算。显式 resume 会获得新一轮
+冻结配置允许的重试机会，attempt 编号继续递增。不新增 Profile 或模型评审调用。
 
 ## 运行记录与恢复
 
@@ -362,7 +363,7 @@ uv run t2i-story generate \
 --frames INTEGER       每个主题的画面数，1 至 6
 --female-count INTEGER 可选女性人数约束，0 至 8
 --male-count INTEGER   可选男性人数约束，0 至 8
---concurrency INTEGER  frame sequence 并发数，1 至 32
+--concurrency INTEGER  frame batch 并发数，1 至 32
 --generation-retries INTEGER 每个生成单元额外重试次数，0 至 5
 --quality-mode TEXT    off、report 或 enforce；不关闭基础契约
 --content-level TEXT   aesthetic、erotic 或 hardcore
@@ -407,7 +408,7 @@ attempt 和完整 result JSON 只保存在 `runs/`，不会复制到 `prompts/`�
 
 同一天、同一 content level 下完整名称重名时，序号按 `_0001`、`_0002` 递增
 分配。
-每条 prose 最多 32,768 个字符；frame sequence 请求和 provider 缺省输出上限
+每条 prose 最多 32,768 个字符；frame batch 请求和 provider 缺省输出上限
 也都是 32,768 tokens。该 token 上限由同一次调用中的全部缺失 frames 与传输标签
 共同使用，不是每帧单独分配。
 
