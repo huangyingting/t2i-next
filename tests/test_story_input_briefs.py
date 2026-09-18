@@ -575,8 +575,10 @@ def test_bundled_visual_recipe_accepts_external_output_constraints(language, mod
         validation={"frames": {"mode": mode, "checks": checks}},
     )
     resolved = resolve_story_input(document, run_configuration=configuration)
-    assert resolved.quality == configuration.validation
-    assert resolved.run_configuration == configuration
+    assert resolved.quality.frames == configuration.validation.frames
+    assert resolved.run_configuration.generation == configuration.generation
+    assert resolved.quality.themes.mode == "enforce"
+    assert len(resolved.quality.themes.checks) == 3
     restored = ResolvedStoryInput.model_validate_json(resolved.model_dump_json())
     assert restored.fingerprint() == resolved.fingerprint()
     frames = frame_messages(

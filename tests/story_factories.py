@@ -84,10 +84,15 @@ def make_story_input(
             "runtime": {
                 name: getattr(settings, name) for name in StoryRuntime.model_fields
             },
-            "validation": settings.quality,
+            "validation": {
+                name: {
+                    "mode": getattr(settings.quality, name).mode,
+                    "checks": getattr(settings.quality, name).checks,
+                }
+                for name in ("themes", "frames")
+            },
         }
     )
-    configuration = configuration.model_copy(update={"validation": settings.quality})
     resolved = resolve_story_input(document, run_configuration=configuration)
     return ResolvedStoryInput.model_validate(
         {**resolved.model_dump(), "request": request}
@@ -97,6 +102,12 @@ def make_story_input(
 def make_theme(index: int = 1) -> NarrativeTheme:
     return NarrativeTheme(
         theme_id=f"T{index:03d}",
+        diversity={
+            "subject": "两名共同核对遗失行李的成年旅人",
+            "setting": f"1930年代秋夜旧车站第{index}站台",
+            "situation": f"根据第{index}条线索检查皮箱受损位置",
+            "visual": f"平视中景围绕第{index}根站柱形成纵深",
+        },
         title=f"遗失行李的方向 {index}",
         premise=(
             f"两名三十岁的成年人根据第 {index} 条线索，在1930年代秋夜的旧车站"

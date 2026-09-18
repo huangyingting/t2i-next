@@ -148,6 +148,12 @@ def test_frame_prompt_keeps_retry_slot_identity(tmp_path: Path) -> None:
     )
     theme = NarrativeTheme(
         theme_id="T001",
+        diversity={
+            "subject": "An adult posing for a studio portrait",
+            "setting": "An empty portrait studio",
+            "situation": "Standing still for coordinated front and rear views",
+            "visual": "Soft studio lighting with a neutral backdrop",
+        },
         title="Studio portrait",
         premise="An adult stands in a studio.",
         style="Soft studio lighting.",

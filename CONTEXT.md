@@ -119,6 +119,11 @@ _Avoid_: Hidden cast override, universal eight-person image limit
 **Story Quality Policy**:
 Externally declared output targets and local Theme/Frame evidence checks,
 frozen in run settings rather than authored in visual recipes.
+Unspecified defaults and explicit overrides retain distinct intent through typed,
+dictionary and JSON forms. Resolved input freezes a concrete policy for each Theme
+using its language and known principal count or lower bound; background populations
+do not enlarge per-principal length targets. Explicit fixed bounds do not scale
+merely because their numbers equal a default.
 Each stage independently selects `off` to skip checks, `report` to record warnings
 without quality retries, or `enforce` to reject failed output with bounded retries.
 Theme checks target a named title, premise, or style field before the batch is
@@ -209,11 +214,22 @@ _Avoid_: Exact-date invention, silent modernization
 **Narrative Theme**:
 One micro-story concept derived from the Story Description. It owns a short
 title, a complete stable premise, and an actionable visual direction appropriate
-to its medium, without a fixed sentence quota. The model submits these fields
+to its medium, without a fixed sentence quota, plus a compact diversity signature.
+The model submits these fields
 without an ID; the program assigns the Narrative Theme ID. Differences between Narrative
 Themes come from story events rather than prop, color, or camera substitutions.
 The premise is a bounded story seed, not a scene-by-scene action list.
 _Avoid_: Legacy Theme, variant label
+
+**Theme Diversity Signature**:
+A compact account of the Theme's subject relationships, setting, visible
+situation, and distinguishing visual design, generated alongside its full prose.
+Every accepted signature remains in subsequent Theme prompts; only the two most
+recent full Themes are repeated. Full Theme checkpoints remain authoritative for
+Frame generation and resume. Matching signatures or matching premise/style text
+are rejected deterministically, but different wording is not proof of semantic
+novelty. This is coverage memory, not a new generation or review stage.
+_Avoid_: Truncated premise, rolling window that forgets older Themes, quality score
 
 **Narrative Frame**:
 One final, independently renderable prose paragraph. It naturally integrates

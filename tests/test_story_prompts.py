@@ -86,6 +86,15 @@ def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
     prompt = messages[0].content
     payload = json.loads(messages[1].content)
     assert payload["semantic_name"] == "lost_luggage_reunion"
+    assert payload["existing_themes"] == [
+        make_theme(index).model_dump(
+            mode="json", include={"theme_id", "title", "diversity"}
+        )
+        for index in range(1, 11)
+    ]
+    assert payload["recent_themes"] == [
+        make_theme(index).model_dump(mode="json") for index in (9, 10)
+    ]
     assert "If semantic_name is supplied, return it exactly" in prompt
 
 
@@ -101,7 +110,11 @@ def test_prompt_can_delegate_theme_ids_to_program() -> None:
     assert payload["theme_count"] == 3
     assert "program_assigns_theme_ids" not in payload
     assert "the program assigns all Theme IDs" in messages[0].content
-    assert "Submit only semantic_name, title, premise, and style" in messages[0].content
+    assert (
+        "Submit only semantic_name and each Theme's "
+        "title, premise, style, and diversity"
+        in messages[0].content
+    )
     assert "theme_ids" not in payload
 
 

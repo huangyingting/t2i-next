@@ -25,6 +25,7 @@ from t2i_story_pipeline.models import (
     StoryQualityReport,
     StoryStage,
     TextLengthBounds,
+    ThemeEffectiveQuality,
     ThemeQualityPolicy,
     WordCountCheck,
 )
@@ -219,32 +220,48 @@ def check_frame_quality(
 
 
 def quality_report(
-    policy: StoryQualityPolicy,
+    policies: Sequence[ThemeEffectiveQuality],
     language: OutputLanguage,
     themes: Sequence[NarrativeThemeResult],
 ) -> StoryQualityReport:
+    by_id = {item.theme_id: item.policy for item in policies}
+    if not policies or len(by_id) != len(policies):
+        raise ValueError("effective quality policies must be nonempty and unique")
+    policy = policies[0].policy
+    if any(
+        item.policy.themes.mode != policy.themes.mode
+        or item.policy.frames.mode != policy.frames.mode
+        for item in policies
+    ):
+        raise ValueError("effective quality modes must agree across Themes")
     theme_issues = [
         issue
         for item in themes
-        for issue in check_theme_quality(policy.themes, item.theme.theme_id, item.theme)
+        for issue in check_theme_quality(
+            by_id[item.theme.theme_id].themes, item.theme.theme_id, item.theme
+        )
     ]
     frame_issues = [
         issue
         for item in themes
         for frame in item.frames
         for issue in check_frame_quality(
-            policy.frames, language, item.theme.theme_id, frame
+            by_id[item.theme.theme_id].frames, language, item.theme.theme_id, frame
         )
     ]
     return StoryQualityReport(
         themes=_stage_report(
-            policy.themes, theme_issues, active_checks=bool(policy.themes.checks)
+            policy.themes,
+            theme_issues,
+            active_checks=any(item.policy.themes.checks for item in policies),
         ),
         frames=_stage_report(
             policy.frames,
             frame_issues,
             active_checks=any(
-                frame_check_applies(check, language) for check in policy.frames.checks
+                frame_check_applies(check, language)
+                for item in policies
+                for check in item.policy.frames.checks
             ),
         ),
     )

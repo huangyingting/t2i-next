@@ -10,3 +10,4 @@ runs/
 .tmp*/
 dist/
 snofs.py
+.pytest*/

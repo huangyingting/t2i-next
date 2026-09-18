@@ -9,6 +9,7 @@ from t2i_story_pipeline.models import (
     NarrativeThemeResult,
     OutputLanguage,
     StoryQualityPolicy,
+    ThemeEffectiveQuality,
     ThemeQualityPolicy,
 )
 from t2i_story_pipeline.quality_validation import (
@@ -134,7 +135,11 @@ def test_language_conditional_checks_skip_without_claiming_a_pass(mode):
             frames=[NarrativeFrame(frame_id="F01", prose="两名成年旅人在车站重逢。")],
         )
     ]
-    report = quality_report(policy, OutputLanguage.CHINESE, results)
+    report = quality_report(
+        (ThemeEffectiveQuality(theme_id="T001", policy=policy),),
+        OutputLanguage.CHINESE,
+        results,
+    )
     assert report.frames.status == "skipped"
     assert not report.frames.issues
     assert not check_frame_quality(
@@ -149,13 +154,18 @@ def test_language_conditional_checks_skip_without_claiming_a_pass(mode):
 
 def test_language_filter_does_not_disable_other_frame_checks():
     report = quality_report(
-        StoryQualityPolicy(
-            frames={
-                "checks": [
-                    {"type": "ascii", "when_language": "english"},
-                    {"type": "required_text", "values": ["车站"]},
-                ],
-            }
+        (
+            ThemeEffectiveQuality(
+                theme_id="T001",
+                policy=StoryQualityPolicy(
+                    frames={
+                        "checks": [
+                            {"type": "ascii", "when_language": "english"},
+                            {"type": "required_text", "values": ["车站"]},
+                        ],
+                    }
+                ),
+            ),
         ),
         OutputLanguage.CHINESE,
         [
@@ -196,8 +206,15 @@ def test_literal_checks_are_case_sensitive_and_report_each_value():
 )
 def test_reports_distinguish_skipped_and_warnings(mode, status, count):
     result = quality_report(
-        StoryQualityPolicy(
-            frames=FrameQualityPolicy(mode=mode, checks=[{"type": "camera_evidence"}])
+        (
+            ThemeEffectiveQuality(
+                theme_id="T001",
+                policy=StoryQualityPolicy(
+                    frames=FrameQualityPolicy(
+                        mode=mode, checks=[{"type": "camera_evidence"}]
+                    )
+                ),
+            ),
         ),
         OutputLanguage.CHINESE,
         [
@@ -214,10 +231,15 @@ def test_reports_distinguish_skipped_and_warnings(mode, status, count):
 def test_enforcement_cannot_publish_failed_report():
     with pytest.raises(StoryQualityError, match="T001-F01"):
         quality_report(
-            StoryQualityPolicy(
-                frames=FrameQualityPolicy(
-                    mode="enforce", checks=[{"type": "camera_evidence"}]
-                )
+            (
+                ThemeEffectiveQuality(
+                    theme_id="T001",
+                    policy=StoryQualityPolicy(
+                        frames=FrameQualityPolicy(
+                            mode="enforce", checks=[{"type": "camera_evidence"}]
+                        )
+                    ),
+                ),
             ),
             OutputLanguage.CHINESE,
             [
@@ -287,7 +309,7 @@ def test_final_report_keeps_stage_modes_and_issues_separate():
         ),
     )
     report = quality_report(
-        policy,
+        (ThemeEffectiveQuality(theme_id="T001", policy=policy),),
         OutputLanguage.CHINESE,
         [
             NarrativeThemeResult(
@@ -316,7 +338,7 @@ def test_enforced_theme_policy_is_rechecked_before_publication():
     )
     with pytest.raises(StoryQualityError, match="T001.premise"):
         quality_report(
-            policy,
+            (ThemeEffectiveQuality(theme_id="T001", policy=policy),),
             OutputLanguage.CHINESE,
             [
                 NarrativeThemeResult(

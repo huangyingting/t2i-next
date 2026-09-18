@@ -25,6 +25,7 @@ from t2i_story_pipeline.inputs.loader import asset_path, load_yaml_model
 from t2i_story_pipeline.inputs.planning import (
     ThemeInputPlan,
     plan_themes,
+    possible_casts,
     validate_requirements,
 )
 from t2i_story_pipeline.inputs.schema import (
@@ -36,10 +37,10 @@ from t2i_story_pipeline.inputs.schema import (
     PolicyDocument,
     StoryDocument,
     StoryRunConfiguration,
+    default_validation,
 )
 from t2i_story_pipeline.models import (
     Model,
-    ProseLengthCheck,
     RuleText,
     StageAuthoring,
     StoryAuthoring,
@@ -48,18 +49,13 @@ from t2i_story_pipeline.models import (
     StoryRuleSet,
     StoryRuntime,
     StoryStage,
-    ThemeTextLengthCheck,
+    TextLengthBounds,
+    ThemeEffectiveQuality,
 )
 from t2i_story_pipeline.quality_validation import writing_constraints
 
 _POLICIES = Path(__file__).resolve().parents[1] / "rule_packs" / "policies"
 _MODULE_CONTEXT = TypeAdapter(ModuleContext)
-_DEFAULT_THEME_LENGTHS = {
-    "title": (4, 48, 0),
-    "premise": (160, 520, 60),
-    "style": (100, 360, 30),
-}
-_DEFAULT_FRAME_LENGTH = (450, 950, 100)
 
 
 class InputSource(Model):
@@ -83,6 +79,7 @@ class ResolvedStoryInput(Model):
     run_configuration: StoryRunConfiguration
     runtime: StoryRuntime
     quality: StoryQualityPolicy
+    effective_quality: tuple[ThemeEffectiveQuality, ...]
     rules: StoryRuleSet
     sources: tuple[InputSource, ...]
     modules: tuple[ModuleContext, ...] = ()
@@ -145,6 +142,14 @@ class ResolvedStoryInput(Model):
         )
         if self.plans != expected_plans:
             raise ValueError("input plans do not match the frozen allocation and cast")
+        if self.effective_quality != tuple(
+            ThemeEffectiveQuality(
+                theme_id=plan.theme_id,
+                policy=_cast_scaled_quality(self.quality, plan),
+            )
+            for plan in self.plans
+        ):
+            raise ValueError("effective quality differs from frozen policy and plans")
         module_ids = [module.id for module in self.modules]
         kinds = [module.kind for module in self.modules]
         if len(kinds) != len(set(kinds)):
@@ -202,7 +207,6 @@ class ResolvedStoryInput(Model):
                 for rule in getattr(source, stage.value)
             ) + (
                 output_language_rule(self.request),
-                *writing_constraints(self.quality, stage, self.request.output_language),
             )
             if self.rules.for_stage(stage) != expected_rules:
                 raise ValueError(
@@ -218,6 +222,28 @@ class ResolvedStoryInput(Model):
             sort_keys=True,
         ).encode("utf-8")
         return hashlib.sha256(payload).hexdigest()
+
+    def quality_for(self, theme_id: str) -> StoryQualityPolicy:
+        for item in self.effective_quality:
+            if item.theme_id == theme_id:
+                return item.policy
+        raise StoryConfigurationError(f"unknown quality policy theme_id: {theme_id}")
+
+    def writing_rules_for(self, stage: StoryStage, theme_ids: list[str]) -> str:
+        policies = [self.quality_for(theme_id) for theme_id in theme_ids]
+        constraints = [
+            writing_constraints(policy, stage, self.request.output_language)
+            for policy in policies
+        ]
+        if constraints and all(value == constraints[0] for value in constraints):
+            rules = constraints[0]
+        else:
+            rules = tuple(
+                f"For {theme_id} only: {rule}"
+                for theme_id, instructions in zip(theme_ids, constraints, strict=True)
+                for rule in instructions
+            )
+        return "\n".join((*self.rules.for_stage(stage), *rules))
 
     def context_for(
         self,
@@ -341,16 +367,19 @@ def _effective(
 ) -> StoryRunConfiguration:
     generation = configuration.generation.model_dump(mode="python")
     runtime = configuration.runtime.model_dump(mode="python")
-    quality = configuration.validation.model_dump(mode="python")
+    configured_quality = configuration.validation.model_dump(mode="python")
     for name, value in overrides.model_dump(exclude_none=True).items():
         if name in generation:
             generation[name] = value
         elif name in runtime:
             runtime[name] = value
         elif name == "theme_quality_mode":
-            quality["themes"]["mode"] = value
+            configured_quality["themes"]["mode"] = value
         elif name == "frame_quality_mode":
-            quality["frames"]["mode"] = value
+            configured_quality["frames"]["mode"] = value
+    quality = default_validation(generation["output_language"]).model_dump()
+    for name in ("themes", "frames"):
+        quality[name].update(configured_quality[name])
     checks = list(quality["frames"]["checks"])
     for kind, unit in (("word_count", "words"), ("prose_length", "chars")):
         bounds = {
@@ -368,6 +397,8 @@ def _effective(
             checks.append({"type": kind, **bounds})
         else:
             checks[index] = {**checks[index], **bounds}
+        if kind == "prose_length":
+            checks[-1 if index is None else index]["extra_person_chars"] = 0
     quality["frames"]["checks"] = checks
     return StoryRunConfiguration(
         generation=generation,
@@ -378,49 +409,33 @@ def _effective(
 
 def _cast_scaled_quality(
     policy: StoryQualityPolicy,
-    plans: tuple[ThemeInputPlan, ...],
+    plan: ThemeInputPlan,
 ) -> StoryQualityPolicy:
-    principal_count = max((plan.cast.principal_total or 2) for plan in plans)
-    additional_people = max(0, principal_count - 2)
-    if additional_people == 0:
-        return policy
-
-    theme_checks = []
-    for check in policy.themes.checks:
-        if isinstance(check, ThemeTextLengthCheck):
-            minimum, maximum, increment = _DEFAULT_THEME_LENGTHS[check.field]
-            if (
-                increment
-                and check.min_chars == minimum
-                and check.max_chars == maximum
-            ):
-                extra = increment * additional_people
-                check = check.model_copy(
-                    update={
-                        "min_chars": check.min_chars + extra,
-                        "max_chars": check.max_chars + extra,
-                    }
-                )
-        theme_checks.append(check)
-
-    frame_checks = []
-    for check in policy.frames.checks:
-        if isinstance(check, ProseLengthCheck):
-            minimum, maximum, increment = _DEFAULT_FRAME_LENGTH
-            if check.min_chars == minimum and check.max_chars == maximum:
-                extra = increment * additional_people
-                check = check.model_copy(
-                    update={
-                        "min_chars": check.min_chars + extra,
-                        "max_chars": check.max_chars + extra,
-                    }
-                )
-        frame_checks.append(check)
-
-    return StoryQualityPolicy(
-        themes=policy.themes.model_copy(update={"checks": tuple(theme_checks)}),
-        frames=policy.frames.model_copy(update={"checks": tuple(frame_checks)}),
+    principal_count = (
+        plan.cast.principal_total
+        if plan.cast.principal_total is not None
+        else min(
+            female + male + len(plan.cast.fixed_roles)
+            for female, male in possible_casts(plan.cast)
+        )
     )
+    additional_people = max(0, principal_count - 2)
+    stages = {}
+    for name in ("themes", "frames"):
+        stage = getattr(policy, name)
+        checks = []
+        for check in stage.checks:
+            value = check.model_dump()
+            if isinstance(check, TextLengthBounds):
+                extra = check.extra_person_chars * additional_people
+                value.update(
+                    min_chars=check.min_chars + extra,
+                    max_chars=check.max_chars + extra,
+                    extra_person_chars=0,
+                )
+            checks.append(value)
+        stages[name] = {"mode": stage.mode, "checks": checks}
+    return StoryQualityPolicy.model_validate(stages)
 
 
 def resolve_story_input(
@@ -509,8 +524,14 @@ def resolve_story_input(
             catalog,
         )
         validate_requirements(request, plans, requirements)
-        quality = _cast_scaled_quality(configuration.validation, plans)
-        configuration = configuration.model_copy(update={"validation": quality})
+        quality = configuration.validation
+        effective_quality = tuple(
+            ThemeEffectiveQuality(
+                theme_id=plan.theme_id,
+                policy=_cast_scaled_quality(quality, plan),
+            )
+            for plan in plans
+        )
 
         authoring = StoryAuthoring(
             themes=StageAuthoring(
@@ -520,9 +541,7 @@ def resolve_story_input(
                 common=tuple(rule for source in sources for rule in source.frames)
             ),
         )
-        rules = resolve_story_rules(
-            request, authoring=authoring, quality=quality
-        )
+        rules = resolve_story_rules(request, authoring=authoring)
         for path in system_rule_sources(request):
             text = path.read_text(encoding="utf-8-sig")
             selected = _rule_lines(text)
@@ -541,6 +560,7 @@ def resolve_story_input(
             run_configuration=configuration,
             runtime=configuration.runtime,
             quality=configuration.validation,
+            effective_quality=effective_quality,
             rules=rules,
             sources=tuple(sources),
             modules=tuple(modules),

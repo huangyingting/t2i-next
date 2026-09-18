@@ -14,7 +14,7 @@ from t2i_story_pipeline.models import (
     exact_theme_batch_model,
 )
 from t2i_story_pipeline.run_store import StoryRunSettings
-from tests.story_factories import make_theme_batch
+from tests.story_factories import make_theme, make_theme_batch
 
 
 def test_exact_theme_batch_schema_requires_requested_count() -> None:
@@ -29,6 +29,14 @@ def test_theme_draft_schema_omits_program_assigned_ids() -> None:
     schema = response_model.model_json_schema()
 
     assert "theme_id" not in json.dumps(schema)
+    draft = schema["$defs"]["NarrativeThemeDraft"]
+    assert set(draft["required"]) == {"title", "premise", "style", "diversity"}
+    diversity = schema["$defs"]["ThemeDiversity"]
+    assert diversity["additionalProperties"] is False
+    assert set(diversity["required"]) == {"subject", "setting", "situation", "visual"}
+    for field in diversity["properties"].values():
+        assert field["minLength"] == 1
+        assert field["maxLength"] == 80
 
 
 def test_theme_provider_output_rejects_model_assigned_ids() -> None:
@@ -80,9 +88,10 @@ def test_narrative_frame_allows_up_to_32768_characters() -> None:
 
 
 def test_narrative_theme_requires_one_style_anchor() -> None:
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="style"):
         NarrativeTheme(
             theme_id="T001",
+            diversity=make_theme().diversity,
             title="遗失的行李",
             premise="两名成年人共同寻找行李。",
         )
@@ -93,6 +102,7 @@ def test_narrative_theme_does_not_truncate_long_style_description() -> None:
 
     theme = NarrativeTheme(
         theme_id="T001",
+        diversity=make_theme().diversity,
         title="遗失的行李",
         premise="两名成年人共同寻找行李。",
         style=style,
@@ -106,6 +116,7 @@ def test_narrative_theme_does_not_truncate_long_premise() -> None:
 
     theme = NarrativeTheme(
         theme_id="T001",
+        diversity=make_theme().diversity,
         title="遗失的行李",
         premise=premise,
         style="旧城雨夜电影风格",

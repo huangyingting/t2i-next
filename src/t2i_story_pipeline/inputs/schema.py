@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from itertools import pairwise
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import Field, PrivateAttr, StringConstraints, model_validator
 
@@ -110,35 +110,38 @@ class StoryRunGeneration(Model):
         return StoryCast.model_validate(values)
 
 
-def _default_validation() -> StoryQualityPolicy:
+def default_validation(language: OutputLanguage) -> StoryQualityPolicy:
+    # English character budgets are calibrated starting defaults, not quality claims.
+    title, premise, style, frame = (
+        ((4, 48, 0), (160, 520, 60), (100, 360, 30), (450, 950, 100))
+        if language == OutputLanguage.CHINESE
+        else ((4, 96, 0), (320, 1040, 120), (200, 720, 60), (900, 1900, 200))
+    )
     return StoryQualityPolicy(
         themes={
             "mode": "enforce",
             "checks": [
                 {
                     "type": "text_length",
-                    "field": "title",
-                    "min_chars": 4,
-                    "max_chars": 48,
-                },
-                {
-                    "type": "text_length",
-                    "field": "premise",
-                    "min_chars": 160,
-                    "max_chars": 520,
-                },
-                {
-                    "type": "text_length",
-                    "field": "style",
-                    "min_chars": 100,
-                    "max_chars": 360,
-                },
+                    "field": field,
+                    "min_chars": bounds[0],
+                    "max_chars": bounds[1],
+                    "extra_person_chars": bounds[2],
+                }
+                for field, bounds in (
+                    ("title", title), ("premise", premise), ("style", style)
+                )
             ],
         },
         frames={
             "mode": "enforce",
             "checks": [
-                {"type": "prose_length", "min_chars": 450, "max_chars": 950}
+                {
+                    "type": "prose_length",
+                    "min_chars": frame[0],
+                    "max_chars": frame[1],
+                    "extra_person_chars": frame[2],
+                }
             ],
         },
     )
@@ -149,25 +152,7 @@ class StoryRunConfiguration(Model):
 
     generation: StoryRunGeneration = Field(default_factory=StoryRunGeneration)
     runtime: StoryRuntime = Field(default_factory=StoryRuntime)
-    validation: StoryQualityPolicy = Field(
-        default_factory=lambda: _default_validation()
-    )
-
-    @model_validator(mode="after")
-    def merge_validation_defaults(self) -> Self:
-        defaults = _default_validation()
-        stages = {}
-        for name in ("themes", "frames"):
-            stage = getattr(self.validation, name)
-            default = getattr(defaults, name)
-            updates = {
-                field: getattr(default, field)
-                for field in ("mode", "checks")
-                if field not in stage.model_fields_set
-            }
-            stages[name] = stage.model_copy(update=updates) if updates else stage
-        self.validation = self.validation.model_copy(update=stages)
-        return self
+    validation: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
 
 
 class Bounds(Model):

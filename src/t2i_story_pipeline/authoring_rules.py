@@ -8,12 +8,10 @@ from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.models import (
     OutputLanguage,
     StoryAuthoring,
-    StoryQualityPolicy,
     StoryRequest,
     StoryRuleSet,
     StoryStage,
 )
-from t2i_story_pipeline.quality_validation import writing_constraints
 
 _SYSTEM_RULES_DIRECTORY = Path(__file__).resolve().parent / "rule_packs" / "system"
 _STAGE_FILENAMES = {
@@ -26,7 +24,6 @@ def resolve_story_rules(
     request: StoryRequest,
     *,
     authoring: StoryAuthoring | None = None,
-    quality: StoryQualityPolicy | None = None,
 ) -> StoryRuleSet:
     """Compile core contracts and already selected authoring; never discover files."""
     system_directory = _require_directory(
@@ -39,14 +36,12 @@ def resolve_story_rules(
             request,
             system_directory,
             authoring or StoryAuthoring(),
-            quality or StoryQualityPolicy(),
         ),
         frames=_compile(
             StoryStage.FRAMES,
             request,
             system_directory,
             authoring or StoryAuthoring(),
-            quality or StoryQualityPolicy(),
         ),
     )
 
@@ -56,7 +51,6 @@ def _compile(
     request: StoryRequest,
     system_directory: Path,
     authoring: StoryAuthoring,
-    quality: StoryQualityPolicy,
 ) -> tuple[str, ...]:
     rules = [
         rule
@@ -65,7 +59,6 @@ def _compile(
     ]
     rules.extend(authoring.selected(stage, request.content_level))
     rules.append(output_language_rule(request))
-    rules.extend(writing_constraints(quality, stage, request.output_language))
     return tuple(rules)
 
 

@@ -11,6 +11,7 @@ from t2i_story_pipeline.models import (
     StoryStage,
 )
 from t2i_story_pipeline.provider import ChatMessage
+from t2i_story_pipeline.theme_memory import theme_history
 
 
 def theme_messages(
@@ -26,7 +27,7 @@ def theme_messages(
     return [
         ChatMessage(
             role="system",
-            content=resolved.rules.text_for(StoryStage.THEMES),
+            content=resolved.writing_rules_for(StoryStage.THEMES, theme_ids),
         ),
         ChatMessage(
             role="user",
@@ -38,9 +39,7 @@ def theme_messages(
                     "theme_count": count,
                     "frames_per_theme": request.frames_per_theme,
                     "input_context": resolved.context_for(StoryStage.THEMES, theme_ids),
-                    "existing_themes": [
-                        theme.model_dump(mode="json") for theme in existing_themes
-                    ],
+                    **theme_history(existing_themes),
                 },
                 ensure_ascii=False,
             ),
@@ -59,7 +58,7 @@ def frame_messages(
     return [
         ChatMessage(
             role="system",
-            content=resolved.rules.text_for(StoryStage.FRAMES),
+            content=resolved.writing_rules_for(StoryStage.FRAMES, [theme.theme_id]),
         ),
         ChatMessage(
             role="user",

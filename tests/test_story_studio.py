@@ -174,6 +174,7 @@ async def test_studio_assigns_ids_and_wraps_batched_text_frames(
                 semantic_name="lost_luggage_reunion",
                 themes=[
                     {
+                        "diversity": source_theme.diversity,
                         "title": source_theme.title,
                         "premise": source_theme.premise,
                         "style": source_theme.style,
@@ -218,6 +219,7 @@ async def test_batched_text_retries_only_rejected_frames(
                 semantic_name="lost_luggage_reunion",
                 themes=[
                     {
+                        "diversity": source_theme.diversity,
                         "title": source_theme.title,
                         "premise": source_theme.premise,
                         "style": source_theme.style,
@@ -342,6 +344,23 @@ async def test_studio_generates_one_hundred_themes_and_six_hundred_frames(
     assert sum(len(item.frames) for item in result.themes) == 600
     assert model.stages.count(StoryStage.THEMES) == 10
     assert model.stages.count(StoryStage.FRAMES) == 100
+    assert len({item.theme.diversity.key() for item in result.themes}) == 100
+    theme_payloads = [
+        json.loads(messages[1].content)
+        for stage, messages in zip(model.stages, model.messages, strict=True)
+        if stage == StoryStage.THEMES
+    ]
+    for batch, payload in enumerate(theme_payloads):
+        previous = [item.theme for item in result.themes[: batch * 10]]
+        assert payload["existing_themes"] == [
+            theme.model_dump(
+                mode="json", include={"theme_id", "title", "diversity"}
+            )
+            for theme in previous
+        ]
+        assert payload["recent_themes"] == [
+            theme.model_dump(mode="json") for theme in previous[-2:]
+        ]
     frame_payloads = [
         json.loads(messages[1].content)
         for stage, messages in zip(model.stages, model.messages, strict=True)

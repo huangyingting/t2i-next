@@ -94,7 +94,7 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
     ):
         prompt = messages[0].content
         payload = json.loads(messages[1].content)
-        assert prompt == restored.rules.text_for(stage)
+        assert prompt == restored.writing_rules_for(stage, ["T001"])
         assert (
             not {
                 "content_level",
@@ -111,7 +111,10 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
         if stage == StoryStage.THEMES:
             assert payload["theme_count"] == 1
             assert "the program assigns all Theme IDs" in prompt
-            assert "Submit only semantic_name, title, premise, and style" in prompt
+            assert (
+                "Submit only semantic_name and each Theme's "
+                "title, premise, style, and diversity"
+            ) in prompt
         else:
             assert payload["requested_frame_slots"] == ["F02"]
             assert "The program assigns all Frame IDs" in prompt

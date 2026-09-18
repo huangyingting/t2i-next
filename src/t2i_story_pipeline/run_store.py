@@ -185,6 +185,7 @@ class StoryAttempt(_Model):
     error: str | None = None
     usage: TokenUsage = Field(default_factory=TokenUsage)
     quality_issues: list[StoryQualityIssue] = Field(default_factory=list)
+    rejected_frames: list[NarrativeFrame] = Field(default_factory=list, max_length=6)
 
 
 @dataclass(frozen=True, slots=True)
@@ -336,6 +337,7 @@ class LocalStoryRunStore:
                     request,
                     themes,
                     frames,
+                    resolved,
                 )
                 return StoryRunSnapshot(
                     run_id=run_id,
@@ -608,7 +610,7 @@ class LocalStoryRunStore:
             raise StoryStorageError("完成结果与已保存 checkpoint 不匹配")
         if result.usage != self.total_usage(run_id):
             raise StoryStorageError("完成结果的 token usage 与运行记录不匹配")
-        self._validate_quality_result(result, snapshot.manifest.settings)
+        self._validate_quality_result(result, snapshot.input)
         directory = self._run_directory(run_id)
         result_file = directory / "result.json"
         completion_manifest = snapshot.manifest
@@ -747,6 +749,7 @@ class LocalStoryRunStore:
         request: StoryRequest,
         themes: tuple[NarrativeTheme, ...],
         frames: dict[str, NarrativeFrameSequence],
+        resolved: ResolvedStoryInput,
     ) -> CompletedStoryRun:
         if manifest.prompt_file is None:
             raise StoryStorageError("已完成 run 缺少发布文件路径")
@@ -781,7 +784,7 @@ class LocalStoryRunStore:
             raise StoryStorageError(
                 "已完成 run 的 result token usage 与 attempt 记录不匹配"
             )
-        self._validate_quality_result(result, manifest.settings)
+        self._validate_quality_result(result, resolved)
         prompt_file = Path(manifest.prompt_file)
         if not prompt_file.is_file():
             raise StoryStorageError("已完成 run 的发布文件不存在")
@@ -797,11 +800,13 @@ class LocalStoryRunStore:
 
     @staticmethod
     def _validate_quality_result(
-        result: StoryResult, settings: StoryRunSettings
+        result: StoryResult, resolved: ResolvedStoryInput
     ) -> None:
         try:
             expected = quality_report(
-                settings.quality, result.request.output_language, result.themes
+                resolved.effective_quality,
+                result.request.output_language,
+                result.themes,
             )
         except StoryQualityError as exc:
             raise StoryStorageError(f"完成结果未通过冻结的质量检查：{exc}") from exc

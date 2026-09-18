@@ -16,7 +16,14 @@ from pydantic import (
     Field,
     StringConstraints,
     create_model,
+    model_serializer,
     model_validator,
+)
+
+from t2i_story_pipeline.theme_memory import (
+    ThemeDiversity,
+    duplicate_themes,
+    normalized_text,
 )
 
 
@@ -178,13 +185,18 @@ class QualityMode(StrEnum):
     ENFORCE = "enforce"
 
 
-class CameraEvidenceCheck(Model):
+class FrozenQualityModel(Model):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+class CameraEvidenceCheck(FrozenQualityModel):
     type: Literal["camera_evidence"]
 
 
-class TextLengthBounds(Model):
+class TextLengthBounds(FrozenQualityModel):
     min_chars: int = Field(default=1, ge=1, le=32768, strict=True)
     max_chars: int = Field(default=32768, ge=1, le=32768, strict=True)
+    extra_person_chars: int = Field(default=0, ge=0, le=32768, strict=True)
 
     @model_validator(mode="after")
     def ordered_bounds(self) -> TextLengthBounds:
@@ -197,12 +209,12 @@ class ProseLengthCheck(TextLengthBounds):
     type: Literal["prose_length"]
 
 
-class AsciiCheck(Model):
+class AsciiCheck(FrozenQualityModel):
     type: Literal["ascii"]
     when_language: OutputLanguage | None = None
 
 
-class WordCountCheck(Model):
+class WordCountCheck(FrozenQualityModel):
     type: Literal["word_count"]
     when_language: OutputLanguage | None = None
     min_words: int = Field(default=1, ge=1, le=32768, strict=True)
@@ -215,12 +227,12 @@ class WordCountCheck(Model):
         return self
 
 
-class RequiredTextCheck(Model):
+class RequiredTextCheck(FrozenQualityModel):
     type: Literal["required_text"]
     values: tuple[RuleText, ...] = Field(min_length=1)
 
 
-class ForbiddenTextCheck(Model):
+class ForbiddenTextCheck(FrozenQualityModel):
     type: Literal["forbidden_text"]
     values: tuple[RuleText, ...] = Field(min_length=1)
 
@@ -236,7 +248,18 @@ QualityCheck = Annotated[
 ]
 
 
-class FrameQualityPolicy(Model):
+class StageQualityPolicy(FrozenQualityModel):
+    @model_serializer(mode="wrap")
+    def serialize_configured_fields(self, handler):
+        # Omitted fields inherit run defaults; explicit empty checks replace them.
+        return {
+            name: value
+            for name, value in handler(self).items()
+            if name in self.model_fields_set
+        }
+
+
+class FrameQualityPolicy(StageQualityPolicy):
     mode: QualityMode = QualityMode.REPORT
     checks: tuple[QualityCheck, ...] = ()
 
@@ -270,7 +293,7 @@ ThemeQualityCheck = Annotated[
 ]
 
 
-class ThemeQualityPolicy(Model):
+class ThemeQualityPolicy(StageQualityPolicy):
     mode: QualityMode = QualityMode.REPORT
     checks: tuple[ThemeQualityCheck, ...] = ()
 
@@ -282,9 +305,14 @@ class ThemeQualityPolicy(Model):
         return self
 
 
-class StoryQualityPolicy(Model):
+class StoryQualityPolicy(FrozenQualityModel):
     themes: ThemeQualityPolicy = Field(default_factory=ThemeQualityPolicy)
     frames: FrameQualityPolicy = Field(default_factory=FrameQualityPolicy)
+
+
+class ThemeEffectiveQuality(FrozenQualityModel):
+    theme_id: ThemeId
+    policy: StoryQualityPolicy
 
 
 class StoryQualityIssue(Model):
@@ -389,6 +417,12 @@ class StoryRequest(Model):
 
 
 class NarrativeThemeDraft(Model):
+    diversity: ThemeDiversity = Field(
+        description=(
+            "Compact factual novelty signature: subject, setting, situation "
+            "and visual design"
+        )
+    )
     title: Text = Field(description="简洁自然的主题标题")
     premise: PremiseText = Field(
         description="完整的人物、地点与当前情境前提，不包含写作指令"
@@ -422,6 +456,13 @@ class NarrativeThemeResult(Model):
     theme: NarrativeTheme
     frames: list[NarrativeFrame] = Field(min_length=1, max_length=6)
 
+    @model_validator(mode="after")
+    def distinct_frames(self) -> NarrativeThemeResult:
+        texts = [normalized_text(frame.prose) for frame in self.frames]
+        if len(texts) != len(set(texts)):
+            raise ValueError("同一 Theme 的 Frame 正文不能完全重复")
+        return self
+
 
 class TokenUsage(Model):
     prompt_tokens: int = Field(default=0, ge=0)
@@ -443,6 +484,14 @@ class StoryResult(Model):
     themes: list[NarrativeThemeResult] = Field(min_length=1, max_length=100)
     usage: TokenUsage
     quality: StoryQualityReport
+
+    @model_validator(mode="after")
+    def distinct_themes(self) -> StoryResult:
+        themes = [item.theme for item in self.themes]
+        issues = duplicate_themes(themes, [theme.theme_id for theme in themes], ())
+        if issues:
+            raise ValueError("; ".join(issues))
+        return self
 
 
 @lru_cache(maxsize=10)

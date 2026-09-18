@@ -271,7 +271,8 @@ def test_provider_controls_stay_internal_without_losing_ids_or_retry_contracts(l
             plan["theme_id"] for plan in theme_payload["input_context"]["plans"]
         ] == ["T002", "T003"]
         assert (
-            "Submit only semantic_name, title, premise, and style; "
+            "Submit only semantic_name and each Theme's "
+            "title, premise, style, and diversity; "
             "the program assigns all Theme IDs."
         ) in themes[0].content
 

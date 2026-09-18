@@ -46,7 +46,7 @@ completed = await StoryStudio(
 ## 生成流程
 
 1. `themes`：每批最多十个，结构化返回 `semantic_name` 及每个主题的 `title`、
-   `premise`、`style`，不提交 ID。程序按响应顺序分配连续 `T001` 等 ID。
+   `premise`、`style`、`diversity`，不提交 ID。程序按响应顺序分配连续 `T001` 等 ID。
    premise 建立足够完整的稳定事实，style 提供适合当前媒介的可执行视觉方向，
    不再机械限制成两句前提或一句风格。更具体的 Story Description 要求优先。
 2. `frames`：一次请求当前主题所有缺失帧，模型仅返回对应数量的
@@ -61,8 +61,16 @@ Frame workers。每批 Theme 保存后立即入队，Frame 生成与后续 Theme
 不等待全部 Theme 完成。两类调用共用 `concurrency` 信号量，默认合计最多八个
 在途生成操作；队列容量也等于该值。
 
-Theme producer 始终看到之前已保存的完整主题列表，保持语义名称、ID 和去重上下文
-顺序稳定。后续 Theme 批次失败不会放弃已排队的 Frame 工作。resume 优先排队已有
+Theme producer 始终看到全部历史主题的 ID、标题及四维 `diversity` 摘要
+（`subject`、`setting`、`situation`、`visual`，每项 1–80 字符），同时保留最近两个
+完整主题作为细节参照。摘要由模型在同一次 Theme 调用中生成，不靠截断正文或
+另一次摘要调用；不得仅复述题材标签，必须对应本主题真实的差异。完整 Theme 仍
+保存在 checkpoint 中，并完整提供给对应 Frame 阶段。后续批次和 resume 都从这些
+checkpoint 重建全部覆盖记忆，不会遗忘早期主题。该方案降低常规历史上下文的
+重复传输，但不是固定大小上下文，也不保证识别换词后的语义重复。
+相同四维摘要或相同 premise/style 组合（规范化空白、大小写与 Unicode 后）在批内
+或历史主题中出现时拒绝；只改标题或只改摘要不能绕过相同正文检查。
+后续 Theme 批次失败不会放弃已排队的 Frame 工作。resume 优先排队已有
 主题的缺失帧，同时补齐缺失 Theme；全部请求内容完成后才发布。
 
 批量文本保持 110 次无错误基础调用，不采用逐帧调用所需的 610 次请求。
@@ -282,7 +290,8 @@ tokens。不从文件名或历史配方配置猜测预算；固定槽位目录�
 中文长度通常应使用 `--frame-min-chars`／`--frame-max-chars`。外部配置中的
 `when_language` 保留语言适用性。CLI 只覆盖给出的长度边界，保留已有检查的另一侧
 边界与语言条件；新增检查默认不限语言，合并后上下限冲突会明确报错。
-字符边界只要修改为非缺省值，就按修改后的范围冻结，不再应用多人增量。
+CLI 显式设置任一字符边界时，该检查整体转为固定范围，不再应用多人增量，
+即使显式数字恰好等于默认值也是如此；另一边界保留当前输出语言的基础值。
 声明的长度、必含／禁用文本等输出要求由同一套
 策略生成写作约束并执行检查，不再在配方正文重复维护。`off` 关闭质量检查与相关
 重试，不删除已声明的输出目标，更不能关闭安全、结构或槽位约束。
@@ -438,17 +447,22 @@ provider 上限的较小值；不会改写 manifest 中冻结的配置。截断�
 `mode` 和 `checks`，不再从视觉 YAML 读取。
 两者缺省均为 `enforce`，并启用以下 Unicode 字符长度闭区间：
 
-| 输出字段 | 一至两名核心人物 | 每名额外核心人物 |
-|---|---:|---:|
-| Theme `title` | 4–48 | 不增加 |
-| Theme `premise` | 160–520 | 上下限各增加 60 |
-| Theme `style` | 100–360 | 上下限各增加 30 |
-| Frame `prose` | 450–950 | 上下限各增加 100 |
+| 输出字段 | 中文一至两名核心人物 | 英文一至两名核心人物 | 额外核心人物增量（中/英） |
+|---|---:|---:|---:|
+| Theme `title` | 4–48 | 4–96 | 0 / 0 |
+| Theme `premise` | 160–520 | 320–1040 | 60 / 120 |
+| Theme `style` | 100–360 | 200–720 | 30 / 60 |
+| Frame `prose` | 450–950 | 900–1900 | 100 / 200 |
 
-多人增量使用同一运行中最大的、可精确确定的核心人物数量；不把背景人群计入逐人
-展开预算，阵容未确定时按不超过两名处理。只提供某阶段的 `mode` 会保留该阶段
-缺省检查；显式提供 `checks` 会完整替换该阶段的缺省列表。CLI 显式覆盖 Frame
-字符边界为非缺省值后按该边界冻结，不再叠加多人增量。两个阶段仍可分别使用不同模式。
+这些均为 Unicode 字符数而非 token；英文范围是独立的起始预算，不代表已经通过
+模型质量实验校准。增量同时加到上下限，从第三名核心人物开始计算。
+每个 Theme 单独按其核心人物数量计算，不使用整批最大人数；精确人数未知时使用
+已经确定的核心人物下限。固定额外角色计入，背景人群不计入。不同人数的目录槽位
+因此可以拥有不同范围，不会把八人场景的下限强加给单人场景。
+只提供某阶段的 `mode` 会保留该阶段缺省检查；显式提供 `checks` 会完整替换该阶段
+的缺省列表，包括显式空列表。用户声明的长度检查默认 `extra_person_chars: 0`，
+即固定范围；非零值是显式选择自适应增长，不再根据边界数值是否碰巧等于默认值推断。
+两个阶段仍可分别使用不同模式。
 不保留旧 `validation.quality`、扁平策略或旧报告结构的解析入口。
 
 | 模式 | 行为 |
@@ -500,10 +514,13 @@ Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
 
 CLI 的 `--theme-quality-mode` 和 `--frame-quality-mode` 分别覆盖对应阶段的模式，
 不改变检查器列表或另一阶段的设置；不保留旧 `--quality-mode`。
-API 通过 `StoryRunConfiguration.validation.themes` / `.frames` 解析同一策略，再将
-`resolved.quality` 与 `resolved.runtime` 写入 `StoryRunSettings`；store拒绝不一致的副本。
-两阶段策略
-完整冻结在 manifest 中，resume 不读当前 YAML、运行配置或规则文件，也不接受切换策略。
+API 的 `StoryRunConfiguration.validation` 保留未提供与显式提供字段的意图，typed
+对象、字典和 JSON 往返采用相同语义。解析后 `resolved.quality` 保存语言基础策略，
+`resolved.effective_quality` 保存每个 Theme 的具体范围；写作约束、生成检查、
+发布报告和 resume 都使用 `resolved.quality_for(theme_id)` 的冻结结果。
+`resolved.writing_rules_for(stage, theme_ids)` 按本次请求的槽位投影相同写作目标。
+`StoryRunSettings` 继续保存基础策略与 runtime，store 拒绝不一致的副本。
+resume 不读当前 YAML、运行配置或规则文件，也不接受切换策略。
 
 检查问题以 `stage`、`theme_id`、`frame_id`、`field`、`check`、`message` 保存到
 attempt 的 `quality_issues`。Theme 问题的 `frame_id` 为 null，Frame 问题指向
@@ -516,6 +533,11 @@ CLI 分别输出两阶段的 `skipped` / `passed` / `warnings` 和报告路径�
 
 每个 Frame 独立接受与保存。一个批次只有部分帧违反结构或 `enforce` 质量检查时，
 通过的帧立即保留，下一次请求只包含失败槽位，并携带已经保存的帧作为上下文。
+对于已经成功解析但质量不合格或重复的 Frame，attempt 保存上一版正文；重试及
+resume 同时携带失败槽位的具体问题和修订证据，不再只保留最后三条 Frame 问题。
+每帧证据最多向模型投影前 2000 字符，并显式标记是否截短；这不是对最终正文的
+截断或本地补字。不可解析的批次没有可可靠归属的逐帧证据，不猜测槽位映射。
+相同 Theme 内完全重复的正文会拒绝，保留先通过的一帧并只重试重复槽位。
 `report` 的告警帧仍会被接受，不引起额外调用。单次执行中，每个主题的 attempt
 次数仍有界，不会因为每次有部分进展而重置重试预算。显式 resume 会获得新一轮
 冻结配置允许的重试机会，attempt 编号继续递增。不新增 Profile 或模型评审调用。
@@ -559,6 +581,18 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
 反馈给模型。全部 checkpoint 完成后才写入 `result.json` 并发布 TXT。
 已完成 run 的 `resume` 直接返回已发布结果，不调用 provider。
 
+### 运行诊断
+
+```bash
+uv run t2i-story diagnostics <run-id> --runs-dir runs --format json
+```
+
+诊断不需要模型凭据、不调用 provider、不修改 run。按阶段展示生成调用次数、
+槽位首次接受率、重复请求槽位数、错误种类、质量失败次数、累计调用耗时和已记录
+token。接受记录与实际落盘数分别统计，以免把中断前尚未落盘的结果误报为完成。
+调用耗时相加不是并发运行的墙钟耗时；token 是 provider 已记录用量而非金额，
+无用量记录的调用单独计数，不视为免费。当前 transport 内部重试未独立计数。
+
 ## 错误分类与重试
 
 错误恢复分为两层：
@@ -570,15 +604,16 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
    Frame 文本边界错误或逐帧拒绝记录为 rejected。文本响应若
    `finish_reason=length`，不把可能截断的内容作为成功批次；无效的截断 Theme
    同样记录为 truncated。下一次 attempt 提升到 manifest 冻结的 provider 上限；
-   Theme 默认初始预算为 6,000 tokens，Frame batch 为 32,768 tokens，
+   Theme 默认初始预算为 12,000 tokens，Frame batch 为 32,768 tokens，
    可通过外部运行配置和显式 CLI 参数配置。
    truncated outcome 会持久化，因此进程重启后的第一次 resume attempt
    也直接使用提升后的预算。
 
 每个 attempt 保存 stage、operation、requested IDs、accepted IDs、具体 issues、
 实际请求 token 上限、耗时和 token usage。当前进程内的下一次 attempt，以及进程
-重启后的 resume，都会读取最近一次与当前 requested IDs 相交的 attempt，并把最多
-三条 issues 反馈给模型。认证失败和 transport 层耗尽后的不可恢复 provider error
+重启后的 resume，都会读取最近一次与当前 requested IDs 相交的 attempt。
+Frame 会带上全部当前失败槽位的 issues 和已保存的上一版失败正文；Theme 的有界
+批次重试继续携带失败结构化结果和最近批次问题。认证失败和 transport 层耗尽后的不可恢复 provider error
 不会在 generation 层盲目循环。
 
 Theme batch 要求完整的结构化响应；Frame batch 在文本边界明确后允许部分接受。
@@ -608,6 +643,7 @@ theme 与 frame 的初始 prompt 同时要求建筑、室内陈设、家具、�
 - Pydantic typed schema；
 - 精确主题数、帧数和连续 ID；
 - 非空单段 prose；
+- Theme 的差异摘要与 premise/style 组合不完全重复，同一 Theme 的 Frame 正文不完全重复；
 - provider 结构错误的有界重试和 token usage 统计。
 
 因此默认 Theme batch size 10 下，100 themes × 6 frames 在没有 provider/schema

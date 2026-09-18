@@ -81,7 +81,16 @@ def document(**fields: object) -> StoryDocument:
 
 def theme() -> NarrativeTheme:
     return NarrativeTheme(
-        theme_id="T001", title="Station", premise="Adult travelers.", style="Ink."
+        theme_id="T001",
+        title="Station",
+        premise="Adult travelers.",
+        style="Ink.",
+        diversity={
+            "subject": "Adult travelers",
+            "setting": "A quiet railway station",
+            "situation": "Waiting for a train",
+            "visual": "Ink drawing",
+        },
     )
 
 
@@ -208,7 +217,8 @@ def test_program_defaults_are_uniform_and_do_not_depend_on_recipe_identity():
     first = resolve_story_input(document(id="motion"))
     second = resolve_story_input(document(id="unknown-visual-recipe"))
     assert first.run_configuration == second.run_configuration
-    assert first.run_configuration == StoryRunConfiguration()
+    assert first.run_configuration.generation == StoryRunConfiguration().generation
+    assert first.runtime == StoryRunConfiguration().runtime
     assert first.request.theme_count == 1
     assert first.request.frames_per_theme == 6
     assert first.request.content_level == ContentLevel.AESTHETIC
@@ -248,9 +258,9 @@ def test_default_lengths_expand_for_additional_principal_people(
     )
     assert tuple(
         (check.min_chars, check.max_chars)
-        for check in resolved.quality.themes.checks
+        for check in resolved.quality_for("T001").themes.checks
     ) == theme_bounds
-    prose = resolved.quality.frames.checks[0]
+    prose = resolved.quality_for("T001").frames.checks[0]
     assert (prose.min_chars, prose.max_chars) == frame_bounds
 
 
@@ -539,7 +549,7 @@ def test_frozen_configuration_is_required_and_consistent():
     tampered = json.loads(json.dumps(original))
     tampered["run_configuration"]["validation"]["frames"]["checks"][0]["min_words"] = 4
     tampered["quality"] = tampered["run_configuration"]["validation"]
-    with pytest.raises(ValidationError, match="rules differ"):
+    with pytest.raises(ValidationError, match="effective quality differs"):
         ResolvedStoryInput.model_validate(tampered)
     tampered = json.loads(json.dumps(original))
     tampered["sources"] = [
@@ -647,7 +657,10 @@ class RecordingModel:
         prose = [
             "Short"
             if self.invalid_second and slot == "F02"
-            else "Adult traveler waits."
+            else "Adult traveler "
+            + ("waits.", "rests.", "reads.", "walks.", "sits.", "stands.")[
+                int(slot[1:]) - 1
+            ]
             for slot in payload["requested_frame_slots"]
         ]
         return TextModelResponse(

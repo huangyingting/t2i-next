@@ -11,6 +11,7 @@ import typer
 from pydantic import ValidationError
 
 from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.diagnostics import run_diagnostics
 from t2i_story_pipeline.errors import (
     StoryConfigurationError,
     StoryPipelineError,
@@ -408,6 +409,26 @@ def runs_command(
             fg=typer.colors.RED,
             err=True,
         )
+
+
+@app.command("diagnostics")
+def diagnostics_command(
+    run_id: str = typer.Argument(..., help="需要统计的 story run ID。"),
+    runs_dir: Path = typer.Option(Path("runs"), "--runs-dir", file_okay=False),
+    output_format: ExplainFormat = typer.Option(ExplainFormat.TEXT, "--format"),
+) -> None:
+    """Summarize attempts, retry causes and recorded token usage without generation."""
+    try:
+        store = LocalStoryRunStore(runs_dir)
+        report = run_diagnostics(store.inspect(run_id), store.attempts(run_id))
+    except StoryPipelineError as exc:
+        _exit_for_error(exc, runs_dir)
+    typer.echo(
+        json.dumps(report, ensure_ascii=False, indent=2)
+        if (output_format == ExplainFormat.JSON)
+        else "Run 诊断（token 为已记录值，非费用估计）：\n"
+        + json.dumps(report, ensure_ascii=False, indent=2)
+    )
 
 
 def _resolve_input(

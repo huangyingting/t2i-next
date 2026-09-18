@@ -33,7 +33,10 @@ def test_document_keeps_prose_and_defaults(tmp_path):
         "First paragraph.\n\nSecond paragraph, with a colon: and # literal text."
     )
     configuration = resolve_story_input(document).run_configuration
-    assert configuration == StoryRunConfiguration()
+    assert configuration.generation == StoryRunConfiguration().generation
+    assert configuration.runtime == StoryRunConfiguration().runtime
+    assert configuration.validation.themes.mode == "enforce"
+    assert configuration.validation.frames.checks[0].min_chars == 450
     assert set(document.model_dump()) == {
         "id",
         "description",

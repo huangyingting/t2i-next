@@ -236,6 +236,20 @@ async def test_story_provider_sends_strict_minimal_schema(
     schema = captured["response_format"]["json_schema"]["schema"]
     assert schema["additionalProperties"] is False
     assert set(schema["required"]) == {"semantic_name", "themes"}
+    draft_schema = schema["$defs"]["NarrativeThemeDraft"]
+    assert draft_schema["additionalProperties"] is False
+    assert set(draft_schema["required"]) == {
+        "title", "premise", "style", "diversity"
+    }
+    diversity_schema = schema["$defs"]["ThemeDiversity"]
+    assert diversity_schema["additionalProperties"] is False
+    assert set(diversity_schema["required"]) == {
+        "subject", "setting", "situation", "visual"
+    }
+    assert all(
+        field["minLength"] == 1 and field["maxLength"] == 80
+        for field in diversity_schema["properties"].values()
+    )
     assert "theme_id" not in json.dumps(schema)
 
 

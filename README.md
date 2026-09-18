@@ -236,20 +236,31 @@ uv run t2i-story generate --input recipes/motion-blur-photography.yaml \
 （拒绝并有界重试）；两阶段分别用 `--theme-quality-mode`、`--frame-quality-mode`
 覆盖。缺省策略对两个阶段使用 `enforce`：Theme 的 `title`、`premise`、`style`
 分别要求 4–48、160–520、100–360 个 Unicode 字符，Frame 正文要求 450–950
-个字符；超过两名核心人物时，每增加一人，`premise`、`style` 和 Frame 的上下限
-分别增加 60、30 和 100 个字符。Theme 在通过检查后才保存并开始生成 Frame。
+个字符（中文）；英文起始范围分别为 4–96、320–1040、200–720 和 900–1900。
+每个 Theme 单独按核心人物数量扩展：超过两人后，中文 `premise`、`style` 和
+Frame 上下限每人增加 60、30、100；英文增加 120、60、200。人数不完全指定时
+采用已知核心人物下限，计入固定角色但不计背景人群。Theme 在通过检查后才保存并开始生成 Frame。
 Frame 可选检查包括摄影文字证据、字符长度、空白分隔词数、ASCII、必含和禁止原文；它们不是模型
 评审，也不保证叙事语义或摄影物理正确。配置的写作目标也会进入对应阶段的提示词；
 `off` 只关闭检查与质量重试，不删除目标。`--frame-min-words` / `--frame-max-words`
 和 `--frame-min-chars` / `--frame-max-chars` 可覆盖帧长度目标；
 词数按空白分隔，中文通常用字符数。
 运行配置只提供模式时保留缺省检查；显式提供某阶段的 `checks` 时完整替换该阶段
-缺省列表。字符边界只要修改为非缺省值，就按修改后的范围冻结，不再叠加多人增量。
+缺省列表。用户长度检查默认固定，CLI 显式覆盖任一字符边界也使该检查固定，
+即使数字与默认值相同；不再按数值猜测配置来源。每个 Theme 的有效范围冻结后
+统一用于写作目标、检查、发布及 resume。
 结构与安全契约不受开关影响。
 质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
 批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、
 `--frame-output-tokens` 覆盖；预算针对整个批次，实际请求受 provider 上限约束。
 完整字段与示例见 [Story pipeline 文档](docs/story-pipeline.md)。
+
+Theme 去重上下文不再反复传输所有完整正文：保留全部历史主题的标题和四维差异摘要，
+加上最近两个完整 Theme；完整 checkpoint 仍用于 Frame 生成。相同摘要或相同
+premise/style 组合会拒绝，同一 Theme 中完全重复的 Frame 也会拒绝；这不等于
+识别所有语义重复。Frame 重试会带上所有失败槽位的问题及有界的上一版正文。
+可用 `uv run t2i-story diagnostics <run-id> --format json` 查看首轮接受率、
+重试、失败类别和已记录 token，用量缺失不被当作免费调用。
 
 story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在运行时加载
 `t2i_prompt_pipeline` 的规则。Story 的通用安全契约集中在系统 `safety.rules`，
@@ -333,8 +344,9 @@ usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次
 空响应、schema 错误和截断输出在 generation 层分类记录并进行有界重试。截断
 Theme 或 Frame batch 输出会把下一次请求预算提升到 run 冻结的 provider token 上限，并在
 resume 后保持该预算。attempt
-记录保存请求/接受 ID、具体 issues、耗时和 usage；resume 会把最近三条相关
-issues 继续反馈给模型。认证错误不会盲目重试。
+记录保存请求/接受 ID、具体 issues、耗时和 usage；Frame 重试及 resume 会带上
+当前失败槽位的全部问题，以及每帧最多 2000 字符的上一版失败正文（截短会标记）。
+已接受的 Frame 不会重新生成。认证错误不会盲目重试。
 
 批量针对一个 Story Description 文件生成固定的 hardcore English 人物组合
 （1男1女、2女、3女、1男2女、2男1女），每组 100 themes × 6 frames：
