@@ -20,12 +20,16 @@ from .models import (
     JointAngles,
     JointRegion,
     Scene,
+    SceneContactError,
+    SceneSolveRequest,
+    SceneSolveResult,
     Shape,
     SolveResult,
     TargetError,
     Tolerances,
     ValidationReport,
 )
+from .scene_solver import solve_scene
 from .solver import ROOT_VARIABLES, VARIABLE_GROUPS, expand_variable_names, solve_actor
 from .validation import face_frame, validate_scene
 
@@ -44,6 +48,9 @@ __all__ = [
     "JointAngles",
     "JointRegion",
     "Scene",
+    "SceneContactError",
+    "SceneSolveRequest",
+    "SceneSolveResult",
     "Shape",
     "Skeleton",
     "SolveResult",
@@ -54,5 +61,6 @@ __all__ = [
     "face_frame",
     "forward_kinematics",
     "solve_actor",
+    "solve_scene",
     "validate_scene",
 ]

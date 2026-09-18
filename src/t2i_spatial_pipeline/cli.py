@@ -33,6 +33,65 @@ def main() -> None:
     """Generate constraint-solved spatial image prompts."""
 
 
+@app.command("audit-geometry")
+def geometry_audit_command(
+    input_path: Path = typer.Argument(
+        ...,
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="包含显式场景几何和逐角色求解变量的 JSON 请求。",
+    ),
+    output: Path | None = typer.Option(
+        None, "--output", dir_okay=False, help="保存数值验收证据 JSON。",
+    ),
+    preview: Path | None = typer.Option(
+        None, "--preview", dir_okay=False, help="保存按相同容差重新验收的三视图 SVG。",
+    ),
+) -> None:
+    """Jointly fit explicit scene contacts and independently validate all bodies."""
+    from t2i_pose_geometry import SceneSolveRequest, solve_scene
+    from t2i_pose_geometry.preview import render_scene_svg
+
+    try:
+        paths = [path.resolve() for path in (input_path, output, preview) if path]
+        if len(paths) != len(set(paths)):
+            raise ValueError("Input, report and preview paths must be distinct")
+        request = SceneSolveRequest.model_validate_json(
+            input_path.read_text(encoding="utf-8")
+        )
+        result = solve_scene(
+            request.scene,
+            request.variables_by_actor,
+            max_nfev=request.max_nfev,
+            root_translation_bound_m=request.root_translation_bound_m,
+            tolerances=request.tolerances,
+        )
+        evidence = {
+            "schema_version": "1.0",
+            "validation_scope": "explicit_static_proxy_scene",
+            "accepted": result.accepted,
+            "physical_validation": False,
+            "catalog_certification": False,
+            "request": request.model_dump(mode="json"),
+            "result": result.model_dump(mode="json"),
+        }
+        serialized = json.dumps(evidence, indent=2) + "\n"
+        if output is not None:
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(serialized, encoding="utf-8")
+        if preview is not None:
+            image = render_scene_svg(result.scene, tolerances=result.tolerances)
+            preview.parent.mkdir(parents=True, exist_ok=True)
+            preview.write_text(image, encoding="utf-8")
+    except (OSError, ValidationError, ValueError) as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(serialized, nl=False)
+    if not result.accepted:
+        raise typer.Exit(code=1)
+
+
 @app.command("generate")
 def generate_command(
     brief: str = typer.Argument(..., help="场景、时代、氛围和视觉风格描述。"),

@@ -15,6 +15,7 @@ from .catalog import (
     PoseEntry,
     WearableProp,
     pose_activity_issues,
+    resolve_central_hand_tasks,
 )
 from .layers import (
     CharacterProfile,
@@ -27,7 +28,7 @@ from .layers import (
 
 ROOT = Path(__file__).resolve().parent
 CATALOGS = ROOT / "catalogs"
-PROMPT_AUDIT_VERSION = 6
+PROMPT_AUDIT_VERSION = 8
 
 
 class SceneSpec(NamedTuple):
@@ -558,6 +559,7 @@ def partner_relationship(
     role = actor_plan.role
     central_role = activity.focus_role
     possessive = "his" if role.startswith("m") else "her"
+    stance = "stands" if "both_feet" in actor_plan.support_points else "kneels"
     if activity.activity_id == "mutual_oral":
         return (
             f"lies fully visible in the opposite direction beside {central_name}; "
@@ -567,7 +569,6 @@ def partner_relationship(
         )
     prop = wearable_prop_for_owner(activity, role)
     if prop:
-        stance = "stands" if "both_feet" in actor_plan.support_points else "kneels"
         if actor_plan.pose_function == "supporting_central":
             return (
                 f"supports {central_name} with both arms while keeping her "
@@ -593,7 +594,7 @@ def partner_relationship(
         side = "left" if actor_plan.screen_position == "center_left" else "right"
         target = phrase(edge.target.region)
         return (
-            f"kneels beside {central_name}'s {side} hip, approaching from the "
+            f"{stance} beside {central_name}'s {side} hip, approaching from the "
             f"{side} while guiding {handheld.prop_id} toward her {target}"
         )
     self_manual = actor_self_manual_contact(activity, role)
@@ -770,8 +771,8 @@ def partner_body_chain_clause(
     received_manual = actor_receives_manual_contact(activity, actor_plan.role)
     if received_manual:
         return (
-            f"{name}'s only head, chest, waist and pelvis remain vertically "
-            f"connected as one body, with {central_name}'s assigned hand "
+            f"{name}'s only head, chest, waist and pelvis remain connected "
+            f"as one body in the stated stance, with {central_name}'s assigned hand "
             f"reaching the {phrase(received_manual.target.region)} on that pelvis."
         )
     return (
@@ -1225,22 +1226,12 @@ def resolved_central_arm_description(
 ) -> str:
     natural = natural_component(pose.arm_configuration)
     focus_role = activity.focus_role
+    resolved = resolve_central_hand_tasks(activity, pose)
+    if resolved.issues:
+        raise ValueError("; ".join(resolved.issues))
     tasks: list[tuple[str, str]] = []
-    assigned_hands: set[str] = set()
-    for edge in activity.contact_edges:
-        if (
-            edge.source.entity_id != focus_role
-            or edge.source.region not in {"hand", "left_hand", "right_hand"}
-        ):
-            continue
-        hand = (
-            edge.source.region
-            if edge.source.region in {"left_hand", "right_hand"}
-            else "right_hand"
-            if "right_hand" not in assigned_hands
-            else "left_hand"
-        )
-        assigned_hands.add(hand)
+    for index, hand in resolved.contact_hands.items():
+        edge = activity.contact_edges[index]
         tasks.append(
             (
                 hand,
@@ -1252,7 +1243,6 @@ def resolved_central_arm_description(
     for prop in activity.handheld_props:
         if prop.controller_role != focus_role:
             continue
-        assigned_hands.add(prop.grip_region)
         tasks.append(
             (
                 prop.grip_region,
@@ -1602,7 +1592,9 @@ def prompt_issues(
     prompt: str,
     character_profiles: list[CharacterProfile],
 ) -> list[str]:
-    issues: list[str] = []
+    issues = pose_activity_issues(
+        activity, entry.central_pose, list(CASTS[spec.cast_key])
+    )
     descriptions = cast_descriptions(spec.cast_key, character_profiles)
     central_name = actor_name(activity.focus_role, spec.cast_key)
     if not prompt.isascii() or "\n" in prompt or "\r" in prompt:
@@ -1631,6 +1623,14 @@ def prompt_issues(
     for value in natural_required:
         if value.lower() not in lowered:
             issues.append(f"missing naturalized plan value: {value}")
+    if support_clause(entry) not in prompt:
+        issues.append("central support allocation changed")
+    if not resolve_central_hand_tasks(activity, entry.central_pose).issues:
+        expected_arms = resolved_central_arm_description(
+            entry.central_pose, activity, spec.cast_key
+        )
+        if expected_arms not in prompt:
+            issues.append("central contact-hand allocation changed")
     for edge in activity.contact_edges:
         visibility = edge.preferred_visibility
         if visibility not in lowered:
@@ -1811,6 +1811,12 @@ def prompt_issues(
             ),
             "",
         )
+        if actor_sentence.startswith(f"{name} kneels") and resolved_partner_supports(
+            actor_plan, activity, entry.central_pose
+        ) == ["both_feet"]:
+            issues.append(
+                f"{name} has a kneeling stance with standing-only supports"
+            )
         if actor_gives_oral(activity, actor_plan.role):
             if activity.activity_id == "mutual_oral":
                 reaches_contact = (

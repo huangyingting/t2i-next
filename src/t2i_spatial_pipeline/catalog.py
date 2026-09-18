@@ -16,7 +16,7 @@ Identifier = Annotated[
     ),
 ]
 RoleCode = Annotated[str, StringConstraints(pattern=r"^[fm][1-9][0-9]*$")]
-TOPOLOGY_AUDIT_VERSION = 2
+TOPOLOGY_AUDIT_VERSION = 4
 
 
 class StrictModel(BaseModel):
@@ -206,6 +206,17 @@ class CentralPose(StrictModel):
     primary_surface: Identifier
     support_points: list[Identifier] = Field(min_length=1, max_length=8)
     compatible_camera_views: list[Identifier] = Field(min_length=3, max_length=6)
+
+    @model_validator(mode="after")
+    def raised_leg_is_not_a_planted_support(self) -> CentralPose:
+        if (
+            self.leg_configuration == "one_leg_vertical"
+            and "both_feet" in self.support_points
+        ):
+            raise ValueError(
+                "a vertically raised leg cannot contribute to both-feet support"
+            )
+        return self
 
 
 class ActorPlan(StrictModel):
@@ -1787,6 +1798,7 @@ def resolved_support_points(
     if leg_configuration in {
         "one_leg_extended",
         "one_leg_raised",
+        "one_leg_vertical",
         "one_knee_raised",
     }:
         points = ["planted_foot" if point == "both_feet" else point for point in points]
@@ -2050,6 +2062,71 @@ def _central_hand_capacity(pose: CentralPose) -> int:
     return 0
 
 
+class CentralHandTasks(NamedTuple):
+    contact_hands: dict[int, str]
+    issues: tuple[str, ...]
+
+
+def resolve_central_hand_tasks(
+    activity: ActivityTemplate, pose: CentralPose
+) -> CentralHandTasks:
+    """Reserve pose-specific and explicitly named hands before generic contacts."""
+    contacts = [
+        (index, edge.source.region)
+        for index, edge in enumerate(activity.contact_edges)
+        if edge.source.entity_id == activity.focus_role
+        and edge.source.region in {"hand", "left_hand", "right_hand"}
+    ]
+    grips = [
+        prop.grip_region
+        for prop in activity.handheld_props
+        if prop.controller_role == activity.focus_role
+    ]
+    issues = []
+    if len(contacts) + len(grips) > _central_hand_capacity(pose):
+        issues.append("central pose does not leave enough hands for contact tasks")
+    reserved: set[str] = set()
+    if pose.arm_configuration in {
+        "lower_arm_forward",
+        "upper_arm_overhead",
+        "upper_hand_hip",
+    }:
+        lower = {
+            "horizontal_left": "left_hand",
+            "horizontal_right": "right_hand",
+        }.get(pose.torso_orientation)
+        if lower is None:
+            issues.append(
+                "side-relative arm configuration lacks a lying-side orientation"
+            )
+        elif pose.arm_configuration == "lower_arm_forward":
+            reserved.add(lower)
+        else:
+            reserved.add("right_hand" if lower == "left_hand" else "left_hand")
+    occupied = set(reserved)
+    assignments: dict[int, str] = {}
+    for hand in [hand for _, hand in contacts if hand != "hand"] + grips:
+        if hand in reserved:
+            issues.append("central contact requires the hand reserved by the pose")
+        elif hand in occupied:
+            issues.append("central hand assigned to multiple contact tasks")
+        occupied.add(hand)
+    for index, hand in contacts:
+        if hand == "hand":
+            available = [
+                candidate
+                for candidate in ("right_hand", "left_hand")
+                if candidate not in occupied
+            ]
+            if not available:
+                issues.append("central contact has no unassigned hand")
+                continue
+            hand = available[0]
+            occupied.add(hand)
+        assignments[index] = hand
+    return CentralHandTasks(assignments, tuple(issues))
+
+
 def _role_contact_regions(
     activity: ActivityTemplate,
 ) -> dict[str, set[str]]:
@@ -2104,20 +2181,7 @@ def pose_activity_issues(
     ):
         issues.append("closed leg configuration blocks the pelvic contact zone")
 
-    central_hand_regions = {
-        endpoint.region
-        for edge in activity.contact_edges
-        for endpoint in (edge.source, edge.target)
-        if endpoint.entity_id == focus_role
-        and endpoint is edge.source
-        and endpoint.region in {"hand", "left_hand", "right_hand"}
-    }
-    central_hand_demand = len(central_hand_regions)
-    central_hand_demand += sum(
-        prop.controller_role == focus_role for prop in activity.handheld_props
-    )
-    if central_hand_demand > _central_hand_capacity(pose):
-        issues.append("central pose does not leave enough hands for contact tasks")
+    issues.extend(resolve_central_hand_tasks(activity, pose).issues)
 
     declared_props = {
         prop.prop_id
@@ -2134,6 +2198,11 @@ def pose_activity_issues(
 
     if pose.family == "lifted_supported" and pose.primary_surface == "partner_support":
         occupied_lift_roles = set(cast_roles[:2])
+        if any(
+            prop.controller_role in occupied_lift_roles
+            for prop in activity.handheld_props
+        ):
+            issues.append("lift support conflicts with handheld prop control")
         if any(
             edge.source.entity_id in occupied_lift_roles
             and edge.source.region in {"hand", "left_hand", "right_hand", "mouth"}
