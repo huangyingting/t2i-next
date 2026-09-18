@@ -522,7 +522,7 @@ def test_spatial_audit_resumes_from_atomic_seed_checkpoint(
     def interrupt_second_seed(*args, **kwargs):
         nonlocal interrupted_calls
         interrupted_calls += 1
-        if interrupted_calls == 2:
+        if interrupted_calls == 3:
             raise RuntimeError("simulated interruption")
         return original_build(*args, **kwargs)
 
@@ -563,7 +563,17 @@ def test_spatial_audit_resumes_from_atomic_seed_checkpoint(
     assert progress.complete is True
     assert progress.casts["one_woman"].completed_seeds == 3
     assert progress.last_error is None
-    assert resumed_calls == 2
+    assert resumed_calls == 4
+    assert progress.casts["one_woman"].reproducibility_checks == 3
+    assert (
+        progress.casts["one_woman"].structural_diagnostics.evaluated_scenes == 60
+    )
+    uninterrupted = run_spatial_audit(
+        tmp_path / "uninterrupted.json",
+        seed_count=3,
+        cast_keys=("one_woman",),
+    )
+    assert progress == uninterrupted
 
 
 def test_spatial_audit_rejects_checkpoint_for_different_options(tmp_path) -> None:

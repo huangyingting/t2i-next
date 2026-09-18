@@ -2,13 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
-from t2i_story_pipeline.documents import load_story_document
-from t2i_story_pipeline.errors import StoryConfigurationError
-from t2i_story_pipeline.models import ContentLevel, StoryStage
-from tests.story_factories import make_story_request
+from t2i_story_pipeline.inputs import load_story_document, resolve_story_input
+from t2i_story_pipeline.models import ContentLevel, StoryAuthoring, StoryStage
+from tests.story_factories import make_story_input, make_story_request
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
@@ -49,64 +46,59 @@ def test_story_content_level_rules_match_prompt_pipeline() -> None:
         ).read_text(encoding="utf-8")
 
 
-def test_story_rules_append_optional_user_files_in_stage_order(tmp_path) -> None:
-    (tmp_path / "content_levels").mkdir()
-    (tmp_path / "common.rules").write_text(
-        "# ignored\nUser common rule.\n\n",
-        encoding="utf-8",
-    )
-    (tmp_path / "themes.rules").write_text(
-        "User Theme rule.\n",
-        encoding="utf-8",
-    )
-    (tmp_path / "frames.rules").write_text(
-        "User Frame rule.\n",
-        encoding="utf-8",
-    )
-    (tmp_path / "content_levels" / "aesthetic.rules").write_text(
-        "User aesthetic rule.\n",
-        encoding="utf-8",
+def test_story_rules_append_selected_authoring_in_stage_order() -> None:
+    authoring = StoryAuthoring.model_validate(
+        {
+            stage: {
+                "common": ["Shared authored rule.", f"User {stage} rule."],
+                "content_levels": {
+                    "aesthetic": ["User aesthetic rule."],
+                    "erotic": ["Unselected erotic rule."],
+                },
+            }
+            for stage in ("themes", "frames")
+        }
     )
     request = make_story_request(content_level=ContentLevel.AESTHETIC)
 
-    rules = resolve_story_rules(request, user_directory=tmp_path)
+    rules = resolve_story_rules(request, authoring=authoring)
 
     assert rules.themes[-4:-1] == (
-        "User common rule.",
-        "User Theme rule.",
+        "Shared authored rule.",
+        "User themes rule.",
         "User aesthetic rule.",
     )
     assert rules.frames[-4:-1] == (
-        "User common rule.",
-        "User Frame rule.",
+        "Shared authored rule.",
+        "User frames rule.",
         "User aesthetic rule.",
     )
     assert "Write every natural-language output field" in rules.themes[-1]
     assert "Write every natural-language output field" in rules.frames[-1]
+    assert "Unselected erotic rule." not in rules.themes + rules.frames
 
 
-def test_story_rules_reject_missing_user_directory(tmp_path) -> None:
+def test_core_is_universal_and_named_policy_owns_nationality_defaults() -> None:
     request = make_story_request()
+    core = resolve_story_rules(request)
+    resolved = make_story_input(request)
+    policy = next(source for source in resolved.sources if source.kind == "policy")
+    assert policy.id == "standard-story"
+    for stage in StoryStage:
+        assert "默认为中国籍" not in core.text_for(stage)
+        assert "场景国家默认为中国" not in core.text_for(stage)
+        assert "默认为中国籍" in resolved.rules.text_for(stage)
+        assert "场景国家默认为中国" in resolved.rules.text_for(stage)
 
-    with pytest.raises(
-        StoryConfigurationError,
-        match="story user rules directory does not exist",
-    ):
-        resolve_story_rules(
-            request,
-            user_directory=tmp_path / "missing",
-        )
 
-
-def test_story_rules_fingerprint_changes_with_user_rules(tmp_path) -> None:
+def test_story_rules_fingerprint_changes_with_authored_rules() -> None:
     request = make_story_request()
     builtin = resolve_story_rules(request)
-    (tmp_path / "common.rules").write_text(
-        "Project-specific story rule.\n",
-        encoding="utf-8",
+    authoring = StoryAuthoring.model_validate(
+        {"themes": {"common": ["Project-specific story rule."]}}
     )
 
-    customized = resolve_story_rules(request, user_directory=tmp_path)
+    customized = resolve_story_rules(request, authoring=authoring)
 
     assert customized.fingerprint() != builtin.fingerprint()
 
@@ -114,34 +106,44 @@ def test_story_rules_fingerprint_changes_with_user_rules(tmp_path) -> None:
 def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
     required_contracts = {
         "creative.yaml": (
-            "FRAME-STAGE GRID CONTRACT",
-            "MINIATURE-WORLD CAMERA LANGUAGE",
-            "THUMBNAIL SCALE HIERARCHY",
-            "BRIGHT CLEAN COLOR STANDARD",
+            "微缩成年人物",
+            "缩略图",
+            "明亮",
+            "六区域广告概念板",
         ),
         "multi-view.yaml": (
-            "FULL-BLEED MULTI-VIEW LAYOUT",
             "A full-bleed [two/three/four]-view hard-cut tiled composition",
         ),
         "dress.yaml": (
-            "SIX-VIEW BOARD CONTRACT",
-            "exactly six non-overlapping view regions",
+            "恰好包含六个互不重叠的视图区",
         ),
         "edo-warai-e.yaml": (
-            "SPATIAL AND CONTACT GEOMETRY",
-            "PERFORMED UKIYO-E TRANSLATION",
-            "DISTANCE-READ FLATNESS GATE",
-            "MALE BODY VOCABULARY GATE",
+            "平坦、分隔的色块",
+            "中性外部词语",
+            "实体搭建和真人表演",
         ),
         "ming-gongbi-mixi-tu.yaml": (
-            "GONGBI LINE DISCIPLINE",
-            "LAYERED GONGBI COLOR",
-            "AGED SILK AND PIGMENT PATINA",
+            "游丝般细腻的线条",
+            "三矾九染",
+            "茶褐色氧化",
         ),
     }
 
     for filename, phrases in required_contracts.items():
-        story = load_story_document(
-            REPOSITORY_ROOT / "story-inputs" / filename
-        ).description
-        assert all(phrase in story for phrase in phrases)
+        document = load_story_document(
+            REPOSITORY_ROOT / "story-inputs" / "recipes" / filename
+        )
+        resolved = resolve_story_input(document)
+        story = "\n".join(
+            (document.description, *resolved.rules.themes, *resolved.rules.frames)
+        )
+        assert all(phrase in story for phrase in phrases), (
+            filename, [phrase for phrase in phrases if phrase not in story]
+        )
+        if filename == "creative.yaml":
+            layout = next(
+                module for module in resolved.modules
+                if module.kind == "layout_multiview"
+            )
+            assert layout.parameters.layout == "grid"
+            assert (layout.parameters.rows, layout.parameters.columns) == (3, 2)

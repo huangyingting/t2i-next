@@ -13,19 +13,17 @@ store = LocalStoryRunStore(
     Path("runs"),
     Path("prompts"),
 )
-request = StoryRequest(
-    story="故事要求",
-    theme_count=100,
-    frames_per_theme=6,
-    female_count=1,
-    male_count=1,
-    content_level=ContentLevel.AESTHETIC,
+document_path = Path("story-inputs/recipes/multi-view.yaml")
+resolved = resolve_story_input(
+    load_story_document(document_path),
+    source_path=document_path,
 )
-settings = StoryRunSettings(provider=provider_settings)
-rules = resolve_story_rules(request)
-completed = await StoryStudio(model, store, settings, rules).run(
-    request
+settings = StoryRunSettings(
+    provider=provider_settings,
+    **resolved.runtime.model_dump(),
+    quality=resolved.quality,
 )
+completed = await StoryStudio(model, store, settings).run(resolved)
 ```
 
 恢复时使用同一个 runs 目录和 manifest 中冻结的 settings：
@@ -36,7 +34,6 @@ completed = await StoryStudio(
     model,
     LocalStoryRunStore(Path("runs")),
     snapshot.manifest.settings,
-    snapshot.rules,
 ).resume(run_id)
 ```
 
@@ -79,7 +76,8 @@ Story 只有一条当前执行路径，不通过 output-mode 开关维护多套�
 
 | 层 | 职责 |
 |---|---|
-| `documents.py` / `models.py` | 严格解析文档和定义请求、模型草稿、最终对象、质量策略 |
+| `inputs/` | 严格加载配方与受控资产，解析适用性、模块、阶段规则和确定性槽位计划 |
+| `models.py` | 请求、模型草稿、最终对象、阶段创作和质量策略 |
 | `authoring_rules.py` / `prompts.py` | 冻结创作指令、序列化阶段上下文，不混入执行策略 |
 | `provider.py` | 结构化或文本传输、transport 重试、截断与 usage，不判断故事质量 |
 | `frame_batches.py` / `quality_validation.py` | 纯文本边界解析与纯函数检查，不进行 I/O 或模型调用 |
@@ -91,6 +89,9 @@ Story 只有一条当前执行路径，不通过 output-mode 开关维护多套�
 通用 workflow 框架。创作、验证和执行设置互不冒充。
 公共接口不接收无法冻结的 validator 回调；额外检查统一来自声明式质量策略。
 仅保存当前目录和数据结构，不提供旧整组 JSON checkpoint 或旧输出模式的回退路径。
+旧模式字段即使填入当前路径对应的值也会被拒绝；不存在自动转换模型生成 ID、
+旧配置或旧 checkpoint 的步骤。Theme 的 schema 错误属于结构化响应处理，
+Frame 只处理文本传输、标签边界和逐帧检查，不再保留 Frame schema 响应分支。
 
 ## Content Level
 
@@ -114,11 +115,25 @@ Story 只有一条当前执行路径，不通过 output-mode 开关维护多套�
 另一性别人数遵循 Story Description 明示事实；两项都省略时，人物人数和性别
 完全遵循 Story Description。两项不能同时为 0，已指定人数之和不能超过 8。
 
-约束会同时编译进 theme 和 frame 的 system prompt，并以 `cast_constraints`
-写入两个阶段的 provider request。
+约束通过两个阶段的 `input_context` 传递，包括作用域、固定额外人物以及所选槽位
+的人数条件；不再同时发送缺少作用域的第二份人数对象。
+
+专属配方通过 `requirements` 限制阵容、数量、语言和内容等级。这些要求在
+文档默认值与最终 CLI 覆盖两个阶段检查，不能被 quality off 关闭。
+显式人数作用域使用 `generation.cast.scope` 与 `fixed_roles`；有一名固定额外角色时，
+请求组最多七人，请求组与固定角色合计最多八人。固定角色可由 Theme 选择性别并在该 Theme
+内保持一致，不以编号奇偶强制分配。
+确实包含背景人群的配方需另外声明 `generation.cast.background_counts`，以有界、
+不重叠的 `{min, max}` 区间表达允许数量，且使用明确的主角作用域。背景人群仍是
+成年人并计入画面总人数范围，不能冒充未计数物件。主角容量八人不等于画面总人数
+八人；运动模糊配方的四档背景人数被保留，不擅自删掉16–30人的背景场景。
+没有背景声明的输入不能从正文推断并添加这一人数扩展。
+字母表配方禁止运行级男女数量（显式0也不允许），各主题从目录项获得自己的总人数
+与最低男女数量要求。同一人物的多个视图不重复计数。
 
 ## 人物国籍与地点缺省值
 
+这些缺省偏好由命名的包内 `standard-story` 策略负责，而不是不可变核心契约。
 Story Description 明确说明某个人物国籍时，Theme 和 Frame 忠实沿用。未明确
 说明时，该人物缺省为中国籍。故事地点、姓名、语言、肤色和外貌不作为其他国籍
 的推断依据。
@@ -168,9 +183,11 @@ generation:
 
 authoring:
   themes:
-    - 主题差异来自事件与人物关系，而不是仅更换色调。
+    common:
+      - 主题差异来自事件与人物关系，而不是仅更换色调。
   frames:
-    - 每帧独立描述景别、视角和焦点或景深。
+    common:
+      - 每帧独立描述景别、视角和焦点或景深。
 
 validation:
   themes:
@@ -206,10 +223,84 @@ runtime:
 修补非法文档。人数最终仍经过 StoryRequest 的总人数与非零阵容契约。
 
 缺省值：1 个主题、每主题 6 帧、aesthetic、chinese、不限定男女数量、8 个并发、
-2 次额外 generation retries。`authoring.themes` 和 `authoring.frames` 是逐条
-单行创作指令，按阶段追加到用户规则之后、输出语言规则之前。运行参数与质量策略
+2 次额外 generation retries。运行参数与质量策略
 不会被当成初始创作指令发给模型；若要求模型包含指定内容，也应在正文或 authoring
 中明确表达，而不是只配置检查器。
+
+### 输入子目录与受控模块
+
+当前配方位于 `story-inputs/recipes/`，共享模块位于相邻 `_modules/`，目录数据位于
+`_catalogs/`。资产根默认相对 YAML 文档，`--assets-dir` 可显式覆盖。不再按当前
+工作目录发现 `rules/`；不存在旧 `documents.py` 或 Story `--rules-dir` 入口。
+
+配方、模块、目录和包内策略的 YAML 自然语言内容统一使用中文，包括描述、创作
+规则、目录事实和注释。字段名、ID、枚举、文件名、输出语言配置与必须逐字输出的
+原文保持不变；需要保留的英文原文以引用形式嵌入中文说明。
+输入规则的书写语言不决定生成语言，`generation.output_language` 与显式语言要求
+仍是唯一的语言控制入口。
+
+`authoring.themes` 和 `authoring.frames` 分别包含 `common` 单行规则列表与
+`content_levels` 分支；后者按当前等级选择，不把其他等级及另一阶段的目录指令
+一起发给模型。媒体共性只由显式模块提供，独有内容继续留在配方。
+模块是数据而非插件，不能加载其他模块、执行代码或使用任意模板表达式。
+模块与目录同样拒绝未知字段、重复键、锚点、远程/越界路径、重复ID及悬空引用。
+
+`requirements` 可以声明 `allowed_casts`、人数/主题数/帧数的 `{min, max}` 边界、
+`output_languages`、`content_levels`，或用 `cast_constraints: unspecified` 禁止
+运行级男女人数。这些条件不会自动更改用户设置，也不受可选质量模式影响。
+项目中的两份 miniature 配方分别命名为 `miniature-open-composition` 与
+`miniature-giant-encounter`，保留各自语义，删除旧名称而非添加兼容别名。
+
+### 确定性目录分配
+
+`allocation` 选择 `fixed_slots`、`alphabet_coverage` 或 `cyclic_slots`，并指定一个目录ID。
+固定姿态目录明确列出全部槽位的项目ID；任何缺项或重复会在模型初始化前报错。
+字母目录包含每个字母的创作事实及人数条件：总数26时严格A–Z，小于26时使用目录中
+人工审定的多样性顺序，大于26时完整覆盖后循环，不按模型批次重新计数。
+小于26的具体顺序是明确的数据选择，不宣称数学意义的多样性最优。
+
+`cyclic_slots` 按整个运行的绝对Theme位置循环目录显式的槽位顺序，不执行正文
+中的算式。受限空间的姿态/情绪使用30槽循环，年龄/视角组合使用12槽循环，
+近未来的类别/种子使用30槽循环。原先以“本次返回列表”计数的文字统一为运行级，
+不随provider批大小重置。要求三个姿态家族的配方也明确至少生成三个Theme。
+原情绪余数规则未定义零/一偏移；当前目录明确以首项对应T001、第十项对应T010，
+T011回到首项。这是公开的确定化选择，不声称原文已经规定该偏移。
+未定义确定顺序的创作多样性与技术配额仍由创作规则表达，不宣称已经机器验证。
+
+目录项可携带有界的 `frame_assignment`，声明适用的 `frames_per_theme` 与完整、
+唯一的Frame槽位规则。只有实际帧数匹配时才应用；重试F02只携带原F02的规则，
+不把第二个视角当成第一槽位重新分配。此类Frame事实不会进入Theme请求。
+
+```yaml
+id: studio-views
+entries:
+  - id: neutral
+    themes:
+      - 固定同一个摄影棚场景。
+    frames:
+      - 保留该主题已确定的布光。
+    frame_assignment:
+      frames_per_theme: 2
+      slots:
+        - frame_id: F01
+          rules:
+            - 从正面拍摄。
+        - frame_id: F02
+          rules:
+            - 从背面拍摄。
+slots:
+  - neutral
+```
+
+配方通过 `allocation: {type: cyclic_slots, catalog: studio-views}` 引用该目录。
+`frame_assignment.slots` 必须按序完整覆盖声明数量的 `F01` 至 `Fnn`，不能漏项、
+重复或使用空规则。其他帧数仍使用目录通用Frame事实与配方规则，不伪造槽位分配。
+目录不是通用规则引擎，不接受轴、条件表达式、任意公式或嵌套执行步骤。
+这不是可执行模板、任意条件表达式或新增生成阶段。
+
+每个Theme都有预先冻结的计划，消息只包含本批选中项目及对应阶段的事实。
+批大小、Frame局部重试和resume不会重排计划；所选姿态/字母的画面实现是否正确
+仍不是目录完整性检查能够证明的。
 
 ### 批次与输出预算
 
@@ -263,6 +354,15 @@ Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
   无差别启用。
 - `prose_length`：`min_chars` / `max_chars`（默认 1 / 32768）的闭区间；
   按 Python Unicode 字符数计算，包含标点和空格，不是字节数、汉字数或 token 数。
+- `word_count`：`min_words`（默认1）与可选 `max_words`；按 `len(prose.split())`
+  计算空白分隔单元，不做语言学分词，不以字符数代替词数。边界含端点；
+  不提供 `max_words` 就没有额外词数上限。运动模糊配方的700词下限与850–1200词
+  创作目标是不同要求。
+- `ascii`：检查整段prose是否全为ASCII，只有明确要求整个输出如此的输入才启用。
+  画内英文文案不意味着中文叙事段落也必须ASCII；此检查不识别图内文字槽位。
+- `ascii` 和 `word_count` 可声明 `when_language: english` 或 `chinese`；
+  仅对匹配的运行输出语言执行，省略时对所有语言执行。不提供任意表达式条件。
+  若该阶段全部检查都因语言条件不适用，报告为 `skipped` 而不是 `passed`。
 - `required_text`：非空 `values` 列表，要求每帧逐字包含每一项，区分大小写。
 - `forbidden_text`：非空 `values` 列表，要求每帧不包含任一项，区分大小写。
 
@@ -272,7 +372,9 @@ Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
 
 CLI 的 `--theme-quality-mode` 和 `--frame-quality-mode` 分别覆盖对应阶段的模式，
 不改变检查器列表或另一阶段的设置；不保留旧 `--quality-mode`。
-API 通过 `StoryRunSettings.quality.themes` / `.frames` 设置同一策略。两阶段策略
+API 通过文档的 `validation.themes` / `.frames` 解析同一策略，再将
+`resolved.quality` 与 `resolved.runtime` 写入 `StoryRunSettings`；store拒绝不一致的副本。
+两阶段策略
 完整冻结在 manifest 中，resume 不读当前 YAML 或规则文件，也不接受切换策略。
 
 检查问题以 `stage`、`theme_id`、`frame_id`、`field`、`check`、`message` 保存到
@@ -298,6 +400,7 @@ CLI 分别输出两阶段的 `skipped` / `passed` / `warnings` 和报告路径�
 runs/<run-id>/
 ├── request.json
 ├── rules.json
+├── resolved-input.json
 ├── manifest.json
 ├── attempts/
 │   └── <operation>-<attempt>.json
@@ -311,7 +414,11 @@ runs/<run-id>/
 ```
 
 `manifest.json` 冻结 provider、并发数、generation retry、theme batch size、
-theme/frame token 上限、完整质量策略和发布目录。每个成功 Theme 和每个 Frame
+theme/frame token 上限、完整质量策略和发布目录，并保存解析输入的指纹。
+`resolved-input.json` 保存模块、目录、来源、有效请求及完整槽位计划。
+读取时校验指纹和请求/规则/运行设置的一致性；缺少该快照的旧run直接拒绝。
+resume不重新读取原YAML或当前资产文件，不运行隐式迁移。
+每个成功 Theme 和每个 Frame
 都独立原子写入并 fsync；例如只有 F02 失败时，上图的 F01 和 F03 保留，恢复只请求 F02。
 attempt 在对应 Frame checkpoint 之前保存接受/拒绝信息与 usage。若在多帧落盘
 期间中断，以已经完成原子写入的 Frame 文件为恢复依据，不把未落盘的 accepted ID
@@ -396,7 +503,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story generate \
-  --input story-inputs/motion-blur-photography.yaml \
+  --input story-inputs/recipes/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic \
@@ -407,13 +514,25 @@ uv run t2i-story generate \
 和非 UTF-8 文件会在 provider 调用前报错。输入错误退出码为 2；已创建但未完成
 的 run（包括强制质量检查耗尽）退出码为 1，并打印 resume 命令。批量脚本因此
 能区分共享输入无效与某个阵容生成失败。
-批量脚本的文档预检只使用仓库 `.venv/bin/python` 或仓库目录下的 `uv run python`，
-不会退回到可能缺少项目依赖的 PATH Python；两者都不可用时明确失败。
+批量脚本先通过选定CLI的 `explain` 检查全部五组请求；任意一组不兼容时整批
+退出2且没有生成调用。不再使用独立Python预检或静默跳过不兼容阵容。
+
+```bash
+uv run t2i-story explain \
+  --input story-inputs/recipes/human-typography.yaml --themes 26 --format json
+```
+
+`explain` 与 `generate` 共享同一个解析器及覆盖模型，不读取provider配置、不创建run。
+JSON结果为 `{"status":"valid","fingerprint":"...","input":{...}}`；
+配置错误为 `{"status":"invalid","error":"..."}`，退出2。
+`--format text` 可输出简短摘要。显式 `--female-count 0` 仍违反该字母配方的
+“不提供运行级男女数量”条件。
 
 主要选项：
 
 ```text
 --input PATH           读取 UTF-8 YAML Story Document
+--assets-dir PATH      显式模块/目录资产根，默认相对输入文件
 --themes INTEGER       主题数量，1 至 100
 --frames INTEGER       每个主题的画面数，1 至 6
 --female-count INTEGER 可选女性人数约束，0 至 8

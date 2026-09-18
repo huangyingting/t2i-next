@@ -19,6 +19,7 @@ from t2i_story_pipeline.errors import (
     StoryStructuredOutputError,
 )
 from t2i_story_pipeline.frame_batches import split_frame_batch
+from t2i_story_pipeline.inputs import ResolvedStoryInput
 from t2i_story_pipeline.models import (
     NarrativeFrame,
     NarrativeFrameSequence,
@@ -27,9 +28,7 @@ from t2i_story_pipeline.models import (
     NarrativeThemeResult,
     QualityMode,
     StoryQualityIssue,
-    StoryRequest,
     StoryResult,
-    StoryRuleSet,
     StoryStage,
     TokenUsage,
     exact_theme_batch_model,
@@ -62,18 +61,16 @@ class StoryStudio:
         model: StoryModel,
         store: LocalStoryRunStore,
         settings: StoryRunSettings,
-        rules: StoryRuleSet,
         *,
         on_progress: ProgressCallback | None = None,
     ) -> None:
         self._model = model
         self._store = store
         self._settings = settings
-        self._rules = rules
         self._on_progress = on_progress
 
-    async def run(self, request: StoryRequest) -> CompletedStoryRun:
-        snapshot = self._store.create(request, self._settings, self._rules)
+    async def run(self, resolved: ResolvedStoryInput) -> CompletedStoryRun:
+        snapshot = self._store.create(resolved, self._settings)
         self._emit(f"Run 已创建：{snapshot.run_id}")
         return await self._drive(snapshot, restarting=False)
 
@@ -84,8 +81,6 @@ class StoryStudio:
             return snapshot.completed
         if snapshot.manifest.settings != self._settings:
             raise StoryStorageError("当前生成配置与 story run manifest 不一致")
-        if snapshot.rules != self._rules:
-            raise StoryStorageError("当前 story rules 与 run 冻结规则不一致")
         self._emit(f"继续 Run：{run_id}")
         return await self._drive(snapshot, restarting=True)
 
@@ -114,7 +109,7 @@ class StoryStudio:
         snapshot: StoryRunSnapshot,
     ) -> CompletedStoryRun:
         request = snapshot.request
-        rules = snapshot.rules
+        resolved = snapshot.input
         semaphore = asyncio.Semaphore(self._settings.concurrency)
         queue: asyncio.Queue[NarrativeTheme | None] = asyncio.Queue(
             maxsize=self._settings.concurrency
@@ -129,8 +124,7 @@ class StoryStudio:
             try:
                 async for theme in self._generate_themes(
                     snapshot.run_id,
-                    request,
-                    rules,
+                    resolved,
                     list(snapshot.themes),
                     snapshot.manifest.semantic_name,
                     semaphore,
@@ -147,9 +141,8 @@ class StoryStudio:
                     async with semaphore:
                         await self._generate_frames(
                             snapshot.run_id,
-                            request,
+                            resolved,
                             theme,
-                            rules,
                             snapshot.frames.get(theme.theme_id),
                         )
                     self._emit(f"{theme.theme_id} Frame Sequence 已保存")
@@ -211,12 +204,12 @@ class StoryStudio:
     async def _generate_themes(
         self,
         run_id: str,
-        request: StoryRequest,
-        rules: StoryRuleSet,
+        resolved: ResolvedStoryInput,
         themes: list[NarrativeTheme],
         semantic_name: str | None,
         semaphore: asyncio.Semaphore,
     ) -> AsyncIterator[NarrativeTheme]:
+        request = resolved.request
         while len(themes) < request.theme_count:
             start_index = len(themes) + 1
             count = min(
@@ -224,8 +217,7 @@ class StoryStudio:
                 request.theme_count - len(themes),
             )
             messages = theme_messages(
-                request,
-                rules,
+                resolved,
                 count=count,
                 existing_themes=themes,
                 semantic_name=semantic_name,
@@ -263,11 +255,11 @@ class StoryStudio:
     async def _generate_frames(
         self,
         run_id: str,
-        request: StoryRequest,
+        resolved: ResolvedStoryInput,
         theme: NarrativeTheme,
-        rules: StoryRuleSet,
         existing_sequence: NarrativeFrameSequence | None,
     ) -> NarrativeFrameSequence:
+        request = resolved.request
         policy = self._settings.quality.frames
         expected = [f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)]
         accepted = {
@@ -304,9 +296,8 @@ class StoryStudio:
         for attempt in range(self._settings.generation_retries + 1):
             requested_ids = tuple(f"{theme.theme_id}-{item}" for item in remaining)
             messages = frame_messages(
-                request,
+                resolved,
                 theme,
-                rules,
                 requested_frame_ids=remaining,
                 accepted_frames=[
                     accepted[item] for item in expected if item in accepted
@@ -355,11 +346,6 @@ class StoryStudio:
                 usage = exc.usage
                 error = exc
                 outcome = StoryAttemptOutcome.TRUNCATED
-                issues = [str(exc), *exc.validation_issues]
-            except StoryStructuredOutputError as exc:
-                usage = exc.usage
-                error = exc
-                outcome = StoryAttemptOutcome.REJECTED
                 issues = [str(exc), *exc.validation_issues]
             except StoryProviderResponseError as exc:
                 usage = exc.usage

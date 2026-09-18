@@ -7,6 +7,7 @@ from collections.abc import Sequence
 
 from t2i_story_pipeline.errors import StoryContractError
 from t2i_story_pipeline.models import (
+    AsciiCheck,
     CameraEvidenceCheck,
     ForbiddenTextCheck,
     FrameQualityPolicy,
@@ -14,6 +15,7 @@ from t2i_story_pipeline.models import (
     NarrativeThemeDraft,
     NarrativeThemeResult,
     OutputLanguage,
+    QualityCheck,
     QualityMode,
     RequiredTextCheck,
     StageQualityReport,
@@ -23,6 +25,7 @@ from t2i_story_pipeline.models import (
     StoryStage,
     TextLengthBounds,
     ThemeQualityPolicy,
+    WordCountCheck,
 )
 
 _CAMERA_EVIDENCE = {
@@ -59,6 +62,14 @@ class StoryQualityError(StoryContractError):
     def __init__(self, issues: Sequence[StoryQualityIssue]) -> None:
         self.issues = tuple(issues)
         super().__init__("；".join(issue.feedback() for issue in issues))
+
+
+def _frame_check_applies(check: QualityCheck, language: OutputLanguage) -> bool:
+    return (
+        not isinstance(check, AsciiCheck | WordCountCheck)
+        or check.when_language is None
+        or check.when_language == language
+    )
 
 
 def _text_check_messages(
@@ -110,6 +121,8 @@ def check_frame_quality(
         return ()
     issues: list[StoryQualityIssue] = []
     for check in policy.checks:
+        if not _frame_check_applies(check, language):
+            continue
         messages: list[str] = []
         if isinstance(check, CameraEvidenceCheck):
             missing = [
@@ -119,6 +132,19 @@ def check_frame_quality(
             ]
             if missing:
                 messages.append("缺少摄影文字证据：" + "、".join(missing))
+        elif isinstance(check, AsciiCheck):
+            if not frame.prose.isascii():
+                messages.append("正文包含非 ASCII 字符")
+        elif isinstance(check, WordCountCheck):
+            count = len(frame.prose.split())
+            if count < check.min_words:
+                messages.append(
+                    f"正文包含 {count} 个空白分隔词，至少需要 {check.min_words} 个"
+                )
+            if check.max_words is not None and count > check.max_words:
+                messages.append(
+                    f"正文包含 {count} 个空白分隔词，最多允许 {check.max_words} 个"
+                )
         else:
             messages = _text_check_messages(check, frame.prose)
         issues.extend(
@@ -154,14 +180,24 @@ def quality_report(
         )
     ]
     return StoryQualityReport(
-        themes=_stage_report(policy.themes, theme_issues),
-        frames=_stage_report(policy.frames, frame_issues),
+        themes=_stage_report(
+            policy.themes, theme_issues, active_checks=bool(policy.themes.checks)
+        ),
+        frames=_stage_report(
+            policy.frames,
+            frame_issues,
+            active_checks=any(
+                _frame_check_applies(check, language) for check in policy.frames.checks
+            ),
+        ),
     )
 
 
 def _stage_report(
     policy: ThemeQualityPolicy | FrameQualityPolicy,
     issues: list[StoryQualityIssue],
+    *,
+    active_checks: bool,
 ) -> StageQualityReport:
     if issues and policy.mode == QualityMode.ENFORCE:
         raise StoryQualityError(issues)
@@ -169,7 +205,7 @@ def _stage_report(
         mode=policy.mode,
         status=(
             "skipped"
-            if policy.mode == QualityMode.OFF or not policy.checks
+            if policy.mode == QualityMode.OFF or not active_checks
             else "warnings"
             if issues
             else "passed"

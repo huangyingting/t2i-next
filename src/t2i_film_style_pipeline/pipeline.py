@@ -119,6 +119,7 @@ class FilmStyleRunManifest(_Model):
     profile_file: str | None = None
     compiled_context_file: str | None = None
     prompt_file: str | None = None
+    diversity_report_file: str | None = None
     error: str | None = None
 
 
@@ -130,6 +131,7 @@ class CompletedFilmStylePromptRun:
     profile_file: Path
     compiled_context_file: Path
     prompt_file: Path
+    diversity_report_file: Path
 
 
 @dataclass(frozen=True, slots=True)
@@ -302,6 +304,7 @@ class LocalFilmStyleRunStore:
         run_id: str,
         *,
         prompt_file: Path,
+        diversity_report_file: Path,
     ) -> CompletedFilmStylePromptRun:
         snapshot = self.inspect(run_id)
         manifest = snapshot.manifest
@@ -318,6 +321,9 @@ class LocalFilmStyleRunStore:
             update={
                 "status": FilmStyleRunStatus.COMPLETED,
                 "prompt_file": str(prompt_file.resolve()),
+                "diversity_report_file": str(
+                    diversity_report_file.resolve()
+                ),
                 "updated_at": _now(),
                 "error": None,
             }
@@ -542,6 +548,9 @@ class FilmStylePromptStudio:
                 return self._store.complete(
                     run_id,
                     prompt_file=completed_prompt.published.prompt_file,
+                    diversity_report_file=(
+                        completed_prompt.diversity_report_file
+                    ),
                 )
             except FilmStylePipelineError as exc:
                 self._store.fail(run_id, str(exc))
@@ -592,6 +601,7 @@ def _completed_from_manifest(
         or manifest.profile_file is None
         or manifest.compiled_context_file is None
         or manifest.prompt_file is None
+        or manifest.diversity_report_file is None
     ):
         raise FilmStyleStorageError(
             f"completed Run {manifest.run_id} is missing output paths"
@@ -603,6 +613,7 @@ def _completed_from_manifest(
         profile_file=Path(manifest.profile_file),
         compiled_context_file=Path(manifest.compiled_context_file),
         prompt_file=Path(manifest.prompt_file),
+        diversity_report_file=Path(manifest.diversity_report_file),
     )
 
 

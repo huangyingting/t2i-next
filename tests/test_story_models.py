@@ -13,6 +13,7 @@ from t2i_story_pipeline.models import (
     StoryRequest,
     exact_theme_batch_model,
 )
+from t2i_story_pipeline.run_store import StoryRunSettings
 from tests.story_factories import make_theme_batch
 
 
@@ -28,6 +29,33 @@ def test_theme_draft_schema_omits_program_assigned_ids() -> None:
     schema = response_model.model_json_schema()
 
     assert "theme_id" not in json.dumps(schema)
+
+
+def test_theme_provider_output_rejects_model_assigned_ids() -> None:
+    payload = make_theme_batch().model_dump()
+    payload["themes"][0]["theme_id"] = "T001"
+    with pytest.raises(ValidationError, match="theme_id"):
+        exact_theme_batch_model(1).model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    "removed_setting",
+    [
+        {"theme_output_mode": "structured_with_ids"},
+        {"theme_output_mode": "structured_without_ids"},
+        {"frame_output_mode": "structured_sequence"},
+        {"frame_output_mode": "plain_text"},
+        {"quality": {"mode": "off", "checks": []}},
+    ],
+)
+def test_run_settings_reject_superseded_modes_and_flat_policies(removed_setting):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        StoryRunSettings.model_validate(
+            {
+                "provider": {"model": "test-model"},
+                **removed_setting,
+            }
+        )
 
 
 def test_theme_batch_requires_lowercase_snake_case_semantic_name() -> None:

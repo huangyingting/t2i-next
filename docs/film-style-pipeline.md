@@ -21,7 +21,8 @@ provider 配置。
   `COPILOT_GITHUB_TOKEN`、`GH_TOKEN` 或 `GITHUB_TOKEN`；
 - OpenAI-compatible：`OPENAI_BASE_URL`、`OPENAI_API_KEY_ENV`、
   `OPENAI_AUTH_MODE`、`OPENAI_MODEL`、`OPENAI_THINKING_MODE`、
-  `OPENAI_REASONING_EFFORT`、`OPENAI_TEMPERATURE`、
+  `OPENAI_REASONING_EFFORT`、`OPENAI_THEME_TEMPERATURE`、
+  `OPENAI_FRAME_TEMPERATURE`、
   `OPENAI_OUTPUT_TOKEN_LIMIT`、`OPENAI_TIMEOUT_SECONDS`、
   `OPENAI_TRANSPORT_RETRIES`，以及 `OPENAI_API_KEY_ENV` 指向的认证变量。
 
@@ -46,6 +47,19 @@ provider 配置。
 - 每名入画人物必须复用至少一个原作服装短语；每个场景必须复用至少两个环境短语和一个该场景道具短语。
 - Python 不按导演名或作品名增加分支；差异全部来自请求与结构化视觉档案。
 
+### 姿态与可见性边界
+
+Frame 规则区分场地方向、人物自身的解剖左右和画面左右，要求接触两端的部位、
+人物及左右侧与各自朝向一致。承重描述必须来自同一份支撑安排；支撑物还须
+说明相对位置、高度、接触面积和肢体所需空隙。靠墙后撑、抱膝坐与蹲姿、侧卧
+头部与下侧手臂均须消除空间歧义。
+
+摄影描述区分可见接触边界和自然遮住的接触面，不要求暴露被身体压住的底面。
+表情可读性同时依赖对焦、无遮挡和照明，不能同时要求面部细节与完全逆光剪影。
+这些是模型创作规则，不是人体坐标、受力、可达性或遮挡求解器；规则加载测试
+仅证明约束传入模型，不证明生成正文或最终图像已经满足它们。此模块仍不导入
+spatial 的姿态库，已有输出不会因此被重写或自动认证。
+
 ## CLI
 
 ```bash
@@ -61,7 +75,7 @@ uv run t2i-film-style generate "张艺谋" \
   --validate-frames \
   --content-level aesthetic \
   --concurrency 8 \
-  --theme-batch-size 10 \
+  --theme-batch-size 5 \
   --language chinese \
   --prompts-dir prompts \
   --runs-dir runs/film-style
@@ -73,7 +87,7 @@ uv run t2i-film-style generate "张艺谋" \
 `--filename-stem` 可单独指定英文输出文件名前缀，不改变导演署名、作品来源句或
 原作锚点；只允许 ASCII 字母、数字、下划线和连字符。
 `--theme-batch-size` 控制单次 Theme 模型调用批量返回的独立 Theme 数，范围为
-1–10，默认 10；`--concurrency` 是 Theme 批次与 Frame 调用共同遵守的全局并发
+1–10，默认 5；`--concurrency` 是 Theme 批次与 Frame 调用共同遵守的全局并发
 上限。
 
 完成后 CLI 输出：
@@ -170,17 +184,59 @@ Theme 不再压缩成一句风格总结。`premise` 通常使用三至五句完�
 12,000 tokens。
 
 跨 Theme 批次的避重不再回传所有既有 Theme 全文。程序建立紧凑的
-`diversity_ledger`，保存全部已用标题，以及每个 Theme 的 premise 与 style 短摘要；
-当前批次每个输出位置还会得到两个 `current_batch_novelty_targets`，轮换强调作品与
-场景、人物关系、内容路径、空间调度、摄影、光线材质、环境事件或前景运动等变化
-维度。这些目标只指定优先变化的轴，不分配具体作品、动作、姿态或镜头模板。模型在
+`diversity_ledger`，保存全部已用标题、每个 Theme 的 premise/style 短摘要、来源
+锚点使用次数，以及内容路径、空间、摄影和光线覆盖计数。当前批次每个输出位置还会
+得到一个 `current_batch_diversity_contracts` 条目，以请求上下文哈希和 Theme 顺序
+稳定分配内容路径重点、关系张力、空间策略、摄影策略、光线策略和两个优先变化维度。
+合同只指定高层变化轴，不分配具体作品、动作、姿态、动作发起者、接触链或精确镜头。
+模型在
 输出前比较候选与全局账本；若作品场景、人物组合、关系或内容路径、空间调度、摄影
 光线中有四项重复，就在当前调用内自行重构，不增加额外验证调用或重试 token。
+
+OpenAI-compatible prompt provider 默认对 Theme 使用 `0.85` temperature，对 Frame
+使用 `0.6`；可分别通过 `OPENAI_THEME_TEMPERATURE` 和
+`OPENAI_FRAME_TEMPERATURE` 调整。启用实际 reasoning/thinking 模式时不发送
+temperature；`reasoning_effort=none` 仍允许使用分阶段 temperature。Copilot SDK
+当前不暴露逐调用 temperature，因此这两个设置只影响 OpenAI-compatible 后端。
 
 每个 Frame 都是完全独立的自然语言提示词，必须重新描述完整场景与全部人物，并用
 一句普通来源说明开头，例如“这是一个基于张艺谋导演的《大红灯笼高高挂》（1991）
 原作人物与场景重新构图的电影画面。”随后使用角色 canonical_name 和场景
 canonical_name，依次描述环境、人物、动作与互动、镜头、光线和成片质感。
+Frame payload 中的 `theme_anchor_contract` 把 Theme 实际采用的人物与场景列为
+`required_exact_terms`，并把上下文内其他 canonical anchor 列为
+`forbidden_other_anchor_terms_in_body`。每帧必须在固定来源首句后的画面正文中
+逐字复用全部 required anchors，且不能出现任何 forbidden anchor；来源首句中的
+作品标题即使包含同名人物字样也不计入禁止项。
+模型返回后，程序在写入 checkpoint 前将 `deterministic_anchor_sentence` 幂等地
+放到固定来源首句之后。该自然语言句由 `required_characters` 与 `required_scene`
+构造，不消耗模型 token，也不触发重试。它只保证 canonical 字符串存在；逐人物
+诊断会先移除该句，再检查模型正文是否真正描述了每个人。
+`current_frame_diversity_contracts` 按 `frame_slot` 重申 Theme 已锁定的内容路径及其
+必须同时可见的证据。不同 Theme 按确定性合同分配不同路径，同一 Theme 的全部
+Frame 使用同一路径，只在姿态、核心互动链、动作发起者、景别、机位和光线中变化。
+Hardcore 的四条路径为明确性行为、器具形成的无插入 BDSM 控制链、命令式开放展示
+和外部器具或受控自我刺激。合同只约束高层证据，不固定人物姿势或身体拓扑；同一
+F-ID 在选择性重试和恢复后保持不变。
+未显式指定 `female_count` 与 `male_count` 时，美学级 Theme 选择一至两名成年人，
+极致情色级与赤裸明确级 Theme 恰好选择两名成年人，降低多人身体拓扑复杂度和
+Frame 漏写 Theme 人物的风险；任一人数约束存在时严格采用请求值。极致情色级的
+Frame 合同要求明显裸露或半解服装、实际非生殖器接触、具体欲望或愉悦表情，以及
+皮肤或材质触觉四项同时出现。
+显式请求任意三人及以上的 N 人阵容时，`participant_frame_contracts` 为每个人建立
+独立描述义务，并按每个 F-ID 生成通用 `group_frame_contracts`。合同只携带输入的
+`requested_cast_counts`、Theme 实际选中的 `required_active_participants` 及逐人
+参与要求，不预设核心二人组、观察者、回应者、外围人物、固定角色、配对数量、
+接触顺序或空间站位。
+模型根据人数、场景与身体拓扑自行设计适合当前画面的互动网络，不从程序提供的
+固定结构菜单中选择；每个人都必须通过具体可见且不可删除的动作直接参与同一个
+共同事件，成为至少一条动作或接触链的明确端点，并分别闭合支撑、四肢职责和
+进入路径。
+Hardcore 且 N 人阵容不少于三人时，`hardcore_group_realization` 仍只提供通用约束：
+模型自行决定全部人物的动作、对象与双向关系，不按性别或名单顺序分配角色；每个人
+都必须直接进入当前内容路径，逐人写清动作主客体、接触或器具、受力、支撑与主动
+反应，并让所有参与者属于同一个可追踪互动网络。`no_euphemism` 禁止将当前路径
+软化为协商、游戏、普通亲密姿态或画外暗示。
 每个入画人物必须分别具有一个与当前动作一致的具体可见表情，以至少两项眉眼、
 眼睑、嘴角、嘴唇、下颌、面颊或额头状态落实，并明确视线落点；不得用群体共同
 表情或“神情复杂”等抽象结论代替。
@@ -247,6 +303,7 @@ runs/film-style/<run-id>/
         ├── request.json
         ├── rules.json
         ├── manifest.json
+        ├── diversity-report.json
         ├── themes/
         ├── frames/
         │   └── T001/
@@ -272,3 +329,14 @@ uv run t2i-film-style resume RUN_ID --runs-dir runs/film-style
 恢复使用 run 中冻结的 provider 配置、并发设置和 film-style rules；当前 provider 配置
 不一致时会明确拒绝继续，避免同一 run 混用生成条件。发布文件使用导演署名和安全
 递增序号，因此重复使用同一基础 brief 与作品集合不会覆盖既有结果。
+完成时程序本地计算 `diversity-report.json`，记录标题唯一数、Theme/Frame 精确重复、
+字符三元组余弦相似度、同 Theme Frame 相似度，以及内容路径、来源锚点、空间、景别、
+姿态和光线覆盖计数。所有内容级别都记录自身证据完整与不完整 Frame 数量，并记录
+Frame 是否完整继承 Theme 的 required anchors、是否出现其他作品的 forbidden
+anchors；景别只统计远景、全景、中景、中近景、近景与特写，不混入摄影机方向或
+高度，并单独记录衣袖堆在手臂或“完全赤裸”仍穿衣物等衣物状态冲突。报告不调用
+模型、不拒绝结果，也不会触发重试。
+报告额外拆分 `character_anchor_complete_frames` 与
+`scene_anchor_complete_frames`，并记录 `participant_slot_count`、逐人物完整描述、
+面部、视线和支撑完成槽位。逐人物统计排除程序插入的锚点句，避免 exact anchor
+成功掩盖模型正文中的人物遗漏。

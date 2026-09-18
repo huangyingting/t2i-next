@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from t2i_story_pipeline.inputs import (
+    ResolvedStoryInput,
+    StoryDocument,
+    resolve_story_input,
+)
 from t2i_story_pipeline.models import (
     ContentLevel,
     NarrativeFrame,
@@ -12,8 +17,11 @@ from t2i_story_pipeline.models import (
     StoryQualityReport,
     StoryRequest,
     StoryResult,
+    StoryRuntime,
     TokenUsage,
 )
+from t2i_story_pipeline.provider import StoryProviderSettings
+from t2i_story_pipeline.run_store import StoryRunSettings
 
 
 def make_story_request(
@@ -25,9 +33,13 @@ def make_story_request(
     content_level: ContentLevel = ContentLevel.AESTHETIC,
     output_language: OutputLanguage = OutputLanguage.CHINESE,
     source_prompt_stem: str | None = None,
+    story: str | None = None,
+    prompt_filename_stem: str | None = None,
 ) -> StoryRequest:
     return StoryRequest(
-        story=(
+        story=story
+        if story is not None
+        else (
             "1930年代秋夜，两名三十岁的成年人在旧车站重逢。"
             "他们双方自愿拥抱，彼此回应且任何一方都可以停止。"
             "他们一起寻找遗失的行李，湿润月台反射暖色站灯。"
@@ -39,6 +51,40 @@ def make_story_request(
         content_level=content_level,
         output_language=output_language,
         source_prompt_stem=source_prompt_stem,
+        prompt_filename_stem=prompt_filename_stem,
+    )
+
+
+def make_story_input(
+    request: StoryRequest,
+    settings: StoryRunSettings | None = None,
+) -> ResolvedStoryInput:
+    settings = settings or StoryRunSettings(
+        provider=StoryProviderSettings(model="test-model")
+    )
+    document = StoryDocument.model_validate(
+        {
+            "id": None,
+            "description": request.story,
+            "generation": {
+                "theme_count": request.theme_count,
+                "frames_per_theme": request.frames_per_theme,
+                "content_level": request.content_level,
+                "output_language": request.output_language,
+                "cast": {
+                    "female_count": request.female_count,
+                    "male_count": request.male_count,
+                },
+            },
+            "runtime": {
+                name: getattr(settings, name) for name in StoryRuntime.model_fields
+            },
+            "validation": settings.quality,
+        }
+    )
+    resolved = resolve_story_input(document)
+    return ResolvedStoryInput.model_validate(
+        {**resolved.model_dump(), "request": request}
     )
 
 

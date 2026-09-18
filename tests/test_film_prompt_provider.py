@@ -71,6 +71,7 @@ async def test_film_prompt_provider_generates_structured_theme(
 
     assert response.value == response_value
     assert captured["response_format"]["json_schema"]["strict"] is True
+    assert captured["temperature"] == 0.85
 
 
 @pytest.mark.asyncio
@@ -114,3 +115,49 @@ async def test_film_prompt_provider_generates_frame_text_without_schema(
 
     assert response.text == "完整的单段电影画面正文。"
     assert "response_format" not in captured
+    assert captured["temperature"] == 0.6
+
+
+@pytest.mark.asyncio
+async def test_film_prompt_provider_keeps_stage_temperature_when_reasoning_is_none(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("FILM_TEST_API_KEY", "secret")
+    captured = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured.update(json.loads(request.content))
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {"content": "Frame prose."},
+                    }
+                ]
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = OpenAIFilmPromptModel(
+        FilmPromptProviderSettings(
+            model="film-model",
+            api_key_env="FILM_TEST_API_KEY",
+            reasoning_effort="none",
+            theme_temperature=0.9,
+            frame_temperature=0.55,
+        ),
+        client=client,
+    )
+
+    await provider.generate_text(
+        stage=FilmPromptStage.FRAMES,
+        messages=[ChatMessage(role="user", content="Generate.")],
+        max_output_tokens=1024,
+    )
+    await client.aclose()
+
+    assert captured["reasoning_effort"] == "none"
+    assert captured["temperature"] == 0.55

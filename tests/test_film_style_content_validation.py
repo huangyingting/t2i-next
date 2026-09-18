@@ -435,3 +435,43 @@ def test_aesthetic_frame_requires_strong_sensory_evidence() -> None:
 
     with pytest.raises(FilmStyleContractError, match="美学级感官证据不足"):
         validator.validate_frame(request, theme, weak)
+
+
+def test_erotic_frame_requires_all_four_core_sensory_signals() -> None:
+    film_request = make_film_request()
+    validator = FilmStyleContentValidator(
+        film_request,
+        make_validation_profile(),
+    )
+    request = make_prompt_request(ContentLevel.EROTIC)
+    theme = make_theme("两名成年人在书房里进行强烈的非生殖器亲密互动。")
+    base = complete_camera_frame(film_request).prose
+    complete = make_frame(
+        base
+        + "飞雪半裸跪坐，以双膝稳定支撑，裸露肩背贴住无名胸前；"
+        "无名掌心压住她腰侧，形成实际非生殖器接触。飞雪眼睑半垂、"
+        "嘴唇微张，带着清晰欲望主动回望；汗珠沿泛红皮肤滑下，"
+        "受压衣料形成深褶。"
+    )
+
+    validator.validate_frame(request, theme, complete)
+
+    weak = complete.model_copy(
+        update={
+            "prose": complete.prose.replace(
+                "飞雪眼睑半垂、嘴唇微张，带着清晰欲望主动回望；",
+                "飞雪睁眼看向桌面；",
+            )
+        }
+    )
+    with pytest.raises(FilmStyleContractError, match="欲望或愉悦表情"):
+        validator.validate_frame(request, theme, weak)
+
+    conflicted = complete.model_copy(
+        update={
+            "prose": complete.prose
+            + "她的上衣从肩头滑落并堆叠在手肘处。"
+        }
+    )
+    with pytest.raises(FilmStyleContractError, match="互斥衣物状态"):
+        validator.validate_frame(request, theme, conflicted)

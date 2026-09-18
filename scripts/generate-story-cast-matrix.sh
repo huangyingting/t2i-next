@@ -67,33 +67,7 @@ else
   exit 2
 fi
 
-if [[ -x "$repo_root/.venv/bin/python" ]]; then
-  story_python=("$repo_root/.venv/bin/python")
-elif [[ -n "$uv_executable" ]]; then
-  story_python=("$uv_executable" run python)
-else
-  printf 'Cannot find repository .venv/bin/python or uv to validate the story document.\n' >&2
-  exit 2
-fi
-
 cd -- "$repo_root"
-
-if ! "${story_python[@]}" - "$story_file" <<'PY'
-import sys
-from pathlib import Path
-
-from t2i_story_pipeline.documents import load_story_document
-from t2i_story_pipeline.errors import StoryConfigurationError
-
-try:
-    load_story_document(Path(sys.argv[1]))
-except StoryConfigurationError as exc:
-    print(f"Invalid story document: {exc}", file=sys.stderr)
-    raise SystemExit(2)
-PY
-then
-  exit 2
-fi
 
 labels=(
   "1-man-1-woman"
@@ -108,6 +82,34 @@ male_counts=(1 0 0 1 2)
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
+shared_args=(
+  --input "$story_file"
+  --content-level hardcore
+  --themes 100
+  --frames 6
+  --language english
+)
+
+preflight_failures=0
+for index in "${!labels[@]}"; do
+  if explanation="$("${story_cli[@]}" explain \
+    "${shared_args[@]}" \
+    --female-count "${female_counts[$index]}" \
+    --male-count "${male_counts[$index]}" \
+    --format json)"; then
+    :
+  else
+    printf 'Incompatible cast %s: %s\n' \
+      "${labels[$index]}" "$explanation" >&2
+    preflight_failures=$((preflight_failures + 1))
+  fi
+done
+if ((preflight_failures > 0)); then
+  printf '%d cast configurations failed preflight; no generation was started.\n' \
+    "$preflight_failures" >&2
+  exit 2
+fi
+
 failures=0
 for index in "${!labels[@]}"; do
   label="${labels[$index]}"
@@ -116,13 +118,9 @@ for index in "${!labels[@]}"; do
   printf '\nGenerating %s: female=%s, male=%s\n' \
     "$label" "$female_count" "$male_count"
   if "${story_cli[@]}" generate \
-    --input "$story_file" \
+    "${shared_args[@]}" \
     --female-count "$female_count" \
     --male-count "$male_count" \
-    --content-level hardcore \
-    --themes 100 \
-    --frames 6 \
-    --language english \
     --runs-dir "$runs_dir" \
     --prompts-dir "$prompts_root"; then
     :

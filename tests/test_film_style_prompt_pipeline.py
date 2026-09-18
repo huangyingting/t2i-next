@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import json
+from collections import Counter
 
 import pytest
 
 from t2i_film_style_pipeline.compiler import frame_source_sentence
+from t2i_film_style_pipeline.diversity import (
+    normalize_frame_anchor_prefix,
+    normalize_theme_anchor_terms,
+)
 from t2i_film_style_pipeline.errors import (
     FilmStyleProviderError,
     FilmStyleRunIncompleteError,
@@ -18,8 +23,13 @@ from t2i_film_style_pipeline.pipeline import (
     FilmStyleRunStatus,
     LocalFilmStyleRunStore,
 )
-from t2i_film_style_pipeline.prompt_messages import theme_messages
+from t2i_film_style_pipeline.prompt_messages import (
+    frame_messages,
+    theme_messages,
+)
 from t2i_film_style_pipeline.prompt_models import (
+    ContentLevel,
+    FilmPromptRequest,
     FilmPromptRuleSet,
     FilmPromptStage,
     NarrativeFrameSequence,
@@ -220,9 +230,344 @@ def test_theme_messages_use_compact_global_diversity_ledger() -> None:
     assert [item["theme_id"] for item in signatures] == ["T001", "T002"]
     assert len(signatures[0]["premise_excerpt"]) == 180
     assert len(signatures[0]["style_excerpt"]) == 140
-    targets = payload["current_batch_novelty_targets"]
-    assert [target["output_position"] for target in targets] == [1, 2]
-    assert all(len(target["novelty_priorities"]) == 2 for target in targets)
+    assert "coverage_counts" in payload["diversity_ledger"]
+    assert "source_anchor_mentions" in payload["diversity_ledger"]
+    contracts = payload["current_batch_diversity_contracts"]
+    assert [contract["output_position"] for contract in contracts] == [1, 2]
+    assert all(len(contract["novelty_priorities"]) == 2 for contract in contracts)
+    assert all(
+        contract["cast_size_requirement"] == "选择一至两名原作成年人"
+        for contract in contracts
+    )
+    assert all(
+        {
+            "content_route_emphasis",
+            "cast_size_requirement",
+            "relationship_dynamic",
+            "spatial_strategy",
+            "camera_strategy",
+            "lighting_strategy",
+        }
+        <= contract.keys()
+        for contract in contracts
+    )
+    assert contracts == json.loads(
+        theme_messages(
+            request,
+            rules,
+            start_index=3,
+            count=2,
+            existing_themes=existing,
+            semantic_name="film_run",
+            program_assigns_ids=True,
+        )[1].content
+    )["current_batch_diversity_contracts"]
+
+    all_contracts = [
+        contract
+        for start_index in range(1, 101, 5)
+        for contract in json.loads(
+            theme_messages(
+                request,
+                rules,
+                start_index=start_index,
+                count=5,
+                existing_themes=existing,
+                semantic_name="film_run",
+                program_assigns_ids=True,
+            )[1].content
+        )["current_batch_diversity_contracts"]
+    ]
+    for field in (
+        "content_route_emphasis",
+        "relationship_dynamic",
+        "spatial_strategy",
+        "camera_strategy",
+        "lighting_strategy",
+    ):
+        counts = Counter(contract[field] for contract in all_contracts)
+        assert max(counts.values()) - min(counts.values()) <= 1
+
+
+def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
+    request = FilmPromptRequest(
+        context=(
+            "原作人物与场景锚点\n"
+            "- 林岚：成年人物\n"
+            "- 陈默：成年人物\n"
+            "- 木构内厅：实际场景\n"
+            "- 河岸长廊：实际场景\n\n"
+            "色彩\n低饱和综合色。"
+        ),
+        frames_per_theme=5,
+        content_level=ContentLevel.HARDCORE,
+    )
+    theme = make_theme_batch().themes[0].model_copy(
+        update={
+            "premise": "原作成年人物林岚与陈默位于木构内厅。"
+        }
+    )
+    rules = FilmPromptRuleSet(
+        themes=("Theme rule.",),
+        frames=("Frame rule.",),
+    )
+    frame_ids = [f"F{index:02d}" for index in range(1, 6)]
+
+    payload = json.loads(
+        frame_messages(
+            request,
+            theme,
+            rules,
+            requested_frame_ids=frame_ids,
+            accepted_frames=[],
+        )[1].content
+    )
+
+    assert payload["theme_anchor_contract"] == {
+        "required_characters": ["林岚", "陈默"],
+        "required_scene": "木构内厅",
+        "required_exact_terms": ["林岚", "陈默", "木构内厅"],
+        "forbidden_other_anchor_terms_in_body": ["河岸长廊"],
+        "deterministic_anchor_sentence": (
+            "原作人物林岚、陈默位于原作场景“木构内厅”。"
+        ),
+    }
+    participant_contract = payload["participant_frame_contracts"]
+    assert [
+        item["canonical_name"]
+        for item in participant_contract["participants"]
+    ] == ["林岚", "陈默"]
+    assert participant_contract["group_frame_contracts"] == []
+    contracts = payload["current_frame_diversity_contracts"]
+    assert [contract["frame_slot"] for contract in contracts] == frame_ids
+    assert len({contract["content_route"] for contract in contracts}) == 1
+    assert all(
+        contract["required_level_evidence"] == []
+        for contract in contracts
+    )
+    assert all(contract["required_route_evidence"] for contract in contracts)
+
+    retry_payload = json.loads(
+        frame_messages(
+            request,
+            theme,
+            rules,
+            requested_frame_ids=["F03"],
+            accepted_frames=[],
+        )[1].content
+    )
+    assert retry_payload["current_frame_diversity_contracts"][0] == contracts[2]
+
+    routes = {
+        json.loads(
+            frame_messages(
+                request,
+                theme.model_copy(update={"theme_id": f"T{index:03d}"}),
+                rules,
+                requested_frame_ids=["F01"],
+                accepted_frames=[],
+            )[1].content
+        )["current_frame_diversity_contracts"][0]["content_route"]
+        for index in range(1, 5)
+    }
+    assert routes == {
+        "明确性行为",
+        "器具形成的无插入 BDSM 控制链",
+        "命令式开放展示",
+        "外部器具或受控自我刺激",
+    }
+
+
+def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
+    request = FilmPromptRequest(
+        context=(
+            "原作人物与场景锚点\n"
+            "### 《测试作品》\n"
+            "原作成年人物\n"
+            "- 林岚：成年女性\n"
+            "- 陈默：成年男性\n"
+            "- 周遥：成年女性\n"
+            "原作场景\n"
+            "- 公寓阳台：夜间场景\n\n"
+            "色彩\n低饱和综合色。"
+        ),
+        frames_per_theme=4,
+    )
+    theme = make_theme_batch().themes[0].model_copy(
+        update={
+            "premise": (
+                "林岚、陈默与周遥三名原作成年人位于公寓阳台。"
+            )
+        }
+    )
+    payload = json.loads(
+        frame_messages(
+            request,
+            theme,
+            FilmPromptRuleSet(
+                themes=("Theme rule.",),
+                frames=("Frame rule.",),
+            ),
+            requested_frame_ids=["F01", "F02", "F03", "F04"],
+            accepted_frames=[],
+        )[1].content
+    )
+
+    participant_contract = payload["participant_frame_contracts"]
+    assert [
+        item["canonical_name"]
+        for item in participant_contract["participants"]
+    ] == ["林岚", "陈默", "周遥"]
+    contracts = participant_contract["group_frame_contracts"]
+    assert [contract["frame_slot"] for contract in contracts] == [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+    ]
+    assert all(
+        contract["required_active_participants"]
+        == ["林岚", "陈默", "周遥"]
+        for contract in contracts
+    )
+    assert all(contract["participant_count"] == 3 for contract in contracts)
+    assert all(
+        "core_interaction_pair" not in contract
+        and "independent_participants" not in contract
+        for contract in contracts
+    )
+
+    normalized = normalize_frame_anchor_prefix(
+        request,
+        theme,
+        "这是固定来源句。三人在狭小水泥阳台上纳凉。",
+    )
+    assert normalized == (
+        "这是固定来源句。"
+        "原作人物林岚、陈默、周遥位于原作场景“公寓阳台”。"
+        "三人在狭小水泥阳台上纳凉。"
+    )
+    assert (
+        normalize_frame_anchor_prefix(request, theme, normalized)
+        == normalized
+    )
+    modified_scene_theme = theme.model_copy(
+        update={
+            "premise": (
+                "林岚、陈默与周遥三名原作成年人位于狭小公寓的水泥阳台。"
+            )
+        }
+    )
+    normalized_theme = normalize_theme_anchor_terms(
+        request,
+        modified_scene_theme,
+    )
+    assert normalized_theme.premise.endswith("原作场景为“公寓阳台”。")
+
+    hardcore_request = request.model_copy(
+        update={"content_level": ContentLevel.HARDCORE}
+    )
+    hardcore_payload = json.loads(
+        frame_messages(
+            hardcore_request,
+            theme,
+            FilmPromptRuleSet(
+                themes=("Theme rule.",),
+                frames=("Frame rule.",),
+            ),
+            requested_frame_ids=["F01", "F02", "F03"],
+            accepted_frames=[],
+        )[1].content
+    )
+    hardcore_contracts = hardcore_payload["participant_frame_contracts"][
+        "group_frame_contracts"
+    ]
+    assert all(
+        contract["hardcore_group_realization"]["participants"]
+        == ["林岚", "陈默", "周遥"]
+        for contract in hardcore_contracts
+    )
+    assert all(
+        "role_assignment"
+        not in contract["hardcore_group_realization"]
+        for contract in hardcore_contracts
+    )
+
+
+def test_eight_person_frame_contract_remains_role_agnostic() -> None:
+    names = [
+        "林岚",
+        "陈默",
+        "周遥",
+        "沈青",
+        "许安",
+        "赵川",
+        "苏明",
+        "顾宁",
+    ]
+    request = FilmPromptRequest(
+        context=(
+            "原作人物与场景锚点\n"
+            "### 《测试作品》\n"
+            "原作成年人物\n"
+            + "".join(f"- {name}：成年人物\n" for name in names)
+            + "原作场景\n"
+            "- 公寓客厅：夜间场景\n\n"
+            "色彩\n低饱和综合色。"
+        ),
+        frames_per_theme=5,
+        content_level=ContentLevel.HARDCORE,
+    )
+    theme = make_theme_batch().themes[0].model_copy(
+        update={
+            "premise": (
+                f"{'、'.join(names)}八名原作成年人位于公寓客厅。"
+            )
+        }
+    )
+    rules = FilmPromptRuleSet(
+        themes=("Theme rule.",),
+        frames=("Frame rule.",),
+    )
+    frame_ids = [f"F{index:02d}" for index in range(1, 6)]
+    payload = json.loads(
+        frame_messages(
+            request,
+            theme,
+            rules,
+            requested_frame_ids=frame_ids,
+            accepted_frames=[],
+        )[1].content
+    )
+
+    participant_contract = payload["participant_frame_contracts"]
+    contracts = participant_contract[
+        "group_frame_contracts"
+    ]
+    assert participant_contract["selected_participant_count"] == 8
+    assert len(contracts) == 5
+    for contract in contracts:
+        assert contract["participant_count"] == 8
+        assert contract["required_active_participants"] == names
+        assert "core_interaction_pair" not in contract
+        assert "independent_participants" not in contract
+        assert "participant_spatial_assignments" not in contract
+        realization = contract["hardcore_group_realization"]
+        assert realization["participants"] == names
+        assert "role_assignment" not in realization
+
+    retry_payload = json.loads(
+        frame_messages(
+            request,
+            theme,
+            rules,
+            requested_frame_ids=["F03"],
+            accepted_frames=[],
+        )[1].content
+    )
+    assert retry_payload["participant_frame_contracts"][
+        "group_frame_contracts"
+    ][0] == contracts[2]
 
 
 @pytest.mark.asyncio
@@ -255,6 +600,30 @@ async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
 
     snapshot = store.inspect(completed.run_id)
     assert completed.prompt_file.exists()
+    assert completed.diversity_report_file.exists()
+    report = json.loads(completed.diversity_report_file.read_text())
+    assert report["theme_count"] == 1
+    assert report["frame_count"] == 2
+    assert report["unique_theme_titles"] == 1
+    assert report["same_theme_frame_similarity"]["pair_count"] == 1
+    assert (
+        report["content_evidence_complete_frames"]
+        + report["content_evidence_incomplete_frames"]
+        == 2
+    )
+    assert (
+        report["anchor_complete_frames"]
+        + report["anchor_missing_required_frames"]
+        >= 2
+    )
+    assert report["character_anchor_complete_frames"] == 0
+    assert report["scene_anchor_complete_frames"] == 0
+    assert report["participant_slot_count"] == 0
+    assert report["participant_description_complete_slots"] == 0
+    assert report["participant_face_complete_slots"] == 0
+    assert report["participant_gaze_complete_slots"] == 0
+    assert report["participant_support_complete_slots"] == 0
+    assert report["clothing_state_conflict_frames"] >= 0
     assert snapshot.settings.validate_themes is False
     assert snapshot.settings.validate_frames is False
     assert prompt_model.stages == [
@@ -437,8 +806,17 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
     assert initial_payload["requested_frame_slots"] == ["F01", "F02"]
     assert initial_payload["accepted_frame_prose"] == []
     assert retry_payload["requested_frame_slots"] == ["F01"]
+    source_sentence = frame_source_sentence(make_request())
+    anchor_sentence = retry_payload["theme_anchor_contract"][
+        "deterministic_anchor_sentence"
+    ]
+    expected_accepted = make_film_frame_sequence().frames[1].prose.replace(
+        source_sentence,
+        source_sentence + anchor_sentence,
+        1,
+    )
     assert retry_payload["accepted_frame_prose"] == [
-        make_film_frame_sequence().frames[1].prose
+        expected_accepted
     ]
 
 
@@ -512,8 +890,17 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     ]
     resumed_payload = json.loads(resumed_prompt_model.messages[0][1].content)
     assert resumed_payload["requested_frame_slots"] == ["F02"]
+    source_sentence = frame_source_sentence(make_request())
+    anchor_sentence = resumed_payload["theme_anchor_contract"][
+        "deterministic_anchor_sentence"
+    ]
+    expected_accepted = resumed_sequence.frames[0].prose.replace(
+        source_sentence,
+        source_sentence + anchor_sentence,
+        1,
+    )
     assert resumed_payload["accepted_frame_prose"] == [
-        resumed_sequence.frames[0].prose
+        expected_accepted
     ]
     assert store.inspect(run_id).manifest.status == FilmStyleRunStatus.COMPLETED
 

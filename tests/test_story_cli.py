@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import json
 from contextlib import asynccontextmanager
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from typer.testing import CliRunner
 
 import t2i_story_pipeline.cli as story_cli
-from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.cli import app
 from t2i_story_pipeline.config import load_story_provider_settings
+from t2i_story_pipeline.inputs import ResolvedStoryInput
 from t2i_story_pipeline.models import FrameQualityPolicy, StoryQualityPolicy
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
@@ -18,6 +20,7 @@ from t2i_story_pipeline.run_store import (
 )
 from tests.story_factories import (
     make_frame_sequence,
+    make_story_input,
     make_story_request,
     make_story_result,
     make_theme_batch,
@@ -27,11 +30,13 @@ from tests.test_story_studio import FakeStoryModel
 
 @pytest.fixture(autouse=True)
 def fake_provider_settings(monkeypatch):
+    load_settings = Mock(return_value=StoryProviderSettings(model="test-model"))
     monkeypatch.setattr(
         story_cli,
         "load_story_provider_settings",
-        lambda: StoryProviderSettings(model="test-model"),
+        load_settings,
     )
+    return load_settings
 
 
 def completed_run(directory, run_id="test-run"):
@@ -85,8 +90,8 @@ def test_story_generate_exposes_only_generation_controls() -> None:
     assert "--quality-mode" not in result.stdout
     assert "--generation-retries" in result.stdout
     assert "--prompts-dir" in result.stdout
-    assert "--rules-dir" in result.stdout
-    assert "story-inputs/rules/" in result.stdout
+    assert "--assets-dir" in result.stdout
+    assert "--rules-dir" not in result.stdout
     assert "--output-dir" not in result.stdout
     assert "--content-level" in result.stdout
     assert "内容尺度" in result.stdout
@@ -118,8 +123,8 @@ def test_story_generate_reads_story_document(
         "  theme_output_tokens: 12000\n"
         "  frame_output_tokens: 20000\n"
         "authoring:\n"
-        "  themes: [Custom theme rule.]\n"
-        "  frames: [Custom frame rule.]\n"
+        "  themes: {common: [Custom theme rule.]}\n"
+        "  frames: {common: [Custom frame rule.]}\n"
         "validation:\n"
         "  themes:\n"
         "    mode: enforce\n"
@@ -133,15 +138,14 @@ def test_story_generate_reads_story_document(
     captured = {}
 
     async def fake_generate(
-        request,
+        resolved,
         settings,
-        rules,
         *,
         runs_directory,
         prompts_directory,
     ):
-        captured["request"] = request
-        captured["rules"] = rules
+        captured["request"] = resolved.request
+        captured["rules"] = resolved.rules
         captured["settings"] = settings
         captured["runs_directory"] = runs_directory
         captured["prompts_directory"] = prompts_directory
@@ -173,7 +177,7 @@ def test_story_generate_reads_story_document(
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
     assert captured["request"].source_prompt_stem == "story"
-    assert "The Story Description is authoritative" in "\n".join(
+    assert "validated request" in "\n".join(
         captured["rules"].themes
     )
     assert captured["request"].theme_count == 7
@@ -208,14 +212,13 @@ def test_story_generate_direct_input_has_no_source_prompt_stem(
     captured = {}
 
     async def fake_generate(
-        request,
+        resolved,
         settings,
-        rules,
         *,
         runs_directory,
         prompts_directory,
     ):
-        captured["request"] = request
+        captured["request"] = resolved.request
         captured["settings"] = settings
         return completed_run(prompts_directory)
 
@@ -235,24 +238,35 @@ def test_story_generate_direct_input_has_no_source_prompt_stem(
     assert "skipped" in result.output
 
 
-def test_story_generate_loads_custom_rules(tmp_path, monkeypatch) -> None:
-    rules_dir = tmp_path / "custom-story-rules"
-    rules_dir.mkdir()
-    (rules_dir / "common.rules").write_text(
-        "Custom project-wide story rule.\n",
+def test_story_generate_loads_explicit_module_assets(tmp_path, monkeypatch) -> None:
+    assets = tmp_path / "custom-assets"
+    modules = assets / "_modules"
+    modules.mkdir(parents=True)
+    (modules / "layout.yaml").write_text(
+        "id: layout\nkind: layout_multiview\n"
+        "authoring:\n"
+        "  themes: {common: [Custom theme composition rule.]}\n"
+        "  frames: {common: [Custom frame composition rule.]}\n",
+        encoding="utf-8",
+    )
+    document = tmp_path / "story.yaml"
+    document.write_text(
+        "id: story\ndescription: A station composition.\n"
+        "modules:\n"
+        "  - id: layout\n"
+        "    parameters: {layout: grid, rows: 2, columns: 3}\n",
         encoding="utf-8",
     )
     captured = {}
 
     async def fake_generate(
-        request,
+        resolved,
         settings,
-        rules,
         *,
         runs_directory,
         prompts_directory,
     ):
-        captured["rules"] = rules
+        captured["rules"] = resolved.rules
         return completed_run(prompts_directory)
 
     monkeypatch.setattr(story_cli, "_generate", fake_generate)
@@ -261,20 +275,22 @@ def test_story_generate_loads_custom_rules(tmp_path, monkeypatch) -> None:
         app,
         [
             "generate",
-            "直接输入的故事",
-            "--rules-dir",
-            str(rules_dir),
+            "--input",
+            str(document),
+            "--assets-dir",
+            str(assets),
             "--prompts-dir",
             str(tmp_path / "prompts"),
         ],
     )
 
     assert result.exit_code == 0
-    assert "Custom project-wide story rule." in captured["rules"].themes
-    assert "Custom project-wide story rule." in captured["rules"].frames
+    assert "Custom theme composition rule." in captured["rules"].themes
+    assert "Custom theme composition rule." not in captured["rules"].frames
+    assert "Custom frame composition rule." in captured["rules"].frames
 
 
-def test_story_generate_discovers_rules_inside_story_inputs(
+def test_story_generate_never_discovers_legacy_rules_inside_story_inputs(
     tmp_path,
     monkeypatch,
 ) -> None:
@@ -287,14 +303,13 @@ def test_story_generate_discovers_rules_inside_story_inputs(
     captured = {}
 
     async def fake_generate(
-        request,
+        resolved,
         settings,
-        rules,
         *,
         runs_directory,
         prompts_directory,
     ):
-        captured["rules"] = rules
+        captured["rules"] = resolved.rules
         return completed_run(prompts_directory)
 
     monkeypatch.chdir(tmp_path)
@@ -303,8 +318,8 @@ def test_story_generate_discovers_rules_inside_story_inputs(
     result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
 
     assert result.exit_code == 0
-    assert "Shared story-input rule." in captured["rules"].themes
-    assert "Shared story-input rule." in captured["rules"].frames
+    assert "Shared story-input rule." not in captured["rules"].themes
+    assert "Shared story-input rule." not in captured["rules"].frames
 
 
 def test_story_generate_rejects_story_and_document_together(
@@ -332,7 +347,7 @@ def test_story_generate_rejects_empty_document(tmp_path) -> None:
     )
 
     assert result.exit_code != 0
-    assert "不能为空" in result.output
+    assert "empty YAML document" in result.output
 
 
 def test_story_generate_rejects_missing_document(tmp_path) -> None:
@@ -355,7 +370,7 @@ def test_story_generate_rejects_non_utf8_document(tmp_path) -> None:
     )
 
     assert result.exit_code != 0
-    assert "UTF-8" in result.output
+    assert "utf-8" in result.output.lower()
 
 
 def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
@@ -364,18 +379,17 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
         tmp_path / "runs",
         tmp_path / "prompts",
     )
-    snapshot = store.create(
-        (request := make_story_request()),
-        StoryRunSettings(
-            provider=provider,
-            concurrency=3,
-            quality=StoryQualityPolicy(
-                frames=FrameQualityPolicy(
-                    mode="enforce", checks=[{"type": "camera_evidence"}]
-                )
-            ),
+    settings = StoryRunSettings(
+        provider=provider,
+        concurrency=3,
+        quality=StoryQualityPolicy(
+            frames=FrameQualityPolicy(
+                mode="enforce", checks=[{"type": "camera_evidence"}]
+            )
         ),
-        resolve_story_rules(request),
+    )
+    snapshot = store.create(
+        make_story_input(make_story_request(), settings), settings
     )
     captured = {}
 
@@ -416,10 +430,9 @@ def test_story_runs_lists_resumable_command(tmp_path) -> None:
         tmp_path / "runs",
         tmp_path / "prompts",
     )
+    settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
     snapshot = store.create(
-        (request := make_story_request()),
-        StoryRunSettings(provider=StoryProviderSettings(model="test-model")),
-        resolve_story_rules(request),
+        make_story_input(make_story_request(), settings), settings
     )
 
     result = CliRunner().invoke(
@@ -461,8 +474,8 @@ def test_explicit_cli_options_override_document_and_preserve_zero(
     )
     captured = {}
 
-    async def fake_generate(request, settings, rules, **kwargs):
-        captured["request"] = request
+    async def fake_generate(resolved, settings, **kwargs):
+        captured["request"] = resolved.request
         captured["settings"] = settings
         return completed_run(tmp_path)
 
@@ -545,7 +558,7 @@ def test_resume_freezes_document_rules_and_quality_without_reading_source(
         "  theme_batch_size: 1\n"
         "  theme_output_tokens: 512\n"
         "  frame_output_tokens: 1024\n"
-        "authoring:\n  frames: [Keep the station clock visible.]\n"
+        "authoring:\n  frames: {common: [Keep the station clock visible.]}\n"
         "validation:\n"
         "  themes:\n"
         "    mode: enforce\n"
@@ -665,3 +678,140 @@ def test_invalid_execution_options_fail_before_provider_loading(monkeypatch, opt
     )
     result = CliRunner().invoke(app, ["generate", "An old station.", *options])
     assert result.exit_code == 2
+
+
+@pytest.mark.parametrize("input_mode", ["file", "positional"])
+def test_explain_json_is_provider_free_and_preserves_explicit_overrides(
+    tmp_path, monkeypatch, fake_provider_settings, input_mode
+):
+    monkeypatch.chdir(tmp_path)
+    if input_mode == "file":
+        path = tmp_path / "story.yaml"
+        path.write_text(
+            "id: station\ndescription: A quiet station.\n"
+            "generation: {cast: {female_count: 1, male_count: 1}}\n"
+            "validation:\n"
+            "  themes:\n"
+            "    mode: enforce\n"
+            "    checks: [{type: required_text, field: title, values: [clock]}]\n"
+            "  frames:\n"
+            "    mode: enforce\n"
+            "    checks: [{type: camera_evidence}]\n",
+            encoding="utf-8",
+        )
+        input_args = ["--input", str(path)]
+    else:
+        input_args = ["A quiet station.", "--male-count", "1"]
+    before = set(tmp_path.iterdir())
+    result = CliRunner().invoke(
+        app,
+        [
+            "explain",
+            *input_args,
+            "--themes",
+            "2",
+            "--frames",
+            "1",
+            "--female-count",
+            "0",
+            "--generation-retries",
+            "0",
+            "--concurrency",
+            "3",
+            "--theme-batch-size",
+            "2",
+            "--theme-output-tokens",
+            "512",
+            "--frame-output-tokens",
+            "1024",
+            "--theme-quality-mode",
+            "report",
+            "--frame-quality-mode",
+            "off",
+            "--language",
+            "english",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert set(payload) == {"status", "fingerprint", "input"}
+    assert payload["status"] == "valid"
+    resolved = ResolvedStoryInput.model_validate(payload["input"])
+    assert payload["fingerprint"] == resolved.fingerprint()
+    assert resolved.request.theme_count == 2
+    assert resolved.request.frames_per_theme == 1
+    assert resolved.request.female_count == 0
+    assert resolved.request.male_count == 1
+    assert resolved.request.output_language == "english"
+    assert resolved.runtime.concurrency == 3
+    assert resolved.runtime.generation_retries == 0
+    assert resolved.runtime.theme_batch_size == 2
+    assert resolved.runtime.theme_output_tokens == 512
+    assert resolved.runtime.frame_output_tokens == 1024
+    assert resolved.quality.themes.mode == "report"
+    assert resolved.quality.frames.mode == "off"
+    if input_mode == "file":
+        assert resolved.quality.themes.checks[0].field == "title"
+        assert resolved.quality.frames.checks[0].type == "camera_evidence"
+    fake_provider_settings.assert_not_called()
+    assert set(tmp_path.iterdir()) == before
+
+
+def test_explain_text_is_readable_and_provider_free(
+    tmp_path, monkeypatch, fake_provider_settings
+):
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(
+        app, ["explain", "A quiet station.", "--format", "text"]
+    )
+    assert result.exit_code == 0, result.output
+    assert "指纹" in result.stdout
+    assert "输入有效" in result.stdout
+    assert "计划槽位" in result.stdout
+    fake_provider_settings.assert_not_called()
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize(
+    "configuration",
+    [
+        "unknown: true",
+        "modules: [{id: missing}]",
+        "runtime: {generation_retries: -1}",
+        "generation: {cast: {female_count: 8, male_count: 1}}",
+        "requirements: {theme_count: {min: 2}}",
+        "requirements: {allowed_casts: [{female_count: 0, male_count: 1}]}",
+    ],
+)
+@pytest.mark.parametrize("command", ["explain", "generate"])
+def test_input_applicability_fails_before_provider_or_run_side_effects(
+    tmp_path, monkeypatch, fake_provider_settings, configuration, command
+):
+    monkeypatch.chdir(tmp_path)
+    path = tmp_path / "invalid.yaml"
+    path.write_text(
+        "id: invalid\ndescription: A quiet station.\n" + configuration,
+        encoding="utf-8",
+    )
+    result = CliRunner().invoke(
+        app, [command, "--input", str(path), "--female-count", "1", "--male-count", "1"]
+    )
+    assert result.exit_code == 2, result.output
+    if command == "explain":
+        payload = json.loads(result.stdout)
+        assert set(payload) == {"status", "error"}
+        assert payload["status"] == "invalid"
+        assert payload["error"]
+    fake_provider_settings.assert_not_called()
+    assert set(tmp_path.iterdir()) == {path}
+
+
+def test_explain_missing_file_is_machine_readable(tmp_path, fake_provider_settings):
+    result = CliRunner().invoke(
+        app, ["explain", "--input", str(tmp_path / "missing.yaml")]
+    )
+    assert result.exit_code == 2
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "invalid"
+    assert "missing.yaml" in payload["error"]
+    fake_provider_settings.assert_not_called()

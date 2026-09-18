@@ -19,6 +19,10 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from t2i_film_style_pipeline.diversity import (
+    FilmPromptDiversityReport,
+    build_diversity_report,
+)
 from t2i_film_style_pipeline.errors import (
     FilmPromptRunNotFoundError,
     FilmStyleStorageError,
@@ -161,7 +165,7 @@ class FilmPromptRunSettings(_Model):
     provider: FilmPromptProviderSettings
     concurrency: int = Field(default=8, ge=1, le=32)
     generation_retries: int = Field(default=2, ge=0, le=5)
-    theme_batch_size: int = Field(default=10, ge=1, le=10)
+    theme_batch_size: int = Field(default=5, ge=1, le=10)
     theme_output_tokens: int = Field(default=6000, ge=512, le=65536)
     frame_output_tokens: int = Field(default=32768, ge=512, le=65536)
     theme_output_mode: ThemeOutputMode = ThemeOutputMode.STRUCTURED_WITH_IDS
@@ -200,6 +204,7 @@ class CompletedFilmPromptRun:
     run_id: str
     request_file: Path
     result_file: Path
+    diversity_report_file: Path
     published: PublishedFilmPrompt
     result: FilmPromptResult
 
@@ -583,6 +588,7 @@ class LocalFilmPromptRunStore:
             raise FilmStyleStorageError("完成结果的 token usage 与运行记录不匹配")
         directory = self._run_directory(run_id)
         result_file = directory / "result.json"
+        diversity_report_file = directory / "diversity-report.json"
         completion_manifest = snapshot.manifest
         prompt_path = (
             Path(completion_manifest.prompt_file)
@@ -613,7 +619,12 @@ class LocalFilmPromptRunStore:
                     prompt_path.parent / f".{prompt_path.name}.reserve"
                 )
                 raise
+        diversity_report = build_diversity_report(result)
         _write_json(result_file, result.model_dump(mode="json"))
+        _write_json(
+            diversity_report_file,
+            diversity_report.model_dump(mode="json"),
+        )
         published = publish_film_prompt(result, prompt_path)
         self._remove_reservation(prompt_path.parent / f".{prompt_path.name}.reserve")
         manifest = completion_manifest.model_copy(
@@ -629,6 +640,7 @@ class LocalFilmPromptRunStore:
             run_id=run_id,
             request_file=directory / "request.json",
             result_file=result_file,
+            diversity_report_file=diversity_report_file,
             published=published,
             result=result,
         )
@@ -732,6 +744,7 @@ class LocalFilmPromptRunStore:
         if manifest.prompt_file is None:
             raise FilmStyleStorageError("已完成 run 缺少发布文件路径")
         result_file = directory / "result.json"
+        diversity_report_file = directory / "diversity-report.json"
         try:
             result = FilmPromptResult.model_validate_json(
                 result_file.read_text(encoding="utf-8")
@@ -739,6 +752,14 @@ class LocalFilmPromptRunStore:
         except (OSError, ValidationError) as exc:
             raise FilmStyleStorageError(
                 f"已完成 run 无法读取 result.json：{exc}"
+            ) from exc
+        try:
+            FilmPromptDiversityReport.model_validate_json(
+                diversity_report_file.read_text(encoding="utf-8")
+            )
+        except (OSError, ValidationError) as exc:
+            raise FilmStyleStorageError(
+                f"已完成 run 无法读取 diversity-report.json：{exc}"
             ) from exc
         if result.run_id != manifest.run_id or result.request != request:
             raise FilmStyleStorageError("已完成 run 的 result 与 manifest 不匹配")
@@ -773,6 +794,7 @@ class LocalFilmPromptRunStore:
             run_id=manifest.run_id,
             request_file=directory / "request.json",
             result_file=result_file,
+            diversity_report_file=diversity_report_file,
             published=PublishedFilmPrompt(
                 prompt_file=prompt_file,
             ),

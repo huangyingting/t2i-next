@@ -86,7 +86,7 @@ def test_frame_rules_define_low_complexity_body_topology() -> None:
     assert "骨盆、躯干和头部各自唯一的朝向与高度" in text
     assert "每条可见手臂和腿分配一个且仅一个作用" in text
     assert "谁的哪个部位接触谁的哪个部位或哪件物体" in text
-    assert "每个人最多增加一个无动作含义的辅助接触" in text
+    assert "除共同互动所需动作外不得增加无意义辅助接触" in text
     assert "扶膝、握腕或环颈不能被写成全身支撑" in text
     assert "不得先写该区域完全贴合或没有缝隙" in text
     assert "不得在仍穿上衣或下装时写“完全赤裸”" in text
@@ -96,18 +96,44 @@ def test_frame_rules_define_low_complexity_body_topology() -> None:
     assert "不得让衣袖、衣襟或肩带滑落、褪至或堆在手臂" in text
     assert "身体拓扑和动作可读性优先于" in text
     assert "不得把两个方案混入同一画面" in text
-    assert "当前 Frame 专属的“核心接触链”句" in text
+    assert "实际存在的接触链或动作链" in text
     assert "画面是动作完成后的一个静态受力瞬间" in text
     assert "每张脸与对方的颈侧、胸前、肩后和头发之间保留可见间隔" in text
     assert "每人的重心落在自己的支撑多边形内" in text
     assert "不得使用悬空骨盆、无支点深度俯折" in text
-    assert "其他手臂必须放在自己的身体或主要支撑面上" in text
-    assert "核心接触所需的手、手臂、腿或物体必须具有可见的进入路径" in text
+    assert "每条接触链所需的手、手臂、腿或物体必须具有可见的进入路径" in text
     assert "头颈方向必须与胸骨朝向自然一致" in text
     assert "必须为每个人分别用一句话选定以下一种完整衣物状态" in text
-    assert "核心接触部位及其进入路径不得被仍穿着的衣物覆盖" in text
-    assert "每人至多一只手接触对方" in text
+    assert "所有决定性接触部位及其进入路径不得被仍穿着的衣物覆盖" in text
+    assert "每条肢体只有一个职责" in text
     assert "人物朝向与高低关系" in text
+    assert "theme_anchor_contract 冻结当前 Theme 已选择的原作锚点" in text
+    assert "程序会在固定作品来源首句之后确定性插入" in text
+    assert "participant_frame_contracts.participants 是逐人物硬约束" in text
+    assert "group_frame_contracts" in text
+    assert "不得只观察、等待、递物、做表情或充当背景" in text
+    assert "hardcore_group_realization" in text
+    assert "不得为了完成多人构图而把性部位" in text
+    assert "current_frame_diversity_contracts 按 frame_slot" in text
+    assert "选择性重试时继续执行原 frame_slot 的同一合同" in text
+
+
+def test_frame_rules_distinguish_coordinates_supports_and_visibility() -> None:
+    text = "\n".join(resolve_film_style_rules(make_prompt_request()).frames)
+    for requirement in (
+        "人物自身的解剖左右",
+        "两人并排同向时",
+        "接触必须同时指明两端的人物、部位及左右侧",
+        "支撑记录是承重描述的唯一来源",
+        "臀部离墙、上背倚墙以及手掌和前臂实际占用的空隙",
+        "臀部落地的抱膝坐和臀部离地的蹲姿",
+        "侧卧须交代头部支撑和下侧手臂的位置",
+        "区分接触边界与被身体压住的接触面",
+        "对焦、无遮挡和足够照明",
+        "不得同时写成完全逆光剪影",
+        "不同距离，应调整机位或景深",
+    ):
+        assert requirement in text
 
 
 def test_hardcore_rules_keep_theme_open_and_close_each_frame_topology() -> None:
@@ -141,6 +167,10 @@ def test_erotic_and_hardcore_share_sensory_intensity_but_not_evidence() -> None:
     )
 
     assert "同等精细、浓烈的感官描写" in erotic
+    assert "必须同时直接呈现四项核心证据" in erotic
+    assert "接纳”“放松”“专注”不能替代欲望或愉悦" in erotic
+    assert "衣物终态只允许二选一" in erotic
+    assert "不得让衣袖、衣襟或肩带从肩头滑落" in erotic
     assert "同等精细、浓烈的皮肤、表情、材质" in hardcore
     assert "不得形成完整的色情控制链" in erotic
     assert "极致感官强度必须来自非生殖器接触" in erotic

@@ -110,11 +110,11 @@ def generate_command(
         help="Theme 批次与 Frame 生成共享的最大模型调用并发数。",
     ),
     theme_batch_size: int = typer.Option(
-        10,
+        5,
         "--theme-batch-size",
         min=1,
         max=10,
-        help="每次模型调用批量生成的 Theme 数；每个 Theme 返回后独立进入 Frame 队列。",
+        help="每次模型调用批量生成的 Theme 数；默认 5 以便及时更新多样性账本。",
     ),
     content_level: ContentLevel = typer.Option(
         ContentLevel.AESTHETIC,
@@ -309,6 +309,7 @@ def _print_completed(completed: CompletedFilmStylePromptRun) -> None:
     typer.echo(f"Run：{completed.run_id}")
     typer.echo(f"视觉档案：{completed.profile_file}")
     typer.echo(f"电影提示词：{completed.prompt_file}")
+    typer.echo(f"多样性报告：{completed.diversity_report_file}")
 
 
 def _exit_for_error(error: Exception, runs_dir: Path) -> None:

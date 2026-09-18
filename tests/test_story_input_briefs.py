@@ -1,15 +1,59 @@
+import json
+import re
 from pathlib import Path
 
-from t2i_story_pipeline.documents import StoryDocument, load_story_document
+import pytest
+
+from t2i_story_pipeline.errors import StoryConfigurationError
+from t2i_story_pipeline.inputs import (
+    InputOverrides,
+    StoryDocument,
+    load_story_document,
+    resolve_story_input,
+)
+from t2i_story_pipeline.models import ContentLevel, StoryStage
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+RECIPES = REPOSITORY_ROOT / "story-inputs" / "recipes"
+
+
+def story_contract(document: StoryDocument) -> str:
+    """Inspect creative requirements without pretending all levels reach the model."""
+    sections = [document.description]
+    for stage in (document.authoring.themes, document.authoring.frames):
+        sections.extend(stage.common)
+        for rules in stage.content_levels.values():
+            sections.extend(rules)
+    resolved = resolve_story_input(document)
+    for source in resolved.sources:
+        if source.kind == "module":
+            for stage in json.loads(source.content)["authoring"].values():
+                sections.extend(stage["common"])
+                for rules in stage["content_levels"].values():
+                    sections.extend(rules)
+        elif source.kind == "catalog":
+            for entry in json.loads(source.content)["entries"]:
+                sections.extend(entry["themes"])
+                sections.extend(entry["frames"])
+                if assignment := entry.get("frame_assignment"):
+                    for slot in assignment["slots"]:
+                        sections.extend(slot["rules"])
+    return "\n".join(dict.fromkeys(sections))
+
+
+def authoring_pool(document, label, *, stage=StoryStage.THEMES):
+    authored = getattr(document.authoring, stage.value)
+    rules = (*authored.common, *authored.content_levels.get(ContentLevel.HARDCORE, ()))
+    prefix = f"{label}: - "
+    return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
 
 
 def test_story_inputs_are_yaml_documents_with_matching_ids() -> None:
-    story_inputs_dir = REPOSITORY_ROOT / "story-inputs"
+    story_inputs_dir = REPOSITORY_ROOT / "story-inputs" / "recipes"
     story_inputs = sorted(story_inputs_dir.glob("*.yaml"))
 
     assert len(story_inputs) == 48
+    assert not list((REPOSITORY_ROOT / "story-inputs").glob("*.yaml"))
     assert not list(story_inputs_dir.glob("*.txt"))
     for story_input in story_inputs:
         document = load_story_document(story_input)
@@ -18,42 +62,271 @@ def test_story_inputs_are_yaml_documents_with_matching_ids() -> None:
 
 
 def test_story_inputs_preserve_description_in_generation_requests() -> None:
-    story_inputs = sorted((REPOSITORY_ROOT / "story-inputs").glob("*.yaml"))
+    story_inputs = sorted((REPOSITORY_ROOT / "story-inputs" / "recipes").glob("*.yaml"))
 
     assert story_inputs
-    assert not (REPOSITORY_ROOT / "story-inputs" / "multi-view-scenes.yaml").exists()
+    assert not (
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "multi-view-scenes.yaml"
+    ).exists()
 
     for story_input in story_inputs:
         document = load_story_document(story_input)
         assert isinstance(document, StoryDocument), story_input.name
-        request = document.generation.request(document.description, document.id)
+        resolved = resolve_story_input(document)
+        request = resolved.request
 
         assert request.story == document.description, story_input.name
         assert request.source_prompt_stem == document.id, story_input.name
         assert request.theme_count == document.generation.theme_count, story_input.name
-        assert (
-            request.frames_per_theme == document.generation.frames_per_theme
-        ), story_input.name
-        assert (
-            request.content_level == document.generation.content_level
-        ), story_input.name
-        assert (
-            request.output_language == document.generation.output_language
-        ), story_input.name
+        assert request.frames_per_theme == document.generation.frames_per_theme, (
+            story_input.name
+        )
+        assert request.content_level == document.generation.content_level, (
+            story_input.name
+        )
+        assert request.output_language == document.generation.output_language, (
+            story_input.name
+        )
+
+
+@pytest.mark.parametrize("path", sorted(RECIPES.glob("*.yaml")), ids=lambda p: p.stem)
+def test_recipe_compilation_selects_only_each_stages_active_level(path):
+    document = load_story_document(path)
+    for level in document.requirements.content_levels or tuple(ContentLevel):
+        resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        for stage in StoryStage:
+            authored = getattr(document.authoring, stage.value)
+            compiled = resolved.rules.text_for(stage)
+            selected = authored.selected(level)
+            assert all(rule in compiled for rule in selected)
+            excluded = {
+                rule
+                for other, rules in authored.content_levels.items()
+                if other != level
+                for rule in rules
+            } - set(selected)
+            assert all(rule not in compiled for rule in excluded)
+            assert isinstance(
+                resolved.context_for(stage, [resolved.plans[0].theme_id]), dict
+            )
+
+
+def test_fixed_couple_catalog_is_one_hundred_ordered_single_frame_plans():
+    document = load_story_document(RECIPES / "indoor-couple-pose-aesthetic.yaml")
+    resolved = resolve_story_input(document)
+    request = resolved.request
+    assert request.theme_count == 100
+    assert request.frames_per_theme == 1
+    assert (request.female_count, request.male_count) == (1, 1)
+    assert request.output_language == "english"
+    assert len(resolved.plans) == 100
+    assert len({plan.entry.id for plan in resolved.plans}) == 100
+    catalog = json.loads(
+        next(source.content for source in resolved.sources if source.kind == "catalog")
+    )
+    assert [plan.entry.id for plan in resolved.plans] == catalog["slots"]
+    for overrides in (
+        InputOverrides(theme_count=99),
+        InputOverrides(frames_per_theme=2),
+        InputOverrides(female_count=0),
+        InputOverrides(male_count=0),
+        InputOverrides(output_language="chinese"),
+    ):
+        with pytest.raises(StoryConfigurationError):
+            resolve_story_input(document, overrides)
+
+
+@pytest.mark.parametrize("filename", ["pose.yaml", "dress.yaml"])
+def test_six_internal_views_do_not_force_six_narrative_frames(filename):
+    document = load_story_document(RECIPES / filename)
+    resolved = resolve_story_input(document, InputOverrides(frames_per_theme=1))
+    assert resolved.request.frames_per_theme == 1
+    assert (resolved.request.female_count, resolved.request.male_count) == (1, 0)
+    layout = next(
+        module for module in resolved.modules if module.kind == "layout_multiview"
+    )
+    assert layout.parameters.min_views == 6
+    assert layout.parameters.max_views == 6
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(male_count=1))
+
+
+def test_human_typography_leaves_cast_unspecified_and_uses_catalog_facts():
+    document = load_story_document(RECIPES / "human-typography.yaml")
+    resolved = resolve_story_input(document, InputOverrides(theme_count=26))
+    assert resolved.request.female_count is None
+    assert resolved.request.male_count is None
+    assert len({plan.entry.id for plan in resolved.plans[:26]}) == 26
+    for plan in resolved.plans:
+        assert plan.cast.total == plan.entry.cast.total
+        assert plan.cast.min_female == plan.entry.cast.min_female
+        assert plan.cast.min_male == plan.entry.cast.min_male
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(female_count=1))
+
+
+@pytest.mark.parametrize(
+    "filename", ["miniature-giant-encounter.yaml", "giant-country-fantasy.yaml"]
+)
+def test_giant_cast_is_one_extra_role_with_total_at_most_eight(filename):
+    document = load_story_document(RECIPES / filename)
+    for level in (ContentLevel.EROTIC, ContentLevel.HARDCORE):
+        resolved = resolve_story_input(
+            document, InputOverrides(content_level=level, female_count=7, male_count=0)
+        )
+        assert resolved.request.female_count == 7
+        for plan in resolved.plans:
+            assert plan.cast.scope != "all_people"
+            assert len(plan.cast.fixed_roles) == 1
+            assert plan.cast.total == 8
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(female_count=8, male_count=0))
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(content_level="aesthetic"))
+
+
+@pytest.mark.parametrize(
+    "level", list(ContentLevel)
+)
+def test_motion_blur_keeps_finite_background_bands_outside_principal_cap(level):
+    document = load_story_document(RECIPES / "motion-blur-photography.yaml")
+    resolved = resolve_story_input(
+        document,
+        InputOverrides(content_level=level, female_count=8, male_count=0),
+    )
+    for plan in resolved.plans:
+        assert plan.cast.scope == "primary_people"
+        assert plan.cast.female_count == 8
+        assert plan.cast.male_count == 0
+        assert plan.cast.principal_total == 8
+        assert plan.cast.total is None
+        assert (plan.cast.total_min, plan.cast.total_max) == (8, 38)
+        assert [
+            (band.min, band.max) for band in plan.cast.background_counts
+        ] == [(0, 0), (2, 5), (6, 15), (16, 30)]
+        permitted = {
+            count for band in plan.cast.background_counts
+            for count in range(band.min, band.max + 1)
+        }
+        assert permitted == {0, *range(2, 31)}
+
+
+@pytest.mark.parametrize("stage", list(StoryStage))
+@pytest.mark.parametrize("level", list(ContentLevel))
+def test_motion_blur_partitions_removal_and_active_action_rules(stage, level):
+    document = load_story_document(RECIPES / "motion-blur-photography.yaml")
+    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    rules = resolved.rules.text_for(stage)
+    assert "载体拖迹从这只手开始" in rules
+    assert "保持从手到拖迹再到凝固衣物的一条不间断可见因果链" in rules
+    assert "绝不暗示不可见的投掷、画外释放者" in rules
+
+    active_removal = "腾空衣物必须可见地推进当前脱衣"
+    explicit_action = "内容等级：在 hardcore 等级中，展示一个明确无误"
+    final_release = "照片中的运动只能是最终的手部释放"
+    already_cleared = "在接触开始前就已经完全脱离双腿"
+    if level == ContentLevel.HARDCORE:
+        assert active_removal not in rules
+        assert explicit_action in rules
+        assert final_release in rules
+        assert already_cleared in rules
+        assert "主动接触期间，绝不把普通闭环内衣从被占用的腿" in rules
+    else:
+        assert active_removal in rules
+        assert explicit_action not in rules
+        assert final_release not in rules
+        assert already_cleared not in rules
+
+
+@pytest.mark.parametrize(
+    "filename",
+    ["post-layout.yaml", "film-post.yaml", "magazine-cover.yaml", "jav-dvd-wrap.yaml"],
+)
+def test_visible_copy_language_is_separate_from_recipe_output_requirements(filename):
+    recipe = load_story_document(RECIPES / filename)
+    reference = next(
+        reference for reference in recipe.modules
+        if reference.id == "design-visible-copy"
+    )
+    document = StoryDocument(
+        description="An adult presents a printed design on a physical surface.",
+        modules=(reference,),
+    )
+    resolved = resolve_story_input(document, asset_root=RECIPES)
+    assert resolved.request.output_language == "chinese"
+    assert resolved.quality.frames.checks == ()
+    module = next(
+        module for module in resolved.modules if module.kind == "visible_copy"
+    )
+    assert module.parameters.copy_language == "english"
+    assert module.parameters.ascii == "required"
+    rules = resolved.rules.text_for(StoryStage.FRAMES)
+    assert "而不是描述性提示词的语言" in rules
+    assert "in precise, fluent Chinese" in rules
+    assert "添加字面 ASCII 字符 `: `" in rules
+    assert "以字面 ASCII 字符 `;` 结束" in rules
+    assert "Frame 的最后一个字符必须是 `;`" in rules
+    assert "` ;`" not in rules
+    assert "槽位数量、重复出现的位置、允许的载体、排版区域和产品版式均由配方规定" in rules
+    assert recipe.requirements.output_languages == ("english",)
+    with pytest.raises(StoryConfigurationError, match="output_language"):
+        resolve_story_input(recipe, InputOverrides(output_language="chinese"))
+
+
+@pytest.mark.parametrize(
+    "filename,min_words,max_words,requires_ascii",
+    [
+        ("ming-gongbi-mixi-tu.yaml", 350, 750, False),
+        ("tang-guohua-figures.yaml", 450, 1100, False),
+        ("edo-warai-e.yaml", 1, 1000, False),
+        ("hero-erotic-reinterpretation.yaml", 1, 350, False),
+        ("erotic-fantasy.yaml", 1, 1000, False),
+        ("surreal-conceptual-portrait.yaml", 600, None, True),
+    ],
+)
+def test_bilingual_recipes_keep_word_and_ascii_checks_english_only(
+    filename, min_words, max_words, requires_ascii
+):
+    document = load_story_document(RECIPES / filename)
+    assert resolve_story_input(document).request.output_language == "chinese"
+    for language in ("chinese", "english"):
+        for level in ContentLevel:
+            resolved = resolve_story_input(
+                document,
+                InputOverrides(output_language=language, content_level=level),
+            )
+            assert resolved.request.output_language == language
+            assert resolved.quality == document.validation
+            assert resolved.quality.frames.mode == "report"
+            checks = [
+                check.model_dump(mode="json")
+                for check in resolved.quality.frames.checks
+            ]
+            assert [check for check in checks if check["type"] == "word_count"] == [
+                {
+                    "type": "word_count",
+                    "when_language": "english",
+                    "min_words": min_words,
+                    "max_words": max_words,
+                }
+            ]
+            assert [check for check in checks if check["type"] == "ascii"] == (
+                [{"type": "ascii", "when_language": "english"}]
+                if requires_ascii else []
+            )
 
 
 def test_lifestyle_story_is_social_photography_not_ui() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT
-        / "story-inputs"
-        / "lifestyle-story.yaml"
-    ).description
+    brief = story_contract(
+        load_story_document(
+            REPOSITORY_ROOT / "story-inputs" / "recipes" / "lifestyle-story.yaml"
+        )
+    )
     normalized = " ".join(brief.split())
 
-    assert brief.startswith("BRIEF\n\n")
     assert (
-        "Follow the requested content level while retaining the same polished "
-        "social-lifestyle photographic language."
+        "Retain the same polished social-lifestyle photographic language "
+        "at the requested content level."
     ) in normalized
     assert (
         "Each Frame must independently restate the full cast, identities, styling, "
@@ -65,25 +338,16 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
     ) in normalized
     assert "Instagram and Xiaohongshu" in normalized
     assert "not a literal screen capture of either application" in normalized
-    assert "INSTAGRAM EDITORIAL" in brief
-    assert "XIAOHONGSHU LIFESTYLE" in brief
-    assert "HYBRID SOCIAL EDITORIAL" in brief
     assert "outfit-of-the-day" in normalized
     assert "cafe visit, city walk, weekend trip" in normalized
     assert "Use exactly the requested number of adult women and adult men" in normalized
     assert "Every person is unmistakably twenty-five or older" in normalized
-    assert "every woman is Chinese" in normalized
-    assert "every Frame must identify her naturally as a Chinese woman" in normalized
-    assert "Apply the same Chinese nationality default independently to every man" in normalized
     assert "Never infer another nationality from a foreign-inspired outfit" in normalized
-    assert "set every Theme in China" in normalized
-    assert "without changing the cast's default Chinese nationality" in normalized
     assert "When the requested cast is one woman and zero men" in normalized
     assert "Use an arm's-length selfie, mirror selfie, timer, tripod, or fixed camera" in normalized
     assert "Do not invent a nearby friend, companion, photographer, lover" in normalized
     assert "one concrete occasion per Theme" in normalized
     assert "The location and activity must provide concrete evidence" in normalized
-    assert "FASHION, BEAUTY, AND GROOMING" in brief
     assert "nearby-friend handheld portrait" in normalized
     assert "only when that friend is part of the requested visible cast" in normalized
     assert "only when that companion is part of the requested visible cast" in normalized
@@ -92,7 +356,6 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
     assert "For one woman and zero men, choose only an arm's-length selfie" in normalized
     assert "Never call the view nearby-friend, companion-taken" in normalized
     assert "credible modern phone-camera or compact-camera optics" in normalized
-    assert "ANATOMY AND BODY CONTINUITY" in brief
     assert (
         "Every visible arm or leg must trace continuously from its shoulder or hip"
         in normalized
@@ -117,10 +380,6 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
     )
     assert "simplify the pose or move the camera" in normalized
     assert "small signs of lived reality" in normalized
-    assert "CONTENT LEVEL" in brief
-    assert "Aesthetic:" in brief
-    assert "Erotic:" in brief
-    assert "Hardcore:" in brief
     assert "Hardcore must contain an unmistakable explicit adult act already in progress" in normalized
     assert "touching an inner thigh" in normalized
     assert "For one woman and zero men, show solitary masturbation already in progress" in normalized
@@ -161,32 +420,31 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
 
 
 def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
-    brief = load_story_document(
+    brief = story_contract(load_story_document(
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "intimate-liquid-editorial.yaml"
-    ).description
+    ))
     normalized = " ".join(brief.split())
 
     assert not (
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "overhead-radial-splash-fashion.yaml"
     ).exists()
     assert not (
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "overhead-intimate-liquid-editorial.yaml"
     ).exists()
     assert not (
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "high-angle-intimate-liquid-editorial.yaml"
     ).exists()
     assert "成人亲密液体动势时尚编辑摄影" in normalized
     assert "多样且符合场景的拍摄视点" in normalized
     assert "固定 high-angle 俯拍" in normalized
-    assert "EDITORIAL STYLE LOCK" in brief
     assert "高预算、经过完整造型与美术指导的成人 时尚编辑摄影" in normalized
     assert "露骨动作只是画面事件，不得取代时尚叙事" in normalized
     assert "一件 hero garment 或一个 hero accessory" in normalized
@@ -201,7 +459,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "可扩展的创作种子，不是穷举" in normalized
     assert "就可以自由发明未列出的 场景" in normalized
     assert "不把作品限制在固定摄影棚、白色床垫" in normalized
-    assert "开放场景生成器" in brief
     assert "可控摄影空间" in normalized
     assert "建筑室内" in normalized
     assert "文化与休闲空间" in normalized
@@ -255,7 +512,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "身体液体允许现实基础上的编辑摄影夸张" in normalized
     assert "更高但仍受重力控制的弧线、密集冻结液滴" in normalized
     assert "dramatic、 forceful、high-arc、dense、radiating、burst" in normalized
-    assert "STYLIZED BODY-FLUID LOCK:" in normalized
     assert "Heighten the arc, droplet density, frozen timing, radial shape" in normalized
     assert "Never turn body fluid into pressurized plumbing" in normalized
     assert "夸张重点放在喷射形态、液滴分离、姿势、表情、镜头角度、灯光" in normalized
@@ -271,7 +527,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "不得用手臂紧张、衣物下的动作、 水面波纹、表情或文字声明间接暗示" in normalized
     assert "中央水冠、离体高弧、径向 burst 或明确 jet 只用于从两腿之间正确生殖器开口" in normalized
     assert "人物不必躺在床上" in normalized
-    assert "构图、视点与镜头" in brief
     assert "拍摄角度是开放变化轴" in normalized
     assert "不把 high-angle、overhead 或正俯拍设为默认" in normalized
     assert "垂直高度、俯仰角、绕人物方位、拍摄距离、焦段、裁切尺度和主体落点" in normalized
@@ -290,7 +545,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "湿滑地面禁止无支撑单脚站立" in normalized
     assert "私人泳池与浅水区：轮换仰漂星形" in normalized
     assert "不得让水面反光遮没脸和动作起点" in normalized
-    assert "原生湿景棚与透明平台：轮换透明台上的非对称 X 形" in normalized
     assert "不固定为 50mm 正俯拍" in normalized
     assert "100 种高感官刺激姿势库" in normalized
     pose_ids = [
@@ -299,10 +553,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
         if len(token) == 4 and token.startswith("P") and token[1:].isdigit()
     ]
     assert pose_ids == [f"P{index:03d}" for index in range(1, 101)]
-    assert "P001 正面宽腿站姿" in normalized
-    assert "P050 侧卧镜面姿势" in normalized
-    assert "P081 背后环抱站姿" in normalized
-    assert "P100 床面非对称环抱构图" in normalized
     assert "每个 Frame 只选择一个主姿势" in normalized
     assert "跨 Theme 轮换六大姿势家族" in normalized
     assert "相邻 Theme 不得重复同一姿势家族" in normalized
@@ -313,7 +563,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "24–35mm 环境广景、40–55mm 全身中景、60–85mm 紧凑人像与动作研究" in normalized
     assert "85–105mm beauty 或材质细节" in normalized
     assert "不能隔着大腿、缸壁、床头、手臂、水花或反光拍摄" in normalized
-    assert "不强制双腿形成固定 V 形" in normalized
     assert "不强制双臂水平展开" in normalized
     assert "不强制人物仰卧" in normalized
     assert "每个 Theme 只选择一个主要液体来源家族" in normalized
@@ -339,7 +588,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "液体形态在 Theme 和 Frame 间轮换" in normalized
     assert "软水管或手持喷头可在 Erotic 或 Hardcore 中作为自愿外部自慰工具" in normalized
     assert "不得把高压水流、硬质喷嘴或软管插入身体" in normalized
-    assert "性玩具设计、动作与场景适配" in brief
     assert "性玩具是可选变化轴，不是每个 Theme 的强制道具" in normalized
     assert "一件主要性玩具或由多个不可分离部件组成的一套单一系统" in normalized
     assert "不能只写 generic sex toy" in normalized
@@ -372,17 +620,11 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "Hardcore 可从外部刺激、单一阴道或肛门插入" in normalized
     assert "连续十个包含 性玩具的 Theme 至少覆盖五个玩具家族" in normalized
     assert "相邻玩具 Theme 不得重复玩具家族、材质、颜色、固定方式和姿势组合" in normalized
-    assert "灯光服从场景而不是固定 5500K" in normalized
-    assert "色温可在约 2800–7500K 范围内变化" in normalized
-    assert "CONTENT LEVEL" in brief
     assert "Aesthetic：" in brief
     assert "Erotic：" in brief
     assert "Hardcore：" in brief
-    assert "AESTHETIC WARDROBE LOCK:" in normalized
     assert "opaque fabric fully covers all nipples, external genitals, pubic hair, and anus" in normalized
-    assert "EROTIC WARDROBE LOCK:" in normalized
     assert "visibly retains one or two sheer, translucent, open, wet-clinging, lifted, or partially lowered" in normalized
-    assert "HARDCORE WARDROBE LOCK:" in normalized
     assert "The featured adult woman's lower body is bare" in normalized
     assert "only one minimal upper garment plus zero to four accessories" in normalized
     assert "主表演者必须实际保留一至两件透明、半透明、湿贴、敞开、撩起或 半褪下" in normalized
@@ -396,7 +638,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "必须同时清楚显示上述外部自慰、单一插入或单一成人接触之一" in normalized
     assert "仅把玩具靠近身体、让液体流过裸体不算 Hardcore 动作" in normalized
     assert "同一解剖中心可有与主要动作直接相关的辅助 手部接触" in normalized
-    assert "HARDCORE 液体严格单选" in normalized
     assert "整张 Frame 只描述这一类别的流动" in normalized
     assert "不得同时滴落、喷射、飞溅、形成涟漪或与主要液体混合" in normalized
     assert "不得在 同一 Frame 同时出现尿流与阴道液体" in normalized
@@ -429,7 +670,6 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
     assert "同一视点家族最多出现两次" in normalized
     assert "规则优先级从高到低依次为：场景功能与物理逻辑" in normalized
     assert "必须舍弃更奇怪的地点、器具、水型或构图" in normalized
-    assert "FINAL SCENE-LIQUID GATE" in brief
     assert "只有一个活动液体来源，且地点本来就适合该来源" in normalized
     assert "ONE-SOURCE LOCK: Exactly one visible jet, stream, spray, pour, or moving-fluid event" in normalized
     assert "Never combine, cross, merge, unite, or synchronize liquid from two sources" in normalized
@@ -469,20 +709,18 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 
 
 def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
-    brief = load_story_document(
+    brief = story_contract(load_story_document(
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "indoor-pure-desire-editorial.yaml"
-    ).description
+    ))
     normalized = " ".join(brief.split())
 
-    assert brief.startswith("BRIEF\n\n")
     assert "室内纯欲成人时尚摄影 Theme" in normalized
     assert "纯欲不是幼态，也不是只使用白色内衣" in normalized
     assert "所有场景必须位于真实、封闭、可进入且可安全退出的室内" in normalized
     assert "服装、服饰、妆容、打扮和发型均为自由变化轴" in normalized
     assert "不把纯欲固定为白色" in normalized
-    assert "建议姿势库" in brief
 
     pose_ids = [
         token
@@ -496,7 +734,6 @@ def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
     assert "PD050 Squatting in a deep position" in normalized
     assert "PD100 Standing with the torso upright" in normalized
     assert "每个 Frame 只选择一个主姿势" in normalized
-    assert "构图与视角锁" in brief
     assert "front view 正面" in normalized
     assert "side view 纯侧面" in normalized
     assert "rear view 正后方" in normalized
@@ -525,7 +762,6 @@ def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
     assert "十个 Theme 的批次必须至少各出现一次 front view、side view、rear view" in normalized
     assert "任一视角家族最多出现 两次" in normalized
     assert "十个 Theme 还必须至少包含一次 Dutch angle、over-the-shoulder" in normalized
-    assert "正中对称、偏心三分法、对角线、S 曲线、X 形、C 形" in normalized
     assert "Aesthetic：" in brief
     assert "Erotic：" in brief
     assert "Hardcore：" in brief
@@ -536,9 +772,9 @@ def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
 
 
 def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "piss.yaml"
-    ).description
+    brief = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "piss.yaml"
+    ))
     normalized = " ".join(brief.split())
 
     assert "骨盆居中、双腿紧凑且趋于并拢但不互相接触的低位蹲姿" in normalized
@@ -549,15 +785,11 @@ def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
     assert "不能仅低头、弯颈、把头伸向视点或单独伸出手机来假装前倾" in normalized
     assert "禁止抬高臀部变成站立俯身" in normalized
     assert "人物上身直立、后仰或只弯颈低头" in normalized
-    assert "GROUND-LEVEL VIEWPOINT LOCK:" in normalized
-    assert "SQUAT-TOILET LOCK:" in normalized
     assert "just outside the corresponding rim of a Chinese porcelain squat toilet" in normalized
     assert "aimed upward through a rectilinear 35mm perspective" in normalized
     assert "anatomically correct adult proportions" in normalized
     assert "physically plausible low-angle foreshortening" in normalized
     assert "a head visibly smaller than the shoulder span and torso" in normalized
-    assert "FORWARD-FOLDED SQUAT LOCK:" in normalized
-    assert "STYLE CONTINUITY LOCK:" in normalized
     assert "torso nearly horizontal to the floor" in normalized
     assert "the pelvis centered over the midpoint between the feet" in normalized
     assert "both upper thighs anatomically distinct and closely paired" in normalized
@@ -606,20 +838,18 @@ def test_restroom_brief_requires_forward_leaning_deep_squat() -> None:
     assert "双肩、胸腹和骨盆必须清楚可见" in normalized
     assert "头部不是距离视点最近的物体" in normalized
     assert "头宽达到或超过肩宽、头遮挡身体、头大身小" in normalized
-    assert "年龄按 Theme 编号使用确定性四段循环" in normalized
-    assert "余 1 时选择 25–34 岁的年轻成年人" in normalized
-    assert "余 2 时选择 35–49 岁的成熟成年人" in normalized
-    assert "余 3 时选择 50–64 岁的年长成年人" in normalized
-    assert "余 0 时选择 65–79 岁的老年成年人" in normalized
-    assert "每个 Theme 必须在对应范围内给出一个明确整数年龄" in normalized
+    assert "25–34 岁的年轻成年人范围内选择一个明确整数年龄" in normalized
+    assert "35–49 岁的成熟成年人范围内选择一个明确整数年龄" in normalized
+    assert "50–64 岁的年长成年人范围内选择一个明确整数年龄" in normalized
+    assert "65–79 岁的老年成年人范围内选择一个明确整数年龄" in normalized
     assert "50 岁以上人物必须显示与具体年龄相符的面部细纹" in normalized
     assert "不得让整批年龄集中在 25–39 岁" in normalized
 
 
 def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "piss.yaml"
-    ).description
+    brief = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "piss.yaml"
+    ))
     normalized = " ".join(brief.split())
 
     assert "手机不是必需品" in normalized
@@ -677,26 +907,44 @@ def test_restroom_brief_varies_interactions_and_uses_ground_camera() -> None:
     assert "VIEW DIRECTION LOCK: rear view from the squat toilet's rear rim" in normalized
     assert "VIEW DIRECTION LOCK: front three-quarter view" in normalized
     assert "VIEW DIRECTION LOCK: rear three-quarter view" in normalized
-    assert "生成两帧 Theme 时按 Theme 编号使用确定性视角对" in normalized
-    assert "Theme 编号除以 3 余 1 时" in normalized
-    assert "余 2 时，Frame 1 使用 right side view、Frame 2 使用 rear view" in normalized
-    assert "余 0 时，Frame 1 使用 front three-quarter view" in normalized
-    assert "必须读取当前 Theme 编号决定视角对" in normalized
     assert "最后一句必须正面描述可见的蹲便器陶瓷、脚踏纹、地砖、顶灯" in normalized
 
 
+def test_restroom_plans_preserve_age_and_two_frame_view_cycles() -> None:
+    resolved = resolve_story_input(
+        load_story_document(RECIPES / "piss.yaml"),
+        InputOverrides(theme_count=13, frames_per_theme=2),
+    )
+    ages = ("25–34", "35–49", "50–64", "65–79")
+    views = (
+        ("front view", "left side view"),
+        ("right side view", "rear view"),
+        ("front three-quarter view", "rear three-quarter view"),
+    )
+
+    assert len(resolved.plans) == 13
+    for index, plan in enumerate(resolved.plans):
+        assert plan.entry is not None
+        assert plan.entry.id == f"slot-{index % 12 + 1:02d}"
+        age = ages[index % 4]
+        assert age in " ".join(plan.entry.themes)
+        assert age in " ".join(plan.entry.frames)
+        assignment = plan.entry.frame_assignment
+        assert assignment is not None
+        assert assignment.frames_per_theme == 2
+        assert [slot.frame_id for slot in assignment.slots] == ["F01", "F02"]
+        for slot, view in zip(assignment.slots, views[index % 3], strict=True):
+            assert f"VIEW DIRECTION LOCK: {view} from" in " ".join(slot.rules)
+
+
 def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
-    brief = load_story_document(
+    brief = story_contract(load_story_document(
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "confined-exhibition-fantasy.yaml"
-    ).description
+    ))
     normalized = " ".join(brief.split())
-    scenes = [
-        line
-        for line in brief.splitlines()
-        if len(line) > 5 and line[:3].isdigit() and line[3:5] == ". "
-    ]
+    scenes = re.findall(r"\b\d{3}\. .*?(?=\s\d{3}\. |\n|$)", brief)
 
     assert len(scenes) == 100
     assert len(set(scenes)) == 100
@@ -727,7 +975,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     )
     assert "TOTAL PEOPLE = female_count + male_count 为 4–8" in normalized
     assert "female_count 至少为 2、male_count 至少为 1" in normalized
-    assert "SPECTATORS = TOTAL PEOPLE - 1，因此围观者为 3–7 人" in normalized
     assert "WOMEN SPECTATORS = female_count - 1" in normalized
     assert "MEN SPECTATORS = male_count" in normalized
     assert "保证围观群众同时有女性和男性" in normalized
@@ -739,7 +986,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "真实摄影师在可控私人场地中拍到的一次高预算编辑摄影" in normalized
     assert "皮肤、织物、金属、木材和软垫各有真实质感" in normalized
     assert "不是不可能的关节、复制粘贴式表情、过度锐化、塑料皮肤或堆砌提示词" in normalized
-    assert "HIGHEST PRIORITY OUTPUT" in brief
     assert "400–680 个英文单词" in normalized
     assert "四人场景优先控制在 420–540 个单词" in normalized
     assert "每增加一人最多增加 30 个单词" in normalized
@@ -750,7 +996,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "不输出 `LOCK`、schema、公式、检查步骤" in normalized
     assert "把人数算术留在内部规划中" in normalized
     assert "前两句自然写明准确总人数" in normalized
-    assert "WARDROBE, COLOR, ACCESSORIES, AND EXPRESSION" in brief
     assert "逐项写出：上身单品、下身单品或其明确缺席" in normalized
     assert "主色、辅色、材质、鞋履以及一至四件配件" in normalized
     assert "不得连续使用同一件黑色蕾丝内衣" in normalized
@@ -762,7 +1007,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "左右略不对称的眉形" in normalized
     assert "清晰瞳孔和视线目标" in normalized
     assert "不使用风格化啊嘿颜、完全上翻眼睛、失焦瞳孔" in normalized
-    assert "只有环境温度低于 10°C 时才能写可见呼气" in normalized
     assert "衣服数量较少但保持关键部位完全不透明遮盖" in normalized
     assert "一件贴身连体衣，或两至三件组成的极简性感造型" in normalized
     assert "必须保留一至两件透明、半透明、湿贴、敞开或半褪下" in normalized
@@ -772,7 +1016,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "骨盆明显高于肩线约半个躯干厚度" in normalized
     assert "肘膝保留自然轻屈" in normalized
     assert "不要求达到关节极限或同时触及最远角点" in normalized
-    assert "当前返回 Theme 列表中的顺序使用确定性三项循环" in normalized
     assert "英文 title 以 `FOLDED - ` 开头" in normalized
     assert "title 以 `RAISED HIPS - ` 开头" in normalized
     assert "title 以 `SPREAD EAGLE - ` 开头" in normalized
@@ -783,7 +1026,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "5 人可用 2+2+1" in normalized
     assert "6 人可用 2+2+2 或 3+2+1" in normalized
     assert "7 人可用 3+2+2" in normalized
-    assert "PORTAL AND SILHOUETTE SEPARATION" in brief
     assert "每个 Frame 的前 180 个英文单词内" in normalized
     assert "完整开口内只出现主表演者、承重垫和内部表面" in normalized
     assert "开口中央、主表演者正后方和四肢间负空间保持为清楚可见的空内部背景" in normalized
@@ -806,7 +1048,6 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "每名围观者拥有不同的脸、发型、服装辅色、站位" in normalized
     assert "多数视线落在主表演者" in normalized
     assert "允许在英文 Frame 中使用 camera、lens、aperture、shutter" in normalized
-    assert "PHOTOGRAPHIC REALISM AND VISUAL IMPACT" in brief
     assert "一个主导实景光源、一个克制补光或反射来源" in normalized
     assert "35–50 mm 等效镜头、f/4–f/5.6 光圈" in normalized
     assert "第一层是主表演者的脸、眼神和完整姿势轮廓" in normalized
@@ -815,43 +1056,82 @@ def test_confined_exhibition_fantasy_has_safe_scene_catalog() -> None:
     assert "细小毛孔、柔软汗毛、轻微色差、局部潮红" in normalized
     assert "高光随皮肤曲面缓慢滚落" in normalized
     assert "构图采用略微偏心的编辑摄影瞬间" in normalized
-    assert "BODY, MATERIAL, AND SPACE CONTACT" in brief
     assert "每个 Frame 至少描写三项材质—身体—空间接触证据" in normalized
     assert "臀部使汽车座垫或床垫产生可信形变" in normalized
-    assert "OUTPUT PREFLIGHT" in brief
     assert "Theme title 前缀与唯一姿势家族一致" in normalized
     assert "最终 Frame 只保留可渲染画面正文" in normalized
-    assert "SCENE CATALOG" in brief
-    assert "CONTENT LEVEL" in brief
-    assert "VARIATION AND REJECTION RULES" in brief
 
 
-def test_rebuilt_legacy_inputs_are_complete_story_descriptions() -> None:
-    required_sections = (
-        "BRIEF",
-        "THEME CONTRACT",
-        "FRAME CONTRACT",
-        "VARIATION AND REJECTION RULES",
+@pytest.mark.parametrize("batch_size", [1, 2])
+def test_confined_requires_three_themes_per_run_not_per_provider_batch(batch_size):
+    document = load_story_document(RECIPES / "confined-exhibition-fantasy.yaml")
+    resolved = resolve_story_input(
+        document, InputOverrides(theme_batch_size=batch_size)
+    )
+    assert resolved.request.theme_count == 3
+    assert resolved.runtime.theme_batch_size == batch_size
+    assert document.requirements.theme_count is not None
+    assert document.requirements.theme_count.min == 3
+    assert [plan.entry.id for plan in resolved.plans] == [
+        "folded-emotion-01", "raised-hips-emotion-02", "spread-eagle-emotion-03"
+    ]
+    for theme_count in (1, 2):
+        with pytest.raises(StoryConfigurationError, match="theme_count"):
+            resolve_story_input(
+                document,
+                InputOverrides(
+                    theme_count=theme_count, theme_batch_size=batch_size
+                ),
+            )
+
+
+def test_confined_plans_preserve_independent_pose_and_emotion_cycles() -> None:
+    resolved = resolve_story_input(
+        load_story_document(RECIPES / "confined-exhibition-fantasy.yaml"),
+        InputOverrides(theme_count=31),
+    )
+    families = ("folded", "raised-hips", "spread-eagle")
+    prefixes = ("FOLDED - ", "RAISED HIPS - ", "SPREAD EAGLE - ")
+    emotions = (
+        "主动挑逗", "羞耻但享受", "得意炫耀", "从容自信", "调皮邀请",
+        "紧张兴奋", "惊讶后微笑", "专注沉浸", "慵懒满足", "大胆直视",
     )
 
-    for filename in ("avantgarde.yaml", "snofs.yaml", "tentacle.yaml"):
-        brief = load_story_document(
-            REPOSITORY_ROOT / "story-inputs" / filename
-        ).description
+    assert len(resolved.plans) == 31
+    for index, plan in enumerate(resolved.plans):
+        assert plan.entry is not None
+        assert plan.entry.id == (
+            f"{families[index % 3]}-emotion-{index % 10 + 1:02d}"
+        )
+        assert f"`{prefixes[index % 3]}`" in " ".join(plan.entry.themes)
+        assert emotions[index % 10] in " ".join(plan.entry.themes)
+        assert emotions[index % 10] in " ".join(plan.entry.frames)
 
-        assert all(section in brief for section in required_sections), filename
-        assert "At aesthetic level" in brief, filename
-        assert "At erotic level" in brief, filename
-        assert "At hardcore level" in brief, filename
+
+def test_rebuilt_inputs_have_explicit_stage_and_level_contracts() -> None:
+    for filename in ("avantgarde.yaml", "snofs.yaml", "tentacle.yaml"):
+        document = load_story_document(RECIPES / filename)
+        assert document.description
+        assert document.authoring.themes.common
+        assert document.authoring.frames.common
+        for level in ContentLevel:
+            resolved = resolve_story_input(
+                document, InputOverrides(content_level=level)
+            )
+            assert resolved.request.content_level == level
+            for stage in StoryStage:
+                authored = getattr(document.authoring, stage.value)
+                for rule in authored.selected(level):
+                    assert rule in resolved.rules.text_for(stage)
 
 
 def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> None:
-    film_post = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "film-post.yaml"
-    ).description
-    zero_gravity = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "zero-gravity-intimacy.yaml"
-    ).description
+    film_post = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "film-post.yaml"
+    ))
+    zero_gravity = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "zero-gravity-intimacy.yaml"
+    ))
 
     assert "Use the exact requested cast and no additional people" in film_post
     assert "must appear clearly in every Theme premise and every poster" in film_post
@@ -861,207 +1141,203 @@ def test_story_inputs_do_not_override_run_level_cast_or_frame_semantics() -> Non
 
 
 def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "intimate-lifestyle-portrait.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert "Every Frame is one finished full-bleed photograph" in normalized
-    assert "Aspect ratio and canvas dimensions are controlled outside this brief" in normalized
-    assert "Do not declare, request, prefer, or reject any aspect ratio" in normalized
-    assert "bright, polished East Asian social-media lifestyle-glamour aesthetic" in normalized
-    assert "fresh, gentle, sunlit, colorful" in normalized
-    assert (
+    document = load_story_document(RECIPES / "intimate-lifestyle-portrait.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.generation.output_language == "english"
+    assert document.requirements.output_languages == ("english",)
+    assert resolve_story_input(document).request.output_language == "english"
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(output_language="chinese"))
+    required = (
+        "每个 画面 都是一张完成的满版照片",
+        "宽高比和画布尺寸由本简述之外的配置控制",
+        "不得声明、要求、偏好或拒绝任何宽高比",
+        "明亮、精致的东亚社交媒体生活方式魅力美学",
+        "清新、温柔、充满阳光、色彩鲜明",
+        '"live-action photorealistic location portrait with natural undistorted perspective. '
         "bright high-key East Asian lifestyle beauty portrait, soft feminine "
         "social-media glamour, luminous ivory skin, clear large almond eyes, "
-        "clean modern digital-camera realism"
-    ) in normalized
-    assert "Use exactly `female_count` adult women and exactly `male_count` adult men" in normalized
-    assert "these run parameters are the sole authority for visible human count" in normalized
-    assert "Never infer, add, remove, replace, or duplicate a person" in normalized
-    assert "Every requested person is unmistakably 25 or older" in normalized
-    assert "designate one requested woman as the primary beauty-portrait subject" in normalized
-    assert "the requested companion is equally complete, identifiable, active" in normalized
-    assert "Never copy, name, or closely resemble a real person" in normalized
-    assert "coherent anatomy; the primary woman may have a curvy figure and naturally full bust" in normalized
-    assert "minute visible pores, soft facial peach fuzz" in normalized
-    assert "MAKEUP AND GROOMING" in normalized
-    assert "Describe every woman's complete visible makeup design" in normalized
-    assert "exact blush hue, placement, diffusion, and finish" in normalized
-    assert "peach cream blush high on the cheekbones" in normalized
-    assert "Rotate makeup families across Themes before repeating" in normalized
-    assert "give each a visibly distinct but harmonious makeup design" in normalized
-    assert "describe polished grooming" in normalized
-    assert "ACCESSORIES AND HEADWEAR" in normalized
-    assert "at least three coordinated accessories from different categories" in normalized
-    assert "wide-brim straw hat, structured beret, silk headscarf" in normalized
-    assert "cat-eye, slim oval, softly rectangular, rimless" in normalized
-    assert "fine pendant, pearl strand, velvet choker, layered chain" in normalized
-    assert "charm bracelet, slim bangle stack, cuff, polished watch" in normalized
-    assert "Never hide the eyes behind dark opaque lenses" in normalized
-    assert "build distinct accessory sets with different centerpiece categories" in normalized
-    assert "For a requested man, specify two or more coherent accessories" in normalized
-    assert "remain in the same position in both Frames of one Theme" in normalized
-    assert "distinct location family" in normalized
-    assert "bright neighborhood gym entrance" in normalized
-    assert "sunlit independent cafe or bakery" in normalized
-    assert "bright apartment art corner" in normalized
-    assert "outdoor market lounge" in normalized
-    assert "vintage tea room" in normalized
-    assert "brick-walled garage" in normalized
-    assert "Use original, unbranded designs" in normalized
-    assert "At aesthetic level" in normalized
-    assert "Wardrobe is a major visual attraction, not ordinary daywear" in normalized
-    assert "at least three luxurious fashion materials or treatments" in normalized
-    assert "Use at least three coordinated accessories" in normalized
-    assert "ordinary plain sportswear or a basic top-and-shorts combination is insufficient" in normalized
-    assert "embellished corset top, embroidered bustier, jeweled bodysuit" in normalized
-    assert "Deep cleavage, side cutouts, open backs, bare shoulders" in normalized
-    assert "opaque over nipples and genitals" in normalized
-    assert "At erotic level" in normalized
-    assert "At hardcore level" in normalized
-    assert "Partial toplessness, bare breasts, and visible nipples are permitted" in normalized
-    assert "an unmistakable, currently visible consensual adult sexual act" in normalized
-    assert "A one-woman cast uses an explicit solo act" in normalized
-    assert "a woman-and-man or two-woman cast uses an explicit mutually participatory act" in normalized
-    assert "Do not add an unrequested partner, body part, hidden participant" in normalized
-    assert "The run's requested content level is the sole authority" in normalized
-    assert "Aesthetic has no visible nipples, genitals, or sex act" in normalized
-    assert "one natural, visually legible activity tied to the selected place" in normalized
-    assert "The activity supports the portrait instead of dominating it" in normalized
-    assert "below roughly twenty percent of the frame" in normalized
-    assert "FACE, BODY, AND POSE DIRECTION" in normalized
-    assert "Treat face direction, torso direction, pelvis direction, and camera position as four separate choices" in normalized
-    assert "clean left or right profile" in normalized
-    assert "face turned back over one shoulder" in normalized
-    assert "back mostly toward camera with the face looking over one shoulder" in normalized
-    assert "shoulders and pelvis deliberately counter-rotated" in normalized
-    assert "relaxed standing contrapposto" in normalized
-    assert "floor sitting with one knee raised" in normalized
-    assert "upright kneeling with grounded shins" in normalized
-    assert "reclining diagonally on a sofa or chaise" in normalized
-    assert "use at least four face directions, five body directions" in normalized
-    assert "The eyes are the first focal priority in every Frame" in normalized
-    assert "iris direction, degree of eye convergence" in normalized
-    assert "natural wet lower-lid line, separated eyelashes, detailed irises" in normalized
-    assert "wide, clear, softly attentive eyes" in normalized
-    assert "never predatory, confrontational, or brooding" in normalized
-    assert "Narrowed or half-lidded eyes are valid only when" in normalized
-    assert "focused, luminous half-lidded gaze" in normalized
-    assert "EXPRESSION AND EMOTION VARIATION POOL" in normalized
-    assert "adult playful coquetry" in normalized
-    assert "teasing invitation" in normalized
-    assert "languid ease" in normalized
-    assert "sensual contentment" in normalized
-    assert "dreamy reverie" in normalized
-    assert "private pride" in normalized
-    assert "romantic anticipation" in normalized
-    assert "self-aware glamour" in normalized
-    assert "wistful tenderness" in normalized
-    assert "At aesthetic level, favor approachable, playful, coy" in normalized
-    assert "At erotic level, allow stronger teasing invitation" in normalized
-    assert "Plan expression coverage across the whole batch" in normalized
-    assert "COY AND COQUETTISH" in normalized
-    assert "LANGUID AND SENSORY" in normalized
-    assert "TEASING AND CONFIDENT" in normalized
-    assert "WARM AND OPEN" in normalized
-    assert "DREAMY AND TENDER" in normalized
-    assert "FOCUSED AND PROUD" in normalized
-    assert "Assign these lanes in a varied order rather than by Theme ID" in normalized
-    assert "vary direct lens contact, phone-screen attention, mirror-eye contact" in normalized
-    assert "at least four mutually consistent signals" in normalized
-    assert "Replace vague words such as beautiful, sexy, seductive" in normalized
-    assert "one primary emotion, one quieter secondary emotion" in normalized
-    assert "one concrete trigger in the current scene" in normalized
-    assert "Make the emotional chain visually causal" in normalized
-    assert "A viewer should infer both emotions without a caption" in normalized
-    assert "preserve the exact emotional baseline, trigger, appraisal" in normalized
-    assert "Every Frame captures the identical emotional instant" in normalized
-    assert "PAIR CONTINUITY — HIGHEST PRIORITY" in normalized
-    assert "privately build one immutable subject block" in normalized
-    assert "Copy that immutable subject block" in normalized
-    assert "Pair variation is camera variation only" in normalized
-    assert "Framing family and shooting method never change within a Theme" in normalized
-    assert "Do not put down, raise, transfer, add, or remove a phone or camera" in normalized
-    assert "Continuity outranks novelty" in normalized
-    assert "Every Frame must stand alone" in normalized
-    assert "Restate every stable fact as a present visible fact" in normalized
-    assert "compare paired Frames field by field" in normalized
-    assert "scan out every cross-Frame comparison word above" in normalized
-    assert "Never echo instructions or state absences" in normalized
-    assert "Delete negative checklist phrases before publishing" in normalized
-    assert "do not emit Chinese characters" in normalized
-    assert "Capture an action at its most informative fraction of a second" in normalized
-    assert "one immediate physical consequence" in normalized
-    assert "Every Frame must include a coherent micro-detail hierarchy" in normalized
-    assert "Keep the eyes and action-driving hand as the sharpest details" in normalized
-    assert "live-action photorealistic location portrait photography" in normalized
-    assert "Do not prescribe a focal length" in normalized
-    assert "do not use wide-angle, ultra-wide, fisheye" in normalized
-    assert "Never write wide-angle, ultra-wide, fisheye, 0.5x" in normalized
-    assert "A selfie must use a natural-perspective phone camera mode" in normalized
-    assert "Variation comes from camera position, height, side, distance" in normalized
-    assert "live-action photorealistic location portrait with natural undistorted perspective" in normalized
-    assert "FULL BODY" in normalized
-    assert "show every requested person completely from the top of the hair through both feet and footwear" in normalized
-    assert "LARGE HALF BODY" in normalized
-    assert "hips, and at least the upper thighs or knees" in normalized
-    assert "alternate them across a batch before repeating" in normalized
-    assert "Independently choose one distinct shooting method for every Theme" in normalized
-    assert "arm's-length front-camera selfie" in normalized
-    assert "always using LARGE HALF BODY framing" in normalized
-    assert "mirror selfie showing the exact requested cast and only their corresponding reflections" in normalized
-    assert "a timer photograph from a shelf, counter, windowsill" in normalized
-    assert "Treat selfie, mirror selfie, friend-held camera, timer camera" in normalized
-    assert "physically truthful gaze behavior" in normalized
-    assert "front-camera selfie must never claim full-body framing" in normalized
-    assert "For a batch of three or more Themes" in normalized
-    assert "at least one front-camera selfie or mirror selfie" in normalized
-    assert "at least one nearby-friend portrait" in normalized
-    assert "at least one timer or fixed-camera portrait" in normalized
-    assert "Every Theme premise must explicitly name its framing family and shooting method" in normalized
-    assert "one framing family and one shooting method not yet used" in normalized
-    assert "one expression family, gaze pattern, brow pattern" in normalized
-    assert "one face direction, body direction, and pose family" in normalized
-    assert "Compose three physical depth planes" in normalized
-    assert "Keep the face high-key and readable" in normalized
-    assert "Avoid low-key lighting, heavy chiaroscuro" in normalized
-    assert "one dreamy but physically photographable atmosphere" in normalized
-    assert "soft golden-hour backlight" in normalized
-    assert "small prism refractions" in normalized
-    assert "bright rain droplets, condensation, or misted glass" in normalized
-    assert "candlelight or warm table lamps balanced by cool blue-hour window fill" in normalized
-    assert "sunlit pollen, steam, or fine dust" in normalized
-    assert "delicate practical fairy lights, cafe bulbs, or city lights" in normalized
-    assert "The dreamy atmosphere must remain real-location photography" in normalized
-    assert "Do not use magical particles, supernatural auras" in normalized
-    assert "four consecutive information blocks" in normalized
-    assert "Completeness and image-defining detail matter more than an arbitrary word count" in normalized
-    assert "IDENTITY AND LOOK" in normalized
-    assert "EYES AND EMOTION" in normalized
-    assert "POSE AND ACTION" in normalized
-    assert "CAMERA AND LIGHT" in normalized
-    assert "write one explicit `MAKEUP —` sentence for each woman" in normalized
-    assert "Write one `GROOMING —` sentence for each man" in normalized
-    assert "These sentences and every person's accessories are mandatory in every Frame" in normalized
-    assert "Spend most of the budget on the face, eyes, micro-expression" in normalized
-    assert "THEME CONTRACT" in normalized
-    assert "exactly `female_count` original adult women and `male_count` original adult men" in normalized
-    assert "primary woman's exact blush hue and placement" in normalized
-    assert "the exact parameter-controlled cast" in normalized
-    assert "Do not add, remove, substitute, merge, or crop away a requested person" in normalized
-    assert "FRAME CONTRACT" in normalized
-    assert "VARIATION AND REJECTION RULES" in normalized
+        'clean modern digital-camera realism."',
+        "不得缩短、重排、改写、改变大小写或替换任一句",
+        "严格使用 `female_count` 位成年女性和 `male_count` 位成年男性",
+        "这些运行参数是可见人物数量的唯一依据",
+        "推断、添加、移除、替换或复制人物",
+        "每位指定人物都明确为 25 岁或以上",
+        "指定一位要求中的女性作为主要美妆人像主体",
+        "指定同伴也必须同样完整、可辨认、积极参与且清晰呈现",
+        "绝不复制、点名或高度近似真实人物",
+        "解剖结构连贯、有吸引力的成年人；主要女性可以具有曲线身材和自然丰满的胸部",
+        "细微可见毛孔、柔软面部绒毛",
+        "描述每位女性完整可见的妆容设计",
+        "腮红的确切色相、位置、晕染和质感",
+        "位于颧骨高处的蜜桃色膏状腮红",
+        "轮换妆容系列，全部尝试后再重复",
+        "为每位女性设计视觉上明显不同但和谐的妆容",
+        "描述精致的仪容整理",
+        "至少三件来自不同类别的协调配饰",
+        "宽檐草帽、挺括贝雷帽、丝绸头巾",
+        "猫眼、细椭圆、柔和矩形、无框",
+        "精细吊坠、珍珠串、天鹅绒颈圈、叠戴链",
+        "吊饰手链、叠戴细手镯、宽手镯、精致腕表",
+        "绝不能用深色不透明镜片遮住眼睛",
+        "构建不同配饰组合，使用不同的中心配饰类别",
+        "对于要求中的男性，指定两件或更多协调配饰",
+        "同一 主题 的两个 画面 中，每件物品必须保持同一位置",
+        "一种不同的地点类别",
+        "明亮的社区健身房入口",
+        "阳光充足的独立咖啡馆或面包店",
+        "明亮公寓的艺术角",
+        "户外市场休憩区",
+        "复古茶室",
+        "砖墙车库",
+        "使用原创、无品牌的设计",
+        "服装是主要视觉吸引力，而不是普通日常穿着",
+        "至少三种奢华时装材料或工艺",
+        "使用至少三件协调配饰",
+        "普通素面运动服或基础上衣加短裤组合是不够的",
+        "装饰束身上衣、刺绣胸衣、镶宝石连体衣",
+        "允许深乳沟、侧面镂空、露背、裸肩",
+        "乳头和生殖器上的遮盖必须稳定且不透明",
+        "在 `aesthetic` 级别",
+        "在 `erotic` 级别",
+        "在 `hardcore` 级别",
+        "允许部分裸露上身、裸露乳房和可见乳头",
+        "明确无误、当前可见且适合严格指定人物配置的自愿成年人性行为",
+        "单女性配置使用露骨独自行为",
+        "一女一男或双女性配置使用双方共同参与的露骨行为",
+        "不得添加未要求的伴侣、身体部位、隐藏参与者",
+        "一个与所选地点相关、自然且视觉上清晰可辨的活动",
+        "活动应服务于人像，而不是主导它",
+        "低于画面约百分之二十的面积",
+        "将面部朝向、躯干朝向、骨盆朝向和相机位置视为四项独立选择",
+        "干净的左侧或右侧面",
+        "越过一侧肩膀回头",
+        "背部大致朝向相机，脸越过一侧肩膀回望",
+        "肩膀和骨盆有意反向旋转",
+        "放松重心偏移站姿",
+        "坐在地板上，一膝抬起",
+        "小腿着地、髋部平衡的直身跪姿",
+        "斜躺在沙发或躺椅上",
+        "一批有四个或更多 主题 时，至少使用三种面部朝向、三种身体朝向和四种姿势类别",
+        "一批有六个或更多 主题 时，至少使用四种面部朝向、五种身体朝向和五种姿势类别",
+        "眼睛都是第一焦点",
+        "虹膜方向、双眼汇聚程度",
+        "自然湿润的下眼睑边缘、分明睫毛和细致虹膜",
+        "睁大、清澈且柔和专注的眼睛",
+        "绝不能显得具有掠夺性、对抗性或阴郁",
+        "眯眼或半垂眼睑仅在",
+        "允许聚焦而明亮的半垂眼睑视线",
+        "成年人俏皮娇媚",
+        "逗趣邀约",
+        "慵懒自在",
+        "感官满足",
+        "梦幻遐想",
+        "内心自豪",
+        "浪漫期待",
+        "自觉展现魅力",
+        "惆怅温柔",
+        "在 `aesthetic` 级别，优先采用亲切、俏皮、含蓄娇态",
+        "在 `erotic` 级别，允许更强的逗趣邀约",
+        "先规划整批的表情覆盖",
+        "一批有四个或更多 主题 时，以下四条路线每条至少包含一种表情",
+        '"COY AND COQUETTISH"',
+        '"LANGUID AND SENSORY"',
+        '"TEASING AND CONFIDENT"',
+        '"WARM AND OPEN"',
+        "一批有六个或更多 主题 时，还必须包含",
+        '"DREAMY AND TENDER"',
+        '"FOCUSED AND PROUD"',
+        "以多变的顺序分配这些路线，而不是按 主题 ID 顺序分配",
+        "变化直接看镜头、关注手机屏幕、镜中眼神接触",
+        "至少四个相互一致的信号",
+        '用可见面部证据替代 "beautiful"、"sexy"、"seductive"',
+        "一种主要情绪、一种更含蓄的次要情绪",
+        "当前场景中的一个具体触发因素",
+        "让情绪链在视觉上具有因果关系",
+        "观众应能在没有说明文字的情况下推断出两种情绪",
+        "保持确切的情绪基线、触发因素、判断和微表情",
+        "每个 画面 从不同相机位置捕捉完全相同的情绪瞬间",
+        "先在内部构建一个不可变的主体区块",
+        "将这一不可变主体区块复制到该 主题 的每个 画面 中",
+        "成对变化只能是相机变化",
+        "同一 主题 内取景类别和拍摄方式绝不改变",
+        "不得在 画面 之间放下、举起、转交、增加或移除手机或相机",
+        "连续一致性优先于新颖性",
+        "每个 画面 都必须独立成立",
+        "把每个稳定事实重述为当前可见事实",
+        "逐字段比较成对 画面",
+        "清除上述所有跨 画面 比较词",
+        "绝不复述指令",
+        "发布前删除否定式检查清单短语",
+        "要求英语时，不得在 画面 内输出汉字、未翻译片段或混合语言",
+        "捕捉动作信息最丰富的一瞬间",
+        "一个即时物理后果",
+        "每个 画面 都必须包含连贯的微细节层级",
+        "让眼睛和驱动动作的手成为最清晰的细节",
+        "采用真人实拍般写实的实景人像摄影",
+        "不指定焦距，不使用广角、超广角、鱼眼",
+        '绝不在最终 画面 中写入 "wide-angle"、"ultra-wide"、"fisheye"、"0.5x"',
+        "自拍必须使用自然透视的手机相机模式",
+        "变化来自相机位置、高度、侧别、距离",
+        "完整展示每位指定人物，从头发顶端直到双脚和鞋履",
+        "髋部，以及至少大腿上部或膝盖",
+        "在一批中交替使用，之后再重复",
+        "为每个 主题 独立选择一种不同的拍摄方式",
+        "伸臂前置相机自拍",
+        '始终采用 "LARGE HALF BODY"（大半身）取景',
+        "镜面自拍，呈现严格指定的人物配置及仅对应这些人物的倒影",
+        "从架子、柜台、窗台或稳定迷你三脚架进行定时拍摄",
+        "将自拍、镜面自拍、朋友手持相机、定时相机和固定相机视为不同的摄影情境",
+        "物理上真实的视线行为",
+        "伸臂前置相机自拍绝不能宣称全身取景",
+        "一批有三个或更多 主题 时，至少包含一次前置相机自拍或镜面自拍、一次附近朋友拍摄的人像，以及一次定时或固定相机人像",
+        "每个 主题 的情境说明都必须以可见语言明确指出其取景类别和拍摄方式",
+        "一种本批其他 主题 尚未使用的取景类别和拍摄方式",
+        "表情类别、视线模式、眉部模式",
+        "面部朝向、身体朝向和姿势类别",
+        "构成三个物理纵深层面",
+        "保持面部高调明亮且易于辨读",
+        "避免低调照明、浓重明暗对照",
+        "一种梦幻但能实际拍摄的氛围",
+        "柔和黄金时段逆光",
+        "小型棱镜折射",
+        "明亮雨滴、凝结水珠或起雾玻璃",
+        "烛光或暖桌灯，与蓝调时刻窗户的冷色补光平衡",
+        "受阳光照亮的花粉、蒸汽或细尘",
+        "精巧的实景串灯、咖啡馆灯泡或城市灯光",
+        "梦幻氛围必须仍是具有可见物理来源的真实地点摄影",
+        "不得使用魔法粒子、超自然光环",
+        "四个连续的信息区块",
+        '"IDENTITY AND LOOK"',
+        '"EYES AND EMOTION"',
+        '"POSE AND ACTION"',
+        '"CAMERA AND LIGHT"',
+        "完整性和定义图像的细节比任意字数更重要",
+        "为每位女性写一句明确的 `MAKEUP —` 句子",
+        "为每位男性写一句 `GROOMING —` 句子",
+        "这些句子和每个人的配饰在每个 画面 中都必须出现",
+        "把大部分篇幅用于面部、眼睛、微表情",
+        "恰好 `female_count` 位原创成年女性和 `male_count` 位原创成年男性",
+        "主要女性的确切腮红色相与位置",
+        "严格由参数控制的人物配置",
+        "不得增加、移除、替换、合并或裁掉任何指定人物",
+    )
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
+    aesthetic = resolve_story_input(document, InputOverrides(content_level="aesthetic"))
+    assert "性感但不露骨的造型" in aesthetic.rules.text_for(StoryStage.FRAMES)
 
 
-def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "miniature-fantasy-v2.yaml"
-    ).description
+def test_miniature_giant_encounter_scopes_cast_to_miniature_people() -> None:
+    brief = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "miniature-giant-encounter.yaml"
+    ))
     normalized = " ".join(brief.split())
 
-    assert len(brief) < 9_500
-    assert "仅用于 Erotic 和 Hardcore" in normalized
+    assert set(
+        load_story_document(RECIPES / "miniature-giant-encounter.yaml")
+        .requirements.content_levels
+    ) == {ContentLevel.EROTIC, ContentLevel.HARDCORE}
     assert "female_count 和 male_count 只约束微型人物" in normalized
     assert "每帧画面总人数严格等于 1 + female_count + male_count" in normalized
     assert "不得出现额外脸、头、躯干、肢体或局部人物" in normalized
@@ -1191,7 +1467,6 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "Hardcore 可使用远大于微型人物体量的强烈喷流" in normalized
     assert "喷口、方向、受力表面、汇流路径" in normalized
     assert "束缚架、滑轮悬吊、束带、项圈、夹具、震动器、泵、扩张器" in normalized
-    assert "自愿 BDSM 系统" in normalized
     assert "不得只作装饰、制造伤害、遮住微型完整身体或形成第二性行为" in (
         normalized
     )
@@ -1318,7 +1593,6 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
     assert "只用自然英文简单现在时" in normalized
     assert "只写画面肯定事实" in normalized
     assert "第三句起的 penis、vaginal opening、anus 替换为 the contact point" in normalized
-    assert "逐字符删除 CJK" in normalized
     assert "删除 no、not、without、unseen、uninvolved" in normalized
     assert "替换 centimeter、inch、twentieth、pencil" in normalized
     assert "核对首句身份完整及镜头句精确开头" in normalized
@@ -1351,12 +1625,11 @@ def test_miniature_fantasy_v2_scopes_cast_to_miniature_people() -> None:
 
 
 def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "giant-country-fantasy.yaml"
-    ).description
+    brief = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "giant-country-fantasy.yaml"
+    ))
     normalized = " ".join(brief.split())
 
-    assert brief.startswith("BRIEF\n\n")
     assert "female_count 和 male_count 只约束从正常人类世界来到巨人国的成年访客" in normalized
     assert "每帧画面总人数严格等于 1 + female_count + male_count" in normalized
     assert "加一名巨人国原住民" in normalized
@@ -1370,7 +1643,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "瘦削并有突出的锁骨、肋骨与关节" in normalized
     assert "疤痕、静脉、妊娠纹、色斑和左右轻微不对称" in normalized
     assert "同一 Theme 全部 Frame 固定年龄层、体型和皮肤特征" in normalized
-    assert "IMAGE-SCALE COMPOSITION GATE" in normalized
     assert "访客层" in normalized
     assert "日用品层" in normalized
     assert "身体层" in normalized
@@ -1394,7 +1666,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "市政与公共休闲、文化与娱乐、酒店与度假、运动与健康" in normalized
     assert "不要求先用完固定类别，也不强制工业场景占比" in normalized
     assert "只是启发性例子，不是允许列表、固定菜单、配额或轮换表" in normalized
-    assert "FINGER-LENGTH VISITOR SCALE AND EVERYDAY OBJECT PROOF" in normalized
     assert (
         "所有巨人国原生建筑、家具、车辆、机器和日用品仍按巨人居民的统一日常比例制造"
     ) in normalized
@@ -1469,7 +1740,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "nipple 使用 neck/ribcage/abdomen 固定定位" in normalized
     assert "giant man 只选 penis 或 anus" in normalized
     assert "giant woman 只选 vaginal opening、anus 或 selected nipple" in normalized
-    assert "SILHOUETTE LIMB INVENTORY" in normalized
     assert "lower target 位于两腿之间，selected nipple 属于连续胸部" in normalized
     assert "均不得代替肢体或形成额外身体" in normalized
     assert "先按巨人姿势选择最能表现压倒体量的构图并在 Theme 内锁定" in normalized
@@ -1492,10 +1762,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "每个 Theme 必须先建立一条不可替代的 Necessity Chain" in normalized
     assert "画面显示结果、巨人对指定访客的回应和访客间反馈" in normalized
     assert (
-        "VISIBLE CONSTRAINT 必须先在 S5 以一个具体姿势或双手任务完整可见，"
-        "再在 S6 逐字复制该事实"
-    ) in normalized
-    assert (
         "Because [trigger at TARGET_ID] creates [need at the contact point itself]"
     ) in normalized
     assert "Counterfactual Necessity Test" in normalized
@@ -1509,7 +1775,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert (
         "IF AND ONLY IF request.content_level IS erotic：选择一种明确非插入式亲密行为"
     ) in normalized
-    assert "CONTACT-FIRST GATE" in normalized
     assert (
         "IF AND ONLY IF request.content_level IS hardcore：选择口交、手交、玩具插入"
     ) in normalized
@@ -1521,7 +1786,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
         "Hardcore 每帧最多一种主要体液，显示唯一 source、trajectory、surface 和 landing"
     ) in normalized
     assert "未选择 release 时不得出现喷射、液滴或湿痕" in normalized
-    assert "BDSM 器具有刚性锚点、软垫和快速释放" in normalized
     assert "它可以是简单日用品、柔性材料、家具、服务设施或机械系统" in normalized
     assert "不得用皮肤、阴毛或柔软组织承重，也不得遮住访客" in normalized
     assert "lower-body target 显示连续阴毛边界" in normalized
@@ -1530,7 +1794,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "nipple target 则 trousers 扣好且只掀一件上衣" in normalized
     assert "visibly bunched around both upper thighs" in normalized
     assert "禁止替代下装、第二条 trousers、裤子消失或单腿穿裤" in normalized
-    assert "S4 写出的每件衣物、鞋履和头饰状态必须逐字约束 S5" in normalized
     assert "写了 shoes、boots 或 sandals 就必须保持穿在对应双脚" in normalized
     assert "访客各穿高对比纯色连体工作服和鞋" in normalized
     assert (
@@ -1577,7 +1840,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "再复制到全部 Frame" in normalized
     assert "配对 Frame 只改变相机方位和最终镜头句" in normalized
     assert "严格按以下物理句序写，任何顺序变化都重写" in normalized
-    assert "S1 CAST + EARLY SCALE + INTERACTION + MECHANISM + CAMERA" in normalized
     assert "必须逐字套用以下单句骨架" in normalized
     assert (
         "occupy one separated bay each on a single miniature visitor interaction deck"
@@ -1587,22 +1849,12 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
         "using [location-native Signature Mechanism]"
     ) in normalized
     assert "在 perspective 之前不得出现句号或分号" in normalized
-    assert "S2 TARGET MAP" in normalized
-    assert (
-        "S2 TARGET MAP：写 TARGET_ID、TARGET STATE、RELEASE STATE 和完整解剖"
-    ) in normalized
-    assert "S2B ACTIVE CONTACT：紧接 S2 的第三句写接触已发生" in normalized
     assert "这里命名的接触者、身体部位或 toy 必须在 S5 和 S6 完全相同" in normalized
-    assert "S3 FOUR SCALE PROOFS" in normalized
     assert "Four simultaneous scale proofs share one clear focal plane:" in normalized
     assert "禁止透视假尺度、测量手指或第二巨人" in normalized
-    assert "必须作为 S3 后的独立新句" in normalized
     assert "the selected giant-scale everyday anchor functions as an ordinary everyday object for the giant" in normalized
     assert "不得在 S3 使用 held、worn、lying、resting、remains 或其他位置状态词" in normalized
-    assert "S3 必须明确包含一个最低台阶、门槛、路缘或支撑底座高过访客全身" in normalized
-    assert "S3A FINGER-LENGTH SIZE" in normalized
     assert "不得增加 extended、pointing、dangling 或 measuring finger" in normalized
-    assert "S3B EVERYDAY OBJECT PROOF" in normalized
     assert "its full height clearly towering over every visitor" in normalized
     assert "its [recognizable feature] alone larger than one visitor" in normalized
     assert "Signature Mechanism 必须是地点原生设施或其合理延伸" in normalized
@@ -1610,7 +1862,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert (
         "全部承重、锚点和传力部件属于同一功能链并固定在地面、家具或其他硬结构上"
     ) in normalized
-    assert "S3C GIANT DOMINANCE" in normalized
     assert (
         "The sole giant is the frame's overwhelmingly largest visual mass"
     ) in normalized
@@ -1630,20 +1881,14 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "互动台严格分成与访客人数相等的独立工位，从画面左到右编号" in normalized
     assert "每个工位只有一人并以栏杆和背景缝隙分隔" in normalized
     assert "U+2019 改为 ASCII apostrophe" in normalized
-    assert "S4 CHARACTER DESIGN" in normalized
     assert "一个物理句子先详细写巨人造型" in normalized
-    assert "S4A GARMENT STATE" in normalized
     assert "one continuous garment, with one waistband" in normalized
     assert "一件衣物只有一个 owner、一个 waistband、一个 closure" in normalized
-    assert "GLOBAL ENTITY-STATE AND TOPOLOGY INVARIANTS" in normalized
     assert "一个 prop 不能同时在手中、桌上和背景" in normalized
     assert "parent-chain rule" in normalized
     assert "single-slot rule" in normalized
-    assert "S5 POSE AND ACTION" in normalized
-    assert "S5A LIMB TOPOLOGY" in normalized
     assert "一个物理句子写巨人姿势和全部访客工位" in normalized
     assert "逐人写完整四肢；两只巨人手同深度、自然等大并连接手臂" in normalized
-    assert "S5B UNBROKEN BODY AND CLOTHING" in normalized
     assert "The giant has one unbroken body silhouette" in normalized
     assert (
         "no counter, table, bed edge, cart, interaction deck, machine panel"
@@ -1651,12 +1896,10 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert (
         "crosses, hides, encloses, or duplicates the waist, pelvis, or legs"
     ) in normalized
-    assert "S6 NECESSITY CHAIN" in normalized
     assert "禁止因果句临时新增持物、工作或受限动作" in normalized
     assert (
         "巨人随后必须执行一个会改变接触压力、角度、节奏、流量或位置的可见动作"
     ) in normalized
-    assert "S6 写该动作如何改变接触并得到访客反馈" in normalized
     assert "至少四次写 the contact point itself；禁止被动回应或目标漂移" in normalized
     assert "物理第一句必须点名具体 real-world giant-country setting" in normalized
     assert "紧接句号后的第二句以" in normalized
@@ -1668,7 +1911,6 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
         "distance with a real 35–50 mm camera"
     ) in normalized
     assert "previous frame, same, identical, unchanged, still, again, now, remains, then, afterward, next, about to, will, normal-human-sized" in normalized
-    assert "NEVER OUTPUT THESE TOKENS IN ANY CONTEXT" in normalized
     assert "U+2010、U+2011 和 U+2012 改为 ASCII hyphen" in normalized
     assert (
         "The visitors retain an unmistakable finger-length miniature scale "
@@ -1688,420 +1930,307 @@ def test_giant_country_fantasy_scopes_cast_to_visiting_people() -> None:
     assert "互动台、访客、完整日用品证明与巨人处于同一登记平面" in normalized
     assert "完整头脚跨度沿画面最长轴接近两端但保留边缘空间" in normalized
     assert "超自然地点仅在输入主题明确要求时使用" in normalized
-    assert "THEME CONTRACT" in brief
-    assert "FRAME CONTRACT" in brief
-    assert "VARIATION AND REJECTION RULES" in brief
     assert "1:15" not in normalized
     assert "11-centimeter" not in normalized
     assert "14-centimeter" not in normalized
 
 
 def test_furry_mythic_interactions_uses_original_live_action_characters() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "furry-mythic-interactions.yaml"
-    ).description
-    normalized = " ".join(brief.split())
+    from t2i_story_pipeline.models import AsciiCheck, WordCountCheck
 
-    assert "DETERMINISTIC CAST ALLOCATION" in brief
-    assert "total_count = female_count + male_count" in normalized
-    assert "Set furry_count = 1 for every Theme" in normalized
-    assert "human_count = total_count - 1" in normalized
-    assert "the lower positive count supplies the furry slot" in normalized
-    assert "If the two positive counts are equal, the male slot is furry" in normalized
-    assert "two women and one man becomes two human women and one male furry" in (
-        normalized
+    document = load_story_document(RECIPES / "furry-mythic-interactions.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.generation.output_language == "chinese"
+    assert document.requirements.output_languages is None
+    for language in ("chinese", "english"):
+        assert resolve_story_input(
+            document, InputOverrides(output_language=language)
+        ).request.output_language == language
+    assert document.validation.frames.mode == "report"
+    assert document.validation.frames.checks == (
+        AsciiCheck(type="ascii", when_language="english"),
+        WordCountCheck(type="word_count", when_language="english", min_words=600),
     )
-    assert "one woman and two men becomes one female furry and two human men" in (
-        normalized
+    required = (
+        "`total_count` = `female_count` + `male_count`",
+        "每个 主题 都设置 `furry_count` = 1 及 `human_count` = `total_count` - 1",
+        "由较小的正数所对应性别提供兽人名额",
+        "若两个正数相等，则男性名额为兽人",
+        "两名女性及一名男性对应两名人类女性及一名男性兽人",
+        "一名女性及两名男性对应一名女性兽人及两名人类男性",
+        "human_count = 2, furry_count = 1, zero other bodies",
+        "two named human women and one named adult male anthropomorphic",
+        '禁止出现短语 "human man" 和 "female furry"',
+        "第一句中，先命名两名人类女性及男性兽人，再说明行为",
+        "在同一句中让第二名人类女性与其余两位之一直接接触",
+        "阵容声明必须在同一句中继续使用以下明确接触语法",
+        '"the male furry\'s penis is inside the first human woman\'s vagina, '
+        "while the second human woman's hand directly contacts either the first "
+        'woman\'s clitoris or the male furry\'s penis or scrotum"',
+        "严格保留 `female_count` 个女性名额及 `male_count` 个男性名额",
+        "exactly one requested adult woman and zero adult men, allocated as",
+        "exactly one visible adult body",
+        "with zero humans and zero other furry beings",
+        "绝不添加请求指定名额以外的角色",
+        "清醒、聪慧、能够说话或明显具备推理能力的成年人",
+        "兽人角色继承按确定性规则选出的请求指定名额的性别",
+        "若仅 `female_count` 非零，每名兽人都是女性",
+        "若仅 `male_count` 非零，每名兽人都是男性",
+        "保持姓名、性别、代词及性解剖结构一致",
+        '不得切换性别、使用 "it" 或 "they" 来回避说明性别',
+        "一名女性及零名男性，意味着一名成年女性兽人及零名人类",
+        "全女性运行不包含阴茎、阴囊、睾丸",
+        "仅选择与已锁定解剖结构相容的行为",
+        "被拍摄的成年表演者",
+        "真实在场的电影生物",
+        "每名兽人至少穿戴一件清晰可见",
+        "不得将固定服装或服装类别绑定到物种",
+        "绝不让兽人变成完全没有衣着、仅有毛皮的身体",
+        "公版神话",
+        "《西游记》人物",
+        "八仙",
+        "完全原创的高幻想角色",
+        "完全原创的英雄、义警、宇宙或超人原型",
+        "不得复制来自《魔兽》、漫威、DC",
+        "不得点名、模仿、唤起、组合或移用任何真实导演",
+        "不得使用公众人物、宗教领袖、历史名人、演员或其他真实人物的姓名、头衔、别名、面孔、生平或可识别的特征组合",
+        "不得把 `T001`、`T002` 或任何其他 主题 ID 分配给预先确定的来源",
+        "一个可见且有后果的决定，其效果在所描绘的瞬间已经发生",
+        '绝不写 "must choose,"、"must decide,"',
+        "每个 主题 前提都以两个简洁的证明分句结束",
+        '"Decision: [protagonist name] [completed physical action that enacts the choice]. '
+        "Immediate response: [every other participant's current physical reaction, "
+        'or the solo protagonist\'s visible bodily response]."',
+        '前提必须在 "Immediate response" 分句之后结束',
+        "视觉风格只能放在独立的 主题 `style` 值中",
+        "在 审美级 和 情色级 级别，每个 画面 开头都要独立说明精确地点",
+        "不使用任何回指",
+        "重新安排一个等效的决定性瞬间",
+        "`F02` 不晚于 `F01`",
+        "每种变化都必须看起来是对共同决定性瞬间的全新调度",
+        "展示主角已经完成的决定",
+        "不得取代主角在叙事及视觉上的优先地位",
+        "不得提及创作简报、提示词、请求、模型、生成器",
+        '"the image reads first as,"、"only afterward,"',
+        "当请求语言为英语时，每个 主题 和 画面 仅使用 U+0020 至 U+007E 的 ASCII 码点",
+        "把人名及地名音译为合理的 ASCII 拉丁字母拼写",
+        "扫描每个标题、前提、`style` 及正文值",
+        "排除任何引用另一 画面、自称延续内容，或推进固定时间窗口的 画面",
+        "不得使用动画、漫画",
+        "在 `aesthetic` 级别",
+        "在 `erotic` 级别",
+        "在 `hardcore` 级别",
+        "展示一种已经发生的明确成年人自愿性行为",
+        "前一百个英文词内",
+        '精确短语 "consensual and willing"',
+        "`total_count` 等于一时，在第一句中写明兽人主角明确的独自手部接触",
+        "对于更大阵容，在前两句内让每位参与者都置于同一直接生殖器、口部或手部性行为链中",
+        "明确说明谁的阴茎在谁的阴道或肛门内",
+        '"intimate contact"、"joined bodies"、"explicit interaction"',
+        '该句开头须把图像称为 "live-action fantasy photograph"',
+        "说明请求指定的精确成人性别总数、精确 `human_count`、精确 `furry_count`",
+        "在同一个第一句中写入直接解剖接触",
+        "第一句绝对优先",
+        "所有性解剖结构都是适合该角色的普通成年类人解剖结构",
+        "绝不使用吻部形态、喙、角、利爪、尾巴、翅膀、爪垫",
+        "没有成年人仅在背景旁观",
+        "说明可见成年身体的精确总数",
+        "第一句中逐一命名每个人类及兽人",
+        "前两句必须为每位兽人及人类参与者赋予同一性行为链中一个当前",
+        "第二位或之后的参与者不得在其他人互动时站在旁边",
+        "自我触碰可以补充但绝不能取代与另一位参与者的接触",
+        "为每位参与者提供一个独立、无遮挡的身体位置",
+        "硬性下限为 600 个由空白分隔的词",
+        "目标为 750-950 个词",
+        "绝不在最终文字中提及词数或长度检查",
+        "使用强制的阵容与接触首句",
+        "宽阔、干燥、水平、室温、防滑",
+        "不得从固定的具名姿势目录中选择或重复",
+        "创造一种新的、物理上合理的姿势",
+        "不存在强制姿势顺序、配额或四姿势循环",
+        "不得使用站立插入、压墙身体",
+        "骨盆在不相容高度相接",
+        "先为每位参与者默默完成肢体清单",
+        "左大腿、左膝、左小腿及左脚",
+        "右大腿、右膝、右小腿及右脚",
+        "在前 300 个英文词内",
+        '字面侧别标签 "left arm"、"left hand"、"right arm"、"right hand"、'
+        '"left thigh"、"left knee"、"left lower leg"、"left foot"、"right thigh"、'
+        '"right knee"、"right lower leg" 和 "right foot"',
+        "绝不能替代分侧图谱",
+        "在强制的 露骨级 阵容与接触句及单独一个地点句之后，立即描述骨盆支撑",
+        "完整的人类肢体图谱，再描述完整的兽人肢体图谱",
+        "不得在地点句与这两份肢体图谱之间插入面孔、头发、生平、神话、衣着",
+        "让人类手臂与兽人前肢在视觉上分离",
+        "让每只手、手指、前爪、利爪、物件、衣物边缘及尾巴都位于人类及兽人的嘴外",
+        "不得在嘴唇附近托、遮、压、拉或抚摸面孔",
+        "改将支撑手放在锁骨下方，或共同支撑面",
+        "每名兽人恰好有两条手臂及两条腿",
+        "绝不添加第三条腿、重复膝盖",
+        "亲密接触时尾巴绝不承重",
+        "不得让尾巴缠绕建筑、家具、肢体或另一身体",
+        "让性行为匹配可见的头部解剖结构",
+        "具有喙、扁喙、僵硬吻部、獠牙、大型尖牙",
+        "绝不进行口部与生殖器接触",
+        "使用 35mm 至 65mm 的四分之三身或全身相机视图",
+        "相机须足够斜置，以分开重叠肢体",
+        "露骨级 画面 未在前两句及前一百个英文词内清楚指明成人性行为",
+        '露骨级 画面 用 "explicit interaction" 指代非性仪式',
+        "英文 画面 少于 600 个由空白分隔的词",
     )
-    assert "COMMON CAST EXACT OPENINGS" in brief
-    assert "human_count = 2, furry_count = 1, zero other bodies" in normalized
-    assert "two named human women and one named adult male anthropomorphic" in (
-        normalized
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
+    assert re.search(r"(?:^|\n)\s*-\s*T\d{3}:", story_contract(document)) is None
+    assert "Follow each input_context plan's cast facts exactly" in (
+        resolve_story_input(document).rules.text_for(StoryStage.THEMES)
     )
-    assert "TWO-WOMEN-ONE-MAN ABSOLUTE LOCK" in brief
-    assert "The phrases human man and female furry are forbidden" in normalized
-    assert "name both human women and the male furry before stating the act" in (
-        normalized
-    )
-    assert "give the second human woman direct contact with one of the other two" in (
-        normalized
-    )
-    assert "The cast declaration must continue in that same sentence with" in normalized
-    assert "the male furry's penis is inside the first human woman's vagina" in (
-        normalized
-    )
-    assert "Preserve exactly female_count female slots and male_count male slots" in (
-        normalized
-    )
-    assert "SINGLE-SLOT EXACT OPENING" in brief
-    assert "exactly one requested adult woman and zero adult men, allocated as" in (
-        normalized
-    )
-    assert "exactly one visible adult body" in normalized
-    assert "with zero humans and zero other furry beings" in normalized
-    assert "Never add a character outside those requested slots." in normalized
-    assert "alert, intelligent, speaking or clearly reasoning adult" in normalized
-    assert "FURRY GENDER CONTRACT" in brief
-    assert "The furry character inherits the gender of the deterministically selected" in (
-        normalized
-    )
-    assert (
-        "If only female_count is nonzero, every furry being is female." in normalized
-    )
-    assert "If only male_count is nonzero, every furry being is male." in normalized
-    assert "keep name, gender, pronouns, and sexual anatomy consistent" in normalized
-    assert "FURRY GENDER OVERRIDES ACT SELECTION" in brief
-    assert (
-        "one woman and zero men means one female furry adult and zero humans"
-        in normalized
-    )
-    assert "An all-female run contains no penis, scrotum, testicles" in normalized
-    assert "choose only an act compatible with the locked anatomy" in normalized
-    assert "ungendered presentation" not in normalized
-    assert "photographed adult performer" in normalized
-    assert "physically present cinematic creature" in normalized
-    assert "FURRY WARDROBE FREEDOM" in brief
-    assert "Every furry being wears at least one clearly visible" in normalized
-    assert "Do not assign a fixed outfit or garment family" in normalized
-    assert "never leave the furry being as an entirely unclothed fur-only body" in (
-        normalized
-    )
-    assert "public-domain mythological" in normalized
-    assert "Journey to the West figures" in normalized
-    assert "The Eight Immortals" in normalized
-    assert "completely original high-fantasy characters" in normalized
-    assert "completely original heroic" in normalized
-    assert "Do not reproduce a character" in brief
-    assert "Warcraft" in brief
-    assert "Marvel" in brief
-    assert "Do not name, imitate, evoke, combine, or transpose the style" in normalized
-    assert "Do not use the name, title, alias, face, biography" in normalized
-    assert (
-        "The requested themes and frames run parameters are the sole authority"
-        in normalized
-    )
-    assert (
-        "Do not assign T001, T002, or any other Theme ID to a predetermined source"
-        in normalized
-    )
-    assert "When these Theme IDs exist" not in brief
-    assert "- T001:" not in brief
-    assert "visible, consequential decision that has already taken effect" in normalized
-    assert 'Never write "must choose," "must decide,"' in normalized
-    assert "End every Theme premise with two concise proof clauses" in normalized
-    assert '"Decision: [protagonist name]' in normalized
-    assert "The premise must end after the Immediate response clause." in brief
-    assert "Put the visual style only in the separate Theme style value." in normalized
-    assert (
-        "At Aesthetic and Erotic levels, begin every Frame by independently naming "
-        "the precise location"
-    ) in normalized
-    assert "with no backward pointer" in normalized
-    assert "Restage one equivalent decisive instant" in normalized
-    assert "F02 is not later than F01" in normalized
-    assert "Every variation must read as a fresh staging" in normalized
-    assert "the protagonist's completed decision" in normalized
-    assert "must not displace the protagonist from narrative and optical priority" in (
-        normalized
-    )
-    assert "Do not mention the brief, prompt, request, model, generator" in normalized
-    assert '"the image reads first as," "only afterward,"' in normalized
-    assert "use only ASCII code points U+0020 through U+007E" in normalized
-    assert "Transliterate personal and place names" in normalized
-    assert "scan every title, premise," in normalized
-    assert "advances the fixed time window" in normalized
-    assert "Do not use anime" in brief
-    assert "At aesthetic level" in brief
-    assert "At erotic level" in brief
-    assert "At hardcore level" in brief
-    assert "one explicit consensual adult sexual act already occurring" in normalized
-    assert "Within the first one hundred English words" in normalized
-    assert 'exact phrase "consensual and willing"' in normalized
-    assert "For total_count equal to one, place the furry protagonist's explicit" in (
-        normalized
-    )
-    assert "For larger casts, place every participant in the same direct" in (
-        normalized
-    )
-    assert "whose penis is inside whose vagina or anus" in normalized
-    assert "Vague phrases such as intimate contact" in normalized
-    assert 'calling the image a "live-action fantasy photograph"' in normalized
-    assert (
-        "stating the exact requested adult gender totals, exact human_count, exact "
-        "furry_count"
-    ) in normalized
-    assert "Put the direct anatomical contact in this same first sentence." in normalized
-    assert "first sentence takes absolute priority" in normalized
-    assert "All sexual anatomy is ordinary adult humanoid anatomy" in normalized
-    assert "Never use a muzzle shape, beak, horn, claw, tail, wing, paw pad" in (
-        normalized
-    )
-    assert "no adult merely watches from the background" in normalized
-    assert "ALLOCATED BODY COUNT AND CONTACT LOCK" in brief
-    assert "state the exact total number of visible adult bodies" in normalized
-    assert "Name every human and furry being individually in the first sentence" in (
-        normalized
-    )
-    assert (
-        "the first two sentences must give every furry and human participant one "
-        "current"
-    ) in normalized
-    assert "A second or later participant may not stand beside" in normalized
-    assert "Self-touch may supplement but never replace contact with another" in (
-        normalized
-    )
-    assert "one separate, unobscured body slot for each participant" in normalized
-    assert "hard minimum of 600 whitespace-delimited words" in normalized
-    assert "Target 750-950 words" in normalized
-    assert "Never mention a word count or length check" in normalized
-    assert "At Aesthetic and Erotic levels, begin every Frame" in normalized
-    assert "At Hardcore level, use the mandatory cast-and-contact first" in normalized
-    assert "HARDCORE POSE GEOMETRY" in brief
-    assert "broad, dry, level, room-temperature, non-slip support" in normalized
-    assert "Do not select from or repeat a fixed catalog of named poses." in brief
-    assert "invent a new physically plausible pose" in normalized
-    assert "There is no mandatory pose sequence, quota, or four-pose cycle." in (
-        normalized
-    )
-    assert "Do not use standing penetration, a wall-pressed body" in normalized
-    assert "pelvises to meet at incompatible heights" in normalized
-    assert "complete a silent limb ledger for every participant" in normalized
-    assert "left thigh, left knee, left lower leg, and left foot" in normalized
-    assert "right thigh, right knee, right lower leg, and right foot" in normalized
-    assert "within the first three hundred English words" in normalized
-    assert 'Use the literal side labels "left arm", "left hand", "right arm"' in (
-        normalized
-    )
-    assert "they never replace the side-specific map" in normalized
-    assert "Immediately after the mandatory Hardcore cast-and-contact sentence" in (
-        normalized
-    )
-    assert "the complete human limb map, then the complete furry limb map" in normalized
-    assert "Do not insert face, hair, biography, mythology, wardrobe" in normalized
-    assert "Keep human arms visually separate from furry forelimbs." in brief
-    assert "NON-ORAL MOUTH SAFETY" in brief
-    assert (
-        "keep every hand, finger, forepaw, claw, object, garment edge, and tail "
-        "outside the human and furry mouths"
-    ) in normalized
-    assert "Do not cradle, cover, press, pull, or stroke a face near the lips" in (
-        normalized
-    )
-    assert "place supporting hands below the collarbones or on the shared support" in (
-        normalized
-    )
-    assert "Every furry being has exactly two arms and two legs." in brief
-    assert "Never add a third leg, duplicate a knee" in normalized
-    assert "The tail is never load-bearing during intimacy." in brief
-    assert "Do not coil it around architecture, furniture, a limb" in normalized
-    assert "Match the sexual act to the visible head anatomy." in brief
-    assert "with a beak, bill, rigid muzzle, tusks, large fangs" in normalized
-    assert "never performs oral-genital contact" in normalized
-    assert "Use a 35mm to 65mm three-quarter or full-body camera view" in normalized
-    assert "camera obliquely enough to separate overlapping limbs" in normalized
-    assert "Hardcore Frame without a clearly named adult sexual act" in normalized
-    assert "uses \"explicit interaction\" for nonsexual ritual" in normalized
-    assert "an English Frame below 600 whitespace-delimited words" in normalized
-    assert "THEME CONTRACT" in brief
-    assert "FRAME CONTRACT" in brief
-    assert "VARIATION AND REJECTION RULES" in brief
 
 
 def test_dress_board_region_names_are_layout_only() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "dress.yaml"
-    ).description
+    dress = load_story_document(RECIPES / "dress.yaml")
+    brief = story_contract(dress)
     normalized = " ".join(brief.split())
 
-    assert "Do not render the Theme title or region names as visible text." in brief
-    assert "Use region names only as internal layout references" in brief
-    assert "Begin the scale at visibly sensual" in normalized
-    assert "requires a cast of one woman and zero men" in normalized
-    assert "zero or one visually restrained body-safe adult product" in normalized
-    assert "adult product-and-wearable fashion system" in normalized
-    assert (
-        "Include one to three clearly designed body-safe adult products" in normalized
-    )
-    assert "EXAGGERATED BRIGHT CHARACTER STYLING" in normalized
-    assert (
-        "hairstyle, outfit design, worn styling, and visible facial expression"
-        in normalized
-    )
-    assert "bright lighting alone" in normalized
-    assert "DECISION ORDER" in normalized
-    assert "A later choice must never weaken an earlier one" in normalized
-    assert "limited high-chroma palette" in normalized
-    assert "BDSM equipment-and-wardrobe design board" in normalized
-    assert "Include three to six BDSM-specific designed elements" in normalized
-    assert "BDSM EQUIPMENT SPECIFICATION" in normalized
-    assert "at least two externally wearable pieces" in normalized
-    assert "non-load-bearing, low-pressure, and visibly releasable" in normalized
-    assert "HARDCORE VISUAL IMPACT GATE" in normalized
-    assert "remains powerful at thumbnail scale" in normalized
-    assert "Use at least three of these contrast axes" in normalized
-    assert "one dominant statement, two secondary structures" in normalized
-    assert "CURATED HARDCORE WARDROBE ARCHETYPES" in normalized
-    assert "CURATED HARDCORE EQUIPMENT SYSTEMS" in normalized
-    assert "CURATED EXPLICIT BDSM PRODUCT CATEGORIES" in normalized
-    assert "SEX TOY PRODUCT SPECIFICATION" in normalized
-    assert "CURATED SEX TOY PRODUCT CATEGORIES" in normalized
-    assert "CURATED HARDCORE MATERIAL AND COLOR SYSTEMS" in normalized
-    assert "nipple clamps" in normalized
-    assert "ball gag" in normalized
-    assert "bit gag" in normalized
-    assert "open-center mouth gag" in normalized
-    assert "Any selected hardcore product may appear worn" in normalized
-    assert "visible low-tension limiter" in normalized
-    assert "visible breathing path" in normalized
-    assert "relaxed jaw" in normalized
-    assert "chastity-inspired waist belt" in normalized
-    assert "ventilated leather half-mask" in normalized
-    assert "wide posture collar" in normalized
-    assert "bondage mitts" in normalized
-    assert "breast-framing leather harness" in normalized
-    assert "lightweight padded spreader bar" in normalized
-    assert "soft suede flogger" in normalized
-    assert "broad padded leather paddle" in normalized
-    assert "limited body area necessary" in normalized
-    assert "External wearable sex toys may appear fitted" in normalized
-    assert "Insertive product categories may be named and shown" in normalized
-    assert "must remain completely outside the body" in normalized
-    assert "full-size wand massager" in normalized
-    assert "strap-on harness carrying a removable silicone dildo" in normalized
-    assert "classic silicone dildo" in normalized
-    assert "rabbit vibrator" in normalized
-    assert "jeweled silicone butt plug" in normalized
-    assert "graduated anal-bead set" in normalized
-    assert "textured masturbation sleeve" in normalized
-    assert "one to three sex toys in addition to its BDSM" in normalized
-    assert "PRODUCT AUTHENTICITY GATE" in normalized
-    assert "attach to the nipples" in normalized
-    assert "attached to lace" in normalized
-    assert "must not be called a nipple clamp" in normalized
-    assert "CONSTRUCTION AND CONNECTION INTEGRITY" in normalized
-    assert "collar seamlessly extends into gloves" in normalized
-    assert "material flat lay must show two shoes, two gloves" in normalized
-    assert "genuinely different presentation" in normalized
-    assert "Change at least four of these" in normalized
-    assert "Do not write the internal level names" in normalized
-    assert "BDSM may appear at most once" in normalized
-    assert "do not leak untranslated English workflow words" in normalized
-    assert "Do not pad final prose with compliance-shaped negations" in normalized
-    assert "does not satisfy product emphasis" in normalized
-    assert "Do not use the words futuristic" in normalized
-    assert "generic mid-gray walls" in normalized
-    assert "flat, shadowless catalog lighting" in normalized
-    assert "Every named product has its real shape and intended fit" in normalized
-    assert "Every Frame differs from other Frames" in normalized
-    assert "Final prose never states an internal content level" in normalized
-    assert "cybernetic body parts" in normalized
-    assert (
-        "State shared identity, outfit, palette, and inventory facts once"
-        in normalized
-    )
-    assert "technology-shaped costume components" in normalized
-    assert "utilitarian futurism" not in normalized
-    assert "Aesthetic is sensual lingerie-led fashion" in normalized
-    assert "hardcore is a BDSM wardrobe-and-equipment system" in normalized
-    assert "Present one complete, opaque, non-erotic outfit." not in brief
-    assert "At aesthetic level, include none." not in brief
-
-    wardrobe_pool = brief.split("\nCURATED HARDCORE WARDROBE ARCHETYPES\n", maxsplit=1)[
-        1
-    ].split("\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1)[0]
-    equipment_pool = brief.split("\nCURATED HARDCORE EQUIPMENT SYSTEMS\n", maxsplit=1)[
-        1
-    ].split("\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1)[0]
-    product_pool = brief.split(
-        "\nCURATED EXPLICIT BDSM PRODUCT CATEGORIES\n", maxsplit=1
-    )[1].split("\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1)[0]
-    sex_toy_pool = brief.split("\nCURATED SEX TOY PRODUCT CATEGORIES\n", maxsplit=1)[
-        1
-    ].split("\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1)[0]
-    material_pool = brief.split(
-        "\nCURATED HARDCORE MATERIAL AND COLOR SYSTEMS\n", maxsplit=1
-    )[1].split("\nSIX-VIEW BOARD CONTRACT\n", maxsplit=1)[0]
-    for pool in (
-        wardrobe_pool,
-        equipment_pool,
-        product_pool,
-        sex_toy_pool,
-        material_pool,
+    for requirement in (
+        "不得将主题标题或区域名称呈现为可见文字",
+        "区域名称仅作为内部版式参考",
+        "将强度尺度的起点设为明显性感但不露骨的时尚",
+        "要求一名女性、零名男性",
+        "允许零至一件视觉克制、对身体安全的成人产品",
+        "具有明确成人属性的产品与穿戴物时尚体系",
+        "包含一至三件设计明确、对身体安全的成人产品",
+        "发型、服装设计、穿搭造型和可见面部表情",
+        "绝不能只靠明亮灯光",
+        "后续选择绝不能削弱前面的要求",
+        "有限高彩度配色",
+        "“BDSM”器具与服装设计板",
+        "总共包含三至六个“BDSM”专属设计元素",
+        "至少包含两件外部可穿戴部件",
+        "不承重、低压力，并具有可见的释放方式",
+        "即使缩成缩略图仍然强烈",
+        "至少使用以下三个对比维度",
+        "一个主导重点、两个次级结构",
+        "乳夹",
+        "球形口塞",
+        "衔杆式口塞",
+        "中空口塞",
+        "所选的任何硬核级产品都可在人物视图中以佩戴状态出现",
+        "可见的低张力限制器",
+        "可见呼吸通道",
+        "放松的下颌",
+        "贞操带灵感腰带",
+        "通气皮革半面具",
+        "宽姿态颈圈",
+        "束缚连指手套",
+        "环绕乳房构成框架的皮革束带",
+        "轻质衬垫分腿杆",
+        "柔软绒面革多尾鞭",
+        "宽幅衬垫皮革拍板",
+        "所必需的有限身体区域",
+        "外部可穿戴性玩具可在人物视图中装配",
+        "可以命名和展示插入式产品类别",
+        "必须完全位于体外",
+        "全尺寸棒式按摩器",
+        "承载可拆卸硅胶假阳具的穿戴式固定带",
+        "经典硅胶假阳具",
+        "兔形振动器",
+        "嵌有宝石的硅胶肛塞",
+        "按大小渐变的肛珠",
+        "带纹理的自慰套",
+        "除“BDSM”器具体系之外，使用一至三件性玩具",
+        "夹在乳头上",
+        "夹在蕾丝",
+        "不得称为乳夹",
+        "不得说颈圈无缝延伸成手套",
+        "材质平铺图必须展示两只鞋、两只手套",
+        "每个画面都必须是实质不同的呈现",
+        "至少改变以下四项",
+        "不得写出内部级别名称",
+        "“BDSM”在必要时最多出现一次",
+        "未翻译的英语工作流程词汇",
+        "合规式否定措辞填充最终文字",
+        "不满足产品强调要求",
+        "不得使用“futuristic”",
+        "普通的中灰墙面",
+        "平淡、无阴影的商品目录照明",
+        "每件被命名的产品都有真实形状和预定贴合方式",
+        "每个画面都在至少四个允许变化的呈现维度上区别于同主题的其他画面",
+        "最终文字绝不陈述内部内容级别",
+        "不得使用机械改造身体部件",
+        "共用的身份、服装、配色和物品清单事实只陈述一次",
+        "科技造型服装部件",
+        "区域数量表示一幅图像的内部划分，不是叙事画面数量",
     ):
-        entries = [
-            line.removeprefix("- ").strip()
-            for line in pool.splitlines()
-            if line.startswith("- ")
-        ]
-        assert len(entries) >= 8
-        assert len(entries) == len(set(entries))
+        assert requirement in normalized, requirement
+    for excluded in (
+        "实用未来主义",
+        "呈现一套完整、不透明、非情色的服装",
+        "唯美级不包含任何成人产品",
+        "主题标题恰好出现一次，六个区域标签各出现一次",
+    ):
+        assert excluded not in normalized, excluded
+    assert dress.authoring.themes.content_levels[ContentLevel.AESTHETIC]
+    assert dress.authoring.themes.content_levels[ContentLevel.HARDCORE]
+    layout = next(module for module in dress.modules if module.id == "layout-multiview")
+    assert layout.parameters == {"layout": "grid", "min_views": 6, "max_views": 6}
 
-    explicit_product_entries = [
-        line.removeprefix("- ").strip()
-        for line in product_pool.splitlines()
-        if line.startswith("- ")
-    ]
-    assert len(explicit_product_entries) >= 12
-    sex_toy_entries = [
-        line.removeprefix("- ").strip()
-        for line in sex_toy_pool.splitlines()
-        if line.startswith("- ")
-    ]
-    assert len(sex_toy_entries) >= 10
+    def pool(label):
+        rules = (
+            *dress.authoring.themes.common,
+            *dress.authoring.themes.content_levels[ContentLevel.HARDCORE],
+        )
+        prefix = f"{label}：- "
+        return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
 
-    assert (
-        "The Theme title appears exactly once and the six region labels "
-        "each appear once"
-    ) not in brief
+    for label, minimum in (
+        ("精选硬核级服装原型", 8),
+        ("精选硬核级器具体系", 8),
+        ("精选明确“BDSM”产品类别", 12),
+        ("精选性玩具产品类别", 10),
+        ("精选硬核级材质与配色体系", 8),
+    ):
+        entries = pool(label)
+        assert len(entries) >= minimum, label
+        assert len(entries) == len(set(entries)), label
 
 
 def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "post-layout.yaml"
-    ).description
+    brief = story_contract(load_story_document(RECIPES / "post-layout.yaml"))
     normalized = " ".join(brief.split())
 
-    assert "tactile mid-century cinematic photomontage" in normalized
-    assert "REFERENCE EFFECT AND POSTER DNA" in normalized
-    assert "one dominant monochrome photographic hero" in normalized
-    assert "two to four smaller documentary" in normalized
-    assert (
-        "one oversized condensed headline assembled on a torn paper slab" in normalized
-    )
-    assert "overlapping torn paper with irregular deckled edges" in normalized
-    assert "halftone dots, photocopy grain, coarse newsprint" in normalized
-    assert "Deliberate collage is mandatory" in normalized
-    assert "portrait 4:5 poster" in normalized
-    assert "Repeated photographic crops of the same protagonist" in normalized
-    assert "Do not drift into clean corporate minimalism" in normalized
-    assert "The reference establishes this design grammar only" in normalized
-    assert "ENGLISH-ONLY IMAGE TEXT GATE" in normalized
-    assert "seven internal planning concerns" in normalized
-    assert "not as a literal response format" in normalized
-    assert "Do not print those concern names" in normalized
-    assert "SEVEN-PART CONTENT STRUCTURE" in normalized
-    assert "Their names are internal authoring cues" in normalized
-    assert (
-        "Write one compact, fluent paragraph rather than seven labeled lines"
-        in normalized
-    )
-    assert (
-        "dedicated image-text passage inside the natural prose is the sole "
-        "source of visible image copy"
-    ) in normalized
-    assert "exact physical carrier, poster location" in normalized
-    assert "add an ASCII colon" in normalized
-    assert "end with an ASCII semicolon" in normalized
-    assert "Never enclose copy in quotation marks" in normalized
-    assert "zero Chinese characters" in normalized
-    assert "do not authorize Chinese writing in the image" in normalized
-    assert "no quotation mark surrounds visible copy" in normalized
-    assert "If a word is not explicitly declared in that passage" in normalized
-    assert "zero non-English glyphs appear anywhere" in normalized
-    assert "Composition: one exact aspect ratio" not in normalized
-    assert "Output: resolution matching" not in normalized
-    assert "Composition and Output both specify portrait 4:5" not in normalized
+    for marker in (
+        "具有触感的二十世纪中叶电影式摄影蒙太奇",
+        "一张主导的单色摄影主图",
+        "两至四个较小的纪实、环境、物体、剪影或胶片条图像碎片",
+        "一个超大的窄体标题，拼装于撕裂纸块上",
+        "重叠的撕纸，具有不规则毛边",
+        "半色调网点、复印颗粒、粗糙新闻纸",
+        "必须进行有意识的拼贴，但须形成一个完整海报提案",
+        "竖版 4:5 海报",
+        "同一主角的重复摄影裁切可以作为印刷来源碎片使用，不算增加人物",
+        "不得偏向整洁的企业极简风",
+        "参考仅确立这套设计语法",
+        "将主体、场景、构图、风格、文字、细节及输出作为七项内部规划关注点",
+        "而非逐字输出格式",
+        "不得输出这些关注点名称、字段标签、前缀",
+        "它们的名称仅供内部创作提示",
+        "写成一个紧凑流畅的段落，而非七行带标签文字",
+        "专用画内文字片段是所有可见画内文案的唯一来源",
+        "准确的物理载体、画内位置和排版方式",
+        "添加字面 ASCII 字符 `: `",
+        "以字面 ASCII 字符 `;` 结束",
+        "不得用引号包围文案",
+        "不得呈现非英文文字系统",
+        "人物、地点、年代和物件均不构成使用当地语言文字的许可",
+        "可见文案外围无引号",
+        "若某个词未在该段落中明确声明，则不得在图像任何位置可读",
+        "生成海报任何位置都没有非英语字形",
+        "定义裁切或拍摄距离、拼贴结构、焦点层级、位置、阅读路径和受保护的留白，不得重复宽高比",
+        "不指定输出尺寸或宽高比",
+        "构图及最终输出质量措辞不含重复宽高比或尺寸要求",
+        "不得在海报中呈现备选布局",
+    ):
+        assert marker in normalized, marker
     for label in (
         "Subject:",
         "Scene:",
@@ -2112,121 +2241,129 @@ def test_post_layout_brief_builds_one_analog_collage_poster() -> None:
         "Output:",
     ):
         assert label not in brief
-    assert "turn one finished design into a collage of proposals" not in normalized
 
 
 def test_post_briefs_isolate_text_without_removing_poster_copy() -> None:
-    film_post = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "film-post.yaml"
-    ).description
-    post_layout = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "post-layout.yaml"
-    ).description
+    briefs = {}
+    for filename in ("film-post.yaml", "post-layout.yaml"):
+        document = load_story_document(RECIPES / filename)
+        resolved = resolve_story_input(document)
+        normalized = " ".join(story_contract(document).split())
+        briefs[filename] = normalized
+        assert document.generation.output_language == "english"
+        assert document.requirements.output_languages == ("english",)
+        assert resolved.request.output_language == "english"
+        assert any(check.type == "ascii" for check in document.validation.frames.checks)
+        with pytest.raises(StoryConfigurationError):
+            resolve_story_input(document, InputOverrides(output_language="chinese"))
+        visible_copy = next(
+            module for module in resolved.modules if module.kind == "visible_copy"
+        )
+        assert visible_copy.parameters.product == "poster"
+        assert visible_copy.parameters.copy_language == "english"
+        assert visible_copy.parameters.ascii == "required"
+        for marker in (
+            "Frame 全文必须使用英语",
+            "生成 Theme 时，标题、前提和风格也必须使用仅含 ASCII 字符的英语",
+            "完整 Frame 的每个字符都必须位于 ASCII 码点 0 至 127",
+            "将 U+2018 和 U+2019 替换为直撇号",
+            "专用画内文字片段是所有可见画内文案的唯一来源",
+            "添加字面 ASCII 字符 `: `",
+            "以字面 ASCII 字符 `;` 结束",
+            "不得写出单词 `colon` 或 `semicolon`",
+            "Frame 的最后一个字符必须是 `;`",
+            "乱码",
+            "不可读微小文字",
+            "字符串数量和排版区域数量不固定",
+            "槽位数量、重复出现的位置、允许的载体、排版区域和产品版式均由配方规定",
+            "文案语言与字符集约束的是可见画内文字，而不是描述性提示词的语言",
+        ):
+            assert marker in normalized, (filename, marker)
+        assert "恰好三个可读英语字符串" not in normalized, filename
+        assert "恰好三个受控排版区域" not in normalized, filename
 
-    for filename, brief in (
-        ("film-post.yaml", film_post),
-        ("post-layout.yaml", post_layout),
+    for marker in (
+        "保留原有院线文案组合和排版自由",
+        "片名、宣传语、上映信息、演职员表、署名",
+        "为该设计原创的英语宣传语",
+        "紧凑的虚构英语演职员表",
+        "证据与档案：收据、信件、地图",
+        "手写证据",
     ):
-        normalized = " ".join(brief.split())
-
-        assert "TEXT-LAYER ISOLATION LOCK" in normalized, filename
-        assert "Frame prose must use English throughout" in normalized, filename
-        assert "During Theme generation" in normalized, filename
-        assert (
-            "Every character in the complete Frame must be ASCII code point"
-            in normalized
-        ), filename
-        assert "U+2018 and U+2019 with a straight apostrophe" in normalized, filename
-        assert "dedicated image-text passage" in normalized, filename
-        assert "add an ASCII colon" in normalized, filename
-        assert "end with an ASCII semicolon" in normalized, filename
-        assert "the literal characters `: `" in normalized, filename
-        assert "never write the words colon or semicolon" in normalized, filename
-        assert "The Frame's final character is `;`" in normalized, filename
-        assert "gibberish" in normalized, filename
-        assert "unreadable microtext" in normalized, filename
-        assert "exactly three readable English strings" not in normalized, filename
-        assert "exactly three controlled typography zones" not in normalized, filename
-
-    film_normalized = " ".join(film_post.split())
-    assert (
-        "Keep the original theatrical copy package and typography freedom"
-        in film_normalized
-    )
-    assert "title, tagline, release line, billing block, credits" in film_normalized
-    assert "one original English tagline written for that design" in film_normalized
-    assert "and a compact fictional English billing block" in film_normalized
-    assert "evidence and archive: receipts, letters, maps" in film_normalized
-    assert "handwritten evidence" in film_normalized
-
-    layout_normalized = " ".join(post_layout.split())
-    assert "Visible-copy serialization must not change the poster design" in (
-        layout_normalized
-    )
-    assert (
-        "Do not remove or simplify editorial fragments, credits, quotations, "
-        "dates, venue details" in layout_normalized
-    )
-    assert (
-        "a few short English editorial fragments, credits, quotation blocks, "
-        "date or venue details" in layout_normalized
-    )
-    assert (
-        "ticket, photograph edge, credit strip, badge, sign" in layout_normalized
-    )
+        assert marker in briefs["film-post.yaml"], marker
+    for marker in (
+        "可见文案的序列化不得改变海报设计",
+        "不得删除或简化编辑碎片、署名、引文、日期、场地细节",
+        "少量简短英语编辑片段、署名、引文块、日期或场地细节",
+        "票券、照片边缘、署名条、徽章、标牌",
+    ):
+        assert marker in briefs["post-layout.yaml"], marker
 
 
 def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "jav-dvd-wrap.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert brief.startswith("BRIEF\n\n")
-    assert "back panel on the left, a narrow spine in the center" in normalized
-    assert "ENGLISH-ONLY ASCII LOCK" in normalized
-    assert "Every character in the complete Frame must be ASCII code point" in (
-        normalized
+    document = load_story_document(RECIPES / "jav-dvd-wrap.yaml")
+    normalized = " ".join(story_contract(document).split())
+    resolved = resolve_story_input(document)
+    assert document.generation.output_language == "english"
+    assert document.requirements.output_languages == ("english",)
+    assert resolved.request.output_language == "english"
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(output_language="chinese"))
+    checks = document.validation.frames.checks
+    assert any(check.type == "ascii" for check in checks)
+    word_count = next(check for check in checks if check.type == "word_count")
+    assert (word_count.min_words, word_count.max_words) == (500, 1300)
+    visible_copy = next(
+        module for module in resolved.modules if module.kind == "visible_copy"
     )
-    assert "TEXT-LAYER ISOLATION LOCK" in normalized
-    assert "The Frame's final character must be `;`" in normalized
-    assert "43-46 percent of the width to the back panel" in normalized
-    assert "6-8 percent to the spine" in normalized
-    assert "47-50 percent to the front panel" in normalized
-    assert "six to nine bordered inset stills" in normalized
-    assert "No body, face, hand, limb, prop, fluid, or garment may cross" in (
-        normalized
-    )
-    assert "Use the exact requested human cast and no additional people" in normalized
-    assert "unmistakably mature Chinese adult" in normalized
-    assert "When the requested cast is one woman and zero men" in normalized
-    assert "every front, back, and inset photograph is strictly solitary" in normalized
-    assert "off-camera participant, second body, extra hand, partial head" in normalized
-    assert "premise must describe solo agency" in normalized
-    assert "At aesthetic level" in normalized
-    assert "At erotic level" in normalized
-    assert "At hardcore level" in normalized
-    assert "Every inserted object must be a body-safe sex toy" in normalized
-    assert "Never insert a bottle, food, household object" in normalized
-    assert "Frames are parallel campaign variants" in normalized
-    assert "ADULTS 25+" in normalized
-    assert "one exact invented 13-digit barcode number" in normalized
-    assert "Target 700-1000 words" in normalized
-    assert "absolute range of 500-1300 words" in normalized
-    assert "each inset description under 40 words" in normalized
-    assert "State shared lighting, identity, borders, and print behavior once" in normalized
-    assert "Reject and rewrite any Frame below 500 words or above 1300 words" in normalized
-    assert "final dedicated image-text passage is missing" in normalized
-    assert "one complete flat sleeve" in normalized
+    assert visible_copy.parameters.product == "sleeve"
+    assert visible_copy.parameters.copy_language == "english"
+    assert visible_copy.parameters.ascii == "required"
+    for marker in (
+        "左侧封底、中央窄书脊、右侧封面",
+        "Frame 全文必须使用合乎语法的英语",
+        "生成 Theme 时，标题、前提和风格也必须使用仅含 ASCII 字符的英语",
+        "完整 Frame 的每个字符都必须位于 ASCII 码点 0 至 127",
+        "Frame 的最后一个字符必须是 `;`",
+        "添加字面 ASCII 字符 `: `",
+        "以字面 ASCII 字符 `;` 结束",
+        "封底约占宽度的百分之 43 至 46",
+        "书脊占百分之 6 至 8",
+        "封面占百分之 47 至 50",
+        "六至九张有边框的嵌入剧照",
+        "任何身体、面容、手、肢体、道具、体液或衣物都不得从一张剧照跨入另一张",
+        "严格使用指定人物阵容，不得增加任何人",
+        "明显是成熟的中国成年人",
+        "当请求阵容是一名女性、零名男性时",
+        "所有封面、封底及嵌入照片都严格为单人",
+        "镜头外参与者、第二具身体、多余手部、局部头部",
+        "前提都必须描述单人自主行为",
+        "在 aesthetic 级别",
+        "在 erotic 级别",
+        "在 hardcore 级别",
+        "所有插入物都必须是明确为生殖器或肛门使用设计、对身体安全的性玩具",
+        "绝不插入瓶子、食物、家居物品",
+        "各 Frame 是并行宣传变体",
+        "一个精确虚构的 13 位数字条码编号",
+        "目标为 700 至 1000 词",
+        "严格限定为 500 至 1300 词",
+        "每张嵌入图描述少于 40 词",
+        "共享照明、身份、边框和印刷行为只说明一次",
+        "拒绝并改写任何少于 500 词或多于 1300 词的 Frame",
+        "任何缺少最终专用图中文字段落",
+        "一张完整平面封套",
+        "每个实体出现位置都须声明一次精确可读字符串，包括重复的标题和产品代码位置",
+        "槽位数量、重复出现的位置、允许的载体、排版区域和产品版式均由配方规定",
+    ):
+        assert marker in normalized, marker
 
 
 def _legacy_everyday_social_caricature_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.yaml"
-    ).description
+    brief = story_contract(load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "everyday-social-caricature.yaml"
+    ))
     normalized = " ".join(brief.split())
 
-    assert "EAST ASIAN CAST AND SETTING LOCK" in normalized
     assert "Every visible person is a fictional East Asian adult" in normalized
     assert (
         "mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese, South Korean, "
@@ -2239,10 +2376,8 @@ def _legacy_everyday_social_caricature_contract() -> None:
         normalized
     )
     assert "Every Frame must identify every adult as an East Asian woman or East Asian man" in normalized
-    assert "WOMAN-CENTERED AGENCY" in normalized
     assert "At least one adult woman is the unmistakable narrative" in normalized
     assert "Use exactly the requested cast and add no bystanders" in normalized
-    assert "ENGLISH OUTPUT AND REAL-PERSON PHOTOMONTAGE LOCK" in normalized
     assert "complete Frame in English, regardless of the requested output language" in (
         normalized
     )
@@ -2269,19 +2404,15 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "anime, manga, chibi" in normalized
     assert "real photographic adult cutouts" in normalized
     assert "The final style sentence must positively restate" in normalized
-    assert "LIFE AS THE SOURCE" in normalized
     assert "invisible domestic labor" in normalized
     assert "friendship rituals" in normalized
     assert "dating, courtship, commitment" in normalized
     assert "workplace meetings" in normalized
     assert "attention, imitation, approval, self-presentation" in normalized
-    assert "CARICATURE AND CONTROLLED DISTORTION" in normalized
     assert "Exaggerate decisively" in normalized
-    assert "SATIRICAL CARICATURE HARD GATE" in normalized
     assert "one controlled caricatural exaggeration" in normalized
     assert "thirty to forty percent of the image" in normalized
     assert "Exactly one physical supporting object" in normalized
-    assert "CONTROLLED WHOLE-BODY EXAGGERATION" in normalized
     assert "Every adult appears as one intact photographic person" in normalized
     assert "Use no more than one anatomical or silhouette exaggeration" in normalized
     assert "Never cut, paste, duplicate, float, detach, fold, splice" in normalized
@@ -2320,7 +2451,6 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "Never resize or paste a face or isolated organ" in normalized
     assert "All faces must remain unmistakably mature" in normalized
     assert "Reject smooth doll faces, huge sparkling eyes" in normalized
-    assert "DRAW FIRST, DESCRIBE SECOND" in normalized
     assert "silently draw at least three radically different thumbnail" in normalized
     assert "using only black shapes and one accent color" in normalized
     assert "silently assemble one complete final photomontage" in normalized
@@ -2328,16 +2458,13 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "following the viewer's scan order from dominant icon" in normalized
     assert "If a symbol requires explanation, redesign it before writing" in normalized
     assert "fill thirty-five to fifty percent of the entire image area" in normalized
-    assert "VISUAL LABEL AND POWER MAP" in normalized
     assert "Give each side a concrete visual label" in normalized
     assert "Use one blunt visual contest that survives without context" in normalized
     assert "If the scene can be mistaken for an ordinary lifestyle illustration" in (
         normalized
     )
-    assert "METAPHOR AND SYMBOL SYSTEM" in normalized
     assert "Use an animal, object, garment, or emblem as a visual label" in normalized
     assert "Every symbol must have one clear referent" in normalized
-    assert "ACTION-METAPHOR COUPLING GATE" in normalized
     assert "one closed causal force chain" in normalized
     assert "central woman's intimate movement applies one visible directional force" in (
         normalized
@@ -2354,7 +2481,6 @@ def _legacy_everyday_social_caricature_contract() -> None:
         normalized
     )
     assert "Because [central woman] [physical verb]" in normalized
-    assert "CONTENT-LEVEL INTEGRATION" in normalized
     assert "At aesthetic level" in normalized
     assert "name one complete opaque outfit for each adult" in normalized
     assert "Show no bare torso, transparent garment, lingerie" in normalized
@@ -2370,9 +2496,7 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "Include no clothed spectator or queued participant" in normalized
     assert "Do not pin, trap, force, dominate, restrain" in normalized
     assert "include no loose props or debris" in normalized
-    assert "NON-NEGOTIABLE PRIORITY" in normalized
     assert "everyone awake, alert, willing" in normalized
-    assert "PLANNED ENGLISH LABEL SYSTEM" in normalized
     assert "Every Theme must choose one meaningful pair of opposed English labels" in (
         normalized
     )
@@ -2385,12 +2509,10 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "The two clean label carriers are the only text-bearing surfaces" in (
         normalized
     )
-    assert "LEXICAL TEXT-CARRIER BAN" in normalized
     assert "Do not use any of these English words or their plurals" in normalized
     assert "Replace any candidate containing one of these words" in normalized
     assert "microtext, card, pass, knife, cleaver, blade" in normalized
     assert "weapon, pin, pinned, trap, trapped, force, forced" in normalized
-    assert "THEME CONTENT-PROOF GATE" in normalized
     assert "The Theme premise itself must contain the complete visible proof" in (
         normalized
     )
@@ -2406,7 +2528,6 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "the explicit interaction is the sole ongoing human action" in normalized
     assert "No participant simultaneously reads, types, calculates" in normalized
     assert "The humor comes from desire, etiquette, attention" in normalized
-    assert "DIRECT AND POPULAR LEGIBILITY" in normalized
     assert "understandable without text" in normalized
     assert "Use a poster-like hierarchy" in normalized
     assert "at least four fifths of the composition" in normalized
@@ -2416,7 +2537,6 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "one exact orthographic poster plane" in normalized
     assert "must not resemble people photographed together in a real room" in normalized
     assert "single matte field with no floor line, wall corner, ceiling" in normalized
-    assert "IMAGE-TEXT GATE" in normalized
     assert "Every Frame must visibly include the Theme's exact pair" in normalized
     assert "Every letter must be at least one twentieth of the image height" in (
         normalized
@@ -2430,7 +2550,7 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "dedicated image-text passage at the absolute end" in normalized
     assert "Write exactly two entries" in normalized
     assert "minimum letter height, horizontal orientation, type weight" in normalized
-    assert "Use the literal characters `: `" in normalized
+    assert "Use the literal ASCII characters `: `" in normalized
     assert "Do not add an IMAGE-TEXT heading" in normalized
     assert "The Frame's final character" in normalized
     assert "Write this dedicated passage once only" in normalized
@@ -2447,12 +2567,8 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "The only supporting object is one [singular object]" in normalized
     assert "Name no other loose object, debris, food scatter" in normalized
     assert "Perform a final character scan on every Theme and Frame" in normalized
-    assert "REAL-PERSON PHOTOMONTAGE LANGUAGE" in normalized
     assert "premium physical editorial photomontage" in normalized
     assert "full natural color and photographic tonal variation" in normalized
-    assert "THEME CONTRACT" in normalized
-    assert "FRAME CONTRACT" in normalized
-    assert "WITHIN-THEME CONTINUITY LOCK" in normalized
     assert "names, allowed identities, ages, facial anchors, hair" in normalized
     assert "base garments, chosen exaggerations, primary metaphor, and label pair" in (
         normalized
@@ -2460,1583 +2576,1547 @@ def _legacy_everyday_social_caricature_contract() -> None:
     assert "Clothing may shift only as required by the selected interaction" in normalized
     assert "requested women and men visually unambiguous" in normalized
     assert "No generic shocked open mouths" in normalized
-    assert "VARIATION AND REJECTION RULES" in normalized
+
+
+@pytest.mark.parametrize("level", list(ContentLevel))
+def test_everyday_social_caricature_requires_multiple_adults_and_a_woman(level):
+    document = load_story_document(RECIPES / "everyday-social-caricature.yaml")
+    default = resolve_story_input(document, InputOverrides(content_level=level))
+    assert (default.request.female_count, default.request.male_count) == (1, 1)
+
+    expected = {
+        (female, male)
+        for female in range(1, 9)
+        for male in range(9 - female)
+        if 2 <= female + male <= 8
+    }
+    assert document.requirements.allowed_casts is not None
+    assert {
+        (cast.female_count, cast.male_count)
+        for cast in document.requirements.allowed_casts
+    } == expected
+    assert len(expected) == 35
+    for female, male in sorted(expected):
+        resolved = resolve_story_input(
+            document,
+            InputOverrides(
+                content_level=level, female_count=female, male_count=male
+            ),
+        )
+        assert resolved.request.female_count == female
+        assert resolved.request.male_count == male
+        assert resolved.plans[0].cast.total == female + male
+    for female, male in ((1, 0), (0, 1), (0, 2)):
+        with pytest.raises(StoryConfigurationError, match="cast|female"):
+            resolve_story_input(
+                document,
+                InputOverrides(
+                    content_level=level, female_count=female, male_count=male
+                ),
+            )
 
 
 def test_everyday_social_caricature_centers_women_and_lived_interaction() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "everyday-social-caricature.yaml"
-    ).description
+    document = load_story_document(RECIPES / "everyday-social-caricature.yaml")
+    brief = story_contract(document)
     normalized = " ".join(brief.split())
-
     assert len(brief.splitlines()) <= 150
     assert len(brief) <= 17_000
-    assert brief.isascii()
+    assert document.generation.output_language == "english"
+    assert document.requirements.output_languages == ("english",)
+    assert any(check.type == "ascii" for check in document.validation.frames.checks)
+    assert re.search(r"[\u4e00-\u9fff]", document.description)
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(output_language="chinese"))
 
     required_contract = (
-        "Create original, woman-centered editorial caricatures",
-        "humorous at first glance and bitter on reflection",
-        "Satirize conduct and relationships, never identity itself",
-        "PRIORITY",
-        "exact requested cast",
-        "action-metaphor causality",
-        "CAST, SETTING, AND OUTPUT",
-        "exactly the script-requested number of women and men",
-        "Every visible person is a fictional, willing, alert East Asian adult",
-        "mainland Chinese, Taiwanese, Hong Kong Chinese, Japanese",
-        "Set the scene in mainland China, Taiwan, Hong Kong, Japan",
-        "Give each exactly one identity phrase from this list verbatim",
-        "Never add a second nationality, citizenship, diaspora",
-        "State each person's gender explicitly",
-        "never all-capital surnames",
-        "English-only ASCII",
-        "replace smart punctuation, multiplication signs, and non-English glyphs",
-        "CONTENT LEVEL",
-        "At aesthetic level",
-        "At erotic level",
-        "At hardcore level",
-        "name every participant's anatomy-and-contact role",
-        "holding unrelated items, directing a pose, or touching clothing does not count",
-        "order the cast A > B > C and onward",
-        "permit only adjacent-pair sexual contacts",
-        "C never touches A",
-        "one exclusive target",
-        "the act is independently chosen recreation",
-        "never evidence, payment, initiation, punishment, leverage",
-        "No one demands, requires, forces, purchases, trades, rewards, or records the act",
-        "WARDROBE AND CLEAN BACKGROUND",
-        "striking head-to-foot editorial styling",
-        "one bold clothing silhouette",
-        "high-contrast color blocking",
-        "without becoming another deformation, label, symbol, or metaphor",
-        "Reject generic default officewear",
-        "one broad matte color field plus at most two simple geometric cues",
-        "Include no room inventory, decorative clutter",
-        "The cast, primary structure, and paired motif dominate the image",
-        "BITING PHYSICAL CARICATURE",
-        "exactly two coordinated layers of deformation",
-        "one coherent facial caricature combining at least two altered features",
-        "elongated longitudinally, widened transversely, or enlarged uniformly",
-        "two to four times ordinary scale",
-        "shortened longitudinally, narrowed transversely, or reduced uniformly",
-        "one-half to one-quarter ordinary scale",
-        "Name both facial alterations explicitly",
-        "exactly one allowed verb-axis pair and one numeric scale",
-        "Never combine opposing size verbs or alter a second axis",
-        "A general expression or unquantified adjective does not qualify",
-        "The matching limb and adjacent parts remain ordinary",
-        "never satisfy the required nonfacial layer",
-        "may not invent, spread, intensify, or transfer a deformation",
-        "Every other adult receives exactly one different secondary",
-        "Choose either one facial cluster or one body or limb change, never both",
-        "If body or limb is chosen, keep the face ordinary",
-        "if face is chosen, keep all body proportions ordinary",
-        "Scale changes stop cleanly at named joints",
-        "The face, body, gesture, and action must communicate the same trait",
-        "SHARED ACTION AND METAPHOR",
-        "one closed reaction circuit",
-        "thirty-five to fifty percent of the canvas",
-        "State each contact point, force direction, immediate physical change",
-        "Give every named adult one visible contact-force-result clause",
-        "For hardcore scenes, the explicit act is the sole ongoing human action",
-        "PHYSICAL STAGING",
-        "Describe one frozen instant",
-        "left-to-right and overlap position, facing, weight-bearing support",
-        "Every contact must name two anatomically reachable surfaces",
-        "Preserve one coherent occupancy map",
-        "no limb passes through a body or structure",
-        "no unsupported hovering",
-        "No body may thread, loop, wrap, weave through, or be bisected",
-        "Reflective props show abstract glare, never duplicated people or anatomy",
-        "never attachment, balance, reach path, collision, or load transfer",
-        "hard edges may touch only feet, knees, hands, or forearms",
-        "A broad flat surface may support the back or seat without pressure",
-        "no structure may press, wedge, trap, or bisect the head",
-        "B must occupy the physical center and directly neighbor both endpoints",
-        "Left-to-right order must be A-B-C or C-B-A",
-        "No person or limb may reach across, behind, around, over, under, or through the third person",
-        "If the tableau cannot be reconstructed physically",
-        "establish the complete physical staging map before describing",
-        "exactly one supporting motif represented by two related physical instances",
-        "HYBRID NEWSPAPER PHOTOMONTAGE",
-        "separately photographed real adult performers",
-        "bold adult newspaper screen print",
-        "photographic texture inside each deformed cutout",
-        "exactly four dominant flat spot-color fields outside natural skin and hair",
-        "Controlled graphic foreshortening",
-        "impossible independently of camera proximity",
-        "TEXT PAIR",
-        "Locked image labels: FIRST LABEL | SECOND LABEL.",
-        "each locked label exactly once and only in the terminal serialization",
-        "Never choose an inherently text-bearing object as the primary structure",
-        "COMPLIANCE GATE",
-        "participant contact graph, occupancy map",
-        "discard the whole draft and rebuild it",
-        "THEME CONTRACT",
-        '"Cast:" lists every Title Case name, age of at least twenty-five',
-        '"Deformations:" lists CENTRAL NAME',
-        "explicit woman or man",
+        "创作原创、以女性为中心的社论式夸张讽刺画",
+        "初看幽默、细想苦涩",
+        "讽刺行为和关系，绝不讽刺身份本身",
+        "请求的确切阵容",
+        "动作与隐喻的因果关系",
+        "严格采用脚本请求的女性和男性数量",
+        "每位可见人物都是虚构、自愿、清醒、年满二十五岁的东亚成年人",
+        "场景设在中国大陆、台湾、香港、日本、韩国或新加坡",
+        "为每人从此列表逐字选用恰好一个身份短语",
+        '"mainland Chinese"、"Taiwanese"、"Hong Kong Chinese"、"Japanese"、'
+        '"South Korean" 或 "Singaporean Chinese"',
+        "不得添加第二个国籍、公民身份、侨民身份、混合身份或矛盾身份",
+        "明确写出每人的性别",
+        "绝不用全大写姓氏",
+        "每个主题和画面都只用英文 ASCII 编写",
+        "将智能标点、乘号及非英文字符替换为普通 ASCII",
+        "在 aesthetic 级",
+        "在 erotic 级",
+        "在 hardcore 级",
+        "写明每位参与者的人体部位与接触角色",
+        "拿无关物品、指导姿势或触碰衣物均不算",
+        "按 A > B > C 并继续排列阵容",
+        "仅允许相邻配对的性接触",
+        "C 绝不接触 A",
+        "一个专属目标",
+        "行为是独立选择的娱乐",
+        "绝不是证据、付款、入门仪式、惩罚、要挟手段",
+        "无人索要、要求、强迫、购买、交换、奖赏或记录该行为",
+        "从头到脚醒目的社论式造型",
+        "一种大胆服装轮廓",
+        "高对比色块",
+        "不能变成另一种变形、标签、符号或隐喻",
+        "拒绝通用默认办公服",
+        "一片宽广哑光色域，加至多两个指示地点的简单几何线索",
+        "不得有房间陈设清单、杂乱装饰",
+        "阵容、主要结构和成对母题主导图像",
+        "恰好两个协调的变形层次",
+        "一组连贯的面部夸张，至少改变眼睛、眉毛、脸颊、嘴、下颌、鼻子和发型中的两项",
+        "沿纵向拉长、沿横向加宽或均匀放大",
+        "正常尺度的二到四倍",
+        "沿纵向缩短、沿横向收窄或均匀缩小",
+        "正常尺度的二分之一到四分之一",
+        "明确写出两项面部改变",
+        "只能采用一个允许的动词与轴向组合及一个数值尺度",
+        "绝不能混合相反的尺寸动词或改变第二条轴",
+        "泛化表情或未量化形容词不合格",
+        "对应肢体和相邻部位保持普通",
+        "均不能满足所需的非面部层次",
+        "画面不得创造、扩散、加强或转移其主题未包含的变形",
+        "其余每位成年人恰好获得一种不同的次级面部、身体或肢体变形",
+        "只能选择一组面部特征或一项身体或肢体改变，不可兼有",
+        "若选身体或肢体，面部保持普通",
+        "若选面部，所有身体比例保持普通",
+        "尺度改变在指定关节处明确停止",
+        "面部、身体、手势和动作必须传达同一种特质",
+        "一个闭合反应回路",
+        "占画布百分之三十五到五十",
+        "写明每个接触点、力的方向、即时物理变化",
+        "为每位具名成年人提供一个可见的接触—力—结果分句",
+        "露骨行为是唯一正在进行的人类动作",
+        "描述一个定格瞬间",
+        "左右及遮叠位置、朝向、承重支撑",
+        "每次接触须写明两个解剖上可相互到达的表面",
+        "保持一致的空间占用图",
+        "无肢体穿过身体或结构",
+        "无无支撑悬浮",
+        "任何身体不得穿串、环绕、包缠、编织穿过开口、框架、栏杆、网、家具或结构，也不得被它们横切",
+        "反光道具只显示抽象眩光，绝不重复人物或人体部位",
+        "不改变连接、平衡、伸达路径、碰撞或载荷传递",
+        "硬边只能接触脚、膝、手或前臂",
+        "宽阔平面可无压迫地支撑背部或坐部",
+        "任何结构都不得挤压、楔住、困住或横切头",
+        "B 必须位于实际空间中央，并直接邻接两个端点",
+        "左右顺序必须是 A-B-C 或 C-B-A",
+        "任何人或肢体均不得越过第三个人，或从其后方、周围、上方、下方或体内绕行来接触",
+        "若场面无法在物理上重建，须重新设计",
+        "先建立完整物理场面图，再描述",
+        "只使用一个辅助母题，以两个相关实体呈现",
+        "分别拍摄的真实成年表演者",
+        "大胆的成人报纸丝网印刷",
+        "每个变形剪贴内的人体皮肤、眼睛、头发、手和布料均保留摄影纹理",
+        "在自然皮肤和头发之外恰好四种主导平面专色色域",
+        "受控的图形透视缩短",
+        "必须不依赖镜头远近而仍不可能",
+        '"Locked image labels: FIRST LABEL | SECOND LABEL."',
+        "每个锁定标签只拼写一次，且仅在末尾序列化中出现",
+        "绝不选本来就带文字的物品作主要结构或辅助母题",
+        "参与者接触图、空间占用图",
+        "丢弃整份草稿并重建",
+        '"Cast:" 列出每个人首字母大写的姓名、至少二十五岁的年龄',
+        '"Deformations:" 使用格式 "CENTRAL NAME',
+        "明确的女性或男性",
         "feature plus alteration; feature plus alteration",
         "one nonfacial part, allowed verb-axis pair, and valid scale",
-        '"Consent:" states that every adult freely chose recreation',
-        '"Staging:" fixes A-B-C or C-B-A spatial order, B centered',
+        '"Consent:" 声明每位成年人都自由选择了与社会利害无关的娱乐',
+        '"Staging:" 固定 A-B-C 或 C-B-A 空间顺序、B 居中',
         '"Hardcore proof: Chain A > B > C.',
         "No other sexual contact.",
-        "unified real-person newspaper photomontage medium",
-        "FRAME CONTRACT",
-        "Hybrid real-person newspaper photomontage with biting anatomical caricature:",
-        "Exactly [requested total] East Asian adults fill the image",
-        "Preserve every Theme age, identity, wardrobe, deformation, chain order",
-        "VARIATION AND REJECTION",
-        "mixed media",
-        "interchangeable clothing",
-        "cluttered background",
-        "nonadjacent or repeated contact pair",
-        "contact count other than cast-size-minus-one",
-        "chain midpoint outside the spatial center",
-        "contact reaching across the third adult",
-        "shared anatomical target",
-        "a supporting adult with both facial and bodily change",
-        "opposing scale verbs",
-        "deformation spreading to adjacent parts",
-        "a body threaded through a structure",
-        "hard edge against a core body part",
-        "structure pressing or trapping a body",
-        "non-ASCII glyph",
-        "unsupported, intersecting, or irreconstructible staging",
+        "统一的真人报纸照片蒙太奇媒介",
+        '"Hybrid real-person newspaper photomontage with biting anatomical caricature:"',
+        '"Exactly [requested total] East Asian adults fill the image',
+        "严格保留主题中的每个年龄、身份、服装、变形、链条顺序",
+        "媒介混杂",
+        "可互换衣装",
+        "杂乱背景",
+        "非相邻或重复的接触配对",
+        "接触数不是人数减一",
+        "链条中点不在空间中央",
+        "接触跨越第三位成年人",
+        "共用人体目标",
+        "辅助成年人同时有面部和身体改变",
+        "相反的尺度动词",
+        "变形扩散至相邻部位",
+        "身体穿过结构",
+        "硬边抵住身体核心部位",
+        "结构挤压或困住身体",
+        "非 ASCII 字符",
+        "无支撑、相交或无法重建的场面",
     )
     for marker in required_contract:
-        assert marker in normalized
+        assert marker in normalized, marker
 
-    conflicting_contracts = (
-        "Continue immediately with the complete dominant visual icon",
-        "Do not use photographic",
-        "Select a coherent original medium",
-        "roughly one third of the image",
-        "Choose one dominant deformation grammar per Theme",
-        "both adults' different dominant deformations",
-        "five to eight complete sentences",
-        "premise of no more than two sentences",
-        "foreground, middle ground, background",
-        "forced perspective",
-        "the viewpoint, distance, or perspective",
-    )
-    for conflict in conflicting_contracts:
-        assert conflict not in normalized
+    for conflict in (
+        "立即接续完整的主导视觉图标",
+        "不得使用摄影",
+        "选择一种连贯的原创媒介",
+        "约占图像三分之一",
+        "每个主题选择一种主导变形语法",
+        "两位成年人各自不同的主导变形",
+        "五至八个完整句子",
+        "前提不得超过两句话",
+        "前景、中景、背景",
+        "强制透视",
+        "视点、距离或透视",
+    ):
+        assert conflict not in normalized, conflict
 
 
 def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "creative.yaml"
-    ).description
+    document = load_story_document(RECIPES / "creative.yaml")
+    brief = story_contract(document)
     normalized = " ".join(brief.split())
-
-    assert "PLAN THE WHOLE BATCH FIRST" in normalized
-    assert "at least twice as many candidate concepts as requested" in normalized
-    assert "ONE-OBJECT AND MULTI-OBJECT MODES" in normalized
-    assert "visible mix of single-object and multi-object ensemble Themes" in normalized
-    assert "aiming for roughly half of each" in normalized
-    assert "coherent ensemble of two to five familiar objects" in normalized
-    assert "small inhabitants of a real everyday environment" in normalized
-    assert "travel between objects" in normalized
-    assert "use one object to alter another" in normalized
-    assert "Do not scatter unrelated giant props" in normalized
-    assert "use at least eight clearly different ordinary-use families" in normalized
-    assert "span at least five normal size bands" in normalized
-    assert "choose at least three objects" in normalized
-    assert "larger than an adult hand" in normalized
-    assert "choose no more than three objects" in normalized
-    assert "inside a closed adult hand" in normalized
-    assert "THE ONE-SENTENCE IDEA" in normalized
-    assert "OBJECT TRUTH" in normalized
-    assert "HUMAN STAKE" in normalized
-    assert "CONCEPT ENGINE" in normalized
-    assert "If removing the cast leaves a materials demonstration" in normalized
-    assert "CREATIVE-ENGINE SPREAD" in normalized
-    assert "at least six substantially different primary engines" in normalized
-    assert "No more than two Themes may center on" in normalized
-    assert "No more than two may share one relationship grammar" in normalized
-    assert "CANDIDATE TOURNAMENT" in normalized
-    assert "six genuinely different image opportunities" in normalized
-    assert "six images simply tour six components" in normalized
-    assert "competition, market, permission system, or intimacy economy" in normalized
-    assert "ORDINARY-USE COLLISION" in normalized
-    assert "In at least two of the six regions" in normalized
-    assert "uses the object in a way instantly recognizable" in normalized
-    assert "use the object as designed" in normalized
-    assert "EXTERIOR-ONLY SCALE CONTRACT" in normalized
-    assert "Never place any body inside the object" in normalized
-    assert "Ordinary use never authorizes entry" in normalized
-    assert "SIX PROOFS, NOT SIX PARTS" in normalized
-    assert "one object-specific ordinary-use collision" in normalized
-    assert "At least four stunts must change the cast's goal" in normalized
-    assert "At least two must remain compelling" in normalized
-    assert "THEME-STAGE CONTRACT" in normalized
-    assert "exactly five semicolons" in normalized
-    assert "FRAME-STAGE GRID CONTRACT" in normalized
+    for marker in (
+        "候选概念数量至少为所需数量的两倍，且不得少于十二个",
+        "明显混合单物件主题与多物件组合主题",
+        "力求两者各占约一半",
+        "由两到五个熟悉物件构成的协调组合",
+        "真实日常环境中的小居民",
+        "在物件之间移动",
+        "用一个物件改变另一个",
+        "不要散放无关的巨型道具",
+        "至少八种明显不同的日常用途类别",
+        "至少五个常规尺寸区间",
+        "选择至少三个通常比成年人手掌更大的物件",
+        "能完全握在成年人合拢手掌中的物件不得超过三个",
+        "如果移除人物后只剩材质演示",
+        "至少六种实质不同的主要驱动机制",
+        "受规则支配的制度为核心的主题不得超过两个",
+        "采用同一种关系模式的主题不得超过两个",
+        "六种真正不同的图像表现机会",
+        "六幅图像只是依次展示六个部件",
+        "竞赛、市场、许可制度或亲密经济体系",
+        "在六个区域中的至少两个区域里",
+        "以一眼就能认出是日常使用的方式使用该物件",
+        "符合设计用途的方式使用物件",
+        "绝不将任何身体置于物件内部",
+        "日常使用绝不构成进入内部的许可",
+        "一次来自外部常规尺度、且贴合物件的日常使用碰撞",
+        "至少四个视觉巧招必须改变人物的目标",
+        "即使移除全部性感内容，至少两个仍须具有吸引力",
+        "恰好五个分号",
+        '无论 "frames_per_theme" 的值为何，每个叙事画帧都是一个完整的竖幅 2 列 3 行网格',
+        "绝不将一张概念板分散到多个画帧、为每个区域各用一个画帧",
+        '原文提示词 "Region 1:" 至 "Region 6:"',
+        "每个都必须能够独立作为广告主视觉",
+        '不要将 "erotic" 或 "hardcore" 淡化成中性图像',
+        "受控的移轴或微距式选择性对焦",
+        "首先确保它在缩略图尺寸下清晰可读",
+        "至少使用四个远景或中景，展示完整的成年身体",
+        "用于近距离细节的区域不得超过两个",
+        "一个完整物件或物件组合的主视觉",
+        "避免将宽大而无特征的侧面当作墙壁",
+        "掩盖人物与物件的比例",
+        "其他表面图形体系",
+        "也可以强化尺度感",
+        "沿物件表面的微缩人物眼平视角",
+        "以完整轮廓衬托微小身体的高位斜视角",
+        "这是清晰利落的编辑式广告摄影，而不是电影剧照",
+        "不要使用电影化调色",
+        "使用明亮、洁净的高调色彩",
+        "有意设计的互补色对比",
+        "一眼可读的主导色彩关系",
+        "大胆的周围色块",
+        "避免让不锈钢灰",
+        "不要让浅色皮肤、浅色服装、浅色物件和浅色背景处于同一色调区间",
+        "精心制作的商业桌面广告",
+        "保留可见细节的通透暗部",
+        "并非硬性质量门槛",
+        "这些优先项用于指导筛选和修订",
+        "不可妥协的网格、人物构成、仅限外部、内容级别和数据模式契约仍属强制要求",
+    ):
+        assert marker in normalized, marker
     assert (
-        "Every Narrative Frame is one complete portrait 2-column by 3-row grid"
-        in normalized
-    )
-    assert "regardless of frames_per_theme" in normalized
-    assert "Never distribute a board across Frames" in normalized
-    assert "use one Frame per region" in normalized
-    assert (
-        "A portrait 2-column by 3-row grid forms one image with six cleanly "
-        "separated regions." in normalized
-    )
-    assert (
-        "Every person remains outside all colossal everyday objects throughout "
-        "the board." in normalized
-    )
-    assert '"Region 1:" through "Region 6:"' in normalized
-    assert "When frames_per_theme is 1" not in normalized
-    assert "work as a standalone campaign key visual" in normalized
-    assert "Do not sanitize erotic or hardcore into neutral imagery" in normalized
-    assert "MINIATURE-WORLD CAMERA LANGUAGE" in normalized
-    assert "controlled tilt-shift or macro-style selective focus" in normalized
-    assert "THUMBNAIL SCALE HIERARCHY" in normalized
-    assert "read first at thumbnail size" in normalized
-    assert "at least four wide or medium views" in normalized
-    assert "showing complete adult bodies" in normalized
-    assert "no more than two regions for close detail" in normalized
-    assert "one whole-object or ensemble hero view" in normalized
-    assert "avoid using a broad featureless flank as a wall" in normalized
-    assert "conceal the cast-to-object ratio" in normalized
-    assert "graphic surface systems may reinforce scale" in normalized
-    assert "miniature eye level along the object's surface" in normalized
-    assert "high oblique views revealing tiny bodies" in normalized
-    assert "This is crisp editorial advertising photography" in normalized
-    assert "not a movie still" in normalized
-    assert "Do not use cinematic color grading" in normalized
-    assert "BRIGHT CLEAN COLOR STANDARD" in normalized
-    assert "bright, clean, high-key color" in normalized
-    assert "deliberate complementary contrast" in normalized
-    assert "one immediately legible dominant color relationship" in normalized
-    assert "bold surrounding color field" in normalized
-    assert "Avoid boards dominated by stainless steel gray" in normalized
-    assert "same tonal band" in normalized
-    assert "commercial tabletop campaign" in normalized
-    assert "open shadows with visible detail" in normalized
-    assert "PHOTOGRAPHIC MATERIAL STANDARD" in normalized
-    assert "FINAL CREATIVE PRIORITIES" in normalized
-    assert "they are not a hard quality gate" in normalized
-    assert "Eliminate a candidate when" not in normalized
-    assert "Reject the Theme when" not in normalized
-    assert "- T001:" not in brief
+        '"A portrait 2-column by 3-row grid forms one image with six cleanly '
+        "separated regions. Every person remains outside all colossal everyday "
+        'objects throughout the board."'
+    ) in normalized
+    for conflict in (
+        "当 frames_per_theme 为 1 时",
+        "满足以下情况时淘汰候选方案",
+        "满足以下情况时拒绝主题",
+        "- T001:",
+    ):
+        assert conflict not in brief, conflict
+    assert document.generation.output_language == "chinese"
+    for frames_per_theme in (1, 6):
+        resolved = resolve_story_input(
+            document, InputOverrides(frames_per_theme=frames_per_theme)
+        )
+        assert resolved.request.frames_per_theme == frames_per_theme
+        layout = next(
+            module for module in resolved.modules if module.kind == "layout_multiview"
+        )
+        assert layout.parameters.layout == "grid"
+        assert (layout.parameters.rows, layout.parameters.columns) == (3, 2)
+        assert (layout.parameters.min_views, layout.parameters.max_views) == (6, 6)
 
 
 def test_edo_warai_e_brief_respects_all_content_levels() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.yaml"
-    ).description
+    document = load_story_document(RECIPES / "edo-warai-e.yaml")
+    brief = story_contract(document)
     normalized = " ".join(brief.split())
 
-    assert "ADULT CAST, CONSENT, AND CONTENT LEVEL" in normalized
-    assert "Honor the exact requested content level" in normalized
-    assert "aesthetic: keep every adult fully dressed" in normalized
-    assert "erotic: make unmistakable adult sensuality visible" in normalized
-    assert "clearly erotic but non-explicit interaction" in normalized
-    assert "hardcore: show an explicit, consensual adult sexual act" in normalized
-    assert "already occurring in every Theme and Frame" in normalized
-    assert "do not hide the defining content" in normalized
-    assert "LEVEL-AWARE CLOTHING AND BODY" in normalized
-    assert "At erotic level, robes may fall open" in normalized
-    assert "At hardcore level, adults may be partly or fully nude" in normalized
-    assert "directly establish the requested content level" in normalized
-    assert "Begin every Frame with the selected level's defining state" in normalized
-    assert "preserve the Theme's explicit act in every Frame" in normalized
-    assert "intimate but fully clothed interaction" not in normalized
-    assert "human anatomy natural and fully covered" not in normalized
-    assert "Reject any Frame that depends on nudity" not in normalized
+    assert document.authoring.frames.content_levels
+    assert "aesthetic：让每位成年人完整穿着多层时代服饰" in normalized
+    assert "呈现毫不含糊的成年性感" in normalized
+    assert "明确色情但非露骨的互动" in normalized
+    assert "hardcore：在每个主题与画面中呈现已经发生的露骨、自愿成年性行为" in normalized
+    assert "不得用屏风、扇子、被褥、衣袖、家具、策略性裁切、遥远剪影或喜剧插曲隐藏定义性内容" in normalized
+    assert "在 erotic 等级，衣袍可以敞开" in normalized
+    assert "在 hardcore 等级，成年人可部分或完全裸体" in normalized
+    assert "直接确立所要求内容等级的身体遮盖、衣物状态、当前互动" in normalized
+    assert "每个画面开头即须使所选等级的定义性状态已经可见" in normalized
+    assert "在每个画面中保留主题的露骨行为" in normalized
+    aesthetic = document.authoring.frames.content_levels[ContentLevel.AESTHETIC]
+    for level in (ContentLevel.EROTIC, ContentLevel.HARDCORE):
+        resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        frames = resolved.rules.text_for(StoryStage.FRAMES)
+        assert all(rule not in frames for rule in aesthetic)
 
 
 def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "edo-warai-e.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert "PERFORMED UKIYO-E TRANSLATION" in brief
-    assert "UKIYO-E COLOR GATE" in brief
-    assert "DISTANCE-READ FLATNESS GATE" in brief
-    assert "EDO MATERIAL PATINA" in brief
-    assert "Flat, borderless nishiki-e theatrical picture plane" in normalized
-    assert "enacted by real adult performers" in normalized
-    assert "not a literal woodblock print" in normalized
-    assert "keyblock-like contour separation" in normalized
-    assert "nishiki-e palette" in normalized
-    assert "flat separated color blocks" in normalized
-    assert "one bokashi-style gradient" in normalized
-    assert (
-        "At thumbnail size and viewing distance, every Frame must read as a flat "
-        "nishiki-e composition" in normalized
-    )
-    assert "exactly three shallow stacked bands" in normalized
-    assert "dominant flat silhouettes" in normalized
-    assert "no volumetric light-and-shadow modeling" in normalized
-    assert "Bokashi belongs to one background plane" in normalized
-    assert "Close inspection may reveal live performers" in normalized
-    assert "must never overturn the flat distance read" in normalized
-    assert (
-        '"Flat, borderless nishiki-e theatrical picture plane in a '
+    document = load_story_document(RECIPES / "edo-warai-e.yaml")
+    normalized = " ".join(story_contract(document).split())
+    for marker in (
+        "由成年表演者演绎的平面、无边框 nishiki-e 戏剧画面",
+        "由真实成年表演者演绎",
+        "而非真正的木版画",
+        "类似主版线条的轮廓分隔",
+        "江户 nishiki-e 配色",
+        "平坦、分隔的色块",
+        "恰好一道限于上方条带的 bokashi 风格渐变",
+        "在缩略图尺寸和正常观看距离下，每个画面都必须先读作平面 nishiki-e 构图",
+        "恰好组织为三条与画面平面平行的浅叠画带",
+        "主导性的平面剪影",
+        "不使用体积明暗塑形",
+        "Bokashi 仅限一个背景平面",
+        "近看时，可通过个性化的成熟脸型",
+        "辨认真人表演者",
+        "这些近看线索绝不能推翻远看的平面印象",
+        "所有成年人都留在中央画带",
+        "不得以远近尺度变化或向外伸出的透视缩短肢体打破平面",
+        "当前动作句后立即重复此确切平面媒介锁定句",
+        "恰好两种近看表演者线索，仅可从成熟脸型、连贯外侧关节轮廓、"
+        "可见手部归属、服装接缝或套准织物图案中选择",
+        "目标为 700 至 900 个英文单词",
+        "绝不超过 1000 个英文单词",
+        "三至五种具体的日常老化与使用迹象",
+        "受保护接缝处仍较浓",
+        "按触摸、摩擦、烟、湿气与日晒分配磨损",
+        "不得使整幅图像变成棕色、米色、灰色或去饱和",
+        "成年人的皮肤须保持为暖色、有界哑光色域",
+        "不得使用全局棕褐或泛黄偏色、摄影颗粒",
+        "扫描版画损坏",
+        "仅返回正面描述所描绘场景的正文",
+        "默默执行所有规则",
+        "每个词都必须属于图像生成描述",
+        "直接说出正在发生的行为",
+        "普鲁士蓝仅限于 1820 年代及之后的场景",
+        "不得添加技术拍摄规格",
+        "光学景深模糊",
+    ):
+        assert marker in normalized, marker
+    opening = (
+        "Flat, borderless nishiki-e theatrical picture plane in a "
         "[chūban-like or ōban-like] [vertical or horizontal] proportion, enacted "
         "by real adult performers. Exactly three shallow stacked picture bands: "
         "a lower prop strip, a central adult tableau, and an upper architectural "
         "strip, all parallel to the image surface. Adult faces, limbs, garments, "
         "and furniture read as contour-enclosed matte color shapes with crisp "
         "overlaps and two-step values; contour and flat shadow shapes carry all "
-        "form. "
-        "Edo-period material patina appears only as bounded wear on physical "
-        'costumes, props, and set surfaces."' in normalized
+        "form. Edo-period material patina appears only as bounded wear on physical "
+        "costumes, props, and set surfaces."
     )
-    assert "all adults remain in the central picture band" in normalized
-    assert "No near-far scale change or projecting foreshortened limbs" in normalized
-    assert "Repeat this exact flat-medium lock immediately after" in normalized
+    assert f'"{opening}"' in normalized
     assert (
-        "All visible bodies, garments, props, and room planes return immediately "
+        '"All visible bodies, garments, props, and room planes return immediately '
         "to contour-enclosed matte color shapes on the same flat three-band "
-        "nishiki-e surface." in normalized
+        'nishiki-e surface."'
+    ) in normalized
+    for level, literal in (
+        (ContentLevel.AESTHETIC, "The current fully clothed non-erotic interaction is"),
+        (ContentLevel.EROTIC, "The current erotic but non-explicit interaction is"),
+        (ContentLevel.HARDCORE, "The current explicit consensual adult sexual act is"),
+    ):
+        assert f"“{literal}”" in "\n".join(
+            document.authoring.frames.content_levels[level]
+        )
+    for conflict in (
+        "一个可解的三维布局",
+        "前景、中景和背景",
+        "真实成年表演者的实拍图像",
+        "单根毛发",
+        "细微皮肤变化",
+        "全画幅或中画幅相机",
+        "毫米等效",
+        "光圈行为",
+    ):
+        assert conflict not in normalized, conflict
+    assert "而非圆润光照、皮肤纹理或光学纵深" in normalized
+    word_count = next(
+        check for check in document.validation.frames.checks
+        if check.type == "word_count"
     )
-    assert (
-        "combine exactly two close-read performer cues chosen only from" in normalized
-    )
-    assert "Target 700 to 900 English words" in normalized
-    assert "never exceed 1000 English words" in normalized
-    assert "one solvable three-dimensional arrangement" not in normalized
-    assert "foreground, middle ground, and background" not in normalized
-    assert "live-action image of real adult performers" not in normalized
-    assert "individual hairs" not in normalized
-    assert "subtle skin variation" not in normalized
-    assert "three to five specific signs of ordinary age and handling" in normalized
-    assert "protected seams remain richer" in normalized
-    assert "Distribute wear according to touch, friction, smoke, moisture" in normalized
-    assert "must not turn the whole image brown, beige, gray, or desaturated" in (
-        normalized
-    )
-    assert "Keep adult skin as a warm, bounded matte field" in normalized
-    assert "global sepia or yellow cast" in normalized
-    assert "photographic grain" in normalized
-    assert "scanned-print damage" in normalized
-    assert "Return only positive prose describing the depicted scene" in normalized
-    assert "Enforce every rule silently" in normalized
-    assert "Every word must belong to the image-generation description" in normalized
-    assert '"The current fully clothed non-erotic interaction is"' in normalized
-    assert '"The current erotic but non-explicit interaction is"' in normalized
-    assert '"The current explicit consensual adult sexual act is"' in normalized
-    assert "name the occurring act directly" in normalized
-    assert "Prussian blue is permitted only for settings from the 1820s onward" in (
-        normalized
-    )
-    assert "full-frame or medium-format camera" not in normalized
-    assert "mm equivalent" not in normalized
-    assert "aperture behavior" not in normalized
-    assert "depth of field" not in normalized
+    assert word_count.when_language == "english"
+    assert word_count.max_words == 1000
 
 
 def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "ming-gongbi-mixi-tu.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert brief.startswith("BRIEF\n\n")
-    assert "LATE-MING JIANGNAN WORLD" in brief
-    assert "GONGBI LINE DISCIPLINE" in brief
-    assert "LAYERED GONGBI COLOR" in brief
-    assert "CHINESE PAINTING SPACE" in brief
-    assert "FLAT GONGBI PICTURE-PLANE GATE" in brief
-    assert "ARCHIVAL FACSIMILE MEDIUM LOCK" in brief
-    assert "HUMANIZED GONGBI FIGURE DETAIL" in brief
-    assert "BORDERLESS FULL-BLEED SILK GATE" in brief
-    assert "AGED SILK AND PIGMENT PATINA" in brief
-    assert "anonymous late-Ming Jiangnan workshop album leaf" in normalized
-    assert "between 1573 and 1644" in normalized
-    assert "prepared silk or sized xuan paper" in normalized
-    assert "gossamer-line delicacy" in normalized
-    assert "iron-wire steadiness" in normalized
-    assert "ruled-line jiehua discipline" in normalized
-    assert "visual logic of sanfan jiuran" in normalized
-    assert "five to seven principal color families" in normalized
-    assert "scattered perspective" in normalized
-    assert "flat picture plane must dominate the first read" in normalized
-    assert "minimal tonal modeling" in normalized
-    assert "no volumetric light-and-shadow modeling" in normalized
-    assert "Age must be visible at first glance and thumbnail size" in normalized
-    assert "roughly two-thirds of the impression" in normalized
-    assert "one-third from visible material age" in normalized
-    assert "Full-canvas continuous-silk flat archival facsimile" in normalized
-    assert "two to four shallow, stacked, overlapping bands" in normalized
-    assert "contour-enclosed color fields" in normalized
-    assert "darker tea-brown edge oxidation" in normalized
-    assert "one shallow age crease" in normalized
-    assert "aged prepared-silk painting extends continuously to every canvas edge" in (
-        normalized
-    )
-    assert (
-        "no visible mounting margin, mat, frame, border, or rectangular edge band"
-        in normalized
-    )
-    assert "Edge patina must break, vary, and dissolve inward irregularly" in normalized
-    assert "Human specificity comes from line drawing and bounded washes" in normalized
-    assert "subtle facial asymmetry" in normalized
-    assert "exactly three restrained skin tones" in normalized
-    assert "convincingly human but unmistakably painted" in normalized
-    assert "flat archival facsimile of a hand-painted antique silk album leaf" in (
-        normalized
-    )
-    assert "borderless full-bleed composition" in normalized
-    assert (
-        "Every person, garment, object, and architectural plane exists only as ink "
-        "contour and pigment on silk" in normalized
-    )
-    assert "Repeat this compact medium lock immediately after" in normalized
-    assert "use exactly four descriptive sentences" in normalized
-    assert "No sentence after the fixed five-sentence opening may exceed 60" in (
-        normalized
-    )
-    assert 'literal phrase "three shallow stacked bands"' in normalized
-    assert "between 350 and 750 English words" in normalized
-    assert "Count before returning" in normalized
-    assert (
-        "The entire image remains a visibly aged, flat, hand-painted gongbi silk "
-        "album leaf made from ink contours and mineral pigment" in normalized
-    )
-    assert "three to five localized, physically plausible age cues" in normalized
-    assert "Japanese ukiyo-e" in normalized
-    assert "modern guochao illustration" in normalized
-    assert "Do not generate readable Chinese" in normalized
-    assert '"The current explicit consensual adult sexual act is"' in normalized
-    assert "directly naming or describing male reproductive anatomy" in normalized
-    assert "Every human mentioned in the Theme or Frame must belong" in normalized
-    assert "Do not introduce an absent spouse" in normalized
-
-    frame_contract = brief.split("\nFRAME CONTRACT\n", maxsplit=1)[1]
-    for photography_trigger in (
-        "observed-from-life",
-        "lifelike",
-        "living adult sitters",
-        "subtle flesh variation",
-        "credible weight",
-        "painted from observation",
+    document = load_story_document(RECIPES / "ming-gongbi-mixi-tu.yaml")
+    normalized = " ".join(story_contract(document).split())
+    for marker in (
+        "匿名晚明江南画坊册页",
+        "1573至1644年间",
+        "在熟绢上绘制的历史册页画",
+        "皮肤与五官采用游丝般细腻的线条",
+        "衣物与家具采用铁线般稳定的线条",
+        "以界画的规整线法描绘",
+        "使用三矾九染的视觉逻辑",
+        "五至七个主要色系",
+        "使用散点透视",
+        "平面画幅必须主导第一印象",
+        "最少的色调塑形",
+        "不得使用体积光影塑形",
+        "岁月痕迹必须在第一眼及缩略图尺寸下可见",
+        "绘画与工笔技法约贡献三分之二的印象",
+        "可见的材料老化贡献三分之一",
+        "二至四条浅层、叠置、重叠的带状区域",
+        "轮廓封闭的色域",
+        "一处断续的深茶褐边缘氧化斑",
+        "一道浅旧折痕",
+        "古旧熟绢画面连续延伸至画布的每一条边",
+        "不得出现可见的装裱留边、卡纸、画框、边框或矩形边带",
+        "边缘旧痕必须断续、变化并不规则地向内消散",
+        "每个人物、衣物、物件和建筑平面都只以绢上的墨线轮廓与颜料存在",
+        "成年人是具有个体特征的工笔肖像，成熟面部线条各有差别",
+        "细微不对称",
+        "严格使用三种克制肤色",
+        "每一笔都仍明显是绢上的墨或矿物色",
+        "手绘古绢册页的平面档案摹本",
+        "使用无边框的满幅出血构图",
+        "紧接当下动作句后重复以下紧凑的媒介锁定原文",
+        "严格使用四句描述",
+        "固定五句开头之后，任何一句都不得超过60个英语单词",
+        '必须逐字保留的短语 "three shallow stacked bands"',
+        "硬性限制为350至750个英语单词",
+        "返回前计数",
+        "三至五处局部且物理合理的岁月线索",
+        "日本浮世绘",
+        "现代国潮插画",
+        "不得生成可读汉字",
+        "不直接命名或描述男性生殖解剖结构",
+        "主题或画面中提及的每个人都必须属于所要求的人物阵容",
+        "不得将不在场的配偶",
     ):
-        assert photography_trigger not in frame_contract
+        assert marker in normalized, marker
+    opening = (
+        "Full-canvas continuous-silk flat archival facsimile of a hand-painted "
+        "antique late-Ming Jiangnan gongbi mixi-tu album leaf. The aged prepared-silk "
+        "painting extends continuously to every canvas edge as an uninterrupted "
+        "uneven warm-tea field. Every person, garment, object, and architectural "
+        "plane exists only as ink contour and pigment on silk; adult figures use "
+        "individualized mature facial lines, plausible adult proportions, clear "
+        "joints, and exactly three bounded skin tones in the same silk plane. "
+        "Flat gongbi picture plane with shallow stacked spaces, contour-enclosed "
+        "color fields, dominant flat silhouettes, no volumetric light-and-shadow "
+        "modeling or cast shadows. Fine gossamer-line and iron-wire contours, thin "
+        "layered mineral-color washes, ruled-line jiehua interior, visible silk "
+        "weave, softened outer pigments, rubbed silk fibers at one isolated edge, "
+        "and small age creases."
+    )
+    assert f'"{opening}"' in normalized
+    assert (
+        '"Every person, garment, object, and architectural plane exists only as ink '
+        "contour and pigment on visibly aged silk; adults remain contour-defined "
+        'gongbi figures with mature facial specificity and plausible proportions."'
+    ) in normalized
+    assert (
+        '"The entire image remains a visibly aged, flat, hand-painted gongbi silk '
+        "album leaf made from ink contours and mineral pigment, with individualized "
+        'mature adult faces defined by fine line."'
+    ) in normalized
+    assert '"The current explicit consensual adult sexual act is"' in "\n".join(
+        document.authoring.frames.content_levels[ContentLevel.HARDCORE]
+    )
+    assert "熟绢或施胶宣纸" not in normalized
+    frame_contract = "\n".join(document.authoring.frames.common)
+    for photography_trigger in (
+        "从生活中观察",
+        "栩栩如生",
+        "活生生的成年模特",
+        "细微肌肤变化",
+        "可信重量",
+        "根据观察绘制",
+    ):
+        assert photography_trigger not in frame_contract, photography_trigger
+    word_count = next(
+        check for check in document.validation.frames.checks
+        if check.type == "word_count"
+    )
+    assert word_count.when_language == "english"
+    assert (word_count.min_words, word_count.max_words) == (350, 750)
 
 
 def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "pose.yaml"
-    ).description
-    normalized = " ".join(brief.split())
+    document = load_story_document(RECIPES / "pose.yaml")
+    normalized = " ".join(story_contract(document).split())
+    for requirement in (
+        "可辨认的、双方自愿的成人性姿势",
+        "中性的舞蹈、瑜伽、健身、康养、时装",
+        "身体力学本身必须承载性意图",
+        "不得把库中的条目中性化",
+        "独立、多样化地选取恰好六种姿势蓝图",
+        "不得选取六个相邻条目",
+        "从至少四个不同的姿势类别标题下，不按顺序选取六种姿势",
+        "分配恰好六种不同的镜头角度蓝图",
+        "使用至少四种不同的方位类别",
+        "至少三个机位高度或俯仰角度带",
+        "即使左右镜像也不行",
+        "全画幅50-85毫米",
+        "姿势与镜头蓝图",
+        "从左侧髋部高度取前侧四分之三视角",
+        "一个主导区域和五个辅助区域",
+        "每个内容级别都必须选择具体可穿戴的造型",
+        "一个具体的成人场合",
+        "该画面内的全部六个区域必须共享",
+        "不同画面和不同主题",
+        "先用尽未使用的环境类别",
+        "而不是一个固定房间",
+        "共享背景仅指在同一幅画面内共享",
+        "不要求不同画面或主题重复使用相同场合",
+        "每幅画面都点明六个区域共享的一个具体场合与地点",
+        "须明确具体服装与配饰单品",
+        "主题设定必须点明完整的所选造型",
+        "每幅画面都必须在描述区域之前，用可见图像语言完整重述所选造型",
+        "至少包含一件真实服装或可穿戴配饰",
+        "服装绝不隐含、不泛化",
+        "恰好占一个物理行",
+        "全部六个区域的完整描述放在该画面的一个连续自然语言段落中",
+        "绝不可将一张参考板分散到多幅画面",
+        "每个区域单占一幅画面",
+        "没有任何画面只是一个区域、参考板片段",
+        "完成的参考板没有可见标题、姿势名称",
+        "区域数量表示一幅图像的内部划分，不是叙事画面数量",
+    ):
+        assert requirement in normalized, requirement
+    for level, garment_scale in (
+        (ContentLevel.AESTHETIC, "服装尺度为完整尺寸"),
+        (ContentLevel.EROTIC, "服装尺度缩减至内衣尺寸"),
+        (ContentLevel.HARDCORE, "服装尺度为极简或微型"),
+    ):
+        resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        assert garment_scale in resolved.rules.text_for(StoryStage.FRAMES)
+    layout = next(
+        module for module in document.modules if module.id == "layout-multiview"
+    )
+    assert layout.parameters == {"layout": "grid", "min_views": 6, "max_views": 6}
 
-    assert "RANDOM POSE-GROUP SELECTION" in normalized
-    assert "CAMERA-ANGLE SELECTION" in normalized
-    assert "SEXUAL-INTENT GATE" in normalized
-    assert "recognizable consensual adult sexual position" in normalized
-    assert "Neutral dance, yoga, fitness, wellness, fashion" in normalized
-    assert "The body mechanics themselves must carry the sexual intent" in normalized
-    assert "Do not neutralize a pool entry" in normalized
-    assert "independent varied selection" in normalized
-    assert "selection of exactly six pose blueprints" in normalized
-    assert "Do not take six adjacent entries" in normalized
-    assert "non-sequentially from at least four different pose-family" in normalized
-    assert "assign exactly six distinct camera-angle blueprints" in normalized
-    assert "use at least four different azimuth families" in normalized
-    assert "at least three camera-height or elevation bands" in normalized
-    assert "even as a left-right mirror" in normalized
-    assert "50-85 mm on full frame" in normalized
-    assert "CURATED CAMERA-ANGLE POOL" in normalized
-    assert "pose-and-camera blueprints" in normalized
-    assert "front three-quarter from left hip height" in normalized
-    assert "one dominant region and five supporting regions" in normalized
-    assert "Selecting a concrete wearable look is mandatory" in normalized
-    assert "WARDROBE EXPOSURE LADDER" in normalized
-    assert "strict three-step progression" in normalized
-    assert "Aesthetic uses full-size clothing" in normalized
-    assert "erotic uses lingerie-size clothing" in normalized
-    assert "hardcore uses minimal or micro-scale" in normalized
-    assert "coverage could be mistaken for the neighboring level" in normalized
-    assert "OCCASION AND SETTING SELECTION" in normalized
-    assert "one concrete adult occasion" in normalized
-    assert "All six regions inside that Frame must share" in normalized
-    assert "Different Frames and different Themes" in normalized
-    assert "Exhaust unused setting families" in normalized
-    assert "CURATED OCCASION AND LOCATION FAMILIES" in normalized
-    assert "PROFESSIONAL IMAGE-MAKING" in normalized
-    assert "PRIVATE RESIDENTIAL" in normalized
-    assert "HOSPITALITY AND RETREAT" in normalized
-    assert "ART, DESIGN, AND PERFORMANCE" in normalized
-    assert "PRIVATE WELLNESS AND LEISURE" in normalized
-    assert "ARCHITECTURAL SHOWCASES" in normalized
-    assert "SECLUDED OUTDOOR SETTINGS" in normalized
-    assert "SEASONAL AND ATMOSPHERIC OCCASIONS" in normalized
-    assert "not one permanent room" in normalized
-    assert "Shared background means shared within one Frame only" in normalized
-    assert "different Frames or Themes to reuse the same occasion" in normalized
-    assert "Each Frame names one concrete occasion and location" in normalized
-    assert "Name the exact garment and accessory pieces" in normalized
-    assert "The Theme premise must name the complete selected look" in normalized
-    assert "Every Frame must fully restate that look" in normalized
-    assert "Include at least one real garment or wearable accessory" in normalized
-    assert "wardrobe is never implicit, generic" in normalized
-    assert "Garment scale follows the strict exposure ladder" in normalized
-    assert "becomes exactly one physical line" in normalized
-    assert "all six regions inside that Frame's single uninterrupted" in normalized
-    assert "Never distribute one board across multiple Frames" in normalized
-    assert "use one Frame per region" in normalized
-    assert "no Frame is one region, a board fragment" in normalized
-    assert "The finished board contains no visible title, pose names" in normalized
-    assert brief.count("\nCURATED POSE POOL\n") == 1
-    assert brief.count("\nCURATED CAMERA-ANGLE POOL\n") == 1
-    assert brief.count("\nCURATED OCCASION AND LOCATION FAMILIES\n") == 1
+    def pool(label, *, stage=StoryStage.THEMES):
+        authored = getattr(document.authoring, stage.value)
+        rules = (*authored.common, *authored.content_levels[ContentLevel.HARDCORE])
+        prefix = f"{label}：- "
+        return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
 
-    occasion_pool = brief.split(
-        "\nCURATED OCCASION AND LOCATION FAMILIES\n", maxsplit=1
-    )[1].split("\nCAMERA-ANGLE SELECTION\n", maxsplit=1)[0]
-    occasion_entries = [
-        line.removeprefix("- ").strip()
-        for line in occasion_pool.splitlines()
-        if line.startswith("- ")
-    ]
+    occasion_entries = []
+    for family in (
+        "专业影像创作",
+        "私人住宅",
+        "旅宿与休憩",
+        "艺术、设计与表演",
+        "私密康养与休闲",
+        "建筑展示",
+        "幽静户外环境",
+        "季节与氛围场合",
+    ):
+        entries = pool(family, stage=StoryStage.FRAMES)
+        assert entries, family
+        occasion_entries.extend(entries)
     assert len(occasion_entries) >= 40
     assert len(occasion_entries) == len(set(occasion_entries))
-
-    camera_pool = brief.split("\nCURATED CAMERA-ANGLE POOL\n", maxsplit=1)[1].split(
-        "\nCURATED POSE POOL\n", maxsplit=1
-    )[0]
-    camera_entries = [
-        line.removeprefix("- ").strip()
-        for line in camera_pool.splitlines()
-        if line.startswith("- ")
-    ]
+    camera_entries = pool("精选镜头角度库")
     assert len(camera_entries) >= 15
     assert len(camera_entries) == len(set(camera_entries))
-    assert any("frontal" in entry for entry in camera_entries)
-    assert any("side" in entry for entry in camera_entries)
-    assert any("rear" in entry for entry in camera_entries)
-
-    pool = brief.split("\nCURATED POSE POOL\n", maxsplit=1)[1]
-    pose_entries = [
-        line.removeprefix("- ").strip()
-        for line in pool.splitlines()
-        if line.startswith("- ")
-    ]
+    for direction in ("正面", "侧面", "后方"):
+        assert any(direction in entry for entry in camera_entries), direction
+    pose_entries = []
+    for family in (
+        "正向展示站姿",
+        "后向展示站姿与髋折叠姿势",
+        "坐姿与跨坐",
+        "跪姿与脚跟支撑",
+        "蹲伏与深蹲",
+        "仰卧与骨盆抬高",
+        "侧卧与扭转",
+        "俯卧与胸部支撑",
+        "手膝与前臂支撑",
+    ):
+        entries = pool(family)
+        assert entries, family
+        pose_entries.extend(entries)
     assert len(pose_entries) >= 81
     assert len(pose_entries) == len(set(pose_entries))
-    assert "invisible wall" not in pool
-    assert "seductively" not in pool
-    assert "slowly" not in pool
-    assert "CURATED SELF-TOUCH POOL" in pool
-    assert "NON-EXPLICIT INTIMATE TOUCH" in pool
-    assert "DIRECT STATIC ADULT SELF-TOUCH - HARDCORE ONLY" in pool
-    for family in (
-        "FRONT-PRESENTING STANDING",
-        "REAR-PRESENTING STANDING AND HINGED",
-        "SEATED AND STRADDLING",
-        "KNEELING AND HEEL-SUPPORTED",
-        "CROUCHED AND SQUATTING",
-        "SUPINE AND PELVIS-LIFTED",
-        "SIDE-LYING AND TWISTED",
-        "PRONE AND CHEST-SUPPORTED",
-        "HANDS-AND-KNEES AND FOREARM-SUPPORTED",
-    ):
-        assert family in pool
+    pool_text = "\n".join(pose_entries)
+    for excluded in ("隐形墙", "不可见的墙", "诱惑地", "缓慢"):
+        assert excluded not in pool_text, excluded
 
 
 def test_threshold_emergence_brief_locks_cast_geometry_and_batch_variety() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "threshold-emergence.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert "EMERGING WOMEN + WITNESS WOMEN = REQUESTED WOMEN" in normalized
-    assert "EMERGING MEN + WITNESS MEN = REQUESTED MEN" in normalized
-    assert "Never treat the requested cast as witnesses" in normalized
-    assert "Every visible or implied human counts toward the cast" in normalized
-    assert "The source-side body must remain recognizably human anatomy" in normalized
-    assert "The source plane intersects the emerging person once" in normalized
-    assert "HALF-IN, HALF-OUT SILHOUETTE" in normalized
-    assert "roughly forty to sixty percent of the body is on each side" in normalized
-    assert "the pelvis plus at least one complete connected leg inside" in normalized
-    assert "REFERENCE CRAWL CHOREOGRAPHY" in normalized
-    assert "The adult crawls headfirst perpendicular to the screen" in normalized
-    assert "the bezel stays fully visible around the waist" in normalized
-    assert "SINGLE-SCENE RENDERING CONTRACT" in normalized
-    assert "one camera, one continuous outer location" in normalized
-    assert "appears only inside the exact bounded area" in normalized
-    assert "End every Frame with one concise geometry-lock sentence" in normalized
-    assert "no split screen, second set, reflected duplicate" in normalized
-    assert "Do not flatten, paint, pixelate, dissolve" in normalized
-    assert "no full-body ripple, translucent overlay" in normalized
-    assert "same natural skin, clothing, volume" in normalized
-    assert "Do not promise text and then negate it elsewhere" in normalized
-    assert "Use each lane exactly once in a five-Theme batch" in normalized
-    assert "one home, dinner, party, or other private social setting" in normalized
-    assert (
-        "one cinema, theater, concert, sports, game, or other communal leisure setting"
-        in normalized
+    document = load_story_document(RECIPES / "threshold-emergence.yaml")
+    normalized = " ".join(story_contract(document).split())
+    required = (
+        "绝不把请求中的人物全部当作目击者后，再添加穿出者",
+        "每个可见或暗示存在的人都计入人物数量",
+        "源内侧身体必须仍是可辨认的人体结构",
+        "源平面恰好在腰、髋部或大腿上部与身体相交一次",
+        "身体约百分之四十至六十处于每一侧",
+        "骨盆加至少一条完整相连的腿位于内侧",
+        "成年人头朝前、垂直于屏幕爬出",
+        "腰部周围的边框保持完整可见",
+        "一个相机、一个连续外侧地点",
+        "源内部只出现在电视屏幕、影院银幕、画框、镜框、窗户、舱口或开口的精确限定区域内",
+        "每个画帧以一个简洁的几何锁定句结尾",
+        "没有分屏、第二套布景、反射复制体",
+        "不要把内侧半身压平、绘画化、像素化、溶解",
+        "没有全身波纹、半透明叠层",
+        "相同的自然皮肤、服装、体积",
+        "不要先承诺有文字，再在别处否定",
+        "五主题批次中，每种类别恰好使用一次",
+        "一个家庭、晚餐、聚会或其他私人社交场景",
+        "一个影院、剧院、音乐会、体育、游戏或其他集体休闲场景",
+        "一个花园、公园、海滩、山地、农场",
+        "一个列车、车站、渡轮、机场、公路停靠点",
+        "一个商店、办公室、工作室、实验室、作坊、服务柜台、专业厨房或其他工作场所",
     )
-    assert "one garden, park, beach, mountain, farm" in normalized
-    assert "one train, station, ferry, airport, road stop" in normalized
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
 
 
 def test_magazine_cover_brief_builds_a_finished_newsstand_cover() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "magazine-cover.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert "MAGAZINE, NOT POSTER" in normalized
-    assert "one original recurring masthead at the top" in normalized
-    assert "exactly two short secondary cover lines" in normalized
-    assert "Do not use movie-poster signals" in normalized
-    assert "Do not use social-post signals" in normalized
-    assert "Do not show a physical mockup" in normalized
-    assert "flat, full-bleed portrait 3:4 front cover" in normalized
-    assert "MASTHEAD CONTRACT" in normalized
-    assert "COVER-LINE PACKAGE" in normalized
-    assert "Keep total visible copy under twenty-four English words" in normalized
-    assert "NO MICROTEXT" in normalized
-    assert "four percent of the cover height" in normalized
-    assert "Do not render a barcode, QR code, ISBN, ISSN" in normalized
-    assert "Do not use lowercase letters, digits, punctuation" in normalized
-    assert "Every exact string must match `[A-Z]+( [A-Z]+)*`" in normalized
-    assert "Never use `&`; write `AND` instead" in normalized
-    assert "never a date, month, year, volume, edition" in normalized
-    assert "trademark symbol, registered mark, superscript" in normalized
-    assert "ENGLISH-ONLY IMAGE TEXT GATE" in normalized
-    assert "TEXT-LAYER ISOLATION LOCK" in normalized
-    assert "Frame prose must use English throughout" in normalized
-    assert (
-        "Every character in the complete Frame must be ASCII code point" in normalized
+    document = load_story_document(RECIPES / "magazine-cover.yaml")
+    normalized = " ".join(story_contract(document).split())
+    resolved = resolve_story_input(document)
+    assert document.generation.output_language == "english"
+    assert document.requirements.output_languages == ("english",)
+    assert resolved.request.output_language == "english"
+    assert any(check.type == "ascii" for check in document.validation.frames.checks)
+    with pytest.raises(StoryConfigurationError):
+        resolve_story_input(document, InputOverrides(output_language="chinese"))
+    visible_copy = next(
+        module for module in resolved.modules if module.kind == "visible_copy"
     )
-    assert "A single non-ASCII character invalidates the Frame" in normalized
-    assert (
+    assert visible_copy.parameters.product == "magazine_cover"
+    assert visible_copy.parameters.copy_language == "english"
+    assert visible_copy.parameters.ascii == "required"
+    for marker in (
+        "顶部一个原创且持续使用的刊头",
+        "恰好两条简短次要封面标题",
+        "不得使用电影海报信号",
+        "不得使用社交帖子信号",
+        "不得展示实体样机",
+        "平面、满版出血的竖版 3:4 正面封面",
+        "可见文案总量须少于二十四个英语单词",
+        "字母高度至少约为封面高度的百分之四",
+        "不得渲染条码、二维码、ISBN、ISSN",
+        "可见文案不得使用小写字母、数字、标点",
+        "每个精确字符串必须匹配 `[A-Z]+( [A-Z]+)*`",
+        "绝不使用 `&`，改写为原样文字 `AND`",
+        "绝非日期、月份、年份、卷、版本",
+        "商标符号、注册标记、上标",
+        "Frame 全文必须使用英语",
+        "完整 Frame 的每个字符都必须位于 ASCII 码点 0 至 127",
+        "单个非 ASCII 字符即可使 Frame 无效",
+        "恰好使用三个受控排版区域",
+        "一个对齐的信息块",
+        "所有精确可见文案都隔离到最后段落",
+        "任何连续两个及以上的大写字母序列",
+        "五个精确字符串各出现且仅出现一次",
+        "Frame 最后一个字符是结束季节标记条目的分号",
+        "专用图中文字段落是可见文案的唯一来源",
+        "恰好包含五个条目，顺序为刊头、主要专题标题、第一条次要标题、第二条次要标题、季节标记",
+        "加冒号，再写精确大写文字，以分号结尾",
+        "绝不以引号、括号、框、代码格式或装饰标记包围可见文字",
+        "添加字面 ASCII 字符 `: `",
+        "以字面 ASCII 字符 `;` 结束",
+        "Frame 的最后一个字符必须是 `;`",
+        "占封面约百分之六十至八十的主导主图",
+        "在 hardcore 级别",
+        "结果是一张平面竖版 3:4 杂志正面封面",
+        "槽位数量、重复出现的位置、允许的载体、排版区域和产品版式均由配方规定",
+    ):
+        assert marker in normalized, marker
+    for literal in (
         "The cover contains exactly five readable English strings and zero other "
-        "letters, words, numbers, symbols, pseudo-letters, or glyph-like marks."
-        in normalized
-    )
-    assert "exactly three controlled typography zones" in normalized
-    assert "one aligned information block" in normalized
-    assert (
-        "The five declared English strings are the complete typographic layer"
-        in normalized
-    )
-    assert (
+        "letters, words, numbers, symbols, pseudo-letters, or glyph-like marks.",
+        "The five declared English strings are the complete typographic layer; "
         "all remaining cover areas are pure photography, uninterrupted color, "
-        "or blank negative space" in normalized
-    )
-    assert "Quarantine all exact visible copy until that final passage" in normalized
-    assert (
-        "any all-uppercase sequence of two or more letters anywhere earlier"
-        in normalized
-    )
-    assert "Each of the five exact strings appears once and only once" in normalized
-    assert "The Frame's final character is the semicolon" in normalized
-    assert "dedicated image-text passage" in normalized
-    assert "It contains exactly five entries in this order" in normalized
-    assert "add a colon, then write the exact uppercase text" in normalized
-    assert "Never surround visible text with quotation marks" in normalized
-    assert (
-        "one dominant hero image occupying roughly sixty to eighty percent"
-        in normalized
-    )
-    assert "At hardcore level" in normalized
-    assert "the result is one flat portrait 3:4 magazine front cover" in normalized
+        "or blank negative space.",
+    ):
+        assert f'"{literal}"' in normalized
+    frame_contract = "\n".join(document.authoring.frames.common)
+    for season in ("SPRING", "SUMMER", "AUTUMN", "WINTER", "SPECIAL"):
+        assert f'"{season}"' in frame_contract
 
 
 def test_extreme_absurdity_requires_visible_human_prop_contact_chain() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "extreme-absurdity.yaml"
-    ).description
-    normalized = " ".join(brief.split())
+    normalized = " ".join(
+        story_contract(load_story_document(RECIPES / "extreme-absurdity.yaml")).split()
+    )
+    required = (
+        "明确具体参与者、具体身体部位、具体道具表面、接触方向及持续施力",
+        "仅在近旁、隐含、自动或未被触碰的道具无效",
+        "从人体接触点到道具当前状态，追踪一条不中断、可见的力传递路径",
+        "在前两句内说明人与道具接触点",
+        "为每位成年人提供可见的身高和体型",
+        "承重面积、关节及其他人周围的空隙",
+        "整个画面保持同一尺度",
+        "像摄影师正看着一张完成的静帧并只描述眼前可见内容那样写作",
+        "说明面部朝向、目光目标、通过眉毛、眼睑、嘴、下颌及面颊张力呈现的可见表情",
+        "将最终效果描述为当前可见几何",
+        "等抽象因果动词替代可见接触、力路径与最终物理结果",
+        "为每位参与者提供独特、稳定且可拍摄的完整造型",
+        "不得有人呈现为没有造型的普通裸体",
+        "夸张但物理可信的发型",
+        "为每位参与者明确可见妆容",
+        "分配互补颜色与不同剪影",
+    )
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
 
-    assert "HUMAN-TO-PROP CONTACT CHAIN" in normalized
-    assert (
-        "name the exact participant, exact body part, exact prop surface, "
-        "contact direction, and sustained force"
-        in normalized
+
+def test_near_future_plans_preserve_world_seed_and_action_cycles() -> None:
+    resolved = resolve_story_input(
+        load_story_document(RECIPES / "near-future-intimacy-realism.yaml"),
+        InputOverrides(theme_count=31),
     )
-    assert "A nearby, implied, automatic, or untouched prop is invalid" in normalized
-    assert (
-        "trace one unbroken visible force path from the human contact point "
-        "to the prop's present state"
-        in normalized.lower()
-    )
-    assert (
-        "Within the first two sentences, state the human-to-prop contact point"
-        in normalized
-    )
-    assert "HUMAN-PROP SCALE AND FIT" in normalized
-    assert "Give every adult a visible height and build" in normalized
-    assert "the area carrying body weight, the free space around joints" in normalized
-    assert "Keep one scale throughout the Frame" in normalized
-    assert "EYEWITNESS STATIC DESCRIPTION" in normalized
-    assert (
-        "Write as if a photographer is looking at one finished still" in normalized
-    )
-    assert (
-        "state face direction, gaze target, visible expression through brows, "
-        "eyelids, mouth, jaw, and cheek tension"
-        in normalized
-    )
-    assert "Describe the final effect as present visible geometry" in normalized
-    assert "Do not substitute abstract causal verbs" in normalized
-    assert "BRIGHT EXAGGERATED STYLING" in normalized
-    assert "Give every participant a distinct, stable, photographable styling package" in normalized
-    assert "no participant appears as an unstyled generic nude" in normalized
-    assert "an exaggerated but physically plausible hairstyle" in normalized
-    assert "Specify visible makeup for every participant" in normalized
-    assert "assign complementary colors and different silhouettes" in normalized
+    solo_actions = []
+    group_actions = []
+    seeds = []
+
+    assert len(resolved.plans) == 31
+    for instruction in (
+        resolved.request.story,
+        *resolved.rules.themes,
+        *resolved.rules.frames,
+    ):
+        assert re.search(r"\bT\d{3}\b", instruction) is None
+    for index, plan in enumerate(resolved.plans):
+        assert plan.entry is not None
+        assert plan.entry.id == f"seed-{index % 30 + 1:02d}"
+        bucket = "ABCDEFGHIJ"[index % 10]
+        for rules in (plan.entry.themes, plan.entry.frames):
+            assert all(re.search(r"\bT\d{3}\b", rule) is None for rule in rules)
+            assert any(
+                rule.startswith(f"已选场景世界分桶 {bucket}：")
+                for rule in rules
+            )
+        seeds.append(
+            next(
+                rule for rule in plan.entry.themes
+                if rule.startswith("已选场景种子：")
+            )
+        )
+        solo_actions.append(
+            next(
+                rule for rule in plan.entry.themes
+                if rule.startswith("当请求的总人数为一名成年人时，")
+            )
+        )
+        group_actions.append(
+            next(
+                rule for rule in plan.entry.themes
+                if rule.startswith(
+                    "当请求的总人物构成包含两名或更多成年人时，"
+                )
+            )
+        )
+        assert seeds[-1] in plan.entry.frames
+        assert solo_actions[-1] in plan.entry.frames
+        assert group_actions[-1] in plan.entry.frames
+
+    assert len(set(seeds[:30])) == 30
+    assert seeds[30] == seeds[0]
+    for actions in (solo_actions, group_actions):
+        assert len(set(actions[:10])) == 10
+        assert all(
+            action == actions[index % 10] for index, action in enumerate(actions)
+        )
+    assert sum("自慰" in action for action in group_actions[:10]) >= 2
+    bdsm_families = ("束缚", "拍打", "蒙眼", "支配", "捆绑")
+    assert sum(
+        any(family in action for family in bdsm_families)
+        for action in group_actions[:10]
+    ) >= 4
+    assert sum("插入" in action for action in group_actions[:10]) <= 3
+    for stage in StoryStage:
+        context = resolved.context_for(stage, ["T009", "T011", "T030", "T031"])
+        assert [plan["theme_id"] for plan in context["plans"]] == [
+            "T009", "T011", "T030", "T031"
+        ]
+        assert [plan["entry"]["id"] for plan in context["plans"]] == [
+            "seed-09", "seed-11", "seed-30", "seed-01"
+        ]
+        assert all(
+            re.search(r"\bT\d{3}\b", rule) is None
+            for plan in context["plans"]
+            for rule in plan["entry"]["rules"]
+        )
 
 
 def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "near-future-intimacy-realism.yaml"
-    ).description
+    document = load_story_document(RECIPES / "near-future-intimacy-realism.yaml")
+    brief = story_contract(document)
     normalized = " ".join(brief.split())
-
-    headings = (
-        "PRIORITY AND OUTPUT CONTRACT",
-        "NON-NEGOTIABLE CORE LOCKS",
-        "CAST, CONSENT, AND ANATOMY",
-        "CONTENT AND ACTION",
-        "FUTURE VISUAL SYSTEM",
-        "PHOTOGRAPHIC SYSTEM",
-        "CONDITIONAL TECHNOLOGY MODULES",
-        "POSITION ARCHITECTURES",
-        "TECHNOLOGY FAMILIES",
-        "SCENE SEED LIBRARY",
-        "SILENT REJECTION CHECK",
-        "FINAL FRAME",
-    )
-
-    assert brief.startswith("BRIEF\n\n")
-    assert brief.isascii()
     assert len(brief) < 54_000
-    for heading in headings:
-        assert f"\n{heading}\n" in brief
+    assert document.generation.output_language == "english"
+    assert set(document.requirements.output_languages) == {"english"}
+    checks = {check.type: check for check in document.validation.frames.checks}
+    assert checks["ascii"].when_language == "english"
+    assert checks["word_count"].when_language == "english"
+    assert checks["word_count"].min_words == 600
+    assert checks["word_count"].max_words is None
 
-    assert "cold lived-in realism" in normalized
-    assert "following behavior is permanent" in normalized
-    assert "must never be removed, weakened" in normalized
-    assert "exact visible body count" in normalized
-    assert "distinct complete styling package for every adult" in normalized
-    assert "complete surrounding environment with at least eight compact reality anchors" in normalized
-    assert "at least six discrete props distributed across all depth planes" in normalized
-    assert "simultaneous room-scale, body-scale" in normalized
-    assert "complete force path, center of mass, cast shadow" in normalized
-    assert "approved holographic adult identity" in normalized
-    assert "approved cooling suspension identity" in normalized
-    assert "approved orbital gantry identity" in normalized
-    assert "exact batch routing with distinct scene worlds and sexual actions" in normalized
-    assert "Write only positive visible instructions" in normalized
-    assert "Never copy a rule, rejection, warning" in normalized
-    assert "Silently use those checks before returning" in normalized
-    assert "at least 600 English words per Frame" in normalized
-    assert "no fixed maximum when concrete visual detail remains useful" in normalized
-    assert "600-word minimum is hard" in normalized
-    assert "put cast, action, anatomy, and technology in the first half" in normalized
-    assert "image contains no captions, subtitles, logos" in normalized
-
-    assert "complete requested cast" in normalized
-    assert "Exactly N adults and N complete bodies occupy the entire image" in normalized
-    assert "Exactly two adults and two complete bodies" in normalized
-    assert "single couple remains the only human silhouette group" in normalized
-    assert "a 38-year-old Chinese woman named Mei" in normalized
-    assert "Always write the words woman or man beside each name" in normalized
-    assert "GENDER COMPOSITION LOCK" in brief
-    assert "female_count and male_count as immutable gender slots" in normalized
-    assert "still uses the word woman or man matching that requested slot" in normalized
-    assert "two women and one man: one NN-year-old woman named A" in normalized
-    assert "one woman and two men: one NN-year-old woman named A" in normalized
-    assert "Repeat the complete requested gender structure independently in every Frame" in normalized
-    assert "Show one visible body and face per requested person" in normalized
-    assert "woman has one vulva and the man has one penis" in normalized
-    assert "pubic regions touch directly" in normalized
-    assert "only the attached base remains externally visible" in normalized
-    assert "complete contact geometry within the first 120 words" in normalized
-    assert "both pubic regions are bare and directly pressed together" in normalized
-    assert "Every lower garment is fully removed from both legs" in normalized
-    assert "the man's single penis is rooted continuously in his fully unclothed pelvis" in normalized
-    assert "only its attached base remains visible at their touching pubic skin" in normalized
-    assert "torso-only proxy" in normalized
-    assert "show abstract light or empty room architecture" in normalized
-    assert "visibly unoccupied from edge to edge" in normalized
-    assert "All activity is voluntary" in normalized
-    assert "Keep professional service separate from sex" in normalized
-    assert "INDIVIDUAL APPEARANCE AND STYLING" in brief
-    assert "Describe each person separately" in normalized
-    assert "body build, height impression, skin tone" in normalized
-    assert "face shape and visible facial features" in normalized
-    assert "hairstyle with color, length, texture, cut, parting" in normalized
-    assert "visible grooming or makeup treatment" in normalized
-    assert "current expression through gaze direction, eyelids, brows" in normalized
-    assert "every garment and footwear item" in normalized
-    assert "one to three personal accessories" in normalized
-    assert "Nudity does not remove the styling requirement" in normalized
-    assert "exact placement of their removed outfit" in normalized
-
-    assert "Aesthetic:" in brief
-    assert "Erotic:" in brief
-    assert "Hardcore:" in brief
-    assert "one explicit sexual action visibly underway" in normalized
-    assert "SEXUAL ACTION DIVERSITY" in brief
-    assert "solo masturbation, partner-guided masturbation, mutual masturbation" in normalized
-    assert "consensual BDSM" in normalized
-    assert "SINGLE-ADULT OVERRIDE" in brief
-    assert "this rule overrides every scene seed, technology family, module" in normalized
-    assert "exactly one adult, one complete body, one face, and one silhouette" in normalized
-    assert "sole adult performs solo masturbation" in normalized
-    assert "Across each ten single-adult Themes" in normalized
-    assert "one free release hand" in normalized
-    assert "For ten Themes with two or more requested adults" in normalized
-    assert "Use each applicable action slot exactly once in a ten-Theme batch" in normalized
-    assert "include at least two masturbation scenes and four BDSM scenes" in normalized
-    assert "penetration in no more than three Themes" in normalized
-    assert "compact non-phallic vibrator" in normalized
-    assert "held visibly in one partner's hand" in normalized
-    assert "MASTURBATION AND BDSM GEOMETRY" in brief
-    assert "trace the active hand continuously from shoulder through elbow" in normalized
-    assert "give each adult a separate hand-to-body action" in normalized
-    assert "identify the voluntary roles and show reciprocal consent" in normalized
-    assert "Every restraint has a visible quick release" in normalized
-    assert "Impact lands only on fleshy buttocks or outer thighs" in normalized
-    assert "one bare, unobstructed contact center within the first 120 words" in normalized
-    assert "fully remove trousers, underwear, skirts, and other lower garments" in normalized
-    assert "keep support hardware completely outside both pubic regions" in normalized
-    assert "technology is powered, worn, connected" in normalized
-    assert "Frames under one Theme are alternative photographs" in normalized
-
-    assert "exactly one primary speculative development" in normalized
-    assert "room scale:" in normalized
-    assert "body scale:" in normalized
-    assert "contact scale:" in normalized
-    assert "at least six coherent future signals" in normalized
-    assert "Retrofitted megacity domestic" in normalized
-    assert "Brutalist habitat utility" in normalized
-    assert "Climate-adapted interior" in normalized
-    assert "Spectral telepresence room" in normalized
-    assert "BATCH DIVERSITY ROUTER" in brief
-    assert "ten visibly distinct scene-world buckets" in normalized
-    assert "For exactly ten requested Themes, bind identifiers to buckets" in normalized
-    assert "T001=A, T002=B, T003=C, T004=D, T005=E" in normalized
-    assert "T006=F, T007=G, T008=H, T009=I, and T010=J" in normalized
-    assert "never substitute another D or F scene for I or J" in normalized
-    assert "inside their assigned A-H buckets" in normalized
-    assert "For three to nine Themes, use that many different buckets" in normalized
-    assert "complete all ten buckets before reusing any bucket" in normalized
-    assert "use at most two conventional bedrooms, mattresses, bunks, or hotel rooms" in normalized
-    assert "never repeat a seed, location type, primary technology family" in normalized
-    assert "Make the scene silhouette visibly different before varying styling" in normalized
-    assert "safe service wear through micro-scratches" in normalized
-    assert "remain structurally clean and intact" in normalized
-
-    assert "rectilinear 35-50 mm" in normalized
-    assert "f/5.6-f/11" in normalized
-    assert "foreground, middle ground, and background" in normalized
-    assert "5200K-6500K" in normalized
-    assert "palette is cool dominant" in normalized
-    assert "four active storytelling systems" in normalized
-    assert "at least eight compact reality anchors" in normalized
-    assert "complete occupied space rather than a generic backdrop" in normalized
-    assert "room type, floor, walls, ceiling, entrance" in normalized
-    assert "at least six discrete, visually readable props" in normalized
-    assert "specific object identity, material, color, size impression" in normalized
-    assert "Distribute them across foreground, middle ground, and background" in normalized
-    assert "semicolon-separated environmental sentence" in normalized
-
-    assert "MODULE: SYNTHETIC OR PROXY ADULT" in brief
-    assert "MODULE: HAPTIC VOLUMETRIC ADULT" in brief
-    assert "55-70 percent optical density" in normalized
-    assert "smooth light density" in normalized
-    assert "semi-transparent monochromatic volumetric-light adult" in normalized
-    assert "external anatomy as continuous light formed from that same" in normalized
-    assert "MODULE: HAPTIC OR NEURAL SYSTEM" in brief
-    assert "MODULE: ACTIVE SUSPENSION" in brief
-    assert "broad graphite ribcage pads and outer-thigh wings" in normalized
-    assert "all cables and webbing outside the groin" in normalized
-    assert "wide, flat, dark, and visibly connected" in normalized
-    assert "complete empty bed surface stays visible" in normalized
-    assert "MODULE: ADAPTIVE BED OR TRANSPORT BERTH" in brief
-    assert "domestic furniture rather than a medical chair" in normalized
-    assert "both partners alert, mutually engaged, and physically contributing" in normalized
-    assert "side-lying rear-entry berth" in normalized
-    assert "bare hips flush to the receiving pelvis" in normalized
-    assert "completely clear of both legs" in normalized
-    assert "show rain, transit light, or empty architecture as abstract reflections" in normalized
-    assert "MODULE: COOLING SUSPENSION" in brief
-    assert "four physically separated flexible support wings" in normalized
-    assert "30-40 centimeter oval contact opening" in normalized
-    assert "50-80 centimeters above" in normalized
-    assert "Pale-cyan coolant" in brief
-    assert "front partner on one side with their spine facing" in normalized
-    assert "rear partner parallel on the same side" in normalized
-    assert "rear three-quarter side camera at pelvic height" in normalized
-    assert "MODULE: ORBITAL GANTRY" in brief
-    assert "two independent counterweighted body axes" in normalized
-    assert "30-40-degree backward incline" in normalized
-    assert "35-50-degree forward incline" in normalized
-    assert "two visible ceiling carriages" in normalized
-    assert "safety webbing a muted violet or graphite color" in normalized
-    assert "MODULE: ORBITAL MICROGRAVITY" in brief
-    assert "MODULE: SAPIENT POSTHUMAN PARTNER" in brief
-    assert "MODULE: POSITIVE CONTACT VOCABULARY" in brief
-    assert "directly joined pelvises and touching pubic skin" in normalized
-    assert "blank solid-color rental cases" in normalized
-    assert "Individual styling: for each adult separately" in normalized
-    assert "Future room and props: complete room boundaries" in normalized
-    assert "cyan, ice-blue, or muted-violet arcs" in normalized
-    assert "incorrect total of faces, heads, torsos, pelvises, bodies" in normalized
-    assert "penetrating anatomy appears through clothing, detached from its pelvis" in normalized
-    assert "masturbation contains an ownerless hand" in normalized
-    assert "BDSM loads the neck or airway" in normalized
-    assert "a phallic toy is mounted to a man's pelvis" in normalized
-    assert "resembles a second penis" in normalized
-    assert "a single-adult request contains a second body" in normalized
-    assert "changes female_count or male_count" in normalized
-    assert "turns a requested gender slot into an unspecified" in normalized
-    assert "Selected-action geometry within the first 120 words" in normalized
-    assert "bunched around a thigh, knee, or ankle" in normalized
-    assert "transport window contains a human reflection" in normalized
-    assert "panels are cracked, broken, or unsafe" in normalized
-    assert "flesh-colored support hardware" in normalized
-    assert "rust, corrosion, peeling plaster" in normalized
-
-    family_section = brief.split("TECHNOLOGY FAMILIES\n\n", 1)[1].split(
-        "\n\nSCENE SEED LIBRARY", 1
-    )[0]
-    seed_section = brief.split("SCENE SEED LIBRARY\n\n", 1)[1].split(
-        "\n\nSILENT REJECTION CHECK", 1
-    )[0]
+    for requirement in (
+        "冷峻、带生活痕迹的写实",
+        "精确可见身体数",
+        "每个成年人都有独特完整造型",
+        "完整的周围环境，包含至少八个紧凑现实锚点",
+        "分布在所有纵深层的至少六件独立道具",
+        "同时呈现房间尺度、身体尺度和性接触尺度",
+        "完整受力路径、重心、投影",
+        "获准的全息成年人形态",
+        "获准的冷却悬吊形态",
+        "获准的轨道龙门架形态",
+        "精确遵循批次路由，使场景世界和性动作各不相同",
+        "仅写正向、可见的指令",
+        "绝不将规则、排除项、警告",
+        "返回前",
+        "每个画面至少写 600 个英语单词",
+        "只要具体视觉细节仍然有用，就不设固定上限",
+        "600 词的最低要求是硬性限制",
+        "将人物构成、动作、解剖结构和技术放在前半段",
+        "图像不包含说明文字、字幕、标志",
+        "请求的完整人物构成",
+        '"Exactly N adults and N complete bodies occupy the entire image."',
+        '"Exactly two adults and two complete bodies occupy the entire image, '
+        'one 38-year-old Chinese woman named Mei and one 42-year-old Chinese man named Jun."',
+        "这一对伴侣始终是唯一的人体轮廓组",
+        '"a 38-year-old Chinese woman named Mei and a 42-year-old Chinese man named Jun"',
+        '始终在每个姓名旁写出 "woman" 或 "man"',
+        "将 female_count 和 male_count 视为不可更改的性别名额",
+        '仍须使用与请求名额对应的词语 "woman" 或 "man"',
+        '两名女性和一名男性："one NN-year-old woman named A, '
+        'one NN-year-old woman named B, and one NN-year-old man named C"',
+        '一名女性和两名男性："one NN-year-old woman named A, '
+        'one NN-year-old man named B, and one NN-year-old man named C"',
+        "在每个画面中独立重述请求的完整性别构成",
+        "每个请求的人呈现一个可见身体和一张脸",
+        "女性有一个外阴，男性有一根与其骨盆连续相连的阴茎",
+        "双方耻部直接接触",
+        "外部仅可见相连的根部",
+        "在前 120 个词内描述完整接触几何",
+        "双方耻部裸露且直接相压",
+        "所有下装均从双腿完全脱除",
+        '"Both bare pubic regions press directly together; the man\'s single penis '
+        "is rooted continuously in his fully unclothed pelvis, most of its shaft "
+        "is visibly enveloped by the woman's vagina, and only its attached base "
+        'remains visible at their touching pubic skin."',
+        "仅有躯干的代理体",
+        "呈现抽象光线或空房间的建筑结构",
+        "从一侧边缘到另一侧边缘都明显无人",
+        "所有活动均由具有知情同意能力的成年人自愿进行",
+        "将专业服务与性活动分开",
+        "分别描述每个人",
+        "体型、身高印象、肤色",
+        "脸型和可见五官",
+        "发型的颜色、长度、质感、剪裁、分缝",
+        "可见的仪容修整或妆容",
+        "通过视线方向、眼睑、眉毛、嘴部、下颌、面颊紧张程度呈现当前表情",
+        "每一件衣物和鞋履",
+        "一至三件个人配饰",
+        "裸体不取消造型要求",
+        "脱下衣物的精确位置",
+        "一个清楚可见且正在进行的明确性动作",
+        "独自自慰、伴侣引导的自慰、双方各自自慰",
+        "双方同意的 BDSM",
+        "本规则覆盖下文所有场景种子、技术类别、模块",
+        "恰好呈现一名成年人、一个完整身体、一张脸和一个轮廓",
+        "唯一的成年人进行独自自慰",
+        "另一只手自由操作释放装置",
+        "小型非阴茎形振动器",
+        "由一名伴侣清楚可见地握在手中",
+        "从肩部经过肘部、手腕、手掌和手指，连续追踪主动手",
+        "为每名成年人安排独立的手对身体动作",
+        "明确自愿角色",
+        "展示双向同意",
+        "每处束缚均有可见快速释放装置",
+        "拍打仅落在肉厚的臀部或大腿外侧",
+        "在前 120 个词内确立一个裸露且无遮挡的接触中心",
+        "将长裤、内裤、裙子和其他下装从双腿上完全脱除",
+        "支撑硬件须完全位于双方耻部之外",
+        "处于通电、穿戴、连接",
+        "同一主题下的画面是同一设定的备选照片",
+        "每个主题恰好选择一项主要推想发展",
+        "房间尺度：",
+        "身体尺度：",
+        "接触尺度：",
+        "至少包含六个连贯的未来信号",
+        "改装的巨型都市家居",
+        "粗野主义栖居舱设施",
+        "适应气候的室内",
+        "光谱远程临场房间",
+        "至多两个使用常规卧室、床垫、铺位或旅馆房间",
+        "绝不重复地点类型、主要技术类别",
+        "在改变造型之前，先让场景轮廓明显不同",
+        "通过微划痕、清洁条纹",
+        "展现安全的使用磨损",
+        "在结构上保持洁净完好",
+        "35-50 mm 的直线投影镜头",
+        "f/5.6-f/11",
+        "5200K-6500K",
+        "前景、中景和背景",
+        "配色以冷色为主",
+        "四个主动叙事系统",
+        "至少包含八个紧凑现实锚点",
+        "完整的有人使用的空间，而非通用背景",
+        "房间类型、地板、墙壁、天花板、入口",
+        "至少包含六件独立且视觉可辨的道具",
+        "具体物品身份、材质、颜色、大小印象",
+        "将它们分布在前景、中景和背景",
+        "以分号分隔的环境句子",
+        "55-70% 的光学密度",
+        "平滑的光密度",
+        "半透明单色体积光成年人",
+        "将所有外部身体结构描述为由同一青色、青紫或冷淡紫体积形成的连续光",
+        "宽石墨色胸廓衬垫和大腿外侧翼",
+        "所有缆线和织带均置于腹股沟及身体间接触区之外",
+        "宽、平、深色，且明显连到支撑垫",
+        "完整空床表面须始终可见",
+        "家用家具，而非医疗椅",
+        "双方伴侣都保持清醒、相互投入",
+        "主动参与",
+        "侧卧后入的卧铺",
+        "裸露髋部紧贴接受方骨盆",
+        "完全远离双方腿部",
+        "以抽象倒影呈现雨、交通光线或空的建筑结构",
+        "四片物理上分离的柔性支撑翼",
+        "30-40 厘米的椭圆接触开口",
+        "上方 50-80 厘米处",
+        "淡青色冷却液",
+        "前方伴侣侧卧，脊柱朝向后方伴侣",
+        "后方伴侣平行地朝同一侧侧卧",
+        "骨盆高度的后侧四分之三视角",
+        "两条独立配重平衡的身体轴线",
+        "30-40 度后倾",
+        "35-50 度前倾",
+        "两台可见天花板滑车",
+        "安全织带使用柔和紫或石墨色",
+        '"directly joined pelvises" 和 "touching pubic skin"',
+        "空白纯色租赁箱",
+        "个人造型：分别为每名成年人",
+        "未来房间和道具：完整房间边界",
+        "青色、冰蓝或柔和紫弧形",
+        "脸、头、躯干、骨盆、身体或人体轮廓总数错误",
+        "插入器官穿过衣物出现、脱离骨盆",
+        "自慰出现无归属的手",
+        "BDSM 使颈部或气道承重",
+        "阴茎形玩具安装在男性骨盆上",
+        "形似第二根阴茎",
+        "单一成年人的请求中出现第二个身体",
+        "改变 female_count 或 male_count",
+        "将请求的性别名额变为未指定性别",
+        "前 120 个词内的所选动作几何",
+        "下装仍堆在大腿、膝盖或脚踝处",
+        "交通工具窗户出现人体倒影",
+        "面板开裂、损坏或不安全",
+        "肉色支撑硬件",
+        "锈蚀、腐蚀、剥落灰泥",
+        "雨中延迟全息汽车旅馆",
+        "热量配给冷却悬吊",
+        "循环空气旅馆悬吊",
+        "默默使用这些检查",
+        "其词汇绝不出现在返回的画面中",
+        "仅返回一段正向的英语 ASCII 段落",
+        "确认至少 600 个英语单词",
+        "对应的直形 ASCII 字符",
+    ):
+        assert requirement in normalized, requirement
+    family_section = next(
+        rule for rule in brief.splitlines() if rule.startswith("1. 家用合成伴侣：")
+    )
     for number in range(1, 24):
-        assert f"\n{number}. " in f"\n{family_section}"
-    for number in range(1, 31):
-        assert f"\n{number}. " in f"\n{seed_section}"
-
-    assert "Rain-Lag Hologram Motel" in normalized
-    assert "Heat-Ration Cooling Suspension" in normalized
-    assert "Recycled-Air Hotel Suspension" in normalized
-    assert "Use these checks silently" in normalized
-    assert "Their vocabulary never appears in the returned Frame" in normalized
-    assert "Return only the single positive English ASCII paragraph" in normalized
-    assert "confirm at least 600 English words" in normalized
-    assert "five to seven sentences" not in normalized
-    assert "at most 320 words" not in normalized
-    assert "2000 ASCII characters" not in normalized
-    assert "straight ASCII equivalent" in normalized
+        assert re.search(rf"\b{number}\. ", family_section), number
+    assert document.allocation.type == "cyclic_slots"
+    assert document.allocation.catalog == "near-future-intimacy-realism"
+    resolved = resolve_story_input(document)
+    catalogs = [
+        json.loads(source.content)
+        for source in resolved.sources
+        if source.kind == "catalog"
+    ]
+    assert len(catalogs) == 1
+    assert catalogs[0]["id"] == "near-future-intimacy-realism"
+    assert len(catalogs[0]["entries"]) == 30
+    seeds = {
+        rule
+        for entry in catalogs[0]["entries"]
+        for rule in entry["themes"]
+        if rule.startswith("已选场景种子：")
+    }
+    assert len(seeds) == 30
+    assert seeds == {
+        rule
+        for entry in catalogs[0]["entries"]
+        for rule in entry["frames"]
+        if rule.startswith("已选场景种子：")
+    }
+    assert seeds <= set(brief.splitlines())
+    for excluded in ("五至七个句子", "最多 320 词", "2000 个 ASCII 字符"):
+        assert excluded not in normalized, excluded
 
 
 def test_precise_intimate_activity_geometry_has_explicit_spatial_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT
-        / "story-inputs"
-        / "precise-intimate-activity-geometry.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert brief.startswith("BRIEF\n\n")
-    assert brief.isascii()
-    assert "EXACT CAST AND BODY OWNERSHIP" in brief
-    assert "THEME SEED GATE" in brief
-    assert "CENTRAL PERSON LOCK" in brief
-    assert "OTHER PERSON BLOCKS" in brief
-    assert "2D PROJECTION AND SURFACE VISIBILITY" in brief
-    assert "ACTION-CONTACT CHAIN" in brief
-    assert "LIFTING AND SUPPORT GEOMETRY" in brief
-    assert "SEXUAL ACTION LIBRARY" in brief
-    assert "SILENT REJECTION CHECK" in brief
-    assert "Exactly N adults belong to N coherent bodies in this image" in normalized
-    assert "Every Theme title and premise defines only cast, room, primary activity" in normalized
-    assert "A Theme never defines camera side, lens, framing, crop" in normalized
-    assert "The Frame is the sole owner of camera and visibility" in normalized
-    assert "ignore that language and build one fresh camera graph in the Frame" in normalized
-    assert "Create immutable gender slots before writing each Theme" in normalized
-    assert "exactly female_count adult woman slots" in normalized
-    assert "exactly male_count adult man slots" in normalized
-    assert "every Theme premise and every Frame must name exactly one adult woman" in normalized
-    assert "Never replace a requested man with a woman" in normalized
-    assert "Every visible face, head, torso, pelvis, arm, hand, leg, foot" in normalized
-    assert "Body completeness is topological, not a full-body framing requirement" in normalized
-    assert "Describe only visible limbs that perform an action, bear weight, or define the pose" in normalized
-    assert "Trace each such limb continuously from its visible body attachment" in normalized
-    assert "Hidden limbs and regions outside the frame require no inventory" in normalized
-    assert "Choose exactly one central person" in normalized
-    assert "in one actor block" in normalized
-    assert "screen location: image center, center-left, center-right" in normalized
-    assert "every visible body chain and every named occluding volume" in normalized
-    assert "facial expression and gaze only when the face is visible" in normalized
-    assert "Write each visible limb position, support role, and active contact exactly once" in normalized
-    assert "Do not first assign a passive position" in normalized
-    assert "Describe every other adult in a separate sentence" in normalized
-    assert "describe only the visible limb chains, visible support points" in normalized
-    assert "State head angle, gaze, and expression only if the face is visible" in normalized
-    assert "A flat foot has heel, ball, and toes on the surface" in normalized
-    assert "A raised heel leaves only the ball and toes on the surface" in normalized
-    assert "an extended elbow cannot also be planted as a support" in normalized
-    assert "one opaque two-dimensional projection" in normalized
-    assert "Describe only anatomy and contacts reached by an unobstructed line of sight" in normalized
-    assert "Lock the camera in the second sentence" in normalized
-    assert "framing scale, and near-side visible surfaces" in normalized
-    assert "name any volume that hides the primary contact" in normalized
-    assert "Never defer the camera until the paragraph's end" in normalized
-    assert "single visibility scene graph used by the entire paragraph" in normalized
-    assert "Include only anatomy, contact boundaries, support points, and props visible inside its bounds" in normalized
-    assert "Regions outside the frame are absent from the graph" in normalized
-    assert "Pose, action, styling, lighting, and focus consume this graph" in normalized
-    assert "Assign visibility to surface patches rather than whole body parts" in normalized
-    assert "assigns the primary contact boundary one state: visible or occluded" in normalized
-    assert "An inserted boundary may remain occluded" in normalized
-    assert "action then stays readable from body alignment" in normalized
-    assert "Visibility state is immutable" in normalized
-    assert "cannot later be described, focused on, contacted in view, or called visible" in normalized
-    assert "compare every use of visible, occluded, and hidden" in normalized
-    assert "In a front view, the chest and front torso may be visible" in normalized
-    assert "the full buttocks and rear cleft are not" in normalized
-    assert "In a rear view, the back and buttocks may be visible" in normalized
-    assert "both breasts, nipples, abdomen, and front genitals are not fully visible" in normalized
-    assert "In a strict side view, show only profile contours" in normalized
-    assert "Never combine a full frontal chest with a full rear view of both buttocks" in normalized
-    assert "A head turn changes face visibility but does not rotate the torso" in normalized
-    assert "Use explicit near-side and far-side occlusion order" in normalized
-    assert "move the camera or change the pose" in normalized
-    assert "transparent anatomy, impossible twisting, a second viewpoint" in normalized
-    assert "one physically consistent reflection" in normalized
-    assert "When a contact boundary is visible" in normalized
-    assert "do not merely claim that its sightline is clear" in normalized
-    assert "Prove it by naming the viewing window" in normalized
-    assert "For penile oral insertion, use a side-rear or rear three-quarter camera" in normalized
-    assert "head or near thigh occludes the mouth-to-genital boundary" in normalized
-    assert "Name fellatio once to establish the action" in normalized
-    assert "omit local penis, shaft, glans, lip, tongue, and oral-cavity geometry" in normalized
-    assert "For external genital licking" in normalized
-    assert "CONTACT STATE INVARIANT" in brief
-    assert "Assign every contact one and only one topological state" in normalized
-    assert "separated: two structures have a visible gap" in normalized
-    assert "external contact: two exterior surfaces meet at one visible boundary" in normalized
-    assert "inserted: the receiving boundary encircles the active structure" in normalized
-    assert "One contact cannot occupy two states in the same Frame" in normalized
-    assert "omit every distal structure beyond that boundary" in normalized
-    assert "Do not name, locate, light, focus, or assign motion to anatomy inside" in normalized
-    assert "two sides of every contact boundary share one screen location and one depth plane" in normalized
-    assert "must be reachable from its connected joints" in normalized
-    assert "change the pose or support before writing prose" in normalized
-    assert "For penile oral activity, choose exactly one of two alternatives" in normalized
-    assert "Oral insertion names fellatio once" in normalized
-    assert "assigns their contact boundary to the occluded state" in normalized
-    assert "omits its local anatomy" in normalized
-    assert "These alternatives never coexist" in normalized
-    assert "Any hand contact is a separate action chain" in normalized
-    assert "For mouth-to-breast contact" in normalized
-    assert "The mouth occludes the central patch beneath the lips" in normalized
-    assert "For penetration, use a lateral or three-quarter-lateral view" in normalized
-    assert "End the visible chain at that junction and omit the internal segment" in normalized
-    assert "For lifted penetration, choose either a front-biased view" in normalized
-    assert "the far buttock and far supporting contact remain occluded" in normalized
-    assert "Never claim that both buttocks, both under-buttock contacts" in normalized
-    assert "For manual or toy contact" in normalized
-    assert "a front camera cannot see the rear adult's pelvis" in normalized
-    assert "contact trapped between the two torsos or pelvises" in normalized
-    assert "Offset the adults and use a lateral three-quarter camera" in normalized
-    assert "actor -> owned body part or held object -> target adult" in normalized
-    assert "Choose one action-chain form from the contact boundary's camera-graph state" in normalized
-    assert "Write that chain once inside the active adult's actor block" in normalized
-    assert "does not repeat the contact anatomy or reassign the active limb" in normalized
-    assert "For a visible boundary" in normalized
-    assert "For an occluded boundary" in normalized
-    assert "activity name -> actor and target body alignment" in normalized
-    assert "omits the hidden contact anatomy, contact motion, and interior state" in normalized
-    assert "Never combine the visible and occluded forms for one action" in normalized
-    assert "Mina's tongue extends visibly from Mina's mouth" in normalized
-    assert "Occluded oral insertion: An kneels between Bo's parted thighs" in normalized
-    assert "side-rear camera overlaps An's head silhouette with Bo's pubic region" in normalized
-    assert "Bo's near thigh occludes their contact boundary" in normalized
-    assert "Jun's right shoulder leads to his bent right elbow" in normalized
-    assert "the penetrating anatomy remains visibly continuous with its owner's pelvis" in normalized
-    assert "the receiving adult's pubic region meets it in the same contact plane" in normalized
-    assert "the external insertion junction" in normalized
-    assert "End the visible description at the receiving boundary" in normalized
-    assert "omit the internal portion" in normalized
-    assert "Never terminate penetrating anatomy at an abdomen" in normalized
-    assert "One limb performs one physical role" in normalized
-    assert "across the entire paragraph" in normalized
-    assert "When another adult lifts the central person" in normalized
-    assert "which region bears weight: upper back, ribcage, waist" in normalized
-    assert "both feet clear of the floor" in normalized
-    assert "For lifted penetration, use a mechanically compatible axis" in normalized
-    assert "Do not describe the lifted adult as horizontal or across the lifter" in normalized
-    assert "trace load from the named body region" in normalized
-    assert "Every visible adult participates through an action" in normalized
-    assert "one concise styling clause using only visible elements from the camera graph" in normalized
-    assert "describe footwear only when a foot is visible" in normalized
-    assert "Styling never reintroduces an occluded or off-frame region" in normalized
-    assert "Do not restate or change the camera established in sentence two" in normalized
-    assert "Choose framing for action readability" in normalized
-    assert "Keep every active contact and support chain inside the frame" in normalized
-    assert "omit all anatomy outside the selected framing" in normalized
-    assert "a non-ASCII character remains" in normalized
-    assert "without changing the locked camera" in normalized
-    assert "Return one concise positive English ASCII paragraph" in normalized
-
-    assert "HIGHEST PRIORITY CAST AND CAMERA LOCK" not in brief
-    assert "VISIBLE FUTURE-TECHNOLOGY SIGNATURE" not in brief
-    assert "FUTURE VISUAL WORLD LOCK" not in brief
-    assert "HIGH FUTURE VISUAL INTENSITY LOCK" not in brief
-    assert "ANTI-SCI-FI VISUAL GATE" not in brief
+    document = load_story_document(RECIPES / "precise-intimate-activity-geometry.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.generation.output_language == "english"
+    assert set(document.requirements.output_languages) == {"english"}
+    assert any(
+        check.type == "ascii" for check in document.validation.frames.checks
+    )
+    for requirement in (
+        '"Exactly N adults belong to N coherent bodies in this image."',
+        "每个主题的标题和设定只定义人物、房间、主要活动",
+        "主题绝不定义相机位于哪一侧、镜头、取景、裁切",
+        "画帧独自负责相机和可见性",
+        "忽略这些表述，在画帧中重新建立一个相机场景图",
+        "编写每个主题前，建立不可变的性别名额",
+        "恰好 female_count 个成年女性名额",
+        "恰好 male_count 个成年男性名额",
+        "每个主题设定和每个画帧都必须指名恰好一名成年女性和恰好一名成年男性",
+        "绝不把请求中的男性换成女性",
+        "每个可见的面部、头部、躯干、骨盆、手臂、手、腿、脚",
+        "身体完整性是拓扑要求，不是全身取景要求",
+        "只描述执行动作、承重或决定姿势的可见肢体",
+        "从其可见的身体连接处连续追踪",
+        "隐藏肢体和画外部位不需要清点",
+        "只选择一名中心人物",
+        "在一个人物描述块中",
+        "画面位置：画面中央、偏左中央、偏右中央",
+        "每条可见身体链和每个指名的遮挡体积",
+        "仅在面部可见时描述表情和视线",
+        "每条可见肢体的位置、支撑职责和主动接触，都只在其指名所属者的人物描述块中写一次",
+        "不要先分配被动位置",
+        "用独立句子描述每名其他成年人",
+        "只描述可见肢体链、可见支撑点",
+        "仅在面部可见时说明头部角度、视线和表情",
+        "平放的脚，其脚跟、前脚掌和脚趾都接触表面",
+        "抬起脚跟时，只有前脚掌和脚趾接触表面",
+        "伸直的肘部也不能同时落在表面上充当支撑",
+        "单一不透明二维投影",
+        "只描述无遮挡视线能到达的身体结构和接触",
+        "在第二句中锁定相机",
+        "取景尺度和近侧可见表面",
+        "指明遮挡主要接触的任何体积",
+        "绝不把相机描述拖到段落末尾",
+        "全段使用的唯一可见性场景图",
+        "仅纳入其边界内可见的身体结构、接触边界、支撑点和道具",
+        "画外部位不在图中",
+        "姿势、动作、造型、光线和焦点均使用这张图",
+        "将可见性分配给表面小片，而非整个身体部位",
+        "为主要接触边界指定一种状态：可见，或被某个指名的近侧身体体积遮挡",
+        "插入边界可以保持被遮挡",
+        "此时通过身体对齐关系让动作可读",
+        "可见性状态不可变",
+        "之后不得被描述、对焦、描述为在视野内受到接触或称为可见",
+        '比较每处 "visible"、"occluded" 和 "hidden" 的用法',
+        "正面视角中，胸部和躯干前侧可以可见",
+        "完整臀部和臀沟不可见",
+        "背面视角中，背部和臀部可以可见",
+        "双乳、乳头、腹部和前侧生殖器不能完整可见",
+        "严格侧面视角中，只展示侧面轮廓",
+        "绝不把完整正面胸部和双臀完整后视图结合起来",
+        "转头会改变面部可见性，但不会让躯干",
+        "明确说明近侧与远侧的遮挡顺序",
+        "移动相机或改变姿势",
+        "透明身体、不可能的扭转、第二视角",
+        "一个物理一致的反射",
+        "接触边界可见时",
+        "不要只声称其视线畅通",
+        "通过指明观看窗口来证明",
+        "对于阴茎口腔插入，使用侧后方或后侧四分之三相机视角",
+        "头部或近侧大腿遮住口部与生殖器的接触边界",
+        "只提及一次吮阴茎以确立动作",
+        "省略局部阴茎、阴茎体、龟头、嘴唇、舌头和口腔几何关系",
+        "对于外部生殖器舔舐",
+        "为每处接触分配且只分配一种拓扑状态",
+        "分离：两个结构之间存在可见间隙",
+        "外部接触：两个外表面在一个可见边界相接",
+        "插入：接受方边界环绕主动结构",
+        "同一接触不能在同一画帧中处于两种状态",
+        "省略该边界以外的所有远端结构",
+        "不要为嘴内或身体开口内的身体结构命名、定位、布光、对焦或赋予运动",
+        "每个接触边界的两侧共享同一画面位置和同一深度平面",
+        "必须能由其相连关节到达",
+        "写正文前改变姿势或支撑",
+        "对于阴茎口部活动，只能在两种方案中选择一种",
+        "口腔插入只提及一次吮阴茎",
+        "将其接触边界指定为被遮挡状态",
+        "省略该处局部身体结构",
+        "这两种方案绝不共存",
+        "任何手部接触都是独立动作链",
+        "对于口乳接触",
+        "嘴部遮住唇下的中央区域",
+        "对于插入，使用侧向或四分之三侧向视角",
+        "在该交界处结束可见链条，省略内部部分",
+        "对于托举插入，要么选择偏正面视角",
+        "远侧臀部和远侧支撑接触仍被遮挡",
+        "绝不声称双臀、两个臀下接触点",
+        "对于手部或玩具接触",
+        "正面相机看不到后方成年人的骨盆",
+        "夹在两个躯干或骨盆之间的任何接触",
+        "将两人错开并使用侧向四分之三相机视角",
+        "执行者 -> 其所属身体部位或手持物 -> 目标成年人",
+        "根据接触边界在相机场景图中的状态，选择一种动作链形式",
+        "只在动作执行者的人物描述块中写一次该链",
+        "不重复接触身体结构，也不重新分配执行动作的肢体",
+        "对于可见边界",
+        "对于被遮挡边界",
+        "活动名称 -> 执行者与目标的身体对齐关系",
+        "省略隐藏的接触身体结构、接触运动和内部状态",
+        "绝不对同一动作混用可见和被遮挡两种形式",
+        "Mina 的舌头从 Mina 的嘴中可见地伸出",
+        "被遮挡的口腔插入：An 跪在 Bo 张开的大腿之间",
+        "侧后方相机使 An 的头部轮廓与 Bo 的耻部重叠",
+        "Bo 的近侧大腿遮住他们的接触边界",
+        "Jun 的右肩连续连接到他弯曲的右肘",
+        "插入部位与其所属者的骨盆保持可见连续",
+        "接受方的耻部在同一接触平面与之相接",
+        "外部插入交界",
+        "在接受方边界处结束可见描述",
+        "省略内部部分",
+        "绝不让插入部位终止于腹部",
+        "一条肢体在全段中只承担一个物理职责",
+        "当另一名成年人托举中心人物时",
+        "哪个部位承重：上背部、胸廓、腰部",
+        "双脚均离地",
+        "对于托举插入，使用力学相容的轴向",
+        "不要将被托举者描述为水平或横躺在托举者身上",
+        "将承重路径从指名的身体部位",
+        "每名可见成年人都通过动作",
+        "仅使用相机场景图中的可见元素，为每名成年人写一个简洁的造型分句",
+        "仅在脚可见时描述鞋履",
+        "造型绝不重新引入被遮挡或画外部位",
+        "不要重述或改变第二句中确立的相机",
+        "按动作可读性选择取景",
+        "让每处主动接触和每条支撑链保持在画面内",
+        "省略选定取景之外的所有身体结构",
+        "仍有非 ASCII 字符",
+        "不改变锁定的相机",
+        "每个画帧写成一个自然的英文段落，仅使用可打印 ASCII 字符",
+        "只返回正向的可见描述",
+    ):
+        assert requirement in normalized, requirement
+    for excluded in (
+        "最高优先级人物构成与相机锁定",
+        "可见未来技术特征",
+        "未来视觉世界锁定",
+        "高未来视觉强度锁定",
+        "反科幻视觉门槛",
+    ):
+        assert excluded not in normalized, excluded
 
 
 def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT
-        / "story-inputs"
-        / "surreal-conceptual-portrait.yaml"
-    ).description
-    normalized = " ".join(brief.split())
+    from t2i_story_pipeline.models import AsciiCheck, WordCountCheck
 
-    assert brief.startswith("BRIEF\n\n")
-    assert brief.isascii()
-    assert "ABSOLUTE OUTPUT PRIORITY" in brief
-    assert "at least 600 whitespace-delimited words" in normalized
-    assert "Target 650-900 words" in normalized
-    assert (
-        "Combine restrained fashion photography, practical installation art, "
-        "deadpan theatrical staging"
-    ) in normalized
-    assert (
-        "quiet, precise, uncanny, and emotionally legible rather than spectacular"
-    ) in normalized
-    assert (
-        "including straight quotation marks and ordinary hyphens instead of "
-        "smart punctuation"
-    ) in normalized
-    assert (
-        "replace any Chinese character, accented letter, smart punctuation, or other "
-        "non-ASCII symbol with plain English ASCII"
-    ) in normalized
-    assert "This minimum overrides every later request for brevity" in normalized
-    assert "museum-caliber surreal conceptual portraits" in normalized
-    assert "one impossible but visually coherent metaphor" in normalized
-    assert "Do not copy any reference composition" in normalized
-    assert "one dominant metaphor" in normalized
-    assert (
-        "Use exactly the requested number of adult women and adult men"
-        in normalized
+    document = load_story_document(RECIPES / "surreal-conceptual-portrait.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.policy == "standard-story"
+    assert document.generation.output_language == "chinese"
+    assert document.requirements.output_languages is None
+    for language in ("chinese", "english"):
+        resolved = resolve_story_input(document, InputOverrides(output_language=language))
+        assert resolved.request.output_language == language
+        for stage in StoryStage:
+            compiled = resolved.rules.text_for(stage)
+            assert "未指定时，每个人物分别默认为中国籍" in compiled
+            assert "否则场景国家默认为中国" in compiled
+    assert document.validation.frames.mode == "report"
+    assert document.validation.frames.checks == (
+        AsciiCheck(type="ascii", when_language="english"),
+        WordCountCheck(
+            type="word_count", when_language="english", min_words=600, max_words=None
+        ),
     )
-    assert "this exact visible cast is alone in the scene" in normalized
-    assert "every person is Chinese" in normalized
-    assert (
-        "Give every requested person an indispensable compositional role"
-        in normalized
+    required = (
+        "结合克制的时尚摄影、实体装置艺术、面无表情的戏剧布置",
+        "安静、精确、诡异且情感可读，而非壮观",
+        "博物馆级的超现实观念肖像",
+        "一个不可能但视觉连贯的隐喻",
+        "不得复制任何参考构图",
+        "一个主导隐喻",
+        "严格使用所要求数量的成年女性和成年男性",
+        "场景中只有这组确切可见人物，没有额外人物或人体部位",
+        "为每个要求的人物赋予不可或缺的构图作用",
+        "可信的支撑线向上延伸至画外天花网架",
+        "每件重物都有自己的可信承重路径",
+        "不得通过人的头发、皮肤、颈部、生殖器或衣物悬挂任何东西",
+        "可见衣架或平面非人形支撑",
+        "衣橱档案只包含成人尺寸衣物",
+        "不含婴儿服、儿童尺寸衣物、校服",
+        "超轻空心戏剧复制道具",
+        "其他刚性或沉重物件须位于人物旁边",
+        "围绕一个现有人物真实头部的可穿戴雕塑头饰",
+        "绝非斩首、漂浮替代头、第二个头",
+        "鼻口须不受实体压迫",
+        "绝不使用紧塑料、粘性包裹、勒颈绳",
+        "巴拉克拉法面罩、封闭头罩、麻袋",
+        "宽敞的下半脸呼吸间隙",
+        "绕过颈部的独立承重路径",
+        "轻质防碎亚克力",
+        "真实玻璃、陶瓷、脆性材料",
+        "绝不反射、重复、切碎或增殖人物的脸、眼、头、身体或肢体",
+        "约保留画面的百分之四十至七十",
+        "最多使用两种主导色相加一种点缀",
+        "通常为等效 40-105 毫米",
+        "每条可见肢体连续连接到一个人的躯干",
+        "不得通过物件重叠、黑暗、镜子、画框、屏幕、影子或悬挂衣物创造额外、脱离、重复、融合或无来源的解剖",
+        "在 Hardcore 等级，装置可为行为构框、呼应、计数",
+        "但不得插入、束缚、悬挂、击打",
+        "肩、胸、骨盆、臀部和生殖器均由不透光织物完全覆盖",
+        "同一主题中的画面是平行的完成肖像",
+        "三个悬挂系统、两个落地物件布局",
+        "每个最终画面都明确重申所渲染场景不含可读文字、标志、界面、水印或人物图像",
+        "绝不描述为手写、印刷、写有地址",
+        "至少包含 600 个以空白分隔的单词",
+        "目标为 650-900 个单词的具体可成像细节",
+        "此最低限度优先于后文任何简洁要求",
+        "英文画面至少 600 个单词，或在所要求的其他语言中使用等量细节",
+        "起草以 650-900 个单词为工作范围",
+        "英文画面约使用十二至十六句",
+        "将这六个方面展开至完整句数预算",
+        '"Only the specified cast is present"',
+        '"negative space"',
+        '"no readable text, logo, interface, watermark, or human image"',
+        "英文画面只使用 ASCII 字符，包括直引号和普通连字符，而非智能标点",
+        "发布前扫描英文画面每个字符",
+        "把所有汉字、带重音字母、智能标点或其他非 ASCII 符号替换为纯英文 ASCII",
+        "英文画面包含任何非 ASCII 字符",
+        "返回每个英文画面前，按空白分隔计算单词数；若不足 600",
+        "不得附加材料清单、象征阐释",
     )
-    assert "SUSPENDED ASSEMBLIES" in brief
-    assert (
-        "credible support lines rising to an off-frame ceiling grid"
-        in normalized
-    )
-    assert "Every heavy object has its own plausible load path" in normalized
-    assert (
-        "Nothing hangs by a person's hair, skin, neck, genitals, or clothing"
-        in normalized
-    )
-    assert "visible hanger or flat non-human support" in normalized
-    assert "Wardrobe archives contain only adult-sized garments" in normalized
-    assert "no baby clothes, child-sized clothing, school uniforms" in normalized
-    assert "ultralight hollow theatrical replica" in normalized
-    assert "other rigid or heavy objects remain beside the cast" in normalized
-    assert "OBJECT-HEAD AND FACE CONCEALMENT" in brief
-    assert (
-        "wearable sculptural headpiece around one existing person's real head"
-        in normalized
-    )
-    assert (
-        "never a decapitation, floating replacement, second head"
-        in normalized
-    )
-    assert "Keep the nose and mouth physically uncompressed" in normalized
-    assert "Never use tight plastic, adhesive wrap, strangling cord" in normalized
-    assert "a balaclava, an enclosed hood, a sack" in normalized
-    assert "a generous lower-face breathing gap" in normalized
-    assert "an independent load path that bypasses the neck" in normalized
-    assert "lightweight shatterproof acrylic" in normalized
-    assert "Never place real glass, ceramic, brittle material" in normalized
-    assert "never reflect, repeat, fragment, or multiply a person's" in normalized
-    assert "Reserve approximately forty to seventy percent" in normalized
-    assert "no more than two dominant hues plus one accent" in normalized
-    assert "typically 40-105 mm equivalent" in normalized
-    assert (
-        "Each visible limb connects continuously to one person's torso"
-        in normalized
-    )
-    assert (
-        "Do not create extra, detached, repeated, fused, or source-less anatomy"
-        in normalized
-    )
-    assert "At Hardcore level, the installation may frame, echo, count" in normalized
-    assert "it may not penetrate, restrain, suspend, strike" in normalized
-    assert "shoulders, chest, pelvis, buttocks, and genitals fully covered" in normalized
-    assert "Frames within one Theme are parallel finished portraits" in normalized
-    assert "three suspended systems, two grounded object arrangements" in normalized
-    assert "NO-TEXT IMAGE CONTRACT" in brief
-    assert "Every final Frame explicitly restates" in normalized
-    assert "Never describe them as handwritten, printed, addressed" in normalized
-    assert "at least 600 words long" in normalized
-    assert "650-900 word working range" in normalized
-    assert "approximately twelve to sixteen sentences" in normalized
-    assert "Expand these six areas across the full sentence budget" in normalized
-    assert '"Only the specified cast is present"' in normalized
-    assert "Use ASCII characters only in an English Frame" in normalized
-    assert "scan every character in an English Frame" in normalized
-    assert "contains any non-ASCII character in an English Frame" in normalized
-    assert (
-        "Count whitespace-delimited words before returning each English Frame"
-        in normalized
-    )
-    assert "if the count is below 600" in normalized
-    assert "Do not append a material inventory, symbolic interpretation" in normalized
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
 
 
 def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "demon-lord.yaml"
-    ).description
-    normalized = " ".join(brief.split())
+    from t2i_story_pipeline.models import AsciiCheck, WordCountCheck
 
-    assert brief.startswith("BRIEF\n\n")
-    assert brief.isascii()
-    assert "exactly one central demon sovereign" in normalized
-    assert "adult female demon lord or one adult male demon lord" in normalized
-    assert "Never place both a female and a male demon sovereign" in normalized
-    assert "at least 600 whitespace-delimited words" in normalized
-    assert "Target 650-900 words" in normalized
-    assert "live-action dark-fantasy feature-film image" in normalized
-    assert "LIVE-ACTION CINEMATIC THESIS" in brief
-    assert "real adult performer with natural skin texture" in normalized
-    assert "physically wearable horns, wings, armor" in normalized
-    assert "finished frame from a large-budget live-action" in normalized
-    assert "not an oil painting, illustration, concept art" in normalized
-    assert "restrained invisible visual-effects extension" in normalized
-    assert "intentionally low-saturation, dark-key, high-tonal-contrast" in (
-        normalized
+    document = load_story_document(RECIPES / "demon-lord.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.policy == "standard-story"
+    assert document.generation.output_language == "chinese"
+    assert document.requirements.output_languages is None
+    for language in ("chinese", "english"):
+        assert resolve_story_input(
+            document, InputOverrides(output_language=language)
+        ).request.output_language == language
+    assert document.validation.frames.mode == "report"
+    assert document.validation.frames.checks == (
+        AsciiCheck(type="ascii", when_language="english"),
+        WordCountCheck(type="word_count", when_language="english", min_words=600),
     )
-    assert "desaturated blue-grey and tarnished muted amber" in normalized
-    assert "Do not copy the reference's demon design" in normalized
-    assert "Use exactly the requested number of adult women and adult men" in normalized
-    assert "The demon sovereign counts as one requested woman or one requested man" in (
-        normalized
+    required = (
+        "每个主题恰好包含一位核心恶魔君主",
+        "一位成年女性魔王或一位成年男性魔王",
+        "绝不在同一主题中同时安排女性和男性恶魔君主",
+        "至少含 600 个以空白分隔的单词",
+        "以 650-900 个词的具体可成像细节为目标",
+        "原创真人实拍黑暗奇幻长片图像",
+        "真实的成年演员，具有自然皮肤纹理",
+        "可实际穿戴的角、翅膀、盔甲",
+        "大制作真人实拍黑暗奇幻长片中的完成版画面",
+        "而非油画、插画、概念美术",
+        "克制且不可察觉的视觉特效延展",
+        "有意采用低饱和度、暗调、高明度反差、窄色域配色",
+        "低饱和蓝灰与失去光泽的柔和琥珀色",
+        "不得复制参考中的恶魔设计",
+        "严格使用所要求的成年女性和成年男性人数",
+        "恶魔君主计入所要求的一位女性或一位男性",
+        "在内部为所要求的精确成年女性和精确成年男性分别建立人物记录",
+        "绝不将所要求的女性变为男性",
+        "在每个最终画面的前六十个英文单词内",
+        "图像必须恰好包含一位成年女性和一位成年男性",
+        "每个混合阵容的第一句在描述个人之前，先一并说明所有所要求性别人数",
+        '这两个精确的 "only" 句式只保留给真正的单人请求',
+        "创作严格单人肖像，仅包含这一位恶魔君主",
+        '第一句必须写 "one adult Chinese man only"',
+        '第一句必须写 "one adult Chinese woman only"',
+        "单人主题中绝不使用复数人物、暗示另一个主人的成对物件",
+        "有女性而无男性时",
+        "有男性而无女性时",
+        "混合阵容时，恰好选择所要求的一位成年人",
+        "平衡女性和男性君主",
+        "二十五至七十九岁之间的人类等效外观年龄",
+        "绝不能取代它",
+        "为每个人使用一个精确整数年龄",
+        "绝不写三十五岁上下、四十出头、接近六十岁",
+        "清醒、能力未受损、自愿、会作出回应",
+        "明确描述互动为双方同意且自愿",
+        "在每个 情色级 或 露骨级 画面的前一百个英文单词内",
+        '包含精确短语 "consensual and willing"',
+        "在每个 露骨级 画面的前一百个英文单词内",
+        "说明谁的勃起阴茎在谁的阴道或肛门内",
+        "将该直接 露骨级 接触放在第一句或第二句中",
+        "不得在说出参与动作的解剖结构前，用面孔、角、服装",
+        "所有词语位置检查在内部进行",
+        "绝不提及开头词语、前一百词、词语位置",
+        "绝不使用囚犯、奴隶、祭品、贡品",
+        "衡量不可能争端的地狱法官",
+        "宫廷天文学家、炼金术士、档案管理员",
+        "仅当所要求阵容包含额外成年人时",
+        "不要让每位女性君主都是魅惑女王",
+        "一个头、一条颈、一个躯干、两条手臂",
+        "角为可选，但通常值得采用",
+        "恰好使用一对匹配翅膀，连接于上背部",
+        "可选尾巴从骶骨连续伸出",
+        "不得添加过大的奇幻生殖器",
+        "所有性解剖结构保持为与君主所声明性别相符的成年类人解剖结构",
+        "轮换不同场景类型",
+        "竖向神圣空间",
+        "私密王室内景",
+        "运作中的权力中心",
+        "户外领地",
+        "原创过渡空间",
+        "不要默认每个场景都有烟、余烬",
+        "每个主题恰好选择一个在可见瞬间已发生的主导大型场面事件",
+        "巨大闸门开启",
+        "悬吊锻炉坩埚在水道上方旋转",
+        "风暴观测台的实体环架围绕开放圆形天窗转动",
+        "机械日食光圈在浅色天窗前闭合",
+        "选择清晰可辨的高潮瞬间",
+        "使用一个主导事件，最多再有一个从属环境反应",
+        "整个身体占据区域都干燥、处于室温、稳定",
+        "水可形成不高于脚踝的浅薄反光层",
+        "绝不在水下、完全淹没的室内",
+        "灰烬、尘土、淤泥、火星、雨、烟、蒸汽",
+        "应保持数个身长距离，位于可见路缘、墙、栏杆、水道或其他物理隔离之后",
+        "不得重复参考中的近距离正面膝上布局",
+        "三个清晰可辨的空间层次",
+        "一种主导图形结构",
+        "添加一种尺度对比和一种材料对比",
+        "选择一个运动向量",
+        "开放式姿态创作思路，不是固定菜单或主题编号映射",
+        "在 审美级 级别，变化以下动作",
+        "在 情色级 级别，变化非露骨的成年人布局",
+        "在 露骨级 级别，轮换物理上可信的露骨布局",
+        "面对面坐姿阴道或肛门性交",
+        "有支撑的站立性交",
+        "侧卧性交",
+        "从后方进入的阴道或肛门性交",
+        "相互自慰、相互口部接触",
+        "每个画面中使用一种主导身体布局",
+        "24-135mm 等效透视",
+        "24-28mm 用于环境广角",
+        "轮换摄影机方案类型：正面视线高度对称",
+        "沿反光表面的地面高度视图",
+        "选择一个决定性电影瞬间",
+        "每个最终画面说明一个 24-135mm 范围内以毫米为单位的精确焦距",
+        "电影式视图、戏剧性角度、广阔构图或近景肖像等模糊说法绝不能替代数字焦距",
+        "以真人实拍电影摄影呈现",
+        "实体假体通过可信基部、压力、妆容过渡与阴影衔接皮肤",
+        "细腻电影颗粒",
+        "避免油画、可见笔触、插画",
+        "它是完成版虚构电影本身中的一帧",
+        "抑制色彩对比，同时保留强烈亮度对比",
+        "可见画面至少百分之八十五",
+        "画面约百分之六十至七十五保留在深沉但可辨读的阴影中",
+        "小范围骨白或金属高光",
+        "保留黑色内部细节",
+        "任何彩色点缀最多占画面的百分之五",
+        "不超过两个柔和色相族，另加中性材料",
+        "不得使用饱和绿松石色、电光青",
+        "电影青橙调色",
+        "避免平板灰雾、仅有混浊中间调的表现",
+        "每条可见肢体都通过自然关节连续连接",
+        "在 审美级 级别，每个人始终被不透明成人衣物完全遮盖",
+        "不呈现插入、露骨口部与生殖器接触",
+        "一项清晰可见、已在进行的自愿成年人性行为",
+        "单人阵容使用可见的成年人自慰",
+        "多位成年人时，保持精确阵容可见",
+        "普通成年类人性解剖结构",
+        "绝不使用角、爪、尾巴、触手、武器",
+        "使用朝向远离所有面孔和身体的钝角",
+        "任何参与者都不抓握、拉扯、骑乘或借力于角",
+        "不得使用针尖、刀刃尾尖",
+        "同一主题中的画面是平行的完成版图像",
+        "每个连续滚动的十二主题组内",
+        "在一百个主题的生成中",
+        "至少八种不同主导大型场面事件",
+        "至少六种不同三层纵深设计",
+        "不重复相同环境类型、主导事件",
+        "占比均不得超过主题总数的十分之一",
+        "英文画面仅使用 ASCII 字符",
+        "这是绝对发布要求",
+        "在内部重新扫描每个字符",
+        "结尾重申在场成年女性和成年男性的精确人数",
+        "词数统计是内部写作检查",
+        '不得写 "six hundred words"',
+        '"zero adult women" 或 "zero adult men"',
+        "对单人请求添加任何第二个人、姓名、主人、目光交流对象",
+        "少于 600 个英文单词",
+        "使用鲜艳、霓虹、宝石色、高饱和",
+        "环境保持静态，没有一个可见的当前事件",
+        "组合多于一个主导灾难",
+        "缺少精确的 24-135mm 焦距",
+        "将确切 露骨级 解剖结构或直接接触推迟到前两句或前一百个英文单词之后",
+        "将 情色级 或 露骨级 亲密互动安排在水下",
+        "将灰烬、尘土、淤泥、火星、雨、烟",
+        '缺少 "live-action dark-fantasy feature-film frame"',
     )
-    assert "silently build a cast ledger" in normalized
-    assert "Never convert a requested woman into a man" in normalized
-    assert "Within the first sixty English words" in normalized
-    assert "exactly one adult woman and exactly one adult man" in normalized
-    assert "For every mixed cast, the first sentence states all requested gender counts" in (
-        normalized
-    )
-    assert "Reserve those two exact \"only\" constructions exclusively" in normalized
-    assert "SOLO CAST LOCK" in brief
-    assert "strict solo portrait containing only that one demon sovereign" in normalized
-    assert 'first sentence must say "one adult Chinese man only"' in normalized
-    assert 'first sentence must say "one adult Chinese woman only"' in normalized
-    assert "Never use plural people, paired objects implying another owner" in normalized
-    assert "with women and no men" in normalized
-    assert "with men and no women" in normalized
-    assert "with a mixed cast, choose exactly one requested adult" in normalized
-    assert "balance female and male sovereigns" in normalized
-    assert "visible human-equivalent age from twenty-five through seventy-nine" in (
-        normalized
-    )
-    assert "may never replace it" in normalized
-    assert "Use one exact integer age for every person" in normalized
-    assert "Never write mid-thirties, early forties, late fifties" in normalized
-    assert "retain a clearly Chinese adult identity" in normalized
-    assert "EQUAL AGENCY AND CONSENT" in brief
-    assert "awake, unimpaired, willing, responsive" in normalized
-    assert "describes the interaction as consensual and willing" in normalized
-    assert "Within the first one hundred English words" in normalized
-    assert 'include the exact phrase "consensual and willing"' in normalized
-    assert "Within the first one hundred English words of every Hardcore Frame" in (
-        normalized
-    )
-    assert "whose erect penis is inside whose vagina or anus" in normalized
-    assert "Place that direct Hardcore contact in the first or second sentence" in (
-        normalized
-    )
-    assert "Do not spend the opening on face, horns, wardrobe" in normalized
-    assert "All word-position checks are silent" in normalized
-    assert "Never mention first words, first one hundred words" in normalized
-    assert "Never use a prisoner, slave, sacrifice, tribute" in normalized
-    assert "ROLE AND CHARACTER VARIETY" in brief
-    assert "infernal judge weighing an impossible dispute" in normalized
-    assert "court astronomers, alchemists, archivists" in normalized
-    assert "Only when the requested cast contains additional adults" in normalized
-    assert "Do not let every female sovereign become a seductive queen" in normalized
-    assert "one head, one neck, one torso, two arms" in normalized
-    assert "Horns are optional but usually desirable" in normalized
-    assert "exactly one matched pair attached across the upper back" in normalized
-    assert "optional tail emerges continuously from the sacrum" in normalized
-    assert "Do not add oversized fantasy genitals" in normalized
-    assert "All sexual anatomy remains adult humanoid anatomy" in normalized
-    assert "THRONE, COURT, AND WORLD" in brief
-    assert "Rotate among distinct scene families" in normalized
-    assert "vertical sacred spaces" in normalized
-    assert "intimate royal interiors" in normalized
-    assert "working seats of power" in normalized
-    assert "exterior domains" in normalized
-    assert "original transitional spaces" in normalized
-    assert "Do not default every scene to smoke, embers" in normalized
-    assert "ENVIRONMENTAL SET-PIECE AND EVENT ENGINE" in brief
-    assert "exactly one dominant set-piece event already happening" in normalized
-    assert "colossal floodgate opening" in normalized
-    assert "suspended forge crucible rotating" in normalized
-    assert "storm observatory's physical rings turning" in normalized
-    assert "mechanical eclipse aperture closing" in normalized
-    assert "Choose a peak readable instant" in normalized
-    assert "one dominant event and at most one subordinate environmental reaction" in (
-        normalized
-    )
-    assert "complete occupied body zone is dry, room-temperature, stable" in normalized
-    assert "Water may form a shallow reflective layer no higher than the ankles" in (
-        normalized
-    )
-    assert "Never stage intimacy underwater" in normalized
-    assert "Keep ash, dust, silt, sparks, rain, smoke, steam" in normalized
-    assert "remain several body lengths away behind a visible" in normalized
-    assert "Do not repeat the reference's close frontal lap arrangement" in normalized
-    assert "DEPTH, SILHOUETTE, AND VISUAL IMPACT" in brief
-    assert "three readable spatial layers" in normalized
-    assert "one dominant graphic structure" in normalized
-    assert "Add one scale contrast and one material contrast" in normalized
-    assert "Choose one movement vector" in normalized
-    assert "POSE AND INTERACTION VARIETY" in brief
-    assert "open-ended pose engines" in normalized
-    assert "At Aesthetic level, vary" in normalized
-    assert "At Erotic level, vary non-explicit adult arrangements" in normalized
-    assert "At Hardcore level, rotate physically credible explicit arrangements" in (
-        normalized
-    )
-    assert "face-to-face seated vaginal or anal intercourse" in normalized
-    assert "supported standing intercourse" in normalized
-    assert "side-lying intercourse" in normalized
-    assert "rear-entry vaginal or anal intercourse" in normalized
-    assert "mutual masturbation, reciprocal oral contact" in normalized
-    assert "one dominant body arrangement" in normalized
-    assert "24-135mm equivalent" in normalized
-    assert "Reserve 24-28mm for environmental wides" in normalized
-    assert "Rotate camera families among frontal eye-level symmetry" in normalized
-    assert "floor-level view along a reflective surface" in normalized
-    assert "Select one decisive cinematic instant" in normalized
-    assert "Every final Frame states one exact focal length in millimeters" in normalized
-    assert "vague phrase such as cinematic view, dramatic angle" in normalized
-    assert "LIGHT, COLOR, AND LIVE-ACTION FINISH" in brief
-    assert "Render as live-action cinematic photography" in normalized
-    assert "Practical prosthetics meet skin through credible bases" in normalized
-    assert "fine cinematic grain" in normalized
-    assert "Avoid oil painting, visible brushwork, illustration" in normalized
-    assert "frame from the finished fictional film itself" in normalized
-    assert "LOW-SATURATION HIGH-CONTRAST COLOR LOCK" in brief
-    assert "Suppress color contrast while preserving strong luminance contrast" in (
-        normalized
-    )
-    assert "At least eighty-five percent of the visible frame" in normalized
-    assert "sixty to seventy-five percent of the frame remain in deep readable shadow" in (
-        normalized
-    )
-    assert "a small area of bone-white or metallic highlight" in normalized
-    assert "Preserve detail inside blacks" in normalized
-    assert "Any colored accent occupies at most five percent" in normalized
-    assert "two subdued hue families plus neutral materials" in normalized
-    assert "Do not use saturated turquoise, electric cyan" in normalized
-    assert "cinematic teal-and-orange grade" in normalized
-    assert "Avoid flat grey fog, muddy midtone-only rendering" in normalized
-    assert "Every visible limb connects continuously" in normalized
-    assert "At Aesthetic level, every person remains fully covered" in normalized
-    assert "show no penetration, explicit oral-genital contact" in normalized
-    assert "one clearly visible consensual adult sexual act already in progress" in (
-        normalized
-    )
-    assert "for a one-person cast, use visible adult masturbation" in normalized
-    assert "for multiple adults, keep the exact cast visible" in normalized
-    assert "ordinary adult humanoid sexual anatomy" in normalized
-    assert "Never use a horn, claw, tail, tentacle, weapon" in normalized
-    assert "use blunt horns swept away from all faces and bodies" in normalized
-    assert "No participant grips, pulls, rides, or braces against a horn" in normalized
-    assert "Do not use needle points, bladed tail tips" in normalized
-    assert "Frames within one Theme are parallel finished images" in normalized
-    assert "Within every rolling group of twelve Themes" in normalized
-    assert "Across a one-hundred-Theme run" in normalized
-    assert "eight distinct dominant set-piece events" in normalized
-    assert "six different three-layer depth designs" in normalized
-    assert "do not repeat the same environment family, dominant event" in normalized
-    assert "may occupy more than one tenth of the Themes" in normalized
-    assert "NO-TEXT IMAGE CONTRACT" in brief
-    assert "Use ASCII characters only in an English Frame" in normalized
-    assert "absolute publication requirement" in normalized
-    assert "silently rescan every character" in normalized
-    assert "End by restating the exact number of adult women and adult men" in normalized
-    assert "Word counting is a silent authoring check" in normalized
-    assert 'Do not write phrases such as "six hundred words"' in normalized
-    assert 'State zero as "zero adult women" or "zero adult men"' in normalized
-    assert "adds any second person, name, owner, gaze partner" in normalized
-    assert "falls below 600 English words" in normalized
-    assert "uses vivid, neon, jewel-tone, high-saturation" in normalized
-    assert "leaves the environment static without one visible current event" in normalized
-    assert "combines more than one dominant disaster" in normalized
-    assert "omits an exact 24-135mm focal length" in normalized
-    assert "postpones exact Hardcore anatomy or direct contact" in normalized
-    assert "stages Erotic or Hardcore intimacy underwater" in normalized
-    assert "places ash, dust, silt, sparks, rain, smoke" in normalized
-    assert 'omits "live-action dark-fantasy feature-film frame"' in normalized
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
 
 
 def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "angel.yaml"
-    ).description
-    normalized = " ".join(brief.split())
+    from t2i_story_pipeline.models import AsciiCheck, WordCountCheck
 
-    assert brief.startswith("BRIEF\n\n")
-    assert brief.isascii()
-    assert "live-action dark-fantasy feature-film image" in normalized
-    assert "premium feature film with real adult performers" in normalized
-    assert "exactly one central angel" in normalized
-    assert "adult female angel or one adult male angel" in normalized
-    assert "Never place both a female and a male central angel" in normalized
-    assert "Exactly one requested adult is an angel" in normalized
-    assert "Every other requested adult is an ordinary wingless human" in normalized
-    assert "one winged angel and one wingless human" in normalized
-    assert "at least 600 whitespace-delimited words" in normalized
-    assert "Target 650-900 words" in normalized
-    assert "ASCII is an absolute publication requirement" in normalized
-    assert "final character-by-character ASCII sweep" in normalized
-    assert (
-        'first sixty English words of every final Frame, explicitly call the image '
-        'a "live-action dark-fantasy feature-film frame"'
-    ) in normalized
-    assert "LIVE-ACTION CINEMATIC THESIS" in brief
-    assert "real adult performer with natural skin texture" in normalized
-    assert "physically constructed wings" in normalized
-    assert "monumental locations, controlled production design" in normalized
-    assert "real feature-film optics" in normalized
-    assert "photographic dark-fantasy cinematic realism" in normalized
-    assert "Do not use oil-painting language" in normalized
-    assert "synthetic CGI gloss" in normalized
-    assert "Use restrained invisible visual-effects extension" in normalized
-    assert "Create completely original adult characters and scenes" in normalized
-    assert "Do not copy a reference face, body, pose" in normalized
-    assert "Use exactly the requested number of adult women and adult men" in normalized
-    assert "silently build a cast ledger" in normalized
-    assert "Within the first sixty English words" in normalized
-    assert "identify every non-central requested adult as a wingless human" in (
-        normalized
+    document = load_story_document(RECIPES / "angel.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.policy == "standard-story"
+    assert document.generation.output_language == "chinese"
+    assert document.requirements.output_languages is None
+    for language in ("chinese", "english"):
+        assert resolve_story_input(
+            document, InputOverrides(output_language=language)
+        ).request.output_language == language
+    assert document.validation.frames.mode == "report"
+    assert document.validation.frames.checks == (
+        AsciiCheck(type="ascii", when_language="english"),
+        WordCountCheck(type="word_count", when_language="english", min_words=600),
     )
-    assert "SOLO CAST LOCK" in brief
-    assert "strict solo portrait containing only that central angel" in normalized
-    assert 'first sentence must say "one adult Chinese man only"' in normalized
-    assert 'first sentence must say "one adult Chinese woman only"' in normalized
-    assert "exact visible age from twenty-five through seventy-nine" in normalized
-    assert "State an exact integer age" in normalized
-    assert "retains a clearly Chinese adult identity" in normalized
-    assert "EQUAL AGENCY AND CONSENT" in brief
-    assert "awake, unimpaired, willing, responsive" in normalized
-    assert 'exact phrase "consensual and willing"' in normalized
-    assert "show no alcohol, liquor, wine, beer, cocktail" in normalized
-    assert "REALISTIC CHARACTER AND ROLE VARIETY" in brief
-    assert "celestial marshal inspecting a storm-battered mountain gate" in normalized
-    assert "eclipse navigator adjusting physical rings" in normalized
-    assert "night gardener tending pale plants in an ash-dark conservatory" in normalized
-    assert "ANGEL ANATOMY AND WINGS" in brief
-    assert "plus exactly one matched pair of wings" in normalized
-    assert "Attach both wings across the upper back and shoulder-blade region" in (
-        normalized
+    required = (
+        "原创真人实拍黑暗奇幻长片图像",
+        "高品质长片中的完成版画面，具有真实的成年演员",
+        "每个主题恰好包含一位核心天使",
+        "一位成年女性天使或一位成年男性天使",
+        "绝不在同一主题中同时安排女性和男性核心天使",
+        "所要求的成年人中恰好一位是天使",
+        "其余每位所要求的成年人都是普通的无翼人类",
+        "一位有翼天使和一位无翼人类",
+        "至少含 600 个以空白分隔的单词",
+        "以 650-900 个词的具体、可见、可成像细节为目标",
+        "ASCII 是绝对的发布要求",
+        "返回英文画面前，最后逐字符执行 ASCII 检查",
+        '在每个最终画面的前六十个英文单词内，明确将图像称为 "live-action dark-fantasy feature-film frame"',
+        "真实的成年演员，具有自然皮肤纹理",
+        "实体制作的翅膀",
+        "宏伟的地点、受控的美术设计",
+        "真实长片镜头的光学表现",
+        "摄影式黑暗奇幻电影真实感",
+        "不得使用油画用语",
+        "合成 CGI 光泽",
+        "克制且不可察觉的视觉特效延展",
+        "创作完全原创的成年角色与场景",
+        "不得复制参考中的面孔、身体、姿势",
+        "严格使用所要求的成年女性和成年男性人数",
+        "在内部为每位所要求的成年人分别建立一条人物记录",
+        "在前六十个英文单词内",
+        "在前一百个英文单词内明确将每位非核心的所要求成年人标明为无翼人类",
+        "严格的单人肖像，仅包含该核心天使",
+        '第一句必须写 "one adult Chinese man only"',
+        '第一句必须写 "one adult Chinese woman only"',
+        "二十五至七十九岁之间的一个精确外观年龄",
+        "说明一个精确的整数年龄",
+        "清醒、能力未受损、自愿、会作出回应",
+        '精确短语 "consensual and willing"',
+        "不得出现酒精、烈酒、葡萄酒、啤酒、鸡尾酒",
+        "检查遭受风暴侵袭的山间关门的天界统帅",
+        "调节实体环架的日食导航员",
+        "在灰暗温室照料浅色植物的夜间园丁",
+        "外加恰好一对匹配的翅膀",
+        "将双翼连接在上背部和肩胛骨区域",
+        "恰好有一对匹配翅膀，由一只左翼和一只右翼组成",
+        "修长风化象牙色鹰式飞羽",
+        "氧化银色隼式翅膀",
+        "不得创造六只翅膀、布满眼睛的翅膀、脱离身体的翅膀",
+        "带磨旧古金镶嵌的发黑活动板甲",
+        "失去光泽的浅金色札甲",
+        "欢迎使用金色盔甲",
+        "狭窄受控的高光、较暗关节凹槽",
+        "破损圆形天窗下的巨石玄武岩大教堂",
+        "由深层矿物水透光照明的淹水钟墓",
+        "实体环架围绕开放屋顶的风暴观测台",
+        "每个主题恰好选择一个在可见瞬间已发生的主导大型场面事件",
+        "机械日食光圈在浅色天窗前闭合",
+        "恰好使用一个主导事件，最多再有一个从属物理反应",
+        "整个身体占据区域都干燥、处于室温、稳定",
+        "充满可呼吸空气",
+        "任何面孔、胸部、骨盆、性接触或呼吸通道都不得浸没",
+        "灰烬、尘土、淤泥、火星、雨、烟、蒸汽",
+        "应距人物数个身长，并与人物实际隔离",
+        "每幅图像构建三个清晰可辨的层次",
+        "以前景台阶边缘",
+        "中景包含完整人物阵容",
+        "背景承载宏伟建筑",
+        "每幅图像选择一种强有力的图形结构",
+        "一个清晰可辨的运动向量",
+        "穿过圆形天窗下射光束",
+        "在 情色级 级别，采用非露骨的成年人亲密互动",
+        "一项清晰可见、已在进行的自愿成年人性行为",
+        "在每个 露骨级 画面的前一百个英文单词内",
+        "将确切性行为和当前解剖接触放在前两句中",
+        "哪位成年人的阴茎位于哪位成年人的阴道或肛门内",
+        '泛化的 "point of contact" 不满足 露骨级 要求',
+        "一百词和前两句的位置检查在内部进行",
+        "绝不提及词语位置、词数门槛",
+        "暗调、低饱和度、高反差和窄色域",
+        "可见图像至少百分之八十五",
+        "图像约百分之六十至七十五",
+        "任何彩色点缀最多占图像的百分之五",
+        "不得使用饱和绿松石色、电光青",
+        "24mm 或 28mm 环境广角",
+        "视线高度的 35mm 环境肖像",
+        "50mm 中距离全身镜头",
+        "100mm 或 135mm 压缩建筑构图",
+        "说明 24mm 至 135mm 范围内一个精确焦距",
+        "细微电影颗粒和自然微反差",
+        "每十个主题中",
+        "至少八种不同主导大型场面事件",
+        "至少六种不同三层纵深设计",
+        "每个连续滚动的十二主题组内",
+        "在一百个主题的生成中",
+        "任何单一正面白翼姿势",
+        "占比均不得超过主题总数的十分之一",
+        "词数统计是内部写作检查",
+        "英文画面仅使用 ASCII 字符",
+        "少于 600 个英文单词",
+        "将任何非核心人物称为天使",
+        "多于一个有翼人物或多于一对匹配翅膀",
+        "使用酒精、烈酒、葡萄酒、啤酒、鸡尾酒",
+        "环境保持静态，没有一个可见的当前事件",
+        "缺少清晰可辨的前景、中景和背景纵深",
+        "将亲密互动安排在深水中、潮湿或湿滑的支撑面上",
+        "一幅已完成、可见的真人实拍电影图像",
     )
-    assert "exactly one matched pair consisting of one left wing and one right wing" in (
-        normalized
-    )
-    assert "long weathered ivory eagle-like flight feathers" in normalized
-    assert "oxidized silver falcon-like wings" in normalized
-    assert "Do not create six wings, eye-covered wings, detached wings" in normalized
-    assert "WARDROBE, ARMOR, AND REGALIA" in brief
-    assert "blackened articulated plate with worn old-gold inlay" in normalized
-    assert "tarnished pale-gold lamellar" in normalized
-    assert "Golden armor is welcome" in normalized
-    assert "narrow controlled highlights, darker joint recesses" in normalized
-    assert "MONUMENTAL CINEMATIC LOCATIONS" in brief
-    assert "cyclopean basalt cathedral beneath a broken oculus" in normalized
-    assert "drowned bell crypt lit through deep mineral water" in normalized
-    assert "storm observatory with physical rings surrounding an open roof" in normalized
-    assert "ENVIRONMENTAL SET-PIECE AND EVENT ENGINE" in brief
-    assert "exactly one dominant set-piece event" in normalized
-    assert "mechanical eclipse aperture closing across a pale skylight" in normalized
-    assert "exactly one dominant event and at most one subordinate" in normalized
-    assert "complete occupied body zone is dry, room-temperature, stable" in normalized
-    assert "filled with breathable air" in normalized
-    assert "no face, chest, pelvis, sexual contact, or breathing passage is submerged" in (
-        normalized
-    )
-    assert "Keep ash, dust, silt, sparks, rain, smoke, steam" in normalized
-    assert "several body lengths away and physically isolated" in normalized
-    assert "DEPTH, SILHOUETTE, AND VISUAL IMPACT" in brief
-    assert "Build every image in three readable layers" in normalized
-    assert "foreground threshold" in normalized
-    assert "midground containing the complete cast" in normalized
-    assert "background carrying monumental architecture" in normalized
-    assert "one strong graphic structure per image" in normalized
-    assert "one readable movement vector" in normalized
-    assert "POSE AND ACTION VARIETY" in brief
-    assert "walking through a descending oculus shaft" in normalized
-    assert "At Erotic level, use non-explicit adult intimacy" in normalized
-    assert "one clearly visible consensual adult sexual act already in progress" in (
-        normalized
-    )
-    assert "Within the first one hundred English words" in normalized
-    assert "within the first two sentences" in normalized
-    assert "which adult's penis is inside which adult's vagina or anus" in normalized
-    assert "generic \"point of contact\" does not satisfy Hardcore" in normalized
-    assert "one-hundred-word and first-two-sentence placement checks are silent" in (
-        normalized
-    )
-    assert "Never mention a word position, word threshold" in normalized
-    assert "LOW-SATURATION HIGH-CONTRAST CINEMATIC LIGHT AND COLOR LOCK" in brief
-    assert "dark-key, low-saturation, high-contrast, and narrow-gamut" in normalized
-    assert "At least eighty-five percent of the visible image" in normalized
-    assert "roughly sixty to seventy-five percent of the image" in normalized
-    assert "colored accent occupies at most five percent" in normalized
-    assert "Do not use saturated turquoise, electric cyan" in normalized
-    assert "CAMERA AND LIVE-ACTION FINISH" in brief
-    assert "24mm or 28mm environmental wide" in normalized
-    assert "35mm environmental portrait at eye level" in normalized
-    assert "50mm medium full-body shot" in normalized
-    assert "100mm or 135mm compressed architectural composition" in normalized
-    assert "one exact focal length from 24mm through 135mm" in normalized
-    assert "subtle cinematic grain and natural microcontrast" in normalized
-    assert "Across every ten Themes" in normalized
-    assert "at least eight distinct dominant set-piece events" in normalized
-    assert "at least six different three-layer depth designs" in normalized
-    assert "Within every rolling group of twelve Themes" in normalized
-    assert "Across a one-hundred-Theme run" in normalized
-    assert "No single frontal white-wing pose" in normalized
-    assert "NO-TEXT IMAGE CONTRACT" in brief
-    assert "Word counting is a silent authoring check" in normalized
-    assert "Use ASCII characters only in an English Frame" in normalized
-    assert "falls below 600 English words" in normalized
-    assert "calls any non-central person an angel" in normalized
-    assert "more than one winged person or more than one matched pair" in normalized
-    assert "uses alcohol, liquor, wine, beer, cocktails" in normalized
-    assert "leaves the environment static without one visible current event" in normalized
-    assert "lacks readable foreground, midground, and background depth" in normalized
-    assert "places intimacy in deep water, on wet or slippery support" in normalized
-    assert "finished visible live-action cinematic image" in normalized
+    missing = [text for text in required if text not in normalized]
+    assert not missing, missing
 
 
 def _legacy_motion_blur_photography_contract() -> None:
-    brief = load_story_document(
+    brief = story_contract(load_story_document(
         REPOSITORY_ROOT
-        / "story-inputs"
+        / "story-inputs" / "recipes"
         / "motion-blur-photography.yaml"
-    ).description
+    ))
     normalized = " ".join(brief.split())
 
-    assert brief.startswith("BRIEF\n\n")
-    assert "HIGHEST PRIORITY OUTPUT CONTRACT" in brief
     assert "one self-contained English paragraph of at least 700 words" in normalized
     assert "Target 850-1200 words" in normalized
     assert "Apply a final lexical render gate to the Frame" in normalized
@@ -4055,7 +4135,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "Concision means removing redundancy, never removing required information" in normalized
     assert "Do not shorten by omitting, generalizing, or merely implying" in normalized
     assert "background population, setting, camera, light, exposure" in normalized
-    assert "CAVEMAN OUTPUT MODE" in brief
     assert "compact, telegraphic image-prompt prose instead of literary narration" in normalized
     assert "short subject-verb-object clauses joined by semicolons" in normalized
     assert "Order visible facts first" in normalized
@@ -4073,7 +4152,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "exact adult age, exact height, body proportions" in normalized
     assert "chest and breast proportions as applicable" in normalized
     assert "Repeat that complete dossier independently in every Frame" in normalized
-    assert "COMPLETE PERSON DESCRIPTION IN EVERY FRAME" in brief
     assert "exact height in centimeters" in normalized
     assert "natural breast size, shape, projection" in normalized
     assert "face shape and mature facial anatomy" in normalized
@@ -4083,7 +4161,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "every piece of jewelry and every accessory" in normalized
     assert "one specific facial expression" in normalized
     assert "one complete current action or held pose" in normalized
-    assert "EXPRESSION LEDGER" in brief
     assert "one distinct, stable expression" in normalized
     assert "exact gaze target; eye openness and focus" in normalized
     assert "upper and lower eyelid tension" in normalized
@@ -4092,7 +4169,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "visible evidence of alertness, agency, response, and consent" in normalized
     assert "complementary but non-identical expressions" in normalized
     assert "Lock one expression for the entire exposure" in normalized
-    assert "WARDROBE, UNDRESSING, AND ACCESSORY LEDGER" in brief
     assert "one fixed wardrobe inventory for every primary adult" in normalized
     assert "eyeglasses or sunglasses, scarf or neckwear, jewelry" in normalized
     assert "every primary adult exactly one complete pair of footwear" in normalized
@@ -4120,15 +4196,12 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "A pullover T-shirt has no front opening, buttons, placket, or shirt cuffs" in normalized
     assert "A button-front dress shirt may open along its placket" in normalized
     assert "A slip dress uses straps rather than sleeves" in normalized
-    assert "EROTIC LEVEL" in brief
     assert "at least three of those five signals" in normalized
     assert "Bare breasts and nipples, cleavage, back, abdomen" in normalized
     assert "use a self-possessed held pose with deliberate adult self-touch" in normalized
     assert "every requested adult must participate in reciprocal contact" in normalized
     assert "Erotic Frames do not show genital close-ups" in normalized
-    assert "HARDCORE LEVEL" in brief
     assert "State the act near the beginning of the Frame" in normalized
-    assert "HARDCORE WARDROBE DISTRIBUTION" in brief
     assert "Partial clothing is the default Hardcore styling" in normalized
     assert "Do not choose full nudity merely because" in normalized
     assert "Plan the wardrobe distribution from the requested Hardcore Theme count" in normalized
@@ -4157,14 +4230,9 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert '"fully inserted," "visibly inserted," "fully visible penis,"' in normalized
     assert "Do not describe the glans in an inserted act" in normalized
     assert "sexual fluid remains a small, localized, sharp surface detail" in normalized
-    assert "MOTION MODE CONTRACT" in brief
-    assert "SUBJECT MOTION BLUR" in brief
-    assert "FLASH-FROZEN ACTION PEAK" in brief
-    assert "STILL ANCHOR, MOVING WORLD" in brief
     assert "The modes are mutually exclusive" in normalized
     assert "do not add independently moving crowds, weather, liquid, or thrown props" in normalized
     assert "Never write \"secondary motion,\" \"additional motion evidence,\"" in normalized
-    assert "MOTION NECESSITY AND SCENE CAUSALITY" in brief
     assert "Build the believable scene and current activity first" in normalized
     assert "Never add a moving object, weather condition, crowd behavior" in normalized
     assert "Because this visible current activity is happening" in normalized
@@ -4172,7 +4240,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "never introduce a bucket, glass, hose, splash, or spray only for motion" in normalized
     assert "do not give extras flashlights, lanterns, fabric, or choreographed gestures" in normalized
     assert "If deleting the moving element leaves the scene's activity unchanged" in normalized
-    assert "SCENE, MECHANICS, AND PHOTOGRAPHIC RESULT" in brief
     assert "Close three causal loops before writing" in normalized
     assert "Scene loop: location, operating state, weather, population" in normalized
     assert "Mechanics loop: every force must have a visible source" in normalized
@@ -4192,7 +4259,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "one of the image's two largest visual masses" in normalized
     assert "roughly thirty to seventy percent of the visible frame" in normalized
     assert "The viewer must recognize motion before reading facial or wardrobe detail" in normalized
-    assert "MOTION RECOGNIZABLE AT FIRST GLANCE" in brief
     assert "Choose one dominant motion-evidence carrier per Frame" in normalized
     assert "A subject action and its directly caused garment" in normalized
     assert "background adult group that translates, rotates, falls" in normalized
@@ -4258,7 +4324,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "glasses cannot be both on the face or head and described as removed" in normalized
     assert "Count physical emitting fixtures, not lighting roles" in normalized
     assert "A bank of four uplights counts as four sources" in normalized
-    assert "BACKGROUND POPULATION LEDGER" in brief
     assert "Every Theme and Frame must explicitly state the background population" in normalized
     assert "private, residential, secured, closed, or after-hours location" in normalized
     assert "quiet public location: two to five background adults" in normalized
@@ -4274,7 +4339,6 @@ def _legacy_motion_blur_photography_contract() -> None:
     assert "closure to ordinary public access" in normalized
     assert "informed consenting adult extras is invalid" in normalized
     assert "Render no legible sign, label, advertisement" in normalized
-    assert "LIGHTING LEDGER" in brief
     assert "exact number of active light sources" in normalized
     assert "exact position and height relative to the primary subjects" in normalized
     assert "approximate color temperature or precise hue" in normalized
@@ -4291,225 +4355,219 @@ def _legacy_motion_blur_photography_contract() -> None:
 
 
 def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT
-        / "story-inputs"
-        / "motion-blur-photography.yaml"
-    ).description
-    normalized = " ".join(brief.split())
-
-    assert brief.startswith("BRIEF\n\n")
-    assert "HIGHEST PRIORITY" in brief
-    assert "every moving element must be a necessary result" in normalized
-    assert "Never add a carrier, prop, person, light, or gesture" in normalized
-    assert "If the stated camera settings could not produce the described final image" in normalized
-    assert "one self-contained English paragraph of at least 700 words" in normalized
-    assert "Target 850-1200 words" in normalized
-    assert "short subject-verb-object clauses joined by semicolons" in normalized
-    assert "Theme count, Frame count, female count, male count" in normalized
-    assert "requested primary count" in normalized
-    assert "unmistakably mature adults aged 25 or older" in normalized
-    assert "MULTI-ADULT ROLE AND DEPTH TOPOLOGY" in brief
-    assert "When more than two primary adults are requested, build a private role ledger" in normalized
-    assert "record one current explicit role, exact partner or partners" in normalized
-    assert "every requested primary adult must directly perform or receive a named explicit act" in normalized
-    assert "does not by itself satisfy that role" in normalized
-    assert "For three adults, use one connected explicit-contact topology" in normalized
-    assert "For four or more adults, use either one connected topology or clearly separated explicit pairs" in normalized
-    assert "no primary adult is an assistant, spectator, or support-only participant" in normalized
-    assert "One anatomical part contacts only one receiving boundary" in normalized
-    assert "name left-to-right and near-to-far order" in normalized
-    assert "Place all required faces and decisive boundaries within the declared subject-depth slab" in normalized
-    assert "Do not place one pair meters behind another" in normalized
-    assert "For three or more adults, normally use a 35-50mm lens" in normalized
-    assert "Flash freezes motion; it never expands depth of field" in normalized
-
-    assert "PRIMARY ADULT DOSSIER" in brief
-    assert "exact age and height in centimeters" in normalized
-    assert "natural breast size, shape, projection" in normalized
-    assert "face shape; brow, eyes and color, nose, cheeks" in normalized
-    assert "exact skin color and undertone" in normalized
-    assert "one precise expression using gaze target" in normalized
-    assert "WARDROBE AND ITEM STATE" in brief
-    assert "one complete footwear pair" in normalized
-    assert "at least one non-jewelry signature item" in normalized
-    assert "Give every inventory item its own exact visible color" in normalized
-    assert "name base color, secondary color, trim, and pattern placement" in normalized
-    assert "name upper, sole, heel, hardware, and lace or strap colors" in normalized
-    assert "For jewelry, name metal color, gemstone color, and finish" in normalized
-    assert "For glasses or sunglasses, name frame, temple, hardware, and lens colors" in normalized
-    assert "For a scarf, name ground color, motif colors, border color, and weave sheen" in normalized
-    assert "Carry these colors unchanged through worn, displaced, removed, held, and airborne states" in normalized
-    assert "Never use matching, coordinated, dark, light, neutral, colorful, metallic" in normalized
-    assert "Every item has exactly one visible current state" in normalized
-    assert "A nude adult still has a complete removed-clothing" in normalized
-    assert "Removed clothing must look recently and naturally discarded" in normalized
-    assert "not folded or art-directed for display" in normalized
-    assert "Give each item an exact footprint, orientation, gravity-supported shape, wrinkles" in normalized
-    assert "Limited partial overlap is allowed only when every participating item" in normalized
-    assert "Never default to neatly folded, laid flat, stacked, aligned" in normalized
-    assert "Shoes need not form a tidy pair" in normalized
-    assert "Organized packing is allowed only when it is the visible current activity" in normalized
-    assert "One hand performs one task" in normalized
-
-    assert "ONE NECESSARY MOTION SYSTEM" in brief
-    assert "Natural fit outranks variety" in normalized
-    assert "If deleting the carrier leaves the activity unchanged" in normalized
-    assert "Do not combine carrier classes" in normalized
-    assert "Never pair an action-caused carrier with an independent environmental carrier" in normalized
-    assert "SUBJECT MOTION BLUR" in brief
-    assert "Use only for aesthetic or erotic content, not Hardcore" in normalized
-    assert "FLASH-FROZEN ACTION PEAK" in brief
-    assert "its owner has just finished removing that same garment" in normalized
-    assert "Do not add a scarf, shirt, jacket, underwear, or stocking solely so it can fly" in normalized
-    assert "Do not use required signature glasses, sunglasses, or a silk scarf as the airborne item" in normalized
-    assert "exposing only the neck, collarbone, or an accessory position is insufficient" in normalized
-    assert "Show that person's release as a visible current action in the same image" in normalized
-    assert "The carrier trail starts at that hand" in normalized
-    assert "If no primary adult visibly releases the garment, nothing is airborne" in normalized
-    assert "Never imply an unseen throw, an off-camera releaser" in normalized
-    assert "one unbroken visible causal chain from hand to trail to frozen garment" in normalized
-    assert "without an unexplained clear-air gap" in normalized
-    assert "A short trail cannot explain an object much farther from the hand" in normalized
-    assert "must use real side ties, side snaps" in normalized
-    assert "Never pull ordinary closed-loop underwear over occupied legs" in normalized
-    assert "must have cleared the exact anatomy, contact, or support boundary" in normalized
-    assert "Removing an upper garment merely to expose the torso during lower-body contact does not qualify" in normalized
-    assert "Never throw a filled bucket, ten liters of water" in normalized
-    assert "prefer installed showerheads, faucets, or tub spouts" in normalized
-    assert "Do not add a portable pitcher, bucket, or floating ceramic vessel" in normalized
-    assert "STILL ANCHOR, MOVING WORLD" in brief
-    assert "Do not give them handheld objects or choreographed gestures" in normalized
-    assert "one single-file line cannot fill a wide area" in normalized
-    assert "rather than merging incompatible places" in normalized
-    assert "roughly 30-70 percent of the frame" in normalized
-
-    assert "SCENE GENERATION AND DIVERSITY" in brief
-    assert "Build the scene before choosing the motion carrier" in normalized
-    assert "generative constraints, not a location menu" in normalized
-    assert "maximize meaningful setting diversity" in normalized
-    assert "Avoid the same family in adjacent Themes" in normalized
-    assert "Never assign location categories to fixed Theme IDs" in normalized
-    assert "Natural fit still outranks diversity" in normalized
-    assert "Plan the complete Theme batch before writing individual Themes" in normalized
-    assert "For every pair of Themes, make at least three of these materially different" in normalized
-    assert "Multiple rooms inside ordinary private residences remain one residential family" in normalized
-    assert "Do not repeat that family while another physically credible setting family remains unused" in normalized
-    assert "location was selected merely to host a convenient blur effect" in normalized
-    assert "SCENE AND MECHANICS" in brief
-    assert "Scene loop: location, operating state, time, weather" in normalized
-    assert "Mechanics loop: force has a visible source" in normalized
-    assert "Wet support requires visible non-slip texture" in normalized
-    assert "Keep every decisive contact boundary above opaque or agitated water" in normalized
-    assert "CAMERA, EXPOSURE, AND RECORDED RESULT" in brief
-    assert "Capture technique is non-rendered metadata, never visible scene content" in normalized
-    assert "Describe the complete visible scene first" in normalized
-    assert "use one compact method sentence explaining only how the image was made" in normalized
-    assert "Captured from a [height], [distance], [azimuth], [pitch] viewpoint" in normalized
-    assert "no capture apparatus is visible" in normalized
-    assert "Never give the capturing apparatus a visible location, material, support" in normalized
-    assert "do not write camera body, camera mounted, tripod, gimbal, flash head" in normalized
-    assert "Explain the viewpoint and incoming light, not where hardware stands" in normalized
-    assert "A closed production does not justify production gear in the image" in normalized
-    assert "State one exact virtual viewpoint for every Frame" in normalized
-    assert "sensor height above the supporting floor" in normalized
-    assert "distance to the nearest primary, horizontal azimuth around the cast" in normalized
-    assert "landscape or portrait orientation, lens-axis target" in normalized
-    assert "This describes image geometry, not a visible object" in normalized
-    assert "motion origin, complete visible carrier path, and landing or destination zone" in normalized
-    assert "Avoid foreshortening that collapses the hand-to-carrier distance" in normalized
-    assert "invisible viewpoint must correspond to a real, safe, accessible volume" in normalized
-    assert "stable support surface outside the frame" in normalized
-    assert "A locked camera is locked relative to one declared reference frame" in normalized
-    assert "unseen capture system safely to that same structure so subject distance and framing stay constant" in normalized
-    assert "an external stationary viewpoint records the cast translating" in normalized
-    assert "focal length, orientation, and crop must geometrically fit" in normalized
-    assert "Match viewpoint to motion mode" in normalized
-    assert "state pan pivot, start azimuth, end azimuth" in normalized
-    assert "view the release path from a clear side or oblique angle" in normalized
-    assert "compose the stable cast in one dominant depth layer" in normalized
-    assert "do not default every image to a front-facing camera at standing eye level" in normalized
-    assert "Shutter time and flash duration are different" in normalized
-    assert "plausible t.1 flash duration around 1/2000 to 1/10000 second" in normalized
-    assert "at least three stops below flash exposure" in normalized
-    assert "A tripod prevents camera shake; it does not freeze people" in normalized
-    assert "At shutter times slower than 1/4 second" in normalized
-    assert "a still-anchor shutter slower than 1/4 second must use a short flash" in normalized
-    assert "Without that flash, cap the shutter at 1/4 second" in normalized
-    assert "First-curtain flash puts the crisp image at the beginning" in normalized
-    assert "Rear-curtain flash puts the crisp image at the end" in normalized
-    assert "A stationary lamp reflected on a stationary floor does not streak" in normalized
-    assert "In STILL ANCHOR, every primary adult holds the single stated pose" in normalized
-    assert "Do not use rocking, grinding, thrusting, pumping, bouncing" in normalized
-    assert "only the selected environmental carrier moves" in normalized
-    assert "Claim sharpness only inside plausible depth of field" in normalized
-    assert "Use a large aperture and visibly shallow depth of field as the default visual language" in normalized
-    assert "prefer roughly f/1.4-f/2.8" in normalized
-    assert "use f/3.2-f/4 only when the necessary subject planes cannot otherwise remain readable" in normalized
-    assert "Do not default to f/5.6, f/8, or deeper focus" in normalized
-    assert "state the required neutral-density filtration" in normalized
-    assert "Every Frame must state one shallow depth-of-field design" in normalized
-    assert "name the exact focal plane, the nearest and farthest acceptably sharp subject features" in normalized
-    assert "Make the nearest primary eye or shared face plane critically sharp" in normalized
-    assert "it may enter a gentle focus transition rather than being falsely called tack-sharp" in normalized
-    assert "At least one substantial foreground or background plane is strongly optically soft" in normalized
-    assert "Describe optical defocus separately from carrier motion" in normalized
-    assert "Depth of field must actively stage the motion result" in normalized
-    assert "put the tracked nearest-eye or face plane at focus" in normalized
-    assert "keep the release hand, trajectory origin, and frozen carrier position on or very near the focal plane" in normalized
-    assert "The environmental carrier may sit well outside the depth of field" in normalized
-    assert "Never call an out-of-focus environmental carrier crisp" in normalized
-    assert "State the camera-to-carrier distance and compare it with the declared near and far depth-of-field limits" in normalized
-    assert "An action carrier advertised as flash-frozen must intersect the acceptable focus range" in normalized
-    assert "described as optically soft directional motion, never as sharply resolved structure" in normalized
-    assert "sensor whose entire width is about 36 millimeters" in normalized
-
-    assert "LIGHTING" in brief
-    assert "For visible practical scene lights, state the exact number of real emitting fixtures" in normalized
-    assert "A bank of four lamps counts as four sources" in normalized
-    assert "Describe non-rendered capture illumination only as incoming light" in normalized
-    assert "broad or narrow illumination pattern" in normalized
-    assert "Do not name or locate hardware, a modifier, or an equivalent device" in normalized
-    assert "Visible practical emitters belong to the environment; capture illumination does not" in normalized
-    assert "BACKGROUND POPULATION" in brief
-    assert "A normally operating public place in Beijing or any other stated city" in normalized
-    assert "closed, access-controlled production" in normalized
-    assert "CONTENT LEVEL" in brief
-    assert "Separate Erotic from Hardcore by the visible action boundary" in normalized
-    assert "Full nudity can be Erotic; partial clothing can be Hardcore" in normalized
-    assert "make the adult sexual charge unmistakable and high intensity" in normalized
-    assert "Erotic may use coherent provocative clothing, partial nudity, or full nudity" in normalized
-    assert "The boundary is the depicted action, not clothing coverage" in normalized
-    assert "Hardcore uses only FLASH-FROZEN ACTION PEAK or STILL ANCHOR" in normalized
-    assert "An explicit act already in progress is mandatory" in normalized
-    assert "does not qualify as Hardcore" in normalized
-    assert "Undressing before a future act, preparing access, approaching anatomy" in normalized
-    assert "must depict the explicit contact now, not merely promise it" in normalized
-    assert "Do not enforce a clothing quota or clothing default at Hardcore level" in normalized
-    assert "Choose full nudity, partial dress, or active undressing solely from the scene" in normalized
-    assert "Do not add garments to soften Hardcore content or distinguish it from Erotic" in normalized
-    assert "at least 75 percent of Themes" not in normalized
-    assert "at most 25 percent may make all primary adults nude" not in normalized
-    assert "THEMES AND FINAL AUDIT" in brief
-    assert "Reject a Theme before generating any Frame" in normalized
-    assert "title, premise, and style all name the same single mode and carrier" in normalized
-    assert "reject the Theme unless its premise states the explicit act as current contact" in normalized
-    assert "reject the Theme unless every adult has a named direct explicit role" in normalized
-    assert "Reject any Theme whose wardrobe inventory uses a pile, heap, bundle, scattered items" in normalized
-    assert "neatly folded garments, display-like alignment, unexplained overlap" in normalized
-    assert "Reject a Theme style when a still-anchor shutter slower than 1/4 second omits the required short flash" in normalized
-    assert "defaults to f/5.6 or a smaller aperture without a concrete focus-geometry reason" in normalized
-    assert "flash-frozen carrier falls wholly outside its declared depth-of-field limits" in normalized
-    assert "out-of-focus environmental carrier is called crisp" in normalized
-    assert "The title names one motion idea, not \"X and Y,\"" in normalized
-    assert "For a FLASH-FROZEN Theme" in normalized
-    assert "For a STILL ANCHOR Theme" in normalized
-    assert "Every secondary route, weather effect, fluid system, powered system" in normalized
-    assert "Do not mix a private interior with an ordinarily operating public exterior" in normalized
-    assert "Do not call a constructed replica functioning public infrastructure" in normalized
-    assert "scene loop and mechanics loop pass ordinary-life logic" in normalized
-    assert "Finally search the draft for pile, heap, bundle, scattered" in normalized
-    assert "For removed-item placement, also search for neatly folded, folded into a rectangle" in normalized
-    assert "Do not reject a waistband folded over itself" in normalized
-    assert "those are physical post-removal shapes, not organized storage" in normalized
-    assert "Silently reject and rewrite any Frame that fails one check" in normalized
+    document = load_story_document(RECIPES / "motion-blur-photography.yaml")
+    normalized = " ".join(story_contract(document).split())
+    assert document.generation.output_language == "english"
+    assert set(document.requirements.output_languages) == {"english"}
+    checks = {check.type: check for check in document.validation.frames.checks}
+    assert "ascii" in checks
+    assert checks["word_count"].min_words == 700
+    assert checks["word_count"].max_words is None
+    for requirement in (
+        "每个运动元素都必须是地点与当前活动的必然结果",
+        "绝不只为让图像显得有动感而添加载体、道具、人物、光线或手势",
+        "若所述相机设置无法产生描述的最终图像",
+        "每个画帧返回为一个自足的英文段落，不少于 700 词",
+        "目标为 850-1200 词",
+        "优先用分号连接简短主谓宾分句",
+        "主题数、画帧数、女性数、男性数",
+        "请求中的主要人物数量",
+        "明显成熟、年龄不低于 25 岁的成年人",
+        "请求超过两名主要成年人时，在写主题或画帧前建立内部角色台账",
+        "记录一个当前明确角色、精确的一名或多名搭档",
+        "每名请求中的主要成年人都必须在拍摄瞬间直接执行或接受一个指名的露骨行为",
+        "本身都不能满足该角色",
+        "三人时，使用一个相连的露骨接触拓扑",
+        "四人或更多时，使用一个相连拓扑或明确分开的露骨配对",
+        "没有主要成年人仅是助手、旁观者或只承担支撑的参与者",
+        "一个身体部位只在一个画面位置接触一个接受方边界",
+        "指明从左到右及由近到远的顺序",
+        "把所有必需面部和关键边界放在声明的主体深度层内",
+        "不要把一对放在另一对后方数米处",
+        "三名或更多成年人时，通常使用 35-50mm 镜头",
+        "闪光凝固运动，绝不扩展景深",
+        "精确年龄和以厘米为单位的身高",
+        "自然乳房大小、形状、前突程度",
+        "脸型；眉部、眼睛及其颜色、鼻子、脸颊",
+        "精确肤色与底色",
+        "一个精确表情，通过视线目标",
+        "一整双鞋",
+        "至少一件从眼镜、太阳镜或丝巾中选取的非首饰标志物",
+        "清单中每件物品都要有其精确可见颜色",
+        "指明底色、辅色、饰边以及存在时的图案位置",
+        "鞋面、鞋底、鞋跟、五金件、鞋带或系带颜色",
+        "对首饰，指明金属色、宝石色和表面质感",
+        "对眼镜或太阳镜，指明镜框、镜腿、五金件和镜片颜色",
+        "对围巾，指明底色、纹样颜色、边框颜色和织物光泽",
+        "这些颜色在穿戴、移位、脱下、手持和腾空状态中保持不变",
+        '绝不以 "matching"、"coordinated"、"dark"、"light"、"neutral"、'
+        '"colorful"、"metallic" 或 "same color" 代替实际颜色名称',
+        "每件物品恰好具有一种可见当前状态",
+        "裸体成年人仍有完整的已脱衣物和鞋履清单",
+        "脱下的衣物必须看起来是画中脱衣动作刚刚自然丢下的",
+        "而非为陈列折叠或刻意布置",
+        "为每件物品给出精确占地范围、朝向、重力支撑形状、褶皱",
+        "只有每件参与物品和重叠边界都仍明确可辨时，才允许有限的局部重叠",
+        '绝不默认采用 "neatly folded"、"laid flat"、"stacked"、"aligned"',
+        "鞋不必整齐成双",
+        "只有整理打包本身是可见当前活动时才允许有序收纳",
+        "一只手只执行一个任务",
+        "自然适配优先于多样性",
+        "若删除载体后活动不变",
+        "不要混合载体类别",
+        "绝不把动作引起的载体与独立环境载体配对",
+        "只有所属者刚刚脱完同一件衣物",
+        "不要只为让它飞起而添加围巾、衬衫、夹克、内衣或长袜",
+        "不要仅因必需的标志性眼镜、太阳镜或丝巾已在清单中，就把它们用作腾空物",
+        "只露出颈部、锁骨或配饰位置并不足够",
+        "在同一图像中，将此人的松手呈现为可见当前动作",
+        "载体拖迹从这只手开始",
+        "若没有主要成年人可见地松开衣物，就不能有腾空物",
+        "绝不暗示不可见的投掷、画外释放者",
+        "从手到拖迹再到凝固衣物的一条不间断可见因果链",
+        "中间没有无法解释的清晰空气间隙",
+        "短拖迹不能解释离手远得多的物体",
+        "必须使用真实侧系带、侧按扣",
+        "绝不把普通闭环内衣从被占用的腿",
+        "必须已将衣物移开当前露骨行为所用的精确身体部位、接触边界或支撑边界",
+        "下半身接触期间，仅为露出躯干而脱上装并不合格",
+        "绝不抛掷装满的水桶、十升水",
+        "优先使用其运行已属必要的固定淋浴头、水龙头或浴缸出水口",
+        "不要只为形成液体弧线而添加便携水壶、水桶或漂浮陶瓷容器",
+        "不要为制造拖迹而给他们手持物件或编排手势",
+        "单列队伍不能填满宽阔区域",
+        "而非合并不相容的地点",
+        "占画面约 30-70%",
+        "先建立场景，再选择运动载体",
+        "生成约束，不是地点菜单",
+        "尽量实现有意义的场景多样性",
+        "相邻主题避免同一类型",
+        "绝不将地点类别分配给固定主题 ID",
+        "自然适配仍优先于多样性",
+        "编写单个主题前规划完整主题批次",
+        "任意两个主题之间，以下方面至少三项实质不同",
+        "普通私人住宅内的多个房间仍属同一住宅类型",
+        "只要还有其他物理可信场景类型未使用，就不要重复该类型",
+        "若选择地点仅为容纳方便的模糊效果",
+        "场景回路：地点、运行状态、时间、天气",
+        "力学回路：力有可见来源",
+        "湿滑支撑需要可见防滑纹理",
+        "每个关键接触边界都保持在不透明或扰动水面之上",
+        "拍摄技术是非渲染元数据，绝不是可见场景内容",
+        "先描述完整可见场景",
+        "用一个紧凑的方法句，只解释图像如何拍成",
+        '"Captured from a [height], [distance], [azimuth], [pitch] viewpoint '
+        "with a [focal length] lens at [aperture], focused at [distance]; "
+        "a [shutter] ambient exposure records [carrier path]; "
+        "a [t.1 duration] off-frame pulse from [screen direction] freezes "
+        "[selected plane]; [ND strength when needed] controls ambient exposure; "
+        'no capture apparatus is visible."',
+        "绝不赋予拍摄装置可见位置、材质、支撑",
+        '不要写 "camera body"、"camera mounted"、"tripod"、"gimbal"、"flash head"',
+        "解释视点和入射光，而非硬件立在哪里",
+        "封闭制作并不能成为图像中出现制作器材的理由",
+        "每个画帧说明一个精确虚拟视点",
+        "传感器距支撑地板高度",
+        "到最近主要人物的距离、围绕人物的水平方位角",
+        "横幅或竖幅、镜头轴线目标",
+        "这描述图像几何，而非可见物体",
+        "运动起点、完整可见载体路径和落区或目的区域",
+        "避免压缩手到载体距离",
+        "不可见视点必须对应画外一个真实、安全、可到达的空间和稳定支撑表面",
+        "锁定相机相对于一个声明的参照系锁定",
+        "将不可见拍摄系统安全安装在同一结构上，使主体距离和取景保持恒定",
+        "外部静止视点会记录人物平移",
+        "焦距、画幅方向和裁切必须在几何上符合",
+        "使视点匹配运动模式",
+        "说明摇摄轴心、起始方位角、结束方位角",
+        "从清晰侧面或斜角观看释放路径",
+        "将稳定人物安排在一个主导深度层",
+        "不要默认每幅图像都是站立眼高的正面相机",
+        "快门时间和闪光时长不同",
+        "1/2000 至 1/10000 秒的合理 t.1 闪光时长",
+        "至少比闪光曝光低三档",
+        "三脚架防止相机抖动，但不能凝固人物",
+        "快门时间慢于 1/4 秒时",
+        "静止锚点模式快门慢于 1/4 秒时，必须对每名主要成年人使用短闪光",
+        "没有该闪光时，将快门时间上限设为 1/4 秒",
+        "前帘闪光把清晰影像放在拖迹开端",
+        "后帘闪光把清晰影像放在先前拖迹末端",
+        "静止灯映在静止地板上，不会仅因快门慢就产生拖迹",
+        '在 "STILL ANCHOR" 中，每名主要成年人在整个环境曝光期间保持所述唯一姿势',
+        '不要使用 "rocking"、"grinding"、"thrusting"、"pumping"、"bouncing"',
+        "只有选定环境载体运动",
+        "合理景深内声称清晰",
+        "默认视觉语言为大光圈和明显浅景深",
+        "优先约 f/1.4-f/2.8",
+        "只有必要主体平面无法以其他方式保持可读时才使用 f/3.2-f/4",
+        "不要仅为把每个细节都列为清晰，就默认 f/5.6、f/8 或更深景深",
+        "说明所需中性密度滤镜",
+        "每个画帧必须说明一个浅景深设计",
+        "指明精确焦平面、最近和最远可接受清晰的主体特征",
+        "使最近主要眼睛或共享面部平面极致清晰",
+        "可以进入轻柔对焦过渡，而非被虚称为刀锐般清晰",
+        "至少一个实质性的前景或背景平面必须明显光学柔化",
+        "将光学失焦与载体运动分开描述",
+        "景深必须主动组织运动结果",
+        "将被追踪的最近眼睛或面部平面置于焦点",
+        "使释放手、轨迹起点和凝固载体位置处于或非常靠近焦平面",
+        "环境载体可以远在景深之外",
+        '绝不将失焦环境载体称为 "crisp"',
+        "说明相机到载体的距离，并与声明的景深近界和远界比较",
+        "声称被闪光凝固的动作载体必须与可接受对焦范围相交",
+        "描述为光学柔化的方向性运动，绝不是清晰解析的结构",
+        "整幅宽度约 36 毫米的全画幅传感器",
+        "照明：",
+        "对于可见实景灯，说明真实发光灯具的精确数量",
+        "一组四盏灯算四个光源",
+        "将非渲染拍摄照明描述为入射光",
+        "宽广或狭窄照明形态",
+        "不要命名或定位硬件、控光附件或等效装置",
+        "可见实景发光体属于环境；拍摄照明不属于环境",
+        "北京或任何其他指定城市中正常营业的公共场所",
+        "封闭、出入受控的制作",
+        "以可见动作边界区分 erotic 与 hardcore",
+        "全裸也可以属于 erotic",
+        "部分着装也可以属于 hardcore",
+        "让成年人的性张力明确且强烈",
+        "erotic 可使用连贯的挑逗性服装、局部裸体或全裸",
+        "边界是所描绘的动作，而非衣物覆盖程度",
+        'hardcore 只使用 "FLASH-FROZEN ACTION PEAK" 或 "STILL ANCHOR, MOVING WORLD"',
+        "已经进行中的露骨行为是强制要求",
+        "不构成 hardcore",
+        "为未来行为脱衣、准备接触通道、靠近身体部位",
+        "必须描绘此刻的露骨接触，而非仅作承诺",
+        "hardcore 等级不强制服装配额或默认服装",
+        "完全根据场景和当前行为选择全裸、部分着装或正在脱衣",
+        "不要为弱化 hardcore 内容或将其与 erotic 内容区分而添加衣物",
+        "在生成任何画帧前否决主题",
+        "标题、设定和风格都指向同一个唯一模式与载体",
+        "否决设定未将露骨行为描述为当前接触",
+        "除非每人都有指名的直接露骨角色",
+        "服装清单若使用堆、垛、捆、散乱物品",
+        "整齐折叠衣物、陈列式对齐、无法解释的重叠",
+        "静止锚点模式快门慢于 1/4 秒却省略必需短闪光",
+        "没有具体对焦几何理由却默认 f/5.6 或更小光圈",
+        "闪光凝固载体完全位于声明的景深界限外",
+        "把失焦环境载体称为清晰",
+        '标题只命名一个运动创意，而非 "X and Y"',
+        '对于 "FLASH-FROZEN" 主题',
+        '对于 "STILL ANCHOR" 主题',
+        "每条次要通路、天气效果、流体系统、动力系统",
+        "不要把私人室内与正常运行的公共室外混合",
+        "不要把搭建的复制布景称为具有真实运行的在用公共基础设施",
+        "场景回路和力学回路通过日常生活逻辑检验",
+        '最后在草稿中搜索 "pile"、"heap"、"bundle"、"scattered"',
+        '对于脱下物品的摆放，还要搜索 "neatly folded"、"folded into a rectangle"',
+        "不要否决自身翻折的腰带",
+        "这些是脱下后的物理形状，不是有序收纳",
+        "任何画帧只要有一项未通过，就静默否决并重写",
+    ):
+        assert requirement in normalized, requirement
+    for excluded in (
+        "至少 75% 的主题",
+        "至少百分之七十五的主题",
+        "至多 25% 可以让所有主要成年人全裸",
+        "至多百分之二十五可以让所有主要成年人全裸",
+    ):
+        assert excluded not in normalized, excluded

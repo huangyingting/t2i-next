@@ -1,4 +1,4 @@
-"""Independent OpenAI-compatible structured-output adapter."""
+"""Independent transports for structured Themes and plain-text Frame batches."""
 
 from __future__ import annotations
 
@@ -404,7 +404,7 @@ class OpenAIStoryModel(StoryModel):
 
 
 class CopilotStoryModel(StoryModel):
-    """Generate typed story objects through GitHub Copilot."""
+    """Generate structured Themes and Frame text through GitHub Copilot."""
 
     def __init__(self, settings: StoryProviderSettings) -> None:
         self._model = CopilotStructuredModel(settings)

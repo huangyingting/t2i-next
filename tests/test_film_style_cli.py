@@ -26,7 +26,7 @@ def test_generate_defaults_semantic_validation_off() -> None:
 
     assert defaults["validate_themes"] is False
     assert defaults["validate_frames"] is False
-    assert defaults["theme_batch_size"] == 10
+    assert defaults["theme_batch_size"] == 5
 
 
 def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
@@ -58,6 +58,9 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
             profile_file=runs_directory / "film-run" / "profile.json",
             compiled_context_file=runs_directory / "film-run" / "compiled-context.txt",
             prompt_file=prompts_directory / "prompts.txt",
+            diversity_report_file=(
+                runs_directory / "film-run" / "diversity-report.json"
+            ),
         )
 
     monkeypatch.setattr(
@@ -126,6 +129,7 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     assert captured["prompts_directory"] == tmp_path / "prompts"
     assert "Run：film-run" in result.output
     assert "电影提示词：" in result.output
+    assert "多样性报告：" in result.output
 
 
 def test_generate_no_longer_accepts_brief_file() -> None:

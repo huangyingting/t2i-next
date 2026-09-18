@@ -9,6 +9,10 @@ from time import perf_counter
 
 from pydantic import BaseModel, ValidationError
 
+from t2i_film_style_pipeline.diversity import (
+    normalize_frame_anchor_prefix,
+    normalize_theme_anchor_terms,
+)
 from t2i_film_style_pipeline.errors import (
     FilmPromptRunIncompleteError,
     FilmStyleContractError,
@@ -319,6 +323,10 @@ class FilmPromptStudio:
                         strict=True,
                     ):
                         theme.theme_id = theme_id
+                candidate_themes = [
+                    normalize_theme_anchor_terms(request, theme)
+                    for theme in candidate_themes
+                ]
                 if (
                     expected_semantic_name is not None
                     and value.semantic_name != expected_semantic_name
@@ -469,6 +477,11 @@ class FilmPromptStudio:
                     strict=True,
                 ):
                     try:
+                        prose = normalize_frame_anchor_prefix(
+                            request,
+                            theme,
+                            prose,
+                        )
                         frame = NarrativeFrame(frame_id=frame_id, prose=prose)
                         if self._frame_validator is not None:
                             self._frame_validator(request, theme, frame)

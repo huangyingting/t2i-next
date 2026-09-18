@@ -3,9 +3,13 @@ from __future__ import annotations
 import pytest
 
 from t2i_story_pipeline import persistence, run_store
-from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import StoryStorageError
-from t2i_story_pipeline.models import ContentLevel, StoryStage, TokenUsage
+from t2i_story_pipeline.models import (
+    ContentLevel,
+    StoryRuntime,
+    StoryStage,
+    TokenUsage,
+)
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
     LocalStoryRunStore,
@@ -17,6 +21,7 @@ from t2i_story_pipeline.run_store import (
 from t2i_story_pipeline.storage import publish_story
 from tests.story_factories import (
     make_frame_sequence,
+    make_story_input,
     make_story_request,
     make_story_result,
     make_theme,
@@ -121,6 +126,55 @@ def test_prompt_file_output_stem_normalizes_filename_characters() -> None:
     )
 
 
+@pytest.mark.parametrize("source_prompt_stem", (None, "My Story.v1", "中文输入"))
+def test_compiled_input_preserves_direct_api_output_names(
+    tmp_path, source_prompt_stem
+) -> None:
+    request = make_story_request(
+        source_prompt_stem=source_prompt_stem,
+        prompt_filename_stem="custom output",
+        female_count=1,
+        male_count=0,
+    )
+    settings = StoryRunSettings(
+        provider=StoryProviderSettings(model="test-model"),
+        concurrency=2,
+        generation_retries=3,
+        theme_batch_size=4,
+        theme_output_tokens=1234,
+        frame_output_tokens=2345,
+        quality={
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {
+                        "type": "text_length",
+                        "field": "title",
+                        "min_chars": 2,
+                        "max_chars": 20,
+                    }
+                ],
+            },
+            "frames": {
+                "mode": "report",
+                "checks": [{"type": "ascii", "when_language": "english"}],
+            },
+        },
+    )
+    resolved = make_story_input(request, settings)
+    store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
+    created = store.create(resolved, settings)
+    restored = store.inspect(created.run_id)
+
+    assert resolved.request == request
+    assert restored.input == resolved
+    assert restored.manifest.settings == settings
+    assert resolved.runtime.model_dump() == settings.model_dump(
+        include=set(StoryRuntime.model_fields)
+    )
+    assert resolved.quality == settings.quality
+
+
 def test_durable_mkdir_fsyncs_every_created_directory_parent(
     tmp_path,
     monkeypatch,
@@ -190,8 +244,8 @@ def test_story_run_store_persists_checkpoints_attempts_and_completion(
         tmp_path / "runs",
         tmp_path / "prompts",
     )
-    rules = resolve_story_rules(request)
-    snapshot = store.create(request, settings, rules)
+    rules = make_story_input(request, settings).rules
+    snapshot = store.create(make_story_input(request, settings), settings)
     themes = [make_theme()]
     frames = make_frame_sequence()
 
@@ -285,11 +339,8 @@ def test_story_run_store_rejects_corrupt_checkpoint(tmp_path) -> None:
         tmp_path / "prompts",
     )
     request = make_story_request()
-    snapshot = store.create(
-        request,
-        StoryRunSettings(provider=StoryProviderSettings(model="test-model")),
-        resolve_story_rules(request),
-    )
+    settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
+    snapshot = store.create(make_story_input(request, settings), settings)
     theme_path = tmp_path / "runs" / snapshot.run_id / "themes" / "T001.json"
     theme_path.write_text(
         make_theme(2).model_dump_json(),
@@ -302,16 +353,13 @@ def test_story_run_store_rejects_corrupt_checkpoint(tmp_path) -> None:
 
 def test_story_run_store_rejects_changed_frozen_rules(tmp_path) -> None:
     request = make_story_request()
-    rules = resolve_story_rules(request)
+    rules = make_story_input(request).rules
     store = LocalStoryRunStore(
         tmp_path / "runs",
         tmp_path / "prompts",
     )
-    snapshot = store.create(
-        request,
-        StoryRunSettings(provider=StoryProviderSettings(model="test-model")),
-        rules,
-    )
+    settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
+    snapshot = store.create(make_story_input(request, settings), settings)
     changed_rules = rules.model_copy(
         update={"themes": (*rules.themes, "Changed after run creation.")}
     )
@@ -342,11 +390,8 @@ def test_story_run_listing_ignores_prompt_pipeline_runs(tmp_path) -> None:
 def partial_story_store(tmp_path):
     request = make_story_request(frames_per_theme=2)
     store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
-    snapshot = store.create(
-        request,
-        StoryRunSettings(provider=StoryProviderSettings(model="test-model")),
-        resolve_story_rules(request),
-    )
+    settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
+    snapshot = store.create(make_story_input(request, settings), settings)
     store.checkpoint_themes(snapshot.run_id, [make_theme()], "lost_luggage_reunion")
     frame = make_frame_sequence().frames[0]
     store.checkpoint_frame(snapshot.run_id, "T001", frame)
@@ -365,11 +410,13 @@ def test_partial_checkpoints_are_idempotent_and_cannot_be_replaced(partial_story
 
 def test_partial_sequences_cannot_be_published(partial_story_store):
     store, snapshot, _ = partial_story_store
-    result = make_story_result().model_copy(update={
-        "run_id": snapshot.run_id,
-        "request": snapshot.request,
-        "usage": TokenUsage(),
-    })
+    result = make_story_result().model_copy(
+        update={
+            "run_id": snapshot.run_id,
+            "request": snapshot.request,
+            "usage": TokenUsage(),
+        }
+    )
     with pytest.raises(StoryStorageError, match="Frame checkpoint 尚未完整"):
         store.complete(snapshot.run_id, result)
 

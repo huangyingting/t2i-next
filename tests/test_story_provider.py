@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock
 import httpx
 import pytest
 
-from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import (
     StoryProviderHTTPError,
     StoryProviderTruncatedOutputError,
@@ -25,6 +24,7 @@ from t2i_story_pipeline.provider import (
     StoryProviderSettings,
 )
 from tests.story_factories import (
+    make_story_input,
     make_story_request,
     make_theme,
     make_theme_batch,
@@ -33,9 +33,8 @@ from tests.story_factories import (
 
 def frame_messages(request, theme):
     return compile_frame_messages(
-        request,
+        make_story_input(request),
         theme,
-        resolve_story_rules(request),
         requested_frame_ids=[
             f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
         ],
@@ -43,11 +42,12 @@ def frame_messages(request, theme):
     )
 
 
-def theme_messages():
-    request = make_story_request(theme_count=2)
+def theme_messages(request=None):
+    request = request or make_story_request(theme_count=2)
     return compile_theme_messages(
-        request, resolve_story_rules(request),
-        count=2, existing_themes=[],
+        make_story_input(request),
+        count=2,
+        existing_themes=[],
     )
 
 
@@ -58,8 +58,12 @@ def test_story_provider_defaults_to_32768_output_tokens() -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("female_count", "male_count"),
+    [(None, None), (2, 0), (0, 2), (0, None), (None, 0)],
+)
 async def test_story_provider_returns_plain_text_without_schema(
-    monkeypatch,
+    monkeypatch, female_count, male_count
 ) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     captured = {}
@@ -91,7 +95,10 @@ async def test_story_provider_returns_plain_text_without_schema(
 
     response = await provider.generate_text(
         stage=StoryStage.FRAMES,
-        messages=frame_messages(make_story_request(), make_theme()),
+        messages=frame_messages(
+            make_story_request(female_count=female_count, male_count=male_count),
+            make_theme(),
+        ),
         max_output_tokens=10000,
     )
     await client.aclose()
@@ -99,6 +106,20 @@ async def test_story_provider_returns_plain_text_without_schema(
     assert response.text == "完整的单段画面正文。"
     assert response.usage.total_tokens == 12
     assert "response_format" not in captured
+    payload = json.loads(captured["messages"][1]["content"])
+    assert (
+        not {"cast_constraints", "female_count", "male_count", "cast"} & payload.keys()
+    )
+    cast = payload["input_context"]["plans"][0]["cast"]
+    assert cast["scope"] == "all_people"
+    assert cast["female_count"] == female_count
+    assert cast["male_count"] == male_count
+    assert cast["fixed_roles"] == []
+    assert cast["total"] == (
+        female_count + male_count
+        if female_count is not None and male_count is not None
+        else None
+    )
 
 
 @pytest.mark.asyncio
@@ -139,7 +160,13 @@ async def test_story_provider_rejects_truncated_plain_text(monkeypatch) -> None:
 
 
 @pytest.mark.asyncio
-async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
+@pytest.mark.parametrize(
+    ("female_count", "male_count"),
+    [(None, None), (2, 0), (0, 2), (0, None), (None, 0)],
+)
+async def test_story_provider_sends_strict_minimal_schema(
+    monkeypatch, female_count, male_count
+) -> None:
     monkeypatch.setenv("STORY_TEST_API_KEY", "secret")
     captured = {}
     sequence = make_theme_batch(count=2)
@@ -176,7 +203,11 @@ async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
 
     response = await provider.generate(
         stage=StoryStage.THEMES,
-        messages=theme_messages(),
+        messages=theme_messages(
+            make_story_request(
+                theme_count=2, female_count=female_count, male_count=male_count
+            )
+        ),
         response_model=response_model,
         max_output_tokens=10000,
     )
@@ -187,6 +218,21 @@ async def test_story_provider_sends_strict_minimal_schema(monkeypatch) -> None:
     assert captured["authorization"].startswith("Bearer ")
     assert captured["reasoning_effort"] == "none"
     assert "temperature" not in captured
+    payload = json.loads(captured["messages"][1]["content"])
+    assert (
+        not {"cast_constraints", "female_count", "male_count", "cast"} & payload.keys()
+    )
+    assert len(payload["input_context"]["plans"]) == 2
+    for plan in payload["input_context"]["plans"]:
+        assert plan["cast"]["scope"] == "all_people"
+        assert plan["cast"]["female_count"] == female_count
+        assert plan["cast"]["male_count"] == male_count
+        assert plan["cast"]["fixed_roles"] == []
+        assert plan["cast"]["total"] == (
+            female_count + male_count
+            if female_count is not None and male_count is not None
+            else None
+        )
     schema = captured["response_format"]["json_schema"]["schema"]
     assert schema["additionalProperties"] is False
     assert set(schema["required"]) == {"semantic_name", "themes"}

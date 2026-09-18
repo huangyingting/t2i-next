@@ -79,7 +79,8 @@ class FilmPromptProviderSettings(BaseModel):
     model: str
     thinking_mode: ThinkingMode | None = None
     reasoning_effort: ReasoningEffort | None = None
-    temperature: float = Field(default=0.5, ge=0, le=2)
+    theme_temperature: float = Field(default=0.85, ge=0, le=2)
+    frame_temperature: float = Field(default=0.6, ge=0, le=2)
     output_token_limit: int = Field(default=32768, ge=512, le=65536)
     timeout_seconds: float = Field(default=180, gt=0, le=600)
     transport_retries: int = Field(default=2, ge=0, le=8)
@@ -91,6 +92,11 @@ class FilmPromptProviderSettings(BaseModel):
         if self.thinking_mode is not None and self.reasoning_effort is not None:
             raise ValueError("thinking_mode 与 reasoning_effort 不能同时配置")
         return self
+
+    def temperature_for(self, stage: FilmPromptStage) -> float:
+        if stage == FilmPromptStage.THEMES:
+            return self.theme_temperature
+        return self.frame_temperature
 
 
 ResponseT = TypeVar("ResponseT", bound=BaseModel)
@@ -224,11 +230,8 @@ class OpenAIFilmPromptModel(FilmPromptModel):
                 },
             },
         }
-        if (
-            self._settings.thinking_mode is None
-            and self._settings.reasoning_effort is None
-        ):
-            payload["temperature"] = self._settings.temperature
+        if self._temperature_is_supported():
+            payload["temperature"] = self._settings.temperature_for(stage)
         if self._settings.thinking_mode is not None:
             payload["thinking"] = {"type": self._settings.thinking_mode.value}
         if self._settings.reasoning_effort is not None:
@@ -292,11 +295,8 @@ class OpenAIFilmPromptModel(FilmPromptModel):
                 self._settings.output_token_limit,
             ),
         }
-        if (
-            self._settings.thinking_mode is None
-            and self._settings.reasoning_effort is None
-        ):
-            payload["temperature"] = self._settings.temperature
+        if self._temperature_is_supported():
+            payload["temperature"] = self._settings.temperature_for(stage)
         if self._settings.thinking_mode is not None:
             payload["thinking"] = {"type": self._settings.thinking_mode.value}
         if self._settings.reasoning_effort is not None:
@@ -326,6 +326,13 @@ class OpenAIFilmPromptModel(FilmPromptModel):
                 validation_issues=(),
             )
         return TextModelResponse(text=content.strip(), usage=usage)
+
+    def _temperature_is_supported(self) -> bool:
+        return (
+            self._settings.thinking_mode is None
+            and self._settings.reasoning_effort
+            in {None, ReasoningEffort.NONE}
+        )
 
     async def _post(self, payload: dict[str, Any]) -> httpx.Response:
         url = f"{self._settings.base_url.rstrip('/')}/chat/completions"

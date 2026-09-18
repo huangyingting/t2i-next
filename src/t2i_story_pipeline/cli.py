@@ -3,31 +3,30 @@
 from __future__ import annotations
 
 import asyncio
+import json
+from enum import StrEnum
 from pathlib import Path
 
 import typer
 from pydantic import ValidationError
 
-from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.config import load_story_provider_settings
-from t2i_story_pipeline.documents import (
-    StoryDocument,
-    StoryGeneration,
-    load_story_document,
-)
 from t2i_story_pipeline.errors import (
     StoryConfigurationError,
     StoryPipelineError,
     StoryRunIncompleteError,
 )
+from t2i_story_pipeline.inputs import (
+    InputOverrides,
+    ResolvedStoryInput,
+    StoryDocument,
+    load_story_document,
+    resolve_story_input,
+)
 from t2i_story_pipeline.models import (
     ContentLevel,
     OutputLanguage,
     QualityMode,
-    StoryQualityPolicy,
-    StoryRequest,
-    StoryRuleSet,
-    StoryRuntime,
 )
 from t2i_story_pipeline.provider import (
     StoryProviderSettings,
@@ -165,102 +164,49 @@ def generate_command(
         file_okay=False,
         help="增量 checkpoint 和运行记录目录。",
     ),
-    rules_dir: Path | None = typer.Option(
+    assets_dir: Path | None = typer.Option(
         None,
-        "--rules-dir",
+        "--assets-dir",
         file_okay=False,
-        help="可选 story 用户规则目录；默认使用 story-inputs/rules/。",
+        help="显式模块与目录资产根；默认相对 YAML 文档所在目录。",
     ),
 ) -> None:
     """Generate themes and final narrative paragraphs from one story."""
     try:
-        document = _resolve_document(story, input_file)
-        generation = document.generation if document else StoryGeneration()
-        generation_overrides = {
-            key: value
-            for key, value in {
-                "theme_count": themes,
-                "frames_per_theme": frames,
-                "content_level": content_level,
-                "output_language": output_language,
-            }.items()
-            if value is not None
-        }
-        cast_overrides = {
-            key: value
-            for key, value in {
-                "female_count": female_count,
-                "male_count": male_count,
-            }.items()
-            if value is not None
-        }
-        generation = StoryGeneration.model_validate(
-            {
-                **generation.model_dump(),
-                **generation_overrides,
-                "cast": {**generation.cast.model_dump(), **cast_overrides},
-            }
-        )
-        description = document.description if document else story
-        if description is None:
-            raise AssertionError("story input resolution changed unexpectedly")
-        request = generation.request(description, document.id if document else None)
-        runtime = document.runtime if document else StoryRuntime()
-        runtime = StoryRuntime.model_validate(
-            {
-                **runtime.model_dump(),
-                **{
-                    key: value
-                    for key, value in {
-                        "concurrency": concurrency,
-                        "generation_retries": generation_retries,
-                        "theme_batch_size": theme_batch_size,
-                        "theme_output_tokens": theme_output_tokens,
-                        "frame_output_tokens": frame_output_tokens,
-                    }.items()
-                    if value is not None
-                },
-            }
-        )
-        quality = document.validation if document else StoryQualityPolicy()
-        quality = StoryQualityPolicy.model_validate(
-            {
-                stage: {
-                    **policy.model_dump(),
-                    **({"mode": mode} if mode is not None else {}),
-                }
-                for stage, policy, mode in (
-                    ("themes", quality.themes, theme_quality_mode),
-                    ("frames", quality.frames, frame_quality_mode),
-                )
-            }
-        )
-        default_rules_directory = Path("story-inputs") / "rules"
-        user_rules_directory = (
-            rules_dir
-            if rules_dir is not None
-            else (default_rules_directory if default_rules_directory.is_dir() else None)
-        )
-        rules = resolve_story_rules(
-            request,
-            user_directory=user_rules_directory,
-            authoring=document.authoring if document else None,
+        resolved = _resolve_input(
+            story,
+            input_file,
+            assets_dir,
+            InputOverrides(
+                theme_count=themes,
+                frames_per_theme=frames,
+                female_count=female_count,
+                male_count=male_count,
+                content_level=content_level,
+                output_language=output_language,
+                concurrency=concurrency,
+                generation_retries=generation_retries,
+                theme_batch_size=theme_batch_size,
+                theme_output_tokens=theme_output_tokens,
+                frame_output_tokens=frame_output_tokens,
+                theme_quality_mode=theme_quality_mode,
+                frame_quality_mode=frame_quality_mode,
+            ),
         )
         settings = StoryRunSettings(
             provider=load_story_provider_settings(),
-            **runtime.model_dump(),
-            quality=quality,
+            **resolved.runtime.model_dump(),
+            quality=resolved.quality,
         )
         if not any(
             policy.checks and policy.mode != QualityMode.OFF
-            for policy in (quality.themes, quality.frames)
+            for policy in (resolved.quality.themes, resolved.quality.frames)
         ):
             typer.echo("未启用可选质量检查；仅执行基础结构契约。")
         completed = asyncio.run(
             _generate(
-                request,
+                resolved,
                 settings,
-                rules,
                 runs_directory=runs_dir,
                 prompts_directory=prompts_dir,
             )
@@ -269,6 +215,85 @@ def generate_command(
         _exit_for_error(exc, runs_dir)
 
     _print_completed(completed)
+
+
+class ExplainFormat(StrEnum):
+    JSON = "json"
+    TEXT = "text"
+
+
+@app.command("explain")
+def explain_command(
+    story: str | None = typer.Argument(None),
+    input_file: Path | None = typer.Option(None, "--input"),
+    assets_dir: Path | None = typer.Option(None, "--assets-dir"),
+    themes: int | None = typer.Option(None, "--themes"),
+    frames: int | None = typer.Option(None, "--frames"),
+    female_count: int | None = typer.Option(None, "--female-count"),
+    male_count: int | None = typer.Option(None, "--male-count"),
+    content_level: ContentLevel | None = typer.Option(None, "--content-level"),
+    output_language: OutputLanguage | None = typer.Option(None, "--language"),
+    concurrency: int | None = typer.Option(None, "--concurrency"),
+    generation_retries: int | None = typer.Option(None, "--generation-retries"),
+    theme_batch_size: int | None = typer.Option(None, "--theme-batch-size"),
+    theme_output_tokens: int | None = typer.Option(None, "--theme-output-tokens"),
+    frame_output_tokens: int | None = typer.Option(None, "--frame-output-tokens"),
+    theme_quality_mode: QualityMode | None = typer.Option(None, "--theme-quality-mode"),
+    frame_quality_mode: QualityMode | None = typer.Option(None, "--frame-quality-mode"),
+    output_format: ExplainFormat = typer.Option(ExplainFormat.JSON, "--format"),
+) -> None:
+    """离线预检最终输入、来源和槽位计划；不读取 provider 配置或创建 run。"""
+    try:
+        resolved = _resolve_input(
+            story,
+            input_file,
+            assets_dir,
+            InputOverrides(
+                theme_count=themes,
+                frames_per_theme=frames,
+                female_count=female_count,
+                male_count=male_count,
+                content_level=content_level,
+                output_language=output_language,
+                concurrency=concurrency,
+                generation_retries=generation_retries,
+                theme_batch_size=theme_batch_size,
+                theme_output_tokens=theme_output_tokens,
+                frame_output_tokens=frame_output_tokens,
+                theme_quality_mode=theme_quality_mode,
+                frame_quality_mode=frame_quality_mode,
+            ),
+        )
+    except (ValidationError, StoryPipelineError, typer.BadParameter) as exc:
+        if output_format == ExplainFormat.JSON:
+            typer.echo(
+                json.dumps({"status": "invalid", "error": str(exc)}, ensure_ascii=False)
+            )
+        else:
+            typer.secho(f"输入无效：{exc}", fg=typer.colors.RED, err=True)
+        raise typer.Exit(2) from exc
+    if output_format == ExplainFormat.JSON:
+        typer.echo(
+            json.dumps(
+                {
+                    "status": "valid",
+                    "fingerprint": resolved.fingerprint(),
+                    "input": resolved.model_dump(mode="json"),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    else:
+        typer.echo(f"输入有效：{resolved.request.source_prompt_stem or '直接正文'}")
+        typer.echo(
+            f"主题：{resolved.request.theme_count}；每主题帧：{resolved.request.frames_per_theme}"
+        )
+        typer.echo(
+            f"规则：Theme {len(resolved.rules.themes)}；"
+            f"Frame {len(resolved.rules.frames)}"
+        )
+        typer.echo(f"计划槽位：{len(resolved.plans)}；指纹：{resolved.fingerprint()}")
 
 
 @app.command("resume")
@@ -336,10 +361,12 @@ def runs_command(
         )
 
 
-def _resolve_document(
+def _resolve_input(
     story: str | None,
     input_file: Path | None,
-) -> StoryDocument | None:
+    assets_dir: Path | None,
+    overrides: InputOverrides,
+) -> ResolvedStoryInput:
     if story is not None and input_file is not None:
         raise typer.BadParameter(
             "不能同时提供故事描述和 --input。",
@@ -350,13 +377,20 @@ def _resolve_document(
             "必须提供故事描述或 --input。",
             param_hint="STORY/--input",
         )
-    return load_story_document(input_file) if input_file is not None else None
+    if input_file is not None:
+        document = load_story_document(input_file)
+    else:
+        if story is None:
+            raise AssertionError("story input resolution changed unexpectedly")
+        document = StoryDocument(description=story)
+    return resolve_story_input(
+        document, overrides, asset_root=assets_dir, source_path=input_file
+    )
 
 
 async def _generate(
-    request: StoryRequest,
+    resolved: ResolvedStoryInput,
     settings: StoryRunSettings,
-    rules: StoryRuleSet,
     *,
     runs_directory: Path = Path("runs"),
     prompts_directory: Path = Path("prompts"),
@@ -367,9 +401,8 @@ async def _generate(
             model,
             store,
             settings,
-            rules,
             on_progress=typer.echo,
-        ).run(request)
+        ).run(resolved)
 
 
 async def _resume(
@@ -378,13 +411,11 @@ async def _resume(
     settings: StoryRunSettings,
     store: LocalStoryRunStore,
 ) -> CompletedStoryRun:
-    rules = store.inspect(run_id).rules
     async with story_model(provider) as model:
         return await StoryStudio(
             model,
             store,
             settings,
-            rules,
             on_progress=typer.echo,
         ).resume(run_id)
 

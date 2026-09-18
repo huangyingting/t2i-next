@@ -23,32 +23,24 @@ _STAGE_FILENAMES = {
 def resolve_story_rules(
     request: StoryRequest,
     *,
-    user_directory: Path | None = None,
     authoring: StoryAuthoring | None = None,
 ) -> StoryRuleSet:
-    """Compile the ordered system and optional user rules for a new run."""
+    """Compile core contracts and already selected authoring; never discover files."""
     system_directory = _require_directory(
         _SYSTEM_RULES_DIRECTORY,
         "story system rules directory",
-    )
-    resolved_user_directory = (
-        _require_directory(user_directory.resolve(), "story user rules directory")
-        if user_directory is not None
-        else None
     )
     return StoryRuleSet(
         themes=_compile(
             StoryStage.THEMES,
             request,
             system_directory,
-            resolved_user_directory,
             authoring or StoryAuthoring(),
         ),
         frames=_compile(
             StoryStage.FRAMES,
             request,
             system_directory,
-            resolved_user_directory,
             authoring or StoryAuthoring(),
         ),
     )
@@ -58,25 +50,30 @@ def _compile(
     stage: StoryStage,
     request: StoryRequest,
     system_directory: Path,
-    user_directory: Path | None,
     authoring: StoryAuthoring,
 ) -> tuple[str, ...]:
     rules = [
         rule
         for path in _selected_paths(system_directory, stage, request)
-        for rule in _read_rule_file(path, required=True)
+        for rule in _read_rule_file(path)
     ]
-    if user_directory is not None:
-        rules.extend(
-            rule
-            for path in _selected_paths(user_directory, stage, request)
-            for rule in _read_rule_file(path, required=False)
-        )
-    rules.extend(
+    stage_authoring = (
         authoring.themes if stage == StoryStage.THEMES else authoring.frames
     )
+    rules.extend(stage_authoring.selected(request.content_level))
     rules.append(_output_language_rule(request))
     return tuple(rules)
+
+
+def system_rule_sources(request: StoryRequest) -> tuple[Path, ...]:
+    """The exact packaged files used by the compiler, in stable first-use order."""
+    return tuple(
+        dict.fromkeys(
+            path
+            for stage in StoryStage
+            for path in _selected_paths(_SYSTEM_RULES_DIRECTORY, stage, request)
+        )
+    )
 
 
 def _selected_paths(
@@ -97,11 +94,9 @@ def _require_directory(path: Path, label: str) -> Path:
     return path
 
 
-def _read_rule_file(path: Path, *, required: bool) -> tuple[str, ...]:
+def _read_rule_file(path: Path) -> tuple[str, ...]:
     if not path.exists():
-        if required:
-            raise StoryConfigurationError(f"story rule file does not exist: {path}")
-        return ()
+        raise StoryConfigurationError(f"story rule file does not exist: {path}")
     if not path.is_file():
         raise StoryConfigurationError(f"story rule path is not a file: {path}")
     try:

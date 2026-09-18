@@ -13,6 +13,7 @@ from pydantic import ValidationError
 from t2i_spatial_pipeline.audit import run_spatial_audit
 from t2i_spatial_pipeline.catalog import cast_key_for_counts
 from t2i_spatial_pipeline.errors import SpatialPipelineError
+from t2i_spatial_pipeline.pose_reference_cli import app as pose_reference_app
 from t2i_spatial_pipeline.service import (
     build_scene_requests,
     generate_spatial_batch,
@@ -24,6 +25,7 @@ app = typer.Typer(
     help="生成覆盖完整空间 catalog、且必须经出图复核的提示词。",
     no_args_is_help=True,
 )
+app.add_typer(pose_reference_app, name="poses")
 
 
 @app.callback()

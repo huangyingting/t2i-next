@@ -1,0 +1,603 @@
+id: indoor-couple-poses
+entries:
+- id: pose-001
+  themes:
+  - 平躺仰卧，双膝弯曲，双脚大幅分开并踩稳。
+  frames:
+  - 平躺仰卧，双膝弯曲，双脚大幅分开并踩稳。
+- id: pose-002
+  themes:
+  - 平躺仰卧，双腿张开成宽阔的 V 形。
+  frames:
+  - 平躺仰卧，双腿张开成宽阔的 V 形。
+- id: pose-003
+  themes:
+  - 仰卧，双膝紧紧收向胸前。
+  frames:
+  - 仰卧，双膝紧紧收向胸前。
+- id: pose-004
+  themes:
+  - 仰卧，双脚踝在头后交叉。
+  frames:
+  - 仰卧，双脚踝在头后交叉。
+- id: pose-005
+  themes:
+  - 仰卧，用硬实枕头垫高髋部。
+  frames:
+  - 仰卧，用硬实枕头垫高髋部。
+- id: pose-006
+  themes:
+  - 仰卧于床边，双腿向下垂落。
+  frames:
+  - 仰卧于床边，双腿向下垂落。
+- id: pose-007
+  themes:
+  - 仰卧，双脚平踩，髋部抬起形成桥式。
+  frames:
+  - 仰卧，双脚平踩，髋部抬起形成桥式。
+- id: pose-008
+  themes:
+  - 仰卧，双腿向上伸直，指向天花板。
+  frames:
+  - 仰卧，双腿向上伸直，指向天花板。
+- id: pose-009
+  themes:
+  - 仰卧，双膝弯曲并向两侧打开。
+  frames:
+  - 仰卧，双膝弯曲并向两侧打开。
+- id: pose-010
+  themes:
+  - 仰卧，一条腿弯曲，另一条腿伸直。
+  frames:
+  - 仰卧，一条腿弯曲，另一条腿伸直。
+- id: pose-011
+  themes:
+  - 仰卧，双臂伸过头顶，双腿张开。
+  frames:
+  - 仰卧，双臂伸过头顶，双腿张开。
+- id: pose-012
+  themes:
+  - 仰卧，抱住双膝向内收向肩部。
+  frames:
+  - 仰卧，抱住双膝向内收向肩部。
+- id: pose-013
+  themes:
+  - 仰卧呈卧姿蝴蝶式，两脚脚底相贴。
+  frames:
+  - 仰卧呈卧姿蝴蝶式，两脚脚底相贴。
+- id: pose-014
+  themes:
+  - 仰卧，骨盆向上倾斜，下背部拱起。
+  frames:
+  - 仰卧，骨盆向上倾斜，下背部拱起。
+- id: pose-015
+  themes:
+  - 仰卧，双大腿紧贴，双膝弯曲。
+  frames:
+  - 仰卧，双大腿紧贴，双膝弯曲。
+- id: pose-016
+  themes:
+  - 侧卧，双膝向上收向胸前。
+  frames:
+  - 侧卧，双膝向上收向胸前。
+- id: pose-017
+  themes:
+  - 侧卧，上侧腿朝天花板高高抬起。
+  frames:
+  - 侧卧，上侧腿朝天花板高高抬起。
+- id: pose-018
+  themes:
+  - 侧卧，下侧腿伸直，上侧腿弯曲。
+  frames:
+  - 侧卧，下侧腿伸直，上侧腿弯曲。
+- id: pose-019
+  themes:
+  - 侧卧，双膝上下叠置并略微分开。
+  frames:
+  - 侧卧，双膝上下叠置并略微分开。
+- id: pose-020
+  themes:
+  - 侧卧，紧紧蜷成胎儿式姿态。
+  frames:
+  - 侧卧，紧紧蜷成胎儿式姿态。
+- id: pose-021
+  themes:
+  - 侧卧，脊柱弯成 C 形。
+  frames:
+  - 侧卧，脊柱弯成 C 形。
+- id: pose-022
+  themes:
+  - 侧卧，上侧腿向后勾起。
+  frames:
+  - 侧卧，上侧腿向后勾起。
+- id: pose-023
+  themes:
+  - 侧卧，将髋部挪到最边缘处。
+  frames:
+  - 侧卧，将髋部挪到最边缘处。
+- id: pose-024
+  themes:
+  - 侧卧，上侧腿交叉越过下侧腿。
+  frames:
+  - 侧卧，上侧腿交叉越过下侧腿。
+- id: pose-025
+  themes:
+  - 完全平趴俯卧，双腿并拢伸直。
+  frames:
+  - 完全平趴俯卧，双腿并拢伸直。
+- id: pose-026
+  themes:
+  - 俯卧，髋部下方放置一个枕头。
+  frames:
+  - 俯卧，髋部下方放置一个枕头。
+- id: pose-027
+  themes:
+  - 俯卧，一侧膝盖向上收向腰部。
+  frames:
+  - 俯卧，一侧膝盖向上收向腰部。
+- id: pose-028
+  themes:
+  - 俯卧，用叠放的枕头撑高髋部。
+  frames:
+  - 俯卧，用叠放的枕头撑高髋部。
+- id: pose-029
+  themes:
+  - 俯卧，双腿垂在床尾之外。
+  frames:
+  - 俯卧，双腿垂在床尾之外。
+- id: pose-030
+  themes:
+  - 俯卧，双臂向前伸展，双大腿分开。
+  frames:
+  - 俯卧，双臂向前伸展，双大腿分开。
+- id: pose-031
+  themes:
+  - 俯卧，用楔形枕抬高一侧髋部。
+  frames:
+  - 俯卧，用楔形枕抬高一侧髋部。
+- id: pose-032
+  themes:
+  - 俯卧，前额枕在交叠的双臂上。
+  frames:
+  - 俯卧，前额枕在交叠的双臂上。
+- id: pose-033
+  themes:
+  - 手膝四点支撑跪姿，背部深深向下凹弯。
+  frames:
+  - 手膝四点支撑跪姿，背部深深向下凹弯。
+- id: pose-034
+  themes:
+  - 手膝四点支撑跪姿，背部高高向上拱起。
+  frames:
+  - 手膝四点支撑跪姿，背部高高向上拱起。
+- id: pose-035
+  themes:
+  - 手膝四点支撑跪姿，胸部降低至床垫。
+  frames:
+  - 手膝四点支撑跪姿，胸部降低至床垫。
+- id: pose-036
+  themes:
+  - 手膝四点支撑跪姿，面部压在床上。
+  frames:
+  - 手膝四点支撑跪姿，面部压在床上。
+- id: pose-037
+  themes:
+  - 直身跪立，躯干竖直，双大腿大幅分开。
+  frames:
+  - 直身跪立，躯干竖直，双大腿大幅分开。
+- id: pose-038
+  themes:
+  - 跪姿，上身前倾并以前臂支撑。
+  frames:
+  - 跪姿，上身前倾并以前臂支撑。
+- id: pose-039
+  themes:
+  - 跪姿，前额触床，双臂伸展。
+  frames:
+  - 跪姿，前额触床，双臂伸展。
+- id: pose-040
+  themes:
+  - 跪姿，一侧膝盖在床上，另一只脚平踩稳。
+  frames:
+  - 跪姿，一侧膝盖在床上，另一只脚平踩稳。
+- id: pose-041
+  themes:
+  - 跪姿，双手抓住床头板以保持稳定。
+  frames:
+  - 跪姿，双手抓住床头板以保持稳定。
+- id: pose-042
+  themes:
+  - 跪姿，双手平贴前方墙面。
+  frames:
+  - 跪姿，双手平贴前方墙面。
+- id: pose-043
+  themes:
+  - 跪姿，髋部向后移向脚跟。
+  frames:
+  - 跪姿，髋部向后移向脚跟。
+- id: pose-044
+  themes:
+  - 宽幅蛙式跪姿，双膝相距很远。
+  frames:
+  - 宽幅蛙式跪姿，双膝相距很远。
+- id: pose-045
+  themes:
+  - 直身跪立，双手在下背后交握。
+  frames:
+  - 直身跪立，双手在下背后交握。
+- id: pose-046
+  themes:
+  - 跪姿，胸部抬起，背部呈优雅的弯曲。
+  frames:
+  - 跪姿，胸部抬起，背部呈优雅的弯曲。
+- id: pose-047
+  themes:
+  - 低蹲，双脚分别稳稳踩在两侧。
+  frames:
+  - 低蹲，双脚分别稳稳踩在两侧。
+- id: pose-048
+  themes:
+  - 蹲姿，脚跟平踩，双膝极大幅度地张开。
+  frames:
+  - 蹲姿，脚跟平踩，双膝极大幅度地张开。
+- id: pose-049
+  themes:
+  - 蹲姿，双手撑在膝盖上保持平衡。
+  frames:
+  - 蹲姿，双手撑在膝盖上保持平衡。
+- id: pose-050
+  themes:
+  - 深蹲，双大腿与床面平行。
+  frames:
+  - 深蹲，双大腿与床面平行。
+- id: pose-051
+  themes:
+  - 坐直，背部挺直，双膝向外弯曲。
+  frames:
+  - 坐直，背部挺直，双膝向外弯曲。
+- id: pose-052
+  themes:
+  - 坐直，双腿向前伸展并略微分开。
+  frames:
+  - 坐直，双腿向前伸展并略微分开。
+- id: pose-053
+  themes:
+  - 以坐姿向后斜倚，由双肘支撑。
+  frames:
+  - 以坐姿向后斜倚，由双肘支撑。
+- id: pose-054
+  themes:
+  - 坐直，双腿互相交扣，脚踝交叉。
+  frames:
+  - 坐直，双腿互相交扣，脚踝交叉。
+- id: pose-055
+  themes:
+  - 坐在椅子上，躯干向后倾斜。
+  frames:
+  - 坐在椅子上，躯干向后倾斜。
+- id: pose-056
+  themes:
+  - 坐姿，两脚脚底相贴，双膝下落打开。
+  frames:
+  - 坐姿，两脚脚底相贴，双膝下落打开。
+- id: pose-057
+  themes:
+  - 坐在支撑面边缘，双大腿大幅张开。
+  frames:
+  - 坐在支撑面边缘，双大腿大幅张开。
+- id: pose-058
+  themes:
+  - 坐姿，骨盆前倾，脊柱伸长。
+  frames:
+  - 坐姿，骨盆前倾，脊柱伸长。
+- id: pose-059
+  themes:
+  - 莲花式坐姿，身体后倾并由双手支撑。
+  frames:
+  - 莲花式坐姿，身体后倾并由双手支撑。
+- id: pose-060
+  themes:
+  - 坐直，胸部向前，肩部向后。
+  frames:
+  - 坐直，胸部向前，肩部向后。
+- id: pose-061
+  themes:
+  - 站立，双脚分开，从腰部向前弯身。
+  frames:
+  - 站立，双脚分开，从腰部向前弯身。
+- id: pose-062
+  themes:
+  - 站立，躯干前弯至与地面平行。
+  frames:
+  - 站立，躯干前弯至与地面平行。
+- id: pose-063
+  themes:
+  - 站立，一只脚抬高放在台阶或稳固凳子上。
+  frames:
+  - 站立，一只脚抬高放在台阶或稳固凳子上。
+- id: pose-064
+  themes:
+  - 站立，背部平贴墙面。
+  frames:
+  - 站立，背部平贴墙面。
+- id: pose-065
+  themes:
+  - 站立，双掌平贴墙面，位置高于头部。
+  frames:
+  - 站立，双掌平贴墙面，位置高于头部。
+- id: pose-066
+  themes:
+  - 站立并弯身，双腿在脚踝处交叉。
+  frames:
+  - 站立并弯身，双腿在脚踝处交叉。
+- id: pose-067
+  themes:
+  - 站立，躯干向一侧扭转。
+  frames:
+  - 站立，躯干向一侧扭转。
+- id: pose-068
+  themes:
+  - 踮脚站立，同时深深向前弯身。
+  frames:
+  - 踮脚站立，同时深深向前弯身。
+- id: pose-069
+  themes:
+  - 直立，一侧膝盖向上弯曲并靠向胸前。
+  frames:
+  - 直立，一侧膝盖向上弯曲并靠向胸前。
+- id: pose-070
+  themes:
+  - 站立，双手抓住脚踝，头部低下。
+  frames:
+  - 站立，双手抓住脚踝，头部低下。
+- id: pose-071
+  themes:
+  - 站立，一条腿从膝部向上勾起。
+  frames:
+  - 站立，一条腿从膝部向上勾起。
+- id: pose-072
+  themes:
+  - 站立，双脚大幅分开，身体略向后倾。
+  frames:
+  - 站立，双脚大幅分开，身体略向后倾。
+- id: pose-073
+  themes:
+  - 直身跪立，双手平放在大腿上。
+  frames:
+  - 直身跪立，双手平放在大腿上。
+- id: pose-074
+  themes:
+  - 仰卧，脚尖绷直，大腿内侧露出。
+  frames:
+  - 仰卧，脚尖绷直，大腿内侧露出。
+- id: pose-075
+  themes:
+  - 仰卧，双臂举过头顶并被手按住。
+  frames:
+  - 仰卧，双臂举过头顶并被手按住。
+- id: pose-076
+  themes:
+  - 仰卧，下段脊柱下方垫着卷起的毛巾。
+  frames:
+  - 仰卧，下段脊柱下方垫着卷起的毛巾。
+- id: pose-077
+  themes:
+  - 侧卧，一只手臂向后伸出以拉住一条腿。
+  frames:
+  - 侧卧，一只手臂向后伸出以拉住一条腿。
+- id: pose-078
+  themes:
+  - 俯卧，双腿张开成宽大的菱形。
+  frames:
+  - 俯卧，双腿张开成宽大的菱形。
+- id: pose-079
+  themes:
+  - 跪姿，双大腿紧紧贴在一起。
+  frames:
+  - 跪姿，双大腿紧紧贴在一起。
+- id: pose-080
+  themes:
+  - 蹲姿，以双脚前脚掌承重并保持平衡。
+  frames:
+  - 蹲姿，以双脚前脚掌承重并保持平衡。
+- id: pose-081
+  themes:
+  - 在桌上坐直，双大腿自然垂搭并张开。
+  frames:
+  - 在桌上坐直，双大腿自然垂搭并张开。
+- id: pose-082
+  themes:
+  - 仰卧，双腿搭在平衡球上。
+  frames:
+  - 仰卧，双腿搭在平衡球上。
+- id: pose-083
+  themes:
+  - 仰卧，双膝向上弯曲成菱形。
+  frames:
+  - 仰卧，双膝向上弯曲成菱形。
+- id: pose-084
+  themes:
+  - 侧卧，上侧腿由枕头支起。
+  frames:
+  - 侧卧，上侧腿由枕头支起。
+- id: pose-085
+  themes:
+  - 跪姿，面部转向一侧，脸颊贴在床上。
+  frames:
+  - 跪姿，面部转向一侧，脸颊贴在床上。
+- id: pose-086
+  themes:
+  - 站立，转头越过一侧肩膀向后看。
+  frames:
+  - 站立，转头越过一侧肩膀向后看。
+- id: pose-087
+  themes:
+  - 俯卧，腹部下方放置长枕以垫高。
+  frames:
+  - 俯卧，腹部下方放置长枕以垫高。
+- id: pose-088
+  themes:
+  - 仰卧，颈部由枕头支撑。
+  frames:
+  - 仰卧，颈部由枕头支撑。
+- id: pose-089
+  themes:
+  - 坐直，骨盆缓慢地绕圈摆动。
+  frames:
+  - 坐直，骨盆缓慢地绕圈摆动。
+- id: pose-090
+  themes:
+  - 跪姿，背部形成深深的内凹曲线。
+  frames:
+  - 跪姿，背部形成深深的内凹曲线。
+- id: pose-091
+  themes:
+  - 仰卧，双小腿高高抬起并分开。
+  frames:
+  - 仰卧，双小腿高高抬起并分开。
+- id: pose-092
+  themes:
+  - 仰卧，双臂环抱双膝并向内拉。
+  frames:
+  - 仰卧，双臂环抱双膝并向内拉。
+- id: pose-093
+  themes:
+  - 靠墙站立，双手在背后交握。
+  frames:
+  - 靠墙站立，双手在背后交握。
+- id: pose-094
+  themes:
+  - 跪姿，上身扭转朝向侧面。
+  frames:
+  - 跪姿，上身扭转朝向侧面。
+- id: pose-095
+  themes:
+  - 俯卧，髋部抬起，脚尖向内。
+  frames:
+  - 俯卧，髋部抬起，脚尖向内。
+- id: pose-096
+  themes:
+  - 坐姿，脊柱向前弓起，双膝大幅分开。
+  frames:
+  - 坐姿，脊柱向前弓起，双膝大幅分开。
+- id: pose-097
+  themes:
+  - 仰卧，双脚平压在一个支撑面上。
+  frames:
+  - 仰卧，双脚平压在一个支撑面上。
+- id: pose-098
+  themes:
+  - 跪姿，头部低下，双臂被固定在身体两侧。
+  frames:
+  - 跪姿，头部低下，双臂被固定在身体两侧。
+- id: pose-099
+  themes:
+  - 侧卧，背部紧贴边缘。
+  frames:
+  - 侧卧，背部紧贴边缘。
+- id: pose-100
+  themes:
+  - 站立，躯干直立，一条腿向侧面伸展。
+  frames:
+  - 站立，躯干直立，一条腿向侧面伸展。
+slots:
+- pose-001
+- pose-002
+- pose-003
+- pose-004
+- pose-005
+- pose-006
+- pose-007
+- pose-008
+- pose-009
+- pose-010
+- pose-011
+- pose-012
+- pose-013
+- pose-014
+- pose-015
+- pose-016
+- pose-017
+- pose-018
+- pose-019
+- pose-020
+- pose-021
+- pose-022
+- pose-023
+- pose-024
+- pose-025
+- pose-026
+- pose-027
+- pose-028
+- pose-029
+- pose-030
+- pose-031
+- pose-032
+- pose-033
+- pose-034
+- pose-035
+- pose-036
+- pose-037
+- pose-038
+- pose-039
+- pose-040
+- pose-041
+- pose-042
+- pose-043
+- pose-044
+- pose-045
+- pose-046
+- pose-047
+- pose-048
+- pose-049
+- pose-050
+- pose-051
+- pose-052
+- pose-053
+- pose-054
+- pose-055
+- pose-056
+- pose-057
+- pose-058
+- pose-059
+- pose-060
+- pose-061
+- pose-062
+- pose-063
+- pose-064
+- pose-065
+- pose-066
+- pose-067
+- pose-068
+- pose-069
+- pose-070
+- pose-071
+- pose-072
+- pose-073
+- pose-074
+- pose-075
+- pose-076
+- pose-077
+- pose-078
+- pose-079
+- pose-080
+- pose-081
+- pose-082
+- pose-083
+- pose-084
+- pose-085
+- pose-086
+- pose-087
+- pose-088
+- pose-089
+- pose-090
+- pose-091
+- pose-092
+- pose-093
+- pose-094
+- pose-095
+- pose-096
+- pose-097
+- pose-098
+- pose-099
+- pose-100

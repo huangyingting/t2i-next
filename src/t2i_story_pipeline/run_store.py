@@ -23,6 +23,7 @@ from t2i_story_pipeline.errors import (
     StoryRunNotFoundError,
     StoryStorageError,
 )
+from t2i_story_pipeline.inputs import ResolvedStoryInput
 from t2i_story_pipeline.models import (
     NarrativeFrame,
     NarrativeFrameSequence,
@@ -163,6 +164,7 @@ class StoryRunManifest(_Model):
     updated_at: str
     settings: StoryRunSettings
     rules_fingerprint: str
+    input_fingerprint: str
     prompts_directory: str
     semantic_name: SemanticName | None = None
     prompt_file: str | None = None
@@ -197,6 +199,7 @@ class CompletedStoryRun:
 @dataclass(frozen=True, slots=True)
 class StoryRunSnapshot:
     run_id: str
+    input: ResolvedStoryInput
     request: StoryRequest
     rules: StoryRuleSet
     manifest: StoryRunManifest
@@ -239,10 +242,13 @@ class LocalStoryRunStore:
 
     def create(
         self,
-        request: StoryRequest,
+        resolved: ResolvedStoryInput,
         settings: StoryRunSettings,
-        rules: StoryRuleSet,
     ) -> StoryRunSnapshot:
+        resolved = ResolvedStoryInput.model_validate_json(resolved.model_dump_json())
+        self._check_input_settings(resolved, settings)
+        request = resolved.request
+        rules = resolved.rules
         if self._prompts_root is None:
             raise StoryStorageError("创建 story run 需要 prompts 目录")
         run_id = self._new_run_id()
@@ -256,6 +262,7 @@ class LocalStoryRunStore:
             updated_at=now,
             settings=settings,
             rules_fingerprint=rules.fingerprint(),
+            input_fingerprint=resolved.fingerprint(),
             prompts_directory=str(self._prompts_root),
         )
         try:
@@ -266,6 +273,9 @@ class LocalStoryRunStore:
             durable_mkdir(staging / "attempts")
             _write_json(staging / "request.json", request.model_dump(mode="json"))
             _write_json(staging / "rules.json", rules.model_dump(mode="json"))
+            _write_json(
+                staging / "resolved-input.json", resolved.model_dump(mode="json")
+            )
             _write_json(
                 staging / "manifest.json",
                 manifest.model_dump(mode="json"),
@@ -284,6 +294,7 @@ class LocalStoryRunStore:
             raise StoryStorageError(f"无法创建 story run：{exc}") from exc
         return StoryRunSnapshot(
             run_id=run_id,
+            input=resolved,
             request=request,
             rules=rules,
             manifest=manifest,
@@ -294,6 +305,9 @@ class LocalStoryRunStore:
     def inspect(self, run_id: str) -> StoryRunSnapshot:
         directory = self._run_directory(run_id)
         try:
+            resolved = ResolvedStoryInput.model_validate_json(
+                (directory / "resolved-input.json").read_text(encoding="utf-8")
+            )
             request = StoryRequest.model_validate_json(
                 (directory / "request.json").read_text(encoding="utf-8")
             )
@@ -307,6 +321,11 @@ class LocalStoryRunStore:
                 raise StoryStorageError(f"Run {run_id} 的 manifest run_id 不匹配")
             if rules.fingerprint() != manifest.rules_fingerprint:
                 raise StoryStorageError(f"Run {run_id} 的 rules.json 指纹不匹配")
+            if resolved.fingerprint() != manifest.input_fingerprint:
+                raise StoryStorageError(f"Run {run_id} 的输入快照指纹不匹配")
+            if resolved.request != request or resolved.rules != rules:
+                raise StoryStorageError(f"Run {run_id} 的输入快照与请求或规则不一致")
+            self._check_input_settings(resolved, manifest.settings)
             themes = self._load_themes(directory, request)
             frames = self._load_frames(directory, request, themes)
             if manifest.status == StoryRunStatus.COMPLETED:
@@ -319,6 +338,7 @@ class LocalStoryRunStore:
                 )
                 return StoryRunSnapshot(
                     run_id=run_id,
+                    input=resolved,
                     request=request,
                     rules=rules,
                     manifest=manifest,
@@ -332,12 +352,23 @@ class LocalStoryRunStore:
             raise StoryStorageError(f"Run {run_id} 的 checkpoint 损坏：{exc}") from exc
         return StoryRunSnapshot(
             run_id=run_id,
+            input=resolved,
             request=request,
             rules=rules,
             manifest=manifest,
             themes=themes,
             frames=frames,
         )
+
+    @staticmethod
+    def _check_input_settings(
+        resolved: ResolvedStoryInput, settings: StoryRunSettings
+    ) -> None:
+        runtime = StoryRuntime.model_validate(
+            settings.model_dump(exclude={"provider", "quality"})
+        )
+        if runtime != resolved.runtime or settings.quality != resolved.quality:
+            raise StoryStorageError("Story 运行设置与已解析输入不一致")
 
     def list_runs(self) -> StoryRunListing:
         if not self._runs_root.is_dir():
@@ -559,12 +590,9 @@ class LocalStoryRunStore:
             raise StoryStorageError("完成结果的 semantic_name 与 story run 不匹配")
         if len(snapshot.themes) != snapshot.request.theme_count:
             raise StoryStorageError("Theme checkpoint 尚未完整")
-        if (
-            len(snapshot.frames) != snapshot.request.theme_count
-            or any(
-                len(sequence.frames) != snapshot.request.frames_per_theme
-                for sequence in snapshot.frames.values()
-            )
+        if len(snapshot.frames) != snapshot.request.theme_count or any(
+            len(sequence.frames) != snapshot.request.frames_per_theme
+            for sequence in snapshot.frames.values()
         ):
             raise StoryStorageError("Frame checkpoint 尚未完整")
         expected_themes = [

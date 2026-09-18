@@ -8,12 +8,14 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from .catalog import (
     CASTS,
     TOPOLOGY_AUDIT_VERSION,
     PoseCatalog,
+    build_catalog,
+    entry_signature,
     pose_activity_issues,
 )
 from .compiler import (
@@ -24,11 +26,12 @@ from .compiler import (
     load_catalog,
     prompt_issues,
 )
+from .diagnostics import StructuralDiagnostics, accumulate_structural_diagnostics
 from .layers import CharacterProfile
 from .safety import SAFETY_POLICY_VERSION, SUPPORTED_CASTS
 from .service import ASSIGNMENT_ALGORITHM_VERSION, SceneRequest, build_scene_requests
 
-AUDIT_SCHEMA_VERSION = "1.2"
+AUDIT_SCHEMA_VERSION = "1.3"
 ProgressCallback = Callable[[str], None]
 
 
@@ -49,16 +52,22 @@ class AuditParameters(AuditModel):
 
 class CastAuditProgress(AuditModel):
     catalog_hash: str
+    definition_hash: str
+    catalog_matches_definition: bool = False
     retained_combinations: int = 0
     enabled_entries: int = 0
     completed_seeds: int = Field(default=0, ge=0)
     compiled_prompts: int = Field(default=0, ge=0)
+    reproducibility_checks: int = Field(default=0, ge=0)
     minimum_distinct_activities: int | None = None
+    structural_diagnostics: StructuralDiagnostics = Field(
+        default_factory=StructuralDiagnostics
+    )
     complete: bool = False
 
 
 class SpatialAuditProgress(AuditModel):
-    schema_version: Literal["1.2"] = AUDIT_SCHEMA_VERSION
+    schema_version: Literal["1.3"] = AUDIT_SCHEMA_VERSION
     fingerprint: str
     parameters: AuditParameters
     casts: dict[str, CastAuditProgress]
@@ -66,20 +75,16 @@ class SpatialAuditProgress(AuditModel):
     complete: bool = False
 
 
-def _catalog_hash(cast_key: str) -> str:
-    return hashlib.sha256(
-        (CATALOGS / f"{cast_key}.json").read_bytes()
-    ).hexdigest()
-
-
 def _audit_fingerprint(
     parameters: AuditParameters,
     catalog_hashes: dict[str, str],
+    definition_hashes: dict[str, str],
 ) -> str:
     payload = {
         "schema_version": AUDIT_SCHEMA_VERSION,
         "parameters": parameters.model_dump(mode="json"),
         "catalog_hashes": catalog_hashes,
+        "definition_hashes": definition_hashes,
     }
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
@@ -113,14 +118,21 @@ def _load_or_create_progress(
     path: Path,
     parameters: AuditParameters,
     catalog_hashes: dict[str, str],
+    definition_hashes: dict[str, str],
     *,
     restart: bool,
 ) -> SpatialAuditProgress:
-    fingerprint = _audit_fingerprint(parameters, catalog_hashes)
+    fingerprint = _audit_fingerprint(parameters, catalog_hashes, definition_hashes)
     if path.exists() and not restart:
-        progress = SpatialAuditProgress.model_validate_json(
-            path.read_text(encoding="utf-8")
-        )
+        try:
+            progress = SpatialAuditProgress.model_validate_json(
+                path.read_text(encoding="utf-8")
+            )
+        except ValidationError as exc:
+            raise ValueError(
+                f"audit checkpoint is invalid or has an incompatible schema: "
+                f"{path}; use --restart to replace it"
+            ) from exc
         if progress.fingerprint != fingerprint:
             raise ValueError(
                 f"audit checkpoint does not match current catalogs or options: "
@@ -131,7 +143,10 @@ def _load_or_create_progress(
         fingerprint=fingerprint,
         parameters=parameters,
         casts={
-            cast_key: CastAuditProgress(catalog_hash=catalog_hashes[cast_key])
+            cast_key: CastAuditProgress(
+                catalog_hash=catalog_hashes[cast_key],
+                definition_hash=definition_hashes[cast_key],
+            )
             for cast_key in parameters.cast_keys
         },
     )
@@ -216,7 +231,16 @@ def _audit_requests(
         activity.activity_id: activity for activity in catalog.activities
     }
     for request in requests:
-        entry = entries[(request.family, request.variant)]
+        if request.cast_key != catalog.cast_key:
+            raise ValueError(
+                f"{catalog.cast_key}:{request.scene_id} selected a different cast"
+            )
+        key = (request.family, request.variant)
+        if key not in entries:
+            raise ValueError(
+                f"{catalog.cast_key}:{request.scene_id} selected an unknown pose"
+            )
+        entry = entries[key]
         if request.activity_id not in entry.compatible_activity_ids:
             raise ValueError(
                 f"{catalog.cast_key}:{request.scene_id} selected an incompatible "
@@ -293,13 +317,24 @@ def run_spatial_audit(
         topology_audit_version=TOPOLOGY_AUDIT_VERSION,
         prompt_audit_version=PROMPT_AUDIT_VERSION,
     )
+    catalog_contents = {
+        cast_key: (CATALOGS / f"{cast_key}.json").read_bytes()
+        for cast_key in selected_casts
+    }
     catalog_hashes = {
-        cast_key: _catalog_hash(cast_key) for cast_key in selected_casts
+        cast_key: hashlib.sha256(content).hexdigest()
+        for cast_key, content in catalog_contents.items()
+    }
+    definitions = {cast_key: build_catalog(cast_key) for cast_key in selected_casts}
+    definition_hashes = {
+        cast_key: entry_signature(catalog.model_dump(mode="json"))
+        for cast_key, catalog in definitions.items()
     }
     progress = _load_or_create_progress(
         progress_path,
         parameters,
         catalog_hashes,
+        definition_hashes,
         restart=restart,
     )
     if progress.complete:
@@ -312,7 +347,19 @@ def run_spatial_audit(
         if cast_progress.complete:
             continue
         try:
-            catalog = load_catalog(cast_key)
+            catalog = PoseCatalog.model_validate_json(
+                catalog_contents[cast_key]
+            )
+            if catalog != definitions[cast_key]:
+                raise ValueError(
+                    f"{cast_key} packaged catalog differs from its code definition"
+                )
+            if load_catalog(cast_key) != catalog:
+                raise ValueError(
+                    f"{cast_key} cached catalog differs from packaged data; "
+                    "rerun the audit in a fresh process"
+                )
+            cast_progress.catalog_matches_definition = True
             character_profiles = _audit_character_profiles(catalog)
             if cast_progress.retained_combinations == 0:
                 (
@@ -327,11 +374,25 @@ def run_spatial_audit(
                     seed=seed,
                     count=scene_count,
                 )
+                replayed_requests = build_scene_requests(
+                    cast_key,
+                    seed=seed,
+                    count=scene_count,
+                )
+                if requests != replayed_requests:
+                    raise ValueError(
+                        f"{cast_key} seed {seed} scene allocation is not reproducible"
+                    )
                 distinct_activities = _audit_requests(
                     requests,
                     catalog,
                     scene_count,
                     character_profiles,
+                )
+                diagnostics = accumulate_structural_diagnostics(
+                    cast_progress.structural_diagnostics,
+                    catalog,
+                    requests,
                 )
                 current_minimum = cast_progress.minimum_distinct_activities
                 cast_progress.minimum_distinct_activities = (
@@ -341,6 +402,8 @@ def run_spatial_audit(
                 )
                 cast_progress.completed_seeds = offset + 1
                 cast_progress.compiled_prompts += len(requests)
+                cast_progress.reproducibility_checks += 1
+                cast_progress.structural_diagnostics = diagnostics
                 progress.last_error = None
                 _write_progress(progress_path, progress)
                 if on_progress is not None and (

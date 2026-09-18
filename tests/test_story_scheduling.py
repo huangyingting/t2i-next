@@ -5,7 +5,6 @@ import json
 
 import pytest
 
-from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import (
     StoryProviderHTTPError,
     StoryRunIncompleteError,
@@ -14,7 +13,12 @@ from t2i_story_pipeline.models import StoryStage
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import LocalStoryRunStore, StoryRunSettings
 from t2i_story_pipeline.studio import StoryStudio
-from tests.story_factories import make_frame_sequence, make_story_request, make_theme
+from tests.story_factories import (
+    make_frame_sequence,
+    make_story_input,
+    make_story_request,
+    make_theme,
+)
 from tests.test_story_studio import RoutedStoryModel, make_studio
 
 
@@ -58,9 +62,16 @@ class OverlappingStoryModel(RoutedStoryModel):
 @pytest.mark.asyncio
 async def test_frames_overlap_later_themes_under_one_global_limit(tmp_path):
     model = OverlappingStoryModel()
+    settings = StoryRunSettings(
+        provider=StoryProviderSettings(model="test-model"),
+        concurrency=2,
+        theme_batch_size=2,
+    )
     completed = await asyncio.wait_for(
-        make_studio(model, tmp_path, concurrency=2, theme_batch_size=2).run(
-            make_story_request(theme_count=4, frames_per_theme=1)
+        make_studio(model, tmp_path, settings=settings).run(
+            make_story_input(
+                make_story_request(theme_count=4, frames_per_theme=1), settings
+            )
         ),
         timeout=5,
     )
@@ -80,16 +91,15 @@ async def test_resume_overlaps_saved_theme_holes_with_new_themes(tmp_path):
         concurrency=2,
         theme_batch_size=2,
     )
-    rules = resolve_story_rules(request)
     store = LocalStoryRunStore(tmp_path / "runs", tmp_path / "prompts")
-    snapshot = store.create(request, settings, rules)
+    snapshot = store.create(make_story_input(request, settings), settings)
     store.checkpoint_themes(snapshot.run_id, [make_theme()], "lost_luggage_reunion")
     saved_frame = make_frame_sequence().frames[0]
     store.checkpoint_frame(snapshot.run_id, "T001", saved_frame)
 
     model = OverlappingStoryModel()
     completed = await asyncio.wait_for(
-        StoryStudio(model, store, settings, rules).resume(snapshot.run_id), timeout=5
+        StoryStudio(model, store, settings).resume(snapshot.run_id), timeout=5
     )
     assert model.overlap_observed.is_set()
     assert model.maximum_active == 2
@@ -115,14 +125,16 @@ async def test_theme_failure_drains_saved_work_and_resume_only_fills_gaps(tmp_pa
 
     request = make_story_request(theme_count=4, frames_per_theme=1)
     with pytest.raises(StoryRunIncompleteError) as failure:
+        settings = StoryRunSettings(
+            provider=StoryProviderSettings(model="test-model"),
+            concurrency=2,
+            theme_batch_size=2,
+            generation_retries=0,
+        )
         await asyncio.wait_for(
-            make_studio(
-                FailingLaterThemes(),
-                tmp_path,
-                concurrency=2,
-                theme_batch_size=2,
-                generation_retries=0,
-            ).run(request),
+            make_studio(FailingLaterThemes(), tmp_path, settings=settings).run(
+                make_story_input(request, settings)
+            ),
             timeout=5,
         )
     assert failure.value.missing_themes == 2
@@ -167,9 +179,16 @@ async def test_unexpected_producer_failure_cancels_workers_and_releases_lock(tmp
 
     model = BrokenProducer()
     with pytest.raises(ValueError, match="unexpected model bug"):
+        settings = StoryRunSettings(
+            provider=StoryProviderSettings(model="test-model"),
+            concurrency=2,
+            theme_batch_size=1,
+        )
         await asyncio.wait_for(
-            make_studio(model, tmp_path, concurrency=2, theme_batch_size=1).run(
-                make_story_request(theme_count=2, frames_per_theme=1)
+            make_studio(model, tmp_path, settings=settings).run(
+                make_story_input(
+                    make_story_request(theme_count=2, frames_per_theme=1), settings
+                )
             ),
             timeout=5,
         )
@@ -211,9 +230,16 @@ async def test_cancellation_stops_in_flight_theme_and_frame_calls(tmp_path):
             raise AssertionError("cancelled call returned")
 
     model = CancellablePipeline()
+    settings = StoryRunSettings(
+        provider=StoryProviderSettings(model="test-model"),
+        concurrency=2,
+        theme_batch_size=1,
+    )
     task = asyncio.create_task(
-        make_studio(model, tmp_path, concurrency=2, theme_batch_size=1).run(
-            make_story_request(theme_count=2, frames_per_theme=1)
+        make_studio(model, tmp_path, settings=settings).run(
+            make_story_input(
+                make_story_request(theme_count=2, frames_per_theme=1), settings
+            )
         )
     )
     try:

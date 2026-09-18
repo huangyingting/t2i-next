@@ -94,6 +94,7 @@ _HARDCORE_DISPLAY_EVIDENCE = (
     _HARDCORE_DESIRE_RESPONSE,
 )
 _NEGATED_CONTENT = re.compile(
+    r"非生殖器(?:的)?(?:直接)?(?:接触|互动)|"
     r"(?:不(?:再)?(?:出现|包含|呈现|展示|描写|描绘|涉及)|"
     r"不得(?:出现|包含|呈现|展示|描写|描绘|涉及)|没有|并无)"
     r"[^。；;\n]{0,120}(?:[。；;\n]|$)|"
@@ -115,7 +116,11 @@ _AESTHETIC_EVIDENCE = {
         ("皮肤或贴身轮廓", re.compile(r"裸露|皮肤|肩颈|肩线|锁骨|背部|腰线|贴身|敞开")),
         (
             "身体姿态张力",
-            re.compile(r"前倾|后仰|扭转|绷紧|肌肉|骨骼|身体张力|抬颌|弓身|跨坐"),
+            re.compile(
+                r"前倾|倾向|后仰|扭转|绷紧|肌肉|骨骼|身体张力|"
+                r"抬颌|弓身|跨坐|重心.{0,12}(?:落在|偏向)|"
+                r"(?:膝|手肘).{0,8}(?:微曲|弯曲)|脚尖.{0,8}(?:点地|支撑)"
+            ),
         ),
         (
             "回应式视线或接触",
@@ -123,7 +128,10 @@ _AESTHETIC_EVIDENCE = {
         ),
         (
             "皮肤或织物质地",
-            re.compile(r"受压|凹痕|褶皱|汗|水汽|潮湿|发丝|织物|粗布|皮革|床褥|温润|起栗"),
+            re.compile(
+                r"受压|凹痕|褶皱|汗|水汽|潮湿|发丝|织物|粗布|"
+                r"皮革|床褥|温润|起栗|丝绸|绸缎|纹理|材质|光泽"
+            ),
         ),
         (
             "身体明暗塑形",
@@ -175,6 +183,74 @@ _AESTHETIC_EVIDENCE = {
                 r"(?:skin|shoulder|neck|collarbone|muscle|curve|body)|"
                 r"\b(?:skin|shoulder|neck|collarbone|muscle|curve|body)"
                 r".{0,50}(?:light|highlight|shadow|warm|cool)\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+}
+_EROTIC_EVIDENCE = {
+    "chinese": (
+        (
+            "明显裸露或半解服装",
+            re.compile(
+                r"全裸|半裸|赤裸|裸露|袒露|上身仅着|"
+                r"衣襟.{0,8}(?:敞开|解开)|下装.{0,8}褪至|"
+                r"露出.{0,20}(?:肩|颈|锁骨|胸|背|腰|大腿)"
+            ),
+        ),
+        (
+            "实际非生殖器接触",
+            re.compile(
+                r"贴合|紧贴|相拥|拥抱|亲吻|吻住|跨坐|交叠|"
+                r"(?:掌心|手掌|嘴唇).{0,16}(?:贴|压|触|吻)"
+            ),
+        ),
+        (
+            "欲望或愉悦表情",
+            re.compile(
+                r"欲望|愉悦|喘息|迷离|潮红|媚眼|兴奋|享受|"
+                r"(?:眼睑|嘴唇|嘴角).{0,12}(?:半垂|微张|上扬)"
+            ),
+        ),
+        (
+            "皮肤或材质触觉",
+            re.compile(
+                r"汗|水汽|水珠|受压|凹痕|泛红|潮湿|湿润|"
+                r"褶皱|绷紧|陷入|皮肤.{0,12}(?:贴合|变形)"
+            ),
+        ),
+    ),
+    "english": (
+        (
+            "visible nudity or loosened clothing",
+            re.compile(
+                r"\b(?:fully nude|naked|bare skin|half-dressed|"
+                r"open robe|open shirt|lowered clothing)\b",
+                re.IGNORECASE,
+            ),
+        ),
+        (
+            "actual non-genital contact",
+            re.compile(
+                r"\b(?:presses? against|embraces?|kisses?|straddles?|"
+                r"intertwined|palm|lips).{0,40}(?:skin|shoulder|neck|"
+                r"chest|back|waist|hip|thigh)\b",
+                re.IGNORECASE,
+            ),
+        ),
+        (
+            "desire or pleasure expression",
+            re.compile(
+                r"\b(?:desire|pleasure|aroused|flushed|panting|"
+                r"half-lidded eyes|parted lips|raised mouth corner)\b",
+                re.IGNORECASE,
+            ),
+        ),
+        (
+            "skin or material tactility",
+            re.compile(
+                r"\b(?:sweat|steam|droplet|compressed|pressure mark|"
+                r"flushed skin|damp|wet|crease|indentation)\b",
                 re.IGNORECASE,
             ),
         ),
@@ -319,6 +395,13 @@ _CAMERA_EVIDENCE = {
         ),
     ),
 }
+_CLOTHING_STATE_CONFLICT = re.compile(
+    r"(?:衣襟|衣衫|上衣|肩带|丝绸面料).{0,16}"
+    r"(?:滑落|褪至|堆叠|堆在).{0,16}(?:手肘|手臂|肩头)|"
+    r"(?:滑落|褪至|堆叠|堆在).{0,16}(?:手肘|手臂)|"
+    r"完全赤裸[^。；;\n]{0,80}(?:仍穿|穿着|衣襟|衣袖|长袍|旗袍)",
+    re.IGNORECASE,
+)
 
 
 def _contains_explicit_sex(value: str) -> bool:
@@ -338,6 +421,33 @@ def _contains_hardcore_bdsm(value: str) -> bool:
             _HARDCORE_DISPLAY_EVIDENCE,
         )
     )
+
+
+def content_level_evidence_complete(
+    content_level: ContentLevel,
+    value: str,
+    output_language: str,
+) -> bool:
+    if content_level == ContentLevel.HARDCORE:
+        return _contains_explicit_sex(value) or _contains_hardcore_bdsm(value)
+    if content_level == ContentLevel.EROTIC:
+        return all(
+            pattern.search(value) is not None
+            for _, pattern in _EROTIC_EVIDENCE[output_language]
+        )
+    evidence = _AESTHETIC_EVIDENCE[output_language]
+    present = {
+        name for name, pattern in evidence if pattern.search(value) is not None
+    }
+    return (
+        len(present) >= 4
+        and evidence[0][0] in present
+        and evidence[-1][0] in present
+    )
+
+
+def contains_clothing_state_conflict(value: str) -> bool:
+    return _CLOTHING_STATE_CONFLICT.search(value) is not None
 
 
 @dataclass(frozen=True, slots=True)
@@ -391,6 +501,11 @@ class FilmStyleContentValidator:
             raise FilmStyleContractError(
                 f"{label} 使用了结论式合规话术；必须改为主动回握、"
                 "回应式视线、双向施力和各自支撑等可见事实"
+            )
+        if contains_clothing_state_conflict(prose):
+            raise FilmStyleContractError(
+                f"{label} 包含互斥衣物状态；衣袖和上衣不得滑落、褪至或"
+                "堆在手臂，完全赤裸时身体上不得仍穿衣物"
             )
         self._validate_content_level(request, prose, label=label)
         minimum_length = (
@@ -456,6 +571,19 @@ class FilmStyleContentValidator:
                     f"{label} 美学级感官证据不足：已满足 {len(present)}/5，"
                     "必须至少满足 4/5 且包含皮肤或贴身轮廓与身体明暗塑形；"
                     "缺少" + "、".join(missing)
+                )
+        elif request.content_level == ContentLevel.EROTIC:
+            evidence = _EROTIC_EVIDENCE[self.film_request.output_language]
+            missing = [
+                name
+                for name, pattern in evidence
+                if pattern.search(prose) is None
+            ]
+            if missing:
+                raise FilmStyleContractError(
+                    f"{label} 极致情色级感官证据不足；必须同时包含明显裸露或"
+                    "半解服装、实际非生殖器接触、欲望或愉悦表情，以及皮肤"
+                    "或材质触觉；缺少" + "、".join(missing)
                 )
 
     def _selected_anchors(

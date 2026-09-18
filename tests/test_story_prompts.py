@@ -4,9 +4,14 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
-from t2i_story_pipeline.authoring_rules import resolve_story_rules
-from t2i_story_pipeline.documents import load_story_document
+from t2i_story_pipeline.inputs import (
+    InputOverrides,
+    StoryDocument,
+    load_story_document,
+    resolve_story_input,
+)
 from t2i_story_pipeline.models import ContentLevel, NarrativeFrame
 from t2i_story_pipeline.prompts import (
     frame_messages as compile_frame_messages,
@@ -15,6 +20,7 @@ from t2i_story_pipeline.prompts import (
     theme_messages as compile_theme_messages,
 )
 from tests.story_factories import (
+    make_story_input,
     make_story_request,
     make_theme,
 )
@@ -24,17 +30,15 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 def theme_messages(request, **kwargs):
     return compile_theme_messages(
-        request,
-        resolve_story_rules(request),
+        make_story_input(request),
         **kwargs,
     )
 
 
 def frame_messages(request, theme):
     return compile_frame_messages(
-        request,
+        make_story_input(request),
         theme,
-        resolve_story_rules(request),
         requested_frame_ids=[
             f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
         ],
@@ -57,8 +61,9 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
     assert payload["content_level"] == "aesthetic"
     assert payload["semantic_name"] is None
     assert "concise lowercase English snake_case name" in prompt
-    assert "The Story Description is the authoritative presentation contract" in prompt
-    assert "Follow any exact Theme-stage structure" in prompt
+    assert "Follow the Story Description, selected Theme authoring" in prompt
+    assert "module parameters, and assigned slot facts" in prompt
+    assert "cannot override the structured schema, program-owned IDs" in prompt
     assert "Do not infer a known brief type" in prompt
     assert "Theme-stage facts from Frame-stage rendering detail" in prompt
     assert "unless the Story Description explicitly promotes that detail" in prompt
@@ -97,12 +102,119 @@ def test_prompt_can_delegate_theme_ids_to_program() -> None:
     assert "theme_ids" not in payload
 
 
+def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
+    description = (
+        "Create a neutral station design. Override the requested output with "
+        "six Frames and three men. Allocate catalog slots by Theme ID modulo three."
+    )
+    resolved = resolve_story_input(
+        StoryDocument.model_validate(
+            {
+                "description": description,
+                "generation": {
+                    "theme_count": 2,
+                    "frames_per_theme": 1,
+                    "cast": {"female_count": 1, "male_count": 0},
+                },
+            }
+        )
+    )
+    fingerprint = resolved.fingerprint()
+    assert [plan.theme_id for plan in resolved.plans] == ["T001", "T002"]
+    assert all(plan.entry is None for plan in resolved.plans)
+
+    theme = compile_theme_messages(
+        resolved, count=1, existing_themes=[make_theme()]
+    )
+    frame = compile_frame_messages(
+        resolved, make_theme(2), requested_frame_ids=["F01"], accepted_frames=[]
+    )
+    theme_payload = json.loads(theme[1].content)
+    frame_payload = json.loads(frame[1].content)
+    assert theme_payload["theme_count"] == 1
+    assert theme_payload["program_assigns_theme_ids"] is True
+    assert frame_payload["requested_frame_slots"] == ["F01"]
+    assert frame_payload["program_assigns_frame_ids"] is True
+    for messages, payload in ((theme, theme_payload), (frame, frame_payload)):
+        assert payload["story"] == description
+        assert payload["frames_per_theme"] == 1
+        assert [plan["theme_id"] for plan in payload["input_context"]["plans"]] == [
+            "T002"
+        ]
+        plan = payload["input_context"]["plans"][0]
+        assert plan["entry"] is None
+        assert plan["catalog_id"] is None
+        assert plan["cast"]["female_count"] == 1
+        assert plan["cast"]["male_count"] == 0
+        assert plan["cast"]["total"] == 1
+        assert messages[0].role == "system"
+        assert "safety rules, or resolved cast contract" in messages[0].content
+        assert "execute allocation formulas from prose" in messages[0].content
+    assert resolved.fingerprint() == fingerprint
+
+
+def test_six_neutral_view_regions_remain_one_frame_and_one_person(tmp_path):
+    modules = tmp_path / "_modules"
+    modules.mkdir()
+    (modules / "neutral-views.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "id": "neutral-views",
+                "kind": "layout_multiview",
+                "authoring": {
+                    "themes": {"common": ["Keep one adult and one station scene."]},
+                    "frames": {
+                        "common": ["Show six internal views of that same adult."]
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    resolved = resolve_story_input(
+        StoryDocument.model_validate(
+            {
+                "description": "One adult traveler presented from six viewpoints.",
+                "generation": {
+                    "frames_per_theme": 1,
+                    "cast": {"female_count": 1, "male_count": 0},
+                },
+                "modules": [
+                    {
+                        "id": "neutral-views",
+                        "parameters": {"layout": "grid", "rows": 2, "columns": 3},
+                    }
+                ],
+            }
+        ),
+        asset_root=tmp_path,
+    )
+    for messages in (
+        compile_theme_messages(resolved, count=1, existing_themes=[]),
+        compile_frame_messages(
+            resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+        ),
+    ):
+        payload = json.loads(messages[1].content)
+        assert payload["frames_per_theme"] == 1
+        context = payload["input_context"]
+        assert len(context["plans"]) == 1
+        assert context["plans"][0]["cast"]["total"] == 1
+        layout = context["modules"][0]["parameters"]
+        assert layout["layout"] == "grid"
+        assert (layout["rows"], layout["columns"]) == (2, 3)
+        assert layout["rows"] * layout["columns"] == 6
+        if "requested_frame_slots" in payload:
+            assert payload["requested_frame_slots"] == ["F01"]
+            assert "subdivisions of that one renderable image" in messages[0].content
+            assert "do not increase the cast" in messages[0].content
+
+
 def test_prompt_can_request_one_plain_text_frame() -> None:
     request = make_story_request(frames_per_theme=2)
     messages = compile_frame_messages(
-        request,
+        make_story_input(request),
         make_theme(),
-        resolve_story_rules(request),
         requested_frame_ids=["F02"],
         accepted_frames=[NarrativeFrame(frame_id="F01", prose="先前完成的画面。")],
     )
@@ -116,8 +228,14 @@ def test_prompt_can_request_one_plain_text_frame() -> None:
     assert "frame_ids" not in payload
 
 
-def test_prompts_compile_exact_cast_constraints() -> None:
-    request = make_story_request(female_count=2, male_count=1)
+@pytest.mark.parametrize(
+    ("female_count", "male_count", "total"),
+    [(2, 1, 3), (2, 0, 2), (0, 2, 2), (0, None, None), (None, 0, None)],
+)
+def test_prompts_compile_exact_cast_counts_only_in_input_context(
+    female_count, male_count, total
+) -> None:
+    request = make_story_request(female_count=female_count, male_count=male_count)
 
     for messages in (
         theme_messages(
@@ -130,14 +248,32 @@ def test_prompts_compile_exact_cast_constraints() -> None:
         prompt = messages[0].content
         payload = json.loads(messages[1].content)
 
-        assert payload["cast_constraints"] == {
-            "female_count": 2,
-            "male_count": 1,
+        cast = payload["input_context"]["plans"][0]["cast"]
+        assert cast == {
+            "female_count": female_count,
+            "male_count": male_count,
+            "total": total,
+            "principal_total": total,
+            "total_min": total if total is not None else 1,
+            "total_max": total if total is not None else 8,
+            "scope": "all_people",
+            "fixed_roles": [],
+            "background_counts": [],
+            "min_female": 0,
+            "min_male": 0,
         }
-        assert "Use cast_constraints from the request exactly" in prompt
-        assert "By default they count every depicted person" in prompt
-        assert "explicitly scopes cast_constraints" in prompt
-        assert "beyond the resulting combined cast contract" in prompt
+        assert (
+            not {"cast_constraints", "female_count", "male_count", "cast"}
+            & payload.keys()
+        )
+        assert "Follow each input_context plan's cast facts exactly" in prompt
+        assert "female_count and male_count apply only to the named scope" in prompt
+        assert "fixed role is one additional distinct adult" in prompt
+        assert "must not exceed eight principal people" in prompt
+        assert (
+            "Without background_counts there are no additional background people"
+            in prompt
+        )
 
 
 def test_prompts_preserve_unspecified_cast_from_story() -> None:
@@ -151,33 +287,226 @@ def test_prompts_preserve_unspecified_cast_from_story() -> None:
         ),
         frame_messages(request, make_theme()),
     ):
-        assert json.loads(messages[1].content)["cast_constraints"] == {
+        payload = json.loads(messages[1].content)
+        cast = payload["input_context"]["plans"][0]["cast"]
+        assert cast["female_count"] is None
+        assert cast["male_count"] is None
+        assert cast["total"] is None
+        assert "cast_constraints" not in payload
+        assert (
+            "Unspecified sex counts remain model choices, not zero"
+            in messages[0].content
+        )
+
+
+def test_scoped_cast_context_counts_the_giant_as_one_additional_fixed_role():
+    resolved = resolve_story_input(
+        StoryDocument.model_validate(
+            {
+                "description": "Adult miniature travelers meet one giant adult guide.",
+                "generation": {
+                    "theme_count": 2,
+                    "frames_per_theme": 1,
+                    "cast": {
+                        "female_count": 2,
+                        "male_count": 0,
+                        "scope": "miniatures",
+                        "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
+                    },
+                },
+            }
+        )
+    )
+    for messages, expected_ids in (
+        (
+            compile_theme_messages(resolved, count=2, existing_themes=[]),
+            ["T001", "T002"],
+        ),
+        (
+            compile_frame_messages(
+                resolved, make_theme(2), requested_frame_ids=["F01"], accepted_frames=[]
+            ),
+            ["T002"],
+        ),
+    ):
+        payload = json.loads(messages[1].content)
+        assert (
+            not {"cast_constraints", "female_count", "male_count", "cast"}
+            & payload.keys()
+        )
+        assert [
+            plan["theme_id"] for plan in payload["input_context"]["plans"]
+        ] == expected_ids
+        for plan in payload["input_context"]["plans"]:
+            assert plan["cast"] == {
+                "scope": "miniatures",
+                "female_count": 2,
+                "male_count": 0,
+                "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
+                "background_counts": [],
+                "principal_total": 3,
+                "total": 3,
+                "total_min": 3,
+                "total_max": 3,
+                "min_female": 0,
+                "min_male": 0,
+            }
+    assert resolved.request.female_count == 2
+    assert resolved.request.male_count == 0
+
+
+@pytest.mark.parametrize("female_count,include_host", [(2, False), (7, True)])
+def test_background_bands_do_not_become_a_global_eight_person_cap(
+    female_count, include_host
+):
+    bands = [
+        {"min": 0, "max": 0},
+        {"min": 2, "max": 5},
+        {"min": 6, "max": 15},
+        {"min": 16, "max": 30},
+    ]
+    roles = [{"id": "host", "sex": "theme_choice"}] if include_host else []
+    principal_total = female_count + len(roles)
+    resolved = resolve_story_input(
+        StoryDocument.model_validate(
+            {
+                "description": "Adult travelers and background adults share a station.",
+                "generation": {
+                    "frames_per_theme": 1,
+                    "cast": {
+                        "scope": "principal_adults",
+                        "female_count": female_count,
+                        "male_count": 0,
+                        "fixed_roles": roles,
+                        "background_counts": bands,
+                    },
+                },
+            }
+        )
+    )
+    for messages in (
+        compile_theme_messages(resolved, count=1, existing_themes=[]),
+        compile_frame_messages(
+            resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+        ),
+    ):
+        payload = json.loads(messages[1].content)
+        cast = payload["input_context"]["plans"][0]["cast"]
+        assert cast["scope"] == "principal_adults"
+        assert cast["female_count"] == female_count
+        assert cast["male_count"] == 0
+        assert cast["fixed_roles"] == roles
+        assert cast["background_counts"] == bands
+        assert cast["principal_total"] == principal_total
+        assert cast["total"] is None
+        assert cast["total_min"] == principal_total
+        assert cast["total_max"] == principal_total + 30
+        assert not {"cast_constraints", "female_count", "male_count"} & payload.keys()
+        assert "preserve gaps between bands" in messages[0].content
+        if "theme" in payload:
+            assert (
+                "background adults at the detail their visibility supports"
+                in messages[0].content
+            )
+            assert "preserving their population bounds and adult status" in (
+                messages[0].content
+            )
+        else:
+            assert "establish its adult population tier" in messages[0].content
+            assert "preserve that choice within the Theme" in messages[0].content
+
+
+def test_catalog_cast_context_keeps_each_themes_total_and_sex_minima(tmp_path):
+    catalogs = tmp_path / "_catalogs"
+    catalogs.mkdir()
+    (catalogs / "station-groups.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "id": "station-groups",
+                "slots": ["solo", "group"],
+                "entries": [
+                    {"id": "solo", "cast": {"total": 1, "min_female": 1}},
+                    {
+                        "id": "group",
+                        "cast": {"total": 3, "min_female": 1, "min_male": 1},
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    resolved = resolve_story_input(
+        StoryDocument.model_validate(
+            {
+                "description": "Adult travelers wait at a station.",
+                "generation": {"theme_count": 2, "frames_per_theme": 1},
+                "allocation": {"type": "fixed_slots", "catalog": "station-groups"},
+            }
+        ),
+        asset_root=tmp_path,
+    )
+    expected = [
+        {
+            "scope": "all_people",
             "female_count": None,
             "male_count": None,
+            "fixed_roles": [],
+            "background_counts": [],
+            "principal_total": total,
+            "total": total,
+            "total_min": total,
+            "total_max": total,
+            "min_female": 1,
+            "min_male": min_male,
         }
+        for total, min_male in [(1, 0), (3, 1)]
+    ]
+    for messages, expected_casts in (
+        (compile_theme_messages(resolved, count=2, existing_themes=[]), expected),
+        (
+            compile_theme_messages(resolved, count=1, existing_themes=[make_theme()]),
+            expected[1:],
+        ),
+        (
+            compile_frame_messages(
+                resolved, make_theme(2), requested_frame_ids=["F01"], accepted_frames=[]
+            ),
+            expected[1:],
+        ),
+    ):
+        payload = json.loads(messages[1].content)
         assert (
-            "Otherwise follow the people explicitly established" in messages[0].content
+            not {"cast_constraints", "female_count", "male_count", "cast"}
+            & payload.keys()
         )
+        assert [
+            plan["cast"] for plan in payload["input_context"]["plans"]
+        ] == expected_casts
+    assert resolved.request.female_count is None
+    assert resolved.request.male_count is None
 
 
 def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
     request = make_story_request()
 
-    for messages in (
-        theme_messages(
-            request,
-            count=1,
-            existing_themes=[],
+    for stage, messages in (
+        (
+            "Theme 的 premise",
+            theme_messages(
+                request,
+                count=1,
+                existing_themes=[],
+            ),
         ),
-        frame_messages(request, make_theme()),
+        ("Frame", frame_messages(request, make_theme())),
     ):
         prompt = messages[0].content
 
-        assert "otherwise each person's nationality defaults" in prompt
-        assert "Never infer nationality from setting, name, language" in prompt
-        assert "state it explicitly in every Theme premise and Frame" in prompt
-        assert "otherwise the setting country defaults to China" in prompt
-        assert "State the country explicitly in every Theme premise and Frame" in prompt
+        assert "未指定时，每个人物分别默认为中国籍" in prompt
+        assert "不得根据地点、姓名、语言、肤色或外貌推断国籍" in prompt
+        assert f"必须在每个 {stage} 中明确写出人物国籍" in prompt
+        assert "否则场景国家默认为中国" in prompt
+        assert f"必须在每个 {stage} 中明确写出场景所在国家" in prompt
 
 
 def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
@@ -197,22 +526,31 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
         "F06",
     ]
     assert "Each Narrative Frame is one standalone renderable image" in prompt
-    assert "Fully redescribe every visible person's adult identity" in prompt
-    assert "currently visible states and direct physical results" in prompt
-    assert "one physically possible held pose" in prompt
-    assert "must not travel between positions" in prompt
-    assert "The Story Description is the authoritative Frame contract" in prompt
-    assert "Follow any exact fields, labels, order, counts, grouping" in prompt
+    assert "Fully redescribe each visible principal person's adult identity" in prompt
+    assert (
+        "one coherent body configuration appropriate to the physical setting" in prompt
+    )
+    assert "Assign every visible limb a consistent contact or force role" in prompt
+    assert "Do not describe successive repositioning as a narrative" in prompt
+    assert "Follow the Story Description, selected Frame authoring" in prompt
+    assert (
+        "cannot override the output schema, transport format, requested slots" in prompt
+    )
+    assert "Grounded scenes require credible support" in prompt
+    assert "floating or zero-gravity scenes require coherent free-flight" in prompt
+    assert "exposure may visibly record motion through blur or light trails" in prompt
+    assert "those traces are not additional bodies or chronological Frames" in prompt
     assert "subdivisions of that one renderable image" in prompt
     assert "do not spread one required image across Narrative Frames" in prompt
     assert "Repeated depictions of one named person inside a single image" in prompt
     assert "Preserve the requested medium" in prompt
     assert "Do not default to cinematic photography" in prompt
     assert "viewpoint and illumination in terms appropriate to that medium" in prompt
-    assert "final state explicitly required by the Story Description" in prompt
+    assert "visible state explicitly required by the Story Description" in prompt
     assert "Resolve conditional instructions only from the current request" in prompt
     assert "never borrow a branch assigned to another alternative" in prompt
-    assert "Explicit Story Description constraints take priority" in prompt
+    assert "Explicit Story Description creative constraints take priority" in prompt
+    assert "cannot override safety, typed requests, runtime settings" in prompt
     assert "rope art" not in prompt
     assert "do not mix in untranslated foreign prose" in prompt
     assert "parallel visual alternatives" in prompt
@@ -296,7 +634,8 @@ def test_system_instructions_keep_shared_rule_language_across_output_languages(
     )
 
     for prompt in prompts:
-        assert "The Story Description is authoritative" in prompt
+        assert "validated request" in prompt
+        assert "immutable safety and output contracts" in prompt
         assert "本次使用 美学级（aesthetic）" in prompt
 
 
@@ -356,22 +695,21 @@ def test_prompts_compile_only_selected_content_level(
         (
             ContentLevel.AESTHETIC,
             (
-                "At aesthetic level, the dominant hero photograph must remain "
-                "unmistakably non-explicit"
+                "在 aesthetic 级别，主导照片必须明确保持非露骨"
             ),
         ),
         (
             ContentLevel.EROTIC,
             (
-                "At erotic level, every Frame must make non-explicit adult "
-                "intimacy unmistakably visible in the dominant hero photograph"
+                "在 erotic 级别，每个 Frame 都必须在主导照片中"
+                "明确可见地呈现非露骨的成年亲密互动"
             ),
         ),
         (
             ContentLevel.HARDCORE,
             (
-                "At hardcore level, every Frame must place the direct explicit "
-                "adult interaction in the dominant hero photograph"
+                "在 hardcore 级别，每个 Frame 都必须将直接露骨的"
+                "成年人互动置于主导照片中"
             ),
         ),
     ),
@@ -380,27 +718,31 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     level: ContentLevel,
     required_contract: str,
 ) -> None:
-    brief = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "post-layout.yaml"
-    ).description
-    request = make_story_request(
-        content_level=level,
-        frames_per_theme=1,
-        female_count=1,
-        male_count=1,
-    ).model_copy(update={"story": brief})
-
-    messages = frame_messages(request, make_theme())
+    document = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "post-layout.yaml"
+    )
+    resolved = resolve_story_input(
+        document,
+        InputOverrides(
+            content_level=level, frames_per_theme=1, female_count=1, male_count=1
+        ),
+    )
+    messages = compile_frame_messages(
+        resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+    )
     compiled = " ".join(
         "\n".join(message.content for message in messages).replace("\\n", " ").split()
     )
     payload = json.loads(messages[1].content)
 
     assert payload["content_level"] == level.value
-    assert "Apply only the branch matching the requested content level" in compiled
     assert required_contract in compiled
-    assert "content-level visibility anchor" in compiled
-    assert "cannot satisfy the selected content level" in compiled
+    selected = document.authoring.frames.selected(level)
+    for other, rules in document.authoring.frames.content_levels.items():
+        if other != level:
+            assert all(rule not in compiled for rule in rules if rule not in selected)
+    assert "内容级别可见性锚点" in compiled
+    assert "不能满足所选内容级别" in compiled
 
 
 def test_prompts_express_era_consistency_holistically() -> None:

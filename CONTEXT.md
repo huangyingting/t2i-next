@@ -57,19 +57,53 @@ _Avoid_: Brief, configuration
 **Story Document**:
 The sole file-input format for Story Generation: a UTF-8 `.yaml` document
 containing an explicit ID, a natural-language Story Description, and optional
-generation settings, stage authoring rules, quality policy, and runtime settings.
+generation settings, stage/level authoring rules, quality policy, runtime settings,
+applicability requirements, explicit module references and catalog allocation.
+Packaged YAML authoring text is Chinese; output-language controls remain explicit
+and independent.
 Explicit CLI options override document settings; omitted options do not.
-Only the resolved request, rules, and settings are used on resume.
+Both document defaults and final overrides must satisfy applicability requirements.
+Only the frozen resolved input, request, rules, and settings are used on resume.
 _Avoid_: Plain-text input, visual specification, executable workflow
 
 **Story Rule Set**:
 The immutable ordered authoring rules compiled for the Theme and Frame stages
 of one story run. Built-in rules define only stage semantics and universal
-contracts; optional rules from `story-inputs/rules/` add reusable project
-policy. Story Document authoring rules are appended for their selected stage,
+contracts; the named standard-story policy owns project defaults. Explicit modules
+and Story Document authoring rules are selected for the current stage and level,
 before the output-language rule. The resolved set is frozen with the run and
 reused on resume.
 _Avoid_: Story Description, Prompt Generation rules, per-input special case
+
+**Resolved Story Input**:
+The validated, provider-independent compilation of one Story Document and its
+explicit overrides. It contains effective generation/runtime/quality settings,
+rules, source provenance, module contexts, and one plan per requested Theme.
+It is frozen before generation and reloaded without source-file access on resume.
+_Avoid_: Executable workflow, implicit working-directory configuration
+
+**Story Input Module**:
+A data-only reusable medium or layout capability selected explicitly by a
+document, with bounded typed parameters, stage rules, and applicability.
+Modules cannot load other modules or execute code.
+_Avoid_: Plugin, generic prompt mixin, filename-specific branch
+
+**Story Catalog Allocation**:
+A deterministic mapping from program-owned Theme slots to catalog entries and
+their stage-specific facts and cast requirements. Fixed-slot, alphabet-coverage,
+and bounded cyclic-slot strategies do not change with provider batch boundaries
+or retries. Conditional Frame assignments preserve the original slot when only
+some Frames are retried. Correct
+allocation is not a guarantee of generated geometry or visual quality.
+_Avoid_: Model-selected counter, physical solver
+
+**Story Cast Scope**:
+The named participant group to which requested female/male counts apply.
+Requested participants and fixed additional roles share the eight-principal
+capacity. Explicit background population bands are accounted for separately
+in total population ranges; they are not uncounted people or permission to
+invent extras from prose. Repeated views of one identity do not add people.
+_Avoid_: Hidden cast override, universal eight-person image limit
 
 **Story Quality Policy**:
 An opt-in set of local Theme and Frame evidence checks, frozen in run settings.
@@ -92,8 +126,8 @@ _Avoid_: Hidden warnings, model score
 **Story Description Authority**:
 The rule that medium, layout, regions, views, scale systems, visual hierarchy,
 and other subject-specific presentation behavior live in the Story Description
-rather than Python branches. The story compiler understands stages and schema,
-not named input archetypes.
+and explicit typed modules rather than filename branches. Descriptions cannot
+override immutable schema, safety, or resolved numeric requirements.
 _Avoid_: Brief-type detection, story-input adapter
 
 **Story Content Level**:
@@ -176,8 +210,92 @@ _Avoid_: Structured Frame output, per-frame model call, renderer
 ## Standalone Spatial Pipeline
 
 The `t2i_spatial_pipeline` package is independent from both Prompt Generation
-and Standalone Story Generation. Do not reuse their stages, persistence, or
-provider configuration.
+and Standalone Story Generation, and does not import the Film Style pipeline.
+Do not reuse their stages, persistence, or provider configuration. Its CLI,
+catalogs, diagnostics, and run storage belong to the spatial package; only
+the low-level `t2i_model_provider` transport is shared.
+
+**Neutral Pose Reference Library**:
+An offline library of clothed adult figure-study recipes, exposed through
+`t2i-spatial poses`. It owns typed body, spine, pelvis/chest/head orientation,
+silhouette, balance bias, resting side, limbs and support facts plus compatible
+full-body cameras. Room axes govern pelvis/chest and camera directions;
+anatomical sides govern limbs and support placement; gaze is head-relative and
+negative space is image-frame-relative. Load-bearing prose is derived only from
+support contacts, never from a second weight-distribution label. Side-lying
+recipes include a headrest and a forward lower arm, not an arm hidden beneath
+the torso. Upright kneeling includes knees, shins and insteps on the mat. Its 16
+families contain 48 curated whole-body recipes, not a limb Cartesian product.
+It does not use activity templates or change the existing generate/bulk catalog.
+The code-generated library is the sole definition; JSON is an export, not a
+second editable source.
+_Avoid_: Activity catalog replacement, story pipeline stage
+
+**Reference Presentation**:
+An offline neutral setting, palette, motivated lighting and finish recipe with
+qualitative camera-space capacity and concrete support-surface realizations.
+Each support declares height, extent and orientation; each pose declares its
+anatomical placement. Scene selection and validation require fitting profiles,
+not merely a matching surface name. These are staging requirements, not measured
+coordinates, anthropometry or force constraints. Chair seat and back must
+resolve to the same chair object; a headrest requires a mat. A camera recipe owns
+coherent lens/perspective/distance intent, full-body framing, focus, depth,
+negative space and foreground treatment. Presentation cannot rewrite pose
+geometry. Accessible contact boundaries must remain readable, while naturally
+occluded undersides and crossed limbs need not be exposed. Facial detail needs
+light and visibility as well as focus; a complete silhouette cannot supply it.
+_Avoid_: Unconstrained cinematic adjectives, physical optics simulation
+
+**Reference Subject**:
+A curated adult identity and opaque full-coverage everyday outfit, repeated in
+every independently renderable scene of a batch. The batch fixes one subject;
+textual identity consistency is not a guarantee of rendered-image identity.
+_Avoid_: Per-scene identity randomization
+
+**Pose Reference Batch**:
+A seed-reproducible, duplicate-free sample of neutral recipes with compatible
+cameras, presentations, a fixed subject and locally rendered clothed reference
+descriptions. Selection first balances within-batch family counts, prefers
+historically underused poses, then maximizes nearest structural distance,
+measured as the equal-weight mismatch rate over eight geometry groups.
+Camera/presentation combinations are selected only after support placement,
+height/extent/orientation, head/view-sector and space compatibility checks.
+Labels, gaze, identity and camera changes do not count as
+pose-structure changes. Reports describe symbolic coverage, prior usage and
+pair distances only; they do not certify rendered-image diversity, physical
+equilibrium or anatomical safety. Current schema and renderer are version 3;
+reports explicitly retain physical/visual validation as false and require
+render review. No image-generation backend is provided by this offline module.
+_Avoid_: Perceptual score, visually validated pose
+
+**Reference Usage Snapshot**:
+An immutable, catalog-fingerprint-bound set of cumulative pose, camera,
+presentation and complete-combination counts embedded before and after each
+reference batch. CLI history continues a previous current-schema JSON batch
+without modifying it; exact reproduction requires the same seed, library,
+input snapshot, subject and filters. Concurrent continuations branch rather
+than overwriting shared history. Text exports cannot resume usage, and changed
+catalog definitions or old schemas fail rather than resetting or migrating.
+_Avoid_: Global mutable history file, seed-only reproducibility
+
+**Spatial Audit**:
+An offline, resumable check of packaged catalogs against current code-generated
+definitions, retained topology constraints, deterministic scene allocation,
+and compiled geometry. Every seed is replayed before its successful result
+and structural diagnostics are checkpointed together. Audit checkpoints bind
+both packaged data and generated definitions; incompatible schemas require
+an explicit restart rather than migration.
+_Avoid_: Render validation, visual quality score
+
+**Structural Diagnostics**:
+Counts of selected catalog entries, detailed and macro structural signatures,
+camera/shot and geometry coverage, and exact selection repetitions. Macro
+signatures describe catalog body orientation, supports, and actor layout;
+detailed signatures additionally include limb configurations and roles.
+Within-batch pair counts are separate from accumulated cross-batch coverage.
+These diagnostics are symbolic evidence, not text similarity or rendered-image
+perceptual distance, and do not change scene selection.
+_Avoid_: Perceptual fingerprint, visual diversity guarantee
 
 **Creative Brief**:
 The user's natural-language direction for the spatial batch's world, era,

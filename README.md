@@ -84,15 +84,49 @@ Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构�
 `theme_id`。Theme producer 每次批量生成 `--theme-batch-size` 个 Theme；批次
 checkpoint 后，每个 Theme 独立进入有界 Frame queue，producer 随即生成下一批，
 因此上一批的 Frame 与下一批 Theme 可以并行。二者共同遵守 `--concurrency`
-全局模型调用上限；默认 Theme 批次大小为 10，可在 1–10 之间调整。
+全局模型调用上限；默认 Theme 批次大小为 5，可在 1–10 之间调整。
 后续 Theme 批次使用紧凑的全局多样性账本，而不是重复传入全部既有 Theme 全文；
-账本保留已用标题和 premise/style 短摘要，并为当前输出位置轮换指定两个优先变化
-维度。模型在同一次调用内避开已用的作品场景、人物组合、内容路径、空间调度和
-摄影光线骨架，因此不需要额外的多样性验证调用。
+账本保留已用标题、premise/style 短摘要、来源锚点使用次数和高层覆盖计数。每个
+当前输出位置获得一份稳定、可恢复的高层 diversity contract，平衡内容路径、关系
+张力、空间、摄影和光线，但不固定动作、姿态、动作发起者或接触链。模型在同一次
+调用内避开已用的作品场景、人物组合、内容路径、空间调度和摄影光线骨架，因此
+不需要额外的多样性验证调用。
+OpenAI-compatible 后端默认对 Theme 使用 `0.85` temperature、Frame 使用 `0.6`，
+可用 `OPENAI_THEME_TEMPERATURE` 和 `OPENAI_FRAME_TEMPERATURE` 分别调整；
+Copilot SDK 当前不支持逐调用 temperature。
 每个 Theme 的全部 Frame 在一次纯文本调用中批量返回，由程序拆分并分配
 `frame_id`，避免逐帧调用开销以及 JSON wrapper 或工具提交失败。批次中验证通过的
 Frame 会被保留，后续只重新生成失败槽位。
+每个待生成的 Frame slot 还会获得一份确定性的内容路径合同。不同 Theme 分配不同
+路径，同一 Theme 的所有 Frame 继承 Theme 已锁定的同一路径，避免 Theme 与 Frame
+互相矛盾；合同要求正文同时落实对应路径的全部可见证据，并要求同 Theme 画面至少
+改变姿态、核心互动、景别和机位中的三项，但不固定具体姿势或身体拓扑。Theme 实际选中的 canonical
+人物与场景同时冻结为 required anchors，其他上下文锚点作为 forbidden anchors，
+并只在固定来源首句之后的画面正文中禁止，防止漏写场景或混入另一部作品，同时
+避免作品标题中的同名人物造成误判。选择性重试继续使用原槽位的同一合同。
+程序在模型返回后、写入 Frame checkpoint 前，把 Theme 的 canonical 人物和场景
+组成一条自然语言锚点句，确定性插入固定来源首句之后。该句保证 exact anchor，不
+替代模型的实际人物描写；报告会排除程序句，再逐人物检查服装／外貌与支撑描述、
+两项面部状态、视线落点和独立支撑。
+未指定男女数量时，美学级 Theme 默认选择一至两名成年人，极致情色级和赤裸明确级
+默认选择两名成年人；显式人数约束始终优先。极致情色级每帧必须同时包含明显裸露
+或半解服装、实际非生殖器接触、具体欲望或愉悦表情以及皮肤或材质触觉。
+任意三人及以上的 N 人阵容中，`group_frame_contracts` 只根据输入男女数量和 Theme
+实际选中的人物建立通用参与合同，不预设核心二人组、观察者、回应者、外围人物、
+固定角色、配对数量、接触顺序或空间站位。模型根据人数、场景和身体拓扑自行设计
+适合当前画面的互动网络，不使用程序提供的结构菜单；每个人都必须通过具体可见且
+不可删除的动作直接参与同一个共同互动事件，并保持自己的闭合承重链。
+Hardcore 多人 Frame 的 `hardcore_group_realization` 同样不按性别或名单顺序分配
+角色，只要求全部人物直接进入当前内容路径，逐人写清动作主客体、接触或器具、受力、
+支撑与主动反应，并让所有参与者属于同一个可追踪互动网络。
 通过验证的 Frame 会立即单独写入 checkpoint，因此中断恢复也不会重做已通过画面。
+完成的 prompt 子运行还会写出 `diversity-report.json`，本地统计 Theme/Frame
+重复度、最近邻相似度、同 Theme Frame 差异、各高层变化轴覆盖情况、当前内容级别
+证据完整度和 Frame 锚点一致性；景别统计只包含远景、全景、中景、中近景、近景与
+特写，并记录衣袖堆在手臂或完全赤裸仍穿衣物等衣物状态冲突。报告不调用模型，也
+不会触发拒绝或重试。
+多人诊断还分别记录 character/scene anchor 完整帧数，以及逐人物描述、面部、视线、
+支撑的完成槽位数；因此程序锚点句不会掩盖正文中漏写人物细节的问题。
 每个 Frame 还要求为每名入画人物分别写出具体可见表情，以至少两项面部状态和明确
 视线落点落实，不能使用群体共同表情或抽象情绪标签。
 为减少肢体错乱，Frame 按支撑面、躯干朝向、四肢唯一职责、明确接触链和衣物最终
@@ -148,7 +182,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story generate \
-  --input story-inputs/motion-blur-photography.yaml \
+  --input story-inputs/recipes/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic
@@ -156,8 +190,10 @@ uv run t2i-story generate \
 
 故事位置参数与 `--input` 必须且只能提供一个；不再支持 TXT 文件输入。
 最小文档包含 `id` 和多行 `description`，还可声明 `generation`、`authoring`、
-`validation`、`runtime`。配置优先级为程序默认值 < 文档 < 显式 CLI 参数；
+`validation`、`runtime`、`requirements`、`modules` 和 `allocation`。
+配置优先级为程序默认值 < 文档 < 显式 CLI 参数；
 未提供的 CLI 选项不会覆盖文档，数值 `0` 也能正确覆盖。
+文档默认值与覆盖后的请求都必须满足适用性约束，CLI 不会悄悄改写固定阵容或槽位数。
 `--female-count` 和 `--male-count` 可以分别约束每个主题及每帧的人数。
 
 ```yaml
@@ -169,7 +205,8 @@ generation:
   frames_per_theme: 3
 authoring:
   frames:
-    - 每帧明确描述景别、视角和焦点。
+    common:
+      - 每帧明确描述景别、视角和焦点。
 validation:
   themes:
     mode: report
@@ -193,7 +230,7 @@ runtime:
 （拒绝并有界重试）；两阶段分别用 `--theme-quality-mode`、`--frame-quality-mode`
 覆盖。默认检查列表为空，只验证基础契约。Theme 可以对 `title`、`premise`、
 `style` 分别检查长度、必含和禁止原文，在通过检查后才保存主题并开始生成 Frame。
-Frame 可选检查包括摄影文字证据、字符长度、必含原文和禁止原文；它们不是模型
+Frame 可选检查包括摄影文字证据、字符长度、空白分隔词数、ASCII、必含和禁止原文；它们不是模型
 评审，也不保证叙事语义或摄影物理正确。结构与安全契约不受开关影响。
 质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
 批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、
@@ -205,47 +242,48 @@ story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在�
 并由测试保证逐字一致，其他阶段规则保持独立。story 内置规则位于
 `src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
 schema、人物一致性和内容等级。媒介、版式、区域、视图、比例关系及其他特定视觉
-行为由 Story Description 自己定义，Python 不识别具体 `story-inputs/*.yaml`
+行为由配方描述及其显式模块定义，Python 不识别具体 `story-inputs/recipes/*.yaml`
 类型。
 
-`story-inputs/` 同时承载具体输入和可复用项目规则。可以通过 `--rules-dir`
-显式使用其他规则目录；未传入时，如果当前目录存在 `story-inputs/rules/`，
-会自动使用它：
+输入已逐份移入新子目录。输入编译器位于 `src/t2i_story_pipeline/inputs/`：
 
 ```text
-story-inputs/
-├── creative.yaml
-├── edo-warai-e.yaml
-├── ming-gongbi-mixi-tu.yaml
-├── ...
-└── rules/
-    ├── common.rules
-    ├── themes.rules
-    ├── frames.rules
-    └── content_levels/
-        ├── aesthetic.rules
-        ├── erotic.rules
-        └── hardcore.rules
+story-inputs/recipes/
+├── multi-view.yaml
+├── human-typography.yaml
+├── miniature-open-composition.yaml
+├── miniature-giant-encounter.yaml
+├── ...                         # 48 份当前配方
+├── _modules/                   # 多视图、画内文案、绢本媒介
+└── _catalogs/                  # 字母表、固定姿态及有界循环槽位
 ```
 
-每个 `.rules` 文件一行一条规则，空行和 `#` 注释会被忽略；缺失的用户规则文件不会报错。
-加载顺序是内置 `common → stage → selected content level`，然后按相同顺序追加
-用户规则，然后追加文档对应阶段的 `authoring`，最后追加输出语言规则。
-解析后的规则保存在 run 的 `rules.json`，
-manifest 记录其 SHA-256 指纹，resume 始终使用冻结版本而不重新读取规则目录。
+全部配方、模块、目录和包内策略的 YAML 自然语言使用中文；字段名、ID、枚举、
+文件名、输出语言配置与必须逐字保留的原文不变。中文输入规则不意味着只能生成中文。
 
-只服务于一个输入的主题、媒介、版式、区域、镜头和词汇约束继续写在对应
-`story-inputs/*.yaml` 的正文或对应阶段 `authoring` 中。默认 `story-inputs/rules/`
-中的项目规则会应用于从该
-项目启动的所有 story；只被部分输入共享的规则不能放进默认规则目录，可以保留在
-对应输入中，或放入显式选择的规则 profile 并通过 `--rules-dir` 使用。所有 story
-都必须遵守的阶段、schema、安全和一致性规则才属于包内 system rules。不要按文件名
-在 Python 中增加分支。
+系统拥有不可变格式与安全契约，`standard-story` 命名策略拥有中国籍/中国地点的
+项目缺省偏好。输入只选择需要的模块；独有创作留在 description 和对应阶段
+`authoring.<stage>.common`，等级变体放在对应阶段的 `content_levels`，只编译当前等级。
+字母/姿态由本地计划分配到 Theme 槽位，每批只发送所选项目，不让模型自行续数。
+小于26个字母时使用目录明确的多样性顺序，26个时A–Z，大于26个时覆盖全部再复用。
+其他已有编号规则用有界循环目录表达；条件Frame分配仅对匹配的帧数生效，
+局部重试仍使用原槽位规则，不执行正文中的编号算式。
+图内六区域不等于六Frame，指定组人数与固定额外角色合计最多八人。
+明确需要背景人群的配方使用有界人数区间另行声明，预览展示包含背景的总人数范围，
+不会为了套用主角容量而删除原有拥挤场景。
 
-`story-inputs/*.yaml` 使用唯一的当前文档格式；正文直接描述 Theme、Frame、媒介、
-布局、领域池、变化轴和拒绝条件，执行控制单独放在结构化字段中。输入可以为
-特定人物组合或内容等级声明严格前置条件，但不得增删请求人物，也不得把多个 Frame
-改写成跨 Frame 的连续剧情。多个 Frame 始终是同一 Theme 的平行视觉方案。
+资产根默认相对输入文件，可用 `--assets-dir` 显式指定；不存在工作目录规则发现、
+模块递归 include、远程资源或可执行模板。缺失、冲突和未知字段明确报错。
+旧顶层文件、旧名称别名、Story 的 `--rules-dir` 与旧 authoring 数组格式已删除。
+多个 Frame 始终是同一 Theme 的平行视觉方案，媒介与题材不新增 pipeline。
+
+可以在加载模型配置前离线检查最终输入、规则来源和全部槽位：
+
+```bash
+uv run t2i-story explain --input story-inputs/recipes/human-typography.yaml --themes 26
+```
+
+默认输出 JSON，`--format text` 输出摘要；无效输入退出2，不创建run或调用模型。
 
 Story 使用唯一的当前输出路径：Theme 返回不含 ID 的结构化草稿，Frame 按主题
 批量返回 `<FRAME>...</FRAME>` 纯文本块，所有 ID 由程序分配。正常的
@@ -261,6 +299,8 @@ uv run t2i-story runs --runs-dir runs
 uv run t2i-story resume RUN_ID --runs-dir runs
 ```
 
+`resolved-input.json` 冻结所选模块、目录、来源与完整槽位计划，并校验其指纹。
+resume 不重新读取原输入或资产；缺少当前格式快照的旧run明确拒绝，不做迁移或回退。
 `request.json`、provider/并发/retry/token/质量配置、generation attempts 和 token
 usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
 网络 timeout、transport error、429 和 5xx 默认在 provider 层额外重试两次；
@@ -274,14 +314,15 @@ issues 继续反馈给模型。认证错误不会盲目重试。
 （1男1女、2女、3女、1男2女、2男1女），每组 100 themes × 6 frames：
 
 ```bash
-./scripts/generate-story-cast-matrix.sh story-inputs/motion-blur-photography.yaml
+./scripts/generate-story-cast-matrix.sh story-inputs/recipes/motion-blur-photography.yaml
 ```
 
 最终 TXT 默认统一写入 `prompts/YYYY-MM-DD/hardcore/`，所有可恢复 run 记录在
 `runs/`。也可以把第二、第三个位置参数分别用于覆盖
 prompts root 和 runs directory。
-脚本用正式 YAML loader 做共享输入预检，并保留上述显式阵容、语言、内容等级、
-主题数和帧数覆盖；文档中的并发、重试、authoring 和质量策略仍会生效。
+脚本先用同一 CLI 的 `explain` 对全部五组最终请求预检；任何一组不兼容就整批退出，
+没有生成调用，不默认跳过。字母表、固定双人/单人等配方不能套用这套阵容矩阵。
+文档中的并发、重试、authoring 和质量策略仍会生效。
 
 输出按 `prompts/YYYY-MM-DD/aesthetic|erotic|hardcore/` 分类：
 
@@ -395,6 +436,132 @@ Provider 与其他流水线一样直接复用现有 `.env` 中的 `OPENAI_*`。�
 - `report.json`：最终 TXT 路径、多样性阈值和本地约束校验结果。
 - `blueprint-cache/`：按主题、seed、模型配置和 schema 寻址的缓存。
 
+空间模块拥有自己的 CLI、catalog、配置、审计与运行目录，不导入 story、旧 prompt
+或 film pipeline；仅共享底层 `t2i_model_provider` 接入组件。Film 的多样性账本和
+诊断思路不构成运行时依赖。独立入口为 `t2i-spatial` 或
+`python -m t2i_spatial_pipeline`。
+
+### 非露骨人物姿态参考库
+
+`t2i-spatial poses` 是空间模块内的独立离线工具，用于全身着装、成年人物的日常
+造型和美术参考。它不调用模型、不依赖 story/film，不组合 activity，也不修改
+`generate`/`bulk` 原有的成人活动 catalog。两者用途不同：原有24族目录继续服务
+既有生成命令；这里提供的是新增的非露骨参考配方，不是该目录的兼容层或替代入口。
+
+当前参考库为 **16 个姿态族 × 3 个完整配方 = 48 个姿态**：
+
+- 站立：平行站姿、偏重心站姿、前后错步、靠墙、扶桌、单脚踏台阶、交流手势。
+- 坐姿：端坐、前倾坐、靠背坐、侧向坐、垫上盘坐。
+- 低位：直身跪姿、单膝跪姿、手部辅助蹲姿、侧卧休息。
+
+配方显式定义身体高度、脊柱状态、骨盆与胸口朝向、头部相对胸口的朝向、轮廓、
+重心偏向、侧卧的下侧、腿部排列、左右手职责、视线和支撑接触。
+骨盆、胸口与机位使用固定房间方向；左右肢体和支撑物相对位置使用人物自身的
+解剖方向；留白使用画面方向，视线相对头部描述，不再把这些参照混用。
+`balance_bias` 只表示左右偏重，不列承重部位；全部承重及轻触描述直接来自
+`supports`，不再维护独立的 `weight_distribution`。扶桌/辅助蹲姿的双手版本
+明确保留两手承重。直身跪姿包括膝、小腿及脚背的垫面接触；侧卧有独立头垫，
+下侧前臂放到躯干前方，两腿轻微错开，不把手压在身体下又要求它可见。
+
+不做腿部/手臂的无条件笛卡尔组合。加载时校验承重、左右膝足归属、台阶/地面
+支撑、手的接触与手势冲突、躯干与靠背冲突、头部对齐、支撑位置、结构去重和
+镜头引用。侧卧只接受稍高且兼顾支撑的机位；头部已向外转时排除脸背向机位的
+方向组合。这些是离散的定性规则，不是关节坐标、实际可达距离、受力平衡、
+碰撞检测或医学安全证明；所有姿态仍须出图检查。
+
+参考库还包含 **5 套完整摄影配方、4 个成年人物档案和5套环境视觉配方**：
+摄影配方把镜头类型、透视、拍摄空间需求、焦点、景深、留白和前景关系作为
+一致的组合，不独立随机拼接焦距与距离。所有配方保留全身构图、脸和关键
+手部及可见支撑边界的可读性，前景框景不得遮住身体轮廓；不为面向镜头而改变
+姿态。允许交叠腿部及接触底面的自然遮挡，不要求全部手脚和接触面都无遮挡。
+要求表情细节时保留面部补光，不以“对焦清楚”代替照明。
+人物的年龄、外观和完整不透视着装在同批次内固定，且每条描述独立完整重述。
+人物文字一致不等于渲染身份已得到保证。
+
+环境配方分别声明地点、色彩、可见光源及光线处理、成片质感、拍摄空间和真实
+支撑物。每个 surface 必须映射到具体物体，并声明高度档位、接触空间和水平/
+垂直朝向；`support_layout` 指定它相对身体的位置。扶桌使用髋高、可容纳双掌
+及前臂的水平面，并置于身体前方前臂可及的位置；台阶低于站姿膝部并容纳整脚；
+座面位于坐姿膝高，头垫位于垫上并使头颈对齐。高度、面积或方向不符合配方的
+物体，即使名称正确，也不能用于该姿态。这里的档位是场景设计要求，不是测得
+的人体尺寸或接触坐标。同一把椅子的座面与靠背必须属于同一个 object；头垫
+必须与地垫同时提供。较长拍摄距离只在扩展空间环境中使用。`poses list`
+同时列出摄影、人物和环境 ID 及完整定义。
+
+```bash
+# 列出完整类型化目录，或仅列出一个姿态族
+uv run t2i-spatial poses list
+uv run t2i-spatial poses list --family half_kneeling
+
+# 按 seed 选取16个姿态，输出结构、参考描述和统计
+uv run t2i-spatial poses sample --count 16 --seed 42
+
+# 指定同批人物与环境；只从该环境能实现的姿态和镜头中选择
+uv run t2i-spatial poses sample --count 16 --seed 42 \
+  --subject mara --presentation daylight_atelier
+
+# 导出每行一条的着装人物参考描述；目标文件必须不存在
+uv run t2i-spatial poses sample --count 16 --seed 42 \
+  --format text --output runs/spatial/pose-references/sample.txt
+
+# 检查结构覆盖和所有兼容姿态/摄影/环境组合的描述编译
+uv run python -m t2i_spatial_pipeline poses audit
+```
+
+采样依次优先选择当前批次使用最少的姿态族、历史使用次数较少的姿态，以及
+“与已选姿态的最小结构距离”最大的配方；seed 决定同分时的稳定顺序。
+不筛选环境时，16条每族各一条，完整库最多可取48条；`--family` 筛选后最多
+3条，超量会报错，不重复凑数。指定 `--presentation` 会先过滤支撑或拍摄空间
+不兼容的姿态/镜头，数量上限与可覆盖姿态族随之缩小；没有可用方案会显式报错。
+姿态选定后，从兼容的摄影/环境组合中依次优先选择历史组合重复少、环境使用
+少、镜头使用少的方案。摄影和环境变化不计作新增姿势。
+
+结构距离是8组字段的等权不同比例：身体高度、脊柱、骨盆/胸口/头部朝向、
+轮廓、重心偏向/侧卧下侧、腿部、
+左右手配置和支撑接触集合。ID、姿态族名称、视线和镜头不参与距离计算。
+这只是确定性的结构选择启发式，不是感知相似度或经过标定的视觉质量分数。
+JSON 报告包含族/高度/脊柱/重心偏向覆盖、各部位承重接触次数、场景对数、最小和平均结构距离；
+以及摄影、环境、人物覆盖次数、已在历史中出现的姿态数和完整组合数。单场景
+没有场景对，距离为 `null`，不伪造“完全不同”的分数。
+
+跨批次历史使用**不可变 JSON 快照链**，不维护会被并发命令覆盖的全局计数文件：
+
+```bash
+uv run t2i-spatial poses sample --count 16 --seed 42 \
+  --output runs/spatial/pose-references/first.json
+uv run t2i-spatial poses sample --count 16 --seed 42 \
+  --history runs/spatial/pose-references/first.json \
+  --output runs/spatial/pose-references/second.json
+```
+
+后一批从前一批的 `history_after` 继续，并记录自己的 `history_before` 与
+`history_after`；前一批文件不会被修改。默认沿用前一批人物，显式 `--subject`
+可以为新批次更换人物。相同 seed、目录定义、历史快照、人物和筛选参数得到
+相同结果；历史改变时，相同 seed 可以有不同选择。在完整库上连续取三批16条，
+每批每族一条，先用完48个姿态，再重复使用。姿态用尽后仍会尽量选用较少使用
+的摄影/环境组合，但不承诺无限不重复。
+
+计数按 pose、camera、presentation 和三者组合保存，不把新 scene ID 或换人物
+算成新的几何/摄影/环境组合。JSON 同时记录目录指纹、筛选参数、算法及 renderer
+版本；目录、摄影、人物或环境定义变更时拒绝使用不匹配的历史，不静默重置。
+传入同一个历史文件的多次命令是独立分支；要连续累计，应传入最新批次的 JSON。
+文本导出不含历史快照，不能作为 `--history`。
+
+`list`、`sample`、`audit` 均可通过 `--output` 保存 JSON；`sample --format text`
+输出一行一条的英文参考描述，固定为全身、非露骨、日常不透视着装。目标文件
+已存在时拒绝覆盖。当前参考库和批次 schema 为 `3.0`，采样算法标识为
+`history_aware_family_maximin_v3`，renderer 版本为3；不兼容或迁移旧 schema。
+姿态定义位于 `src/t2i_spatial_pipeline/pose_reference_catalog.py`，视觉配方位于
+`src/t2i_spatial_pipeline/pose_reference_presentation.py`，不维护第二份打包 JSON。
+`poses audit` 输出目录指纹、姿态统计、摄影/人物/环境数量及兼容组合数量；
+它会为每个兼容组合和人物编译并校验描述，但不会调用出图服务或声称视觉验收。
+目录和报告显式保留 `physical_validation: false`、`visual_validation: false`
+及 `requires_render_review: true`。当前模块没有图像生成接口；需要将导出的
+参考描述送入实际图像生成流程，再检查关节、承重、遮挡和面部可读性，不能用
+编译成功或测试数量替代这一步。
+
+### 原有生成目录的离线审计
+
 姿势 catalog 和场景分配器可以完全在本地审核，不读取模型配置，也不调用 LLM：
 
 ```bash
@@ -404,14 +571,34 @@ uv run t2i-spatial audit \
   --runs-dir runs/spatial
 ```
 
-审核会穷举检查六套 catalog 中所有保留的 pose/activity 拓扑，再对全部六种 cast
-运行连续随机种子的20场分配压力测试，并编译、复核每条抽样几何 Prompt。进度在
-每个 seed 完成后原子保存到
+审核先比较六份打包 JSON 与代码生成的 catalog 定义，按解析后的完整数据比较，
+不受 JSON 缩进影响；定义漂移或进程内 catalog 缓存过期会显式报错，不自动改写
+目录。然后穷举检查所有保留的 pose/activity 拓扑，对全部六种 cast 运行连续随机
+种子的场景分配压力测试。每个 seed 用相同参数分配两次并验证结果完全一致，
+再编译、复核每条抽样几何 Prompt。只有整组检查成功才将该 seed 的计数和结构
+统计一并原子保存到
 `runs/spatial/audit-progress.json`；命令中断后使用相同参数再次执行即可从下一个
-未完成 seed 继续。checkpoint 同时绑定 catalog 内容、拓扑规则、Prompt 审核规则、
-分配算法版本和显式安全策略版本；参数、规则或 catalog 改变时会拒绝误续跑，
-此时显式传入
-`--restart` 开始新的审核。
+未完成 seed 继续，不会重复累计已完成样本。checkpoint 同时绑定打包 catalog
+内容、代码生成的定义、拓扑规则、Prompt 审核规则、分配算法版本和显式安全策略
+版本。当前审计 schema 为 `1.3`，旧 schema 不迁移；参数、规则或 catalog 改变时
+也会拒绝误续跑。确认变更后显式传入 `--restart` 开始新的审核。
+
+每种 cast 的审计结果包括 `catalog_matches_definition`、`definition_hash`、
+`reproducibility_checks` 和 `structural_diagnostics`。结构诊断累计报告姿势条目、
+姿势结构、宏观结构、完整选择的重复，以及姿势族、身体高度、躯干/骨盆方向、
+支撑面、机位和景别的使用次数。宏观结构指纹由 catalog 中的身体高度、躯干/骨盆
+方向、支撑面/支撑点和人物布局构成；姿势结构还包含腿部、手臂配置和肢体职责。
+条目名称、scene ID 和支撑点列举顺序不算结构差异。完整选择的重复按 cast、
+family、variant、activity、viewpoint 和 shot scale 统计，不把新 scene ID
+视为新选择。
+
+`within_batch_pairs` 和 `same_macro_structure_pairs` 仅累计每个 seed 批次内部
+的场景对，不计算跨批次两两距离；`minimum_distinct_macro_structures` 记录单批
+最少覆盖的宏观结构数。跨批次重复通过累计的 coverage 和
+`exact_selection_repeats` 查看。同 seed 重放仅用于检查，不重复计入样本。
+这些统计固定标记为 `symbolic_structure_only`、`visual_validation: false`：
+它们不计算文本相似度、图像感知距离或主观视觉质量，也没有未经验证的“多样性
+达标”阈值，不改变现有生成选择器。
 
 Spatial 的 `passed: true` 只表示 schema、catalog、接触端点、支撑和 Prompt
 一致性通过本地符号审核。输出中的 `validation_status` 固定为 `symbolic_only`，

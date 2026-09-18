@@ -66,6 +66,110 @@ def test_length_uses_inclusive_unicode_character_bounds(prose, fails):
     assert bool(issues) is fails
 
 
+@pytest.mark.parametrize("words", [699, 700, 701, 1201])
+def test_word_count_checks_actual_words_without_an_implicit_upper_bound(words):
+    issues = check_frame_quality(
+        FrameQualityPolicy(checks=[{"type": "word_count", "min_words": 700}]),
+        OutputLanguage.ENGLISH,
+        "T001",
+        NarrativeFrame(frame_id="F01", prose=" ".join(["portrait"] * words)),
+    )
+    assert bool(issues) is (words < 700)
+    assert all(issue.check == "word_count" for issue in issues)
+
+
+def test_word_count_counts_whitespace_separated_units_not_characters():
+    policy = FrameQualityPolicy(
+        checks=[{"type": "word_count", "min_words": 2, "max_words": 3}]
+    )
+    for prose, fails in [("long-word", True), ("a  b", False), ("a b c d", True)]:
+        issues = check_frame_quality(
+            policy,
+            OutputLanguage.ENGLISH,
+            "T001",
+            NarrativeFrame(frame_id="F01", prose=prose),
+        )
+        assert bool(issues) is fails
+    with pytest.raises(ValidationError, match="min_words"):
+        FrameQualityPolicy(
+            checks=[{"type": "word_count", "min_words": 3, "max_words": 2}]
+        )
+
+
+def test_ascii_check_is_opt_in_and_applies_to_the_whole_frame():
+    frame = NarrativeFrame(frame_id="F01", prose="中文提示词中的英文标牌 Station")
+    assert not check_frame_quality(
+        FrameQualityPolicy(), OutputLanguage.CHINESE, "T001", frame
+    )
+    issues = check_frame_quality(
+        FrameQualityPolicy(checks=[{"type": "ascii"}]),
+        OutputLanguage.CHINESE,
+        "T001",
+        frame,
+    )
+    assert len(issues) == 1
+    assert issues[0].check == "ascii"
+    assert not check_frame_quality(
+        FrameQualityPolicy(mode="off", checks=[{"type": "ascii"}]),
+        OutputLanguage.CHINESE,
+        "T001",
+        frame,
+    )
+
+
+@pytest.mark.parametrize("mode", ["report", "enforce"])
+def test_language_conditional_checks_skip_without_claiming_a_pass(mode):
+    policy = StoryQualityPolicy(
+        frames={
+            "mode": mode,
+            "checks": [
+                {"type": "ascii", "when_language": "english"},
+                {"type": "word_count", "min_words": 700, "when_language": "english"},
+            ],
+        }
+    )
+    results = [
+        NarrativeThemeResult(
+            theme=make_theme(),
+            frames=[NarrativeFrame(frame_id="F01", prose="两名成年旅人在车站重逢。")],
+        )
+    ]
+    report = quality_report(policy, OutputLanguage.CHINESE, results)
+    assert report.frames.status == "skipped"
+    assert not report.frames.issues
+    assert not check_frame_quality(
+        policy.frames, OutputLanguage.CHINESE, "T001", results[0].frames[0]
+    )
+    issues = check_frame_quality(
+        policy.frames, OutputLanguage.ENGLISH, "T001", results[0].frames[0]
+    )
+    assert [issue.check for issue in issues] == ["ascii", "word_count"]
+    assert StoryQualityPolicy.model_validate_json(policy.model_dump_json()) == policy
+
+
+def test_language_filter_does_not_disable_other_frame_checks():
+    report = quality_report(
+        StoryQualityPolicy(
+            frames={
+                "checks": [
+                    {"type": "ascii", "when_language": "english"},
+                    {"type": "required_text", "values": ["车站"]},
+                ],
+            }
+        ),
+        OutputLanguage.CHINESE,
+        [
+            NarrativeThemeResult(
+                theme=make_theme(),
+                frames=[NarrativeFrame(frame_id="F01", prose="车站。")],
+            )
+        ],
+    )
+    assert report.frames.status == "passed"
+    with pytest.raises(ValidationError, match="when_language"):
+        FrameQualityPolicy(checks=[{"type": "ascii", "when_language": "unknown"}])
+
+
 def test_literal_checks_are_case_sensitive_and_report_each_value():
     issues = check_frame_quality(
         FrameQualityPolicy(

@@ -103,9 +103,19 @@ class StoryStage(StrEnum):
     FRAMES = "frames"
 
 
+class StageAuthoring(Model):
+    common: tuple[RuleText, ...] = ()
+    content_levels: dict[ContentLevel, tuple[RuleText, ...]] = Field(
+        default_factory=dict
+    )
+
+    def selected(self, content_level: ContentLevel) -> tuple[str, ...]:
+        return self.common + self.content_levels.get(content_level, ())
+
+
 class StoryAuthoring(Model):
-    themes: tuple[RuleText, ...] = ()
-    frames: tuple[RuleText, ...] = ()
+    themes: StageAuthoring = Field(default_factory=StageAuthoring)
+    frames: StageAuthoring = Field(default_factory=StageAuthoring)
 
 
 class StoryRuntime(Model):
@@ -141,6 +151,24 @@ class ProseLengthCheck(TextLengthBounds):
     type: Literal["prose_length"]
 
 
+class AsciiCheck(Model):
+    type: Literal["ascii"]
+    when_language: OutputLanguage | None = None
+
+
+class WordCountCheck(Model):
+    type: Literal["word_count"]
+    when_language: OutputLanguage | None = None
+    min_words: int = Field(default=1, ge=1, le=32768, strict=True)
+    max_words: int | None = Field(default=None, ge=1, le=32768, strict=True)
+
+    @model_validator(mode="after")
+    def ordered_bounds(self) -> WordCountCheck:
+        if self.max_words is not None and self.min_words > self.max_words:
+            raise ValueError("min_words 不能大于 max_words")
+        return self
+
+
 class RequiredTextCheck(Model):
     type: Literal["required_text"]
     values: tuple[RuleText, ...] = Field(min_length=1)
@@ -152,7 +180,12 @@ class ForbiddenTextCheck(Model):
 
 
 QualityCheck = Annotated[
-    CameraEvidenceCheck | ProseLengthCheck | RequiredTextCheck | ForbiddenTextCheck,
+    CameraEvidenceCheck
+    | ProseLengthCheck
+    | RequiredTextCheck
+    | ForbiddenTextCheck
+    | AsciiCheck
+    | WordCountCheck,
     Field(discriminator="type"),
 ]
 
@@ -219,6 +252,8 @@ class StoryQualityIssue(Model):
         "text_length",
         "required_text",
         "forbidden_text",
+        "ascii",
+        "word_count",
     ]
     message: RuleText
 

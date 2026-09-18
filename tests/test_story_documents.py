@@ -4,9 +4,14 @@ import re
 from pathlib import Path
 
 import pytest
+import yaml
 
-from t2i_story_pipeline.documents import load_story_document
 from t2i_story_pipeline.errors import StoryConfigurationError
+from t2i_story_pipeline.inputs import (
+    CatalogDocument,
+    StoryDocument,
+    load_story_document,
+)
 
 
 def test_document_keeps_prose_and_defaults(tmp_path):
@@ -35,7 +40,8 @@ def test_document_keeps_prose_and_defaults(tmp_path):
     assert document.validation.themes.checks == ()
     assert document.validation.frames.mode == "report"
     assert document.validation.frames.checks == ()
-    assert document.authoring.themes == ()
+    assert document.authoring.themes.common == ()
+    assert document.authoring.themes.content_levels == {}
 
 
 def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
@@ -95,8 +101,10 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
         "validation: {themes: {checks: "
         "[{type: required_text, field: title, values: [one]}, "
         "{type: required_text, field: title, values: [two]}]}}",
-        "authoring: {frames: ['']}",
-        'authoring: {themes: ["two\\nlines"]}',
+        "authoring: {frames: {common: ['']}}",
+        'authoring: {themes: {common: ["two\\nlines"]}}',
+        "authoring: {themes: [Old array interface.]}",
+        "authoring: {frames: {content_levels: {unknown: [Rule.]}}}",
         "generation:\n  theme_count: 2\n  theme_count: 3",
         "description: Another story.",
         "authoring: &rules {themes: []}",
@@ -109,7 +117,7 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
 def test_invalid_configuration_fails_explicitly(tmp_path, extra):
     path = tmp_path / "story.yaml"
     path.write_text("id: story\ndescription: Story.\n" + extra, encoding="utf-8")
-    with pytest.raises(StoryConfigurationError, match="故事文档无效"):
+    with pytest.raises(StoryConfigurationError, match="Invalid Story input"):
         load_story_document(path)
 
 
@@ -128,7 +136,9 @@ def test_invalid_configuration_fails_explicitly(tmp_path, extra):
 def test_document_requires_id_and_description_mapping(tmp_path, text):
     path = tmp_path / "story.yaml"
     path.write_text(text, encoding="utf-8")
-    with pytest.raises(StoryConfigurationError, match="故事文档无效"):
+    with pytest.raises(
+        StoryConfigurationError, match="requires an explicit id|Invalid Story input"
+    ):
         load_story_document(path)
 
 
@@ -139,12 +149,18 @@ def test_only_current_yaml_format_is_supported(tmp_path):
         load_story_document(path)
 
 
+def test_direct_document_can_omit_id():
+    document = StoryDocument(description="A quiet station.")
+    assert document.id is None
+    assert document.generation.request(document.description).source_prompt_stem is None
+
+
 def test_io_errors_are_configuration_errors(tmp_path):
-    with pytest.raises(StoryConfigurationError, match="无法读取"):
+    with pytest.raises(StoryConfigurationError, match="missing.yaml"):
         load_story_document(tmp_path / "missing.yaml")
     path = tmp_path / "directory.yaml"
     path.mkdir()
-    with pytest.raises(StoryConfigurationError, match="无法读取"):
+    with pytest.raises(StoryConfigurationError, match="directory.yaml"):
         load_story_document(path)
 
 
@@ -157,6 +173,12 @@ def test_documented_yaml_examples_use_the_current_contract(tmp_path, document):
     examples = [block for block in blocks if block.startswith("id:")]
     assert examples
     for example in examples:
+        value = yaml.safe_load(example)
+        if "entries" in value:
+            catalog = CatalogDocument.model_validate(value)
+            assert catalog.entries
+            assert catalog.slots
+            continue
         path = tmp_path / "example.yaml"
         path.write_text(example, encoding="utf-8")
         loaded = load_story_document(path)
