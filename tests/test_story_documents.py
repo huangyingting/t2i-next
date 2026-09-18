@@ -42,8 +42,8 @@ def test_document_keeps_prose_and_defaults(tmp_path):
     assert document.validation.frames.mode == "report"
     assert document.validation.frames.checks == ()
     assert document.authoring.themes.common == ()
-    assert document.authoring.themes.content_levels == {}
-    assert document.authoring.content_levels == {}
+    assert document.authoring.themes.model_dump() == {"common": ()}
+    assert document.authoring.level_refinements == {}
 
 
 def test_document_loads_shared_and_stage_specific_level_refinements(tmp_path):
@@ -54,25 +54,23 @@ def test_document_loads_shared_and_stage_specific_level_refinements(tmp_path):
                 "id": "station",
                 "description": "A quiet station.",
                 "authoring": {
-                    "content_levels": {
-                        "aesthetic": ["Shared station texture."],
-                        "erotic": ["Unselected station texture."],
+                    "level_refinements": {
+                        "aesthetic": {
+                            "shared": ["Shared station texture."],
+                            "themes": ["Choose a station mood."],
+                            "frames": ["Render station details."],
+                        },
+                        "erotic": {"shared": ["Unselected station texture."]},
                     },
-                    "themes": {
-                        "common": ["Choose a station."],
-                        "content_levels": {"aesthetic": ["Choose a station mood."]},
-                    },
-                    "frames": {
-                        "common": ["Render a station."],
-                        "content_levels": {"aesthetic": ["Render station details."]},
-                    },
+                    "themes": {"common": ["Choose a station."]},
+                    "frames": {"common": ["Render a station."]},
                 },
             }
         ),
         encoding="utf-8",
     )
     document = load_story_document(path)
-    assert document.authoring.content_levels[ContentLevel.AESTHETIC] == (
+    assert document.authoring.level_refinements[ContentLevel.AESTHETIC].shared == (
         "Shared station texture.",
     )
     assert document.authoring.selected(StoryStage.THEMES, ContentLevel.AESTHETIC) == (
@@ -149,8 +147,12 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
         "authoring: {themes: [Old array interface.]}",
         "authoring: {frames: {content_levels: {unknown: [Rule.]}}}",
         "authoring: {content_levels: {unknown: [Rule.]}}",
-        "authoring: {content_levels: {aesthetic: ['']}}",
-        'authoring: {content_levels: {aesthetic: ["two\\nlines"]}}',
+        "authoring: {content_levels: {}}",
+        "authoring: {themes: {content_levels: {}}}",
+        "authoring: {frames: {content_levels: {}}}",
+        "authoring: {level_refinements: {unknown: {shared: [Rule.]}}}",
+        "authoring: {level_refinements: {aesthetic: {shared: ['']}}}",
+        'authoring: {level_refinements: {aesthetic: {shared: ["two\\nlines"]}}}',
         "generation:\n  theme_count: 2\n  theme_count: 3",
         "description: Another story.",
         "authoring: &rules {themes: []}",

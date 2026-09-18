@@ -240,7 +240,14 @@ def _volume(
 
 def _joint_parts(name: str) -> tuple[str, ...]:
     if name.startswith("torso_"):
-        return ("torso", "neck", "head", "left_clavicle", "right_clavicle")
+        return (
+            "torso",
+            "upper_torso",
+            "neck",
+            "head",
+            "left_clavicle",
+            "right_clavicle",
+        )
     if name.startswith("head_"):
         return ("head", "neck")
     side, joint, *_ = name.split("_")

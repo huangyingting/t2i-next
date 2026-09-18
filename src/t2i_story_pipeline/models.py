@@ -105,59 +105,63 @@ class StoryStage(StrEnum):
 
 class StageAuthoring(Model):
     common: tuple[RuleText, ...] = ()
-    content_levels: dict[ContentLevel, tuple[RuleText, ...]] = Field(
-        default_factory=dict
-    )
+
+
+class ContentLevelRefinement(Model):
+    shared: tuple[RuleText, ...] = ()
+    themes: tuple[RuleText, ...] = ()
+    frames: tuple[RuleText, ...] = ()
+
+    @model_validator(mode="after")
+    def rules_have_one_owner(self) -> ContentLevelRefinement:
+        for name, rules in (
+            ("shared", self.shared),
+            ("themes", self.themes),
+            ("frames", self.frames),
+        ):
+            if len(rules) != len(set(rules)):
+                raise ValueError(f"{name} refinements must not repeat rules")
+        if set(self.themes) & set(self.frames):
+            raise ValueError("duplicate Theme/Frame refinements belong in shared")
+        for stage, rules in (("themes", self.themes), ("frames", self.frames)):
+            if set(self.shared) & set(rules):
+                raise ValueError(f"shared refinements repeat {stage} instructions")
+        return self
 
 
 class StoryAuthoring(Model):
-    content_levels: dict[ContentLevel, tuple[RuleText, ...]] = Field(
-        default_factory=dict,
-        description="Shared topic-specific refinements, not system-level replacements.",
-    )
     themes: StageAuthoring = Field(default_factory=StageAuthoring)
     frames: StageAuthoring = Field(default_factory=StageAuthoring)
+    level_refinements: dict[ContentLevel, ContentLevelRefinement] = Field(
+        default_factory=dict,
+        description="Topic-specific refinements, not system-level replacements.",
+    )
 
     @model_validator(mode="after")
-    def level_rules_have_one_owner(self) -> StoryAuthoring:
-        for level in ContentLevel:
-            shared = self.content_levels.get(level, ())
-            if len(shared) != len(set(shared)):
-                raise ValueError(f"shared {level} refinements must not repeat rules")
-            theme_rules = self.themes.content_levels.get(level, ())
-            frame_rules = self.frames.content_levels.get(level, ())
-            if set(theme_rules) & set(frame_rules):
-                raise ValueError(
-                    f"duplicate {level} Theme/Frame refinements belong in "
-                    "authoring.content_levels"
-                )
-            for stage in StoryStage:
-                authored = getattr(self, stage.value)
-                specific = authored.content_levels.get(level, ())
-                if len(specific) != len(set(specific)):
-                    raise ValueError(
-                        f"{stage} {level} refinements must not repeat rules"
-                    )
-                if set(specific) & set(authored.common):
-                    raise ValueError(
-                        f"{stage} {level} refinements repeat stage common rules"
-                    )
-                if set(shared) & set((*authored.common, *specific)):
-                    raise ValueError(
-                        f"shared {level} refinements repeat {stage} instructions"
-                    )
+    def refinements_do_not_repeat_common(self) -> StoryAuthoring:
+        for level, refinement in self.level_refinements.items():
+            for stage, common, specific in (
+                ("themes", self.themes.common, refinement.themes),
+                ("frames", self.frames.common, refinement.frames),
+            ):
+                if set(common) & set((*refinement.shared, *specific)):
+                    raise ValueError(f"{level} refinements repeat {stage} common rules")
         return self
 
     def selected(
         self, stage: StoryStage, content_level: ContentLevel
     ) -> tuple[str, ...]:
-        authored = getattr(self, StoryStage(stage).value)
-        level = ContentLevel(content_level)
-        return (
-            authored.common
-            + self.content_levels.get(level, ())
-            + authored.content_levels.get(level, ())
+        stage = StoryStage(stage)
+        common = (
+            self.themes.common if stage == StoryStage.THEMES else self.frames.common
         )
+        refinement = self.level_refinements.get(ContentLevel(content_level))
+        if refinement is None:
+            return common
+        specific = (
+            refinement.themes if stage == StoryStage.THEMES else refinement.frames
+        )
+        return common + refinement.shared + specific
 
 
 class StoryRuntime(Model):

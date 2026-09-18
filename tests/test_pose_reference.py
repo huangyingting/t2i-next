@@ -55,11 +55,18 @@ def test_library_has_curated_structural_coverage() -> None:
     assert set(families.values()) == {3}
     report = describe_reference_poses(LIBRARY.poses)
     assert set(report.body_level_counts) == {
-        "standing", "seated", "kneeling", "crouched", "lying"
+        "standing",
+        "seated",
+        "kneeling",
+        "crouched",
+        "lying",
     }
     assert set(report.spine_counts) == {
-        "upright", "forward_inclined", "reclined",
-        "gentle_twist", "neutral_horizontal",
+        "upright",
+        "forward_inclined",
+        "reclined",
+        "gentle_twist",
+        "neutral_horizontal",
     }
     assert report.pair_count == 48 * 47 // 2
     assert report.minimum_structural_distance is not None
@@ -79,17 +86,23 @@ def test_every_pose_compiles_all_declared_geometry(pose_id: str) -> None:
             continue
         subject = LIBRARY.subjects[0]
         presentation = next(
-            item for item in LIBRARY.presentations
+            item
+            for item in LIBRARY.presentations
             if presentation_supports(
                 item, tuple(contact.surface for contact in pose.supports)
-            ) and presentation_accepts_camera(item, camera)
+            )
+            and presentation_accepts_camera(item, camera)
         )
         prompt = render_pose_reference(pose, camera, subject, presentation)
         geometry = compile_reference_geometry(pose, subject, presentation)
         scene = PoseReferenceScene(
-            pose=pose, camera=camera, subject=subject,
-            presentation=presentation, prompt=prompt,
-            geometry=geometry, geometry_report=reference_geometry_report(geometry),
+            pose=pose,
+            camera=camera,
+            subject=subject,
+            presentation=presentation,
+            prompt=prompt,
+            geometry=geometry,
+            geometry_report=reference_geometry_report(geometry),
             geometry_joints=reference_joint_positions(geometry),
         )
         assert scene.prompt.isascii()
@@ -100,8 +113,13 @@ def test_every_pose_compiles_all_declared_geometry(pose_id: str) -> None:
         assert render_reference_presentation(presentation) in prompt
         assert "non-sexual figure-study" in prompt
         for value in (
-            pose.body_level, pose.spine, pose.facing, pose.silhouette,
-            pose.pelvis_facing, pose.legs, pose.gaze,
+            pose.body_level,
+            pose.spine,
+            pose.facing,
+            pose.silhouette,
+            pose.pelvis_facing,
+            pose.legs,
+            pose.gaze,
         ):
             assert value.replace("_", " ") in prompt
         for side, placement in (("left", pose.left_hand), ("right", pose.right_hand)):
@@ -120,14 +138,12 @@ def test_every_pose_compiles_all_declared_geometry(pose_id: str) -> None:
                 assert f"The {side} hand is {placement.replace('_', ' ')}" in prompt
         for contact in pose.supports:
             description = next(
-                support.description for support in presentation.supports
+                support.description
+                for support in presentation.supports
                 if support.surface == contact.surface
             )
             suffix = " bears weight" if contact.load_bearing else " makes light contact"
-            expected = (
-                f"{contact.body_part.replace('_', ' ')} on "
-                f"{description}{suffix}"
-            )
+            expected = f"{contact.body_part.replace('_', ' ')} on {description}{suffix}"
             assert expected in prompt
 
 
@@ -225,9 +241,7 @@ def test_support_contact_ownership_and_loading() -> None:
         SupportContact(body_part="left_knee", surface="table")
     pose = POSES["standing_parallel_relaxed"]
     payload = pose.model_dump(mode="json")
-    payload["supports"] = [
-        *payload["supports"], payload["supports"][0]
-    ]
+    payload["supports"] = [*payload["supports"], payload["supports"][0]]
     with pytest.raises(ValidationError, match="one surface"):
         NeutralPose.model_validate(payload)
     payload["supports"] = [
@@ -260,7 +274,9 @@ def test_library_rejects_ambiguous_entries(field: str, error: str) -> None:
         payload["poses"][1]["pose_id"] = payload["poses"][0]["pose_id"]
     elif field == "structure":
         payload["poses"][1] = payload["poses"][0] | {
-            "pose_id": "renamed_pose", "family": "new_family", "gaze": "downward"
+            "pose_id": "renamed_pose",
+            "family": "new_family",
+            "gaze": "downward",
         }
     elif field == "camera_id":
         payload["cameras"][1]["camera_id"] = payload["cameras"][0]["camera_id"]
@@ -281,7 +297,8 @@ def test_structural_distance_measures_fields_not_labels_or_gaze() -> None:
     assert structural_distance(pose, left_turn) == 3 / 8
     assert structural_distance(left_turn, pose) == 3 / 8
     renamed = NeutralPose.model_validate(
-        pose.model_dump(mode="json") | {
+        pose.model_dump(mode="json")
+        | {
             "pose_id": "renamed_pose",
             "family": "renamed_family",
             "gaze": "downward",
@@ -339,7 +356,8 @@ def test_sampler_follows_family_first_maximin_rule() -> None:
     for scene in batch.scenes:
         minimum_family_count = min(family_counts[pose.family] for pose in remaining)
         eligible = [
-            pose for pose in remaining
+            pose
+            for pose in remaining
             if family_counts[pose.family] == minimum_family_count
         ]
         assert scene.pose in eligible
@@ -389,8 +407,10 @@ def test_report_counts_exact_pairs_and_single_pose_has_no_distance() -> None:
     assert report.minimum_structural_distance == min(distances)
     assert report.mean_structural_distance == sum(distances) / 3
     for counts in (
-        report.family_counts, report.body_level_counts,
-        report.spine_counts, report.balance_bias_counts,
+        report.family_counts,
+        report.body_level_counts,
+        report.spine_counts,
+        report.balance_bias_counts,
     ):
         assert sum(counts.values()) == 3
     single = describe_reference_poses(poses[:1])
@@ -417,8 +437,10 @@ def test_scene_and_batch_reject_stale_derived_data() -> None:
         PoseReferenceScene.model_validate(scene)
     with pytest.raises(ValueError, match="incompatible"):
         render_pose_reference(
-            POSES["side_lying_rest_left"], LIBRARY.cameras[0],
-            LIBRARY.subjects[0], LIBRARY.presentations[0],
+            POSES["side_lying_rest_left"],
+            LIBRARY.cameras[0],
+            LIBRARY.subjects[0],
+            LIBRARY.presentations[0],
         )
 
 
@@ -429,9 +451,14 @@ def test_cli_list_audit_and_sample_are_wired() -> None:
     assert NeutralPoseLibrary.model_validate_json(listing.stdout) == LIBRARY
     audit = runner.invoke(app, ["poses", "audit"])
     assert audit.exit_code == 0, audit.output
-    assert ReferenceLibraryAudit.model_validate_json(audit.stdout) == (
-        audit_reference_library(LIBRARY)
+    report = ReferenceLibraryAudit.model_validate_json(audit.stdout)
+    assert report == audit_reference_library(LIBRARY)
+    assert report.evidence == "static_proxy_geometry_and_symbolic_structure"
+    assert report.pose_report.evidence == "symbolic_structure_only"
+    assert report.geometry_checked_scenes == (
+        report.compatible_pose_camera_presentation_count * report.subject_count
     )
+    assert not report.geometry_rejections
     sample = runner.invoke(app, ["poses", "sample", "--seed", "42", "--count", "16"])
     assert sample.exit_code == 0, sample.output
     assert PoseReferenceBatch.model_validate_json(sample.stdout) == (
@@ -447,15 +474,23 @@ def test_cli_list_audit_and_sample_are_wired() -> None:
 def test_cli_exports_exact_text_and_never_overwrites(tmp_path: Path) -> None:
     path = tmp_path / "references" / "poses.txt"
     arguments = [
-        "poses", "sample", "--seed", "42", "--count", "3",
-        "--family", "half_kneeling", "--format", "text", "--output", str(path),
+        "poses",
+        "sample",
+        "--seed",
+        "42",
+        "--count",
+        "3",
+        "--family",
+        "half_kneeling",
+        "--format",
+        "text",
+        "--output",
+        str(path),
     ]
     runner = CliRunner()
     result = runner.invoke(app, arguments)
     assert result.exit_code == 0, result.output
-    expected = sample_pose_references(
-        LIBRARY, seed=42, count=3, family="half_kneeling"
-    )
+    expected = sample_pose_references(LIBRARY, seed=42, count=3, family="half_kneeling")
     assert path.read_text(encoding="utf-8").splitlines() == [
         scene.prompt for scene in expected.scenes
     ]
@@ -517,8 +552,11 @@ def test_export_failure_removes_only_its_partial_file(
 def test_reference_modules_have_no_pipeline_or_activity_dependencies() -> None:
     package = Path(reference_cli.__file__).parent
     for name in (
-        "pose_reference.py", "pose_reference_catalog.py", "pose_reference_cli.py",
-        "pose_reference_types.py", "pose_reference_history.py",
+        "pose_reference.py",
+        "pose_reference_catalog.py",
+        "pose_reference_cli.py",
+        "pose_reference_types.py",
+        "pose_reference_history.py",
         "pose_reference_presentation.py",
         "pose_reference_geometry.py",
     ):
@@ -529,9 +567,12 @@ def test_reference_modules_have_no_pipeline_or_activity_dependencies() -> None:
             if isinstance(node, ast.ImportFrom) and node.level
         }
         assert relative_imports <= {
-            "pose_reference", "pose_reference_catalog", "pose_reference_types",
-            "pose_reference_history", "pose_reference_presentation",
-            "pose_reference_geometry", "pose_reference_types",
+            "pose_reference",
+            "pose_reference_catalog",
+            "pose_reference_types",
+            "pose_reference_history",
+            "pose_reference_presentation",
+            "pose_reference_geometry",
         }
         absolute_imports = {
             node.module.split(".")[0]
@@ -545,10 +586,24 @@ def test_reference_modules_have_no_pipeline_or_activity_dependencies() -> None:
             for alias in node.names
         )
         assert absolute_imports <= {
-            "__future__", "random", "collections", "itertools", "typing",
-            "pydantic", "os", "enum", "pathlib", "typer",
-            "hashlib", "json",
-            "t2i_pose_geometry", "numpy", "scipy", "math", "functools", "importlib",
+            "__future__",
+            "random",
+            "collections",
+            "itertools",
+            "typing",
+            "pydantic",
+            "os",
+            "enum",
+            "pathlib",
+            "typer",
+            "hashlib",
+            "json",
+            "t2i_pose_geometry",
+            "numpy",
+            "scipy",
+            "math",
+            "functools",
+            "importlib",
         }
 
 
@@ -604,7 +659,8 @@ def test_offline_cli_and_sampling_survive_python_hash_randomization() -> None:
     digests = []
     for hash_seed in ("1", "99991"):
         environment = {
-            key: value for key, value in os.environ.items()
+            key: value
+            for key, value in os.environ.items()
             if not key.startswith(("OPENAI_", "COPILOT_"))
         }
         environment["PYTHONHASHSEED"] = hash_seed

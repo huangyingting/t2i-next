@@ -26,12 +26,13 @@ from .models import (
     Tolerances,
     ValidationReport,
 )
-from .solver import ROOT_VARIABLES, solve_actor
+from .solver import ROOT_VARIABLES, VARIABLE_GROUPS, expand_variable_names, solve_actor
 from .validation import face_frame, validate_scene
 
 __all__ = [
     "JOINT_LIMITS",
     "ROOT_VARIABLES",
+    "VARIABLE_GROUPS",
     "ActorPose",
     "Anchor",
     "AnchorTarget",
@@ -49,6 +50,7 @@ __all__ = [
     "TargetError",
     "Tolerances",
     "ValidationReport",
+    "expand_variable_names",
     "face_frame",
     "forward_kinematics",
     "solve_actor",

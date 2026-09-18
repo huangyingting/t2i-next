@@ -17,22 +17,27 @@ from t2i_pose_geometry.models import (
 @pytest.mark.parametrize("side", ["left", "right"])
 @pytest.mark.parametrize("scale", [0.94, 1.0, 1.06])
 def test_two_bone_seeds_preserve_lengths_and_meet_actual_surface_target(
-    side: str, scale: float,
+    side: str,
+    scale: float,
 ) -> None:
     opposite = "right" if side == "left" else "left"
     actor = ActorPose(
-        actor_id="person", body=BodySpec().scaled(scale),
+        actor_id="person",
+        body=BodySpec().scaled(scale),
         root_position=(0.2, -0.1, 0.895 * scale),
         root_rotation=(0, 0, 30),
-        angles=JointAngles.model_validate({
-            f"{opposite}_shoulder_flex": 15,
-            f"{opposite}_elbow_flex": 50,
-        }),
+        angles=JointAngles.model_validate(
+            {
+                f"{opposite}_shoulder_flex": 15,
+                f"{opposite}_elbow_flex": 50,
+            }
+        ),
     )
     before = actor.model_dump_json()
     site = forward_kinematics(actor).anchors[f"{opposite}_forearm"]
     target = AnchorTarget(
-        anchor=f"{side}_palm", position=site.position,
+        anchor=f"{side}_palm",
+        position=site.position,
         normal=(-site.normal[0], -site.normal[1], -site.normal[2]),
     )
     candidates = arm_seed_candidates(actor, side, target)

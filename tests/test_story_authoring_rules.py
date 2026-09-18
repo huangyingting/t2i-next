@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.inputs import load_story_document, resolve_story_input
 from t2i_story_pipeline.models import ContentLevel, StoryAuthoring, StoryStage
@@ -22,36 +24,57 @@ def test_story_rules_compile_only_the_selected_content_level() -> None:
         assert "本次使用 赤裸裸的性描写（hardcore）" not in text
 
 
-def test_story_content_level_rules_match_prompt_pipeline() -> None:
-    prompt_rules = (
-        REPOSITORY_ROOT
-        / "src"
-        / "t2i_prompt_pipeline"
-        / "rule_packs"
-        / "system"
-        / "content_levels"
+@pytest.mark.parametrize("level", list(ContentLevel))
+def test_common_contracts_have_one_owner_at_every_level(level: ContentLevel) -> None:
+    system = REPOSITORY_ROOT / "src" / "t2i_story_pipeline" / "rule_packs" / "system"
+    common = (system / "common.rules").read_text(encoding="utf-8").splitlines()
+    universal = [
+        rule
+        for rule in common
+        if rule.startswith(
+            (
+                "Every depicted person must be an unmistakable adult.",
+                "All participants must be alert, consenting, "
+                "responsive, and able to stop.",
+                "Do not write the content-level name,",
+            )
+        )
+    ]
+    assert len(universal) == 3
+    grade = (system / "content_levels" / f"{level.value}.rules").read_text(
+        encoding="utf-8"
     )
-    story_rules = (
-        REPOSITORY_ROOT
-        / "src"
-        / "t2i_story_pipeline"
-        / "rule_packs"
-        / "system"
-        / "content_levels"
-    )
+    assert "不要把内容等级名称" not in grade
+    assert "所有角色必须外观明确成年。" not in grade
+    rules = resolve_story_rules(make_story_request(content_level=level))
+    for stage in StoryStage:
+        selected = getattr(rules, stage.value)
+        for rule in universal:
+            assert selected.count(rule) == 1
 
-    for filename in ("aesthetic.rules", "erotic.rules", "hardcore.rules"):
-        assert (story_rules / filename).read_text(encoding="utf-8") == (
-            prompt_rules / filename
-        ).read_text(encoding="utf-8")
+
+@pytest.mark.parametrize("level", list(ContentLevel))
+def test_grade_specific_limits_are_not_promoted_to_common(level: ContentLevel) -> None:
+    rules = resolve_story_rules(make_story_request(content_level=level))
+    for stage in StoryStage:
+        text = rules.text_for(stage)
+        assert ("二十一岁以上" in text) == (level == ContentLevel.HARDCORE)
+        assert ("反射或前景遮挡合计最多占一个 Frame" in text) == (
+            level == ContentLevel.EROTIC
+        )
+        assert ("尺度上限为" in text) == (level == ContentLevel.AESTHETIC)
+        if level == ContentLevel.HARDCORE:
+            assert "以主动接触或共同施力提供符合公共参与要求的可见证据" in text
+        elif level == ContentLevel.EROTIC:
+            assert "回应视线、主动接触、相向姿态或共同施力" in text
 
 
 def test_story_rules_append_selected_authoring_in_stage_order() -> None:
     authoring = StoryAuthoring.model_validate(
         {
-            "content_levels": {
-                "aesthetic": ["User aesthetic rule."],
-                "erotic": ["Unselected erotic rule."],
+            "level_refinements": {
+                "aesthetic": {"shared": ["User aesthetic rule."]},
+                "erotic": {"shared": ["Unselected erotic rule."]},
             },
             **{
                 stage: {

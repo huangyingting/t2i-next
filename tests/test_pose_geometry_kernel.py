@@ -11,6 +11,7 @@ from scipy.spatial.transform import Rotation
 
 from t2i_pose_geometry import (
     JOINT_LIMITS,
+    VARIABLE_GROUPS,
     ActorPose,
     AnchorTarget,
     BodyContact,
@@ -22,6 +23,7 @@ from t2i_pose_geometry import (
     Scene,
     Shape,
     Tolerances,
+    expand_variable_names,
     face_frame,
     forward_kinematics,
     solve_actor,
@@ -125,8 +127,129 @@ def test_side_lying_shoulder_envelope_and_floor_contact(
     assert report.passed, report
 
 
+@pytest.mark.parametrize("pitch", [-40, -20, 0, 25])
+@pytest.mark.parametrize("yaw", [-35, 0, 40])
+def test_back_anchor_is_upper_thorax_root_posterior_support_with_true_normal(
+    pitch: float, yaw: float
+) -> None:
+    actor = ActorPose(
+        actor_id="adult",
+        root_rotation=(17, -22, 41),
+        angles=JointAngles(torso_pitch=pitch, torso_yaw=yaw),
+    )
+    skeleton = forward_kinematics(actor)
+    back = skeleton.anchors["back"]
+    normal = matrix(actor.root_rotation) @ np.array([0, -1, 0])
+    assert back.normal == pytest.approx(normal, abs=1e-12)
+    assert back.shape_id == "upper_torso"
+    posterior = float(np.asarray(back.position) @ normal)
+    shape = next(shape for shape in skeleton.shapes if shape.shape_id == back.shape_id)
+    maximum = float(np.asarray(shape.center) @ normal) + Collider(shape).extent(normal)
+    assert posterior == pytest.approx(maximum, abs=1e-12)
+    rotation = matrix(shape.rotation)
+    local = rotation.T @ np.subtract(back.position, shape.center)
+    gradient = rotation @ (local / np.square(shape.radii))
+    gradient /= np.linalg.norm(gradient)
+    assert back.normal == pytest.approx(gradient, abs=1e-12)
+
+
+@pytest.mark.parametrize("torso_pitch,head_pitch", [(-20, 40), (-6, 10)])
+def test_reclined_back_contact_on_vertical_wall_uses_root_frame_normal(
+    torso_pitch: float, head_pitch: float
+) -> None:
+    actor = ActorPose(
+        actor_id="adult",
+        angles=JointAngles(torso_pitch=torso_pitch, head_pitch=head_pitch),
+    )
+    back = forward_kinematics(actor).anchors["back"]
+    wall = Box(
+        object_id="wall",
+        center=(0, back.position[1] - 0.05, 1),
+        size=(2, 0.1, 2),
+    )
+    report = validate_scene(
+        Scene(
+            actors=(actor,),
+            objects=(wall,),
+            contacts=(
+                Contact(
+                    actor_id="adult",
+                    anchor="back",
+                    object_id="wall",
+                    face="front",
+                ),
+            ),
+        )
+    )
+    assert report.passed, report
+
+
+@pytest.mark.parametrize("side", ["left", "right"])
+def test_forearm_back_is_opposite_capsule_surface_at_same_segment_midpoint(
+    side: str,
+) -> None:
+    actor = ActorPose(
+        actor_id="adult",
+        root_rotation=(20, -30, 40),
+        angles=JointAngles(
+            **{
+                f"{side}_shoulder_flex": 60,
+                f"{side}_shoulder_abduction": 20,
+                f"{side}_shoulder_rotation": 40,
+                f"{side}_elbow_flex": 75,
+            }
+        ),
+    )
+    skeleton = forward_kinematics(actor)
+    front = skeleton.anchors[f"{side}_forearm"]
+    back = skeleton.anchors[f"{side}_forearm_back"]
+    midpoint = (
+        np.asarray(skeleton.joints[f"{side}_elbow"]) + skeleton.joints[f"{side}_wrist"]
+    ) / 2
+    assert front.shape_id == back.shape_id == f"{side}_forearm"
+    assert back.normal == pytest.approx(-np.asarray(front.normal), abs=1e-12)
+    assert back.position == pytest.approx(
+        midpoint - actor.body.forearm_radius * np.asarray(front.normal), abs=1e-12
+    )
+    assert (np.asarray(front.position) + back.position) / 2 == pytest.approx(
+        midpoint, abs=1e-12
+    )
+
+
+def test_upper_back_contact_does_not_exempt_lower_torso_wall_penetration() -> None:
+    actor = ActorPose(actor_id="adult", angles=JointAngles(torso_pitch=25))
+    back = forward_kinematics(actor).anchors["back"]
+    report = validate_scene(
+        Scene(
+            actors=(actor,),
+            objects=(
+                Box(
+                    object_id="wall",
+                    center=(0, back.position[1] - 0.05, 1),
+                    size=(2, 0.1, 2),
+                ),
+            ),
+            contacts=(
+                Contact(
+                    actor_id="adult",
+                    anchor="back",
+                    object_id="wall",
+                    face="front",
+                ),
+            ),
+        )
+    )
+    assert not report.passed
+    assert not any(issue.code.startswith("contact_") for issue in report.issues)
+    assert any(
+        issue.code == "object_collision" and issue.parts == ("adult", "torso", "wall")
+        for issue in report.issues
+    )
+
+
 @pytest.mark.parametrize("gap", [0.02, 0.0, -0.03])
-def test_rotated_capsule_box_analytic_gap(gap: float) -> None:
+@pytest.mark.parametrize("reverse", [False, True])
+def test_rotated_capsule_box_analytic_gap(gap: float, reverse: bool) -> None:
     rotation = Rotation.from_euler("xyz", [27, -19, 41], degrees=True)
     transform = rotation.as_matrix()
     offset = np.array([1.2, -0.7, 0.5])
@@ -139,7 +262,8 @@ def test_rotated_capsule_box_analytic_gap(gap: float) -> None:
         size=(2, 2, 1),
         rotation=(27, -19, 41),
     )
-    result = query_pair(tube, box)
+    first, second = (box, tube) if reverse else (tube, box)
+    result = query_pair(first, second)
     if gap > 0:
         assert not result.colliding
         assert result.distance_m == pytest.approx(gap, abs=2e-6)
@@ -150,6 +274,56 @@ def test_rotated_capsule_box_analytic_gap(gap: float) -> None:
     else:
         assert result.distance_m == pytest.approx(0, abs=2e-6)
         assert shallow_overlap_proven(Collider(tube), Collider(box), 1e-5, result)
+
+
+@pytest.mark.parametrize("length", [0.0, 1e-12, 1e-8])
+@pytest.mark.parametrize("gap", [0.002, 0.0, -0.002])
+@pytest.mark.parametrize("reverse", [False, True])
+def test_rotated_near_spherical_capsule_against_box(
+    length: float, gap: float, reverse: bool
+) -> None:
+    rotation = Rotation.from_euler("xyz", [31, -14, 57], degrees=True)
+    offset = np.array([-0.3, 0.9, 0.2])
+    tube = capsule(
+        "near_sphere",
+        tuple(rotation.apply((-length / 2, 0, 0.6 + gap)) + offset),
+        tuple(rotation.apply((length / 2, 0, 0.6 + gap)) + offset),
+        0.1,
+    )
+    box = Box(
+        object_id="slab",
+        center=tuple(offset),
+        size=(2, 2, 1),
+        rotation=(31, -14, 57),
+    )
+    first, second = (box, tube) if reverse else (tube, box)
+    result = query_pair(first, second)
+    assert math.isfinite(result.distance_m)
+    if gap > 0:
+        assert not result.colliding
+        assert result.distance_m == pytest.approx(gap, abs=2e-6)
+    elif gap < 0:
+        assert result.colliding
+        assert result.penetration_m == pytest.approx(-gap, abs=2e-6)
+        assert not shallow_overlap_proven(
+            Collider(first), Collider(second), 1e-5, result
+        )
+    else:
+        assert result.distance_m <= 2e-6
+        assert shallow_overlap_proven(Collider(first), Collider(second), 1e-5, result)
+
+
+def test_unsigned_distance_sentinel_is_never_a_penetration_depth(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    first = capsule("capsule", (0, 0, 0), (0, 0, 0.3), 0.04)
+    second = Box(object_id="box", center=(2, 0, 0), size=(1, 1, 1))
+    monkeypatch.setattr("t2i_pose_geometry.collision.fcl.distance", lambda *_: -1.0)
+    result = query_pair(first, second)
+    assert result.colliding
+    assert result.distance_m == 0
+    assert result.penetration_m is None
+    assert not result.contacts
 
 
 def test_rotated_ellipsoid_uses_solid_support_not_centerline() -> None:
@@ -461,11 +635,7 @@ def test_own_lap_palm_ik_is_independently_validated_without_collision_exemptions
                 normal=tuple(-value for value in lap.normal),
             ),
         ),
-        tuple(
-            name
-            for name in JOINT_LIMITS
-            if name.startswith(("left_shoulder", "left_elbow", "left_wrist"))
-        ),
+        ("left_shoulder", "left_elbow", "left_wrist"),
         max_nfev=100,
     )
     assert result.converged, result
@@ -553,6 +723,73 @@ def test_fixed_bone_lengths_under_arbitrary_rotations_and_scaling() -> None:
         )
 
 
+def test_shape_free_fk_has_identical_joints_and_anchors_across_transforms() -> None:
+    rng = np.random.default_rng(8034)
+    for _ in range(25):
+        actor = ActorPose(
+            actor_id="adult",
+            body=BodySpec().scaled(float(rng.uniform(0.8, 1.2))),
+            root_position=tuple(rng.uniform(-2, 2, size=3)),
+            root_rotation=tuple(rng.uniform(-180, 180, size=3)),
+            angles=JointAngles(
+                **{
+                    name: rng.uniform(lower, upper)
+                    for name, (lower, upper) in JOINT_LIMITS.items()
+                }
+            ),
+        )
+        full = forward_kinematics(actor)
+        fast = forward_kinematics(actor, include_shapes=False)
+        assert fast.joints == full.joints
+        assert fast.anchors == full.anchors
+        assert not fast.shapes and not fast.joint_regions
+        assert full.shapes and full.joint_regions
+
+
+def test_ik_fast_path_never_constructs_collision_models_or_converts_to_euler(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    actor = ActorPose(actor_id="adult")
+    target = AnchorTarget(
+        anchor="left_sole", position=(-actor.body.hip_half_width, 0.2, 0.1)
+    )
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Collision-only work ran during shape-free IK")
+
+    for name in ("Shape", "JointRegion", "capsule", "euler"):
+        monkeypatch.setattr(f"t2i_pose_geometry.kinematics.{name}", forbidden)
+    skeleton = forward_kinematics(actor, include_shapes=False)
+    assert skeleton.anchors["left_sole"].position[2] == pytest.approx(0)
+    result = solve_actor(actor, (target,), ("root_position",), max_nfev=30)
+    assert result.converged, result
+    assert result.actor.angles == actor.angles
+
+
+def test_shape_free_fk_still_revalidates_unchecked_actor_parameters() -> None:
+    invalid_body = BodySpec().model_copy(update={"shin_length": math.nan})
+    actor = ActorPose(actor_id="adult").model_copy(update={"body": invalid_body})
+    with pytest.raises(ValidationError):
+        forward_kinematics(actor, include_shapes=False)
+
+
+def test_scene_validation_always_rebuilds_full_geometry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = []
+
+    def checked_fk(actor):
+        skeleton = forward_kinematics(actor)
+        assert skeleton.shapes and skeleton.joint_regions
+        calls.append(actor.actor_id)
+        return skeleton
+
+    monkeypatch.setattr("t2i_pose_geometry.validation.forward_kinematics", checked_fk)
+    report = validate_scene(standing_scene())
+    assert report.passed, report
+    assert calls == ["adult"]
+
+
 def test_flexion_and_bilateral_abduction_conventions() -> None:
     actor = ActorPose(
         actor_id="adult",
@@ -592,7 +829,96 @@ def test_ankle_dorsiflexion_and_wrist_flexion_conventions() -> None:
     )
 
 
-def test_reachable_bounded_ik_preserves_bones_and_fits_normals() -> None:
+@pytest.mark.parametrize("side", ["left", "right"])
+def test_toe_anchor_is_exact_foot_front_face_with_rotated_outward_normal(
+    side: str,
+) -> None:
+    actor = ActorPose(
+        actor_id="adult",
+        root_rotation=(15, -30, 45),
+        angles=JointAngles(**{f"{side}_knee_flex": 107, f"{side}_ankle_flex": 17}),
+    )
+    skeleton = forward_kinematics(actor)
+    foot = next(shape for shape in skeleton.shapes if shape.shape_id == f"{side}_foot")
+    toe = skeleton.anchors[f"{side}_toes"]
+    rotation = matrix(foot.rotation)
+    expected_normal = rotation @ np.array([0, 1, 0])
+    expected_position = (
+        np.asarray(foot.center) + expected_normal * actor.body.foot_length / 2
+    )
+    assert toe.shape_id == foot.shape_id
+    assert toe.normal == pytest.approx(expected_normal, abs=1e-12)
+    assert toe.position == pytest.approx(expected_position, abs=1e-12)
+
+
+@pytest.mark.parametrize("side", ["left", "right"])
+def test_knee_ground_is_root_down_sphere_surface_independent_of_shin(
+    side: str,
+) -> None:
+    actor = ActorPose(
+        actor_id="adult",
+        root_rotation=(15, -30, 45),
+        angles=JointAngles(**{f"{side}_hip_flex": 25, f"{side}_knee_flex": 107}),
+    )
+    skeleton = forward_kinematics(actor)
+    anchor = skeleton.anchors[f"{side}_knee_ground"]
+    normal = matrix(actor.root_rotation) @ np.array([0, 0, -1])
+    center = np.asarray(skeleton.joints[f"{side}_knee"])
+    assert anchor.normal == pytest.approx(normal, abs=1e-12)
+    assert anchor.position == pytest.approx(
+        center + normal * actor.body.knee_radius, abs=1e-12
+    )
+    assert anchor.shape_id == f"{side}_knee_joint"
+    assert np.linalg.norm(np.asarray(anchor.position) - center) == pytest.approx(
+        actor.body.knee_radius, abs=1e-12
+    )
+    assert not np.allclose(anchor.normal, skeleton.anchors[f"{side}_knee"].normal)
+
+
+def test_knee_ground_and_vertical_toes_contact_mat_without_relaxing_limits() -> None:
+    body = BodySpec()
+    knee_angle = math.degrees(
+        math.acos(-(0.75 * body.foot_length - body.knee_radius) / body.shin_length)
+    )
+    actor = ActorPose(
+        actor_id="adult",
+        root_position=(0, 0, body.thigh_length + body.knee_radius),
+        angles=JointAngles(
+            left_knee_flex=knee_angle,
+            right_knee_flex=knee_angle,
+            left_ankle_flex=knee_angle - 90,
+            right_ankle_flex=knee_angle - 90,
+        ),
+    )
+    skeleton = forward_kinematics(actor)
+    for side in ("left", "right"):
+        for site in ("knee_ground", "toes"):
+            anchor = skeleton.anchors[f"{side}_{site}"]
+            assert anchor.position[2] == pytest.approx(0, abs=1e-12)
+            assert anchor.normal == pytest.approx((0, 0, -1), abs=1e-12)
+    scene = Scene(
+        actors=(actor,),
+        objects=(Box(object_id="mat", center=(0, 0, -0.025), size=(3, 3, 0.05)),),
+        contacts=tuple(
+            Contact(actor_id="adult", anchor=f"{side}_{site}", object_id="mat")
+            for side in ("left", "right")
+            for site in ("knee_ground", "toes")
+        ),
+    )
+    report = validate_scene(scene)
+    assert report.passed, report
+
+
+@pytest.mark.parametrize(
+    "variables",
+    [
+        ("left_shoulder_flex", "left_elbow_flex", "left_wrist_flex"),
+        ("left_shoulder.flex", "left_elbow.flex", "left_wrist.flex"),
+    ],
+)
+def test_reachable_bounded_ik_preserves_bones_and_fits_normals(
+    variables: tuple[str, ...],
+) -> None:
     desired = ActorPose(
         actor_id="adult",
         angles=JointAngles(
@@ -607,7 +933,7 @@ def test_reachable_bounded_ik_preserves_bones_and_fits_normals() -> None:
     result = solve_actor(
         initial,
         (AnchorTarget(anchor="left_palm", position=palm.position, normal=palm.normal),),
-        ("left_shoulder_flex", "left_elbow_flex", "left_wrist_flex"),
+        variables,
         max_nfev=100,
     )
     assert result.converged, result
@@ -638,14 +964,24 @@ def test_unreachable_ik_remains_explicit_and_bounded() -> None:
         )
 
 
-def test_root_only_ik_and_no_variable_normal_failure() -> None:
+@pytest.mark.parametrize(
+    "variables",
+    [
+        ("root_x", "root_y", "root_z"),
+        ("root_position",),
+        ("root_position.x", "root_position.y", "root_position.z"),
+    ],
+)
+def test_root_only_ik_and_no_variable_normal_failure(
+    variables: tuple[str, ...],
+) -> None:
     actor = ActorPose(actor_id="adult")
     sole = forward_kinematics(actor).anchors["left_sole"]
     target = tuple(np.asarray(sole.position) + (0.2, 0.1, 0.3))
     result = solve_actor(
         actor,
         (AnchorTarget(anchor="left_sole", position=target),),
-        ("root_x", "root_y", "root_z"),
+        variables,
     )
     assert result.converged
     assert result.actor.root_position == pytest.approx((0.2, 0.1, 1.195))
@@ -693,7 +1029,17 @@ def test_unknown_contact_targets_fail_explicitly(
     assert any(issue.code == code for issue in report.issues)
 
 
-@pytest.mark.parametrize("variable", ["independent_knee_x", "left_knee", "root_roll"])
+@pytest.mark.parametrize(
+    "variable",
+    [
+        "independent_knee_x",
+        "left_knee.translation_x",
+        "root_roll",
+        "head.rotation",
+        "left.shoulder_flex",
+        "root.x",
+    ],
+)
 def test_unknown_ik_variables_cannot_move_independent_joints(variable: str) -> None:
     with pytest.raises(ValueError, match="Unknown IK variables"):
         solve_actor(
@@ -713,6 +1059,66 @@ def test_unknown_ik_anchor_and_unbounded_budgets_fail() -> None:
             solve_actor(actor, (target,), max_nfev=budget)
     with pytest.raises(ValueError, match="root_translation_bound_m"):
         solve_actor(actor, (target,), root_translation_bound_m=math.inf)
+
+
+def test_ik_groups_are_explicit_immutable_and_expand_in_requested_order() -> None:
+    assert VARIABLE_GROUPS["left_shoulder"] == (
+        "left_shoulder_flex",
+        "left_shoulder_abduction",
+        "left_shoulder_rotation",
+    )
+    assert VARIABLE_GROUPS["right_knee"] == ("right_knee_flex",)
+    assert expand_variable_names(
+        ("right_knee", "left_shoulder", "torso.pitch", "root_rotation.z")
+    ) == (
+        "right_knee_flex",
+        "left_shoulder_flex",
+        "left_shoulder_abduction",
+        "left_shoulder_rotation",
+        "torso_pitch",
+        "root_rotation_z",
+    )
+    with pytest.raises(TypeError):
+        VARIABLE_GROUPS["left_shoulder"] = ()
+
+
+@pytest.mark.parametrize(
+    "variables",
+    [
+        ("left_shoulder", "left_shoulder.flex"),
+        ("root_position", "root_z"),
+        ("left_elbow", "left_elbow"),
+    ],
+)
+def test_overlapping_ik_variable_selections_fail_explicitly(
+    variables: tuple[str, ...],
+) -> None:
+    with pytest.raises(ValueError, match="Duplicate IK variable"):
+        solve_actor(
+            ActorPose(actor_id="adult"),
+            (AnchorTarget(anchor="left_palm", position=(0, 0, 1)),),
+            variables,
+        )
+
+
+def test_root_rotation_group_fits_rigid_anchor_transform() -> None:
+    actor = ActorPose(actor_id="adult")
+    desired = actor.model_copy(update={"root_rotation": (10, -15, 20)})
+    skeleton = forward_kinematics(desired)
+    targets = tuple(
+        AnchorTarget(
+            anchor=f"{side}_sole",
+            position=skeleton.anchors[f"{side}_sole"].position,
+            normal=skeleton.anchors[f"{side}_sole"].normal,
+        )
+        for side in ("left", "right")
+    )
+    result = solve_actor(actor, targets, ("root_rotation",), max_nfev=100)
+    assert result.converged, result
+    assert result.actor.root_rotation == pytest.approx((10, -15, 20), abs=1e-5)
+    assert result.actor.root_position == actor.root_position
+    assert result.actor.angles == actor.angles
+    assert_lengths(result.actor)
 
 
 def test_finite_frozen_models_dimensions_and_roundtrip() -> None:

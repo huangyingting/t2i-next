@@ -101,7 +101,9 @@ def sample_poses(
     history: Annotated[
         Path | None,
         typer.Option(
-            exists=True, dir_okay=False, readable=True,
+            exists=True,
+            dir_okay=False,
+            readable=True,
             help="Previous JSON batch; continue its immutable usage snapshot.",
         ),
     ] = None,
@@ -133,7 +135,8 @@ def sample_poses(
             count=count,
             family=family,
             subject_id=(
-                subject if subject is not None or previous is None
+                subject
+                if subject is not None or previous is None
                 else previous.subject.subject_id
             ),
             presentation_id=presentation,
@@ -143,7 +146,8 @@ def sample_poses(
             typer.secho(
                 f"Rejected {len(batch.geometry_rejections)} invalid geometry "
                 "configurations; diagnostics are included in JSON output.",
-                fg=typer.colors.YELLOW, err=True,
+                fg=typer.colors.YELLOW,
+                err=True,
             )
         content = (
             "\n".join(scene.prompt for scene in batch.scenes)
@@ -172,7 +176,8 @@ def audit_poses(
             typer.secho(
                 f"Geometry audit rejected {len(report.geometry_rejections)} "
                 "configurations. See geometry_rejections in the report.",
-                fg=typer.colors.RED, err=True,
+                fg=typer.colors.RED,
+                err=True,
             )
             raise typer.Exit(code=1)
     except (OSError, ValueError) as exc:

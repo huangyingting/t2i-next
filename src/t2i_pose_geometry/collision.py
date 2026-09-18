@@ -115,11 +115,23 @@ def query_colliders(a: Collider, b: Collider) -> PairResult:
             max((max(0.0, c.penetration_m) for c in contacts), default=None),
             contacts,
         )
-    distance = float(
-        fcl.distance(a.object, b.object, fcl.DistanceRequest(), fcl.DistanceResult())
+    # FCL dispatch can use different distance algorithms for reversed primitive
+    # pairs. Both unsigned queries make this diagnostic symmetric without using
+    # signed-distance EPA at degenerate tangencies.
+    distances = tuple(
+        float(
+            fcl.distance(
+                first,
+                second,
+                fcl.DistanceRequest(enable_signed_distance=False),
+                fcl.DistanceResult(),
+            )
+        )
+        for first, second in ((a.object, b.object), (b.object, a.object))
     )
-    if not math.isfinite(distance):
+    if not all(math.isfinite(distance) for distance in distances):
         raise ArithmeticError("FCL produced an invalid separation distance")
+    distance = min(distances)
     if distance < 0:
         # Unsigned FCL distance may report its overlap sentinel at tangency
         # even when collide() reports separation. Resolve conservatively;
@@ -129,7 +141,14 @@ def query_colliders(a: Collider, b: Collider) -> PairResult:
 
 
 def query_pair(a: Shape | Box, b: Shape | Box) -> PairResult:
-    """Exact convex collision boolean and unsigned separation, in meters."""
+    """FCL convex collision flag and unsigned separation estimate, in meters.
+
+    A negative unsigned-distance sentinel is conservatively treated as a
+    collision with unknown penetration depth. Only collision contacts supply
+    diagnostic penetration depths; their finite list is not a contact patch.
+    Positive separation is the minimum estimate from both pair orders, not a
+    substitute for collision or support-function checks.
+    """
     return query_colliders(Collider(a), Collider(b))
 
 

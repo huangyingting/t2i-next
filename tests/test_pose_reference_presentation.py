@@ -112,8 +112,10 @@ def test_subject_accepts_adult_age_boundary_and_requires_clothing() -> None:
         ReferenceSubject.model_validate(payload)
 
 
-@pytest.mark.parametrize("scale", [0.0, 0.84, 1.16, float("nan"), float("inf")])
-def test_subject_body_scale_is_bounded_and_finite(scale: float) -> None:
+@pytest.mark.parametrize(
+    "scale", [0.0, 0.84, 1.16, float("nan"), float("inf"), True, "1.0"]
+)
+def test_subject_body_scale_is_bounded_and_finite(scale: object) -> None:
     payload = SUBJECTS[0].model_dump() | {"body_scale": scale}
     with pytest.raises(ValidationError):
         ReferenceSubject.model_validate(payload)
@@ -134,8 +136,19 @@ def test_subject_body_scale_is_bounded_and_finite(scale: float) -> None:
 @pytest.mark.parametrize(
     "text",
     [
-        "", "   ", "\t", "a\tb", "a\nb", "ends with newline\n", "a\rb",
-        "a\x00b", "a\x1bb", "a\x7fb", "caf\u00e9", "\u00a0", "x" * 401,
+        "",
+        "   ",
+        "\t",
+        "a\tb",
+        "a\nb",
+        "ends with newline\n",
+        "a\rb",
+        "a\x00b",
+        "a\x1bb",
+        "a\x7fb",
+        "caf\u00e9",
+        "\u00a0",
+        "x" * 401,
     ],
 )
 def test_recipe_text_is_bounded_nonblank_printable_ascii(
@@ -149,12 +162,22 @@ def test_recipe_text_is_bounded_nonblank_printable_ascii(
 
 def test_support_profile_vocabulary_and_curated_geometry_are_exact() -> None:
     assert get_args(SurfaceHeight) == (
-        "ground", "below_standing_knee", "seated_knee", "standing_hip",
-        "standing_shoulder", "seated_upper_back", "lying_head",
+        "ground",
+        "below_standing_knee",
+        "seated_knee",
+        "standing_hip",
+        "standing_shoulder",
+        "seated_upper_back",
+        "lying_head",
     )
     assert get_args(SurfaceExtent) == (
-        "whole_body", "seat_and_thighs", "upper_back", "upper_body",
-        "both_palms_and_forearms", "whole_foot", "head_and_neck",
+        "whole_body",
+        "seat_and_thighs",
+        "upper_back",
+        "upper_body",
+        "both_palms_and_forearms",
+        "whole_foot",
+        "head_and_neck",
     )
     assert get_args(SurfaceOrientation) == ("horizontal", "vertical")
     assert len(SURFACES) == len(SUPPORT_PROFILES) == 8
@@ -214,7 +237,9 @@ def test_surface_geometry_accepts_all_bounded_profiles(
     payload.update(height=height, extent=extent, orientation=orientation)
     support = ReferenceSurfaceRealization.model_validate(payload)
     assert (support.height, support.extent, support.orientation) == (
-        height, extent, orientation
+        height,
+        extent,
+        orientation,
     )
     assert support == ReferenceSurfaceRealization.model_validate_json(
         support.model_dump_json()
@@ -318,14 +343,17 @@ def test_presentation_requires_at_least_one_surface() -> None:
 
 
 @pytest.mark.parametrize(
-    "recipe", (
-        *CAMERAS, *SUBJECTS, *PRESENTATIONS,
+    "recipe",
+    (
+        *CAMERAS,
+        *SUBJECTS,
+        *PRESENTATIONS,
         *(
             support
             for presentation in PRESENTATIONS
             for support in presentation.supports
         ),
-    )
+    ),
 )
 def test_recipes_are_frozen_forbid_extras_and_roundtrip(
     recipe: ReferenceModel,
@@ -342,9 +370,7 @@ def test_recipes_are_frozen_forbid_extras_and_roundtrip(
 
 def test_curated_camera_ids_keep_existing_views_and_heights() -> None:
     assert len(CAMERAS) == 5
-    assert {
-        camera.camera_id: (camera.view, camera.height) for camera in CAMERAS
-    } == {
+    assert {camera.camera_id: (camera.view, camera.height) for camera in CAMERAS} == {
         "front_eye": ("front", "subject_eye_level"),
         "left_eye": ("left_three_quarter", "subject_eye_level"),
         "right_eye": ("right_three_quarter", "subject_eye_level"),
@@ -375,8 +401,15 @@ def test_curated_subjects_have_distinct_clothed_adult_identities() -> None:
         for feature in ("skin", "eyes"):
             assert feature in subject.appearance
         for garment in (
-            "opaque", "long-sleeved", "shirt", "fully covering", "full-length",
-            "trousers", "socks", "closed-toe", "shoes",
+            "opaque",
+            "long-sleeved",
+            "shirt",
+            "fully covering",
+            "full-length",
+            "trousers",
+            "socks",
+            "closed-toe",
+            "shoes",
         ):
             assert garment in subject.outfit
 
@@ -394,7 +427,8 @@ def test_curated_presentations_cover_every_support_and_camera_combination() -> N
     assert len({frozenset(s.surface for s in p.supports) for p in PRESENTATIONS}) >= 4
     assert {p.space for p in PRESENTATIONS} == {"standard", "extended"}
     universal = [
-        p for p in PRESENTATIONS
+        p
+        for p in PRESENTATIONS
         if p.space == "extended" and presentation_supports(p, SURFACES)
     ]
     assert universal
@@ -418,7 +452,8 @@ def test_mat_presentations_have_distinct_contact_ready_towel_headrests() -> None
         if "headrest" in by_surface:
             headrest = by_surface["headrest"]
             towels[presentation.presentation_id] = (
-                headrest.object_id, headrest.description
+                headrest.object_id,
+                headrest.description,
             )
             assert headrest.object_id != by_surface["mat"].object_id
     assert towels == {
@@ -452,9 +487,9 @@ def test_presentation_supports_matches_surface_subsets(
     assert presentation_supports(presentation, (surface, surface))
 
 
-@pytest.mark.parametrize(("presentation", "camera"), itertools.product(
-    PRESENTATIONS, CAMERAS
-))
+@pytest.mark.parametrize(
+    ("presentation", "camera"), itertools.product(PRESENTATIONS, CAMERAS)
+)
 def test_camera_space_compatibility(
     presentation: ReferencePresentation, camera: ReferenceCamera
 ) -> None:
@@ -531,9 +566,13 @@ def test_subject_renderer_preserves_age_identity_outfit_and_coverage(
     assert text.isascii() and "\n" not in text
     for phrase in (
         f"exactly one adult aged {subject.adult_age}",
-        subject.appearance, subject.outfit, subject.coverage.replace("_", " "),
-        "opaque everyday clothing", "torso, arms, and legs",
-        "shoes on both feet", "neutral, non-sexual figure study",
+        subject.appearance,
+        subject.outfit,
+        subject.coverage.replace("_", " "),
+        "opaque everyday clothing",
+        "torso, arms, and legs",
+        "shoes on both feet",
+        "neutral, non-sexual figure study",
     ):
         assert phrase in text
 
@@ -568,14 +607,8 @@ def test_presentation_renderer_preserves_recipe_without_unused_supports(
 @pytest.mark.parametrize(
     ("recipe", "renderer", "identifier"),
     [
-        *(
-            (camera, render_reference_camera, "camera_id")
-            for camera in CAMERAS
-        ),
-        *(
-            (subject, render_reference_subject, "subject_id")
-            for subject in SUBJECTS
-        ),
+        *((camera, render_reference_camera, "camera_id") for camera in CAMERAS),
+        *((subject, render_reference_subject, "subject_id") for subject in SUBJECTS),
         *(
             (presentation, render_reference_presentation, "presentation_id")
             for presentation in PRESENTATIONS
@@ -594,16 +627,22 @@ def test_renderers_ignore_identifiers_and_omit_internal_metadata(
     assert ":" not in text
     assert "_" not in text
     for internal in (
-        "camera recipe", "subject_id", "presentation_id", "object_id", "schema",
-        "simulation", "qualitative", "validation", "symbolic", "workflow",
+        "camera recipe",
+        "subject_id",
+        "presentation_id",
+        "object_id",
+        "schema",
+        "simulation",
+        "qualitative",
+        "validation",
+        "symbolic",
+        "workflow",
     ):
         assert internal not in text.lower()
 
 
 def test_recipe_accessors_are_deterministic_tuples() -> None:
-    for accessor in (
-        reference_cameras, reference_subjects, reference_presentations
-    ):
+    for accessor in (reference_cameras, reference_subjects, reference_presentations):
         assert isinstance(accessor(), tuple)
         assert accessor() == accessor()
 

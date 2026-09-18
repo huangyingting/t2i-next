@@ -103,7 +103,7 @@ class ReferenceSubject(ReferenceModel):
     adult_age: int = Field(ge=25, strict=True)
     appearance: ReferenceText
     outfit: ReferenceText
-    body_scale: float = Field(ge=0.85, le=1.15, allow_inf_nan=False)
+    body_scale: float = Field(ge=0.85, le=1.15, allow_inf_nan=False, strict=True)
     coverage: Literal["fully_clothed"] = "fully_clothed"
 
 
@@ -297,25 +297,30 @@ _PRESENTATIONS = (
             _support("floor", "oak_floor", "the dry, level oak floor"),
             _support("mat", "sage_mat", "the flat, non-slip sage exercise mat"),
             _support(
-                "headrest", "sage_towel",
+                "headrest",
+                "sage_towel",
                 "the folded sage towel resting flat on the mat",
             ),
             _support(
-                "chair_seat", "oak_chair",
+                "chair_seat",
+                "oak_chair",
                 "the broad seat of the stable, armless oak chair",
             ),
             _support(
-                "chair_back", "oak_chair",
+                "chair_back",
+                "oak_chair",
                 "the solid back of the same stable, armless oak chair",
             ),
             _support("wall", "plaster_wall", "the solid chalk-white plaster wall"),
             _support(
-                "table", "oak_table",
+                "table",
+                "oak_table",
                 "the level top of the sturdy, stationary oak table",
             ),
             _support(
-                "step", "sage_step",
-                "the broad non-slip top of the low, fixed sage step",
+                "step",
+                "sage_step",
+                "the broad non-slip top of the fixed sage step",
             ),
         ),
     ),
@@ -332,11 +337,13 @@ _PRESENTATIONS = (
         supports=(
             _support("floor", "beech_floor", "the dry, level beech floor"),
             _support(
-                "chair_seat", "blue_chair",
+                "chair_seat",
+                "blue_chair",
                 "the wide seat of the sturdy, armless blue wooden chair",
             ),
             _support(
-                "chair_back", "blue_chair",
+                "chair_back",
+                "blue_chair",
                 "the solid back of the same sturdy, armless blue wooden chair",
             ),
             _support("wall", "cream_wall", "the solid cream plaster wall"),
@@ -356,16 +363,19 @@ _PRESENTATIONS = (
             _support("floor", "stage_floor", "the dry, level gray stage floor"),
             _support("mat", "rust_mat", "the flat, non-slip terracotta exercise mat"),
             _support(
-                "headrest", "terracotta_towel",
+                "headrest",
+                "terracotta_towel",
                 "the folded terracotta towel resting flat on the mat",
             ),
             _support(
-                "table", "ash_table",
+                "table",
+                "ash_table",
                 "the level top of the sturdy, stationary ash table",
             ),
             _support(
-                "step", "stage_step",
-                "the broad non-slip top of the low, fixed stage step",
+                "step",
+                "stage_step",
+                "the broad non-slip top of the fixed stage step",
             ),
         ),
     ),
@@ -383,7 +393,8 @@ _PRESENTATIONS = (
             _support("floor", "studio_floor", "the dry, level matte gray floor"),
             _support("wall", "teal_wall", "the solid muted-teal plaster wall"),
             _support(
-                "table", "work_table",
+                "table",
+                "work_table",
                 "the cleared, level top of the heavy, stationary work table",
             ),
         ),
@@ -400,24 +411,26 @@ _PRESENTATIONS = (
         space="standard",
         supports=(
             _support("floor", "birch_floor", "the dry, level birch floor"),
+            _support("mat", "burgundy_mat", "the flat, non-slip burgundy exercise mat"),
             _support(
-                "mat", "burgundy_mat", "the flat, non-slip burgundy exercise mat"
-            ),
-            _support(
-                "headrest", "burgundy_towel",
+                "headrest",
+                "burgundy_towel",
                 "the folded burgundy towel resting flat on the mat",
             ),
             _support(
-                "chair_seat", "birch_chair",
+                "chair_seat",
+                "birch_chair",
                 "the broad seat of the stable, armless birch chair",
             ),
             _support(
-                "chair_back", "birch_chair",
+                "chair_back",
+                "birch_chair",
                 "the solid back of the same stable, armless birch chair",
             ),
             _support(
-                "step", "birch_step",
-                "the broad non-slip top of the low, fixed birch step",
+                "step",
+                "birch_step",
+                "the broad non-slip top of the fixed birch step",
             ),
         ),
     ),

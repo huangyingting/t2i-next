@@ -24,17 +24,15 @@ POLICIES = REPOSITORY_ROOT / "src" / "t2i_story_pipeline" / "rule_packs" / "poli
 
 
 def authoring_prose(authoring: StoryAuthoring) -> Iterator[tuple[str, str]]:
-    for level, rules in authoring.content_levels.items():
-        for index, rule in enumerate(rules):
-            yield f"authoring.content_levels.{level.value}[{index}]", rule
     for stage in StoryStage:
         authored = getattr(authoring, stage.value)
         for index, rule in enumerate(authored.common):
             yield f"authoring.{stage.value}.common[{index}]", rule
-        for level, rules in authored.content_levels.items():
-            for index, rule in enumerate(rules):
+    for level, refinement in authoring.level_refinements.items():
+        for owner in ("shared", "themes", "frames"):
+            for index, rule in enumerate(getattr(refinement, owner)):
                 yield (
-                    f"authoring.{stage.value}.content_levels.{level.value}[{index}]",
+                    f"authoring.level_refinements.{level.value}.{owner}[{index}]",
                     rule,
                 )
 
@@ -149,9 +147,9 @@ def shared_authoring_document(tmp_path):
                 "id": "neutral-layout",
                 "kind": "layout_multiview",
                 "authoring": {
-                    "content_levels": {
-                        "aesthetic": ["模块共享的柔和纹理。"],
-                        "hardcore": ["模块未选中的强烈纹理。"],
+                    "level_refinements": {
+                        "aesthetic": {"shared": ["模块共享的柔和纹理。"]},
+                        "hardcore": {"shared": ["模块未选中的强烈纹理。"]},
                     },
                     "themes": {"common": ["模块主题布局说明。"]},
                     "frames": {"common": ["模块画面布局说明。"]},
@@ -174,16 +172,17 @@ def shared_authoring_document(tmp_path):
                     }
                 ],
                 "authoring": {
-                    "content_levels": {
-                        "aesthetic": ["候选池: - 未选中的唯美候选"],
-                        "hardcore": ["候选池: - 两阶段共享候选"],
+                    "level_refinements": {
+                        "aesthetic": {"shared": ["候选池: - 未选中的唯美候选"]},
+                        "hardcore": {
+                            "shared": ["候选池: - 两阶段共享候选"],
+                            "themes": ["候选池: - 主题独有候选"],
+                            "frames": ["候选池: - 画面独有候选"],
+                        },
                     },
                     **{
                         stage: {
                             "common": [f"候选池: - {label}通用候选"],
-                            "content_levels": {
-                                "hardcore": [f"候选池: - {label}独有候选"]
-                            },
                         }
                         for stage, label in (("themes", "主题"), ("frames", "画面"))
                     },
@@ -204,14 +203,16 @@ def test_source_conservation_reads_shared_recipe_and_module_rules(
     resolved = resolve_story_input(document)
     for path in (document_path, module_path):
         fields = dict(bundled_authoring_prose(path))
-        assert "authoring.content_levels.aesthetic[0]" in fields
-        assert "authoring.content_levels.hardcore[0]" in fields
+        aesthetic = "authoring.level_refinements.aesthetic.shared[0]"
+        hardcore = "authoring.level_refinements.hardcore.shared[0]"
+        assert aesthetic in fields
+        assert hardcore in fields
         assert all(prose in contract for prose in fields.values())
         assert all(not untranslated_authoring(prose) for prose in fields.values())
         for stage in StoryStage:
             compiled = resolved.rules.text_for(stage)
-            assert fields["authoring.content_levels.aesthetic[0]"] in compiled
-            assert fields["authoring.content_levels.hardcore[0]"] not in compiled
+            assert fields[aesthetic] in compiled
+            assert fields[hardcore] not in compiled
 
 
 @pytest.mark.parametrize(
@@ -227,17 +228,18 @@ def test_authoring_pool_reads_shared_and_stage_specific_candidates(
 
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
-def test_chinese_guard_does_not_skip_shared_level_rules(level):
+@pytest.mark.parametrize("owner", ("shared", "themes", "frames"))
+def test_chinese_guard_does_not_skip_level_refinement_owners(level, owner):
     authoring = StoryAuthoring.model_validate(
         {
-            "content_levels": {level: ["Untranslated shared instruction."]},
+            "level_refinements": {level: {owner: ["Untranslated instruction."]}},
             "themes": {"common": ["中文的主题说明。"]},
             "frames": {"common": ["中文的画面说明。"]},
         }
     )
     fields = dict(authoring_prose(authoring))
     assert untranslated_authoring(
-        fields[f"authoring.content_levels.{level.value}[0]"]
+        fields[f"authoring.level_refinements.{level.value}.{owner}[0]"]
     ) == ["natural-language instruction contains no Chinese"]
 
 
@@ -326,7 +328,6 @@ def test_recipe_compilation_selects_only_each_stages_active_level(path):
         resolved = resolve_story_input(document, InputOverrides(content_level=level))
         base = resolve_story_rules(resolved.request)
         for stage in StoryStage:
-            authored = getattr(document.authoring, stage.value)
             compiled = resolved.rules.text_for(stage)
             selected = document.authoring.selected(stage, level)
             assert set(getattr(base, stage.value)) <= set(
@@ -335,13 +336,9 @@ def test_recipe_compilation_selects_only_each_stages_active_level(path):
             assert all(rule in compiled for rule in selected)
             excluded = {
                 rule
-                for levels in (
-                    document.authoring.content_levels,
-                    authored.content_levels,
-                )
-                for other, rules in levels.items()
+                for other in document.authoring.level_refinements
                 if other != level
-                for rule in rules
+                for rule in document.authoring.selected(stage, other)
             } - set(selected)
             assert all(rule not in compiled for rule in excluded)
             assert isinstance(
@@ -2464,10 +2461,8 @@ def test_dress_board_region_names_are_layout_only() -> None:
     ):
         assert excluded not in normalized, excluded
     for level in (ContentLevel.AESTHETIC, ContentLevel.HARDCORE):
-        assert (
-            dress.authoring.content_levels.get(level)
-            or dress.authoring.themes.content_levels.get(level)
-        )
+        refinement = dress.authoring.level_refinements[level]
+        assert refinement.shared or refinement.themes
     layout = next(module for module in dress.modules if module.id == "layout-multiview")
     assert layout.parameters == {"layout": "grid", "min_views": 6, "max_views": 6}
 
@@ -3159,10 +3154,7 @@ def test_edo_warai_e_brief_respects_all_content_levels() -> None:
     brief = story_contract(document)
     normalized = " ".join(brief.split())
 
-    assert (
-        document.authoring.content_levels
-        or document.authoring.frames.content_levels
-    )
+    assert document.authoring.level_refinements
     assert "在 aesthetic 等级，让每位成年人完整穿着多层时代服饰" in normalized
     assert "不得用屏风、扇子、被褥、衣袖、家具、策略性裁切、遥远剪影或喜剧插曲隐藏定义性内容" in normalized
     assert "在 erotic 等级，衣袍可以敞开" in normalized

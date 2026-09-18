@@ -142,9 +142,9 @@ _Avoid_: Legacy Content Level, safety mode
 
 **Story Content-Level Refinement**:
 A topic-specific requirement compatible with the selected system level.
-Requirements shared by Theme planning and Frame execution live once in
-`authoring.content_levels`; genuinely different stage tasks stay in that stage's
-`content_levels`. Shared requirements reach both stages directly rather than
+Each level has one `authoring.level_refinements` entry, with `shared`, `themes`,
+and `frames` responsibilities. Stage authoring outside this entry contains only
+level-independent common rules. Shared requirements reach both stages directly rather than
 depending on a generated Theme to restate them. Exact duplicate ownership is
 invalid; this structural check is not a natural-language conflict detector.
 _Avoid_: Level override, duplicated grade definition, shared reference-pool dump
@@ -235,21 +235,52 @@ full-body cameras. Room axes govern pelvis/chest and camera directions;
 anatomical sides govern limbs and support placement; gaze is head-relative and
 negative space is image-frame-relative. Load-bearing prose is derived only from
 support contacts, never from a second weight-distribution label. Side-lying
-recipes include a headrest and a forward lower arm, not an arm hidden beneath
-the torso. Upright kneeling includes knees, shins and insteps on the mat. Its 16
+recipes include a headrest and a forward lower palm on the mat with its elbow
+raised, not an arm hidden beneath the torso. Upright kneeling uses knees and toe
+ends; floor sitting uses bent knees and both feet on the mat. Its 16
 families contain 48 curated whole-body recipes, not a limb Cartesian product.
 It does not use activity templates or change the existing generate/bulk catalog.
 The code-generated library is the sole definition; JSON is an export, not a
 second editable source.
 _Avoid_: Activity catalog replacement, story pipeline stage
 
+**Pose Geometry Kernel**:
+The independent `t2i_pose_geometry` package imports no pipeline or provider.
+It owns a synthetic articulated body with fixed bone lengths, explicit joint
+bounds, volumetric collision proxies, and metre-based right/front/up world
+coordinates. NumPy/SciPy implement kinematics and bounded static contact
+solving; python-fcl supplies primitive collision queries. Analytic two-bone arm
+seeds cover alternative elbow and hand orientations without changing lengths.
+An independent validator checks joint bounds, finite surface contacts, normals,
+self-collisions, object collisions and inter-actor collisions. Contact
+declarations never exempt collisions; adjacent shapes only receive localized
+joint-region allowances. Solver success alone cannot certify a pose. These
+are synthetic proxy assumptions, not biomechanics, balance, friction, cloth,
+finger-level anatomy or rendered-image validation.
+_Avoid_: Story dependency, dynamics simulator, anatomical safety certificate
+
+**Reference Geometry**:
+The spatial adapter turns each neutral recipe into a candidate actor and solid
+furniture, fits contacts, and requires a passing independent report before
+rendering reference text. Standard furniture is sized for the pose, not a
+certificate for arbitrary real furniture. Canonical solutions may initialize
+uniformly scaled bodies and furniture, including mat thickness, but every
+scaled instance is revalidated. Failed candidates remain rejected with explicit
+diagnostics, never a symbolic fallback. A scene exports body dimensions,
+angles, objects, contact constraints, world joints, numerical tolerances and
+the report; loading checks that this evidence matches the current recipe and
+kinematics. Three-view diagnostic SVGs recompute validation and show actual
+proxy volumes, including failed candidates with a nonzero CLI exit.
+_Avoid_: Reused pass flag, solver convergence as validity, AI-rendered preview
+
 **Reference Presentation**:
 An offline neutral setting, palette, motivated lighting and finish recipe with
 qualitative camera-space capacity and concrete support-surface realizations.
 Each support declares height, extent and orientation; each pose declares its
 anatomical placement. Scene selection and validation require fitting profiles,
-not merely a matching surface name. These are staging requirements, not measured
-coordinates, anthropometry or force constraints. Chair seat and back must
+not merely a matching surface name. These qualitative staging requirements
+precede concrete geometric realization, not measured anthropometry or force
+constraints. Chair seat and back must
 resolve to the same chair object; a headrest requires a mat. A camera recipe owns
 coherent lens/perspective/distance intent, full-body framing, focus, depth,
 negative space and foreground treatment. Presentation cannot rewrite pose
@@ -259,25 +290,30 @@ light and visibility as well as focus; a complete silhouette cannot supply it.
 _Avoid_: Unconstrained cinematic adjectives, physical optics simulation
 
 **Reference Subject**:
-A curated adult identity and opaque full-coverage everyday outfit, repeated in
-every independently renderable scene of a batch. The batch fixes one subject;
+A curated adult identity, explicitly authored uniform proxy-body scale, and
+opaque full-coverage everyday outfit, repeated in every independently
+renderable scene of a batch. Scale is not inferred from demographic traits.
+The batch fixes one subject;
 textual identity consistency is not a guarantee of rendered-image identity.
 _Avoid_: Per-scene identity randomization
 
 **Pose Reference Batch**:
 A seed-reproducible, duplicate-free sample of neutral recipes with compatible
 cameras, presentations, a fixed subject and locally rendered clothed reference
-descriptions. Selection first balances within-batch family counts, prefers
-historically underused poses, then maximizes nearest structural distance,
+descriptions. Selection fixes the subject and rejects failed geometry before
+balancing within-batch family counts, preferring
+historically underused poses, then maximizing nearest structural distance,
 measured as the equal-weight mismatch rate over eight geometry groups.
 Camera/presentation combinations are selected only after support placement,
 height/extent/orientation, head/view-sector and space compatibility checks.
 Labels, gaze, identity and camera changes do not count as
-pose-structure changes. Reports describe symbolic coverage, prior usage and
-pair distances only; they do not certify rendered-image diversity, physical
-equilibrium or anatomical safety. Current schema and renderer are version 3;
-reports explicitly retain physical/visual validation as false and require
-render review. No image-generation backend is provided by this offline module.
+pose-structure changes. Reports describe symbolic coverage, prior usage, pair
+distances, checked geometry and explicit geometry rejections; they do not certify
+rendered-image diversity, physical equilibrium or anatomical safety. Current
+schema and renderer are version 4, with `geometry_gated_family_maximin_v4`
+selection. Reports retain full physical/visual validation as false and require
+render review; a passing static-proxy report has narrower meaning. No
+image-generation backend is provided by this offline module.
 _Avoid_: Perceptual score, visually validated pose
 
 **Reference Usage Snapshot**:
@@ -287,7 +323,8 @@ reference batch. CLI history continues a previous current-schema JSON batch
 without modifying it; exact reproduction requires the same seed, library,
 input snapshot, subject and filters. Concurrent continuations branch rather
 than overwriting shared history. Text exports cannot resume usage, and changed
-catalog definitions or old schemas fail rather than resetting or migrating.
+catalog definitions, geometry implementation, numerical dependency versions or
+old schemas fail rather than resetting or migrating.
 _Avoid_: Global mutable history file, seed-only reproducibility
 
 **Spatial Audit**:

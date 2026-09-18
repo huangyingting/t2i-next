@@ -9,7 +9,7 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from t2i_pose_geometry.models import Scene, ValidationReport
+from t2i_pose_geometry.models import Scene, Tolerances, ValidationReport
 
 from .pose_reference_geometry import (
     ReferenceGeometryError,
@@ -47,22 +47,48 @@ Facing = Literal["front", "left_three_quarter", "right_three_quarter"]
 Silhouette = Literal["column", "diagonal", "triangle", "folded", "horizontal", "arc"]
 BalanceBias = Literal["unbiased", "left", "right"]
 Legs = Literal[
-    "parallel_feet", "left_foot_forward", "right_foot_forward",
-    "right_foot_on_step", "left_foot_on_step", "seated_parallel",
-    "seated_left_forward", "seated_right_forward", "floor_seated_bent_knees",
-    "knees_and_toes_on_mat", "left_half_kneel", "right_half_kneel",
-    "bent_knees_feet_flat", "staggered_bent_knees",
+    "parallel_feet",
+    "left_foot_forward",
+    "right_foot_forward",
+    "right_foot_on_step",
+    "left_foot_on_step",
+    "seated_parallel",
+    "seated_left_forward",
+    "seated_right_forward",
+    "floor_seated_bent_knees",
+    "knees_and_toes_on_mat",
+    "left_half_kneel",
+    "right_half_kneel",
+    "bent_knees_feet_flat",
+    "staggered_bent_knees",
 ]
 HandPlacement = Literal[
-    "at_side", "on_lap", "on_knee", "across_forearm", "forward_gesture",
-    "on_wall", "on_table", "on_seat", "on_floor", "on_mat_forward",
+    "at_side",
+    "on_lap",
+    "on_knee",
+    "across_forearm",
+    "forward_gesture",
+    "on_wall",
+    "on_table",
+    "on_seat",
+    "on_floor",
+    "on_mat_forward",
     "relaxed_in_front",
 ]
 BodyPart = Literal[
-    "left_foot", "right_foot", "left_knee", "right_knee",
-    "left_hand", "right_hand", "pelvis", "upper_back", "left_side", "right_side",
+    "left_foot",
+    "right_foot",
+    "left_knee",
+    "right_knee",
+    "left_hand",
+    "right_hand",
+    "pelvis",
+    "upper_back",
+    "left_side",
+    "right_side",
     "head",
-    "left_toes", "right_toes",
+    "left_toes",
+    "right_toes",
 ]
 _CONTACT_SURFACES: dict[BodyPart, frozenset[Surface]] = {
     "left_foot": frozenset(("floor", "mat", "step")),
@@ -124,10 +150,15 @@ class HeadOrientation(ReferenceModel):
 
 
 SupportPosition = Literal[
-    "under_body", "under_pelvis", "behind_upper_back",
-    "in_front_within_forearm_reach", "left_within_forearm_reach",
-    "right_within_forearm_reach", "under_left_raised_foot",
-    "under_right_raised_foot", "under_aligned_head",
+    "under_body",
+    "under_pelvis",
+    "behind_upper_back",
+    "in_front_within_forearm_reach",
+    "left_within_forearm_reach",
+    "right_within_forearm_reach",
+    "under_left_raised_foot",
+    "under_right_raised_foot",
+    "under_aligned_head",
 ]
 
 
@@ -208,7 +239,8 @@ class NeutralPose(ReferenceModel):
             raise ValueError("leg configuration contradicts body level")
         if self.spine == "gentle_twist":
             if self.pelvis_facing == self.facing or "front" not in {
-                self.pelvis_facing, self.facing
+                self.pelvis_facing,
+                self.facing,
             }:
                 raise ValueError(
                     "gentle twist requires adjacent pelvis/chest directions"
@@ -216,9 +248,7 @@ class NeutralPose(ReferenceModel):
         elif self.pelvis_facing != self.facing:
             raise ValueError("untwisted pelvis and chest must face the same direction")
         if self.balance_bias != "unbiased":
-            bias_foot = (
-                "left_foot" if self.balance_bias == "left" else "right_foot"
-            )
+            bias_foot = "left_foot" if self.balance_bias == "left" else "right_foot"
             if self.body_level != "standing" or bias_foot not in bearing:
                 raise ValueError("balance bias requires a standing load-bearing foot")
         if self.body_level == "lying" and self.spine != "neutral_horizontal":
@@ -229,7 +259,8 @@ class NeutralPose(ReferenceModel):
             raise ValueError("resting side must be declared only for lying references")
         contacts = {contact.body_part: contact for contact in self.supports}
         for body_part, placement in (
-            ("left_hand", self.left_hand), ("right_hand", self.right_hand)
+            ("left_hand", self.left_hand),
+            ("right_hand", self.right_hand),
         ):
             contact = contacts.get(body_part)
             if placement in _HAND_SURFACES:
@@ -262,16 +293,22 @@ class NeutralPose(ReferenceModel):
             expected_leg_contacts = {"left_foot": "floor", "right_foot": "floor"}
         elif self.legs == "knees_and_toes_on_mat":
             expected_leg_contacts = {
-                "left_knee": "mat", "right_knee": "mat",
-                "left_toes": "mat", "right_toes": "mat",
+                "left_knee": "mat",
+                "right_knee": "mat",
+                "left_toes": "mat",
+                "right_toes": "mat",
             }
         elif self.legs == "floor_seated_bent_knees":
             expected_leg_contacts = {
-                "pelvis": "mat", "left_foot": "mat", "right_foot": "mat",
+                "pelvis": "mat",
+                "left_foot": "mat",
+                "right_foot": "mat",
             }
         elif self.body_level == "seated":
             expected_leg_contacts = {
-                "pelvis": "chair_seat", "left_foot": "floor", "right_foot": "floor"
+                "pelvis": "chair_seat",
+                "left_foot": "floor",
+                "right_foot": "floor",
             }
         elif self.resting_side == "left":
             expected_leg_contacts = {"left_side": "mat", "head": "headrest"}
@@ -331,17 +368,21 @@ class NeutralPose(ReferenceModel):
             self.body_level,
             self.spine,
             (
-                self.pelvis_facing, self.facing,
-                self.head_orientation.yaw, self.head_orientation.pitch,
+                self.pelvis_facing,
+                self.facing,
+                self.head_orientation.yaw,
+                self.head_orientation.pitch,
             ),
             self.silhouette,
             (self.balance_bias, self.resting_side),
             self.legs,
             (self.left_hand, self.right_hand),
-            tuple(sorted(
-                (contact.body_part, contact.surface, contact.load_bearing)
-                for contact in self.supports
-            )),
+            tuple(
+                sorted(
+                    (contact.body_part, contact.surface, contact.load_bearing)
+                    for contact in self.supports
+                )
+            ),
         )
 
 
@@ -421,6 +462,7 @@ class PoseReferenceScene(ReferenceModel):
     subject: ReferenceSubject
     presentation: ReferencePresentation
     geometry: Scene
+    geometry_tolerances: Tolerances = Field(default_factory=Tolerances)
     geometry_report: ValidationReport
     geometry_joints: tuple[ReferenceJointPosition, ...] = Field(min_length=1)
     prompt: str = Field(min_length=1)
@@ -433,6 +475,10 @@ class PoseReferenceScene(ReferenceModel):
             self.pose, self.subject, self.presentation
         ):
             raise ValueError("reference geometry differs from its validated recipe")
+        if self.geometry_tolerances != Tolerances():
+            raise ValueError(
+                "reference geometry tolerances differ from the current policy"
+            )
         if self.geometry_report != reference_geometry_report(self.geometry):
             raise ValueError("reference geometry report differs from its geometry")
         if self.geometry_joints != reference_joint_positions(self.geometry):
@@ -529,7 +575,9 @@ class PoseReferenceBatch(ReferenceModel):
 class ReferenceLibraryAudit(ReferenceModel):
     schema_version: Literal["4.0"] = "4.0"
     catalog_fingerprint: Digest
-    evidence: Literal["symbolic_structure_only"] = "symbolic_structure_only"
+    evidence: Literal["static_proxy_geometry_and_symbolic_structure"] = (
+        "static_proxy_geometry_and_symbolic_structure"
+    )
     visual_validation: Literal[False] = False
     physical_validation: Literal[False] = False
     requires_render_review: Literal[True] = True
@@ -539,6 +587,7 @@ class ReferenceLibraryAudit(ReferenceModel):
     presentation_count: int = Field(ge=1)
     compatible_pose_camera_presentation_count: int = Field(ge=1)
     geometry_checked_scenes: int = Field(ge=0)
+    geometry_tolerances: Tolerances = Field(default_factory=Tolerances)
     geometry_rejections: tuple[ReferenceGeometryRejection, ...] = ()
 
 
@@ -553,11 +602,15 @@ def audit_reference_library(library: NeutralPoseLibrary) -> ReferenceLibraryAudi
                     geometry = compile_reference_geometry(pose, subject, presentation)
                 except ReferenceGeometryError as exc:
                     key = (
-                        pose.pose_id, subject.subject_id, presentation.presentation_id
+                        pose.pose_id,
+                        subject.subject_id,
+                        presentation.presentation_id,
                     )
                     rejections[key] = ReferenceGeometryRejection(
-                        pose_id=pose.pose_id, subject_id=subject.subject_id,
-                        presentation_id=presentation.presentation_id, report=exc.report,
+                        pose_id=pose.pose_id,
+                        subject_id=subject.subject_id,
+                        presentation_id=presentation.presentation_id,
+                        report=exc.report,
                     )
                     continue
                 PoseReferenceScene(
@@ -596,19 +649,23 @@ def describe_reference_poses(poses: tuple[NeutralPose, ...]) -> PoseReferenceRep
     return PoseReferenceReport(
         pose_count=len(poses),
         family_counts=dict(sorted(Counter(pose.family for pose in poses).items())),
-        body_level_counts=dict(sorted(
-            Counter(pose.body_level for pose in poses).items()
-        )),
+        body_level_counts=dict(
+            sorted(Counter(pose.body_level for pose in poses).items())
+        ),
         spine_counts=dict(sorted(Counter(pose.spine for pose in poses).items())),
-        balance_bias_counts=dict(sorted(
-            Counter(pose.balance_bias for pose in poses).items()
-        )),
-        load_bearing_contact_counts=dict(sorted(
-            Counter(
-                contact.body_part for pose in poses
-                for contact in pose.supports if contact.load_bearing
-            ).items()
-        )),
+        balance_bias_counts=dict(
+            sorted(Counter(pose.balance_bias for pose in poses).items())
+        ),
+        load_bearing_contact_counts=dict(
+            sorted(
+                Counter(
+                    contact.body_part
+                    for pose in poses
+                    for contact in pose.supports
+                    if contact.load_bearing
+                ).items()
+            )
+        ),
         pair_count=len(distances),
         minimum_structural_distance=min(distances) if distances else None,
         mean_structural_distance=sum(distances) / len(distances) if distances else None,
@@ -629,21 +686,28 @@ def describe_reference_scenes(
 ) -> PoseReferenceReport:
     report = describe_reference_poses(tuple(scene.pose for scene in scenes))
     return PoseReferenceReport(
-        **report.model_dump(exclude={
-            "camera_counts", "presentation_counts", "subject_counts",
-            "previously_used_pose_scenes", "previously_used_combination_scenes",
-            "geometry_checked_scenes",
-        }),
+        **report.model_dump(
+            exclude={
+                "camera_counts",
+                "presentation_counts",
+                "subject_counts",
+                "previously_used_pose_scenes",
+                "previously_used_combination_scenes",
+                "geometry_checked_scenes",
+            }
+        ),
         geometry_checked_scenes=len(scenes),
-        camera_counts=dict(sorted(Counter(
-            scene.camera.camera_id for scene in scenes
-        ).items())),
-        presentation_counts=dict(sorted(Counter(
-            scene.presentation.presentation_id for scene in scenes
-        ).items())),
-        subject_counts=dict(sorted(Counter(
-            scene.subject.subject_id for scene in scenes
-        ).items())),
+        camera_counts=dict(
+            sorted(Counter(scene.camera.camera_id for scene in scenes).items())
+        ),
+        presentation_counts=dict(
+            sorted(
+                Counter(scene.presentation.presentation_id for scene in scenes).items()
+            )
+        ),
+        subject_counts=dict(
+            sorted(Counter(scene.subject.subject_id for scene in scenes).items())
+        ),
         previously_used_pose_scenes=sum(
             scene.pose.pose_id in history.pose_counts for scene in scenes
         ),
@@ -691,7 +755,8 @@ def pose_accepts_camera(pose: NeutralPose, camera: ReferenceCamera) -> bool:
 
 
 def presentation_fits_pose(
-    presentation: ReferencePresentation, pose: NeutralPose,
+    presentation: ReferencePresentation,
+    pose: NeutralPose,
 ) -> bool:
     available = {item.surface: item for item in presentation.supports}
     return all(
@@ -700,7 +765,8 @@ def presentation_fits_pose(
             available[surface].height,
             available[surface].extent,
             available[surface].orientation,
-        ) == SUPPORT_PROFILES[surface]
+        )
+        == SUPPORT_PROFILES[surface]
         for surface in _pose_surfaces(pose)
     )
 
@@ -754,7 +820,8 @@ def _render_hand(side: Literal["left", "right"], placement: HandPlacement) -> st
 
 
 def _render_support_layout(
-    pose: NeutralPose, presentation: ReferencePresentation,
+    pose: NeutralPose,
+    presentation: ReferencePresentation,
 ) -> str:
     realizations = {item.surface: item for item in presentation.supports}
     positions: dict[SupportPosition, str] = {
@@ -944,21 +1011,30 @@ def sample_pose_references(
             except ReferenceGeometryError as exc:
                 key = (pose.pose_id, presentation.presentation_id)
                 rejections[key] = ReferenceGeometryRejection(
-                    pose_id=pose.pose_id, subject_id=subject.subject_id,
-                    presentation_id=presentation.presentation_id, report=exc.report,
+                    pose_id=pose.pose_id,
+                    subject_id=subject.subject_id,
+                    presentation_id=presentation.presentation_id,
+                    report=exc.report,
                 )
                 continue
             options[pose.pose_id].append((camera, presentation))
     candidates = [pose for pose in candidates if options[pose.pose_id]]
+    rejection_summary = f"{len(rejections)} geometry configurations rejected"
+    if rejections:
+        first = next(iter(rejections.values()))
+        issue = first.report.issues[0]
+        rejection_summary += (
+            f"; {first.pose_id}/{first.subject_id}/{first.presentation_id}: "
+            f"{issue.code} ({', '.join(issue.parts)}): {issue.details}"
+        )
     if not candidates:
         raise ValueError(
             "no reference poses fit the selected environment and cameras; "
-            f"{len(rejections)} geometry configurations rejected"
+            f"{rejection_summary}"
         )
     if not 1 <= count <= len(candidates):
         raise ValueError(
-            f"count must be between 1 and {len(candidates)}; "
-            f"{len(rejections)} geometry configurations rejected"
+            f"count must be between 1 and {len(candidates)}; {rejection_summary}"
         )
     rng = random.Random(seed)
     rng.shuffle(candidates)
@@ -989,26 +1065,30 @@ def sample_pose_references(
         camera, presentation = min(
             compatible,
             key=lambda option: (
-                combination_counts[ReferenceChoice(
-                    pose_id=pose.pose_id,
-                    camera_id=option[0].camera_id,
-                    presentation_id=option[1].presentation_id,
-                ).fingerprint()],
+                combination_counts[
+                    ReferenceChoice(
+                        pose_id=pose.pose_id,
+                        camera_id=option[0].camera_id,
+                        presentation_id=option[1].presentation_id,
+                    ).fingerprint()
+                ],
                 presentation_counts[option[1].presentation_id],
                 camera_counts[option[0].camera_id],
             ),
         )
         geometry = compile_reference_geometry(pose, subject, presentation)
-        scenes.append(PoseReferenceScene(
-            pose=pose,
-            camera=camera,
-            subject=subject,
-            presentation=presentation,
-            geometry=geometry,
-            geometry_report=reference_geometry_report(geometry),
-            geometry_joints=reference_joint_positions(geometry),
-            prompt=render_pose_reference(pose, camera, subject, presentation),
-        ))
+        scenes.append(
+            PoseReferenceScene(
+                pose=pose,
+                camera=camera,
+                subject=subject,
+                presentation=presentation,
+                geometry=geometry,
+                geometry_report=reference_geometry_report(geometry),
+                geometry_joints=reference_joint_positions(geometry),
+                prompt=render_pose_reference(pose, camera, subject, presentation),
+            )
+        )
         camera_counts[camera.camera_id] += 1
         presentation_counts[presentation.presentation_id] += 1
         combination_counts[_scene_choice(scenes[-1]).fingerprint()] += 1

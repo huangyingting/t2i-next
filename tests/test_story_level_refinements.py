@@ -20,6 +20,7 @@ from t2i_story_pipeline.inputs import (
 )
 from t2i_story_pipeline.models import (
     ContentLevel,
+    ContentLevelRefinement,
     StoryAuthoring,
     StoryStage,
 )
@@ -29,17 +30,19 @@ from t2i_story_pipeline.prompts import theme_messages
 def authored_rules() -> StoryAuthoring:
     return StoryAuthoring.model_validate(
         {
-            "content_levels": {
-                level.value: [f"Shared palette for {level.value}."]
+            "level_refinements": {
+                level.value: {
+                    "shared": [f"Shared palette for {level.value}."],
+                    **{
+                        stage.value: [f"Only {stage.value} at {level.value}."]
+                        for stage in StoryStage
+                    },
+                }
                 for level in ContentLevel
             },
             **{
                 stage.value: {
                     "common": [f"Common {stage.value} instruction."],
-                    "content_levels": {
-                        level.value: [f"Only {stage.value} at {level.value}."]
-                        for level in ContentLevel
-                    },
                 }
                 for stage in StoryStage
             },
@@ -50,11 +53,42 @@ def authored_rules() -> StoryAuthoring:
 @pytest.mark.parametrize("level", list(ContentLevel))
 def test_selected_refinements_have_one_ordered_owner(level: ContentLevel) -> None:
     authoring = authored_rules()
+    assert isinstance(authoring.level_refinements[level], ContentLevelRefinement)
+    assert "content_levels" not in authoring.model_dump_json()
     for stage in StoryStage:
         assert authoring.selected(stage, level) == (
             f"Common {stage.value} instruction.",
             f"Shared palette for {level.value}.",
             f"Only {stage.value} at {level.value}.",
+        )
+
+
+def test_selected_refinements_preserve_order_within_each_owner() -> None:
+    authoring = StoryAuthoring.model_validate(
+        {
+            **{
+                stage: {"common": [f"{stage} common zeta.", f"{stage} common alpha."]}
+                for stage in ("themes", "frames")
+            },
+            "level_refinements": {
+                "aesthetic": {
+                    "shared": ["Shared zeta.", "Shared alpha."],
+                    **{
+                        stage: [f"{stage} specific zeta.", f"{stage} specific alpha."]
+                        for stage in ("themes", "frames")
+                    },
+                }
+            },
+        }
+    )
+    for stage in StoryStage:
+        assert authoring.selected(stage, ContentLevel.AESTHETIC) == (
+            f"{stage.value} common zeta.",
+            f"{stage.value} common alpha.",
+            "Shared zeta.",
+            "Shared alpha.",
+            f"{stage.value} specific zeta.",
+            f"{stage.value} specific alpha.",
         )
 
 
@@ -109,8 +143,10 @@ def test_module_shared_refinement_controls_stage_projection_and_frozen_replay(
                 "id": "neutral-layout",
                 "kind": "layout_multiview",
                 "authoring": {
-                    "content_levels": {
-                        level.value: ["Use a coordinated palette for both views."]
+                    "level_refinements": {
+                        level.value: {
+                            "shared": ["Use a coordinated palette for both views."]
+                        }
                     }
                 },
             }
@@ -155,54 +191,134 @@ def test_module_shared_refinement_controls_stage_projection_and_frozen_replay(
     data = json.loads(frozen)
     source = next(item for item in data["sources"] if item["kind"] == "module")
     content = json.loads(source["content"])
-    content["authoring"]["content_levels"][level.value] = ["Changed palette."]
+    content["authoring"]["level_refinements"][level.value]["shared"] = [
+        "Changed palette."
+    ]
     source["content"] = json.dumps(content)
     with pytest.raises(ValidationError, match="metadata differs"):
         ResolvedStoryInput.model_validate(data)
 
 
 @pytest.mark.parametrize(
-    "authoring",
+    ("authoring", "error"),
     [
-        {"content_levels": {"aesthetic": ["Repeated.", "Repeated."]}},
-        {"content_levels": {"unknown": ["Unknown grade."]}},
-        {"content_levels": {"aesthetic": ["First\nSecond"]}},
-        {"content_levels": ["Not a mapping."]},
-        {"content_levels": {"aesthetic": []}, "replace_system": True},
-        {
-            "themes": {"content_levels": {"aesthetic": ["Repeated."]}},
-            "frames": {"content_levels": {"aesthetic": ["Repeated."]}},
-        },
-        {
-            "content_levels": {"aesthetic": ["Repeated."]},
-            "themes": {"content_levels": {"aesthetic": ["Repeated."]}},
-        },
-        {
-            "content_levels": {"aesthetic": ["Repeated."]},
-            "frames": {"common": ["Repeated."]},
-        },
-        {
-            "frames": {
-                "common": ["Repeated."],
-                "content_levels": {"aesthetic": ["Repeated."]},
-            }
-        },
-        {"frames": {"content_levels": {"aesthetic": ["Repeated.", "Repeated."]}}},
+        (
+            {"level_refinements": {"aesthetic": {"shared": ["Repeated."] * 2}}},
+            "shared refinements must not repeat",
+        ),
+        (
+            {"level_refinements": {"unknown": {"shared": ["Unknown grade."]}}},
+            "aesthetic.*erotic.*hardcore",
+        ),
+        (
+            {"level_refinements": {"aesthetic": {"shared": ["First\nSecond"]}}},
+            "不能包含换行",
+        ),
+        ({"level_refinements": ["Not a mapping."]}, "dictionary"),
+        (
+            {"level_refinements": {"aesthetic": {}}, "replace_system": True},
+            "Extra inputs",
+        ),
+        (
+            {
+                "level_refinements": {
+                    "aesthetic": {"themes": ["Repeated."], "frames": ["Repeated."]}
+                }
+            },
+            "duplicate Theme/Frame",
+        ),
+        (
+            {
+                "level_refinements": {
+                    "aesthetic": {"shared": ["Repeated."], "themes": ["Repeated."]}
+                }
+            },
+            "shared refinements repeat themes",
+        ),
+        (
+            {
+                "level_refinements": {"aesthetic": {"shared": ["Repeated."]}},
+                "frames": {"common": ["Repeated."]},
+            },
+            "refinements repeat frames common",
+        ),
+        (
+            {
+                "level_refinements": {"aesthetic": {"frames": ["Repeated."]}},
+                "frames": {"common": ["Repeated."]},
+            },
+            "refinements repeat frames common",
+        ),
+        (
+            {"level_refinements": {"aesthetic": {"frames": ["Repeated."] * 2}}},
+            "frames refinements must not repeat",
+        ),
+        (
+            {"level_refinements": {"aesthetic": {"themes": ["Repeated."] * 2}}},
+            "themes refinements must not repeat",
+        ),
+        ({"level_refinements": {"aesthetic": []}}, "dictionary"),
+        (
+            {"level_refinements": {"aesthetic": {"common": ["Wrong owner."]}}},
+            "Extra inputs",
+        ),
     ],
 )
 def test_refinements_reject_ambiguous_ownership_and_invalid_shapes(
-    authoring: dict[str, object],
+    authoring: dict[str, object], error: str,
 ) -> None:
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match=error):
         StoryAuthoring.model_validate(authoring)
+
+
+@pytest.mark.parametrize("owner", ("shared", "themes", "frames"))
+@pytest.mark.parametrize("rules", ({}, {"aesthetic": ["Obsolete rule."]}))
+@pytest.mark.parametrize("include_current", (False, True))
+def test_former_maps_are_rejected_even_empty_or_alongside_current_shape(
+    owner: str, rules: dict[str, list[str]], include_current: bool
+) -> None:
+    old = {"content_levels": rules}
+    value: dict[str, object] = old if owner == "shared" else {owner: old}
+    if include_current:
+        value["level_refinements"] = {"aesthetic": {"shared": ["Current rule."]}}
+    with pytest.raises(ValidationError) as caught:
+        StoryAuthoring.model_validate(value)
+    location = ("content_levels",) if owner == "shared" else (owner, "content_levels")
+    assert any(
+        error["type"] == "extra_forbidden" and error["loc"] == location
+        for error in caught.value.errors()
+    )
+
+
+def test_cross_stage_common_rules_keep_their_stage_ownership() -> None:
+    authoring = StoryAuthoring.model_validate(
+        {
+            "themes": {"common": ["Common palette."]},
+            "frames": {"common": ["Common palette."]},
+            "level_refinements": {
+                "aesthetic": {
+                    "shared": ["Shared layout."],
+                    "themes": ["Plan composition."],
+                    "frames": ["Render composition."],
+                }
+            },
+        }
+    )
+    for stage, specific in (
+        (StoryStage.THEMES, "Plan composition."),
+        (StoryStage.FRAMES, "Render composition."),
+    ):
+        assert authoring.selected(stage, ContentLevel.AESTHETIC) == (
+            "Common palette.", "Shared layout.", specific,
+        )
 
 
 def test_rule_shared_across_levels_has_no_cross_stage_copies() -> None:
     authoring = StoryAuthoring.model_validate(
         {
-            "content_levels": {
-                "aesthetic": ["Keep the wardrobe palette."],
-                "erotic": ["Keep the wardrobe palette."],
+            "level_refinements": {
+                "aesthetic": {"shared": ["Keep the wardrobe palette."]},
+                "erotic": {"shared": ["Keep the wardrobe palette."]},
             }
         }
     )
@@ -216,9 +332,11 @@ def test_rule_shared_across_levels_has_no_cross_stage_copies() -> None:
         assert authoring.selected(stage, ContentLevel.HARDCORE) == ()
 
 
-@pytest.mark.parametrize("duplicate", [False, True])
+@pytest.mark.parametrize(
+    "invalid", (None, "duplicate", "old_shared", "old_themes", "old_frames")
+)
 def test_offline_explain_selects_shared_rules_and_rejects_duplicate_ownership(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, duplicate: bool
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, invalid: str | None
 ) -> None:
     def unexpected_provider_load() -> None:
         pytest.fail("Offline explanation must not load provider settings.")
@@ -234,22 +352,26 @@ def test_offline_explain_selects_shared_rules_and_rejects_duplicate_ownership(
         "authoring": authored_rules().model_dump(mode="json"),
         "validation": {"themes": {"mode": "off"}, "frames": {"mode": "off"}},
     }
-    if duplicate:
-        source["authoring"]["frames"]["content_levels"]["erotic"].append(
+    if invalid == "duplicate":
+        source["authoring"]["level_refinements"]["erotic"]["frames"].append(
             "Shared palette for erotic."
         )
+    elif invalid == "old_shared":
+        source["authoring"]["content_levels"] = {}
+    elif invalid in ("old_themes", "old_frames"):
+        source["authoring"][invalid.removeprefix("old_")]["content_levels"] = {}
     path = tmp_path / "neutral.yaml"
     path.write_text(yaml.safe_dump(source), encoding="utf-8")
     result = CliRunner().invoke(
         app, ["explain", "--input", str(path), "--content-level", "erotic"]
     )
     payload = json.loads(result.stdout)
-    assert result.exit_code == (2 if duplicate else 0), result.stdout
-    assert payload["status"] == ("invalid" if duplicate else "valid")
-    if duplicate:
-        assert (
-            "shared erotic refinements repeat frames instructions" in payload["error"]
-        )
+    assert result.exit_code == (2 if invalid else 0), result.stdout
+    assert payload["status"] == ("invalid" if invalid else "valid")
+    if invalid == "duplicate":
+        assert "shared refinements repeat frames instructions" in payload["error"]
+    elif invalid:
+        assert "Extra inputs are not permitted" in payload["error"]
     else:
         assert payload["input"]["request"]["content_level"] == "erotic"
         for stage in StoryStage:

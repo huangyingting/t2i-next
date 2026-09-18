@@ -335,6 +335,19 @@ def test_collisions_and_joint_constraints_are_reported_and_highlighted() -> None
         assert labels and all(label.text.startswith("E") for label in labels)
 
 
+def test_torso_constraint_highlights_both_current_torso_volumes() -> None:
+    scene = Scene(
+        actors=(ActorPose(actor_id="adult", angles=JointAngles(torso_yaw=81)),)
+    )
+    root = ET.fromstring(render_scene_svg(scene))
+    assert _status(root).startswith("FAIL")
+    for panel in _panels(root):
+        for name in ("torso", "upper_torso"):
+            volume = _volume(panel, "adult", name)
+            assert volume.attrib["fill"] == "#c62828"
+            assert "joint_limit" in volume.attrib["data-errors"]
+
+
 def test_object_collision_labels_the_body_and_box() -> None:
     actor = ActorPose(actor_id="adult")
     head = next(
@@ -446,10 +459,10 @@ def test_body_contacts_show_both_actual_anchors_and_constraint_errors(
                     abs=2e-6,
                 )
             )
-            torso = _volume(panel, owner, "torso")
-            assert (torso.attrib["fill"] == "#c62828") == bool(gap)
+            shape = _volume(panel, owner, skeletons[owner].anchors["back"].shape_id)
+            assert (shape.attrib["fill"] == "#c62828") == bool(gap)
             if gap:
-                assert "body_contact_distance" in torso.attrib["data-errors"]
+                assert "body_contact_distance" in shape.attrib["data-errors"]
         if gap and panel.attrib["data-view"] != "front":
             line = panel.find(".//s:line[@class='body-contact-gap']", _NS)
             assert line is not None

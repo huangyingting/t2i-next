@@ -74,9 +74,9 @@ def test_usage_updates_are_immutable_and_count_complete_choices() -> None:
     ],
 )
 def test_usage_rejects_inconsistent_snapshot(changes: dict[str, object]) -> None:
-    payload = ReferenceUsage(
-        catalog_fingerprint=LIBRARY.fingerprint()
-    ).model_dump(mode="json")
+    payload = ReferenceUsage(catalog_fingerprint=LIBRARY.fingerprint()).model_dump(
+        mode="json"
+    )
     with pytest.raises(ValidationError):
         ReferenceUsage.model_validate(payload | changes)
 
@@ -106,8 +106,12 @@ def test_three_history_batches_exhaust_poses_before_reusing() -> None:
 def test_same_seed_snapshot_and_filters_replay_exactly() -> None:
     first = sample_pose_references(LIBRARY, seed=5, count=16)
     batch = sample_pose_references(
-        LIBRARY, seed=5, count=3, family="half_kneeling",
-        subject_id=first.subject.subject_id, history=first.history_after,
+        LIBRARY,
+        seed=5,
+        count=3,
+        family="half_kneeling",
+        subject_id=first.subject.subject_id,
+        history=first.history_after,
     )
     restored = PoseReferenceBatch.model_validate_json(batch.model_dump_json())
     assert restored == sample_pose_references(
@@ -160,9 +164,12 @@ def test_batch_rejects_stale_history_and_inconsistent_subject() -> None:
     another = next(s for s in LIBRARY.subjects if s != batch.subject)
     geometry = compile_reference_geometry(scene.pose, another, scene.presentation)
     replacement = PoseReferenceScene(
-        pose=scene.pose, camera=scene.camera,
-        subject=another, presentation=scene.presentation,
-        geometry=geometry, geometry_report=reference_geometry_report(geometry),
+        pose=scene.pose,
+        camera=scene.camera,
+        subject=another,
+        presentation=scene.presentation,
+        geometry=geometry,
+        geometry_report=reference_geometry_report(geometry),
         geometry_joints=reference_joint_positions(geometry),
         prompt=render_pose_reference(
             scene.pose, scene.camera, another, scene.presentation
@@ -214,10 +221,12 @@ def test_environment_filter_excludes_unsupported_poses_without_duplicates() -> N
         p for p in LIBRARY.presentations if not presentation_supports(p, ("step",))
     )
     eligible = [
-        pose for pose in LIBRARY.poses
+        pose
+        for pose in LIBRARY.poses
         if presentation_supports(
             presentation, tuple(contact.surface for contact in pose.supports)
-        ) and any(
+        )
+        and any(
             camera.camera_id in pose.compatible_camera_ids
             and presentation_accepts_camera(presentation, camera)
             for camera in LIBRARY.cameras
@@ -225,7 +234,9 @@ def test_environment_filter_excludes_unsupported_poses_without_duplicates() -> N
     ]
     assert 0 < len(eligible) < 48
     batch = sample_pose_references(
-        LIBRARY, seed=0, count=len(eligible),
+        LIBRARY,
+        seed=0,
+        count=len(eligible),
         presentation_id=presentation.presentation_id,
     )
     assert {scene.pose for scene in batch.scenes} == set(eligible)
@@ -234,13 +245,18 @@ def test_environment_filter_excludes_unsupported_poses_without_duplicates() -> N
     }
     with pytest.raises(ValueError, match="count must be between"):
         sample_pose_references(
-            LIBRARY, seed=0, count=len(eligible) + 1,
+            LIBRARY,
+            seed=0,
+            count=len(eligible) + 1,
             presentation_id=presentation.presentation_id,
         )
     with pytest.raises(ValueError, match="no reference poses fit"):
         sample_pose_references(
-            LIBRARY, seed=0, count=1,
-            family="step_supported", presentation_id=presentation.presentation_id,
+            LIBRARY,
+            seed=0,
+            count=1,
+            family="step_supported",
+            presentation_id=presentation.presentation_id,
         )
 
 
@@ -262,11 +278,13 @@ def test_reference_renderer_rejects_unsupported_environment_and_space() -> None:
         render_pose_reference(pose, camera, LIBRARY.subjects[0], unsupported)
     cramped = next(p for p in LIBRARY.presentations if p.space == "standard")
     long_camera = next(
-        c for c in LIBRARY.cameras
+        c
+        for c in LIBRARY.cameras
         if c.subject_distance == "extended_full_body_clearance"
     )
     pose = next(
-        p for p in LIBRARY.poses
+        p
+        for p in LIBRARY.poses
         if long_camera.camera_id in p.compatible_camera_ids
         and presentation_supports(cramped, tuple(c.surface for c in p.supports))
     )
@@ -279,14 +297,25 @@ def test_cli_history_is_a_read_only_chain_and_preserves_subject(tmp_path: Path) 
     previous = tmp_path / "first.json"
     following = tmp_path / "second.json"
     first = runner.invoke(
-        app, ["poses", "sample", "--count", "16", "--seed", "42",
-              "--output", str(previous)]
+        app,
+        ["poses", "sample", "--count", "16", "--seed", "42", "--output", str(previous)],
     )
     assert first.exit_code == 0, first.output
     original = previous.read_bytes()
     result = runner.invoke(
-        app, ["poses", "sample", "--count", "16", "--seed", "99",
-              "--history", str(previous), "--output", str(following)]
+        app,
+        [
+            "poses",
+            "sample",
+            "--count",
+            "16",
+            "--seed",
+            "99",
+            "--history",
+            str(previous),
+            "--output",
+            str(following),
+        ],
     )
     assert result.exit_code == 0, result.output
     prior = PoseReferenceBatch.model_validate_json(original)
@@ -297,8 +326,17 @@ def test_cli_history_is_a_read_only_chain_and_preserves_subject(tmp_path: Path) 
     assert current.report.previously_used_pose_scenes == 0
     assert previous.read_bytes() == original
     repeated = runner.invoke(
-        app, ["poses", "sample", "--count", "16", "--seed", "99",
-              "--history", str(previous)]
+        app,
+        [
+            "poses",
+            "sample",
+            "--count",
+            "16",
+            "--seed",
+            "99",
+            "--history",
+            str(previous),
+        ],
     )
     assert repeated.exit_code == 0, repeated.output
     assert PoseReferenceBatch.model_validate_json(repeated.stdout) == current
@@ -309,8 +347,17 @@ def test_cli_subject_and_presentation_filters_are_recorded() -> None:
     subject = LIBRARY.subjects[-1]
     presentation = next(p for p in LIBRARY.presentations if p.space == "extended")
     result = CliRunner().invoke(
-        app, ["poses", "sample", "--count", "1", "--subject", subject.subject_id,
-              "--presentation", presentation.presentation_id]
+        app,
+        [
+            "poses",
+            "sample",
+            "--count",
+            "1",
+            "--subject",
+            subject.subject_id,
+            "--presentation",
+            presentation.presentation_id,
+        ],
     )
     assert result.exit_code == 0, result.output
     batch = PoseReferenceBatch.model_validate_json(result.stdout)

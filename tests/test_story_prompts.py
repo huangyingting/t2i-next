@@ -689,7 +689,19 @@ def test_prompts_compile_only_selected_content_level(
         prompt = messages[0].content
         assert required in prompt
         assert all(item not in prompt for item in excluded)
-        assert "不要把内容等级名称、英文名或合规说明写进生成内容" in prompt
+        assert "Do not write the content-level name, CLI value" in prompt
+        assert "Every depicted person must be an unmistakable adult" in prompt
+        assert (
+            "All participants must be alert, consenting, responsive, and able to stop"
+            in prompt
+        )
+        assert "不要把内容等级名称、英文名或合规说明写进生成内容" not in prompt
+        grade_boundary = {
+            ContentLevel.AESTHETIC: "不得描写自慰、口交、插入或明确性行为",
+            ContentLevel.EROTIC: "不出现性器官特写、插入或口部性行为、自慰",
+            ContentLevel.HARDCORE: "所有角色必须外观明确为二十一岁以上成年人",
+        }
+        assert grade_boundary[level] in prompt
 
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
@@ -697,10 +709,10 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
     document = load_story_document(
         REPOSITORY_ROOT / "story-inputs" / "recipes" / "avantgarde.yaml"
     )
-    shared = document.authoring.content_levels
-    assert shared[ContentLevel.HARDCORE]
+    refinements = document.authoring.level_refinements
+    assert refinements[ContentLevel.HARDCORE].shared
     assert all(
-        anchor in " ".join(shared[ContentLevel.HARDCORE])
+        anchor in " ".join(refinements[ContentLevel.HARDCORE].shared)
         for anchor in ("发型", "服装", "配饰")
     )
     resolved = resolve_story_input(
@@ -727,7 +739,8 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         selected = document.authoring.selected(stage, level)
         assert all(rule in compiled for rule in getattr(base, stage.value))
         assert all(rule in compiled for rule in selected)
-        assert all(compiled.count(rule) == 1 for rule in shared.get(level, ()))
+        selected_shared = refinements[level].shared if level in refinements else ()
+        assert all(compiled.count(rule) == 1 for rule in selected_shared)
         for other_level in ContentLevel:
             if other_level != level:
                 assert all(
@@ -799,15 +812,13 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     assert payload["content_level"] == level.value
     assert required_contract in compiled
     selected = document.authoring.selected(StoryStage.FRAMES, level)
-    for levels in (
-        document.authoring.content_levels,
-        document.authoring.frames.content_levels,
-    ):
-        for other, rules in levels.items():
-            if other != level:
-                assert all(
-                    rule not in compiled for rule in rules if rule not in selected
-                )
+    for other in document.authoring.level_refinements:
+        if other != level:
+            assert all(
+                rule not in compiled
+                for rule in document.authoring.selected(StoryStage.FRAMES, other)
+                if rule not in selected
+            )
     assert "内容级别可见性锚点" in compiled
     assert "不能满足所选内容级别" in compiled
 

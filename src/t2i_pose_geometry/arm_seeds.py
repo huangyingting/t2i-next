@@ -32,11 +32,12 @@ def arm_seed_candidates(
         or not 1 <= max_candidates <= 256
     ):
         raise ValueError("max_candidates must be an integer within [1, 256]")
-    skeleton = forward_kinematics(actor)
+    skeleton = forward_kinematics(actor, include_shapes=False)
     shoulder = np.asarray(skeleton.joints[f"{side}_shoulder"])
     position = np.asarray(target.position)
     normal = np.asarray(
-        target.normal if target.normal is not None
+        target.normal
+        if target.normal is not None
         else skeleton.anchors[target.anchor].normal
     )
     normal /= np.linalg.norm(normal)
@@ -56,20 +57,23 @@ def arm_seed_candidates(
     sign = -1.0 if side == "left" else 1.0
     front, up, outward = torso[:, 1], torso[:, 2], sign * torso[:, 0]
     poles = (
-        front, front + up, front + outward, up,
-        outward, front - up, -up, -front,
+        front,
+        front + up,
+        front + outward,
+        up,
+        outward,
+        front - up,
+        -up,
+        -front,
     )
     candidate_groups: list[list[ActorPose]] = []
     seen: set[tuple[float, ...]] = set()
     for azimuth in (0, 90, -90, 180, 45, -45, 135, -135, 15, -15, 30, -30):
         group: list[ActorPose] = []
         candidate_groups.append(group)
-        finger = Rotation.from_rotvec(
-            normal * math.radians(azimuth)
-        ).apply(preferred)
+        finger = Rotation.from_rotvec(normal * math.radians(azimuth)).apply(preferred)
         wrist = (
-            position - normal * body.hand_thickness / 2
-            - finger * body.hand_length / 2
+            position - normal * body.hand_thickness / 2 - finger * body.hand_length / 2
         )
         delta = wrist - shoulder
         distance = float(np.linalg.norm(delta))
@@ -79,10 +83,18 @@ def arm_seed_candidates(
         along = (upper * upper - lower * lower + distance * distance) / (2 * distance)
         radius = math.sqrt(max(0.0, upper * upper - along * along))
         center = shoulder + direction * along
-        elbow_flex = math.degrees(math.acos(float(np.clip(
-            (distance * distance - upper * upper - lower * lower) / (2 * upper * lower),
-            -1.0, 1.0,
-        ))))
+        elbow_flex = math.degrees(
+            math.acos(
+                float(
+                    np.clip(
+                        (distance * distance - upper * upper - lower * lower)
+                        / (2 * upper * lower),
+                        -1.0,
+                        1.0,
+                    )
+                )
+            )
+        )
         hand_rotation = np.column_stack((np.cross(normal, -finger), normal, -finger))
         for pole in poles:
             perpendicular = pole - direction * float(pole @ direction)
@@ -91,9 +103,9 @@ def arm_seed_candidates(
                 continue
             elbow = center + radius * perpendicular / length
             arm_local = torso.T @ ((elbow - shoulder) / upper)
-            abduction = math.degrees(math.asin(float(np.clip(
-                sign * arm_local[0], -1.0, 1.0
-            ))))
+            abduction = math.degrees(
+                math.asin(float(np.clip(sign * arm_local[0], -1.0, 1.0)))
+            )
             flex = math.degrees(math.atan2(arm_local[1], -arm_local[2]))
             base = (
                 torso
@@ -124,7 +136,8 @@ def arm_seed_candidates(
             if any(
                 not (
                     JOINT_LIMITS[name][0] - 1e-8
-                    <= value <= JOINT_LIMITS[name][1] + 1e-8
+                    <= value
+                    <= JOINT_LIMITS[name][1] + 1e-8
                 )
                 for name, value in updates.items()
             ):
@@ -140,7 +153,9 @@ def arm_seed_candidates(
             candidate = ActorPose.model_validate(
                 actor.model_dump() | {"angles": angles.model_dump()}
             )
-            actual = forward_kinematics(candidate).anchors[target.anchor]
+            actual = forward_kinematics(candidate, include_shapes=False).anchors[
+                target.anchor
+            ]
             if (
                 np.linalg.norm(np.asarray(actual.position) - position) > 1e-7
                 or np.linalg.norm(np.asarray(actual.normal) - normal) > 1e-7
@@ -151,6 +166,7 @@ def arm_seed_candidates(
     candidates = [
         group[index]
         for index in range(max(map(len, candidate_groups), default=0))
-        for group in candidate_groups if index < len(group)
+        for group in candidate_groups
+        if index < len(group)
     ]
     return tuple(candidates[:max_candidates])

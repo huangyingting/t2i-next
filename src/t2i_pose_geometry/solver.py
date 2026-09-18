@@ -7,6 +7,8 @@ lengths and all joint coordinates remain FK-derived on every evaluation.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
+from types import MappingProxyType
 
 import numpy as np
 from scipy.optimize import least_squares
@@ -32,6 +34,51 @@ ROOT_VARIABLES = (
 )
 
 
+def _variable_groups() -> Mapping[str, tuple[str, ...]]:
+    groups: dict[str, list[str]] = {}
+    for name in JOINT_LIMITS:
+        group = name.rsplit("_", 1)[0]
+        groups.setdefault(group, []).append(name)
+    groups["root_position"] = list(ROOT_VARIABLES[:3])
+    groups["root_rotation"] = list(ROOT_VARIABLES[3:])
+    return MappingProxyType({name: tuple(values) for name, values in groups.items()})
+
+
+VARIABLE_GROUPS = _variable_groups()
+
+
+def expand_variable_names(variable_names: tuple[str, ...]) -> tuple[str, ...]:
+    """Expand joint groups and ``group.component`` selectors into flat variables.
+
+    Examples: left_shoulder, left_elbow, left_wrist, torso, head, root_position,
+    root_rotation; left_shoulder.flex, left_hip.yaw, root_position.z. Unknown
+    selectors and duplicate variables after expansion raise ValueError.
+    """
+    if isinstance(variable_names, str):
+        raise ValueError("IK variables must be a sequence of selectors, not a string")
+    expanded: list[str] = []
+    known = set(JOINT_LIMITS) | set(ROOT_VARIABLES)
+    for selector in variable_names:
+        if not isinstance(selector, str):
+            raise ValueError("IK variable selectors must be strings")
+        if selector in VARIABLE_GROUPS:
+            expanded.extend(VARIABLE_GROUPS[selector])
+            continue
+        name = selector
+        if "." in selector:
+            group, component = selector.split(".", maxsplit=1)
+            prefix = "root" if group == "root_position" else group
+            name = f"{prefix}_{component}"
+            if name not in VARIABLE_GROUPS.get(group, ()):
+                raise ValueError(f"Unknown IK variables: {selector!r}")
+        if name not in known:
+            raise ValueError(f"Unknown IK variables: {selector!r}")
+        expanded.append(name)
+    if len(set(expanded)) != len(expanded):
+        raise ValueError("Duplicate IK variable names after group expansion")
+    return tuple(expanded)
+
+
 def solve_actor(
     actor: ActorPose,
     targets: tuple[AnchorTarget, ...],
@@ -43,9 +90,10 @@ def solve_actor(
 ) -> SolveResult:
     """Fit anchor positions/normals within explicit bounded numerical tolerances.
 
-    Variables are flat JointAngles fields or ROOT_VARIABLES. Translation bounds
-    are relative to the supplied root and capped at 10m; rotations are within
-    +/-180 degrees of the supplied root. Joint bounds are JOINT_LIMITS.
+    Variables are flat JointAngles fields, ROOT_VARIABLES, VARIABLE_GROUPS, or
+    ``group.component`` selectors. Translation bounds are relative to the
+    supplied root and capped at 10m; rotations are within +/-180 degrees of the
+    supplied root. Joint bounds are JOINT_LIMITS.
     Unknown anchors/variables and invalid inputs raise ValueError. A finite,
     reachable fit reports ``converged`` only when *all* target errors pass;
     least-squares termination alone never establishes convergence or geometry.
@@ -64,15 +112,11 @@ def solve_actor(
         raise ValueError("root_translation_bound_m must be within (0, 10]")
     if not targets:
         raise ValueError("At least one target is required")
-    skeleton = forward_kinematics(actor)
+    skeleton = forward_kinematics(actor, include_shapes=False)
     unknown = {target.anchor for target in targets} - skeleton.anchors.keys()
     if unknown:
         raise ValueError(f"Unknown anchors: {sorted(unknown)}")
-    if len(set(variable_names)) != len(variable_names):
-        raise ValueError("Duplicate IK variable names")
-    unknown_variables = set(variable_names) - set(JOINT_LIMITS) - set(ROOT_VARIABLES)
-    if unknown_variables:
-        raise ValueError(f"Unknown IK variables: {sorted(unknown_variables)}")
+    variable_names = expand_variable_names(variable_names)
     for name, (lower, upper) in JOINT_LIMITS.items():
         if (
             name not in variable_names
@@ -119,7 +163,7 @@ def solve_actor(
     normal_scale = 2 * math.sin(math.radians(tolerances.normal_degrees) / 2)
 
     def residual(values: np.ndarray) -> np.ndarray:
-        current = forward_kinematics(candidate(values))
+        current = forward_kinematics(candidate(values), include_shapes=False)
         result = []
         for target in targets:
             anchor = current.anchors[target.anchor]
@@ -148,7 +192,7 @@ def solve_actor(
         nfev, message = int(fit.nfev), str(fit.message)
     else:
         fitted, nfev, message = actor, 0, "No variables requested"
-    current = forward_kinematics(fitted)
+    current = forward_kinematics(fitted, include_shapes=False)
     errors: list[TargetError] = []
     for target in targets:
         anchor = current.anchors[target.anchor]

@@ -58,7 +58,9 @@ def reference_joint_positions(scene: Scene) -> tuple[ReferenceJointPosition, ...
     return tuple(
         ReferenceJointPosition(actor_id=actor.actor_id, joint=joint, position=position)
         for actor in sorted(scene.actors, key=lambda item: item.actor_id)
-        for joint, position in sorted(forward_kinematics(actor).joints.items())
+        for joint, position in sorted(
+            forward_kinematics(actor, include_shapes=False).joints.items()
+        )
     )
 
 
@@ -110,11 +112,11 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
     elif pose.spine == "reclined":
         angles["torso_pitch"] = -6.0
     angles["head_yaw"] = {
-        "aligned": 0.0, "gentle_left": 20.0, "gentle_right": -20.0,
+        "aligned": 0.0,
+        "gentle_left": 20.0,
+        "gentle_right": -20.0,
     }[pose.head_orientation.yaw]
-    angles["head_pitch"] = (
-        0.0 if pose.head_orientation.pitch == "neutral" else 10.0
-    )
+    angles["head_pitch"] = 0.0 if pose.head_orientation.pitch == "neutral" else 10.0
     for side in ("left", "right"):
         angles[f"{side}_shoulder_flex"] = 0.0
         angles[f"{side}_shoulder_abduction"] = 6.0
@@ -140,9 +142,9 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
             angles[f"{side}_knee_flex"] = 70.0
             angles[f"{side}_ankle_flex"] = -20.0
     elif pose.legs in {"knees_and_toes_on_mat", "left_half_kneel", "right_half_kneel"}:
-        knee_flex = math.degrees(math.acos(
-            -(0.75 * body.foot_length - body.knee_radius) / body.shin_length
-        ))
+        knee_flex = math.degrees(
+            math.acos(-(0.75 * body.foot_length - body.knee_radius) / body.shin_length)
+        )
         for side in ("left", "right"):
             angles[f"{side}_knee_flex"] = knee_flex
             angles[f"{side}_ankle_flex"] = knee_flex - 90.0
@@ -166,13 +168,16 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
             angles[f"{side}_knee_flex"] = 130.0
             angles[f"{side}_ankle_flex"] = 20.0
     elif pose.legs == "floor_seated_bent_knees":
-        shin_angle = math.degrees(math.acos(
-            (
-                body.pelvis_half_height
-                - body.thigh_length * math.cos(math.radians(125.0))
-                - body.foot_thickness
-            ) / body.shin_length
-        ))
+        shin_angle = math.degrees(
+            math.acos(
+                (
+                    body.pelvis_half_height
+                    - body.thigh_length * math.cos(math.radians(125.0))
+                    - body.foot_thickness
+                )
+                / body.shin_length
+            )
+        )
         for side in ("left", "right"):
             angles[f"{side}_hip_flex"] = 125.0
             angles[f"{side}_knee_flex"] = 125.0 - shin_angle
@@ -189,13 +194,16 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
             angles[f"{side}_shoulder_abduction"] = 15.0
             angles[f"{side}_elbow_flex"] = 35.0
         elif hand == "on_mat_forward":
-            incline = math.degrees(math.asin(
-                (
-                    body.shoulder_radius
-                    + body.upper_arm_length * math.sin(math.radians(15))
-                    - body.hand_thickness / 2
-                ) / body.forearm_length
-            ))
+            incline = math.degrees(
+                math.asin(
+                    (
+                        body.shoulder_radius
+                        + body.upper_arm_length * math.sin(math.radians(15))
+                        - body.hand_thickness / 2
+                    )
+                    / body.forearm_length
+                )
+            )
             angles[f"{side}_shoulder_flex"] = 90.0
             angles[f"{side}_shoulder_abduction"] = -15.0
             angles[f"{side}_shoulder_rotation"] = -90.0 if side == "left" else 90.0
@@ -215,23 +223,34 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
             angles[f"{side}_shoulder_abduction"] = 20.0
             angles[f"{side}_elbow_flex"] = 55.0
     roll = (
-        -90.0 if pose.resting_side == "left"
-        else 90.0 if pose.resting_side == "right" else 0.0
+        -90.0
+        if pose.resting_side == "left"
+        else 90.0
+        if pose.resting_side == "right"
+        else 0.0
     )
     return ActorPose(
-        actor_id="subject", body=body, angles=JointAngles.model_validate(angles),
-        root_position=(0.0, 0.0, 1.0), root_rotation=(0.0, roll, 0.0),
+        actor_id="subject",
+        body=body,
+        angles=JointAngles.model_validate(angles),
+        root_position=(0.0, 0.0, 1.0),
+        root_rotation=(0.0, roll, 0.0),
     )
 
 
 def _support_anchor(
-    body_part: str, resting_side: Literal["none", "left", "right"],
+    body_part: str,
+    resting_side: Literal["none", "left", "right"],
 ) -> str:
     names = {
-        "left_foot": "left_sole", "right_foot": "right_sole",
-        "left_hand": "left_palm", "right_hand": "right_palm",
-        "left_knee": "left_knee_ground", "right_knee": "right_knee_ground",
-        "pelvis": "seat", "upper_back": "back",
+        "left_foot": "left_sole",
+        "right_foot": "right_sole",
+        "left_hand": "left_palm",
+        "right_hand": "right_palm",
+        "left_knee": "left_knee_ground",
+        "right_knee": "right_knee_ground",
+        "pelvis": "seat",
+        "upper_back": "back",
     }
     if body_part == "head":
         return f"{resting_side}_head"
@@ -250,7 +269,8 @@ def _ground_actor(pose: NeutralPose, actor: ActorPose) -> ActorPose:
     else:
         ground_feet = [
             _support_anchor(c.body_part, pose.resting_side)
-            for c in pose.supports if c.surface == "floor" and "foot" in c.body_part
+            for c in pose.supports
+            if c.surface == "floor" and "foot" in c.body_part
         ]
         base = min(skeleton.anchors[name].position[2] for name in ground_feet)
     root = actor.root_position
@@ -264,28 +284,41 @@ def _ground_actor(pose: NeutralPose, actor: ActorPose) -> ActorPose:
             position = skeleton.anchors[anchor].position
             if abs(position[2]) > 0.0005:
                 side = contact.body_part.split("_")[0]
-                targets.append(AnchorTarget(
-                    anchor=anchor, position=(position[0], position[1], 0.0),
-                    normal=(0.0, 0.0, -1.0),
-                ))
-                variables.extend((
-                    f"{side}_hip_flex", f"{side}_knee_flex", f"{side}_ankle_flex",
-                ))
+                targets.append(
+                    AnchorTarget(
+                        anchor=anchor,
+                        position=(position[0], position[1], 0.0),
+                        normal=(0.0, 0.0, -1.0),
+                    )
+                )
+                variables.extend(
+                    (
+                        f"{side}_hip_flex",
+                        f"{side}_knee_flex",
+                        f"{side}_ankle_flex",
+                    )
+                )
     if targets:
         actor = solve_actor(
-            actor, tuple(targets), variable_names=tuple(variables), max_nfev=160,
+            actor,
+            tuple(targets),
+            variable_names=tuple(variables),
+            max_nfev=160,
         ).actor
     return actor
 
 
 def _box(
-    name: str, center: tuple[float, float, float], size: tuple[float, float, float],
+    name: str,
+    center: tuple[float, float, float],
+    size: tuple[float, float, float],
 ) -> Box:
     return Box(object_id=name, center=center, size=size, rotation=(0.0, 0.0, 0.0))
 
 
 def _environment(
-    pose: NeutralPose, actor: ActorPose,
+    pose: NeutralPose,
+    actor: ActorPose,
 ) -> tuple[tuple[Box, ...], dict[str, str]]:
     anchors = forward_kinematics(actor).anchors
     surfaces = {c.surface for c in pose.supports}
@@ -294,83 +327,157 @@ def _environment(
     faces: dict[str, str] = {"floor": "top", "mat": "top"}
     if "mat" in surfaces:
         mat_y = -0.9 * scale if "half_kneel" in pose.legs else 0.0
-        objects.append(_box("mat", (0.0, mat_y, _MAT_TOP / 2), (
-            3.0 * scale, 2.0 * scale, _MAT_TOP,
-        )))
+        objects.append(
+            _box(
+                "mat",
+                (0.0, mat_y, _MAT_TOP / 2),
+                (
+                    3.0 * scale,
+                    2.0 * scale,
+                    _MAT_TOP,
+                ),
+            )
+        )
     if "table" in surfaces:
         height = actor.root_position[2] - 0.02 * scale
         depth, width = 0.5 * scale, 1.0 * scale
         center_y = 0.45 * scale
-        objects.append(_box("table", (0.0, center_y, height - 0.02 * scale), (
-            width, depth, 0.04 * scale,
-        )))
-        for side, x in (("left", -width / 2 + 0.03 * scale),
-                        ("right", width / 2 - 0.03 * scale)):
-            for edge, y in (("front", center_y + depth / 2 - 0.03 * scale),
-                            ("back", center_y - depth / 2 + 0.03 * scale)):
-                objects.append(_box(
-                    f"table_leg_{side}_{edge}", (x, y, (height - 0.04 * scale) / 2),
-                    (0.04 * scale, 0.04 * scale, height - 0.04 * scale),
-                ))
+        objects.append(
+            _box(
+                "table",
+                (0.0, center_y, height - 0.02 * scale),
+                (
+                    width,
+                    depth,
+                    0.04 * scale,
+                ),
+            )
+        )
+        for side, x in (
+            ("left", -width / 2 + 0.03 * scale),
+            ("right", width / 2 - 0.03 * scale),
+        ):
+            for edge, y in (
+                ("front", center_y + depth / 2 - 0.03 * scale),
+                ("back", center_y - depth / 2 + 0.03 * scale),
+            ):
+                objects.append(
+                    _box(
+                        f"table_leg_{side}_{edge}",
+                        (x, y, (height - 0.04 * scale) / 2),
+                        (0.04 * scale, 0.04 * scale, height - 0.04 * scale),
+                    )
+                )
         faces["table"] = "top"
     if "step" in surfaces:
         side = "left" if pose.legs == "left_foot_on_step" else "right"
         foot = anchors[f"{side}_sole"].position
-        objects.append(_box("step", (foot[0], foot[1], foot[2] / 2), (
-            0.18 * scale, 0.34 * scale, foot[2],
-        )))
+        objects.append(
+            _box(
+                "step",
+                (foot[0], foot[1], foot[2] / 2),
+                (
+                    0.18 * scale,
+                    0.34 * scale,
+                    foot[2],
+                ),
+            )
+        )
         faces["step"] = "top"
     if "chair_seat" in surfaces:
         seat = anchors["seat"].position
         height = seat[2]
-        objects.append(_box("chair_seat", (seat[0], seat[1] + 0.06 * scale,
-                                          height - 0.02 * scale), (
-            0.55 * scale, 0.36 * scale, 0.04 * scale,
-        )))
+        objects.append(
+            _box(
+                "chair_seat",
+                (seat[0], seat[1] + 0.06 * scale, height - 0.02 * scale),
+                (
+                    0.55 * scale,
+                    0.36 * scale,
+                    0.04 * scale,
+                ),
+            )
+        )
         for side, x in (("left", -0.235 * scale), ("right", 0.235 * scale)):
             for edge, y in (("front", 0.21 * scale), ("back", -0.09 * scale)):
-                objects.append(_box(
-                    f"chair_leg_{side}_{edge}", (x, y, (height - 0.04 * scale) / 2),
-                    (0.04 * scale, 0.04 * scale, height - 0.04 * scale),
-                ))
+                objects.append(
+                    _box(
+                        f"chair_leg_{side}_{edge}",
+                        (x, y, (height - 0.04 * scale) / 2),
+                        (0.04 * scale, 0.04 * scale, height - 0.04 * scale),
+                    )
+                )
         faces["chair_seat"] = "top"
     if "chair_back" in surfaces:
         back = anchors["back"].position
         low = anchors["seat"].position[2]
         height = back[2] - low + 0.16 * scale
-        objects.append(_box("chair_back", (0.0, back[1] - 0.025 * scale,
-                                          low + height / 2), (
-            0.55 * scale, 0.05 * scale, height,
-        )))
+        objects.append(
+            _box(
+                "chair_back",
+                (0.0, back[1] - 0.025 * scale, low + height / 2),
+                (
+                    0.55 * scale,
+                    0.05 * scale,
+                    height,
+                ),
+            )
+        )
         faces["chair_back"] = "front"
     if "wall" in surfaces:
         if any(c.body_part == "upper_back" for c in pose.supports):
             y = anchors["back"].position[1]
-            objects.append(_box("wall", (0.0, y - 0.025 * scale, 1.0 * scale), (
-                2.0 * scale, 0.05 * scale, 2.0 * scale,
-            )))
+            objects.append(
+                _box(
+                    "wall",
+                    (0.0, y - 0.025 * scale, 1.0 * scale),
+                    (
+                        2.0 * scale,
+                        0.05 * scale,
+                        2.0 * scale,
+                    ),
+                )
+            )
             faces["wall"] = "front"
         else:
             left = pose.left_hand == "on_wall"
             x = (-0.525 if left else 0.525) * scale
-            objects.append(_box("wall", (x, 0.0, 1.0 * scale), (
-                0.05 * scale, 2.0 * scale, 2.0 * scale,
-            )))
+            objects.append(
+                _box(
+                    "wall",
+                    (x, 0.0, 1.0 * scale),
+                    (
+                        0.05 * scale,
+                        2.0 * scale,
+                        2.0 * scale,
+                    ),
+                )
+            )
             faces["wall"] = "right" if left else "left"
     if "headrest" in surfaces:
         head = anchors[f"{pose.resting_side}_head"].position
         height = head[2] - _MAT_TOP
         if height <= 0:
             raise ValueError("lying head leaves no positive headrest clearance")
-        objects.append(_box("headrest", (head[0], head[1], _MAT_TOP + height / 2), (
-            2.2 * actor.body.head_radius, 2.2 * actor.body.head_radius, height,
-        )))
+        objects.append(
+            _box(
+                "headrest",
+                (head[0], head[1], _MAT_TOP + height / 2),
+                (
+                    2.2 * actor.body.head_radius,
+                    2.2 * actor.body.head_radius,
+                    height,
+                ),
+            )
+        )
         faces["headrest"] = "top"
     return tuple(objects), faces
 
 
 def _arm_targets(
-    pose: NeutralPose, actor: ActorPose, objects: tuple[Box, ...],
+    pose: NeutralPose,
+    actor: ActorPose,
+    objects: tuple[Box, ...],
 ) -> tuple[tuple[AnchorTarget, ...], tuple[BodyContact, ...], tuple[str, ...]]:
     skeleton = forward_kinematics(actor)
     boxes = {box.object_id: box for box in objects}
@@ -397,32 +504,50 @@ def _arm_targets(
             target_anchor = f"{opposite}_{suffix}"
         if target_anchor is not None:
             target = skeleton.anchors[target_anchor]
-            targets.append(AnchorTarget(
-                anchor=anchor, position=target.position,
-                normal=(-target.normal[0], -target.normal[1], -target.normal[2]),
-            ))
-            contacts.append(BodyContact(
-                actor_id="subject", anchor=anchor,
-                target_actor_id="subject", target_anchor=target_anchor,
-            ))
+            targets.append(
+                AnchorTarget(
+                    anchor=anchor,
+                    position=target.position,
+                    normal=(-target.normal[0], -target.normal[1], -target.normal[2]),
+                )
+            )
+            contacts.append(
+                BodyContact(
+                    actor_id="subject",
+                    anchor=anchor,
+                    target_actor_id="subject",
+                    target_anchor=target_anchor,
+                )
+            )
         elif placement == "on_table":
             table = boxes["table"]
-            targets.append(AnchorTarget(
-                anchor=anchor,
-                position=(sign * 0.22 * scale, 0.38 * scale,
-                          table.center[2] + table.size[2] / 2),
-                normal=(0.0, 0.0, -1.0),
-            ))
+            targets.append(
+                AnchorTarget(
+                    anchor=anchor,
+                    position=(
+                        sign * 0.22 * scale,
+                        0.38 * scale,
+                        table.center[2] + table.size[2] / 2,
+                    ),
+                    normal=(0.0, 0.0, -1.0),
+                )
+            )
         elif placement == "on_wall":
-            targets.append(AnchorTarget(
-                anchor=anchor,
-                position=(sign * 0.5 * scale, 0.05 * scale,
-                          skeleton.joints[f"{side}_shoulder"][2] - 0.1 * scale),
-                normal=(sign, 0.0, 0.0),
-            ))
+            targets.append(
+                AnchorTarget(
+                    anchor=anchor,
+                    position=(
+                        sign * 0.5 * scale,
+                        0.05 * scale,
+                        skeleton.joints[f"{side}_shoulder"][2] - 0.1 * scale,
+                    ),
+                    normal=(sign, 0.0, 0.0),
+                )
+            )
         elif placement == "on_floor":
             foot_shape = next(
-                shape for shape in skeleton.shapes
+                shape
+                for shape in skeleton.shapes
                 if shape.shape_id == skeleton.anchors[f"{side}_sole"].shape_id
             )
             rotation = Rotation.from_euler(
@@ -431,14 +556,17 @@ def _arm_targets(
             foot_front = foot_shape.center[1] + float(
                 np.abs(rotation[1]) @ (np.asarray(foot_shape.size) / 2)
             )
-            hand_clearance = math.hypot(
-                actor.body.hand_length / 2, actor.body.hand_width / 2
-            ) + 0.02 * scale
-            targets.append(AnchorTarget(
-                anchor=anchor,
-                position=(sign * 0.38 * scale, foot_front + hand_clearance, 0.0),
-                normal=(0.0, 0.0, -1.0),
-            ))
+            hand_clearance = (
+                math.hypot(actor.body.hand_length / 2, actor.body.hand_width / 2)
+                + 0.02 * scale
+            )
+            targets.append(
+                AnchorTarget(
+                    anchor=anchor,
+                    position=(sign * 0.38 * scale, foot_front + hand_clearance, 0.0),
+                    normal=(0.0, 0.0, -1.0),
+                )
+            )
         elif placement == "on_mat_forward":
             shoulder = skeleton.joints[f"{side}_shoulder"]
             incline = getattr(actor.angles, f"{side}_elbow_flex") - 15.0
@@ -447,24 +575,32 @@ def _arm_targets(
                 + actor.body.forearm_length * math.cos(math.radians(incline))
                 + actor.body.hand_length / 2
             )
-            targets.append(AnchorTarget(
-                anchor=anchor,
-                position=(shoulder[0], shoulder[1] + reach, _MAT_TOP),
-                normal=(0.0, 0.0, -1.0),
-            ))
+            targets.append(
+                AnchorTarget(
+                    anchor=anchor,
+                    position=(shoulder[0], shoulder[1] + reach, _MAT_TOP),
+                    normal=(0.0, 0.0, -1.0),
+                )
+            )
             continue
         elif placement == "on_seat":
             seat = boxes["chair_seat"]
-            targets.append(AnchorTarget(
-                anchor=anchor,
-                position=(sign * 0.23 * scale, seat.center[1],
-                          seat.center[2] + seat.size[2] / 2),
-                normal=(0.0, 0.0, -1.0),
-            ))
+            targets.append(
+                AnchorTarget(
+                    anchor=anchor,
+                    position=(
+                        sign * 0.23 * scale,
+                        seat.center[1],
+                        seat.center[2] + seat.size[2] / 2,
+                    ),
+                    normal=(0.0, 0.0, -1.0),
+                )
+            )
         else:
             continue
         variables.extend(
-            name for name in JOINT_LIMITS
+            name
+            for name in JOINT_LIMITS
             if name.startswith(
                 (f"{side}_shoulder_", f"{side}_elbow_", f"{side}_wrist_")
             )
@@ -480,7 +616,8 @@ def _rotate_scene(scene: Scene, yaw: float) -> Scene:
                 actor,
                 root_position=_vector(matrix @ np.array(actor.root_position)),
                 root_rotation=(
-                    actor.root_rotation[0], actor.root_rotation[1],
+                    actor.root_rotation[0],
+                    actor.root_rotation[1],
                     actor.root_rotation[2] + yaw,
                 ),
             )
@@ -489,7 +626,8 @@ def _rotate_scene(scene: Scene, yaw: float) -> Scene:
         objects=tuple(
             Box(
                 object_id=box.object_id,
-                center=_vector(matrix @ np.array(box.center)), size=box.size,
+                center=_vector(matrix @ np.array(box.center)),
+                size=box.size,
                 rotation=(box.rotation[0], box.rotation[1], box.rotation[2] + yaw),
             )
             for box in scene.objects
@@ -500,17 +638,22 @@ def _rotate_scene(scene: Scene, yaw: float) -> Scene:
 
 
 def _scene_for_actor(
-    pose: NeutralPose, actor: ActorPose,
-    objects: tuple[Box, ...], faces: dict[str, str],
+    pose: NeutralPose,
+    actor: ActorPose,
+    objects: tuple[Box, ...],
+    faces: dict[str, str],
 ) -> Scene:
     _, body_contacts, _ = _arm_targets(pose, actor, objects)
     return Scene(
-        actors=(actor,), objects=objects, body_contacts=body_contacts,
+        actors=(actor,),
+        objects=objects,
+        body_contacts=body_contacts,
         contacts=tuple(
             Contact(
                 actor_id="subject",
                 anchor=_support_anchor(contact.body_part, pose.resting_side),
-                object_id=contact.surface, face=faces[contact.surface],
+                object_id=contact.surface,
+                face=faces[contact.surface],
             )
             for contact in pose.supports
         ),
@@ -519,16 +662,21 @@ def _scene_for_actor(
 
 def _report_score(report: ValidationReport) -> tuple[int, int, float]:
     return (
-        sum(issue.code in {"self_collision", "object_collision", "actor_collision"}
-            for issue in report.issues),
+        sum(
+            issue.code
+            in {"self_collision", "object_collision", "inter_actor_collision"}
+            for issue in report.issues
+        ),
         len(report.issues),
         sum(abs(issue.error_m or 0.0) for issue in report.issues),
     )
 
 
 def _fit_arms(
-    pose: NeutralPose, actor: ActorPose,
-    objects: tuple[Box, ...], faces: dict[str, str],
+    pose: NeutralPose,
+    actor: ActorPose,
+    objects: tuple[Box, ...],
+    faces: dict[str, str],
 ) -> ActorPose:
     beam = [actor]
     sides: tuple[Literal["left", "right"], ...] = (
@@ -537,7 +685,10 @@ def _fit_arms(
     for side in sides:
         placement = pose.left_hand if side == "left" else pose.right_hand
         if placement in {
-            "at_side", "relaxed_in_front", "forward_gesture", "on_mat_forward"
+            "at_side",
+            "relaxed_in_front",
+            "forward_gesture",
+            "on_mat_forward",
         }:
             continue
         ranked: list[tuple[tuple[int, int, float], ActorPose]] = []
@@ -547,7 +698,8 @@ def _fit_arms(
             candidates = arm_seed_candidates(current, side, target, max_candidates=16)
             if not candidates:
                 fitted = solve_actor(
-                    current, (target,),
+                    current,
+                    (target,),
                     variable_names=tuple(n for n in variables if n.startswith(side)),
                     max_nfev=100,
                 )
@@ -571,14 +723,16 @@ def _fit_arms(
 
 @lru_cache(maxsize=256)
 def _canonical_geometry(
-    pose: NeutralPose, body_scale: float,
+    pose: NeutralPose,
+    body_scale: float,
 ) -> tuple[Scene, ValidationReport]:
     if body_scale != 1.0:
         reference, _ = _canonical_geometry(pose, 1.0)
         scaled = Scene(
             actors=tuple(
                 _replace_actor(
-                    actor, body=actor.body.scaled(body_scale),
+                    actor,
+                    body=actor.body.scaled(body_scale),
                     root_position=tuple(v * body_scale for v in actor.root_position),
                 )
                 for actor in reference.actors
@@ -587,11 +741,13 @@ def _canonical_geometry(
                 Box(
                     object_id=box.object_id,
                     center=tuple(v * body_scale for v in box.center),
-                    size=tuple(v * body_scale for v in box.size), rotation=box.rotation,
+                    size=tuple(v * body_scale for v in box.size),
+                    rotation=box.rotation,
                 )
                 for box in reference.objects
             ),
-            contacts=reference.contacts, body_contacts=reference.body_contacts,
+            contacts=reference.contacts,
+            body_contacts=reference.body_contacts,
         )
         return scaled, reference_geometry_report(scaled)
     body = BodySpec().scaled(body_scale)

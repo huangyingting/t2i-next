@@ -74,13 +74,22 @@ def capsule(
     )
 
 
-def forward_kinematics(actor: ActorPose) -> Skeleton:
+def forward_kinematics(actor: ActorPose, *, include_shapes: bool = True) -> Skeleton:
     """Derive joint positions, outward-facing surface anchors, and solid volumes.
 
-    Lap and forearm anchors use their segment's local anterior (+y) normal.
+    Lap and forearm anchors use their segment's local anterior (+y) normal;
+    forearm_back uses the opposite (-y) surface at the same forearm midpoint.
     Knee anchors follow the shin frame for kneeling; knee_top anchors follow the
-    thigh frame, facing upward in a 90-degree seated hip pose. All anchors lie
-    on named solid surfaces; none independently modifies the joint positions.
+    thigh frame, facing upward in a 90-degree seated hip pose. Knee_ground uses
+    the knee sphere's root-frame -z support point, independent of shin rotation.
+    Back is the exact upper-thorax ellipsoid support point along root-frame -y.
+    Toes are foot-box local +y face centers with outward local +y normals.
+    All anchors lie on named solid surfaces; none independently modifies joints.
+
+    ``include_shapes=False`` computes identical joints and anchors but leaves
+    shapes/joint_regions empty, avoiding collider construction and matrix-to-Euler
+    conversion during IK. Inputs are still validated. Scene validation always
+    uses the full default path and never accepts this as a collision certificate.
     """
     actor = ActorPose.model_validate(actor.model_dump())
     body, angles = actor.body, actor.angles
@@ -103,6 +112,8 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
         rotation: np.ndarray,
         dimensions: tuple[float, float, float],
     ) -> None:
+        if not include_shapes:
+            return
         keyword = "size" if kind == "box" else "radii"
         shapes.append(
             Shape(
@@ -115,7 +126,14 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
         )
 
     def ball(name: str, position: np.ndarray, radius: float) -> None:
-        solid(name, "ellipsoid", position, np.eye(3), (radius,) * 3)
+        if include_shapes:
+            solid(name, "ellipsoid", position, np.eye(3), (radius,) * 3)
+
+    def bone(name: str, start: np.ndarray, end: np.ndarray, radius: float) -> None:
+        if include_shapes:
+            shapes.append(
+                capsule(name, vector(start), vector(end), radius, shorten=True)
+            )
 
     def anchor(
         name: str,
@@ -134,6 +152,8 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
     def joint_region(
         joint: str, center: np.ndarray, radius: float, names: tuple[str, ...]
     ) -> None:
+        if not include_shapes:
+            return
         for pair in itertools.combinations(names, 2):
             regions.append(
                 JointRegion(
@@ -150,16 +170,17 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
     )
     torso_z = (body.torso_length + body.pelvis_half_height) / 2
     torso_center = origin + torso @ np.array([0.0, 0.0, torso_z])
+    torso_radii = (
+        body.torso_half_width,
+        body.torso_depth,
+        (body.torso_length - body.pelvis_half_height) / 2,
+    )
     solid(
         "torso",
         "ellipsoid",
         torso_center,
         torso,
-        (
-            body.torso_half_width,
-            body.torso_depth,
-            (body.torso_length - body.pelvis_half_height) / 2,
-        ),
+        torso_radii,
     )
     joint_region(
         "root",
@@ -174,16 +195,17 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
     upper_torso_center = origin + torso @ np.array(
         [0.0, 0.0, body.upper_torso_center_height]
     )
+    upper_torso_radii = (
+        body.upper_torso_half_width,
+        body.torso_depth,
+        body.upper_torso_half_height,
+    )
     solid(
         "upper_torso",
         "ellipsoid",
         upper_torso_center,
         torso,
-        (
-            body.upper_torso_half_width,
-            body.torso_depth,
-            body.upper_torso_half_height,
-        ),
+        upper_torso_radii,
     )
     joint_region(
         "thorax",
@@ -208,15 +230,7 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
     head_center = point(
         "head", head_base + head_frame @ np.array([0.0, 0.0, body.head_radius])
     )
-    shapes.append(
-        capsule(
-            "neck",
-            vector(shoulder_center),
-            vector(head_base),
-            body.neck_radius,
-            shorten=True,
-        )
-    )
+    bone("neck", shoulder_center, head_base, body.neck_radius)
     solid("head", "ellipsoid", head_center, head_frame, (body.head_radius,) * 3)
     joint_region("head_base", head_base, body.head_radius, ("neck", "head"))
     joint_region(
@@ -242,7 +256,15 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
         (0, 0, -body.pelvis_half_height),
         (0, 0, -1),
     )
-    anchor("back", "torso", torso_center, torso, (0, -body.torso_depth, 0), (0, -1, 0))
+    back_normal = root @ np.array([0.0, -1.0, 0.0])
+    local_normal = torso.T @ back_normal
+    radii = np.asarray(upper_torso_radii)
+    offset = radii**2 * local_normal / np.linalg.norm(radii * local_normal)
+    anchors["back"] = Anchor(
+        position=vector(upper_torso_center + torso @ offset),
+        normal=vector(back_normal),
+        shape_id="upper_torso",
+    )
     for side, sign in (("left", -1), ("right", 1)):
         anchor(
             f"{side}_side",
@@ -302,9 +324,7 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             ("thigh", hip, knee, body.thigh_radius),
             ("shin", knee, ankle, body.shin_radius),
         ):
-            shapes.append(
-                capsule(f"{side}_{segment}", vector(a), vector(b), radius, shorten=True)
-            )
+            bone(f"{side}_{segment}", a, b, radius)
         for name, position, radius, adjacent in (
             ("hip", hip, body.hip_radius, ("pelvis", f"{side}_thigh")),
             (
@@ -344,6 +364,14 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             (0, 0, 1),
         )
         anchor(
+            f"{side}_toes",
+            f"{side}_foot",
+            foot_center,
+            foot_frame,
+            (0, body.foot_length / 2, 0),
+            (0, 1, 0),
+        )
+        anchor(
             f"{side}_knee",
             f"{side}_knee_joint",
             knee,
@@ -358,6 +386,14 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             thigh_frame,
             (0, body.knee_radius, 0),
             (0, 1, 0),
+        )
+        anchor(
+            f"{side}_knee_ground",
+            f"{side}_knee_joint",
+            knee,
+            root,
+            (0, 0, -body.knee_radius),
+            (0, 0, -1),
         )
         anchor(
             f"{side}_lap",
@@ -383,15 +419,7 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             f"{side}_shoulder",
             shoulder_center + torso @ np.array([sign * body.shoulder_half_width, 0, 0]),
         )
-        shapes.append(
-            capsule(
-                f"{side}_clavicle",
-                vector(collar_center),
-                vector(shoulder),
-                body.upper_arm_radius,
-                shorten=True,
-            )
-        )
+        bone(f"{side}_clavicle", collar_center, shoulder, body.upper_arm_radius)
         arm_frame = (
             torso
             @ _axis("x", getattr(angles, f"{side}_shoulder_flex"))
@@ -425,9 +453,7 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             ("upper_arm", shoulder, elbow, body.upper_arm_radius),
             ("forearm", elbow, wrist, body.forearm_radius),
         ):
-            shapes.append(
-                capsule(f"{side}_{segment}", vector(a), vector(b), radius, shorten=True)
-            )
+            bone(f"{side}_{segment}", a, b, radius)
         for name, position, radius, adjacent in (
             (
                 "shoulder",
@@ -475,6 +501,14 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             forearm_frame,
             (0, body.forearm_radius, 0),
             (0, 1, 0),
+        )
+        anchor(
+            f"{side}_forearm_back",
+            f"{side}_forearm",
+            (elbow + wrist) / 2,
+            forearm_frame,
+            (0, -body.forearm_radius, 0),
+            (0, -1, 0),
         )
     return Skeleton(
         joints=MappingProxyType(joints),

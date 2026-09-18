@@ -12,18 +12,27 @@ validation:
       min_words: 450
       max_words: 1100
 authoring:
-  content_levels:
+  level_refinements:
     aesthetic:
-    - 在审美级别（aesthetic），每个成年人都须完整穿着全套唐代层叠服饰，保持衣着闭合并正确分层。允许私下交谈、交换物件、逗引的目光、交缠衣袖、共同奏乐、园中漫步或温柔拥抱，但须遮住乳房、臀部和生殖器，不得呈现情色自我抚触。
+      shared:
+      - 在审美级别（aesthetic），每个成年人都须完整穿着全套唐代层叠服饰，保持衣着闭合并正确分层。允许私下交谈、交换物件、逗引的目光、交缠衣袖、共同奏乐、园中漫步或温柔拥抱，但须遮住乳房、臀部和生殖器，不得呈现情色自我抚触。
+      frames:
+      - '- aesthetic: 逐字使用开头短语 "The current fully clothed non-erotic interaction is"。'
     erotic:
-    - 在情色级别（erotic），不得呈现生殖器接触或色情式解剖强调。
-    - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
-    - 在情色级别（erotic），领口、半臂、裙、袍或诃子可以松开、敞开或落向一侧，但仍须可辨认。
+      shared:
+      - 在情色级别（erotic），不得呈现生殖器接触或色情式解剖强调。
+      - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
+      - 在情色级别（erotic），领口、半臂、裙、袍或诃子可以松开、敞开或落向一侧，但仍须可辨认。
+      frames:
+      - '- erotic: 逐字使用开头短语 "The current erotic but non-explicit interaction is"。'
     hardcore:
-    - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
-    - 在露骨级别（hardcore），不直接命名或描述男性生殖解剖结构。通过直接点明正在发生的行为，以及描述相容的骨盆对齐、肢体位置、支撑、可见接触及其轴线、衣物移位、相关身体反应和相互自主性，保持清晰。词汇限制只改变措辞，不改变所要求的动作、可见性、同意或空间精度。默默执行，绝不要在生成的文字中引用或解释这项门槛。
-    - 在露骨级别（hardcore），成年人可以部分或全身裸露，但保留的衣物、叠起的袍服、移位的披帛、鞋、发饰和寝具必须保持明确的历史特征及构图重要性。
-    - 露骨级别的出游场景须位于野餐席、车厢地板、亭中长凳或栏杆旁；绝不在动物身上或与动物一起发生。
+      shared:
+      - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
+      - 在露骨级别（hardcore），不直接命名或描述男性生殖解剖结构。通过直接点明正在发生的行为，以及描述相容的骨盆对齐、肢体位置、支撑、可见接触及其轴线、衣物移位、相关身体反应和相互自主性，保持清晰。词汇限制只改变措辞，不改变所要求的动作、可见性、同意或空间精度。默默执行，绝不要在生成的文字中引用或解释这项门槛。
+      - 在露骨级别（hardcore），成年人可以部分或全身裸露，但保留的衣物、叠起的袍服、移位的披帛、鞋、发饰和寝具必须保持明确的历史特征及构图重要性。
+      - 露骨级别的出游场景须位于野餐席、车厢地板、亭中长凳或栏杆旁；绝不在动物身上或与动物一起发生。
+      frames:
+      - '- hardcore: 逐字使用开头短语 "The current explicit consensual adult sexual act is"。'
   themes:
     common:
     - 成果是在熟绢上绘制的历史绢本画幅或手卷片段。它不是真人实拍、摄影、电影剧照、西方油画、日本浮世绘、宋代山水、明代工笔情色册页、清代宫廷画、现代汉服摄影、动漫、计算机生成图像、游戏美术、博物馆陈列，也不是装框艺术品的照片。
@@ -34,7 +43,9 @@ authoring:
     - 绘制的建筑、留白绢地、衣物或枝叶可以越出画布边缘。不得出现卡纸、画框、装裱留边、内矩形或均匀边带。岁月痕迹必须分别断开并向内消散：一角磨损、一侧茶褐色斑块、其他位置较洁净的象牙色。
     - 严格使用所要求的人物阵容。每个被描绘的人都必须是明确成熟、年满二十五岁的汉族成年人，且其面部结构、体格、发型、饰物、妆容、社会角色、衣着和关系在整个主题中保持稳定。应以成熟的面部比例、沉稳举止、成人社会背景和个体特征清晰呈现成年身份，而不只是贴上标签。
     - 每次互动都必须清醒、相互、温暖、自由选择且有所回应。每个成年人都必须通过手、姿态、目光和身体朝向，可见地主动发起、引导、回应或调整共同动作。不得描绘胁迫、痛苦、醉态、睡眠、伤害、羞辱、未经同意的窥视、将年龄模糊性性癖化，或无法叫停的成年人。
-    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders, chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs, knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
+    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+      chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs,
+      knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
     - 将每个主题设于618至907年间、历史上合理的唐代地点，例如长安、洛阳、扬州、成都或帝国内的州府城市。优先采用盛唐和中唐的城市与宫廷生活：若符合场景，可选开元、天宝、大历或贞元年间。明确年份、季节、时段、城市或坊、房间或园林功能，以及成人社会背景。
     - 优先选择户外出游场地：曲江、渭水柳岸、马球场、郊外骑行小径、车驾停歇处、山间台地和园林堤岸。不得以室内画廊、琴房或居室为环境。不要把每个环境都变成妓院、战场或寺庙壁画。
     - 使用相互协调的唐代建筑和陈设：夯土或砖砌台基、朱柱、白灰墙、斗拱、格门、垂挂竹帘、低榻和床台、胡床折凳、圆坐墩、月牙凳、低案、彩绘屏风、铜灯、香炉、衣架，以及木台上的绗缝寝具。榫卯、尺度、木料、漆面、陶瓷、寝具和房间用途须内部一致。不得引入明代罗汉榻、清代雕花床、作为主要座具的宋代搭脑椅或现代家具。
@@ -213,7 +224,9 @@ authoring:
     - 每个人物、衣物、马和景物都以绢上的墨、矿物色平涂及笔刷渲染存在。成年人是具有个体特征的工笔肖像，面部线条成熟、比例可信、姿态有支撑。不得要求毛孔、镜面高光、电影氛围、光学对焦或被摄影的材质。绢织纹与颜料始终是表面实质。
     - 绘制的建筑、留白绢地、衣物或枝叶可以越出画布边缘。不得出现卡纸、画框、装裱留边、内矩形或均匀边带。岁月痕迹必须分别断开并向内消散：一角磨损、一侧茶褐色斑块、其他位置较洁净的象牙色。
     - 每次互动都必须清醒、相互、温暖、自由选择且有所回应。每个成年人都必须通过手、姿态、目光和身体朝向，可见地主动发起、引导、回应或调整共同动作。不得描绘胁迫、痛苦、醉态、睡眠、伤害、羞辱、未经同意的窥视、将年龄模糊性性癖化，或无法叫停的成年人。
-    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders, chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs, knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
+    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+      chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs,
+      knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
     - 赋予每个成年人独立意图和可见的参与。避免让一名主动者搭配一具被动装饰性的身体。通过每位女子的目光、手的位置、姿态、对衣物的控制和回应，明确展现她的欲望、判断和自主性。绝不能从性别推断支配地位、职业或身份，也绝不能用地位不平等代替同意。
     - 使用一处正在发生的小型叙事痕迹，使画面具有生活感：落下的步摇、掉落的马球杖、啃食柳枝的马、勾在鞍上的披帛、渐冷的香，或留在野餐席旁的鞋。痕迹必须辅助成年人的动作，不得变成滑稽奇观或引入未要求的旁观者。
     - 主题或画面中提及的每个人都必须属于所要求的人物阵容，并且在画中可见。不得将不在场的配偶、主人、仆人、宾客、顾客、官员、观看者或其他画外人物作为背景故事、动机、暗示的见证者或信件收件人引入。私密情境须在所描绘的成年人之间自成完整。
@@ -235,19 +248,35 @@ authoring:
     - 不得模仿、归属、点名、署名或复现已知历史构图或在世艺术家的风格。只将作品描述为匿名唐代绢本人物画幅。
     - 岁月痕迹在缩略图尺寸下可见，但不遮住脸或动作：不均匀暖茶色绢地；一处向内消散的断续茶褐边斑；一处磨损角；空白绢地或建筑上一道折痕；三处局部线索，如可见织纹、粉化石青、褪色胭脂或接触下缘的无字印形。不得使用全局棕褐、胶片颗粒、烧焦边、霉菌或伪龟裂。
     - 每个画面都是同一主题下的一幅独立唐代绢本人物画设计，不是故事板、序列、拼贴、分屏、接触印样、多格漫画、装框博物馆物件或画作照片。每个画面必须以以下五句原文开头：
-    - '逐字保留这五句开头原文："Full-canvas continuous-silk archival facsimile of a hand-painted antique Tang-dynasty 绢本重彩 figure-painting panel mixing graphic 平面 color fields with painterly 渲染. The aged prepared-silk painting extends continuously to every canvas edge as an uninterrupted uneven warm-tea field. Every person, garment, horse, and landscape exists as ink, mineral 平涂, and brush 渲染 on silk; adult figures use individualized mature facial lines, ample Tang proportions, clear joints, three bounded skin tones plus visible flesh 渲染. Hybrid picture surface: flat 锦 and architectural silhouettes combined with painterly washes on faces, 披帛, foliage, and animals; no photography, no CGI, no cinematic lighting. Fine 游丝描 and 铁线描, mineral 平涂 on garment panels, wet 渲染 on flesh and landscape, visible silk weave, rubbed fibers at one isolated edge, and small age creases."'
+    - '逐字保留这五句开头原文："Full-canvas continuous-silk archival facsimile of a hand-painted antique Tang-dynasty
+      绢本重彩 figure-painting panel mixing graphic 平面 color fields with painterly 渲染. The aged prepared-silk
+      painting extends continuously to every canvas edge as an uninterrupted uneven warm-tea field. Every
+      person, garment, horse, and landscape exists as ink, mineral 平涂, and brush 渲染 on silk; adult figures
+      use individualized mature facial lines, ample Tang proportions, clear joints, three bounded skin
+      tones plus visible flesh 渲染. Hybrid picture surface: flat 锦 and architectural silhouettes combined
+      with painterly washes on faces, 披帛, foliage, and animals; no photography, no CGI, no cinematic lighting.
+      Fine 游丝描 and 铁线描, mineral 平涂 on garment panels, wet 渲染 on flesh and landscape, visible silk weave,
+      rubbed fibers at one isolated edge, and small age creases."'
     - 紧接着用一句紧凑的空间位置说明，将每个成年人安排在画面左侧、中央或右侧，以及前景、中景或背景。该句须说明各人的躯干与骨盆方向、明确命名的支撑面、次要支撑肢体及可见手部任务。
     - 然后写一句独立的当下动作句，以所选内容级别对应的精确短语开头：
     - 用正在发生的动作、衣着状态、接触几何及相互回应补全此句，以证实该级别。
-    - 紧接当下动作句后重复以下紧凑的媒介锁定原文："Every person, garment, horse, and landscape exists as ink, 平涂, and 渲染 on visibly aged silk; adults remain 工笔 figures with mature facial specificity, Tang hairstyle, ornaments, makeup, and plausible ample proportions, garments as 平面 panels, flesh and foliage as 画." 然后将其余细节描述为绢上的线、平涂或渲染，而非被摄影的材质。
+    - 紧接当下动作句后重复以下紧凑的媒介锁定原文："Every person, garment, horse, and landscape exists as ink, 平涂, and 渲染 on
+      visibly aged silk; adults remain 工笔 figures with mature facial specificity, Tang hairstyle, ornaments,
+      makeup, and plausible ample proportions, garments as 平面 panels, flesh and foliage as 画." 然后将其余细节描述为绢上的线、平涂或渲染，而非被摄影的材质。
     - 重复媒介锁定句后，按画面从左至右的顺序，为每个成年人严格写一个人物段。每个人物段为一至两句，不受六十词上限限制。严格遵循以下语法：
-    - '保留并遵循以下格式原文："[Name], [woman or man], [age], [class], occupies [image-left, center, or image-right] in the [foreground, middle ground, or background]: [face shape, 开额, eyes, brow family, mouth, and makeup stack]; [bun family, 义髻, 蝉鬓, and each ornament with placement]; [body fullness, shoulders, waist, hands, and natural feet]; [named wardrobe archetype, then clothing from the body outward with weave, color, motif, and hang]; [臂钏 or other jewelry]; [named support and pose]; left hand [task], right hand [task]; [content-level garment state]; gaze toward [target]."'
+    - '保留并遵循以下格式原文："[Name], [woman or man], [age], [class], occupies [image-left, center, or image-right]
+      in the [foreground, middle ground, or background]: [face shape, 开额, eyes, brow family, mouth, and
+      makeup stack]; [bun family, 义髻, 蝉鬓, and each ornament with placement]; [body fullness, shoulders,
+      waist, hands, and natural feet]; [named wardrobe archetype, then clothing from the body outward
+      with weave, color, motif, and hang]; [臂钏 or other jewelry]; [named support and pose]; left hand
+      [task], right hand [task]; [content-level garment state]; gaze toward [target]."'
     - 不得省略任何衣物层、饰物或手。若主题建立了身份卡，画面仍必须逐项写明。男性须将髻、花钿及臂钏分句替换为指定男性原型、幞头或席帽或顶髻、如有的胡须、完整衣物层次、腰带和靴。然后严格使用四句描述，再接最终媒介锁定句：
     - 1. 用一句合并精确日期、地点、季节、时刻、私密情境及成年人的表情和视线，不重复人物段；
     - 2. 用一句合并出游景物或少量室内场景、如有的马或车、至多两个象征母题、绢地留白，以及明确命名的平面与画的划分；
     - 3. 用一句合并五至七个色系的调色方案、平涂衣物色域、肌肤渲染、线条层次及景物罩染；
     - 4. 用一句合并不均匀暖茶色底面、延伸至每一画布边缘的满幅绢地、一处断续不对称边缘氧化斑、一处磨损角、一道旧折痕，以及严格三处局部颜料、墨或纤维变化，其各自独立的边缘痕迹分别向内消散；以及
-    - 5. 逐字使用以下最终媒介锁定句："The entire image remains a visibly aged hand-painted Tang silk figure painting mixing 平面 mineral panels with 画 渲染, with individualized mature adult faces defined by fine line."
+    - 5. 逐字使用以下最终媒介锁定句："The entire image remains a visibly aged hand-painted Tang silk figure painting
+      mixing 平面 mineral panels with 画 渲染, with individualized mature adult faces defined by fine line."
     - 除人物段外，固定五句开头之后，任何一句都不得超过60个英语单词；分号分隔的分句仍计入该句上限。空间位置句与当下动作句各须少于60词。将属性压缩成精确短语，不添加背景故事或次要装饰。
     - 每个画面必须重述足够信息，以独立作为图像生成提示词。每个画面硬性限制为450至950个英语单词；阵容有三位或以上成年人时可达1100词；或使用其他所要求语言中的等效信息密度。返回前计数；若草稿超限，通过删除次要装饰、背景故事和冗余材料解释来重写，绝不能删掉身份卡。保留主题的身份、关系、环境、家具锚点、媒介、调色逻辑及所选内容级别，同时变化人体几何、衣物节奏、观看高度、裁切、重叠、前景线索、留白形状、象征点缀和色彩重点。
     - 只返回正面描述所绘绢画的文字。默默执行所有规则。绝不讨论指令、门槛、合规、验证、所要求的人物阵容、内部内容级别、词汇限制或输出省略了什么。除既有中文姓名、服装术语、头发术语、妆容术语、绘画术语和地名外，每个自然语言词语都必须使用所要求的输出语言。
@@ -275,10 +304,3 @@ authoring:
     - '- 包含畸形解剖、多余肢体、模糊肢体归属、无支撑重量、矛盾方向、穿插家具、不可能的接触轴线或通用展示姿势；或'
     - '- 只改姓名、颜色或道具便重复另一个主题或画面。'
     - 返回前，确认画作首先读作原创唐代绢本人物画，其次是服饰、头发、饰物、体态和妆容清楚可辨的精确成熟私密场景，最后才是细心保存的古旧文物。精细线条、层叠色彩、历史秩序、人物自主性和空间清晰度必须始终强于装饰或损伤。
-    content_levels:
-      aesthetic:
-      - '- aesthetic: 逐字使用开头短语 "The current fully clothed non-erotic interaction is"。'
-      erotic:
-      - '- erotic: 逐字使用开头短语 "The current erotic but non-explicit interaction is"。'
-      hardcore:
-      - '- hardcore: 逐字使用开头短语 "The current explicit consensual adult sexual act is"。'

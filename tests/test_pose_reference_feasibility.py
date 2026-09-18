@@ -44,9 +44,7 @@ def test_load_description_has_one_source_of_truth(pose_id: str) -> None:
         not c.load_bearing for c in pose.supports
     )
     for contact in pose.supports:
-        realization = next(
-            s for s in ATELIER.supports if s.surface == contact.surface
-        )
+        realization = next(s for s in ATELIER.supports if s.surface == contact.surface)
         expected = (
             f"{contact.body_part.replace('_', ' ')} on {realization.description}"
             + (" bears weight" if contact.load_bearing else " makes light contact")
@@ -64,7 +62,10 @@ def test_two_hand_support_keeps_both_loads(pose_id: str) -> None:
     pose = POSES[pose_id]
     assert pose.balance_bias == "unbiased"
     assert {c.body_part for c in pose.supports if c.load_bearing} == {
-        "left_foot", "right_foot", "left_hand", "right_hand"
+        "left_foot",
+        "right_foot",
+        "left_hand",
+        "right_hand",
     }
 
 
@@ -81,7 +82,10 @@ def test_supporting_hands_cannot_silently_become_light_contacts(pose_id: str) ->
 def test_upright_kneeling_records_knees_and_toe_ends() -> None:
     pose = POSES["kneeling_upright_centered"]
     assert {c.body_part for c in pose.supports} == {
-        "left_knee", "right_knee", "left_toes", "right_toes",
+        "left_knee",
+        "right_knee",
+        "left_toes",
+        "right_toes",
     }
     assert all(c.surface == "mat" and c.load_bearing for c in pose.supports)
 
@@ -91,7 +95,10 @@ def test_reference_intro_does_not_override_the_selected_visual_medium() -> None:
         p for p in LIBRARY.presentations if p.presentation_id == "rehearsal_stage"
     )
     prompt = render_pose_reference(
-        POSES["standing_parallel_relaxed"], LIBRARY.cameras[0], SUBJECT, presentation,
+        POSES["standing_parallel_relaxed"],
+        LIBRARY.cameras[0],
+        SUBJECT,
+        presentation,
     )
     assert "gouache figure study" in prompt
     assert "photograph" not in prompt
@@ -172,7 +179,9 @@ def test_lying_rest_supports_head_and_releases_lower_arm(variant: str) -> None:
     ],
 )
 def test_rejects_contradictory_reference_frames_and_postures(
-    pose_id: str, changes: dict[str, object], message: str,
+    pose_id: str,
+    changes: dict[str, object],
+    message: str,
 ) -> None:
     with pytest.raises(ValidationError, match=message):
         NeutralPose.model_validate(POSES[pose_id].model_dump() | changes)
@@ -241,7 +250,8 @@ def test_support_layout_is_complete_unique_and_anatomical() -> None:
     ],
 )
 def test_present_but_unsuitable_table_is_rejected_everywhere(
-    field: str, value: str,
+    field: str,
+    value: str,
 ) -> None:
     payload = ATELIER.model_dump()
     for surface in payload["supports"]:
@@ -255,9 +265,13 @@ def test_present_but_unsuitable_table_is_rejected_everywhere(
     geometry = compile_reference_geometry(pose, SUBJECT, ATELIER)
     with pytest.raises(ValidationError, match="height, extent or orientation"):
         PoseReferenceScene(
-            pose=pose, camera=LIBRARY.cameras[0], subject=SUBJECT,
-            presentation=presentation, prompt="A stale but nonempty prompt.",
-            geometry=geometry, geometry_report=reference_geometry_report(geometry),
+            pose=pose,
+            camera=LIBRARY.cameras[0],
+            subject=SUBJECT,
+            presentation=presentation,
+            prompt="A stale but nonempty prompt.",
+            geometry=geometry,
+            geometry_report=reference_geometry_report(geometry),
             geometry_joints=reference_joint_positions(geometry),
         )
     library_payload = LIBRARY.model_dump(mode="json")
@@ -265,7 +279,10 @@ def test_present_but_unsuitable_table_is_rejected_everywhere(
     library = NeutralPoseLibrary.model_validate(library_payload)
     with pytest.raises(ValueError, match="no reference poses fit"):
         sample_pose_references(
-            library, seed=1, count=1, family="table_supported",
+            library,
+            seed=1,
+            count=1,
+            family="table_supported",
             presentation_id=ATELIER.presentation_id,
         )
     audit_reference_library(library)

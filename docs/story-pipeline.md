@@ -112,6 +112,12 @@ Frame 只处理文本传输、标签边界和逐帧检查，不再保留 Frame s
 显式 CLI `--content-level` > `generation.content_level` > 默认 `aesthetic`。
 声明三个等级的细化分支不等于同时启用三个等级。
 
+这里有四个不同职责，不是四套等级定义：`generation.content_level` 选择等级，
+`requirements.content_levels` 限制配方可用等级，系统等级文件定义边界，
+`authoring.level_refinements` 细化题材的实现。通用成年、自愿参与和输出约束由系统
+`common.rules` 单独拥有；等级特有年龄下限、可见证据与禁止范围仍留在对应等级文件，
+不能为了去重扩展成所有等级的共同限制。
+
 ## 人物数量约束
 
 `StoryRequest.female_count` 和 `male_count` 是可选人物数量约束，分别接受 0 至 8。
@@ -187,9 +193,14 @@ generation:
     male_count: 1
 
 authoring:
-  content_levels:
+  level_refinements:
     aesthetic:
-      - 旅人的服装保持完整穿着，以衣物轮廓和站台光线承载画面。
+      shared:
+        - 旅人的服装保持完整穿着，以衣物轮廓和站台光线承载画面。
+      themes:
+        - 确定与旅人身份相符的服装组合和色彩。
+      frames:
+        - 通过当前姿势和站台光线呈现选定的服装轮廓。
   themes:
     common:
       - 主题差异来自事件与人物关系，而不是仅更换色调。
@@ -247,24 +258,27 @@ runtime:
 输入规则的书写语言不决定生成语言，`generation.output_language` 与显式语言要求
 仍是唯一的语言控制入口。
 
-内容等级规则按职责存放，不在 Theme 和 Frame 下复制同一段：
+配方与模块只有一个等级细化入口，不再分别在三个位置维护等级映射：
 
 | 位置 | 职责 |
 |---|---|
 | 系统 `content_levels/*.rules` | 定义等级的通用边界；配方不再重复定义 |
-| `authoring.content_levels.<level>` | 两阶段共用的题材特有细化，只维护一份 |
-| `authoring.themes.content_levels.<level>` | 只适用于该等级的主题规划任务 |
-| `authoring.frames.content_levels.<level>` | 只适用于该等级的画面执行任务 |
+| `authoring.level_refinements.<level>.shared` | 两阶段共用的题材特有细化，只维护一份 |
+| `authoring.level_refinements.<level>.themes` | 只适用于该等级的主题规划任务 |
+| `authoring.level_refinements.<level>.frames` | 只适用于该等级的画面执行任务 |
 | `authoring.<stage>.common` | 该阶段不随等级变化的创作规则 |
 
-每阶段的配方规则按 `阶段 common + 共享当前等级 + 阶段当前等级` 选择；
+每个等级的三种职责集中在同一个块中。每阶段的配方规则按
+`阶段 common + 当前等级 shared + 当前等级对应阶段` 选择；
 系统当前等级规则始终保留。这是细化而非覆盖，不提供 `replace` 或“后写覆盖前写”
 语义。模块使用同一结构。其他等级和另一阶段专属指令不会进入本阶段请求。
 共享细化仍直接交给 Frame，而不是假设生成的 Theme 已完整复述所有约束。
 仅供 Theme 选择的参考池、仅供 Frame 使用的输出格式不应搬进共享等级分支。
 
 加载时拒绝同一条等级规则在 Theme／Frame 重复、在共享与阶段块重复，或与该阶段
-`common` 重复；无规则的等级分支可以省略。这些检查识别的是完全相同的规则，
+`common` 重复；无规则的等级或职责分支可以省略。旧的 `authoring.content_levels`
+及 `authoring.themes/frames.content_levels` 即使为空也被拒绝，没有别名或兼容读取。
+这些检查识别的是完全相同的规则，
 不是自然语言语义冲突检测，也不证明模型输出符合内容边界。
 清理通用等级定义时以系统规则为准；配方独有的更严格服装要求、构图与可见性要求
 继续保留，不能以去重为由丢失。媒体共性只由显式模块提供，独有内容继续留在配方。

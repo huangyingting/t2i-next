@@ -158,14 +158,17 @@ def test_stage_and_enum_branches_only_select_effective_level(
     asset_root: Path, level: ContentLevel
 ) -> None:
     authoring = {
-        stage: {
-            "common": [f"{stage} common marker"],
-            "content_levels": {
-                item.value: [f"{stage} {item.value} selected marker"]
-                for item in ContentLevel
-            },
-        }
-        for stage in ("themes", "frames")
+        **{
+            stage: {"common": [f"{stage} common marker"]}
+            for stage in ("themes", "frames")
+        },
+        "level_refinements": {
+            item.value: {
+                stage: [f"{stage} {item.value} selected marker"]
+                for stage in ("themes", "frames")
+            }
+            for item in ContentLevel
+        },
     }
     module(asset_root, authoring=authoring)
     value = document(
@@ -209,7 +212,7 @@ def test_stage_and_enum_branches_only_select_effective_level(
     [
         {"themes": ["old shape"]},
         {"frames": {"common": ["first\nsecond"]}},
-        {"themes": {"content_levels": {"unknown": ["rule"]}}},
+        {"level_refinements": {"unknown": {"themes": ["rule"]}}},
         {"themes": {"common": [" "]}},
     ],
 )
@@ -950,6 +953,7 @@ def test_context_projects_only_requested_slots_and_stage_rules(
     assert str(asset_root) not in serialized
     assert "sources" not in serialized
     assert "content_levels" not in serialized
+    assert "level_refinements" not in serialized
     assert (
         "Theme fact" not in serialized
         if stage == StoryStage.FRAMES
@@ -971,7 +975,9 @@ def test_context_modules_follow_selected_stage_authoring(
         asset_root,
         "copy",
         "visible_copy",
-        authoring={"frames": {"content_levels": {"aesthetic": ["Visible copy."]}}},
+        authoring={
+            "level_refinements": {"aesthetic": {"frames": ["Visible copy."]}}
+        },
     )
     module(asset_root, "silk", "silk_painting")
     resolved = resolve_story_input(

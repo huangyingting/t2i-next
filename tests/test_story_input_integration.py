@@ -105,15 +105,25 @@ def planned_input(tmp_path):
                     }
                 ],
                 "authoring": {
-                    stage: {
-                        "common": [f"DOCUMENT_{stage.upper()} retains a quiet mood."],
-                        "content_levels": {
-                            "aesthetic": [f"SELECTED_{stage.upper()} uses soft light."],
-                            "erotic": [f"UNSELECTED_{stage.upper()} uses warm light."],
-                            "hardcore": [f"OTHER_{stage.upper()} uses stark light."],
-                        },
-                    }
-                    for stage in ("themes", "frames")
+                    **{
+                        stage: {
+                            "common": [
+                                f"DOCUMENT_{stage.upper()} retains a quiet mood."
+                            ]
+                        }
+                        for stage in ("themes", "frames")
+                    },
+                    "level_refinements": {
+                        level: {
+                            stage: [f"{marker}_{stage.upper()} uses {light} light."]
+                            for stage in ("themes", "frames")
+                        }
+                        for level, marker, light in (
+                            ("aesthetic", "SELECTED", "soft"),
+                            ("erotic", "UNSELECTED", "warm"),
+                            ("hardcore", "OTHER", "stark"),
+                        )
+                    },
                 },
                 "runtime": {
                     "theme_batch_size": 2,

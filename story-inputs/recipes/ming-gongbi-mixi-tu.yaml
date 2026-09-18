@@ -12,17 +12,26 @@ validation:
       min_words: 350
       max_words: 750
 authoring:
-  content_levels:
+  level_refinements:
     aesthetic:
-    - 在审美级别（aesthetic），每个成年人都须完整穿着全套晚明层叠服饰，保持衣着闭合并正确分层。允许私下交谈、交换物件、逗引的目光、交缠衣袖、共同奏乐或温柔拥抱，但须遮住乳房、臀部和生殖器，不得呈现情色自我抚触。
+      shared:
+      - 在审美级别（aesthetic），每个成年人都须完整穿着全套晚明层叠服饰，保持衣着闭合并正确分层。允许私下交谈、交换物件、逗引的目光、交缠衣袖、共同奏乐或温柔拥抱，但须遮住乳房、臀部和生殖器，不得呈现情色自我抚触。
+      frames:
+      - '- aesthetic: 逐字使用开头短语 "The current fully clothed non-erotic interaction is"。'
     erotic:
-    - 在情色级别（erotic），不得呈现生殖器接触或色情式解剖强调。
-    - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
-    - 在情色级别（erotic），领口、袄、裙、裤或内袍可以松开、敞开或落向一侧，但仍须可辨认。
+      shared:
+      - 在情色级别（erotic），不得呈现生殖器接触或色情式解剖强调。
+      - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
+      - 在情色级别（erotic），领口、袄、裙、裤或内袍可以松开、敞开或落向一侧，但仍须可辨认。
+      frames:
+      - '- erotic: 逐字使用开头短语 "The current erotic but non-explicit interaction is"。'
     hardcore:
-    - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
-    - 在露骨级别（hardcore），不直接命名或描述男性生殖解剖结构。通过直接点明正在发生的行为，以及描述相容的骨盆对齐、肢体位置、支撑、可见接触及其轴线、衣物移位、相关身体反应和相互自主性，保持清晰。词汇限制只改变措辞，不改变所要求的动作、可见性、同意或空间精度。默默执行，绝不要在生成的文字中引用或解释这项门槛。
-    - 在露骨级别（hardcore），成年人可以部分或全身裸露，但保留的衣物、叠起的袍服、移位的腰带、鞋、发饰和寝具必须保持明确的历史特征及构图重要性。
+      shared:
+      - 在情色级别（erotic）和露骨级别（hardcore），不得将界定内容的部分藏在屏风、帘、被、袖、家具、刻意裁切、远处剪影、象征花卉或诗意隐喻之后。绘画可以优雅克制，但所选内容级别在视觉上必须毫无歧义。
+      - 在露骨级别（hardcore），不直接命名或描述男性生殖解剖结构。通过直接点明正在发生的行为，以及描述相容的骨盆对齐、肢体位置、支撑、可见接触及其轴线、衣物移位、相关身体反应和相互自主性，保持清晰。词汇限制只改变措辞，不改变所要求的动作、可见性、同意或空间精度。默默执行，绝不要在生成的文字中引用或解释这项门槛。
+      - 在露骨级别（hardcore），成年人可以部分或全身裸露，但保留的衣物、叠起的袍服、移位的腰带、鞋、发饰和寝具必须保持明确的历史特征及构图重要性。
+      frames:
+      - '- hardcore: 逐字使用开头短语 "The current explicit consensual adult sexual act is"。'
   themes:
     common:
     - 成果是在熟绢上绘制的历史册页画。它不是真人实拍、摄影、电影剧照、西方油画、日本浮世绘、现代插画、动漫、计算机生成图像、游戏美术、博物馆陈列，也不是装框艺术品的照片。
@@ -33,7 +42,9 @@ authoring:
     - 保持岁月痕迹可见，但不要勾出画面边框。边缘旧痕必须断续、变化并不规则地向内消散：一角可露出磨损的绢纤维，一侧局部可带茶褐色氧化痕，另一边可保留较洁净的暖象牙色绢地。绝不能将这些痕迹连接为连续矩形、画面内轮廓、均匀着色的边缘围框、装饰线或空白纸质围边。
     - 严格使用所要求的人物阵容。每个被描绘的人都必须是明确成熟、年满二十五岁的汉族成年人，且其面部结构、体格、发型、社会角色、衣着和关系在整个主题中保持稳定。应以成熟的面部比例、沉稳举止、成人社会背景和个体特征清晰呈现成年身份，而不只是贴上标签。
     - 每次互动都必须清醒、相互、温暖、自由选择且有所回应。每个成年人都必须通过手、姿态、目光和身体朝向，可见地主动发起、引导、回应或调整共同动作。不得描绘胁迫、痛苦、醉态、睡眠、伤害、羞辱、未经同意的窥视、将年龄模糊性性癖化，或无法叫停的成年人。
-    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders, chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs, knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
+    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+      chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs,
+      knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
     - 将每个主题设于1573至1644年间、历史上合理的江南地点，例如苏州、杭州、南京、扬州、嘉兴，或该文化区域内的运河城镇。明确年份、季节、时段、城市或城镇、房间功能和成人社会背景。轮换采用文人之家、商人宅邸、私家园林书斋、琴房、绣房、藏书家的居室、僻静客亭和雅致客栈，不要把每个环境都变成宫殿或妓院。
     - 使用相互协调的晚明建筑与陈设：白灰墙、深色木格窗、月洞门、廊庑、园石、竹帘、架子帐床、罗汉榻、卧榻、脚凳、香几、嵌入式搁架、折屏、垂帘、明式桌案、凳、柜和灯架。榫卯、尺度、木料、漆面、陶瓷、寝具和房间用途须内部一致。
     - 为成年人穿着可信的晚明汉族服饰。使用层叠袍服、袄、裙、裤、内袍、腰带、绣领，仅在符合历史时使用云肩，并使用布鞋、丝履、克制的首饰及带梳或簪的成熟盘发。即使衣物松开或脱下，也要保留所要求成年人的服装作为具体设计物件的特征。
@@ -96,7 +107,9 @@ authoring:
     - 古旧熟绢画面连续延伸至画布的每一条边，绘制的建筑、留白绢地、衣物形状、枝叶或裁切的物件自然触及并越出图像边界。不得出现可见的装裱留边、卡纸、画框、边框或矩形边带。
     - 保持岁月痕迹可见，但不要勾出画面边框。边缘旧痕必须断续、变化并不规则地向内消散：一角可露出磨损的绢纤维，一侧局部可带茶褐色氧化痕，另一边可保留较洁净的暖象牙色绢地。绝不能将这些痕迹连接为连续矩形、画面内轮廓、均匀着色的边缘围框、装饰线或空白纸质围边。
     - 每次互动都必须清醒、相互、温暖、自由选择且有所回应。每个成年人都必须通过手、姿态、目光和身体朝向，可见地主动发起、引导、回应或调整共同动作。不得描绘胁迫、痛苦、醉态、睡眠、伤害、羞辱、未经同意的窥视、将年龄模糊性性癖化，或无法叫停的成年人。
-    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders, chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs, knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
+    - 提及男性身体时，只能使用此白名单中的中性外部词语，原词保留为："body, skin, head, hair, face, eyes, mouth, jaw, neck, shoulders,
+      chest, torso, back, abdomen, waist, hips, pelvis, buttocks, arms, elbows, hands, fingers, thighs,
+      knees, legs, calves, ankles, feet, and toes"。允许单复数词形变化。不得直接命名任何男性生殖部位、该部位特有的生理状态、俚语、含蓄同义词、情色昵称、解剖尺寸或物件隐喻。
     - 赋予每个成年人独立意图和可见的参与。避免让一名主动者搭配一具被动装饰性的身体。出现女性时，通过她的目光、手的位置、姿态、对衣物的控制和回应，明确展现她的欲望、判断和自主性。绝不能从性别推断支配地位、职业或身份，也绝不能用地位不平等代替同意。
     - 使用一处正在发生的小型叙事痕迹，使画面具有生活感：落下的发簪、渐冷的香、折到一半的信、移位的屏风、洒出的茶、尚未完成的绣架、松开的床帘、搁置的乐器、飘入格窗的雨，或遗在榻边的便鞋。痕迹必须辅助成年人的动作，不得变成滑稽奇观或引入未要求的旁观者。
     - 主题或画面中提及的每个人都必须属于所要求的人物阵容，并且在画中可见。不得将不在场的配偶、主人、仆人、宾客、顾客、官员、观看者或其他画外人物作为背景故事、动机、暗示的见证者或信件收件人引入。私密情境须在所描绘的成年人之间自成完整。
@@ -144,17 +157,29 @@ authoring:
     - 老化必须符合暴露、经手、折叠、颜料化学和装裱构造的规律。保护脸、手、解剖结构、视线、衣物结构及界定内容的互动，避免严重损伤。重要轮廓保持清晰墨线，遮护区域保留更浓的矿物色。
     - 不得施加全局棕褐滤镜、黄罩、灰色去饱和、摄影颗粒、遍布全图的刮痕、暗角、褪色胶片效果、烧焦边缘、严重褐斑、霉菌、大面积水渍、密集虫孔、夸张撕裂、皮肤上的伪龟裂、人工墨晕或笼统污垢。不得让册页看起来像被遗弃、出土、烧灼或经过数字做旧。
     - 每个画面都是同一主题下的一幅独立晚明工笔秘戏图册页设计，不是故事板、序列、拼贴、分屏、接触印样、多格漫画、装框博物馆物件或画作照片。每个画面必须以以下五句原文开头：
-    - 逐字保留这五句开头原文："Full-canvas continuous-silk flat archival facsimile of a hand-painted antique late-Ming Jiangnan gongbi mixi-tu album leaf. The aged prepared-silk painting extends continuously to every canvas edge as an uninterrupted uneven warm-tea field. Every person, garment, object, and architectural plane exists only as ink contour and pigment on silk; adult figures use individualized mature facial lines, plausible adult proportions, clear joints, and exactly three bounded skin tones in the same silk plane. Flat gongbi picture plane with shallow stacked spaces, contour-enclosed color fields, dominant flat silhouettes, no volumetric light-and-shadow modeling or cast shadows. Fine gossamer-line and iron-wire contours, thin layered mineral-color washes, ruled-line jiehua interior, visible silk weave, softened outer pigments, rubbed silk fibers at one isolated edge, and small age creases."
+    - 逐字保留这五句开头原文："Full-canvas continuous-silk flat archival facsimile of a hand-painted antique late-Ming
+      Jiangnan gongbi mixi-tu album leaf. The aged prepared-silk painting extends continuously to every
+      canvas edge as an uninterrupted uneven warm-tea field. Every person, garment, object, and architectural
+      plane exists only as ink contour and pigment on silk; adult figures use individualized mature facial
+      lines, plausible adult proportions, clear joints, and exactly three bounded skin tones in the same
+      silk plane. Flat gongbi picture plane with shallow stacked spaces, contour-enclosed color fields,
+      dominant flat silhouettes, no volumetric light-and-shadow modeling or cast shadows. Fine gossamer-line
+      and iron-wire contours, thin layered mineral-color washes, ruled-line jiehua interior, visible silk
+      weave, softened outer pigments, rubbed silk fibers at one isolated edge, and small age creases."
     - 紧接着用一句紧凑的空间位置说明，将每个成年人安排在画面左侧、中央或右侧，以及前景、中景或背景。该句须说明各人的躯干与骨盆方向、明确命名的支撑面、次要支撑肢体及可见手部任务。
     - 然后写一句独立的当下动作句，以所选内容级别对应的精确短语开头：
     - 用正在发生的动作、衣着状态、接触几何及相互回应补全此句，以证实该级别。
-    - 紧接当下动作句后重复以下紧凑的媒介锁定原文："Every person, garment, object, and architectural plane exists only as ink contour and pigment on visibly aged silk; adults remain contour-defined gongbi figures with mature facial specificity and plausible proportions." 然后将所有其余细节描述为勾画线条、有边界的罩染、绢地留白或矿物颜料色形，而非物理写实材料。
+    - 紧接当下动作句后重复以下紧凑的媒介锁定原文："Every person, garment, object, and architectural plane exists only as ink
+      contour and pigment on visibly aged silk; adults remain contour-defined gongbi figures with mature
+      facial specificity and plausible proportions." 然后将所有其余细节描述为勾画线条、有边界的罩染、绢地留白或矿物颜料色形，而非物理写实材料。
     - 重复媒介锁定句后，严格使用四句描述，再接最终媒介锁定句：
     - 1. 用一句合并精确日期、地点、季节、时刻、私密情境、完整成年人阵容、成熟面部线条差别、细微不对称、晚明发式、衣着、表情、视线和其余手部任务；
     - 2. 用一句合并前景线索、不超过三件物件、一个象征母题、绢地留白、规整建筑，以及必须逐字保留的短语 "three shallow stacked bands"；
     - 3. 用一句合并五至七个色系的调色方案、轮廓封闭的色域、严格三种有边界的肤色、线条层次及分层罩染；
     - 4. 用一句合并不均匀暖茶色底面、延伸至每一画布边缘的满幅绢地、一处断续不对称边缘氧化斑、一处磨损角、一道旧折痕，以及严格三处局部颜料、墨或纤维变化，其各自独立的边缘痕迹分别向内消散；以及
-    - 5. 逐字使用以下最终媒介锁定句："The entire image remains a visibly aged, flat, hand-painted gongbi silk album leaf made from ink contours and mineral pigment, with individualized mature adult faces defined by fine line."
+    - 5. 逐字使用以下最终媒介锁定句："The entire image remains a visibly aged, flat, hand-painted gongbi silk album
+      leaf made from ink contours and mineral pigment, with individualized mature adult faces defined
+      by fine line."
     - 固定五句开头之后，任何一句都不得超过60个英语单词；分号分隔的分句仍计入该句上限。空间位置句与当下动作句各须少于60词。将属性压缩成精确短语，不添加背景故事或次要装饰。
     - 每个画面必须重述足够信息，既可独立作为图像生成提示词，又保持简洁。每个画面硬性限制为350至750个英语单词，或其他所要求语言中的等效信息密度。返回前计数；若草稿超过750个英语单词，通过删除次要装饰、背景故事、重复解剖描述和冗余材料解释来重写。保留主题的身份、关系、环境、家具锚点、媒介、调色逻辑及所选内容级别，同时变化人体几何、衣物节奏、观看高度、裁切、重叠、前景线索、留白形状、象征点缀和色彩重点。
     - 只返回正面描述所绘册页的文字。默默执行所有规则。绝不讨论指令、门槛、合规、验证、所要求的人物阵容、内部内容级别、词汇限制或输出省略了什么。除既有中文姓名、服装术语、绘画术语和地名外，每个自然语言词语都必须使用所要求的输出语言。
@@ -174,10 +199,3 @@ authoring:
     - '- 包含畸形解剖、多余肢体、模糊肢体归属、无支撑重量、矛盾方向、穿插家具、不可能的接触轴线或通用展示姿势；或'
     - '- 只改姓名、颜色或道具便重复另一个主题或画面。'
     - 返回前，确认画作首先读作原创晚明工笔册页，其次是精确的成熟私密场景，最后才是细心保存的古旧文物。精细线条、层叠色彩、历史秩序、人物自主性和空间清晰度必须始终强于装饰或损伤。
-    content_levels:
-      aesthetic:
-      - '- aesthetic: 逐字使用开头短语 "The current fully clothed non-erotic interaction is"。'
-      erotic:
-      - '- erotic: 逐字使用开头短语 "The current erotic but non-explicit interaction is"。'
-      hardcore:
-      - '- hardcore: 逐字使用开头短语 "The current explicit consensual adult sexual act is"。'
