@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import pytest
-
 from t2i_prompt_pipeline.config import build_config
-from t2i_prompt_pipeline.errors import ConfigurationError
 from tests.factories import make_spec
 
 
@@ -97,34 +94,3 @@ def test_embedding_similarity_is_disabled_without_model(
     config = build_config(make_spec())
 
     assert config.run_settings.theme_similarity is None
-
-
-def test_config_auto_loads_project_user_rules(monkeypatch, tmp_path) -> None:
-    monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("OPENAI_MODEL", "model-name")
-    rules = tmp_path / "rules"
-    rules.mkdir()
-    (rules / "common.rules").write_text(
-        "项目自定义规则\n",
-        encoding="utf-8",
-    )
-
-    config = build_config(make_spec())
-
-    assert config.rules is not None
-    assert "项目自定义规则" in config.rules.foundation
-    assert "项目自定义规则" in config.rules.themes
-    assert "项目自定义规则" in config.rules.frames
-
-
-def test_config_rejects_missing_explicit_rule_directory(
-    monkeypatch,
-    tmp_path,
-) -> None:
-    monkeypatch.chdir(tmp_path)
-
-    with pytest.raises(ConfigurationError, match="用户规则目录不存在"):
-        build_config(
-            make_spec(),
-            rules_directory=tmp_path / "missing",
-        )

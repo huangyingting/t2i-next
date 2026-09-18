@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 from typer.testing import CliRunner
 
@@ -93,8 +91,6 @@ def test_generate_command_reports_batched_call_count(
             "hardcore",
             "--language",
             "english",
-            "--rules-dir",
-            str(tmp_path / "custom-rules"),
         ],
     )
 
@@ -106,9 +102,7 @@ def test_generate_command_reports_batched_call_count(
     assert captured["spec"].output_language == OutputLanguage.ENGLISH
     assert captured["spec"].female_count is None
     assert captured["spec"].male_count is None
-    assert captured["kwargs"]["rules_directory"] == (
-        tmp_path / "custom-rules"
-    )
+    assert "rules_directory" not in captured["kwargs"]
 
 
 def test_cli_exposes_generation_resume_and_runs_commands() -> None:
@@ -120,8 +114,20 @@ def test_cli_exposes_generation_resume_and_runs_commands() -> None:
     assert "generate-safe-avant-garde" in result.output
     assert "resume" in result.output
     assert "runs" in result.output
+    assert "--rules-dir" not in result.output
     assert "probe" not in result.output
     assert "validate" not in result.output
+
+
+@pytest.mark.parametrize(
+    "command",
+    ("generate", "generate-cast-matrix", "generate-safe-avant-garde"),
+)
+def test_generation_commands_do_not_expose_legacy_rules_directory(command) -> None:
+    result = CliRunner().invoke(cli.app, [command, "--help"])
+
+    assert result.exit_code == 0
+    assert "--rules-dir" not in result.output
 
 
 def test_safe_avant_garde_command_wires_fixed_batch(
@@ -180,9 +186,7 @@ def test_safe_avant_garde_command_wires_fixed_batch(
     assert "生成 Frame：43200/43200" in result.output
     assert captured["spec"].theme_count == 100
     assert captured["spec"].frames_per_theme == 6
-    assert captured["kwargs"]["rules_directory"] == (
-        Path("rules/batches/safe_avant_garde")
-    )
+    assert "rules_directory" not in captured["kwargs"]
     assert captured["state_file"] == (
         tmp_path / "runs/safe-avant-garde-batch.json"
     )
@@ -242,8 +246,6 @@ def test_cast_matrix_command_wires_five_resumable_tasks(
             "共享视觉 brief",
             "--content-level",
             "hardcore",
-            "--rules-dir",
-            str(tmp_path / "rules"),
             "--runs-dir",
             str(tmp_path / "runs"),
             "--prompts-dir",

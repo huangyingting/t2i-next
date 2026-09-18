@@ -147,12 +147,6 @@ def generate_command(
         file_okay=False,
         help="最终提示词文件目录。",
     ),
-    rules_dir: Path | None = typer.Option(
-        None,
-        "--rules-dir",
-        file_okay=False,
-        help="用户规则目录；默认自动使用当前目录下的 rules/。",
-    ),
 ) -> None:
     """Create a run, checkpoint each object, and publish when complete."""
     try:
@@ -170,7 +164,6 @@ def generate_command(
             spec,
             runs_directory=runs_dir,
             prompts_directory=prompts_dir,
-            rules_directory=rules_dir,
             max_concurrency=concurrency,
             theme_batch_size=theme_batch_size,
             generation_retries=generation_retries,
@@ -228,12 +221,6 @@ def generate_safe_avant_garde_command(
         file_okay=False,
         help="最终提示词文件目录。",
     ),
-    rules_dir: Path = typer.Option(
-        Path("rules/batches/safe_avant_garde"),
-        "--rules-dir",
-        file_okay=False,
-        help="安全先锋艺术批次规则目录。",
-    ),
     state_file: Path | None = typer.Option(
         None,
         "--state-file",
@@ -261,7 +248,6 @@ def generate_safe_avant_garde_command(
             tasks[0].spec,
             runs_directory=runs_dir,
             prompts_directory=prompts_dir,
-            rules_directory=rules_dir,
             max_concurrency=concurrency,
             theme_batch_size=theme_batch_size,
             generation_retries=generation_retries,
@@ -296,12 +282,6 @@ def generate_cast_matrix_command(
         ...,
         "--content-level",
         help="五组任务共同使用的内容尺度。",
-    ),
-    rules_dir: Path | None = typer.Option(
-        None,
-        "--rules-dir",
-        file_okay=False,
-        help="可选用户规则目录；默认使用当前目录下的 rules/。",
     ),
     runs_dir: Path = typer.Option(
         Path("runs"),
@@ -347,7 +327,6 @@ def generate_cast_matrix_command(
             tasks[0].spec,
             runs_directory=runs_dir,
             prompts_directory=prompts_dir,
-            rules_directory=rules_dir,
             max_concurrency=16,
             theme_batch_size=5,
             generation_retries=5,

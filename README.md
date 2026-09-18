@@ -788,13 +788,11 @@ src/t2i_prompt_pipeline/rule_packs/system/
 instruction；去除前导空格后以 `#` 开头的行是注释。没有 TOML/YAML、
 priority、replace、disable、模板变量或条件 DSL，行顺序就是规则顺序。
 
-项目可以在根目录的 `rules/` 下使用同样的可选目录结构添加用户规则，也可以用
-`--rules-dir PATH` 显式指定目录。缺失的用户规则文件会跳过；显式指定的目录
-不存在时会报错。每个阶段按以下固定顺序编译：
+规则只从上述包内系统目录加载，不发现工作目录文件，也没有用户规则覆盖入口。
+每个阶段按以下固定顺序编译：
 
 1. 系统 common、stage、当前 content level，以及 Frame 的当前 mode；
-2. 用户 common、stage、当前 content level，以及 Frame 的当前 mode；
-3. 运行时生成的输出语言要求，以及 Theme 的无名人物标签要求。
+2. 运行时生成的输出语言要求，以及 Theme 的无名人物标签要求。
 
 因此每次只把当前选择的 content level 和 frame mode 发送给模型，不会发送另外
 两套等级，既避免规则冲突，也减少输入 token。当前系统规则要求：
@@ -923,7 +921,6 @@ uv run t2i-prompts generate \
   --concurrency 8 \
   --theme-batch-size 5 \
   --generation-retries 2 \
-  --rules-dir rules \
   --runs-dir runs \
   --prompts-dir prompts
 ```
@@ -957,8 +954,7 @@ run 和 6,000 条提示词：
 ```
 
 第二个参数显式指定 `aesthetic`、`erotic` 或 `hardcore` 时只运行该尺度，共生成
-5 个 run 和 3,000 条提示词。第三个可选参数可以指定另一个规则目录；未传时使用
-项目根目录的 `rules/`。
+5 个 run 和 3,000 条提示词。
 脚本会为每组 brief 补充明确成年的人物配置，因此共享 brief 不应自行指定人数。
 批次状态按 brief、content level 和规则自动写入 `runs/cast-matrix-*.json`。
 单次生成暂时没有进展时会在批次预算内自动继续同一 run；Theme 相似度重生成耗尽时
@@ -975,8 +971,7 @@ run 和 6,000 条提示词：
 uv run t2i-prompts generate-safe-avant-garde
 ```
 
-该命令固定使用 `aesthetic` 和 `variations`，并加载
-`rules/batches/safe_avant_garde/` 的隔离规则，要求所有人物 25 岁以上、
+该命令固定使用 `aesthetic` 和 `variations`；任务 brief 要求所有人物 25 岁以上、
 全程穿着不透明且完整覆盖的服装，不生成裸露、性行为或性化接触。
 批次进度默认写入 `runs/safe-avant-garde-batch.json`；命令中断后执行同一
 命令，会跳过已完成任务并通过现有 run checkpoint 继续当前任务。

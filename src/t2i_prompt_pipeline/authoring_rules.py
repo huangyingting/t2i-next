@@ -24,37 +24,27 @@ _STAGE_FILENAMES = {
 
 def resolve_rules(
     spec: GenerationSpec,
-    *,
-    user_directory: Path | None = None,
 ) -> ResolvedRuleSet:
     """Resolve the immutable rules used by one new run."""
     system_directory = _require_directory(
         _SYSTEM_RULES_DIRECTORY,
         "系统规则目录",
     )
-    resolved_user_directory = (
-        _require_directory(user_directory.resolve(), "用户规则目录")
-        if user_directory is not None
-        else None
-    )
     return ResolvedRuleSet(
         foundation=_compile(
             GenerationStage.FOUNDATION,
             spec,
             system_directory,
-            resolved_user_directory,
         ),
         themes=_compile(
             GenerationStage.THEMES,
             spec,
             system_directory,
-            resolved_user_directory,
         ),
         frames=_compile(
             GenerationStage.FRAMES,
             spec,
             system_directory,
-            resolved_user_directory,
         ),
     )
 
@@ -63,19 +53,12 @@ def _compile(
     stage: GenerationStage,
     spec: GenerationSpec,
     system_directory: Path,
-    user_directory: Path | None,
 ) -> tuple[str, ...]:
     rules = [
         rule
         for path in _selected_paths(system_directory, stage, spec)
-        for rule in _read_rule_file(path, required=True)
+        for rule in _read_rule_file(path)
     ]
-    if user_directory is not None:
-        rules.extend(
-            rule
-            for path in _selected_paths(user_directory, stage, spec)
-            for rule in _read_rule_file(path, required=False)
-        )
     if stage == GenerationStage.THEMES:
         rules.append(_character_label_rule(spec))
     rules.append(_output_language_rule(spec))
@@ -105,11 +88,9 @@ def _require_directory(path: Path, label: str) -> Path:
     return path
 
 
-def _read_rule_file(path: Path, *, required: bool) -> tuple[str, ...]:
+def _read_rule_file(path: Path) -> tuple[str, ...]:
     if not path.exists():
-        if required:
-            raise ConfigurationError(f"规则文件不存在：{path}")
-        return ()
+        raise ConfigurationError(f"规则文件不存在：{path}")
     if not path.is_file():
         raise ConfigurationError(f"规则路径不是文件：{path}")
     try:

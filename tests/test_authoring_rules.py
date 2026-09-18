@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from t2i_prompt_pipeline.authoring_rules import resolve_rules
-from t2i_prompt_pipeline.errors import ConfigurationError
 from t2i_prompt_pipeline.models import (
     ContentLevel,
     FrameBatch,
@@ -333,56 +332,6 @@ def test_output_language_rule_is_selected_for_every_stage() -> None:
         assert "普通动作、姿态和光效必须使用中文" in chinese_rules
 
         assert "schema 规定的机器标识字段不受此限制" in chinese_rules
-
-
-def test_user_rules_are_appended_in_file_order_and_selected_by_run(
-    tmp_path: Path,
-) -> None:
-    user = tmp_path / "rules"
-    (user / "content_levels").mkdir(parents=True)
-    (user / "frame_modes").mkdir()
-    (user / "common.rules").write_text(
-        "# comment\n\n用户通用规则一\n  用户通用规则二  \n",
-        encoding="utf-8",
-    )
-    (user / "themes.rules").write_text("用户主题规则\n", encoding="utf-8")
-    (user / "content_levels" / "aesthetic.rules").write_text(
-        "不应加载的美学规则\n",
-        encoding="utf-8",
-    )
-    (user / "content_levels" / "erotic.rules").write_text(
-        "用户情色规则\n",
-        encoding="utf-8",
-    )
-    (user / "frame_modes" / "sequential.rules").write_text(
-        "不应加载的连续规则\n",
-        encoding="utf-8",
-    )
-    (user / "frame_modes" / "variations.rules").write_text(
-        "用户变化规则\n",
-        encoding="utf-8",
-    )
-    spec = make_spec()
-    spec.content_level = ContentLevel.EROTIC
-    spec.frame_mode = FrameMode.VARIATIONS
-
-    resolved = resolve_rules(spec, user_directory=user)
-
-    assert "用户通用规则一" in resolved.themes
-    assert "用户通用规则二" in resolved.themes
-    assert resolved.themes.index("用户通用规则一") < resolved.themes.index(
-        "用户主题规则"
-    )
-    assert "用户情色规则" in resolved.themes
-    assert "不应加载的美学规则" not in resolved.themes
-    assert "用户变化规则" in resolved.frames
-    assert "不应加载的连续规则" not in resolved.frames
-    assert resolved.themes[-1].startswith("输出语言要求")
-
-
-def test_explicit_user_rule_directory_must_exist(tmp_path: Path) -> None:
-    with pytest.raises(ConfigurationError, match="用户规则目录不存在"):
-        resolve_rules(make_spec(), user_directory=tmp_path / "missing")
 
 
 def test_rule_fingerprint_is_stable_and_content_sensitive() -> None:
