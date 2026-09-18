@@ -13,9 +13,10 @@ store = LocalStoryRunStore(
     Path("runs"),
     Path("prompts"),
 )
-document_path = Path("story-inputs/recipes/multi-view.yaml")
+document_path = Path("recipes/multi-view.yaml")
 resolved = resolve_story_input(
     load_story_document(document_path),
+    run_configuration=load_run_configuration(Path("story-run.json")),
     source_path=document_path,
 )
 settings = StoryRunSettings(
@@ -76,9 +77,9 @@ Story 只有一条当前执行路径，不通过 output-mode 开关维护多套�
 
 | 层 | 职责 |
 |---|---|
-| `inputs/` | 严格加载配方与受控资产，解析适用性、模块、阶段规则和确定性槽位计划 |
+| `inputs/` | 分别严格加载视觉 YAML 与外部运行 JSON，解析适用性、模块、阶段规则和确定性槽位计划 |
 | `models.py` | 请求、模型草稿、最终对象、阶段创作和质量策略 |
-| `authoring_rules.py` / `prompts.py` | 冻结创作指令、序列化阶段上下文，不混入执行策略 |
+| `authoring_rules.py` / `prompts.py` | 冻结系统与视觉指令、序列化阶段上下文及适用的输出目标，不传递检查模式或重试策略 |
 | `provider.py` | 结构化或文本传输、transport 重试、截断与 usage，不判断故事质量 |
 | `frame_batches.py` / `quality_validation.py` | 纯文本边界解析与纯函数检查，不进行 I/O 或模型调用 |
 | `studio.py` | 编排两个固定阶段，分配 ID，决定接受、缺失帧重试和完成 |
@@ -109,13 +110,14 @@ Frame 只处理文本传输、标签边界和逐帧检查，不再保留 Frame s
 
 系统规则是等级定义的唯一来源。配方和模块只能补充题材相关、与该等级相容的要求，
 不能替换等级定义或削弱其下限与上限。等级选择仍遵循
-显式 CLI `--content-level` > `generation.content_level` > 默认 `aesthetic`。
+显式 CLI `--content-level` > 外部运行配置的 `generation.content_level` > 默认 `aesthetic`。
 声明三个等级的细化分支不等于同时启用三个等级。
 
-这里有四个不同职责，不是四套等级定义：`generation.content_level` 选择等级，
+这里有四个不同职责，不是四套等级定义：运行配置的 `generation.content_level` 选择等级，
 `requirements.content_levels` 限制配方可用等级，系统等级文件定义边界，
-`authoring.level_refinements` 细化题材的实现。通用成年、自愿参与和输出约束由系统
-`common.rules` 单独拥有；等级特有年龄下限、可见证据与禁止范围仍留在对应等级文件，
+`authoring.level_refinements` 细化题材的实现。通用成年、自愿参与等安全边界由系统
+`safety.rules` 单独拥有，通用叙事和输出约束由 `common.rules` 负责；
+等级特有年龄下限、可见证据与禁止范围仍留在对应等级文件，
 不能为了去重扩展成所有等级的共同限制。
 
 ## 人物数量约束
@@ -129,12 +131,13 @@ Frame 只处理文本传输、标签边界和逐帧检查，不再保留 Frame s
 约束通过两个阶段的 `input_context` 传递，包括作用域、固定额外人物以及所选槽位
 的人数条件；不再同时发送缺少作用域的第二份人数对象。
 
-专属配方通过 `requirements` 限制阵容、数量、语言和内容等级。这些要求在
-文档默认值与最终 CLI 覆盖两个阶段检查，不能被 quality off 关闭。
-显式人数作用域使用 `generation.cast.scope` 与 `fixed_roles`；有一名固定额外角色时，
+专属配方通过 `requirements` 限制视觉阵容、人物数量和内容等级，不配置执行次数或
+输出语言。外部运行配置本身必须合法，最终有效请求还必须满足配方适用性；
+这些检查不能被 quality off 关闭。
+显式人数作用域使用 `cast.scope` 与 `fixed_roles`；有一名固定额外角色时，
 请求组最多七人，请求组与固定角色合计最多八人。固定角色可由 Theme 选择性别并在该 Theme
 内保持一致，不以编号奇偶强制分配。
-确实包含背景人群的配方需另外声明 `generation.cast.background_counts`，以有界、
+确实包含背景人群的配方需另外声明 `cast.background_counts`，以有界、
 不重叠的 `{min, max}` 区间表达允许数量，且使用明确的主角作用域。背景人群仍是
 成年人并计入画面总人数范围，不能冒充未计数物件。主角容量八人不等于画面总人数
 八人；运动模糊配方的四档背景人数被保留，不擅自删掉16–30人的背景场景。
@@ -166,11 +169,11 @@ Theme premise 和每个最终 Frame 都必须逐人明确写出国籍，并明�
 失败后果”、固定的“此刻”动作句、倒数第二句摄影或最后一句光线。只有故事真正需要
 时才写期限和后果，不为制造戏剧性虚构委托、验收、倒计时和抽象风险。多帧像从同一
 微型故事中选出的不同静止画面，不机械套用建立、加压、发现、结果、余波六阶段。
-篇幅由人物和画面复杂度决定，不设目标字数。
+未配置输出长度时，篇幅由人物和画面复杂度决定；字数与字符数目标只来自外部运行配置。
 
 系统没有模型评审、关键词评分、相似度 gate 或 revision 阶段。默认不选择任何
-额外质量检查，因此仍只执行基础结构契约。Story Document 可以显式选择本地
-Frame 证据检查；这些检查不保证叙事语义正确，也不代替创作规则。
+额外质量检查，因此仍只执行基础结构契约。运行配置可以显式选择本地 Theme／Frame
+证据检查；这些检查不保证叙事语义正确，也不代替画面定义与系统安全约束。
 
 ## Story Document
 
@@ -183,14 +186,9 @@ description: |
   1930年代秋夜，两名成年旅人在旧车站重逢。
   用克制的现实主义摄影描绘他们辨认彼此的瞬间。
 
-generation:
-  theme_count: 12
-  frames_per_theme: 3
-  content_level: aesthetic
-  output_language: chinese
-  cast:
-    female_count: 1
-    male_count: 1
+cast:
+  female_count: 1
+  male_count: 1
 
 authoring:
   level_refinements:
@@ -208,28 +206,16 @@ authoring:
     common:
       - 每帧独立描述景别、视角和焦点或景深。
 
-validation:
-  themes:
-    mode: report
-    checks:
-      - type: required_text
-        field: premise
-        values: [旧车站]
-  frames:
-    mode: report
-    checks:
-      - type: camera_evidence
-      - type: prose_length
-        min_chars: 100
-        max_chars: 2000
-
-runtime:
-  concurrency: 8
-  generation_retries: 2
-  theme_batch_size: 3
-  theme_output_tokens: 12000
-  frame_output_tokens: 32768
 ```
+
+YAML 只定义视觉内容：人物构成、外观、关系、动作、媒介、布局、光线、物件、
+画内文字，以及明确的视觉资产分配。`cast` 的作用域、额外角色与背景人群是画面
+事实；不是执行次数。画内区域／视图数量也不是 `frames_per_theme`。
+
+配方不再接受 `generation`、`runtime`、`validation`、`policy`，即使为空也会报错。
+正文不承载安全声明、词数门槛、精确句式、协议标签、检查／重写流程或运行参数。
+不可关闭的安全底线由系统统一提供；具体的支撑几何、人物外观年龄和画内文案仍是
+视觉事实，不能为了清理控制指令而删除。
 
 `id` 只接受小写字母、数字及单个分隔用的 `-`、`_`，长度不超过 120。
 它作为 `source_prompt_stem` 冻结到请求，文件改名不改变发布名称。
@@ -237,26 +223,83 @@ runtime:
 所有未知字段、非法枚举、重复键、anchors、aliases、merge keys、多个 YAML 文档、
 非标准对象标签、错误数值类型和越界参数都会在加载 provider 配置前明确报错。
 
-优先级为：程序默认值 < 文档配置 < **显式** CLI 参数。只覆盖已传入的字段，
-包括数值 `0`；未传的另一侧人物数仍采用文档配置。文档自身必须有效，不能靠 CLI
-修补非法文档。人数最终仍经过 StoryRequest 的总人数与非零阵容契约。
+### 外部运行配置
+
+生成数量、描述语言、等级选择、并发、重试、token 预算与质量策略放在独立的 JSON
+运行配置中，而不是为每份配方维护另一份隐式控制表。例如 `story-run.json`：
+
+```json
+{
+  "generation": {
+    "theme_count": 12,
+    "frames_per_theme": 3,
+    "content_level": "aesthetic",
+    "output_language": "chinese"
+  },
+  "runtime": {
+    "concurrency": 8,
+    "generation_retries": 2,
+    "theme_batch_size": 3,
+    "theme_output_tokens": 12000,
+    "frame_output_tokens": 32768
+  },
+  "validation": {
+    "themes": {
+      "mode": "report",
+      "checks": [
+        {"type": "text_length", "field": "premise", "min_chars": 80, "max_chars": 500}
+      ]
+    },
+    "frames": {
+      "mode": "report",
+      "checks": [
+        {"type": "camera_evidence"},
+        {"type": "prose_length", "min_chars": 100, "max_chars": 2000}
+      ]
+    }
+  }
+}
+```
+
+```bash
+uv run t2i-story generate --input recipes/motion-blur-photography.yaml \
+  --run-config story-run.json --frames 4
+uv run t2i-story explain --input recipes/motion-blur-photography.yaml \
+  --run-config story-run.json --frame-min-chars 500 --frame-max-chars 2500 --format json
+```
+
+JSON 使用 UTF-8，拒绝重复键、未知字段与非法类型。优先级为：程序默认值 <
+运行配置 < **显式** CLI 参数；视觉配方的阵容是未显式覆盖人数时的基础。
+只覆盖已传入的字段，包括数值 `0`。视觉文档与运行配置自身都须有效，不能靠 CLI
+修补非法输入。最终请求还须满足视觉适用性、非零阵容与槽位分配契约。
 
 缺省值：1 个主题、每主题 6 帧、aesthetic、chinese、不限定男女数量、8 个并发、
-2 次额外 generation retries。运行参数与质量策略
-不会被当成初始创作指令发给模型；若要求模型包含指定内容，也应在正文或 authoring
-中明确表达，而不是只配置检查器。
+2 次额外 generation retries。不从文件名或历史配方配置猜测预算；固定槽位目录等
+视觉分配要求必须由兼容的显式请求满足，例如百姿目录需要 `--themes 100`。
+
+`--frame-min-words`／`--frame-max-words` 使用现有的空白分词计数；
+中文长度通常应使用 `--frame-min-chars`／`--frame-max-chars`。外部配置中的
+`when_language` 保留语言适用性。CLI 只覆盖给出的长度边界，保留已有检查的另一侧
+边界与语言条件；新增检查默认不限语言，合并后上下限冲突会明确报错。
+声明的长度、必含／禁用文本等输出要求由同一套
+策略生成写作约束并执行检查，不再在配方正文重复维护。`off` 关闭质量检查与相关
+重试，不删除已声明的输出目标，更不能关闭安全、结构或槽位约束。
+
+有效运行配置随 resolved input 冻结。续跑不重新读取配置文件，也不接受旧版
+包含执行控制字段的配方快照；旧输入与旧快照不提供兼容读取或自动迁移。
 
 ### 输入子目录与受控模块
 
-当前配方位于 `story-inputs/recipes/`，共享模块位于相邻 `_modules/`，目录数据位于
-`_catalogs/`。资产根默认相对 YAML 文档，`--assets-dir` 可显式覆盖。不再按当前
+当前配方位于仓库根目录的 `recipes/`，共享模块位于 `recipes/_modules/`，目录数据位于
+`recipes/_catalogs/`。资产根默认相对 YAML 文档，`--assets-dir` 可显式覆盖。不再按当前
 工作目录发现 `rules/`；不存在旧 `documents.py` 或 Story `--rules-dir` 入口。
 
 配方、模块、目录和包内策略的 YAML 自然语言内容统一使用中文，包括描述、创作
-规则、目录事实和注释。字段名、ID、枚举、文件名、输出语言配置与必须逐字输出的
+规则、目录事实和注释。字段名、ID、枚举、文件名与真正画内文字的
 原文保持不变；需要保留的英文原文以引用形式嵌入中文说明。
-输入规则的书写语言不决定生成语言，`generation.output_language` 与显式语言要求
-仍是唯一的语言控制入口。
+输入规则的书写语言不决定生成语言，外部运行配置的 `generation.output_language`
+与 CLI `--language` 控制描述语言。画内文案的语言和字符集是视觉设计的一部分，
+不要求描述整幅画面的提示词也使用同一种语言或字符集。
 
 配方与模块只有一个等级细化入口，不再分别在三个位置维护等级映射：
 
@@ -273,7 +316,34 @@ runtime:
 系统当前等级规则始终保留。这是细化而非覆盖，不提供 `replace` 或“后写覆盖前写”
 语义。模块使用同一结构。其他等级和另一阶段专属指令不会进入本阶段请求。
 共享细化仍直接交给 Frame，而不是假设生成的 Theme 已完整复述所有约束。
-仅供 Theme 选择的参考池、仅供 Frame 使用的输出格式不应搬进共享等级分支。
+仅供 Theme 选择的参考池、仅供 Frame 使用的具体画面细节不应搬进共享等级分支。
+
+等级键负责选择，正文只写选择完成后的具体要求：既不要混写其他等级，也不要反复
+写“在情色级级别”等当前等级前缀。等级标识保留在配置、适用性检查和冻结快照中，
+不作为 `content_level` 字段或等级自报口令发送给模型。将共同适用的条件分别写入
+各自等级，并保留各自的具体边界；`shared` 只表示当前等级的两阶段共享，
+不表示跨等级共享。
+`description` 和阶段 `common` 不承载按等级分流的行为条件；例如只适用于部分
+等级的公共场所拍摄要求，应放入这些等级的 `frames`。不要要求输出等级证明、
+合规回执或服装锁定口令；应直接规定人物、服装、动作与可见证据。画面中确实需要
+出现的文字仍是画面事实；摄影和媒介事实也须保留，但不再绑定固定开场句式、
+措辞锁或段落位置。协议、篇幅和检查流程不属于视觉配方。
+仓库回归测试检查已收录规则及实际选中指令中的等级标签和分流，
+但不是通用的自然语言语义验证器。
+
+精简以同一次请求中的重复为准。相同硬约束分别交给 Theme 和 Frame，可能是两个
+独立阶段各自必需的输入，不能假定生成的 Theme 能无损转述它们。系统通用契约只
+维护一处；配方保留外观年龄、人数、位置、可见性和物理关系。移除检查表时仍保留
+其中独有的视觉要求和摄影参数，不以减少字数为由丢失画面事实。评估使用相同输入与
+相同既有 Theme 样本，分别比较编译后的请求长度、约束保留和阶段／等级适用性；
+字符数下降不等于已验证模型生成质量改善。
+
+视觉多样性依赖开放的变化空间，而不是更长的候选清单。配方应区分题材身份与可选
+表现：例如 `recipes/angel.yaml` 保留真人实拍、一位计入阵容的核心天使及一对羽翼，
+但不把暗调、低饱和、宏伟建筑、大型事件或三层纵深设为每幅必选条件。
+Theme 固定身份、场所和基本情境，Frame 在同一时间窗口内变化姿态、羽翼开合、
+景别、机位、焦点与相容的局部照明。遮挡或裁切仍须保持人物归属与动作可理解，
+不要求所有身体细节在所有构图中同时可见。可选方向不配置轮转次数或执行配额。
 
 加载时拒绝同一条等级规则在 Theme／Frame 重复、在共享与阶段块重复，或与该阶段
 `common` 重复；无规则的等级或职责分支可以省略。旧的 `authoring.content_levels`
@@ -285,8 +355,8 @@ runtime:
 模块是数据而非插件，不能加载其他模块、执行代码或使用任意模板表达式。
 模块与目录同样拒绝未知字段、重复键、锚点、远程/越界路径、重复ID及悬空引用。
 
-`requirements` 可以声明 `allowed_casts`、人数/主题数/帧数的 `{min, max}` 边界、
-`output_languages`、`content_levels`，或用 `cast_constraints: unspecified` 禁止
+`requirements` 可以声明 `allowed_casts`、男女人数的 `{min, max}` 边界、
+`content_levels`，或用 `cast_constraints: unspecified` 禁止
 运行级男女人数。这些条件不会自动更改用户设置，也不受可选质量模式影响。
 项目中的两份 miniature 配方分别命名为 `miniature-open-composition` 与
 `miniature-giant-encounter`，保留各自语义，删除旧名称而非添加兼容别名。
@@ -302,13 +372,15 @@ runtime:
 `cyclic_slots` 按整个运行的绝对Theme位置循环目录显式的槽位顺序，不执行正文
 中的算式。受限空间的姿态/情绪使用30槽循环，年龄/视角组合使用12槽循环，
 近未来的类别/种子使用30槽循环。原先以“本次返回列表”计数的文字统一为运行级，
-不随provider批大小重置。要求三个姿态家族的配方也明确至少生成三个Theme。
+不随provider批大小重置。想在一次运行中覆盖多个姿态家族时，由调用方显式选择
+足够的 Theme 数量，配方不再暗中设置执行次数。
 原情绪余数规则未定义零/一偏移；当前目录明确以首项对应T001、第十项对应T010，
 T011回到首项。这是公开的确定化选择，不声称原文已经规定该偏移。
-未定义确定顺序的创作多样性与技术配额仍由创作规则表达，不宣称已经机器验证。
+未定义确定顺序的创作多样性仍由视觉规则表达，不宣称已经机器验证。
 
-目录项可携带有界的 `frame_assignment`，声明适用的 `frames_per_theme` 与完整、
-唯一的Frame槽位规则。只有实际帧数匹配时才应用；重试F02只携带原F02的规则，
+目录项可携带有界的 `frame_assignment`，声明完整、唯一的Frame槽位规则，
+适用帧数由 `slots` 长度推导，不重复存储执行数量。只有实际帧数匹配时才应用；
+重试F02只携带原F02的规则，
 不把第二个视角当成第一槽位重新分配。此类Frame事实不会进入Theme请求。
 
 ```yaml
@@ -320,7 +392,6 @@ entries:
     frames:
       - 保留该主题已确定的布光。
     frame_assignment:
-      frames_per_theme: 2
       slots:
         - frame_id: F01
           rules:
@@ -333,7 +404,7 @@ slots:
 ```
 
 配方通过 `allocation: {type: cyclic_slots, catalog: studio-views}` 引用该目录。
-`frame_assignment.slots` 必须按序完整覆盖声明数量的 `F01` 至 `Fnn`，不能漏项、
+`frame_assignment.slots` 必须按序完整覆盖 `F01` 至 `Fnn`，不能漏项、
 重复或使用空规则。其他帧数仍使用目录通用Frame事实与配方规则，不伪造槽位分配。
 目录不是通用规则引擎，不接受轴、条件表达式、任意公式或嵌套执行步骤。
 这不是可执行模板、任意条件表达式或新增生成阶段。
@@ -361,7 +432,8 @@ provider 上限的较小值；不会改写 manifest 中冻结的配置。截断�
 
 ## 可选质量检查
 
-`validation.themes` 与 `validation.frames` 分别声明本阶段的 `mode` 和 `checks`。
+外部 JSON 运行配置中的 `validation.themes` 与 `validation.frames` 分别声明本阶段的
+`mode` 和 `checks`，不再从视觉 YAML 读取。
 两者默认均为 `report`、空检查列表；可以只启用一个阶段，也可以使用不同模式。
 不保留旧 `validation.quality`、扁平策略或旧报告结构的解析入口。
 
@@ -396,8 +468,8 @@ Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
   按 Python Unicode 字符数计算，包含标点和空格，不是字节数、汉字数或 token 数。
 - `word_count`：`min_words`（默认1）与可选 `max_words`；按 `len(prose.split())`
   计算空白分隔单元，不做语言学分词，不以字符数代替词数。边界含端点；
-  不提供 `max_words` 就没有额外词数上限。运动模糊配方的700词下限与850–1200词
-  创作目标是不同要求。
+  不提供 `max_words` 就没有额外词数上限。配方不再隐含700词等门槛；
+  需要长度目标时由运行配置或 `--frame-min-words` / `--frame-max-words` 显式设置。
 - `ascii`：检查整段prose是否全为ASCII，只有明确要求整个输出如此的输入才启用。
   画内英文文案不意味着中文叙事段落也必须ASCII；此检查不识别图内文字槽位。
 - `ascii` 和 `word_count` 可声明 `when_language: english` 或 `chinese`；
@@ -412,10 +484,10 @@ Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
 
 CLI 的 `--theme-quality-mode` 和 `--frame-quality-mode` 分别覆盖对应阶段的模式，
 不改变检查器列表或另一阶段的设置；不保留旧 `--quality-mode`。
-API 通过文档的 `validation.themes` / `.frames` 解析同一策略，再将
+API 通过 `StoryRunConfiguration.validation.themes` / `.frames` 解析同一策略，再将
 `resolved.quality` 与 `resolved.runtime` 写入 `StoryRunSettings`；store拒绝不一致的副本。
 两阶段策略
-完整冻结在 manifest 中，resume 不读当前 YAML 或规则文件，也不接受切换策略。
+完整冻结在 manifest 中，resume 不读当前 YAML、运行配置或规则文件，也不接受切换策略。
 
 检查问题以 `stage`、`theme_id`、`frame_id`、`field`、`check`、`message` 保存到
 attempt 的 `quality_issues`。Theme 问题的 `frame_id` 为 null，Frame 问题指向
@@ -455,9 +527,9 @@ runs/<run-id>/
 
 `manifest.json` 冻结 provider、并发数、generation retry、theme batch size、
 theme/frame token 上限、完整质量策略和发布目录，并保存解析输入的指纹。
-`resolved-input.json` 保存模块、目录、来源、有效请求及完整槽位计划。
+`resolved-input.json` 保存模块、目录、来源、有效请求、有效运行配置及完整槽位计划。
 读取时校验指纹和请求/规则/运行设置的一致性；缺少该快照的旧run直接拒绝。
-resume不重新读取原YAML或当前资产文件，不运行隐式迁移。
+resume不重新读取原YAML、外部JSON配置或当前资产文件，不运行隐式迁移。
 每个成功 Theme 和每个 Frame
 都独立原子写入并 fsync；例如只有 F02 失败时，上图的 F01 和 F03 保留，恢复只请求 F02。
 attempt 在对应 Frame checkpoint 之前保存接受/拒绝信息与 usage。若在多帧落盘
@@ -483,7 +555,7 @@ checkpoint；`resume` 扫描它们，只生成缺失部分，并把上次同一 
    `finish_reason=length`，不把可能截断的内容作为成功批次；无效的截断 Theme
    同样记录为 truncated。下一次 attempt 提升到 manifest 冻结的 provider 上限；
    Theme 默认初始预算为 6,000 tokens，Frame batch 为 32,768 tokens，
-   可通过文档和显式 CLI 参数配置。
+   可通过外部运行配置和显式 CLI 参数配置。
    truncated outcome 会持久化，因此进程重启后的第一次 resume attempt
    也直接使用提升后的预算。
 
@@ -543,7 +615,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story generate \
-  --input story-inputs/recipes/motion-blur-photography.yaml \
+  --input recipes/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic \
@@ -559,7 +631,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story explain \
-  --input story-inputs/recipes/human-typography.yaml --themes 26 --format json
+  --input recipes/human-typography.yaml --themes 26 --format json
 ```
 
 `explain` 与 `generate` 共享同一个解析器及覆盖模型，不读取provider配置、不创建run。
@@ -572,18 +644,23 @@ JSON结果为 `{"status":"valid","fingerprint":"...","input":{...}}`；
 
 ```text
 --input PATH           读取 UTF-8 YAML Story Document
+--run-config PATH      读取独立 UTF-8 JSON 运行配置
 --assets-dir PATH      显式模块/目录资产根，默认相对输入文件
 --themes INTEGER       主题数量，1 至 100
 --frames INTEGER       每个主题的画面数，1 至 6
 --female-count INTEGER 可选女性人数约束，0 至 8
 --male-count INTEGER   可选男性人数约束，0 至 8
----concurrency INTEGER  Theme/Frame 共用并发上限，1 至 32
+--concurrency INTEGER  Theme/Frame 共用并发上限，1 至 32
 --generation-retries INTEGER 每个生成单元额外重试次数，0 至 5
 --theme-batch-size INTEGER 每批 Theme 数量，1 至 10
 --theme-output-tokens INTEGER Theme 批次初始预算，512 至 65536
 --frame-output-tokens INTEGER Frame 批次初始预算，512 至 65536
 --theme-quality-mode TEXT Theme 的 off、report 或 enforce
 --frame-quality-mode TEXT Frame 的 off、report 或 enforce
+--frame-min-words INTEGER 帧正文的空白分隔词数下限
+--frame-max-words INTEGER 帧正文的空白分隔词数上限
+--frame-min-chars INTEGER 帧正文的 Unicode 字符数下限
+--frame-max-chars INTEGER 帧正文的 Unicode 字符数上限
 --content-level TEXT   aesthetic、erotic 或 hardcore
 --language TEXT        chinese 或 english
 --prompts-dir DIRECTORY 按日期保存最终 TXT 的根目录

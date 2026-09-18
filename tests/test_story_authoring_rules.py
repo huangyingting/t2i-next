@@ -19,24 +19,27 @@ def test_story_rules_compile_only_the_selected_content_level() -> None:
 
     for stage in StoryStage:
         text = rules.text_for(stage)
-        assert "本次使用 极致情色级（erotic）" in text
-        assert "本次使用 美学级（aesthetic）" not in text
-        assert "本次使用 赤裸裸的性描写（hardcore）" not in text
+        assert "当前画面直接呈现裸露、挑逗和非露骨亲密互动。" in text
+        assert "尺度下限是静止画面可见的形体表达" not in text
+        assert "当前画面直接、清晰地呈现角色之间的明确性行为。" not in text
 
 
 @pytest.mark.parametrize("level", list(ContentLevel))
 def test_common_contracts_have_one_owner_at_every_level(level: ContentLevel) -> None:
     system = REPOSITORY_ROOT / "src" / "t2i_story_pipeline" / "rule_packs" / "system"
-    common = (system / "common.rules").read_text(encoding="utf-8").splitlines()
+    common = "\n".join(
+        (system / filename).read_text(encoding="utf-8")
+        for filename in ("common.rules", "safety.rules")
+    ).splitlines()
     universal = [
         rule
         for rule in common
         if rule.startswith(
             (
-                "Every depicted person must be an unmistakable adult.",
+                "Every depicted person must be an unmistakable adult",
                 "All participants must be alert, consenting, "
                 "responsive, and able to stop.",
-                "Do not write the content-level name,",
+                "Do not write configuration metadata,",
             )
         )
     ]
@@ -64,7 +67,7 @@ def test_grade_specific_limits_are_not_promoted_to_common(level: ContentLevel) -
         )
         assert ("尺度上限为" in text) == (level == ContentLevel.AESTHETIC)
         if level == ContentLevel.HARDCORE:
-            assert "以主动接触或共同施力提供符合公共参与要求的可见证据" in text
+            assert "以主动接触或共同施力提供双方自愿参与的可见证据" in text
         elif level == ContentLevel.EROTIC:
             assert "回应视线、主动接触、相向姿态或共同施力" in text
 
@@ -137,12 +140,14 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
             "六区域广告概念板",
         ),
         "multi-view.yaml": (
-            "A full-bleed [two/three/four]-view hard-cut tiled composition",
+            "两个、三个或四个视图",
+            "互不重叠的矩形区域覆盖画布的 100%",
+            "硬切边界",
         ),
         "dress.yaml": ("恰好包含六个互不重叠的视图区",),
         "edo-warai-e.yaml": (
             "平坦、分隔的色块",
-            "中性外部词语",
+            "nishiki-e",
             "实体搭建和真人表演",
         ),
         "ming-gongbi-mixi-tu.yaml": (
@@ -154,7 +159,7 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
 
     for filename, phrases in required_contracts.items():
         document = load_story_document(
-            REPOSITORY_ROOT / "story-inputs" / "recipes" / filename
+            REPOSITORY_ROOT / "recipes" / filename
         )
         resolved = resolve_story_input(document)
         story = "\n".join(

@@ -10,7 +10,9 @@ from typing import Literal, Self
 from pydantic import ConfigDict, TypeAdapter, ValidationError, model_validator
 
 from t2i_story_pipeline.authoring_rules import (
+    output_language_rule,
     resolve_story_rules,
+    system_rule_source_id,
     system_rule_sources,
 )
 from t2i_story_pipeline.errors import StoryConfigurationError
@@ -33,7 +35,7 @@ from t2i_story_pipeline.inputs.schema import (
     ModuleDocument,
     PolicyDocument,
     StoryDocument,
-    StoryGeneration,
+    StoryRunConfiguration,
 )
 from t2i_story_pipeline.models import (
     Model,
@@ -46,6 +48,7 @@ from t2i_story_pipeline.models import (
     StoryRuntime,
     StoryStage,
 )
+from t2i_story_pipeline.quality_validation import writing_constraints
 
 _POLICIES = Path(__file__).resolve().parents[1] / "rule_packs" / "policies"
 _MODULE_CONTEXT = TypeAdapter(ModuleContext)
@@ -69,6 +72,7 @@ class ResolvedStoryInput(Model):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
     request: StoryRequest
+    run_configuration: StoryRunConfiguration
     runtime: StoryRuntime
     quality: StoryQualityPolicy
     rules: StoryRuleSet
@@ -94,14 +98,26 @@ class ResolvedStoryInput(Model):
         if len(documents) != 1:
             raise ValueError("resolved input must freeze exactly one source document")
         document = StoryDocument.model_validate_json(documents[0].content)
+        configuration = StoryRunConfiguration.model_validate_json(
+            self.run_configuration.model_dump_json(), strict=True
+        )
+        # Publication names are frozen request metadata, not generation controls.
+        publication_fields = {"source_prompt_stem", "prompt_filename_stem"}
+        if configuration.generation.request(document).model_dump(
+            exclude=publication_fields
+        ) != self.request.model_dump(exclude=publication_fields):
+            raise ValueError("request differs from frozen run_configuration and cast")
+        if (
+            configuration.runtime != self.runtime
+            or configuration.validation != self.quality
+        ):
+            raise ValueError("runtime or quality differs from frozen run_configuration")
         _validate_source(documents[0], document, self.request)
         policies = [source for source in self.sources if source.kind == "policy"]
         if len(policies) != 1:
             raise ValueError("resolved input must freeze exactly one named policy")
         policy = PolicyDocument.model_validate_json(policies[0].content)
         _validate_source(policies[0], policy, self.request)
-        if policy.id != document.policy:
-            raise ValueError("frozen policy must match the source document")
         catalogs = [
             CatalogDocument.model_validate_json(source.content)
             for source in self.sources
@@ -115,12 +131,7 @@ class ResolvedStoryInput(Model):
             strict=True,
         ):
             _validate_source(source, catalog, self.request)
-        cast = document.generation.cast.model_copy(
-            update={
-                "female_count": self.request.female_count,
-                "male_count": self.request.male_count,
-            }
-        )
+        cast = configuration.generation.effective_cast(document.cast)
         expected_plans = plan_themes(
             self.request, cast, document.allocation, catalogs[0] if catalogs else None
         )
@@ -150,15 +161,45 @@ class ResolvedStoryInput(Model):
             if expected_context != context:
                 raise ValueError("module context differs from frozen source parameters")
         requirements = _requirements(self.sources)
-        default_request = document.generation.request(document.description, document.id)
-        default_plans = plan_themes(
-            default_request,
-            document.generation.cast,
-            document.allocation,
-            catalogs[0] if catalogs else None,
-        )
-        validate_requirements(default_request, default_plans, requirements)
         validate_requirements(self.request, self.plans, requirements)
+        system_sources = [source for source in self.sources if source.kind == "system"]
+        expected_system_ids = [
+            system_rule_source_id(path) for path in system_rule_sources(self.request)
+        ]
+        if [source.id for source in system_sources] != expected_system_ids:
+            raise ValueError("frozen input must include all mandatory system rules")
+        for source in system_sources:
+            lines = _rule_lines(source.content)
+            if not lines:
+                raise ValueError("mandatory system rule sources must not be empty")
+            if (
+                source.themes != (lines if source.id != "system/frames.rules" else ())
+                or source.frames
+                != (lines if source.id != "system/themes.rules" else ())
+                or source.requirements is not None
+            ):
+                raise ValueError("system rules differ from frozen source content")
+        for stage in StoryStage:
+            by_id = {source.id: source for source in system_sources}
+            ordered_system_sources = (
+                by_id[system_rule_source_id(path)]
+                for path in system_rule_sources(self.request, stage)
+            )
+            expected_rules = tuple(
+                rule
+                for source in (
+                    *ordered_system_sources,
+                    *(source for source in self.sources if source.kind != "system"),
+                )
+                for rule in getattr(source, stage.value)
+            ) + (
+                output_language_rule(self.request),
+                *writing_constraints(self.quality, stage, self.request.output_language),
+            )
+            if self.rules.for_stage(stage) != expected_rules:
+                raise ValueError(
+                    "rules differ from frozen sources and run_configuration"
+                )
         return self
 
     def fingerprint(self) -> str:
@@ -257,6 +298,14 @@ def _source(
     )
 
 
+def _rule_lines(content: str) -> tuple[str, ...]:
+    return tuple(
+        stripped
+        for line in content.splitlines()
+        if (stripped := line.strip()) and not stripped.startswith("#")
+    )
+
+
 def _validate_source(
     source: InputSource,
     value: StoryDocument | PolicyDocument | ModuleDocument | CatalogDocument,
@@ -280,16 +329,13 @@ def _validate_source(
 
 
 def _effective(
-    document: StoryDocument, overrides: InputOverrides
-) -> tuple[StoryRequest, StoryGeneration, StoryRuntime, StoryQualityPolicy]:
-    generation = document.generation.model_dump(mode="python")
-    runtime = document.runtime.model_dump(mode="python")
-    quality = document.validation.model_dump(mode="python")
-    cast = document.generation.cast.model_dump(mode="python")
+    configuration: StoryRunConfiguration, overrides: InputOverrides
+) -> StoryRunConfiguration:
+    generation = configuration.generation.model_dump(mode="python")
+    runtime = configuration.runtime.model_dump(mode="python")
+    quality = configuration.validation.model_dump(mode="python")
     for name, value in overrides.model_dump(exclude_none=True).items():
-        if name in ("female_count", "male_count"):
-            cast[name] = value
-        elif name in generation:
+        if name in generation:
             generation[name] = value
         elif name in runtime:
             runtime[name] = value
@@ -297,13 +343,28 @@ def _effective(
             quality["themes"]["mode"] = value
         elif name == "frame_quality_mode":
             quality["frames"]["mode"] = value
-    generation["cast"] = cast
-    effective = StoryGeneration.model_validate(generation)
-    return (
-        effective.request(document.description, document.id),
-        effective,
-        StoryRuntime.model_validate(runtime),
-        StoryQualityPolicy.model_validate(quality),
+    checks = list(quality["frames"]["checks"])
+    for kind, unit in (("word_count", "words"), ("prose_length", "chars")):
+        bounds = {
+            f"{bound}_{unit}": value
+            for bound in ("min", "max")
+            if (value := getattr(overrides, f"frame_{bound}_{unit}")) is not None
+        }
+        if not bounds:
+            continue
+        index = next(
+            (index for index, check in enumerate(checks) if check["type"] == kind),
+            None,
+        )
+        if index is None:
+            checks.append({"type": kind, **bounds})
+        else:
+            checks[index] = {**checks[index], **bounds}
+    quality["frames"]["checks"] = checks
+    return StoryRunConfiguration(
+        generation=generation,
+        runtime=runtime,
+        validation=quality,
     )
 
 
@@ -311,10 +372,11 @@ def resolve_story_input(
     document: StoryDocument,
     overrides: InputOverrides | None = None,
     *,
+    run_configuration: StoryRunConfiguration | None = None,
     asset_root: Path | None = None,
     source_path: Path | None = None,
 ) -> ResolvedStoryInput:
-    """Validate defaults and overrides before producing provider-free run inputs.
+    """Combine visual input and external execution choices into a frozen run.
 
     Asset lookup is relative only to the explicit root or source document.
     A direct document has no implicit cwd asset root and may omit its source id.
@@ -327,6 +389,11 @@ def resolve_story_input(
         overrides = InputOverrides.model_validate(
             (overrides or InputOverrides()).model_dump()
         )
+        configuration = StoryRunConfiguration.model_validate_json(
+            (run_configuration or StoryRunConfiguration()).model_dump_json(),
+            strict=True,
+        )
+        configuration = _effective(configuration, overrides)
         root = (
             asset_root
             if asset_root is not None
@@ -336,8 +403,8 @@ def resolve_story_input(
             raise ValueError(
                 "explicit asset_root or source_path is required for assets"
             )
-        request, generation, runtime, quality = _effective(document, overrides)
-        policy_path = _POLICIES / f"{document.policy}.yaml"
+        request = configuration.generation.request(document)
+        policy_path = _POLICIES / "standard-story.yaml"
         policy = load_yaml_model(policy_path, PolicyDocument)
         sources = [
             _source("document", document, source_path, request),
@@ -380,15 +447,12 @@ def resolve_story_input(
             sources.append(_source("catalog", catalog, path, request))
 
         requirements = _requirements(sources)
-        default_request = document.generation.request(document.description, document.id)
-        try:
-            default_plans = plan_themes(
-                default_request, document.generation.cast, document.allocation, catalog
-            )
-            validate_requirements(default_request, default_plans, requirements)
-        except ValueError as exc:
-            raise ValueError(f"invalid document defaults: {exc}") from exc
-        plans = plan_themes(request, generation.cast, document.allocation, catalog)
+        plans = plan_themes(
+            request,
+            configuration.generation.effective_cast(document.cast),
+            document.allocation,
+            catalog,
+        )
         validate_requirements(request, plans, requirements)
 
         authoring = StoryAuthoring(
@@ -399,18 +463,16 @@ def resolve_story_input(
                 common=tuple(rule for source in sources for rule in source.frames)
             ),
         )
-        rules = resolve_story_rules(request, authoring=authoring)
+        rules = resolve_story_rules(
+            request, authoring=authoring, quality=configuration.validation
+        )
         for path in system_rule_sources(request):
             text = path.read_text(encoding="utf-8-sig")
-            selected = tuple(
-                stripped
-                for line in text.splitlines()
-                if (stripped := line.strip()) and not stripped.startswith("#")
-            )
+            selected = _rule_lines(text)
             sources.append(
                 InputSource(
                     kind="system",
-                    id=path.relative_to(path.parents[1]).as_posix(),
+                    id=system_rule_source_id(path),
                     path=str(path),
                     content=text,
                     themes=selected if path.name != "frames.rules" else (),
@@ -419,8 +481,9 @@ def resolve_story_input(
             )
         return ResolvedStoryInput(
             request=request,
-            runtime=runtime,
-            quality=quality,
+            run_configuration=configuration,
+            runtime=configuration.runtime,
+            quality=configuration.validation,
             rules=rules,
             sources=tuple(sources),
             modules=tuple(modules),

@@ -8,10 +8,12 @@ from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.models import (
     OutputLanguage,
     StoryAuthoring,
+    StoryQualityPolicy,
     StoryRequest,
     StoryRuleSet,
     StoryStage,
 )
+from t2i_story_pipeline.quality_validation import writing_constraints
 
 _SYSTEM_RULES_DIRECTORY = Path(__file__).resolve().parent / "rule_packs" / "system"
 _STAGE_FILENAMES = {
@@ -24,6 +26,7 @@ def resolve_story_rules(
     request: StoryRequest,
     *,
     authoring: StoryAuthoring | None = None,
+    quality: StoryQualityPolicy | None = None,
 ) -> StoryRuleSet:
     """Compile core contracts and already selected authoring; never discover files."""
     system_directory = _require_directory(
@@ -36,12 +39,14 @@ def resolve_story_rules(
             request,
             system_directory,
             authoring or StoryAuthoring(),
+            quality or StoryQualityPolicy(),
         ),
         frames=_compile(
             StoryStage.FRAMES,
             request,
             system_directory,
             authoring or StoryAuthoring(),
+            quality or StoryQualityPolicy(),
         ),
     )
 
@@ -51,6 +56,7 @@ def _compile(
     request: StoryRequest,
     system_directory: Path,
     authoring: StoryAuthoring,
+    quality: StoryQualityPolicy,
 ) -> tuple[str, ...]:
     rules = [
         rule
@@ -58,19 +64,30 @@ def _compile(
         for rule in _read_rule_file(path)
     ]
     rules.extend(authoring.selected(stage, request.content_level))
-    rules.append(_output_language_rule(request))
+    rules.append(output_language_rule(request))
+    rules.extend(writing_constraints(quality, stage, request.output_language))
     return tuple(rules)
 
 
-def system_rule_sources(request: StoryRequest) -> tuple[Path, ...]:
+def system_rule_sources(
+    request: StoryRequest, stage: StoryStage | None = None
+) -> tuple[Path, ...]:
     """The exact packaged files used by the compiler, in stable first-use order."""
     return tuple(
         dict.fromkeys(
             path
-            for stage in StoryStage
-            for path in _selected_paths(_SYSTEM_RULES_DIRECTORY, stage, request)
+            for selected_stage in (StoryStage if stage is None else (stage,))
+            for path in _selected_paths(
+                _SYSTEM_RULES_DIRECTORY, selected_stage, request
+            )
         )
     )
+
+
+def system_rule_source_id(path: Path) -> str:
+    """Logical provenance IDs do not depend on the installation directory."""
+    group = "content_levels" if path.parent.name == "content_levels" else "system"
+    return f"{group}/{path.name}"
 
 
 def _selected_paths(
@@ -80,6 +97,7 @@ def _selected_paths(
 ) -> tuple[Path, ...]:
     return (
         directory / "common.rules",
+        directory / "safety.rules",
         directory / _STAGE_FILENAMES[stage],
         directory / "content_levels" / f"{request.content_level.value}.rules",
     )
@@ -109,15 +127,18 @@ def _read_rule_file(path: Path) -> tuple[str, ...]:
     )
 
 
-def _output_language_rule(request: StoryRequest) -> str:
+def output_language_rule(request: StoryRequest) -> str:
     if request.output_language == OutputLanguage.ENGLISH:
         return (
             "Write every natural-language output field in precise, fluent "
             "English. Preserve only literal foreign text explicitly required "
-            "by the Story Description."
+            "by the visual input, including module parameters for visible image copy. "
+            "Those literal image-copy languages do not change the prose language."
         )
     return (
         "Write every natural-language output field in precise, fluent Chinese. "
         "Preserve only literal foreign text explicitly required by the Story "
-        "Description; do not mix in untranslated foreign prose."
+        "Description or module parameters for visible image copy; those literal "
+        "image-copy languages do not change the prose language. Do not mix in "
+        "untranslated foreign prose."
     )

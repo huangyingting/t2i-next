@@ -15,6 +15,7 @@ from t2i_story_pipeline.inputs import (
     InputOverrides,
     ResolvedStoryInput,
     StoryDocument,
+    StoryRunConfiguration,
     resolve_story_input,
 )
 from t2i_story_pipeline.inputs.schema import FrameAssignment
@@ -32,7 +33,6 @@ def write_catalog(root: Path, period: int) -> Path:
             "themes": [f"Theme-only fact {index}."],
             "frames": [f"Frame-only fact {index}."],
             "frame_assignment": {
-                "frames_per_theme": 2,
                 "slots": [
                     {"frame_id": "F01", "rules": [f"Front view {index}."]},
                     {"frame_id": "F02", "rules": [f"Rear view {index}."]},
@@ -54,11 +54,10 @@ def write_catalog(root: Path, period: int) -> Path:
     return path
 
 
-def cycle_document(count: int, frames: int = 2) -> StoryDocument:
+def cycle_document() -> StoryDocument:
     return StoryDocument.model_validate(
         {
             "description": "A neutral studio portrait.",
-            "generation": {"theme_count": count, "frames_per_theme": frames},
             "allocation": {"type": "cyclic_slots", "catalog": "neutral-cycle"},
         }
     )
@@ -70,20 +69,32 @@ def test_cycles_use_global_indices_without_catalog_exhaustion(
     tmp_path: Path, period: int, count: int
 ) -> None:
     write_catalog(tmp_path, period)
-    document = cycle_document(count)
-    resolved = resolve_story_input(document, asset_root=tmp_path)
+    document = cycle_document()
+    configuration = StoryRunConfiguration(
+        generation={"theme_count": count, "frames_per_theme": 2}
+    )
+    resolved = resolve_story_input(
+        document, run_configuration=configuration, asset_root=tmp_path
+    )
     assert [plan.entry.id for plan in resolved.plans] == [
         f"slot-{index % period}" for index in range(count)
     ]
     rebatched = resolve_story_input(
-        document, InputOverrides(theme_batch_size=1), asset_root=tmp_path
+        document,
+        InputOverrides(theme_batch_size=1),
+        run_configuration=configuration,
+        asset_root=tmp_path,
     )
     assert rebatched.plans == resolved.plans
 
 
 def test_cycle_context_and_frame_retry_survive_asset_removal(tmp_path: Path) -> None:
     path = write_catalog(tmp_path, 30)
-    resolved = resolve_story_input(cycle_document(100), asset_root=tmp_path)
+    resolved = resolve_story_input(
+        cycle_document(),
+        InputOverrides(theme_count=100, frames_per_theme=2),
+        asset_root=tmp_path,
+    )
     frozen = resolved.model_dump_json()
     path.unlink()
     restored = ResolvedStoryInput.model_validate_json(frozen)
@@ -120,7 +131,9 @@ def test_frame_assignment_applies_only_to_declared_frame_count(
     tmp_path: Path, frames: int
 ) -> None:
     write_catalog(tmp_path, 12)
-    resolved = resolve_story_input(cycle_document(1, frames), asset_root=tmp_path)
+    resolved = resolve_story_input(
+        cycle_document(), InputOverrides(frames_per_theme=frames), asset_root=tmp_path
+    )
     context = resolved.context_for(StoryStage.FRAMES, ["T001"])
     assert context["plans"][0]["frame_slots"] == []
     assert "Front view" not in json.dumps(context)
@@ -130,7 +143,9 @@ def test_frame_assignment_applies_only_to_declared_frame_count(
 
 def test_frame_prompt_keeps_retry_slot_identity(tmp_path: Path) -> None:
     write_catalog(tmp_path, 3)
-    resolved = resolve_story_input(cycle_document(1), asset_root=tmp_path)
+    resolved = resolve_story_input(
+        cycle_document(), InputOverrides(frames_per_theme=2), asset_root=tmp_path
+    )
     theme = NarrativeTheme(
         theme_id="T001",
         title="Studio portrait",
@@ -169,7 +184,9 @@ def test_invalid_frame_selections_fail_explicitly(
     tmp_path: Path, stage: StoryStage, frame_ids: list[str]
 ) -> None:
     write_catalog(tmp_path, 3)
-    resolved = resolve_story_input(cycle_document(1), asset_root=tmp_path)
+    resolved = resolve_story_input(
+        cycle_document(), InputOverrides(frames_per_theme=2), asset_root=tmp_path
+    )
     with pytest.raises(StoryConfigurationError):
         resolved.context_for(stage, ["T001"], frame_ids=frame_ids)
 
@@ -177,24 +194,27 @@ def test_invalid_frame_selections_fail_explicitly(
 @pytest.mark.parametrize(
     "assignment",
     [
-        {"frames_per_theme": 0, "slots": []},
-        {"frames_per_theme": 7, "slots": []},
-        {"frames_per_theme": True, "slots": []},
-        {"frames_per_theme": 1, "slots": []},
+        {"slots": []},
         {
-            "frames_per_theme": 2,
-            "slots": [{"frame_id": "F01", "rules": ["One view."]}],
+            "slots": [
+                {"frame_id": f"F{index:02d}", "rules": ["A view."]}
+                for index in range(1, 8)
+            ]
+        },
+        {"frames_per_theme": 1, "slots": [{"frame_id": "F01", "rules": ["A view."]}]},
+        {
+            "slots": [
+                {"frame_id": "F01", "rules": ["One view."]},
+                {"frame_id": "F03", "rules": ["Missing second view."]},
+            ],
         },
         {
-            "frames_per_theme": 2,
             "slots": [{"frame_id": "F01", "rules": ["One view."]}] * 2,
         },
         {
-            "frames_per_theme": 1,
             "slots": [{"frame_id": "F02", "rules": ["Wrong slot."]}],
         },
         {
-            "frames_per_theme": 1,
             "slots": [{"frame_id": "F01", "rules": []}],
         },
     ],
@@ -212,7 +232,7 @@ def test_cycle_requires_explicit_slot_order(tmp_path: Path) -> None:
     del data["slots"]
     path.write_text(yaml.safe_dump(data))
     with pytest.raises(StoryConfigurationError, match="explicit slot order"):
-        resolve_story_input(cycle_document(1), asset_root=tmp_path)
+        resolve_story_input(cycle_document(), asset_root=tmp_path)
 
 
 def test_superseded_axes_and_expressions_are_not_an_alternative_schema() -> None:

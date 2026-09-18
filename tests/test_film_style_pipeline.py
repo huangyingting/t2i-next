@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -235,7 +234,7 @@ def test_compile_film_context_injects_profile_after_brief_header() -> None:
     assert "生成与输出规则" not in compiled
     assert "母风格名称" not in compiled
     assert "作品集合风格总结：" not in compiled
-    assert "story-inputs/film.txt" not in compiled
+    assert "recipes/" not in compiled
 
 
 def test_profile_prompt_uses_only_work_metadata() -> None:
@@ -316,7 +315,6 @@ def test_director_rules_own_theme_and_frame_workflow() -> None:
         "The Story Description is authoritative" in rule
         for rule in rules.frames
     )
-    assert not (Path(__file__).parents[1] / "story-inputs" / "film.txt").exists()
 
 
 @pytest.mark.asyncio

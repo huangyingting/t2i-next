@@ -59,13 +59,13 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
 
     assert payload["story"] == request.story
     assert payload["theme_count"] == 10
-    assert payload["content_level"] == "aesthetic"
+    assert "content_level" not in payload
     assert payload["semantic_name"] is None
     assert "concise lowercase English snake_case name" in prompt
-    assert "Follow the Story Description, selected Theme authoring" in prompt
+    assert "Follow the Story Description, selected authoring" in prompt
     assert "module parameters, and assigned slot facts" in prompt
-    assert "cannot override the structured schema, program-owned IDs" in prompt
-    assert "Do not infer a known brief type" in prompt
+    assert "requested counts and slots, runtime settings, or output format" in prompt
+    assert "Never infer requirements from a filename or a known brief type" in prompt
     assert "Theme-stage facts from Frame-stage rendering detail" in prompt
     assert "unless the Story Description explicitly promotes that detail" in prompt
     assert "Do not impose narrative conflict, chronology, or a decision" in prompt
@@ -99,7 +99,9 @@ def test_prompt_can_delegate_theme_ids_to_program() -> None:
 
     payload = json.loads(messages[1].content)
     assert payload["theme_count"] == 3
-    assert payload["program_assigns_theme_ids"] is True
+    assert "program_assigns_theme_ids" not in payload
+    assert "the program assigns all Theme IDs" in messages[0].content
+    assert "Submit only semantic_name, title, premise, and style" in messages[0].content
     assert "theme_ids" not in payload
 
 
@@ -112,30 +114,25 @@ def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
         StoryDocument.model_validate(
             {
                 "description": description,
-                "generation": {
-                    "theme_count": 2,
-                    "frames_per_theme": 1,
-                    "cast": {"female_count": 1, "male_count": 0},
-                },
+                "cast": {"female_count": 1, "male_count": 0},
             }
-        )
+        ),
+        InputOverrides(theme_count=2, frames_per_theme=1),
     )
     fingerprint = resolved.fingerprint()
     assert [plan.theme_id for plan in resolved.plans] == ["T001", "T002"]
     assert all(plan.entry is None for plan in resolved.plans)
 
-    theme = compile_theme_messages(
-        resolved, count=1, existing_themes=[make_theme()]
-    )
+    theme = compile_theme_messages(resolved, count=1, existing_themes=[make_theme()])
     frame = compile_frame_messages(
         resolved, make_theme(2), requested_frame_ids=["F01"], accepted_frames=[]
     )
     theme_payload = json.loads(theme[1].content)
     frame_payload = json.loads(frame[1].content)
     assert theme_payload["theme_count"] == 1
-    assert theme_payload["program_assigns_theme_ids"] is True
+    assert "program_assigns_theme_ids" not in theme_payload
     assert frame_payload["requested_frame_slots"] == ["F01"]
-    assert frame_payload["program_assigns_frame_ids"] is True
+    assert "program_assigns_frame_ids" not in frame_payload
     for messages, payload in ((theme, theme_payload), (frame, frame_payload)):
         assert payload["story"] == description
         assert payload["frames_per_theme"] == 1
@@ -149,8 +146,10 @@ def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
         assert plan["cast"]["male_count"] == 0
         assert plan["cast"]["total"] == 1
         assert messages[0].role == "system"
-        assert "safety rules, or resolved cast contract" in messages[0].content
-        assert "execute allocation formulas from prose" in messages[0].content
+        assert "may override safety, the required visible range" in messages[0].content
+        assert "sole authority for cast scope, sex counts" in messages[0].content
+        assert "Never recompute routing from Theme IDs" in messages[0].content
+        assert "retry order, or prose formulas" in messages[0].content
     assert resolved.fingerprint() == fingerprint
 
 
@@ -176,10 +175,7 @@ def test_six_neutral_view_regions_remain_one_frame_and_one_person(tmp_path):
         StoryDocument.model_validate(
             {
                 "description": "One adult traveler presented from six viewpoints.",
-                "generation": {
-                    "frames_per_theme": 1,
-                    "cast": {"female_count": 1, "male_count": 0},
-                },
+                "cast": {"female_count": 1, "male_count": 0},
                 "modules": [
                     {
                         "id": "neutral-views",
@@ -189,6 +185,7 @@ def test_six_neutral_view_regions_remain_one_frame_and_one_person(tmp_path):
             }
         ),
         asset_root=tmp_path,
+        overrides=InputOverrides(frames_per_theme=1),
     )
     for messages in (
         compile_theme_messages(resolved, count=1, existing_themes=[]),
@@ -223,7 +220,9 @@ def test_prompt_can_request_one_plain_text_frame() -> None:
 
     payload = json.loads(messages[1].content)
     assert payload["requested_frame_slots"] == ["F02"]
-    assert payload["program_assigns_frame_ids"] is True
+    assert "program_assigns_frame_ids" not in payload
+    assert "The program assigns all Frame IDs" in messages[0].content
+    assert "Output no JSON, IDs," in messages[0].content
     assert payload["accepted_frames"] == [
         {"frame_id": "F01", "prose": "先前完成的画面。"}
     ]
@@ -306,18 +305,15 @@ def test_scoped_cast_context_counts_the_giant_as_one_additional_fixed_role():
         StoryDocument.model_validate(
             {
                 "description": "Adult miniature travelers meet one giant adult guide.",
-                "generation": {
-                    "theme_count": 2,
-                    "frames_per_theme": 1,
-                    "cast": {
-                        "female_count": 2,
-                        "male_count": 0,
-                        "scope": "miniatures",
-                        "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
-                    },
+                "cast": {
+                    "female_count": 2,
+                    "male_count": 0,
+                    "scope": "miniatures",
+                    "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
                 },
             }
-        )
+        ),
+        InputOverrides(theme_count=2, frames_per_theme=1),
     )
     for messages, expected_ids in (
         (
@@ -373,18 +369,16 @@ def test_background_bands_do_not_become_a_global_eight_person_cap(
         StoryDocument.model_validate(
             {
                 "description": "Adult travelers and background adults share a station.",
-                "generation": {
-                    "frames_per_theme": 1,
-                    "cast": {
-                        "scope": "principal_adults",
-                        "female_count": female_count,
-                        "male_count": 0,
-                        "fixed_roles": roles,
-                        "background_counts": bands,
-                    },
+                "cast": {
+                    "scope": "principal_adults",
+                    "female_count": female_count,
+                    "male_count": 0,
+                    "fixed_roles": roles,
+                    "background_counts": bands,
                 },
             }
-        )
+        ),
+        InputOverrides(frames_per_theme=1),
     )
     for messages in (
         compile_theme_messages(resolved, count=1, existing_themes=[]),
@@ -441,11 +435,11 @@ def test_catalog_cast_context_keeps_each_themes_total_and_sex_minima(tmp_path):
         StoryDocument.model_validate(
             {
                 "description": "Adult travelers wait at a station.",
-                "generation": {"theme_count": 2, "frames_per_theme": 1},
                 "allocation": {"type": "fixed_slots", "catalog": "station-groups"},
             }
         ),
         asset_root=tmp_path,
+        overrides=InputOverrides(theme_count=2, frames_per_theme=1),
     )
     expected = [
         {
@@ -534,10 +528,8 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     )
     assert "Assign every visible limb a consistent contact or force role" in prompt
     assert "Do not describe successive repositioning as a narrative" in prompt
-    assert "Follow the Story Description, selected Frame authoring" in prompt
-    assert (
-        "cannot override the output schema, transport format, requested slots" in prompt
-    )
+    assert "Follow the Story Description, selected authoring" in prompt
+    assert "requested counts and slots, runtime settings, or output format" in prompt
     assert "Grounded scenes require credible support" in prompt
     assert "floating or zero-gravity scenes require coherent free-flight" in prompt
     assert "exposure may visibly record motion through blur or light trails" in prompt
@@ -552,16 +544,17 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "Resolve conditional instructions only from the current request" in prompt
     assert "never borrow a branch assigned to another alternative" in prompt
     assert "Explicit Story Description creative constraints take priority" in prompt
-    assert "cannot override safety, selected system content-level boundaries" in prompt
-    assert "typed requests, runtime settings, or deterministic input plans" in prompt
+    assert "may override safety, the required visible range and its limits" in prompt
+    assert "input_context plans govern assignments and slot identity" in prompt
     assert "rope art" not in prompt
-    assert "do not mix in untranslated foreign prose" in prompt
+    assert "do not mix in untranslated foreign prose" in prompt.lower()
     assert "parallel visual alternatives" in prompt
     assert "share stable Theme facts" in prompt
     assert "All alternatives depict an equivalent point" in prompt
     assert "variation must not imply elapsed time" in prompt
     assert "Never refer to another Frame or use backward-pointing" in prompt
-    assert "Let length follow the Story Description's exact contract" in prompt
+    assert "Follow the requested writing targets when supplied" in prompt
+    assert "without a fixed word quota or padding" in prompt
     assert "follow exactly six sections" not in prompt
     assert "must begin exactly with" not in prompt
     assert "penultimate sentence" not in prompt
@@ -637,9 +630,13 @@ def test_system_instructions_keep_shared_rule_language_across_output_languages(
     )
 
     for prompt in prompts:
-        assert "validated request" in prompt
-        assert "immutable safety and output contracts" in prompt
-        assert "本次使用 美学级（aesthetic）" in prompt
+        assert (
+            "may override safety, the required visible range and its limits" in prompt
+        )
+        assert (
+            "requested counts and slots, runtime settings, or output format" in prompt
+        )
+        assert "尺度下限是静止画面可见的形体表达" in prompt
 
 
 @pytest.mark.parametrize(
@@ -647,26 +644,26 @@ def test_system_instructions_keep_shared_rule_language_across_output_languages(
     (
         (
             ContentLevel.AESTHETIC,
-            "本次使用 美学级（aesthetic）",
+            "尺度下限是静止画面可见的形体表达",
             (
-                "本次使用 极致情色级（erotic）",
-                "本次使用 赤裸裸的性描写（hardcore）",
+                "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
+                "当前画面直接、清晰地呈现角色之间的明确性行为",
             ),
         ),
         (
             ContentLevel.EROTIC,
-            "本次使用 极致情色级（erotic）",
+            "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
             (
-                "本次使用 美学级（aesthetic）",
-                "本次使用 赤裸裸的性描写（hardcore）",
+                "尺度下限是静止画面可见的形体表达",
+                "当前画面直接、清晰地呈现角色之间的明确性行为",
             ),
         ),
         (
             ContentLevel.HARDCORE,
-            "本次使用 赤裸裸的性描写（hardcore）",
+            "当前画面直接、清晰地呈现角色之间的明确性行为",
             (
-                "本次使用 美学级（aesthetic）",
-                "本次使用 极致情色级（erotic）",
+                "尺度下限是静止画面可见的形体表达",
+                "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
             ),
         ),
     ),
@@ -687,9 +684,13 @@ def test_prompts_compile_only_selected_content_level(
         frame_messages(request, make_theme()),
     ):
         prompt = messages[0].content
+        assert "content_level" not in json.loads(messages[1].content)
         assert required in prompt
         assert all(item not in prompt for item in excluded)
-        assert "Do not write the content-level name, CLI value" in prompt
+        assert "Do not write configuration metadata, internal IDs" in prompt
+        assert all(candidate.value not in prompt for candidate in ContentLevel)
+        assert "本次使用" not in prompt
+        assert "本级" not in prompt
         assert "Every depicted person must be an unmistakable adult" in prompt
         assert (
             "All participants must be alert, consenting, responsive, and able to stop"
@@ -707,7 +708,7 @@ def test_prompts_compile_only_selected_content_level(
 @pytest.mark.parametrize("level", tuple(ContentLevel))
 def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(level):
     document = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "recipes" / "avantgarde.yaml"
+        REPOSITORY_ROOT / "recipes" / "avantgarde.yaml"
     )
     refinements = document.authoring.level_refinements
     assert refinements[ContentLevel.HARDCORE].shared
@@ -735,7 +736,8 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         ),
     ):
         compiled = "\n".join(message.content for message in messages)
-        assert json.loads(messages[1].content)["content_level"] == level.value
+        assert "content_level" not in json.loads(messages[1].content)
+        assert resolved.request.content_level == level
         selected = document.authoring.selected(stage, level)
         assert all(rule in compiled for rule in getattr(base, stage.value))
         assert all(rule in compiled for rule in selected)
@@ -758,7 +760,9 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         assert all(rule not in compiled for rule in other_duties)
         if stage == StoryStage.THEMES:
             for prefix, count in (
-                ("发型灵感：", 65), ("服装灵感：", 156), ("配饰灵感：", 92)
+                ("发型灵感：", 65),
+                ("服装灵感：", 156),
+                ("配饰灵感：", 92),
             ):
                 assert sum(rule.startswith(prefix) for rule in selected) == count
 
@@ -768,23 +772,15 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
     (
         (
             ContentLevel.AESTHETIC,
-            (
-                "在 aesthetic 级别，主导照片必须明确保持非露骨"
-            ),
+            "主导照片必须明确保持非露骨",
         ),
         (
             ContentLevel.EROTIC,
-            (
-                "在 erotic 级别，每个 Frame 都必须在主导照片中"
-                "明确可见地呈现非露骨的成年亲密互动"
-            ),
+            ("主导照片中呈现非露骨的亲密互动"),
         ),
         (
             ContentLevel.HARDCORE,
-            (
-                "在 hardcore 级别，每个 Frame 都必须将直接露骨的"
-                "成年人互动置于主导照片中"
-            ),
+            ("直接露骨的互动置于主导照片中"),
         ),
     ),
 )
@@ -793,7 +789,7 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     required_contract: str,
 ) -> None:
     document = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "recipes" / "post-layout.yaml"
+        REPOSITORY_ROOT / "recipes" / "post-layout.yaml"
     )
     resolved = resolve_story_input(
         document,
@@ -809,7 +805,8 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     )
     payload = json.loads(messages[1].content)
 
-    assert payload["content_level"] == level.value
+    assert "content_level" not in payload
+    assert resolved.request.content_level == level
     assert required_contract in compiled
     selected = document.authoring.selected(StoryStage.FRAMES, level)
     for other in document.authoring.level_refinements:
@@ -820,7 +817,7 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
                 if rule not in selected
             )
     assert "内容级别可见性锚点" in compiled
-    assert "不能满足所选内容级别" in compiled
+    assert "不能替代所选级别的可见内容" in compiled
 
 
 def test_prompts_express_era_consistency_holistically() -> None:

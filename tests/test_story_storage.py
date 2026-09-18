@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 
 from t2i_story_pipeline import persistence, run_store
@@ -26,6 +28,26 @@ from tests.story_factories import (
     make_story_result,
     make_theme,
 )
+
+
+def test_store_timestamps_remain_monotonic_when_clock_moves_backward(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    first = datetime(2026, 9, 19, 4, 0, tzinfo=UTC)
+    timestamps = iter((first, first - timedelta(seconds=1)))
+
+    class ReversingClock:
+        @classmethod
+        def now(cls, timezone):
+            assert timezone is UTC
+            return next(timestamps)
+
+    monkeypatch.setattr(run_store, "datetime", ReversingClock)
+    store = LocalStoryRunStore(tmp_path / "runs")
+
+    assert store.now() == first.isoformat()
+    assert store.now() == (first + timedelta(microseconds=1)).isoformat()
 
 
 @pytest.mark.parametrize(

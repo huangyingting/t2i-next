@@ -20,6 +20,7 @@ from t2i_story_pipeline.inputs import (
     InputOverrides,
     ResolvedStoryInput,
     StoryDocument,
+    load_run_configuration,
     load_story_document,
     resolve_story_input,
 )
@@ -67,21 +68,26 @@ def generate_command(
         dir_okay=False,
         readable=True,
         resolve_path=True,
-        help="读取 UTF-8 YAML 故事文档（正文、生成参数、创作规则与质量策略）。",
+        help="读取只描述画面内容的 UTF-8 YAML 故事文档。",
+    ),
+    run_config: Path | None = typer.Option(
+        None,
+        "--run-config",
+        help="读取外部 UTF-8 JSON 执行配置；显式 CLI 选项优先。",
     ),
     themes: int | None = typer.Option(
         None,
         "--themes",
         min=1,
         max=100,
-        help="覆盖文档主题数；未配置时为 1。",
+        help="覆盖执行配置主题数；未配置时为 1。",
     ),
     frames: int | None = typer.Option(
         None,
         "--frames",
         min=1,
         max=6,
-        help="覆盖文档每主题帧数；未配置时为 6。",
+        help="覆盖执行配置每主题帧数；未配置时为 6。",
     ),
     female_count: int | None = typer.Option(
         None,
@@ -109,7 +115,7 @@ def generate_command(
         "--generation-retries",
         min=0,
         max=5,
-        help="覆盖文档生成重试次数；未配置时为 2。",
+        help="覆盖执行配置生成重试次数；未配置时为 2。",
     ),
     theme_batch_size: int | None = typer.Option(
         None,
@@ -142,15 +148,43 @@ def generate_command(
         "--frame-quality-mode",
         help="Frame 可选质量检查：off、report 或 enforce。",
     ),
+    frame_min_words: int | None = typer.Option(
+        None,
+        "--frame-min-words",
+        min=1,
+        max=32768,
+        help="每帧正文最少空白分隔词数；中文通常应使用字符预算。",
+    ),
+    frame_max_words: int | None = typer.Option(
+        None,
+        "--frame-max-words",
+        min=1,
+        max=32768,
+        help="每帧正文最多空白分隔词数。",
+    ),
+    frame_min_chars: int | None = typer.Option(
+        None,
+        "--frame-min-chars",
+        min=1,
+        max=32768,
+        help="每帧正文最少字符数（含空格和标点）。",
+    ),
+    frame_max_chars: int | None = typer.Option(
+        None,
+        "--frame-max-chars",
+        min=1,
+        max=32768,
+        help="每帧正文最多字符数（含空格和标点）。",
+    ),
     content_level: ContentLevel | None = typer.Option(
         None,
         "--content-level",
-        help="覆盖文档内容尺度；未配置时为 aesthetic。",
+        help="覆盖执行配置内容尺度；未配置时为 aesthetic。",
     ),
     output_language: OutputLanguage | None = typer.Option(
         None,
         "--language",
-        help="覆盖文档正文语言；未配置时为 chinese。",
+        help="覆盖执行配置正文语言；未配置时为 chinese。",
     ),
     prompts_dir: Path = typer.Option(
         Path("prompts"),
@@ -191,7 +225,12 @@ def generate_command(
                 frame_output_tokens=frame_output_tokens,
                 theme_quality_mode=theme_quality_mode,
                 frame_quality_mode=frame_quality_mode,
+                frame_min_words=frame_min_words,
+                frame_max_words=frame_max_words,
+                frame_min_chars=frame_min_chars,
+                frame_max_chars=frame_max_chars,
             ),
+            run_config=run_config,
         )
         settings = StoryRunSettings(
             provider=load_story_provider_settings(),
@@ -226,6 +265,7 @@ class ExplainFormat(StrEnum):
 def explain_command(
     story: str | None = typer.Argument(None),
     input_file: Path | None = typer.Option(None, "--input"),
+    run_config: Path | None = typer.Option(None, "--run-config"),
     assets_dir: Path | None = typer.Option(None, "--assets-dir"),
     themes: int | None = typer.Option(None, "--themes"),
     frames: int | None = typer.Option(None, "--frames"),
@@ -240,6 +280,10 @@ def explain_command(
     frame_output_tokens: int | None = typer.Option(None, "--frame-output-tokens"),
     theme_quality_mode: QualityMode | None = typer.Option(None, "--theme-quality-mode"),
     frame_quality_mode: QualityMode | None = typer.Option(None, "--frame-quality-mode"),
+    frame_min_words: int | None = typer.Option(None, "--frame-min-words"),
+    frame_max_words: int | None = typer.Option(None, "--frame-max-words"),
+    frame_min_chars: int | None = typer.Option(None, "--frame-min-chars"),
+    frame_max_chars: int | None = typer.Option(None, "--frame-max-chars"),
     output_format: ExplainFormat = typer.Option(ExplainFormat.JSON, "--format"),
 ) -> None:
     """离线预检最终输入、来源和槽位计划；不读取 provider 配置或创建 run。"""
@@ -262,7 +306,12 @@ def explain_command(
                 frame_output_tokens=frame_output_tokens,
                 theme_quality_mode=theme_quality_mode,
                 frame_quality_mode=frame_quality_mode,
+                frame_min_words=frame_min_words,
+                frame_max_words=frame_max_words,
+                frame_min_chars=frame_min_chars,
+                frame_max_chars=frame_max_chars,
             ),
+            run_config=run_config,
         )
     except (ValidationError, StoryPipelineError, typer.BadParameter) as exc:
         if output_format == ExplainFormat.JSON:
@@ -366,6 +415,8 @@ def _resolve_input(
     input_file: Path | None,
     assets_dir: Path | None,
     overrides: InputOverrides,
+    *,
+    run_config: Path | None = None,
 ) -> ResolvedStoryInput:
     if story is not None and input_file is not None:
         raise typer.BadParameter(
@@ -384,7 +435,13 @@ def _resolve_input(
             raise AssertionError("story input resolution changed unexpectedly")
         document = StoryDocument(description=story)
     return resolve_story_input(
-        document, overrides, asset_root=assets_dir, source_path=input_file
+        document,
+        overrides,
+        run_configuration=(
+            load_run_configuration(run_config) if run_config is not None else None
+        ),
+        asset_root=assets_dir,
+        source_path=input_file,
     )
 
 

@@ -11,7 +11,7 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from itertools import count
 from pathlib import Path
@@ -239,6 +239,7 @@ class LocalStoryRunStore:
         self._prompts_root = (
             prompts_root.resolve() if prompts_root is not None else None
         )
+        self._last_timestamp: datetime | None = None
 
     def create(
         self,
@@ -891,9 +892,12 @@ class LocalStoryRunStore:
                 return run_id
         raise StoryStorageError("无法分配唯一的 story run ID")
 
-    @staticmethod
-    def _now() -> str:
-        return datetime.now(UTC).isoformat()
+    def _now(self) -> str:
+        timestamp = datetime.now(UTC)
+        if self._last_timestamp is not None and timestamp <= self._last_timestamp:
+            timestamp = self._last_timestamp + timedelta(microseconds=1)
+        self._last_timestamp = timestamp
+        return timestamp.isoformat()
 
 
 def _write_json(path: Path, value: object) -> None:

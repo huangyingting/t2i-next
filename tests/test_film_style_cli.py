@@ -141,7 +141,7 @@ def test_generate_no_longer_accepts_brief_file() -> None:
             "--work",
             "Film (2000)",
             "--brief-file",
-            "story-inputs/film.txt",
+            "unused.txt",
         ],
     )
 
@@ -157,4 +157,4 @@ def test_generate_help_exposes_scene_not_intermediate_output() -> None:
     assert "--brief-file" not in result.output
     assert "--output-dir" not in result.output
     assert "可选 film-style" in result.output
-    assert "story-inputs/rules/" not in result.output
+    assert "recipes/" not in result.output

@@ -44,23 +44,12 @@ def build_config(
     *,
     runs_directory: Path = Path("runs"),
     prompts_directory: Path = Path("prompts"),
-    rules_directory: Path | None = None,
     max_concurrency: int = 8,
     theme_batch_size: int = 5,
     generation_retries: int = 2,
 ) -> AppConfig:
     load_environment()
-    default_rules_directory = Path("rules")
-    user_rules_directory = (
-        rules_directory
-        if rules_directory is not None
-        else (
-            default_rules_directory
-            if default_rules_directory.is_dir()
-            else None
-        )
-    )
-    rules = resolve_rules(spec, user_directory=user_rules_directory)
+    rules = resolve_rules(spec)
     try:
         provider = load_provider_settings(load_dotenv_file=False)
         return AppConfig(

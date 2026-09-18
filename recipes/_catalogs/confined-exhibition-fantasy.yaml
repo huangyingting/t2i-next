@@ -1,0 +1,243 @@
+id: confined-exhibition-fantasy
+entries:
+- id: folded-emotion-01
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：主动挑逗。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：主动挑逗。
+- id: raised-hips-emotion-02
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：羞耻但享受。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：羞耻但享受。
+- id: spread-eagle-emotion-03
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：得意炫耀。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：得意炫耀。
+- id: folded-emotion-04
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：从容自信。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：从容自信。
+- id: raised-hips-emotion-05
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：调皮邀请。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：调皮邀请。
+- id: spread-eagle-emotion-06
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：紧张兴奋。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：紧张兴奋。
+- id: folded-emotion-07
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：惊讶后微笑。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：惊讶后微笑。
+- id: raised-hips-emotion-08
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：专注沉浸。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：专注沉浸。
+- id: spread-eagle-emotion-09
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：慵懒满足。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：慵懒满足。
+- id: folded-emotion-10
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：大胆直视。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：大胆直视。
+- id: raised-hips-emotion-01
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：主动挑逗。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：主动挑逗。
+- id: spread-eagle-emotion-02
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：羞耻但享受。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：羞耻但享受。
+- id: folded-emotion-03
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：得意炫耀。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：得意炫耀。
+- id: raised-hips-emotion-04
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：从容自信。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：从容自信。
+- id: spread-eagle-emotion-05
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：调皮邀请。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：调皮邀请。
+- id: folded-emotion-06
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：紧张兴奋。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：紧张兴奋。
+- id: raised-hips-emotion-07
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：惊讶后微笑。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：惊讶后微笑。
+- id: spread-eagle-emotion-08
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：专注沉浸。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：专注沉浸。
+- id: folded-emotion-09
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：慵懒满足。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：慵懒满足。
+- id: raised-hips-emotion-10
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：大胆直视。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：大胆直视。
+- id: spread-eagle-emotion-01
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：主动挑逗。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：主动挑逗。
+- id: folded-emotion-02
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：羞耻但享受。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：羞耻但享受。
+- id: raised-hips-emotion-03
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：得意炫耀。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：得意炫耀。
+- id: spread-eagle-emotion-04
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：从容自信。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：从容自信。
+- id: folded-emotion-05
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：调皮邀请。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：调皮邀请。
+- id: raised-hips-emotion-06
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：紧张兴奋。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：紧张兴奋。
+- id: spread-eagle-emotion-07
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：惊讶后微笑。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：惊讶后微笑。
+- id: folded-emotion-08
+  themes:
+  - 姿势采用身体折叠类形态。
+  - 主表演者的固定表情基调：专注沉浸。
+  frames:
+  - 姿势保持身体折叠类形态。
+  - 保持主表演者的固定表情基调：专注沉浸。
+- id: raised-hips-emotion-09
+  themes:
+  - 姿势采用抬高骨盆或四点支撑类形态。
+  - 主表演者的固定表情基调：慵懒满足。
+  frames:
+  - 姿势保持抬高骨盆或四点支撑类形态。
+  - 保持主表演者的固定表情基调：慵懒满足。
+- id: spread-eagle-emotion-10
+  themes:
+  - 姿势采用对角伸展类形态。
+  - 主表演者的固定表情基调：大胆直视。
+  frames:
+  - 姿势保持对角伸展类形态。
+  - 保持主表演者的固定表情基调：大胆直视。
+slots:
+- folded-emotion-01
+- raised-hips-emotion-02
+- spread-eagle-emotion-03
+- folded-emotion-04
+- raised-hips-emotion-05
+- spread-eagle-emotion-06
+- folded-emotion-07
+- raised-hips-emotion-08
+- spread-eagle-emotion-09
+- folded-emotion-10
+- raised-hips-emotion-01
+- spread-eagle-emotion-02
+- folded-emotion-03
+- raised-hips-emotion-04
+- spread-eagle-emotion-05
+- folded-emotion-06
+- raised-hips-emotion-07
+- spread-eagle-emotion-08
+- folded-emotion-09
+- raised-hips-emotion-10
+- spread-eagle-emotion-01
+- folded-emotion-02
+- raised-hips-emotion-03
+- spread-eagle-emotion-04
+- folded-emotion-05
+- raised-hips-emotion-06
+- spread-eagle-emotion-07
+- folded-emotion-08
+- raised-hips-emotion-09
+- spread-eagle-emotion-10

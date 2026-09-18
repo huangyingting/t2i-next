@@ -4,7 +4,7 @@
 具体作品及可选的场景方向，通过一次结构化模型调用生成可复用视觉档案，再用包内
 导演 Profile/Theme/Frame workflow 生成最终提示词。模型、消息、checkpoint、发布器、
 错误类型和规则解析都由 `t2i_film_style_pipeline` 自己实现，不 import 或调用其他
-生成 pipeline，也不加载外部 `film.txt` 或 `story-inputs/rules/`。
+生成 pipeline，也不加载 Story 的视觉配方或外部 `film.txt`。
 
 模型配置只从仓库根目录的 `.env.film` 加载：
 `T2I_MODEL_BACKEND=openai` 使用直接

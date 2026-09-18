@@ -5,7 +5,7 @@ from t2i_story_pipeline.inputs.compiler import (
     ResolvedStoryInput,
     resolve_story_input,
 )
-from t2i_story_pipeline.inputs.loader import load_story_document
+from t2i_story_pipeline.inputs.loader import load_run_configuration, load_story_document
 from t2i_story_pipeline.inputs.planning import PlannedCast, ThemeInputPlan
 from t2i_story_pipeline.inputs.schema import (
     CatalogCast,
@@ -14,8 +14,10 @@ from t2i_story_pipeline.inputs.schema import (
     InputOverrides,
     InputRequirements,
     ModuleDocument,
+    StoryCast,
     StoryDocument,
-    StoryGeneration,
+    StoryRunConfiguration,
+    StoryRunGeneration,
 )
 
 __all__ = [
@@ -28,9 +30,12 @@ __all__ = [
     "ModuleDocument",
     "PlannedCast",
     "ResolvedStoryInput",
+    "StoryCast",
     "StoryDocument",
-    "StoryGeneration",
+    "StoryRunConfiguration",
+    "StoryRunGeneration",
     "ThemeInputPlan",
+    "load_run_configuration",
     "load_story_document",
     "resolve_story_input",
 ]

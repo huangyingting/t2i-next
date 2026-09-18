@@ -47,7 +47,7 @@ uv run python scripts/refine-text-file.py \
 `t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
 视觉档案，并在同一命令中生成最终提示词。它自带完整、独立的 Profile、common、
 Theme、Frame、模型、provider、checkpoint 和发布实现，不 import 或调用
-`t2i_story_pipeline`，也不依赖 `story-inputs/` 中的描述文档或规则。
+`t2i_story_pipeline`，也不依赖 `recipes/` 中的视觉配方。
 它只加载仓库根目录的 `.env.film`，不会读取通用 `.env`。该配置文件仅保留 film
 所需的后端、模型、认证、推理、token、超时和重试项。它为每部输入电影提取原作成年人物
 与实际场景锚点，Theme 和 Frame 必须使用同一部电影的原作人物与场景，不得跨片
@@ -178,52 +178,58 @@ uv run t2i-story generate \
   --concurrency 8
 ```
 
-也可以把 Story Description 和执行配置保存为 UTF-8 YAML Story Document：
+也可以把画面描述保存为 UTF-8 YAML Story Document，执行配置单独放在 JSON 中：
 
 ```bash
 uv run t2i-story generate \
-  --input story-inputs/recipes/motion-blur-photography.yaml \
+  --input recipes/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic
 ```
 
 故事位置参数与 `--input` 必须且只能提供一个；不再支持 TXT 文件输入。
-最小文档包含 `id` 和多行 `description`，还可声明 `generation`、`authoring`、
-`validation`、`runtime`、`requirements`、`modules` 和 `allocation`。
-配置优先级为程序默认值 < 文档 < 显式 CLI 参数；
-未提供的 CLI 选项不会覆盖文档，数值 `0` 也能正确覆盖。
-文档默认值与覆盖后的请求都必须满足适用性约束，CLI 不会悄悄改写固定阵容或槽位数。
+最小文档包含 `id` 和多行 `description`，还可声明 `cast`、`authoring`、
+`requirements`、`modules` 和 `allocation`；只表达人物、构图、媒介和可见内容。
+`--run-config story-run.json` 加载严格 JSON 执行配置，优先级为
+程序默认值 < 外部 JSON < 显式 CLI 参数；数值 `0` 也能正确覆盖。
+统一默认是1个 Theme、每主题6帧、中文、`aesthetic`；未被外部覆盖的人数来自视觉 `cast`。
+配置本身必须合法，最终请求还必须满足视觉适用性，程序不按配方推断或修补执行参数。
+例如固定100槽的目录必须显式请求100个 Theme，非默认等级也须显式选择。
 `--female-count` 和 `--male-count` 可以分别约束每个主题及每帧的人数。
 
 ```yaml
 id: station-reunion
 description: |
   秋夜，两名成年旅人在旧车站重逢。
-generation:
-  theme_count: 12
-  frames_per_theme: 3
 authoring:
   frames:
     common:
       - 每帧明确描述景别、视角和焦点。
-validation:
-  themes:
-    mode: report
-    checks:
-      - type: required_text
-        field: premise
-        values: [旧车站]
-  frames:
-    mode: report
-    checks:
-      - type: camera_evidence
-runtime:
-  concurrency: 8
-  generation_retries: 2
-  theme_batch_size: 3
-  theme_output_tokens: 12000
-  frame_output_tokens: 32768
+```
+
+外部运行配置示例：
+
+```json
+{
+  "generation": {"theme_count": 12, "frames_per_theme": 3},
+  "runtime": {"concurrency": 8, "theme_batch_size": 3},
+  "validation": {
+    "themes": {
+      "mode": "report",
+      "checks": [{"type": "required_text", "field": "premise", "values": ["旧车站"]}]
+    },
+    "frames": {
+      "mode": "report",
+      "checks": [{"type": "prose_length", "min_chars": 100, "max_chars": 2000}]
+    }
+  }
+}
+```
+
+```bash
+uv run t2i-story generate --input recipes/motion-blur-photography.yaml \
+  --run-config story-run.json
 ```
 
 质量模式支持 `off`（跳过可选检查）、`report`（记录告警但不重试）和 `enforce`
@@ -231,25 +237,30 @@ runtime:
 覆盖。默认检查列表为空，只验证基础契约。Theme 可以对 `title`、`premise`、
 `style` 分别检查长度、必含和禁止原文，在通过检查后才保存主题并开始生成 Frame。
 Frame 可选检查包括摄影文字证据、字符长度、空白分隔词数、ASCII、必含和禁止原文；它们不是模型
-评审，也不保证叙事语义或摄影物理正确。结构与安全契约不受开关影响。
+评审，也不保证叙事语义或摄影物理正确。配置的写作目标也会进入对应阶段的提示词；
+`off` 只关闭检查与质量重试，不删除目标。`--frame-min-words` / `--frame-max-words`
+和 `--frame-min-chars` / `--frame-max-chars` 可覆盖帧长度目标；
+词数按空白分隔，中文通常用字符数。
+结构与安全契约不受开关影响。
 质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
 批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、
 `--frame-output-tokens` 覆盖；预算针对整个批次，实际请求受 provider 上限约束。
 完整字段与示例见 [Story pipeline 文档](docs/story-pipeline.md)。
 
 story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在运行时加载
-`t2i_prompt_pipeline` 的规则。Story 的公共参与和输出约束由公共规则负责，
+`t2i_prompt_pipeline` 的规则。Story 的通用安全契约集中在系统 `safety.rules`，
+公共叙事和输出约束由 `common.rules` 负责，
 三个 content-level 文件只保留等级特有的边界与可见要求；规则组织不再依赖与
 另一条流水线逐字相同。story 内置规则位于
 `src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
 schema、人物一致性和内容等级。媒介、版式、区域、视图、比例关系及其他特定视觉
-行为由配方描述及其显式模块定义，Python 不识别具体 `story-inputs/recipes/*.yaml`
+行为由配方描述及其显式模块定义，Python 不识别具体 `recipes/*.yaml`
 类型。
 
-输入已逐份移入新子目录。输入编译器位于 `src/t2i_story_pipeline/inputs/`：
+视觉配方位于仓库根目录的 `recipes/`，输入编译器位于 `src/t2i_story_pipeline/inputs/`：
 
 ```text
-story-inputs/recipes/
+recipes/
 ├── multi-view.yaml
 ├── human-typography.yaml
 ├── miniature-open-composition.yaml
@@ -260,7 +271,8 @@ story-inputs/recipes/
 ```
 
 全部配方、模块、目录和包内策略的 YAML 自然语言使用中文；字段名、ID、枚举、
-文件名、输出语言配置与必须逐字保留的原文不变。中文输入规则不意味着只能生成中文。
+文件名与真正画内文字的原文不变。中文输入规则不意味着只能生成中文；
+画内文案语言也不强制整段描述使用同一种语言。
 
 系统拥有不可变格式与安全契约，`standard-story` 命名策略拥有中国籍/中国地点的
 项目缺省偏好。输入只选择需要的模块；独有创作留在 description 和对应阶段
@@ -268,6 +280,10 @@ story-inputs/recipes/
 `authoring.level_refinements.<level>` 细化，在该块内用 `shared`、`themes`、
 `frames` 区分共同约束与阶段任务，不再保留三个分散的等级映射入口。
 只编译当前等级，细化不替换系统边界；同一等级规则的重复归属会明确报错。
+等级标识留在配置与冻结快照中，不重复传入模型请求。规则正文直接描述所需内容，
+不使用等级自报、合规证明或服装锁定口令。人数、支撑几何、媒介及画内文字等视觉
+事实保留；字数、固定句式、格式协议、检查与重写流程不属于配方。
+安全由系统始终施加，不通过删除 YAML 中的重复声明来关闭。
 字母/姿态由本地计划分配到 Theme 槽位，每批只发送所选项目，不让模型自行续数。
 小于26个字母时使用目录明确的多样性顺序，26个时A–Z，大于26个时覆盖全部再复用。
 其他已有编号规则用有界循环目录表达；条件Frame分配仅对匹配的帧数生效，
@@ -279,12 +295,14 @@ story-inputs/recipes/
 资产根默认相对输入文件，可用 `--assets-dir` 显式指定；不存在工作目录规则发现、
 模块递归 include、远程资源或可执行模板。缺失、冲突和未知字段明确报错。
 旧顶层文件、旧名称别名、Story 的 `--rules-dir` 与旧 authoring 数组格式已删除。
+旧配方的 `generation`、`runtime`、`validation`、`policy` 即使为空也被拒绝，
+不提供旧字段读取、自动迁移或按配方文件名查询的影子运行配置。
 多个 Frame 始终是同一 Theme 的平行视觉方案，媒介与题材不新增 pipeline。
 
 可以在加载模型配置前离线检查最终输入、规则来源和全部槽位：
 
 ```bash
-uv run t2i-story explain --input story-inputs/recipes/human-typography.yaml --themes 26
+uv run t2i-story explain --input recipes/human-typography.yaml --themes 26
 ```
 
 默认输出 JSON，`--format text` 输出摘要；无效输入退出2，不创建run或调用模型。
@@ -303,8 +321,8 @@ uv run t2i-story runs --runs-dir runs
 uv run t2i-story resume RUN_ID --runs-dir runs
 ```
 
-`resolved-input.json` 冻结所选模块、目录、来源与完整槽位计划，并校验其指纹。
-resume 不重新读取原输入或资产；缺少当前格式快照的旧run明确拒绝，不做迁移或回退。
+`resolved-input.json` 冻结所选模块、目录、来源、有效运行配置与完整槽位计划，并校验其指纹。
+resume 不重新读取原输入、外部JSON配置或资产；旧格式快照明确拒绝，不做迁移或回退。
 `request.json`、provider/并发/retry/token/质量配置、generation attempts 和 token
 usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
 网络 timeout、transport error、429 和 5xx 默认在 provider 层额外重试两次；
@@ -318,15 +336,18 @@ issues 继续反馈给模型。认证错误不会盲目重试。
 （1男1女、2女、3女、1男2女、2男1女），每组 100 themes × 6 frames：
 
 ```bash
-./scripts/generate-story-cast-matrix.sh story-inputs/recipes/motion-blur-photography.yaml
+./scripts/generate-story-cast-matrix.sh recipes/motion-blur-photography.yaml
 ```
 
 最终 TXT 默认统一写入 `prompts/YYYY-MM-DD/hardcore/`，所有可恢复 run 记录在
 `runs/`。也可以把第二、第三个位置参数分别用于覆盖
 prompts root 和 runs directory。
+可选第四参数或 `T2I_STORY_RUN_CONFIG` 指定外部 JSON；提供后不再强制上述
+100 themes / 6 frames / hardcore / English，而由 JSON 与程序默认决定，
+脚本仅覆盖这五组人数。
 脚本先用同一 CLI 的 `explain` 对全部五组最终请求预检；任何一组不兼容就整批退出，
 没有生成调用，不默认跳过。字母表、固定双人/单人等配方不能套用这套阵容矩阵。
-文档中的并发、重试、authoring 和质量策略仍会生效。
+视觉配方的 authoring 与外部运行配置的并发、重试和质量策略分别生效。
 
 输出按 `prompts/YYYY-MM-DD/aesthetic|erotic|hardcore/` 分类：
 
@@ -343,8 +364,9 @@ prompts root 和 runs directory。
 
 每个 Narrative Frame 只有 `frame_id` 和一段无换行的 `prose`。每帧自然点明风格、
 年代、地点和当前时刻，重新完整描写所有可见人物，并将当前静态关系、环境证据、
-镜头与光线融为一个通顺段落。本地不再使用叙事质量门、关键词计数或质量反馈；
-只校验 typed schema、精确数量、连续 ID 和安全底线。叙事规则以整体画面是否自然、
+镜头与光线融为一个通顺段落。本地始终校验 typed schema、精确数量、连续 ID 和
+存储契约；可选质量检查只来自外部运行配置。系统安全指令始终加载，
+但这些文本检查并不证明模型输出或生成图像的语义安全。叙事规则以整体画面是否自然、
 人物空间是否成立和段落能否直接用于文生图为准，不要求固定句首或六段填表结构。
 每帧必须重新交代年代、地点与当前时刻；建筑、陈设、器物、材料、服装、发型、
 交通、通信、照明、社会称谓和人物用语必须符合该时代与地域。不确定时采用保守的
@@ -354,9 +376,9 @@ prompts root 和 runs directory。
 
 独立故事分支支持 `--content-level aesthetic|erotic|hardcore`。默认
 `aesthetic` 以故事和构图为主，不主动增加性内容；`erotic` 要求可见但非露骨的
-成人裸露与双方主动亲密接触；`hardcore` 要求直接呈现明确的成人性行为。后两级
-必须在 Story Description 中明确清醒、自愿、持续回应和可随时停止。三个等级都
-严格限制为二十一岁以上成年人，并禁止胁迫、伤害与无法退出的互动。
+成人裸露与双方主动亲密接触；`hardcore` 要求直接呈现明确的成人性行为。
+通用成年、自愿、清醒、持续回应和可随时停止要求由系统安全规则施加，
+不要求配方重复声明。等级特有边界仍由相应系统等级规则负责。
 
 Provider 直接复用共享的 `OPENAI_*` 环境变量；完整说明见
 [独立故事生成器](docs/story-pipeline.md)。
@@ -799,13 +821,11 @@ src/t2i_prompt_pipeline/rule_packs/system/
 instruction；去除前导空格后以 `#` 开头的行是注释。没有 TOML/YAML、
 priority、replace、disable、模板变量或条件 DSL，行顺序就是规则顺序。
 
-项目可以在根目录的 `rules/` 下使用同样的可选目录结构添加用户规则，也可以用
-`--rules-dir PATH` 显式指定目录。缺失的用户规则文件会跳过；显式指定的目录
-不存在时会报错。每个阶段按以下固定顺序编译：
+规则只从上述包内系统目录加载，不发现工作目录文件，也没有用户规则覆盖入口。
+每个阶段按以下固定顺序编译：
 
 1. 系统 common、stage、当前 content level，以及 Frame 的当前 mode；
-2. 用户 common、stage、当前 content level，以及 Frame 的当前 mode；
-3. 运行时生成的输出语言要求，以及 Theme 的无名人物标签要求。
+2. 运行时生成的输出语言要求，以及 Theme 的无名人物标签要求。
 
 因此每次只把当前选择的 content level 和 frame mode 发送给模型，不会发送另外
 两套等级，既避免规则冲突，也减少输入 token。当前系统规则要求：
@@ -934,7 +954,6 @@ uv run t2i-prompts generate \
   --concurrency 8 \
   --theme-batch-size 5 \
   --generation-retries 2 \
-  --rules-dir rules \
   --runs-dir runs \
   --prompts-dir prompts
 ```
@@ -968,8 +987,7 @@ run 和 6,000 条提示词：
 ```
 
 第二个参数显式指定 `aesthetic`、`erotic` 或 `hardcore` 时只运行该尺度，共生成
-5 个 run 和 3,000 条提示词。第三个可选参数可以指定另一个规则目录；未传时使用
-项目根目录的 `rules/`。
+5 个 run 和 3,000 条提示词。
 脚本会为每组 brief 补充明确成年的人物配置，因此共享 brief 不应自行指定人数。
 批次状态按 brief、content level 和规则自动写入 `runs/cast-matrix-*.json`。
 单次生成暂时没有进展时会在批次预算内自动继续同一 run；Theme 相似度重生成耗尽时
@@ -986,8 +1004,7 @@ run 和 6,000 条提示词：
 uv run t2i-prompts generate-safe-avant-garde
 ```
 
-该命令固定使用 `aesthetic` 和 `variations`，并加载
-`rules/batches/safe_avant_garde/` 的隔离规则，要求所有人物 25 岁以上、
+该命令固定使用 `aesthetic` 和 `variations`；任务 brief 要求所有人物 25 岁以上、
 全程穿着不透明且完整覆盖的服装，不生成裸露、性行为或性化接触。
 批次进度默认写入 `runs/safe-avant-garde-batch.json`；命令中断后执行同一
 命令，会跳过已完成任务并通过现有 run checkpoint 继续当前任务。

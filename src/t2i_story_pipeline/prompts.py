@@ -33,11 +33,9 @@ def theme_messages(
             content=json.dumps(
                 {
                     "story": request.story,
-                    "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "semantic_name": semantic_name,
                     "theme_count": count,
-                    "program_assigns_theme_ids": True,
                     "frames_per_theme": request.frames_per_theme,
                     "input_context": resolved.context_for(StoryStage.THEMES, theme_ids),
                     "existing_themes": [
@@ -68,7 +66,6 @@ def frame_messages(
             content=json.dumps(
                 {
                     "story": request.story,
-                    "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "theme": theme.model_dump(mode="json"),
                     "frames_per_theme": request.frames_per_theme,
@@ -78,7 +75,6 @@ def frame_messages(
                         [theme.theme_id],
                         frame_ids=requested_frame_ids,
                     ),
-                    "program_assigns_frame_ids": True,
                     "accepted_frames": [
                         frame.model_dump(mode="json") for frame in accepted_frames
                     ],

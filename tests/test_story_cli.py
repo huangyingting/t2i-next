@@ -11,7 +11,7 @@ from typer.testing import CliRunner
 import t2i_story_pipeline.cli as story_cli
 from t2i_story_pipeline.cli import app
 from t2i_story_pipeline.config import load_story_provider_settings
-from t2i_story_pipeline.inputs import ResolvedStoryInput
+from t2i_story_pipeline.inputs import ResolvedStoryInput, StoryRunConfiguration
 from t2i_story_pipeline.models import FrameQualityPolicy, StoryQualityPolicy
 from t2i_story_pipeline.provider import StoryProviderSettings
 from t2i_story_pipeline.run_store import (
@@ -48,6 +48,15 @@ def completed_run(directory, run_id="test-run"):
     )
 
 
+def write_run_configuration(directory, **fields):
+    path = directory / "run.json"
+    path.write_text(
+        StoryRunConfiguration.model_validate(fields).model_dump_json(),
+        encoding="utf-8",
+    )
+    return path
+
+
 def test_story_settings_reuse_shared_environment(monkeypatch, tmp_path) -> None:
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("OPENAI_MODEL", "shared-model")
@@ -81,6 +90,9 @@ def test_story_generate_exposes_only_generation_controls() -> None:
     assert "--male-count" in result.stdout
     assert "--concurrency" in result.stdout
     assert "--input" in result.stdout
+    assert "--run-config" in result.stdout
+    for bound in ("min-words", "max-words", "min-chars", "max-chars"):
+        assert f"--frame-{bound}" in result.stdout
     assert "--prompt-file" not in result.stdout
     assert "--theme-quality-mode" in result.stdout
     assert "--frame-quality-mode" in result.stdout
@@ -111,29 +123,39 @@ def test_story_generate_reads_story_document(
         "description: |\n"
         "  1930年代秋夜，两个成年人在旧车站重逢。\n"
         "  他们共同寻找遗失的行李。\n"
-        "generation:\n"
-        "  theme_count: 7\n"
-        "  frames_per_theme: 3\n"
-        "  output_language: english\n"
-        "  cast: {female_count: 1, male_count: 2}\n"
-        "runtime:\n"
-        "  concurrency: 3\n"
-        "  generation_retries: 0\n"
-        "  theme_batch_size: 3\n"
-        "  theme_output_tokens: 12000\n"
-        "  frame_output_tokens: 20000\n"
+        "cast: {female_count: 1, male_count: 2}\n"
         "authoring:\n"
         "  themes: {common: [Custom theme rule.]}\n"
-        "  frames: {common: [Custom frame rule.]}\n"
-        "validation:\n"
-        "  themes:\n"
-        "    mode: enforce\n"
-        "    checks: [{type: forbidden_text, field: title, values: [UNWANTED]}]\n"
-        "  frames:\n"
-        "    mode: report\n"
-        "    checks:\n"
-        "      - type: camera_evidence\n",
+        "  frames: {common: [Custom frame rule.]}\n",
         encoding="utf-8",
+    )
+    configuration_path = write_run_configuration(
+        tmp_path,
+        generation={
+            "theme_count": 7,
+            "frames_per_theme": 3,
+            "output_language": "english",
+        },
+        runtime={
+            "concurrency": 3,
+            "generation_retries": 0,
+            "theme_batch_size": 3,
+            "theme_output_tokens": 12000,
+            "frame_output_tokens": 20000,
+        },
+        validation={
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {
+                        "type": "forbidden_text",
+                        "field": "title",
+                        "values": ["UNWANTED"],
+                    },
+                ],
+            },
+            "frames": {"mode": "report", "checks": [{"type": "camera_evidence"}]},
+        },
     )
     captured = {}
 
@@ -159,6 +181,8 @@ def test_story_generate_reads_story_document(
             "generate",
             "--input",
             str(prompt_file),
+            "--run-config",
+            str(configuration_path),
             "--female-count",
             "2",
             "--male-count",
@@ -177,9 +201,7 @@ def test_story_generate_reads_story_document(
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
     assert captured["request"].source_prompt_stem == "story"
-    assert "validated request" in "\n".join(
-        captured["rules"].themes
-    )
+    assert "requested counts and slots" in "\n".join(captured["rules"].themes)
     assert captured["request"].theme_count == 7
     assert captured["request"].frames_per_theme == 3
     assert captured["request"].output_language == "english"
@@ -290,14 +312,14 @@ def test_story_generate_loads_explicit_module_assets(tmp_path, monkeypatch) -> N
     assert "Custom frame composition rule." in captured["rules"].frames
 
 
-def test_story_generate_never_discovers_legacy_rules_inside_story_inputs(
+def test_story_generate_never_discovers_rules_from_working_directory(
     tmp_path,
     monkeypatch,
 ) -> None:
-    rules_dir = tmp_path / "story-inputs" / "rules"
+    rules_dir = tmp_path / "rules"
     rules_dir.mkdir(parents=True)
     (rules_dir / "common.rules").write_text(
-        "Shared story-input rule.\n",
+        "Unexpected working-directory rule.\n",
         encoding="utf-8",
     )
     captured = {}
@@ -318,8 +340,8 @@ def test_story_generate_never_discovers_legacy_rules_inside_story_inputs(
     result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
 
     assert result.exit_code == 0
-    assert "Shared story-input rule." not in captured["rules"].themes
-    assert "Shared story-input rule." not in captured["rules"].frames
+    assert "Unexpected working-directory rule." not in captured["rules"].themes
+    assert "Unexpected working-directory rule." not in captured["rules"].frames
 
 
 def test_story_generate_rejects_story_and_document_together(
@@ -388,9 +410,7 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
             )
         ),
     )
-    snapshot = store.create(
-        make_story_input(make_story_request(), settings), settings
-    )
+    snapshot = store.create(make_story_input(make_story_request(), settings), settings)
     captured = {}
 
     async def fake_resume(run_id, current_provider, settings, current_store):
@@ -431,9 +451,7 @@ def test_story_runs_lists_resumable_command(tmp_path) -> None:
         tmp_path / "prompts",
     )
     settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
-    snapshot = store.create(
-        make_story_input(make_story_request(), settings), settings
-    )
+    snapshot = store.create(make_story_input(make_story_request(), settings), settings)
 
     result = CliRunner().invoke(
         app,
@@ -445,32 +463,39 @@ def test_story_runs_lists_resumable_command(tmp_path) -> None:
     assert f"t2i-story resume {snapshot.run_id}" in result.output
 
 
-def test_explicit_cli_options_override_document_and_preserve_zero(
+def test_explicit_cli_options_override_run_json_and_preserve_zero(
     tmp_path, monkeypatch
 ):
     path = tmp_path / "story.yaml"
     path.write_text(
-        "id: story\ndescription: Story.\n"
-        "generation:\n"
-        "  theme_count: 7\n"
-        "  frames_per_theme: 3\n"
-        "  content_level: erotic\n"
-        "  output_language: english\n"
-        "  cast: {female_count: 2, male_count: 1}\n"
-        "runtime:\n"
-        "  concurrency: 3\n"
-        "  generation_retries: 2\n"
-        "  theme_batch_size: 4\n"
-        "  theme_output_tokens: 12000\n"
-        "  frame_output_tokens: 20000\n"
-        "validation:\n"
-        "  themes:\n"
-        "    mode: enforce\n"
-        "    checks: [{type: required_text, field: style, values: [rain]}]\n"
-        "  frames:\n"
-        "    mode: enforce\n"
-        "    checks: [{type: camera_evidence}]\n",
+        "id: story\ndescription: Story.\ncast: {female_count: 2, male_count: 1}\n",
         encoding="utf-8",
+    )
+    configuration_path = write_run_configuration(
+        tmp_path,
+        generation={
+            "theme_count": 7,
+            "frames_per_theme": 3,
+            "content_level": "erotic",
+            "output_language": "english",
+            "female_count": 1,
+        },
+        runtime={
+            "concurrency": 3,
+            "generation_retries": 2,
+            "theme_batch_size": 4,
+            "theme_output_tokens": 12000,
+            "frame_output_tokens": 20000,
+        },
+        validation={
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {"type": "required_text", "field": "style", "values": ["rain"]},
+                ],
+            },
+            "frames": {"mode": "enforce", "checks": [{"type": "camera_evidence"}]},
+        },
     )
     captured = {}
 
@@ -486,6 +511,8 @@ def test_explicit_cli_options_override_document_and_preserve_zero(
             "generate",
             "--input",
             str(path),
+            "--run-config",
+            str(configuration_path),
             "--themes",
             "1",
             "--frames",
@@ -552,21 +579,36 @@ def test_resume_freezes_document_rules_and_quality_without_reading_source(
     path = tmp_path / "source.yaml"
     path.write_text(
         "id: stable-name\ndescription: An old station.\n"
-        "generation: {frames_per_theme: 1}\n"
-        "runtime:\n"
-        "  generation_retries: 0\n"
-        "  theme_batch_size: 1\n"
-        "  theme_output_tokens: 512\n"
-        "  frame_output_tokens: 1024\n"
-        "authoring:\n  frames: {common: [Keep the station clock visible.]}\n"
-        "validation:\n"
-        "  themes:\n"
-        "    mode: enforce\n"
-        "    checks: [{type: forbidden_text, field: title, values: [UNWANTED]}]\n"
-        "  frames:\n"
-        "    mode: enforce\n"
-        "    checks: [{type: required_text, values: [station clock]}]\n",
+        "authoring:\n  frames: {common: [Keep the station clock visible.]}\n",
         encoding="utf-8",
+    )
+    configuration_path = write_run_configuration(
+        tmp_path,
+        generation={"frames_per_theme": 1},
+        runtime={
+            "generation_retries": 0,
+            "theme_batch_size": 1,
+            "theme_output_tokens": 512,
+            "frame_output_tokens": 1024,
+        },
+        validation={
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {
+                        "type": "forbidden_text",
+                        "field": "title",
+                        "values": ["UNWANTED"],
+                    },
+                ],
+            },
+            "frames": {
+                "mode": "enforce",
+                "checks": [
+                    {"type": "required_text", "values": ["station clock"]},
+                ],
+            },
+        },
     )
     model = FakeStoryModel([make_theme_batch(), make_frame_sequence(frame_count=1)])
 
@@ -576,7 +618,9 @@ def test_resume_freezes_document_rules_and_quality_without_reading_source(
 
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(story_cli, "story_model", fake_model)
-    result = CliRunner().invoke(app, ["generate", "--input", str(path)])
+    result = CliRunner().invoke(
+        app, ["generate", "--input", str(path), "--run-config", str(configuration_path)]
+    )
     assert result.exit_code == 1, result.output
     store = LocalStoryRunStore(tmp_path / "runs")
     run_id = store.list_runs().runs[0].run_id
@@ -592,6 +636,7 @@ def test_resume_freezes_document_rules_and_quality_without_reading_source(
     assert "Keep the station clock visible." in snapshot.rules.frames
 
     path.unlink()
+    configuration_path.unlink()
     failed_again = FakeStoryModel([make_frame_sequence(frame_count=1)])
     model = failed_again
     result = CliRunner().invoke(app, ["resume", run_id])
@@ -624,13 +669,20 @@ def test_report_mode_publishes_plain_prose_and_displays_quality_warnings(
 ):
     path = tmp_path / "report.yaml"
     path.write_text(
-        "id: report\ndescription: An old station.\n"
-        "generation: {frames_per_theme: 1}\n"
-        "validation:\n"
-        "  frames:\n"
-        "    mode: report\n"
-        "    checks: [{type: required_text, values: [station clock]}]\n",
+        "id: report\ndescription: An old station.\n",
         encoding="utf-8",
+    )
+    configuration_path = write_run_configuration(
+        tmp_path,
+        generation={"frames_per_theme": 1},
+        validation={
+            "frames": {
+                "mode": "report",
+                "checks": [
+                    {"type": "required_text", "values": ["station clock"]},
+                ],
+            }
+        },
     )
     sequence = make_frame_sequence(frame_count=1)
     model = FakeStoryModel([make_theme_batch(), sequence])
@@ -641,7 +693,9 @@ def test_report_mode_publishes_plain_prose_and_displays_quality_warnings(
 
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(story_cli, "story_model", fake_model)
-    result = CliRunner().invoke(app, ["generate", "--input", str(path)])
+    result = CliRunner().invoke(
+        app, ["generate", "--input", str(path), "--run-config", str(configuration_path)]
+    )
     assert result.exit_code == 0, result.output
     assert "warnings" in result.output
     assert "1 条质量告警" in result.output
@@ -689,17 +743,26 @@ def test_explain_json_is_provider_free_and_preserves_explicit_overrides(
         path = tmp_path / "story.yaml"
         path.write_text(
             "id: station\ndescription: A quiet station.\n"
-            "generation: {cast: {female_count: 1, male_count: 1}}\n"
-            "validation:\n"
-            "  themes:\n"
-            "    mode: enforce\n"
-            "    checks: [{type: required_text, field: title, values: [clock]}]\n"
-            "  frames:\n"
-            "    mode: enforce\n"
-            "    checks: [{type: camera_evidence}]\n",
+            "cast: {female_count: 1, male_count: 1}\n",
             encoding="utf-8",
         )
-        input_args = ["--input", str(path)]
+        configuration_path = write_run_configuration(
+            tmp_path,
+            validation={
+                "themes": {
+                    "mode": "enforce",
+                    "checks": [
+                        {
+                            "type": "required_text",
+                            "field": "title",
+                            "values": ["clock"],
+                        },
+                    ],
+                },
+                "frames": {"mode": "enforce", "checks": [{"type": "camera_evidence"}]},
+            },
+        )
+        input_args = ["--input", str(path), "--run-config", str(configuration_path)]
     else:
         input_args = ["A quiet station.", "--male-count", "1"]
     before = set(tmp_path.iterdir())

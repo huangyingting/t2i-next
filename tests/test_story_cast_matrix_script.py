@@ -224,12 +224,112 @@ def test_story_cast_matrix_script_preflights_then_generates_identical_casts(
         ]
 
 
-@pytest.mark.parametrize("exit_code", [1, 2])
-def test_any_explain_failure_finishes_preflight_but_starts_no_generation(
-    tmp_path, fake_cli, exit_code
+@pytest.mark.parametrize(
+    "profile_source", ["argument", "environment", "argument-over-environment"]
+)
+def test_run_profile_replaces_execution_defaults_for_every_cast(
+    tmp_path, fake_cli, profile_source
+):
+    document = tmp_path / "story input.yaml"
+    document.write_text("id: story\ndescription: Story.\n", encoding="utf-8")
+    profile_dir = tmp_path / "run profiles"
+    profile_dir.mkdir()
+    profile = profile_dir / "small chinese run.json"
+    profile.write_text(
+        json.dumps(
+            {
+                "generation": {
+                    "theme_count": 2,
+                    "frames_per_theme": 3,
+                    "output_language": "chinese",
+                    "content_level": "aesthetic",
+                    "female_count": 7,
+                    "male_count": 0,
+                },
+                "runtime": {"concurrency": 1, "generation_retries": 0},
+                "validation": {"frames": {"mode": "off"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    prompts = tmp_path / "prompts"
+    runs = tmp_path / "runs"
+    arguments = [prompts, runs]
+    environment = {}
+    relative_profile = str(profile.relative_to(tmp_path))
+    if profile_source == "environment":
+        environment["T2I_STORY_RUN_CONFIG"] = relative_profile
+    else:
+        arguments.append(relative_profile)
+        if profile_source == "argument-over-environment":
+            environment["T2I_STORY_RUN_CONFIG"] = "missing-environment-profile.json"
+
+    result = run_matrix(tmp_path, fake_cli, document, *arguments, **environment)
+
+    assert result.returncode == 0, result.stderr
+    calls = read_calls(tmp_path / "calls.jsonl")
+    assert len(calls) == 10
+    assert {call["cwd"] for call in calls} == {str(REPO_ROOT)}
+    for index, (female_count, male_count) in enumerate(CASTS):
+        shared = [
+            "--input",
+            str(document),
+            "--run-config",
+            str(profile),
+            "--female-count",
+            str(female_count),
+            "--male-count",
+            str(male_count),
+        ]
+        assert calls[index]["args"] == ["explain", *shared, "--format", "json"]
+        assert calls[index + 5]["args"] == [
+            "generate",
+            *shared,
+            "--runs-dir",
+            str(runs),
+            "--prompts-dir",
+            str(prompts),
+        ]
+
+
+@pytest.mark.parametrize("profile_source", ["argument", "environment"])
+@pytest.mark.parametrize("path_kind", ["missing", "directory"])
+def test_unusable_run_profile_is_rejected_before_invoking_cli(
+    tmp_path, fake_cli, profile_source, path_kind
 ):
     document = tmp_path / "story.yaml"
     document.write_text("id: story\ndescription: Story.\n", encoding="utf-8")
+    profile = tmp_path / "run.json"
+    if path_kind == "directory":
+        profile.mkdir()
+    arguments = [tmp_path / "prompts", tmp_path / "runs"]
+    environment = {}
+    if profile_source == "argument":
+        arguments.append(profile.name)
+    else:
+        environment["T2I_STORY_RUN_CONFIG"] = profile.name
+
+    result = run_matrix(tmp_path, fake_cli, document, *arguments, **environment)
+
+    assert result.returncode == 2, result.stderr
+    assert "Run configuration is not a readable file" in result.stderr
+    assert not (tmp_path / "calls.jsonl").exists()
+    assert not (tmp_path / "prompts").exists()
+    assert not (tmp_path / "runs").exists()
+
+
+@pytest.mark.parametrize("with_run_profile", [False, True])
+@pytest.mark.parametrize("exit_code", [1, 2])
+def test_any_explain_failure_finishes_preflight_but_starts_no_generation(
+    tmp_path, fake_cli, exit_code, with_run_profile
+):
+    document = tmp_path / "story.yaml"
+    document.write_text("id: story\ndescription: Story.\n", encoding="utf-8")
+    environment = {}
+    if with_run_profile:
+        profile = tmp_path / "run.json"
+        profile.write_text("{}", encoding="utf-8")
+        environment["T2I_STORY_RUN_CONFIG"] = str(profile)
     result = run_matrix(
         tmp_path,
         fake_cli,
@@ -239,6 +339,7 @@ def test_any_explain_failure_finishes_preflight_but_starts_no_generation(
         FAIL_COMMAND="explain",
         FAIL_FEMALE_COUNT="3",
         FAIL_EXIT_CODE=str(exit_code),
+        **environment,
     )
     assert result.returncode == 2
     assert "Incompatible cast 3-women" in result.stderr
@@ -372,16 +473,88 @@ def test_story_cast_matrix_script_rejects_invalid_documents_before_generation(
     assert not (tmp_path / "prompts").exists()
 
 
-def test_real_preflight_checks_all_casts_before_generating_any(tmp_path, real_cli):
+@pytest.mark.parametrize("profile_source", ["argument", "environment"])
+@pytest.mark.parametrize(
+    "content",
+    [
+        pytest.param(b'{"generation":', id="malformed-json"),
+        pytest.param(b'{"generation": {"output_language": "\xff"}}', id="invalid-utf8"),
+        pytest.param(b'{"generation": {"theme_count": 0}}', id="invalid-generation"),
+        pytest.param(b'{"safety": false}', id="unsupported-control"),
+    ],
+)
+def test_invalid_run_profile_finishes_preflight_without_generation_or_provider(
+    tmp_path, real_cli, profile_source, content
+):
+    document = tmp_path / "story.yaml"
+    document.write_text("id: story\ndescription: Story.\n", encoding="utf-8")
+    profile = tmp_path / "run.json"
+    profile.write_bytes(content)
+    arguments = [tmp_path / "prompts", tmp_path / "runs"]
+    environment = {}
+    if profile_source == "argument":
+        arguments.append(profile.name)
+    else:
+        environment["T2I_STORY_RUN_CONFIG"] = profile.name
+
+    result = run_matrix(tmp_path, real_cli, document, *arguments, **environment)
+
+    assert result.returncode == 2, result.stderr
+    assert result.stderr.count("Incompatible cast") == 5
+    assert result.stderr.count('"status": "invalid"') == 5
+    assert "5 cast configurations failed preflight" in result.stderr
+    assert "no generation was started" in result.stderr
+    calls = read_calls(tmp_path / "calls.jsonl")
+    assert [call["args"][0] for call in calls] == ["explain"] * 5
+    for call in calls:
+        args = call["args"]
+        assert args[args.index("--run-config") + 1] == str(profile)
+    assert not (tmp_path / "provider-load").exists()
+    assert not (tmp_path / "runs").exists()
+    assert not (tmp_path / "prompts").exists()
+
+
+@pytest.mark.parametrize("with_run_profile", [False, True])
+def test_real_preflight_checks_all_casts_before_generating_any(
+    tmp_path, real_cli, with_run_profile
+):
     document = tmp_path / "limited-cast.yaml"
+    requirements = (
+        "requirements: {female_count: {max: 2}, content_levels: [aesthetic]}\n"
+        if with_run_profile
+        else "requirements: {female_count: {max: 2}}\n"
+    )
     document.write_text(
         "id: limited-cast\ndescription: A station composition.\n"
-        "generation: {cast: {female_count: 1, male_count: 1}}\n"
-        "requirements: {female_count: {max: 2}}\n",
+        "cast: {female_count: 1, male_count: 1}\n" + requirements,
         encoding="utf-8",
     )
+    environment = {}
+    if with_run_profile:
+        profile = tmp_path / "run.json"
+        profile.write_text(
+            json.dumps(
+                {
+                    "generation": {
+                        "theme_count": 2,
+                        "frames_per_theme": 3,
+                        "output_language": "chinese",
+                        "content_level": "aesthetic",
+                        "female_count": 7,
+                        "male_count": 0,
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        environment["T2I_STORY_RUN_CONFIG"] = profile.name
     result = run_matrix(
-        tmp_path, real_cli, document, tmp_path / "prompts", tmp_path / "runs"
+        tmp_path,
+        real_cli,
+        document,
+        tmp_path / "prompts",
+        tmp_path / "runs",
+        **environment,
     )
     assert result.returncode == 2, result.stderr
     assert result.stderr.count("Incompatible cast") == 1

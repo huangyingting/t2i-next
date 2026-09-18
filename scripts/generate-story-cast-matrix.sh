@@ -16,14 +16,15 @@ resolve_executable() {
   )
 }
 
-if (($# < 1 || $# > 3)); then
-  printf 'Usage: %s STORY_YAML [PROMPTS_ROOT] [RUNS_DIR]\n' "$0" >&2
+if (($# < 1 || $# > 4)); then
+  printf 'Usage: %s STORY_YAML [PROMPTS_ROOT] [RUNS_DIR] [RUN_CONFIG_JSON]\n' "$0" >&2
   exit 2
 fi
 
 story_file="$1"
 prompts_root="${2:-${T2I_STORY_PROMPTS_ROOT:-$repo_root/prompts}}"
 runs_dir="${3:-${T2I_STORY_RUNS_DIR:-$repo_root/runs}}"
+run_config="${4:-${T2I_STORY_RUN_CONFIG:-}}"
 
 if [[ ! -f "$story_file" ]]; then
   printf 'Story file does not exist: %s\n' "$story_file" >&2
@@ -38,6 +39,16 @@ story_file="$(
   cd -- "$(dirname -- "$story_file")"
   printf '%s/%s\n' "$PWD" "$(basename -- "$story_file")"
 )"
+if [[ -n "$run_config" ]]; then
+  if [[ ! -f "$run_config" || ! -r "$run_config" ]]; then
+    printf 'Run configuration is not a readable file: %s\n' "$run_config" >&2
+    exit 2
+  fi
+  run_config="$(
+    cd -- "$(dirname -- "$run_config")"
+    printf '%s/%s\n' "$PWD" "$(basename -- "$run_config")"
+  )"
+fi
 if [[ "$prompts_root" != /* ]]; then
   prompts_root="$repo_root/$prompts_root"
 fi
@@ -84,11 +95,17 @@ trap 'exit 143' TERM
 
 shared_args=(
   --input "$story_file"
-  --content-level hardcore
-  --themes 100
-  --frames 6
-  --language english
 )
+if [[ -n "$run_config" ]]; then
+  shared_args+=(--run-config "$run_config")
+else
+  shared_args+=(
+    --content-level hardcore
+    --themes 100
+    --frames 6
+    --language english
+  )
+fi
 
 preflight_failures=0
 for index in "${!labels[@]}"; do

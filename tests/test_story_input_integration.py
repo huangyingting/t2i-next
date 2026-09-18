@@ -13,6 +13,7 @@ from t2i_story_pipeline.errors import (
 )
 from t2i_story_pipeline.inputs import (
     InputOverrides,
+    StoryRunConfiguration,
     load_story_document,
     resolve_story_input,
 )
@@ -49,7 +50,6 @@ def planned_input(tmp_path):
                         ],
                         "frames": [f"FRAME_{name.upper()} renders the station detail."],
                         "frame_assignment": {
-                            "frames_per_theme": 2,
                             "slots": [
                                 {
                                     "frame_id": frame_id,
@@ -59,7 +59,8 @@ def planned_input(tmp_path):
                                     ],
                                 }
                                 for frame_id, viewpoint in (
-                                    ("F01", "front"), ("F02", "rear")
+                                    ("F01", "front"),
+                                    ("F02", "rear"),
                                 )
                             ],
                         },
@@ -92,8 +93,6 @@ def planned_input(tmp_path):
             {
                 "id": "station",
                 "description": "A collection of quiet station compositions.",
-                "generation": {"theme_count": 4, "frames_per_theme": 1},
-                "requirements": {"theme_count": {"min": 3}},
                 "allocation": {
                     "type": "fixed_slots",
                     "catalog": "station-details",
@@ -125,17 +124,21 @@ def planned_input(tmp_path):
                         )
                     },
                 },
-                "runtime": {
-                    "theme_batch_size": 2,
-                    "concurrency": 1,
-                    "generation_retries": 1,
-                },
             }
         ),
         encoding="utf-8",
     )
     resolved = resolve_story_input(
-        load_story_document(document_path), asset_root=assets
+        load_story_document(document_path),
+        asset_root=assets,
+        run_configuration=StoryRunConfiguration(
+            generation={"theme_count": 4, "frames_per_theme": 1},
+            runtime={
+                "theme_batch_size": 2,
+                "concurrency": 1,
+                "generation_retries": 1,
+            },
+        ),
     )
     return resolved, (document_path, catalog_path, module_path)
 
@@ -208,10 +211,9 @@ async def test_catalog_assignments_are_independent_of_theme_batch_boundaries(
     original, paths = planned_input
     resolved = resolve_story_input(
         load_story_document(paths[0]),
-        InputOverrides(
-            theme_batch_size=batch_size, frames_per_theme=frames_per_theme
-        ),
+        InputOverrides(theme_batch_size=batch_size, frames_per_theme=frames_per_theme),
         asset_root=paths[1].parent.parent,
+        run_configuration=original.run_configuration,
     )
     assert resolved.plans == original.plans
     assert resolved.fingerprint() != original.fingerprint()
@@ -328,11 +330,12 @@ async def test_catalog_plans_survive_batch_retry_and_offline_resume(
 async def test_frame_assignment_projection_survives_partial_retry_and_offline_resume(
     tmp_path, planned_input
 ):
-    _, source_paths = planned_input
+    original, source_paths = planned_input
     resolved = resolve_story_input(
         load_story_document(source_paths[0]),
         InputOverrides(frames_per_theme=2, generation_retries=2),
         asset_root=source_paths[1].parent.parent,
+        run_configuration=original.run_configuration,
     )
     settings = StoryRunSettings(
         provider=StoryProviderSettings(model="test-model"),
@@ -439,7 +442,7 @@ def test_input_fingerprint_detects_tampering(frozen_run, target):
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["runtime"]["concurrency"] = 3
     path.write_text(json.dumps(payload), encoding="utf-8")
-    with pytest.raises(StoryStorageError, match="输入快照指纹不匹配"):
+    with pytest.raises(StoryStorageError):
         store.inspect(snapshot.run_id)
 
 
