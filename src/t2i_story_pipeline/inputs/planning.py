@@ -239,25 +239,11 @@ def validate_requirements(
     plans: tuple[ThemeInputPlan, ...],
     requirements: tuple[tuple[str, InputRequirements], ...],
 ) -> None:
-    """Intersect declarations without rewriting defaults or caller overrides."""
+    """Intersect visual applicability without rewriting caller choices."""
     for source, requirement in requirements:
-        for name in ("theme_count", "frames_per_theme"):
-            bounds = getattr(requirement, name)
-            value = getattr(request, name)
-            if bounds is not None and (
-                bounds.min is not None
-                and value < bounds.min
-                or bounds.max is not None
-                and value > bounds.max
-            ):
-                raise ValueError(f"{source}: {name}={value} violates {bounds}")
-        for name, field in (
-            ("output_language", "output_languages"),
-            ("content_level", "content_levels"),
-        ):
-            allowed = getattr(requirement, field)
-            if allowed is not None and getattr(request, name) not in allowed:
-                raise ValueError(f"{source}: {name} must be one of {allowed}")
+        allowed = requirement.content_levels
+        if allowed is not None and request.content_level not in allowed:
+            raise ValueError(f"{source}: content_level must be one of {allowed}")
         if requirement.cast_constraints == "unspecified" and (
             request.female_count is not None or request.male_count is not None
         ):

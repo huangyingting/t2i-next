@@ -3,6 +3,7 @@ from __future__ import annotations
 from t2i_story_pipeline.inputs import (
     ResolvedStoryInput,
     StoryDocument,
+    StoryRunConfiguration,
     resolve_story_input,
 )
 from t2i_story_pipeline.models import (
@@ -66,15 +67,19 @@ def make_story_input(
         {
             "id": None,
             "description": request.story,
+            "cast": {
+                "female_count": request.female_count,
+                "male_count": request.male_count,
+            },
+        }
+    )
+    configuration = StoryRunConfiguration.model_validate(
+        {
             "generation": {
                 "theme_count": request.theme_count,
                 "frames_per_theme": request.frames_per_theme,
                 "content_level": request.content_level,
                 "output_language": request.output_language,
-                "cast": {
-                    "female_count": request.female_count,
-                    "male_count": request.male_count,
-                },
             },
             "runtime": {
                 name: getattr(settings, name) for name in StoryRuntime.model_fields
@@ -82,7 +87,7 @@ def make_story_input(
             "validation": settings.quality,
         }
     )
-    resolved = resolve_story_input(document)
+    resolved = resolve_story_input(document, run_configuration=configuration)
     return ResolvedStoryInput.model_validate(
         {**resolved.model_dump(), "request": request}
     )

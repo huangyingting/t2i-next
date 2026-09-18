@@ -79,24 +79,43 @@ class StoryCast(Model):
         return self
 
 
-class StoryGeneration(Model):
+class StoryRunGeneration(Model):
+    """Execution choices; omitted gender counts inherit the visual cast."""
+
     theme_count: int = Field(default=1, ge=1, le=100, strict=True)
     frames_per_theme: int = Field(default=6, ge=1, le=6, strict=True)
     content_level: ContentLevel = ContentLevel.AESTHETIC
     output_language: OutputLanguage = OutputLanguage.CHINESE
-    cast: StoryCast = Field(default_factory=StoryCast)
+    female_count: Count | None = None
+    male_count: Count | None = None
 
-    def request(self, description: str, source_id: str | None = None) -> StoryRequest:
+    def request(self, document: StoryDocument) -> StoryRequest:
+        cast = self.effective_cast(document.cast)
         return StoryRequest(
-            story=description,
-            source_prompt_stem=source_id,
+            story=document.description,
+            source_prompt_stem=document.id,
             theme_count=self.theme_count,
             frames_per_theme=self.frames_per_theme,
-            female_count=self.cast.female_count,
-            male_count=self.cast.male_count,
+            female_count=cast.female_count,
+            male_count=cast.male_count,
             content_level=self.content_level,
             output_language=self.output_language,
         )
+
+    def effective_cast(self, cast: StoryCast) -> StoryCast:
+        values = cast.model_dump()
+        for name in ("female_count", "male_count"):
+            if (value := getattr(self, name)) is not None:
+                values[name] = value
+        return StoryCast.model_validate(values)
+
+
+class StoryRunConfiguration(Model):
+    """External execution configuration, frozen with every resolved input."""
+
+    generation: StoryRunGeneration = Field(default_factory=StoryRunGeneration)
+    runtime: StoryRuntime = Field(default_factory=StoryRuntime)
+    validation: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
 
 
 class Bounds(Model):
@@ -125,11 +144,6 @@ class InputRequirements(Model):
     allowed_casts: tuple[AllowedCast, ...] | None = Field(default=None, min_length=1)
     female_count: Bounds | None = None
     male_count: Bounds | None = None
-    theme_count: Bounds | None = None
-    frames_per_theme: Bounds | None = None
-    output_languages: tuple[OutputLanguage, ...] | None = Field(
-        default=None, min_length=1
-    )
     content_levels: tuple[ContentLevel, ...] | None = Field(default=None, min_length=1)
     cast_constraints: Literal["unspecified"] | None = None
 
@@ -149,19 +163,15 @@ class StoryDocument(Model):
 
     id: Slug | None = None
     description: StoryText
-    generation: StoryGeneration = Field(default_factory=StoryGeneration)
+    cast: StoryCast = Field(default_factory=StoryCast)
     authoring: StoryAuthoring = Field(default_factory=StoryAuthoring)
-    validation: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
-    runtime: StoryRuntime = Field(default_factory=StoryRuntime)
-    policy: Literal["standard-story"] = "standard-story"
     modules: tuple[ModuleReference, ...] = ()
     requirements: InputRequirements = Field(default_factory=InputRequirements)
     allocation: InputAllocation | None = None
     _source_path: Path | None = PrivateAttr(default=None)
 
     @model_validator(mode="after")
-    def request_is_valid(self) -> StoryDocument:
-        self.generation.request(self.description, self.id)
+    def unique_modules(self) -> StoryDocument:
         ids = [module.id for module in self.modules]
         if len(ids) != len(set(ids)):
             raise ValueError("module IDs must be unique")
@@ -184,6 +194,10 @@ class InputOverrides(Model):
     frame_output_tokens: int | None = Field(default=None, ge=512, le=65536, strict=True)
     theme_quality_mode: QualityMode | None = None
     frame_quality_mode: QualityMode | None = None
+    frame_min_words: int | None = Field(default=None, ge=1, le=32768, strict=True)
+    frame_max_words: int | None = Field(default=None, ge=1, le=32768, strict=True)
+    frame_min_chars: int | None = Field(default=None, ge=1, le=32768, strict=True)
+    frame_max_chars: int | None = Field(default=None, ge=1, le=32768, strict=True)
 
 
 class LayoutParameters(Model):
@@ -275,15 +289,18 @@ class FrameSlotRules(Model):
 
 
 class FrameAssignment(Model):
-    frames_per_theme: int = Field(ge=1, le=6, strict=True)
     slots: tuple[FrameSlotRules, ...] = Field(min_length=1, max_length=6)
+
+    @property
+    def slot_count(self) -> int:
+        return len(self.slots)
 
     @model_validator(mode="after")
     def complete_slots(self) -> FrameAssignment:
-        expected = [f"F{index:02d}" for index in range(1, self.frames_per_theme + 1)]
+        expected = [f"F{index:02d}" for index in range(1, self.slot_count + 1)]
         if [slot.frame_id for slot in self.slots] != expected:
             raise ValueError(
-                "frame_assignment slots must exactly cover frames_per_theme in order"
+                "frame_assignment slots must have sequential IDs starting at F01"
             )
         return self
 

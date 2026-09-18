@@ -77,7 +77,7 @@ class StageThemeInputPlan(Model):
             tuple(assigned_slots[frame_id] for frame_id in frame_ids)
             if stage == StoryStage.FRAMES
             and assignment is not None
-            and assignment.frames_per_theme == frames_per_theme
+            and assignment.slot_count == frames_per_theme
             else ()
         )
         return cls(

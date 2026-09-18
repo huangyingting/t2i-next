@@ -178,7 +178,7 @@ uv run t2i-story generate \
   --concurrency 8
 ```
 
-也可以把 Story Description 和执行配置保存为 UTF-8 YAML Story Document：
+也可以把画面描述保存为 UTF-8 YAML Story Document，执行配置单独放在 JSON 中：
 
 ```bash
 uv run t2i-story generate \
@@ -189,41 +189,47 @@ uv run t2i-story generate \
 ```
 
 故事位置参数与 `--input` 必须且只能提供一个；不再支持 TXT 文件输入。
-最小文档包含 `id` 和多行 `description`，还可声明 `generation`、`authoring`、
-`validation`、`runtime`、`requirements`、`modules` 和 `allocation`。
-配置优先级为程序默认值 < 文档 < 显式 CLI 参数；
-未提供的 CLI 选项不会覆盖文档，数值 `0` 也能正确覆盖。
-文档默认值与覆盖后的请求都必须满足适用性约束，CLI 不会悄悄改写固定阵容或槽位数。
+最小文档包含 `id` 和多行 `description`，还可声明 `cast`、`authoring`、
+`requirements`、`modules` 和 `allocation`；只表达人物、构图、媒介和可见内容。
+`--run-config story-run.json` 加载严格 JSON 执行配置，优先级为
+程序默认值 < 外部 JSON < 显式 CLI 参数；数值 `0` 也能正确覆盖。
+统一默认是1个 Theme、每主题6帧、中文、`aesthetic`；未被外部覆盖的人数来自视觉 `cast`。
+配置本身必须合法，最终请求还必须满足视觉适用性，程序不按配方推断或修补执行参数。
+例如固定100槽的目录必须显式请求100个 Theme，非默认等级也须显式选择。
 `--female-count` 和 `--male-count` 可以分别约束每个主题及每帧的人数。
 
 ```yaml
 id: station-reunion
 description: |
   秋夜，两名成年旅人在旧车站重逢。
-generation:
-  theme_count: 12
-  frames_per_theme: 3
 authoring:
   frames:
     common:
       - 每帧明确描述景别、视角和焦点。
-validation:
-  themes:
-    mode: report
-    checks:
-      - type: required_text
-        field: premise
-        values: [旧车站]
-  frames:
-    mode: report
-    checks:
-      - type: camera_evidence
-runtime:
-  concurrency: 8
-  generation_retries: 2
-  theme_batch_size: 3
-  theme_output_tokens: 12000
-  frame_output_tokens: 32768
+```
+
+外部运行配置示例：
+
+```json
+{
+  "generation": {"theme_count": 12, "frames_per_theme": 3},
+  "runtime": {"concurrency": 8, "theme_batch_size": 3},
+  "validation": {
+    "themes": {
+      "mode": "report",
+      "checks": [{"type": "required_text", "field": "premise", "values": ["旧车站"]}]
+    },
+    "frames": {
+      "mode": "report",
+      "checks": [{"type": "prose_length", "min_chars": 100, "max_chars": 2000}]
+    }
+  }
+}
+```
+
+```bash
+uv run t2i-story generate --input story-inputs/recipes/motion-blur-photography.yaml \
+  --run-config story-run.json
 ```
 
 质量模式支持 `off`（跳过可选检查）、`report`（记录告警但不重试）和 `enforce`
@@ -231,14 +237,19 @@ runtime:
 覆盖。默认检查列表为空，只验证基础契约。Theme 可以对 `title`、`premise`、
 `style` 分别检查长度、必含和禁止原文，在通过检查后才保存主题并开始生成 Frame。
 Frame 可选检查包括摄影文字证据、字符长度、空白分隔词数、ASCII、必含和禁止原文；它们不是模型
-评审，也不保证叙事语义或摄影物理正确。结构与安全契约不受开关影响。
+评审，也不保证叙事语义或摄影物理正确。配置的写作目标也会进入对应阶段的提示词；
+`off` 只关闭检查与质量重试，不删除目标。`--frame-min-words` / `--frame-max-words`
+和 `--frame-min-chars` / `--frame-max-chars` 可覆盖帧长度目标；
+词数按空白分隔，中文通常用字符数。
+结构与安全契约不受开关影响。
 质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
 批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、
 `--frame-output-tokens` 覆盖；预算针对整个批次，实际请求受 provider 上限约束。
 完整字段与示例见 [Story pipeline 文档](docs/story-pipeline.md)。
 
 story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在运行时加载
-`t2i_prompt_pipeline` 的规则。Story 的公共参与和输出约束由公共规则负责，
+`t2i_prompt_pipeline` 的规则。Story 的通用安全契约集中在系统 `safety.rules`，
+公共叙事和输出约束由 `common.rules` 负责，
 三个 content-level 文件只保留等级特有的边界与可见要求；规则组织不再依赖与
 另一条流水线逐字相同。story 内置规则位于
 `src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
@@ -260,7 +271,8 @@ story-inputs/recipes/
 ```
 
 全部配方、模块、目录和包内策略的 YAML 自然语言使用中文；字段名、ID、枚举、
-文件名、输出语言配置与必须逐字保留的原文不变。中文输入规则不意味着只能生成中文。
+文件名与真正画内文字的原文不变。中文输入规则不意味着只能生成中文；
+画内文案语言也不强制整段描述使用同一种语言。
 
 系统拥有不可变格式与安全契约，`standard-story` 命名策略拥有中国籍/中国地点的
 项目缺省偏好。输入只选择需要的模块；独有创作留在 description 和对应阶段
@@ -269,8 +281,9 @@ story-inputs/recipes/
 `frames` 区分共同约束与阶段任务，不再保留三个分散的等级映射入口。
 只编译当前等级，细化不替换系统边界；同一等级规则的重复归属会明确报错。
 等级标识留在配置与冻结快照中，不重复传入模型请求。规则正文直接描述所需内容，
-不使用等级自报、合规证明或服装锁定口令；人数、输出格式和具体内容边界仍须完整
-保留。精简按同一次请求评估，不以删掉 Frame 必需约束来缩短 Theme／Frame 总长度。
+不使用等级自报、合规证明或服装锁定口令。人数、支撑几何、媒介及画内文字等视觉
+事实保留；字数、固定句式、格式协议、检查与重写流程不属于配方。
+安全由系统始终施加，不通过删除 YAML 中的重复声明来关闭。
 字母/姿态由本地计划分配到 Theme 槽位，每批只发送所选项目，不让模型自行续数。
 小于26个字母时使用目录明确的多样性顺序，26个时A–Z，大于26个时覆盖全部再复用。
 其他已有编号规则用有界循环目录表达；条件Frame分配仅对匹配的帧数生效，
@@ -282,6 +295,8 @@ story-inputs/recipes/
 资产根默认相对输入文件，可用 `--assets-dir` 显式指定；不存在工作目录规则发现、
 模块递归 include、远程资源或可执行模板。缺失、冲突和未知字段明确报错。
 旧顶层文件、旧名称别名、Story 的 `--rules-dir` 与旧 authoring 数组格式已删除。
+旧配方的 `generation`、`runtime`、`validation`、`policy` 即使为空也被拒绝，
+不提供旧字段读取、自动迁移或按配方文件名查询的影子运行配置。
 多个 Frame 始终是同一 Theme 的平行视觉方案，媒介与题材不新增 pipeline。
 
 可以在加载模型配置前离线检查最终输入、规则来源和全部槽位：
@@ -306,8 +321,8 @@ uv run t2i-story runs --runs-dir runs
 uv run t2i-story resume RUN_ID --runs-dir runs
 ```
 
-`resolved-input.json` 冻结所选模块、目录、来源与完整槽位计划，并校验其指纹。
-resume 不重新读取原输入或资产；缺少当前格式快照的旧run明确拒绝，不做迁移或回退。
+`resolved-input.json` 冻结所选模块、目录、来源、有效运行配置与完整槽位计划，并校验其指纹。
+resume 不重新读取原输入、外部JSON配置或资产；旧格式快照明确拒绝，不做迁移或回退。
 `request.json`、provider/并发/retry/token/质量配置、generation attempts 和 token
 usage 都随 run 保存。已完成 run 的 `resume` 是幂等的，不会再次调用 provider。
 网络 timeout、transport error、429 和 5xx 默认在 provider 层额外重试两次；
@@ -327,9 +342,12 @@ issues 继续反馈给模型。认证错误不会盲目重试。
 最终 TXT 默认统一写入 `prompts/YYYY-MM-DD/hardcore/`，所有可恢复 run 记录在
 `runs/`。也可以把第二、第三个位置参数分别用于覆盖
 prompts root 和 runs directory。
+可选第四参数或 `T2I_STORY_RUN_CONFIG` 指定外部 JSON；提供后不再强制上述
+100 themes / 6 frames / hardcore / English，而由 JSON 与程序默认决定，
+脚本仅覆盖这五组人数。
 脚本先用同一 CLI 的 `explain` 对全部五组最终请求预检；任何一组不兼容就整批退出，
 没有生成调用，不默认跳过。字母表、固定双人/单人等配方不能套用这套阵容矩阵。
-文档中的并发、重试、authoring 和质量策略仍会生效。
+视觉配方的 authoring 与外部运行配置的并发、重试和质量策略分别生效。
 
 输出按 `prompts/YYYY-MM-DD/aesthetic|erotic|hardcore/` 分类：
 
@@ -346,8 +364,9 @@ prompts root 和 runs directory。
 
 每个 Narrative Frame 只有 `frame_id` 和一段无换行的 `prose`。每帧自然点明风格、
 年代、地点和当前时刻，重新完整描写所有可见人物，并将当前静态关系、环境证据、
-镜头与光线融为一个通顺段落。本地不再使用叙事质量门、关键词计数或质量反馈；
-只校验 typed schema、精确数量、连续 ID 和安全底线。叙事规则以整体画面是否自然、
+镜头与光线融为一个通顺段落。本地始终校验 typed schema、精确数量、连续 ID 和
+存储契约；可选质量检查只来自外部运行配置。系统安全指令始终加载，
+但这些文本检查并不证明模型输出或生成图像的语义安全。叙事规则以整体画面是否自然、
 人物空间是否成立和段落能否直接用于文生图为准，不要求固定句首或六段填表结构。
 每帧必须重新交代年代、地点与当前时刻；建筑、陈设、器物、材料、服装、发型、
 交通、通信、照明、社会称谓和人物用语必须符合该时代与地域。不确定时采用保守的
@@ -357,9 +376,9 @@ prompts root 和 runs directory。
 
 独立故事分支支持 `--content-level aesthetic|erotic|hardcore`。默认
 `aesthetic` 以故事和构图为主，不主动增加性内容；`erotic` 要求可见但非露骨的
-成人裸露与双方主动亲密接触；`hardcore` 要求直接呈现明确的成人性行为。后两级
-必须在 Story Description 中明确清醒、自愿、持续回应和可随时停止。三个等级都
-严格限制为二十一岁以上成年人，并禁止胁迫、伤害与无法退出的互动。
+成人裸露与双方主动亲密接触；`hardcore` 要求直接呈现明确的成人性行为。
+通用成年、自愿、清醒、持续回应和可随时停止要求由系统安全规则施加，
+不要求配方重复声明。等级特有边界仍由相应系统等级规则负责。
 
 Provider 直接复用共享的 `OPENAI_*` 环境变量；完整说明见
 [独立故事生成器](docs/story-pipeline.md)。

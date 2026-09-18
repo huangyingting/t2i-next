@@ -1,14 +1,9 @@
 id: social-caricature
-policy: standard-story
 description: 从可辨认的成年人生活中创作原创、以女性为中心的社会夸张讽刺画。叙事中心的女性必须行动、造成可见后果，并始终比每件道具更重要。
-generation:
-  output_language: english
-  cast:
-    female_count: 1
-    male_count: 1
+cast:
+  female_count: 1
+  male_count: 1
 requirements:
-  output_languages:
-  - english
   female_count:
     min: 1
   allowed_casts:
@@ -82,10 +77,6 @@ requirements:
     male_count: 1
   - female_count: 8
     male_count: 0
-validation:
-  frames:
-    checks:
-    - type: ascii
 authoring:
   level_refinements:
     aesthetic:

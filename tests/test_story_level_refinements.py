@@ -350,7 +350,6 @@ def test_offline_explain_selects_shared_rules_and_rejects_duplicate_ownership(
         "id": "neutral",
         "description": "A neutral studio portrait.",
         "authoring": authored_rules().model_dump(mode="json"),
-        "validation": {"themes": {"mode": "off"}, "frames": {"mode": "off"}},
     }
     if invalid == "duplicate":
         source["authoring"]["level_refinements"]["erotic"]["frames"].append(
@@ -363,7 +362,10 @@ def test_offline_explain_selects_shared_rules_and_rejects_duplicate_ownership(
     path = tmp_path / "neutral.yaml"
     path.write_text(yaml.safe_dump(source), encoding="utf-8")
     result = CliRunner().invoke(
-        app, ["explain", "--input", str(path), "--content-level", "erotic"]
+        app, [
+            "explain", "--input", str(path), "--content-level", "erotic",
+            "--theme-quality-mode", "off", "--frame-quality-mode", "off",
+        ]
     )
     payload = json.loads(result.stdout)
     assert result.exit_code == (2 if invalid else 0), result.stdout

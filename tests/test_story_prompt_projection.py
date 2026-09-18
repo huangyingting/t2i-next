@@ -10,6 +10,7 @@ import pytest
 from t2i_story_pipeline.inputs import (
     ResolvedStoryInput,
     StoryDocument,
+    StoryRunConfiguration,
     resolve_story_input,
 )
 from t2i_story_pipeline.models import ContentLevel, NarrativeFrame, StoryStage
@@ -40,15 +41,13 @@ VISIBLE_LIMITS = {
         "核心动作在整组至少一半 Frame 中完成为可见接触",
         "近景不得以胯下、腹股沟或性器官区域为主视觉",
         "不出现性器官特写、插入或口部性行为、自慰、体液和性暴力细节",
-        "不得出现悬吊、勒颈、堵塞呼吸、电击、真实武器、伤口、流血、失能、胁迫或无法退出",
+        "不得出现悬吊",
     ),
     ContentLevel.HARDCORE: (
         "当前画面直接、清晰地呈现角色之间的明确性行为",
         "器具、束缚或痛感强度本身不能替代这一要求",
         "所有角色必须外观明确为二十一岁以上成年人",
         "以主动接触或共同施力提供双方自愿参与的可见证据",
-        "不得出现未成年或年龄模糊外观、亲属、动物参与性接触、偷拍",
-        "失能、胁迫、无法退出、勒颈窒息、电击、真实武器、伤口、流血或性暴力",
     ),
 }
 
@@ -63,7 +62,6 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
     document = StoryDocument.model_validate(
         {
             "description": "A neutral portrait of two adults.",
-            "generation": {"content_level": level, "frames_per_theme": 2},
             "authoring": {
                 "level_refinements": {
                     candidate.value: {"shared": [rule]}
@@ -72,7 +70,12 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
             },
         }
     )
-    resolved = resolve_story_input(document)
+    resolved = resolve_story_input(
+        document,
+        run_configuration=StoryRunConfiguration(
+            generation={"content_level": level, "frames_per_theme": 2}
+        ),
+    )
     frozen = resolved.model_dump_json()
     restored = ResolvedStoryInput.model_validate_json(frozen)
     assert restored.request.content_level == level
@@ -116,7 +119,13 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
         assert all(label not in prompt for label in ("本次使用", "本级", "该等级"))
         for candidate, rule in refinements.items():
             assert (rule in prompt) == (candidate == level)
-        assert "Every depicted person must be an unmistakable adult." in prompt
+        safety = [
+            line for line in (SYSTEM / "safety.rules").read_text().splitlines()
+            if line and not line.startswith("#")
+        ]
+        assert safety
+        assert all(prompt.count(rule) == 1 for rule in safety)
+        assert "Every depicted person must be an unmistakable adult" in prompt
         assert (
             "All participants must be alert, consenting, responsive, and able to stop."
             in prompt

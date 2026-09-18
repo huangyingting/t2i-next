@@ -3,6 +3,8 @@
 from t2i_story_pipeline.inputs import (
     ResolvedStoryInput,
     StoryDocument,
+    StoryRunConfiguration,
+    load_run_configuration,
     load_story_document,
     resolve_story_input,
 )
@@ -15,7 +17,9 @@ __all__ = [
     "StoryDocument",
     "StoryRequest",
     "StoryResult",
+    "StoryRunConfiguration",
     "StoryStudio",
+    "load_run_configuration",
     "load_story_document",
     "resolve_story_input",
 ]

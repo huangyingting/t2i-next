@@ -1,11 +1,5 @@
 id: relationship-caricature
-policy: standard-story
 description: 创作关于普通成年人关系的原创、超写实社论式社会夸张讽刺主题。揭示恋爱、婚姻、职场等级、友谊、共同家务劳动、家庭期待、地位、关注、功劳、照料或琐碎日常摩擦中可辨认的矛盾。
-generation:
-  output_language: english
-requirements:
-  output_languages:
-  - english
 authoring:
   level_refinements:
     aesthetic:

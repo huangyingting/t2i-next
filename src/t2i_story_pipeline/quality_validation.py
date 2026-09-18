@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Sequence
 
@@ -64,12 +65,68 @@ class StoryQualityError(StoryContractError):
         super().__init__("；".join(issue.feedback() for issue in issues))
 
 
-def _frame_check_applies(check: QualityCheck, language: OutputLanguage) -> bool:
+def frame_check_applies(check: QualityCheck, language: OutputLanguage) -> bool:
     return (
         not isinstance(check, AsciiCheck | WordCountCheck)
         or check.when_language is None
         or check.when_language == language
     )
+
+
+def writing_constraints(
+    policy: StoryQualityPolicy, stage: StoryStage, language: OutputLanguage
+) -> tuple[str, ...]:
+    """Render requested writing targets even when local validation is off."""
+    selected = (
+        policy.themes.checks
+        if stage == StoryStage.THEMES
+        else tuple(
+            check
+            for check in policy.frames.checks
+            if frame_check_applies(check, language)
+        )
+    )
+    instructions = []
+    for check in selected:
+        target = (
+            f"each Theme's {check.field}"
+            if stage == StoryStage.THEMES
+            else "each Frame's prose"
+        )
+        if isinstance(check, TextLengthBounds):
+            instruction = (
+                f"Write {target} using {check.min_chars} to {check.max_chars} "
+                "characters, counting spaces and punctuation."
+            )
+        elif isinstance(check, WordCountCheck):
+            maximum = (
+                f" and at most {check.max_words}" if check.max_words is not None else ""
+            )
+            instruction = (
+                f"Write {target} using at least {check.min_words}{maximum} "
+                "whitespace-separated words."
+            )
+        elif isinstance(check, AsciiCheck):
+            instruction = f"Use only ASCII characters in {target}."
+        elif isinstance(check, CameraEvidenceCheck):
+            examples = (
+                "特写、平视、焦点或景深"
+                if language == OutputLanguage.CHINESE
+                else "close-up, eye-level, focus or depth of field"
+            )
+            instruction = (
+                f"In {target}, explicitly describe shot scale, viewpoint, and "
+                f"focus or depth of field using concrete terms such as {examples}."
+            )
+        else:
+            literals = json.dumps(check.values, ensure_ascii=False)
+            instruction = (
+                f"Include every exact literal in {target}: {literals}."
+                if isinstance(check, RequiredTextCheck)
+                else f"Exclude all of these exact literals from {target}: {literals}."
+            )
+        instructions.append(instruction)
+    return tuple(instructions)
 
 
 def _text_check_messages(
@@ -121,7 +178,7 @@ def check_frame_quality(
         return ()
     issues: list[StoryQualityIssue] = []
     for check in policy.checks:
-        if not _frame_check_applies(check, language):
+        if not frame_check_applies(check, language):
             continue
         messages: list[str] = []
         if isinstance(check, CameraEvidenceCheck):
@@ -187,7 +244,7 @@ def quality_report(
             policy.frames,
             frame_issues,
             active_checks=any(
-                _frame_check_applies(check, language) for check in policy.frames.checks
+                frame_check_applies(check, language) for check in policy.frames.checks
             ),
         ),
     )

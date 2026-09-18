@@ -2,188 +2,160 @@ id: piss
 entries:
 - id: slot-01
   themes:
-  - 在 25–34 岁的年轻成年人范围内选择一个明确整数年龄。
+  - 人物呈现 25–34 岁的年轻成年人外观。
   frames:
-  - 保持当前 主题 已确定的 25–34 岁范围内的明确整数年龄。
+  - 人物保持选定的 25–34 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front view from the squat toilet''s front rim.”'
+      - 相机位于蹲便器前缘，采用正面视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: left side view from the squat toilet''s left
-        rim.”'
+      - 相机位于蹲便器左缘，采用左侧视角。
 - id: slot-02
   themes:
-  - 在 35–49 岁的成熟成年人范围内选择一个明确整数年龄。
+  - 人物呈现 35–49 岁的成熟成年人外观。
   frames:
-  - 保持当前 主题 已确定的 35–49 岁范围内的明确整数年龄。
+  - 人物保持选定的 35–49 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: right side view from the squat toilet''s right
-        rim.”'
+      - 相机位于蹲便器右缘，采用右侧视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear view from the squat toilet''s rear rim.”'
+      - 相机位于蹲便器后缘，采用背面视角。
 - id: slot-03
   themes:
-  - 在 50–64 岁的年长成年人范围内选择一个明确整数年龄。
+  - 人物呈现 50–64 岁的年长成年人外观。
   frames:
-  - 保持当前 主题 已确定的 50–64 岁范围内的明确整数年龄。
+  - 人物保持选定的 50–64 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front three-quarter view from the squat toilet''s
-        front-side rim.”'
+      - 相机位于蹲便器前侧缘，采用前四分之三视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear three-quarter view from the squat toilet''s
-        rear-side rim.”'
+      - 相机位于蹲便器后侧缘，采用后四分之三视角。
 - id: slot-04
   themes:
-  - 在 65–79 岁的老年成年人范围内选择一个明确整数年龄。
+  - 人物呈现 65–79 岁的老年成年人外观。
   frames:
-  - 保持当前 主题 已确定的 65–79 岁范围内的明确整数年龄。
+  - 人物保持选定的 65–79 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front view from the squat toilet''s front rim.”'
+      - 相机位于蹲便器前缘，采用正面视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: left side view from the squat toilet''s left
-        rim.”'
+      - 相机位于蹲便器左缘，采用左侧视角。
 - id: slot-05
   themes:
-  - 在 25–34 岁的年轻成年人范围内选择一个明确整数年龄。
+  - 人物呈现 25–34 岁的年轻成年人外观。
   frames:
-  - 保持当前 主题 已确定的 25–34 岁范围内的明确整数年龄。
+  - 人物保持选定的 25–34 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: right side view from the squat toilet''s right
-        rim.”'
+      - 相机位于蹲便器右缘，采用右侧视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear view from the squat toilet''s rear rim.”'
+      - 相机位于蹲便器后缘，采用背面视角。
 - id: slot-06
   themes:
-  - 在 35–49 岁的成熟成年人范围内选择一个明确整数年龄。
+  - 人物呈现 35–49 岁的成熟成年人外观。
   frames:
-  - 保持当前 主题 已确定的 35–49 岁范围内的明确整数年龄。
+  - 人物保持选定的 35–49 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front three-quarter view from the squat toilet''s
-        front-side rim.”'
+      - 相机位于蹲便器前侧缘，采用前四分之三视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear three-quarter view from the squat toilet''s
-        rear-side rim.”'
+      - 相机位于蹲便器后侧缘，采用后四分之三视角。
 - id: slot-07
   themes:
-  - 在 50–64 岁的年长成年人范围内选择一个明确整数年龄。
+  - 人物呈现 50–64 岁的年长成年人外观。
   frames:
-  - 保持当前 主题 已确定的 50–64 岁范围内的明确整数年龄。
+  - 人物保持选定的 50–64 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front view from the squat toilet''s front rim.”'
+      - 相机位于蹲便器前缘，采用正面视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: left side view from the squat toilet''s left
-        rim.”'
+      - 相机位于蹲便器左缘，采用左侧视角。
 - id: slot-08
   themes:
-  - 在 65–79 岁的老年成年人范围内选择一个明确整数年龄。
+  - 人物呈现 65–79 岁的老年成年人外观。
   frames:
-  - 保持当前 主题 已确定的 65–79 岁范围内的明确整数年龄。
+  - 人物保持选定的 65–79 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: right side view from the squat toilet''s right
-        rim.”'
+      - 相机位于蹲便器右缘，采用右侧视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear view from the squat toilet''s rear rim.”'
+      - 相机位于蹲便器后缘，采用背面视角。
 - id: slot-09
   themes:
-  - 在 25–34 岁的年轻成年人范围内选择一个明确整数年龄。
+  - 人物呈现 25–34 岁的年轻成年人外观。
   frames:
-  - 保持当前 主题 已确定的 25–34 岁范围内的明确整数年龄。
+  - 人物保持选定的 25–34 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front three-quarter view from the squat toilet''s
-        front-side rim.”'
+      - 相机位于蹲便器前侧缘，采用前四分之三视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear three-quarter view from the squat toilet''s
-        rear-side rim.”'
+      - 相机位于蹲便器后侧缘，采用后四分之三视角。
 - id: slot-10
   themes:
-  - 在 35–49 岁的成熟成年人范围内选择一个明确整数年龄。
+  - 人物呈现 35–49 岁的成熟成年人外观。
   frames:
-  - 保持当前 主题 已确定的 35–49 岁范围内的明确整数年龄。
+  - 人物保持选定的 35–49 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front view from the squat toilet''s front rim.”'
+      - 相机位于蹲便器前缘，采用正面视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: left side view from the squat toilet''s left
-        rim.”'
+      - 相机位于蹲便器左缘，采用左侧视角。
 - id: slot-11
   themes:
-  - 在 50–64 岁的年长成年人范围内选择一个明确整数年龄。
+  - 人物呈现 50–64 岁的年长成年人外观。
   frames:
-  - 保持当前 主题 已确定的 50–64 岁范围内的明确整数年龄。
+  - 人物保持选定的 50–64 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: right side view from the squat toilet''s right
-        rim.”'
+      - 相机位于蹲便器右缘，采用右侧视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear view from the squat toilet''s rear rim.”'
+      - 相机位于蹲便器后缘，采用背面视角。
 - id: slot-12
   themes:
-  - 在 65–79 岁的老年成年人范围内选择一个明确整数年龄。
+  - 人物呈现 65–79 岁的老年成年人外观。
   frames:
-  - 保持当前 主题 已确定的 65–79 岁范围内的明确整数年龄。
+  - 人物保持选定的 65–79 岁年龄段与同一外观年龄。
   frame_assignment:
-    frames_per_theme: 2
     slots:
     - frame_id: F01
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: front three-quarter view from the squat toilet''s
-        front-side rim.”'
+      - 相机位于蹲便器前侧缘，采用前四分之三视角。
     - frame_id: F02
       rules:
-      - '紧接四条固定锁后逐字输出此方位锁，不得改写或组合： “VIEW DIRECTION LOCK: rear three-quarter view from the squat toilet''s
-        rear-side rim.”'
+      - 相机位于蹲便器后侧缘，采用后四分之三视角。
 slots:
 - slot-01
 - slot-02

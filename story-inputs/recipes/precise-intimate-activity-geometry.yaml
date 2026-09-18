@@ -1,10 +1,5 @@
 id: precise-intimate-activity-geometry
 description: 为成年人之间明确、自愿的性活动创作独立的照片级写实图像提示词。用精确、简洁的空间语言描述可见动作。图像必须通过身体几何关系让人理解，而不是依赖情绪、委婉语或装饰性文辞。
-generation:
-  theme_count: 1
-  frames_per_theme: 6
-  output_language: english
-  content_level: aesthetic
 authoring:
   themes:
     common:
@@ -97,13 +92,3 @@ authoring:
     - '最终顺序：5. 尚未说明的任何其余束缚、家具或装置承重路径。'
     - '最终顺序：6. 每名成年人的简洁可见造型。'
     - '最终顺序：7. 室内环境、有明确位置的道具、光线、景深层次和焦点，不改变锁定的相机。'
-validation:
-  themes:
-    mode: report
-  frames:
-    mode: report
-    checks:
-    - type: ascii
-requirements:
-  output_languages:
-  - english

@@ -376,7 +376,7 @@ def test_real_preflight_checks_all_casts_before_generating_any(tmp_path, real_cl
     document = tmp_path / "limited-cast.yaml"
     document.write_text(
         "id: limited-cast\ndescription: A station composition.\n"
-        "generation: {cast: {female_count: 1, male_count: 1}}\n"
+        "cast: {female_count: 1, male_count: 1}\n"
         "requirements: {female_count: {max: 2}}\n",
         encoding="utf-8",
     )

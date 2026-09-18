@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import yaml
@@ -9,7 +10,7 @@ from yaml.events import AliasEvent, NodeEvent
 from yaml.nodes import MappingNode, Node
 
 from t2i_story_pipeline.errors import StoryConfigurationError
-from t2i_story_pipeline.inputs.schema import StoryDocument
+from t2i_story_pipeline.inputs.schema import StoryDocument, StoryRunConfiguration
 from t2i_story_pipeline.models import Model
 
 
@@ -75,6 +76,29 @@ def load_story_document(path: Path) -> StoryDocument:
     document = load_yaml_model(path, StoryDocument)
     document._source_path = path.resolve()
     return document
+
+
+def load_run_configuration(path: Path) -> StoryRunConfiguration:
+    """Load only strict UTF-8 JSON, with duplicate keys rejected at every depth."""
+    if path.suffix != ".json":
+        raise StoryConfigurationError(f"Story run configuration must use .json: {path}")
+    try:
+        text = path.read_text(encoding="utf-8")
+        json.loads(text, object_pairs_hook=_unique_json_keys)
+        return StoryRunConfiguration.model_validate_json(text, strict=True)
+    except (OSError, UnicodeError, ValueError, RecursionError) as exc:
+        raise StoryConfigurationError(
+            f"Invalid Story run configuration {path}: {exc}"
+        ) from exc
+
+
+def _unique_json_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
 
 
 def asset_path(root: Path, directory: str, asset_id: str) -> Path:

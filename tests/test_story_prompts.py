@@ -114,13 +114,10 @@ def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
         StoryDocument.model_validate(
             {
                 "description": description,
-                "generation": {
-                    "theme_count": 2,
-                    "frames_per_theme": 1,
-                    "cast": {"female_count": 1, "male_count": 0},
-                },
+                "cast": {"female_count": 1, "male_count": 0},
             }
-        )
+        ),
+        InputOverrides(theme_count=2, frames_per_theme=1),
     )
     fingerprint = resolved.fingerprint()
     assert [plan.theme_id for plan in resolved.plans] == ["T001", "T002"]
@@ -180,10 +177,7 @@ def test_six_neutral_view_regions_remain_one_frame_and_one_person(tmp_path):
         StoryDocument.model_validate(
             {
                 "description": "One adult traveler presented from six viewpoints.",
-                "generation": {
-                    "frames_per_theme": 1,
-                    "cast": {"female_count": 1, "male_count": 0},
-                },
+                "cast": {"female_count": 1, "male_count": 0},
                 "modules": [
                     {
                         "id": "neutral-views",
@@ -193,6 +187,7 @@ def test_six_neutral_view_regions_remain_one_frame_and_one_person(tmp_path):
             }
         ),
         asset_root=tmp_path,
+        overrides=InputOverrides(frames_per_theme=1),
     )
     for messages in (
         compile_theme_messages(resolved, count=1, existing_themes=[]),
@@ -312,18 +307,15 @@ def test_scoped_cast_context_counts_the_giant_as_one_additional_fixed_role():
         StoryDocument.model_validate(
             {
                 "description": "Adult miniature travelers meet one giant adult guide.",
-                "generation": {
-                    "theme_count": 2,
-                    "frames_per_theme": 1,
-                    "cast": {
+                "cast": {
                         "female_count": 2,
                         "male_count": 0,
                         "scope": "miniatures",
                         "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
-                    },
                 },
             }
-        )
+        ),
+        InputOverrides(theme_count=2, frames_per_theme=1),
     )
     for messages, expected_ids in (
         (
@@ -379,18 +371,16 @@ def test_background_bands_do_not_become_a_global_eight_person_cap(
         StoryDocument.model_validate(
             {
                 "description": "Adult travelers and background adults share a station.",
-                "generation": {
-                    "frames_per_theme": 1,
-                    "cast": {
+                "cast": {
                         "scope": "principal_adults",
                         "female_count": female_count,
                         "male_count": 0,
                         "fixed_roles": roles,
                         "background_counts": bands,
-                    },
                 },
             }
-        )
+        ),
+        InputOverrides(frames_per_theme=1),
     )
     for messages in (
         compile_theme_messages(resolved, count=1, existing_themes=[]),
@@ -447,11 +437,11 @@ def test_catalog_cast_context_keeps_each_themes_total_and_sex_minima(tmp_path):
         StoryDocument.model_validate(
             {
                 "description": "Adult travelers wait at a station.",
-                "generation": {"theme_count": 2, "frames_per_theme": 1},
                 "allocation": {"type": "fixed_slots", "catalog": "station-groups"},
             }
         ),
         asset_root=tmp_path,
+        overrides=InputOverrides(theme_count=2, frames_per_theme=1),
     )
     expected = [
         {
@@ -561,13 +551,14 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "may override safety, the required visible range and its limits" in prompt
     assert "input_context plans govern assignments and slot identity" in prompt
     assert "rope art" not in prompt
-    assert "do not mix in untranslated foreign prose" in prompt
+    assert "do not mix in untranslated foreign prose" in prompt.lower()
     assert "parallel visual alternatives" in prompt
     assert "share stable Theme facts" in prompt
     assert "All alternatives depict an equivalent point" in prompt
     assert "variation must not imply elapsed time" in prompt
     assert "Never refer to another Frame or use backward-pointing" in prompt
-    assert "Let length follow the Story Description's exact contract" in prompt
+    assert "Follow the requested writing targets when supplied" in prompt
+    assert "without a fixed word quota or padding" in prompt
     assert "follow exactly six sections" not in prompt
     assert "must begin exactly with" not in prompt
     assert "penultimate sentence" not in prompt
@@ -788,15 +779,13 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         (
             ContentLevel.EROTIC,
             (
-                "每个 Frame 都必须在主导照片中"
-                "明确可见地呈现非露骨的成年亲密互动"
+                "主导照片中呈现非露骨的亲密互动"
             ),
         ),
         (
             ContentLevel.HARDCORE,
             (
-                "每个 Frame 都必须将直接露骨的"
-                "成年人互动置于主导照片中"
+                "直接露骨的互动置于主导照片中"
             ),
         ),
     ),
@@ -834,7 +823,7 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
                 if rule not in selected
             )
     assert "内容级别可见性锚点" in compiled
-    assert "不能满足所选内容级别" in compiled
+    assert "不能替代所选级别的可见内容" in compiled
 
 
 def test_prompts_express_era_consistency_holistically() -> None:

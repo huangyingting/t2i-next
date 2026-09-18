@@ -1,18 +1,4 @@
 id: near-future-intimacy-realism
-policy: standard-story
-generation:
-  output_language: english
-requirements:
-  output_languages:
-  - english
-validation:
-  frames:
-    checks:
-    - type: ascii
-      when_language: english
-    - type: word_count
-      when_language: english
-      min_words: 600
 description: '创作关于近未来成年人自愿亲密关系的照片级写实主题与画面。技术已改变身体、距离、生育、劳动、隐私和性姿势，日常生活的物质层面却依然平常。每幅图像都应像是在住宅、栖居舱、旅馆、诊所、工坊、交通工具舱室或出租房内拍摄的一张不煽情的照片。
 
   主导风格是冷峻、带生活痕迹的写实：先进系统会被购买、租用、修理、清洁、充电、修补，也会引发争执。未来感必须通过建筑、材料、光线和身体尺度的技术一眼可辨，而不是靠奇观或摆在当代房间里的一件小装置。

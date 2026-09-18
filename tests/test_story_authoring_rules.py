@@ -27,13 +27,16 @@ def test_story_rules_compile_only_the_selected_content_level() -> None:
 @pytest.mark.parametrize("level", list(ContentLevel))
 def test_common_contracts_have_one_owner_at_every_level(level: ContentLevel) -> None:
     system = REPOSITORY_ROOT / "src" / "t2i_story_pipeline" / "rule_packs" / "system"
-    common = (system / "common.rules").read_text(encoding="utf-8").splitlines()
+    common = "\n".join(
+        (system / filename).read_text(encoding="utf-8")
+        for filename in ("common.rules", "safety.rules")
+    ).splitlines()
     universal = [
         rule
         for rule in common
         if rule.startswith(
             (
-                "Every depicted person must be an unmistakable adult.",
+                "Every depicted person must be an unmistakable adult",
                 "All participants must be alert, consenting, "
                 "responsive, and able to stop.",
                 "Do not write configuration metadata,",
@@ -142,7 +145,7 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
         "dress.yaml": ("恰好包含六个互不重叠的视图区",),
         "edo-warai-e.yaml": (
             "平坦、分隔的色块",
-            "中性外部词语",
+            "nishiki-e",
             "实体搭建和真人表演",
         ),
         "ming-gongbi-mixi-tu.yaml": (

@@ -55,21 +55,29 @@ interaction, action, emotion, environment, camera intent, and lighting intent.
 _Avoid_: Brief, configuration
 
 **Story Document**:
-The sole file-input format for Story Generation: a UTF-8 `.yaml` document
-containing an explicit ID, a natural-language Story Description, and optional
-generation settings, stage/level authoring rules, quality policy, runtime settings,
-applicability requirements, explicit module references and catalog allocation.
-Packaged YAML authoring text is Chinese; output-language controls remain explicit
-and independent.
-Explicit CLI options override document settings; omitted options do not.
-Both document defaults and final overrides must satisfy applicability requirements.
-Only the frozen resolved input, request, rules, and settings are used on resume.
-_Avoid_: Plain-text input, visual specification, executable workflow
+The visual recipe input: a UTF-8 `.yaml` document containing an explicit ID,
+natural-language visual facts, cast structure, stage/level visual refinements,
+visual applicability, module references and catalog allocation. It contains no
+generation, runtime, validation, policy-selection or safety-control settings.
+Packaged visual prose is Chinese; the generated prose language is an independent
+execution choice. Image text language and visual panel counts remain image facts.
+_Avoid_: Run configuration, plain-text file input, executable workflow
+
+**Story Run Configuration**:
+The external generation, runtime and output-quality controls, supplied through
+explicit JSON and CLI options rather than visual recipes or filename lookups.
+Explicit CLI values override the supplied configuration, including zero;
+unspecified gender counts use the recipe's visual cast. Program defaults do not
+silently adapt to each recipe. The final request must satisfy visual applicability
+and allocation contracts. The effective configuration is frozen with the resolved
+input; resume does not rediscover its file or migrate older snapshot shapes.
+_Avoid_: Recipe-specific shadow profile, safety switch, implicit directory lookup
 
 **Story Rule Set**:
 The immutable ordered authoring rules compiled for the Theme and Frame stages
 of one story run. Built-in rules define only stage semantics and universal
-contracts; the named standard-story policy owns project defaults. Explicit modules
+contracts and mandatory safety; the program-selected standard-story policy owns
+project defaults. Explicit modules
 and Story Document authoring rules are selected for the current stage and level,
 before the output-language rule. Shared level refinements have one source owner;
 each stage receives its common rules, the shared selected-level refinements, and
@@ -78,8 +86,9 @@ reused on resume.
 _Avoid_: Story Description, Prompt Generation rules, per-input special case
 
 **Resolved Story Input**:
-The validated, provider-independent compilation of one Story Document and its
-explicit overrides. It contains effective generation/runtime/quality settings,
+The validated, provider-independent compilation of one visual Story Document,
+external run configuration and explicit overrides. It contains effective
+generation/runtime/quality settings,
 rules, source provenance, module contexts, and one plan per requested Theme.
 It is frozen before generation and reloaded without source-file access on resume.
 _Avoid_: Executable workflow, implicit working-directory configuration
@@ -94,8 +103,8 @@ _Avoid_: Plugin, generic prompt mixin, filename-specific branch
 A deterministic mapping from program-owned Theme slots to catalog entries and
 their stage-specific facts and cast requirements. Fixed-slot, alphabet-coverage,
 and bounded cyclic-slot strategies do not change with provider batch boundaries
-or retries. Conditional Frame assignments preserve the original slot when only
-some Frames are retried. Correct
+or retries. Conditional Frame assignments derive their view count from their slots and
+preserve the original slot when only some Frames are retried. Correct
 allocation is not a guarantee of generated geometry or visual quality.
 _Avoid_: Model-selected counter, physical solver
 
@@ -108,13 +117,17 @@ invent extras from prose. Repeated views of one identity do not add people.
 _Avoid_: Hidden cast override, universal eight-person image limit
 
 **Story Quality Policy**:
-An opt-in set of local Theme and Frame evidence checks, frozen in run settings.
+Externally declared output targets and local Theme/Frame evidence checks,
+frozen in run settings rather than authored in visual recipes.
 Each stage independently selects `off` to skip checks, `report` to record warnings
 without quality retries, or `enforce` to reject failed output with bounded retries.
 Theme checks target a named title, premise, or style field before the batch is
 checkpointed or queued for Frame generation; Frame checks target final prose.
 Basic schema, count, persistence, and safety contracts remain independent.
-Checks do not add authoring instructions or call a model evaluator.
+Applicable text constraints are projected into concrete writing targets using the
+same stage and language applicability as validation. Disabling quality checks
+does not erase configured output targets or mandatory safety. No model evaluator
+is invoked.
 _Avoid_: Safety switch, semantic guarantee, automatic review stage
 
 **Story Quality Report**:

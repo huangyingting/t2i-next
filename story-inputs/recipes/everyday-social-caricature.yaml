@@ -1,14 +1,9 @@
 id: everyday-social-caricature
-policy: standard-story
 description: 从可辨认的成年人社会行为中创作原创、以女性为中心的社论式夸张讽刺画。每个主题揭示虚荣、虚伪、贪婪、狭隘、怯懦、伪善、自大、投机、依赖或另一种通过行为表现的矛盾。图像须初看幽默、细想苦涩。讽刺行为和关系，绝不讽刺身份本身。
-generation:
-  output_language: english
-  cast:
-    female_count: 1
-    male_count: 1
+cast:
+  female_count: 1
+  male_count: 1
 requirements:
-  output_languages:
-  - english
   female_count:
     min: 1
   allowed_casts:
@@ -82,10 +77,6 @@ requirements:
     male_count: 1
   - female_count: 8
     male_count: 0
-validation:
-  frames:
-    checks:
-    - type: ascii
 authoring:
   level_refinements:
     aesthetic:

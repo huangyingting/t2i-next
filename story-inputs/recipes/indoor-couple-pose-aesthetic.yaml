@@ -1,13 +1,8 @@
 id: indoor-couple-pose-aesthetic
 description: 创作美丽、精致、感性的室内伴侣摄影，以女性严格执行的指定姿态，以及男性与之互补的亲密位置为核心。
-generation:
-  theme_count: 100
-  frames_per_theme: 1
-  output_language: english
-  content_level: aesthetic
-  cast:
-    female_count: 1
-    male_count: 1
+cast:
+  female_count: 1
+  male_count: 1
 authoring:
   themes:
     common:
@@ -24,27 +19,10 @@ authoring:
     - 光线、镜头与美感：为每个场景选择优美的摄影或绘画感摄影风格，例如艺术编辑摄影、浪漫电影写实、明亮时装摄影、柔和明暗对照、当代私房摄影、古典构图、梦幻写实、优雅电影剧照、低饱和胶片色彩或精致高级时装极简主义。明确使用保留直线透视的 35-85 mm 镜头，并写明光圈、机位高度、拍摄侧向、取景、景深层次、焦点层级和色板。优先采用能够清楚展示指定姿态的中远景或全身构图。避免裁断肢体、鱼眼畸变、极端广角、混乱镜面、重复身体、畸形双手和融合的解剖结构。
     - 严格保留所分配目录条目的姿态。不得遗漏、合并、改述成另一种姿态，或重复使用已分配姿态。
     - 每幅画面正文是至少 450 个单词的自然英语段落。仅使用 U+0020 至 U+007E 范围的可打印 ASCII 字符。只返回肯定式可见描述，不得包含标题、标签、主题标识符、画面标识符、核对清单、备选方案、负面提示词或评论。返回前核验精确阵容、精确指定姿态、室内环境、完整造型、连贯解剖、优美光线、镜头规格和 ASCII 输出。
-validation:
-  themes:
-    mode: report
-  frames:
-    mode: report
-    checks:
-    - type: ascii
-    - type: word_count
-      min_words: 450
 requirements:
   allowed_casts:
   - female_count: 1
     male_count: 1
-  theme_count:
-    min: 100
-    max: 100
-  frames_per_theme:
-    min: 1
-    max: 1
-  output_languages:
-  - english
 allocation:
   type: fixed_slots
   catalog: indoor-couple-poses

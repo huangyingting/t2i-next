@@ -10,7 +10,9 @@ from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.inputs import (
     CatalogDocument,
     StoryDocument,
+    StoryRunConfiguration,
     load_story_document,
+    resolve_story_input,
 )
 from t2i_story_pipeline.models import ContentLevel, StoryStage
 
@@ -30,17 +32,12 @@ def test_document_keeps_prose_and_defaults(tmp_path):
     assert document.description == (
         "First paragraph.\n\nSecond paragraph, with a colon: and # literal text."
     )
-    assert document.generation.theme_count == 1
-    assert document.generation.frames_per_theme == 6
-    assert document.runtime.concurrency == 8
-    assert document.runtime.generation_retries == 2
-    assert document.runtime.theme_batch_size == 10
-    assert document.runtime.theme_output_tokens == 6000
-    assert document.runtime.frame_output_tokens == 32768
-    assert document.validation.themes.mode == "report"
-    assert document.validation.themes.checks == ()
-    assert document.validation.frames.mode == "report"
-    assert document.validation.frames.checks == ()
+    configuration = resolve_story_input(document).run_configuration
+    assert configuration == StoryRunConfiguration()
+    assert set(document.model_dump()) == {
+        "id", "description", "cast", "authoring", "modules", "requirements",
+        "allocation",
+    }
     assert document.authoring.themes.common == ()
     assert document.authoring.themes.model_dump() == {"common": ()}
     assert document.authoring.level_refinements == {}
@@ -85,20 +82,16 @@ def test_document_loads_shared_and_stage_specific_level_refinements(tmp_path):
     )
 
 
-def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
+@pytest.mark.parametrize("field", ["generation", "runtime", "validation", "policy"])
+@pytest.mark.parametrize("value", ["{}", "null"])
+def test_yaml_rejects_execution_roots_even_when_empty(tmp_path, field, value):
     path = tmp_path / "story.yaml"
     path.write_text(
-        "id: story\ndescription: Story.\n"
-        "validation:\n"
-        "  frames:\n"
-        "    mode: off\n"
-        "    checks:\n"
-        "      - type: prose_length\n"
-        "        min_chars: 5\n"
-        "        max_chars: 20\n",
+        f"id: story\ndescription: Story.\n{field}: {value}\n",
         encoding="utf-8",
     )
-    assert load_story_document(path).validation.frames.mode == "off"
+    with pytest.raises(StoryConfigurationError, match=field):
+        load_story_document(path)
 
 
 @pytest.mark.parametrize(
@@ -200,7 +193,7 @@ def test_only_current_yaml_format_is_supported(tmp_path):
 def test_direct_document_can_omit_id():
     document = StoryDocument(description="A quiet station.")
     assert document.id is None
-    assert document.generation.request(document.description).source_prompt_stem is None
+    assert resolve_story_input(document).request.source_prompt_stem is None
 
 
 def test_io_errors_are_configuration_errors(tmp_path):
@@ -230,7 +223,18 @@ def test_documented_yaml_examples_use_the_current_contract(tmp_path, document):
         path = tmp_path / "example.yaml"
         path.write_text(example, encoding="utf-8")
         loaded = load_story_document(path)
-        assert loaded.validation.themes.checks
-        assert loaded.validation.frames.checks
-        assert loaded.runtime.theme_batch_size == 3
-        assert loaded.runtime.theme_output_tokens == 12000
+        assert loaded.description
+        assert not {"generation", "runtime", "validation", "policy"} & value.keys()
+
+
+@pytest.mark.parametrize(
+    "field", ["theme_count", "frames_per_theme", "output_languages"]
+)
+def test_visual_requirements_reject_execution_requirements(tmp_path, field):
+    path = tmp_path / "story.yaml"
+    path.write_text(
+        f"id: visual\ndescription: A quiet station.\nrequirements:\n  {field}: null\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(StoryConfigurationError, match=field):
+        load_story_document(path)

@@ -1,5 +1,4 @@
 id: erotic-fantasy
-policy: standard-story
 description: 创作多样、精致、超写实的成人幻想六宫格摄影作品。统一的私密布景以严格的三列两行网格呈现同一组成年人物的六个摄影视角，区域之间无缝衔接。整体构图借鉴 Wes Anderson 式的强迫症般置中对称、高饱和度与粉彩调色，结合童话质感的复古美学，与贴近人物的低机位和明亮写实触感形成鲜明反差。
 modules:
 - id: layout-multiview
@@ -9,12 +8,6 @@ modules:
     columns: 3
     min_views: 6
     max_views: 6
-validation:
-  frames:
-    checks:
-    - type: word_count
-      when_language: english
-      max_words: 1000
 authoring:
   level_refinements:
     aesthetic:

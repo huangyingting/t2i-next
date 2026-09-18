@@ -1,13 +1,6 @@
 id: hero-erotic-reinterpretation
-policy: standard-story
 description: 创作一批以二〇〇二年中国武侠电影《英雄》为分析起点、但在人物、事件、场面和镜头上完全原创的成人情色电影剧照。提取原作的高层电影语法：战国想象中的中国武侠世界、同一事件的多重主观叙述、以红白蓝绿黑组织不同情绪真相、巨大宫殿与空旷自然形成的尺度对比、书法与剑术共享的身体节奏，以及忠诚、欺骗、牺牲和私人欲望之间的冲突。每个
   Theme 必须把这些抽象方法转化为一部从未存在过的原创成人武侠电影中的决定性静帧。
-validation:
-  frames:
-    checks:
-    - type: word_count
-      when_language: english
-      max_words: 350
 authoring:
   level_refinements:
     aesthetic:

@@ -24,6 +24,7 @@ from tests.test_story_input_briefs import (
     POLICIES,
     RECIPES,
     REPOSITORY_ROOT,
+    audit_run_configuration,
     bundled_authoring_prose,
 )
 
@@ -204,55 +205,36 @@ def test_output_name_ban_exception_does_not_hide_grade_routing():
     "name", ("edo-warai-e", "ming-gongbi-mixi-tu", "tang-guohua-figures")
 )
 @pytest.mark.parametrize("level", tuple(ContentLevel))
-def test_painting_messages_keep_action_bounds_after_spatial_map_without_preludes(
+def test_painting_messages_keep_visible_action_and_medium_without_templates(
     name, level
 ):
     document = load_story_document(RECIPES / f"{name}.yaml")
-    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    resolved = resolve_story_input(
+        document, InputOverrides(content_level=level),
+        run_configuration=audit_run_configuration(document),
+    )
     messages = frame_messages(
         resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
     )
     prompt = " ".join(messages[0].content.split())
     action_constraints = {
-        ContentLevel.AESTHETIC: (
-            "当前动作句直接描述完整穿着的成年人正在进行的非情色互动，"
-            "不添加模板化引导语。"
-        ),
-        ContentLevel.EROTIC: (
-            "当前动作句直接描述可见的感官亲密互动，保持非露骨边界，"
-            "不添加模板化引导语。"
-        ),
-        ContentLevel.HARDCORE: (
-            "当前动作句直接说明正在发生的、双方自愿的成年人明确性行为，"
-            "不添加模板化引导语。"
-        ),
+        ContentLevel.AESTHETIC: "画面直接呈现完整穿着的人物正在进行的非情色互动。",
+        ContentLevel.EROTIC: "画面直接呈现可见的感官亲密互动，保持非露骨边界。",
+        ContentLevel.HARDCORE: "画面直接呈现正在发生的明确性行为。",
     }
     for owner, constraint in action_constraints.items():
         assert prompt.count(constraint) == (1 if owner == level else 0)
     assert unexpected_grade_names(prompt, level) == ()
-    assert "不先报告内容类别" in prompt
+    assert "空间" in prompt
+    assert "轮廓" in prompt
     if name == "edo-warai-e":
-        opening = "每个画面必须以下列四句原文开头"
-        spatial_map = "其后立即接一个最多 70 个英文单词的空间位置图句子"
-        action = "空间位置图之后，立即写一个独立的当前动作句"
-        medium_lock = "当前动作句后立即重复此确切平面媒介锁定句"
-        action_limit = "当前动作句须直接说出正在发生的行为，且不得超过 70 个英文单词"
-        assert (action_limit in prompt) == (level == ContentLevel.HARDCORE)
+        assert "nishiki-e" in prompt
+        assert "平面" in prompt
     else:
-        opening = "逐字保留这五句开头原文"
-        spatial_map = "紧接着用一句紧凑的空间位置说明"
-        action = "然后写一句独立的当下动作句"
-        medium_lock = "紧接当下动作句后重复以下紧凑的媒介锁定原文"
-        assert "空间位置句与当下动作句各须少于60词" in prompt
-        assert "固定五句开头之后，任何一句都不得超过60个英语单词" in prompt
-        if name == "tang-guohua-figures":
-            assert "每个人物段为一至两句，不受六十词上限限制" in prompt
-    assert (
-        prompt.index(opening)
-        < prompt.index(spatial_map)
-        < prompt.index(action)
-        < prompt.index(medium_lock)
-    )
+        assert "绢" in prompt
+        assert "矿物" in prompt
+    assert "句原文开头" not in prompt
+    assert "英文单词的空间位置图" not in prompt
 
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
@@ -261,10 +243,9 @@ def test_provider_controls_stay_internal_without_losing_ids_or_retry_contracts(l
         StoryDocument.model_validate(
             {
                 "description": "中性的成年人物画面。",
-                "generation": {"theme_count": 3, "frames_per_theme": 4},
             }
         ),
-        InputOverrides(content_level=level),
+        InputOverrides(content_level=level, theme_count=3, frames_per_theme=4),
     )
     restored = ResolvedStoryInput.model_validate_json(resolved.model_dump_json())
     assert restored.fingerprint() == resolved.fingerprint()
@@ -312,7 +293,7 @@ def test_provider_controls_stay_internal_without_losing_ids_or_retry_contracts(l
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
 @pytest.mark.parametrize("stage", tuple(StoryStage))
-def test_relationship_messages_keep_five_sentences_and_contact_without_proofs(
+def test_relationship_messages_keep_visual_contact_and_carriers_without_templates(
     level, stage
 ):
     document = load_story_document(RECIPES / "relationship-caricature.yaml")
@@ -325,70 +306,23 @@ def test_relationship_messages_keep_five_sentences_and_contact_without_proofs(
         )
     )
     prompt = " ".join(messages[0].content.split())
-    contact_maps = {
-        ContentLevel.AESTHETIC: (
-            "Contact map: force chain - [EACH ADULT'S BODY PART, TARGET, AND FORCE]."
-        ),
-        ContentLevel.EROTIC: (
-            "Contact map: sensual contact - [CURRENT NON-EXPLICIT SELF-CONTACT "
-            "OR RECIPROCAL CONTACT]; force and support - "
-            "[EACH ADULT'S BODY PART, TARGET, AND FORCE]."
-        ),
-        ContentLevel.HARDCORE: (
-            "Contact map: defining sexual contact - "
-            "[CURRENT EXPLICIT ANATOMICAL CONTACT]; force and support - "
-            "[EACH ADULT'S BODY PART, TARGET, AND FORCE]."
-        ),
-    }
     bounds = {
-        ContentLevel.AESTHETIC: (
-            "每位成年人穿完整不透明服装，共同互动不涉及性",
-        ),
+        ContentLevel.AESTHETIC: ("不透明", "普通动作", "劳动"),
         ContentLevel.EROTIC: (
-            "不得显示露骨性行为或色情解剖接触",
-            "单人时必须有有意的感官自我接触",
-            "多人时必须有涵盖所有人的相互感官接触",
+            "非露骨", "自我接触", "相互感官接触",
         ),
-        ContentLevel.HARDCORE: (
-            "每个主题和画面中都显示一个清晰可见、已经发生的自愿成年性互动",
-            "不得以准备、暗示、事后或委婉语替代",
-        ),
+        ContentLevel.HARDCORE: ("生殖器", "口部", "手部", "接触"),
     }
     assert all(bound in prompt for bound in bounds[level])
     assert unexpected_grade_names(prompt, level) == ()
-    for owner, literal in contact_maps.items():
-        assert prompt.count(literal) == (1 if owner == level else 0)
-    assert (
-        "每个主题前提和画面的第四句紧接接触图，直接描述此刻可见的衣着、动作、"
-        "每人的主动角色、有支撑的接触几何及其承载的关系对立"
-    ) in prompt
-    assert "不加证明标题" in prompt
-    if stage == StoryStage.THEMES:
-        assert "前提必须恰用五句话" in prompt
-        sentence_markers = (
-            "主题前提第一句必须以动态阵容声明开头",
-            '第二句必须以 "Body exaggerations:" 开头',
-            '第三句必须以 "Contact map:" 开头',
-            "第四句直接说明可见动作如何通过主导隐喻机构呈现关系矛盾",
-            "第五句必须是涵盖每位成年人、场景及两个文案载体的完整",
-        )
-        assert "并包含锁定图像文案对" in prompt
-    else:
-        sentence_markers = (
-            "第一句必须是精确动态阵容声明",
-            '第二句必须是完整 "Body exaggerations:" 序列化',
-            '第三句必须是完整 "Contact map:" 序列化',
-            "第四句直接描述当前衣着、动作、主动角色、支撑几何及其承载的关系对立",
-            '第五句必须是完整 "Style map:" 序列化',
-        )
-        assert "这五个必需句完成前不得加入自由描述" in prompt
-    positions = [prompt.index(marker) for marker in sentence_markers]
-    assert positions == sorted(positions)
-    assert (
-        "五个必需开头句之后的前 80 个单词内，"
-        "须将定义该行为的当前接触和无遮挡空间关系重新描述为可见图像内容"
-        in prompt
-    ) == (stage == StoryStage.FRAMES and level == ContentLevel.HARDCORE)
+    for fact in ("主导", "高饱和", "隐喻", "载体", "支撑", "关系"):
+        assert fact in prompt
+    assert all(
+        rule in messages[0].content
+        for rule in document.authoring.selected(stage, level)
+    )
+    payload = json.loads(messages[1].content)
+    assert _PROVIDER_CONTROL_FIELDS.isdisjoint(payload)
 
 
 @pytest.mark.parametrize(
@@ -438,25 +372,20 @@ def test_liquid_messages_keep_concrete_wardrobe_constraints_without_proofs(
 
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
-def test_dress_preserves_output_name_bans_and_scopes_product_permission(level):
+def test_dress_preserves_selected_product_design_without_word_blacklists(level):
     document = load_story_document(RECIPES / "dress.yaml")
-    permission = (
-        "若有助于准确指明所设计的物件，可以使用乳夹、口塞、假阳具、"
-        "振动器或塞具等直白的标准商业产品名称。"
-    )
-    assert permission not in document.description
-    for stage in StoryStage:
-        assert all(
-            permission not in rule
-            for rule in getattr(document.authoring, stage.value).common
-        )
+    visual_features = {
+        ContentLevel.AESTHETIC: ("内衣", "连体衣", "轻透叠穿"),
+        ContentLevel.EROTIC: ("身体首饰", "敞开式服装", "束带结构"),
+        ContentLevel.HARDCORE: ("快拆束环", "身体链饰", "五金件"),
+    }
     resolved = resolve_story_input(document, InputOverrides(content_level=level))
     restored = ResolvedStoryInput.model_validate_json(resolved.model_dump_json())
     assert restored.fingerprint() == resolved.fingerprint()
     for state in (resolved, restored):
         for stage in StoryStage:
             compiled = state.rules.text_for(stage)
-            assert (permission in compiled) == (level != ContentLevel.AESTHETIC)
+            assert all(feature in compiled for feature in visual_features[level])
             assert unexpected_grade_names(compiled, level) == ()
             messages = (
                 theme_messages(state, count=1, existing_themes=[])
@@ -469,25 +398,21 @@ def test_dress_preserves_output_name_bans_and_scopes_product_permission(level):
                 messages[0].content,
                 *string_values(json.loads(messages[1].content)),
             ]
-            assert any(permission in value for value in prose) == (
-                level != ContentLevel.AESTHETIC
+            assert all(
+                any(feature in value for value in prose)
+                for feature in visual_features[level]
             )
             if stage == StoryStage.FRAMES:
                 assert all(
-                    clause in messages[0].content for clause in _DRESS_OUTPUT_NAME_BANS
+                    clause not in messages[0].content
+                    for clause in _DRESS_OUTPUT_NAME_BANS
                 )
 
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
-def test_motion_public_production_rule_has_frame_and_grade_scope(level):
+def test_motion_public_setting_is_visual_and_safety_is_always_system_owned(level):
     document = load_story_document(RECIPES / "motion-blur-photography.yaml")
-    public_production = (
-        "背景人群：公共场所拍摄必须采用封闭、出入受控的制作。"
-        "前 100 个英文词内，说明对普通公众关闭、临时演员均为知情同意的成年人，"
-        "以及人群密度。临时演员绝不成为不知情目击者。"
-    )
-    for stage in StoryStage:
-        assert public_production not in getattr(document.authoring, stage.value).common
+    public_production = "公共场所呈现封闭片场的空间状态及明确背景人群密度"
     resolved = resolve_story_input(document, InputOverrides(content_level=level))
     restored = ResolvedStoryInput.model_validate_json(resolved.model_dump_json())
     assert restored.fingerprint() == resolved.fingerprint()
@@ -505,11 +430,19 @@ def test_motion_public_production_rule_has_frame_and_grade_scope(level):
                 ContentLevel.EROTIC,
                 ContentLevel.HARDCORE,
             )
-            assert getattr(state.rules, stage.value).count(public_production) == (
+            assert state.rules.text_for(stage).count(public_production) == (
                 1 if expected else 0
             )
             assert messages[0].content.count(public_production) == (
                 1 if expected else 0
+            )
+            assert "前 100 个英文词" not in messages[0].content
+            safety = next(
+                source for source in state.sources
+                if source.kind == "system" and source.id.endswith("safety.rules")
+            )
+            assert all(
+                rule in messages[0].content for rule in getattr(safety, stage.value)
             )
 
 
@@ -521,30 +454,14 @@ def test_motion_frames_define_camera_contract_once_and_scope_subject_blur(level)
         resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
     )
     prompt = " ".join(messages[0].content.split())
-    for literal in (
-        "camera body", "camera mounted", "tripod", "gimbal", "flash head",
-        "flash unit", "softbox", "light stand", "umbrella", "reflector",
-        "capture cable", "shutter trigger", "capture monitor", "production crew",
-        "photographer", "lighting assistant", "production personnel",
-        "equipment outside the frame",
+    for visual_fact in (
+        "拍摄系统不进入图像", "设备、人员、轮廓、阴影或反射",
+        "快门时间和闪光时长不同", "1/2000", "1/10000",
+        "焦平面", "前景过渡", "背景过渡",
     ):
-        assert prompt.count(f'"{literal}"') == 1, literal
-    method = (
-        '"Captured from a [height], [distance], [azimuth], [pitch] viewpoint '
-        "with a [focal length] lens at [aperture], focused at [distance]; "
-        "a [shutter] ambient exposure records [carrier path]; "
-        "a [t.1 duration] off-frame pulse from [screen direction] freezes "
-        "[selected plane]; [ND strength when needed] controls ambient exposure; "
-        'no capture apparatus is visible."'
-    )
-    assert prompt.count(method) == 1
-    for exception in (
-        '"Crew cut" 和 "crew-neck" 仍是有效的外观与衣物结构用语',
-        "显示器、线缆或设备架仍有效",
-        "不要否决自身翻折的腰带",
-        "这些是脱下后的物理形状，不是有序收纳",
-    ):
-        assert exception in prompt
+        assert visual_fact in prompt
+    assert "Captured from a [height]" not in prompt
+    assert '"camera body"' not in prompt
     for instruction in (
         '"SUBJECT MOTION BLUR"',
         "相机不是锁定或固定的",
@@ -629,7 +546,10 @@ def test_selected_messages_and_assets_have_no_grade_announcements_or_dispatch(pa
     document = load_story_document(path)
     violations = []
     for level in document.requirements.content_levels or tuple(ContentLevel):
-        resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        resolved = resolve_story_input(
+            document, InputOverrides(content_level=level),
+            run_configuration=audit_run_configuration(document),
+        )
         assert resolved.request.content_level == level
         for stage in StoryStage:
             for field, prose in selected_asset_prose(resolved, stage):
@@ -680,7 +600,6 @@ def test_selected_asset_audit_catches_module_catalog_and_frame_slot_prose(tmp_pa
                         "themes": ["A neutral layout."],
                         "frames": [bad],
                         "frame_assignment": {
-                            "frames_per_theme": 1,
                             "slots": [{"frame_id": "F01", "rules": [bad]}],
                         },
                     }
@@ -693,7 +612,6 @@ def test_selected_asset_audit_catches_module_catalog_and_frame_slot_prose(tmp_pa
         StoryDocument.model_validate(
             {
                 "description": "A neutral layout.",
-                "generation": {"frames_per_theme": 1, "content_level": "erotic"},
                 "modules": [
                     {
                         "id": "layout",
@@ -703,6 +621,7 @@ def test_selected_asset_audit_catches_module_catalog_and_frame_slot_prose(tmp_pa
                 "allocation": {"type": "fixed_slots", "catalog": "slots"},
             }
         ),
+        InputOverrides(frames_per_theme=1, content_level="erotic"),
         asset_root=tmp_path,
     )
     violations = {
@@ -723,22 +642,22 @@ def test_selected_asset_audit_catches_module_catalog_and_frame_slot_prose(tmp_pa
 _FRAME_FEATURES = {
     "demon-lord": {
         ContentLevel.AESTHETIC: ("所有成年人穿完整不透明衣物", "王座"),
-        ContentLevel.EROTIC: ("consensual and willing", "前一百个英文单词"),
-        ContentLevel.HARDCORE: ("当前精确接触、身体朝向、支撑和角色", "前两句"),
+        ContentLevel.EROTIC: ("触碰的可见相互回应", "衣物必须遵循当前姿势与重力"),
+        ContentLevel.HARDCORE: ("当前精确接触、身体朝向、支撑和角色", "具体连接"),
     },
     "angel": {
         ContentLevel.AESTHETIC: ("完整的不透明衣物", "雨、浸水、汗、雾和逆光"),
-        ContentLevel.EROTIC: ("非露骨的成年人亲密互动", "consensual and willing"),
-        ContentLevel.HARDCORE: ("实际可行的翅膀净空", "前两句"),
+        ContentLevel.EROTIC: ("非露骨的成年人亲密互动", "相互回应可见"),
+        ContentLevel.HARDCORE: ("实际可行的翅膀净空", "参与动作的普通人类解剖结构"),
     },
     "post-layout": {
         ContentLevel.AESTHETIC: ("主导照片必须明确保持非露骨",),
         ContentLevel.EROTIC: (
-            "主导照片中明确可见地呈现非露骨",
+            "主导照片中呈现非露骨的亲密互动",
             "至少一个较小摄影碎片",
         ),
         ContentLevel.HARDCORE: (
-            "将直接露骨的成年人互动置于主导照片中",
+            "将直接露骨的互动置于主导照片中",
             "至少一个较小摄影碎片",
         ),
     },
@@ -787,10 +706,8 @@ def test_real_messages_keep_current_features_without_other_grade_prose(name, lev
         )
         if name == "motion-blur-photography":
             for clause in (
-                "公共场所拍摄必须采用封闭、出入受控的制作",
-                "前 100 个英文词内，说明对普通公众关闭",
-                "临时演员均为知情同意的成年人，以及人群密度",
-                "临时演员绝不成为不知情目击者",
+                "公共场所呈现封闭片场的空间状态",
+                "背景成年人保持次要位置",
             ):
                 assert any(clause in value for value in prose) == (
                     stage == StoryStage.FRAMES and level != ContentLevel.AESTHETIC
@@ -798,6 +715,8 @@ def test_real_messages_keep_current_features_without_other_grade_prose(name, lev
         if stage == StoryStage.FRAMES:
             compiled = messages[0].content
             assert all(marker in compiled for marker in _FRAME_FEATURES[name][level])
+            assert "前 100 个英文词" not in compiled
+            assert "前一百个英文单词" not in compiled
             if name in ("demon-lord", "angel") and level != ContentLevel.AESTHETIC:
                 assert "不高于脚踝" in compiled
                 assert "任何面孔、胸部、骨盆、性接触或呼吸通道都不得浸没" in compiled

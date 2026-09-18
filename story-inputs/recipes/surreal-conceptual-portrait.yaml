@@ -1,14 +1,5 @@
 id: surreal-conceptual-portrait
-policy: standard-story
 description: 为确切要求的成年人物阵容创作原创、博物馆级的超现实观念肖像。结合克制的时尚摄影、实体装置艺术、面无表情的戏剧布置，以及一个不可能但视觉连贯的隐喻。图像应显得安静、精确、诡异且情感可读，而非壮观、异想天开、装饰性或由特效驱动。
-validation:
-  frames:
-    checks:
-    - type: ascii
-      when_language: english
-    - type: word_count
-      when_language: english
-      min_words: 600
 authoring:
   level_refinements:
     aesthetic:
