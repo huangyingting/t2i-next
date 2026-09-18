@@ -670,8 +670,15 @@ _FRAME_FEATURES = {
     },
     "angel": {
         ContentLevel.AESTHETIC: ("完整的不透明衣物", "雨、浸水、汗、雾和逆光"),
-        ContentLevel.EROTIC: ("非露骨的成年人亲密互动", "相互回应可见"),
-        ContentLevel.HARDCORE: ("实际可行的翅膀净空", "参与动作的普通人类解剖结构"),
+        ContentLevel.EROTIC: (
+            "清楚可见且非露骨的成年人情色状态",
+            "相互回应可见",
+        ),
+        ContentLevel.HARDCORE: (
+            "实际可行的翅膀净空",
+            "参与动作的普通人类解剖结构",
+            "身体内部结构始终不可见",
+        ),
     },
     "post-layout": {
         ContentLevel.AESTHETIC: ("主导照片必须明确保持非露骨",),
@@ -777,21 +784,66 @@ def test_angel_visual_choices_reach_each_stage_without_fixed_style_locks(level, 
     choices = {
         StoryStage.THEMES: (
             "姿态、双翼开合、具体接触布局、景别、机位、焦点和局部照明留给各 Frame",
+            "人物目的、关系结构、空间用途、环境状态、羽翼形态、服装体系与视觉语言",
+            "已经接受的 Theme",
+            "当前目标、阻碍或异常状态",
+            "不把其中任何一项或其组合当作默认天使母题",
             "不要求每个主题都有大型场面事件",
             "明亮、中间调或暗调曝光均可成立",
             "普通居所、狭窄工作间",
+            "地点具有可见用途并影响人物活动、姿态与羽翼净空",
             "不是封闭职业清单",
         ),
         StoryStage.FRAMES: (
             "同一时间窗口中的平行画面方案",
+            "任意两个 Frame 至少在景别、机位高度",
+            "至少生成三个 Frame 时",
+            "一个头部、一个躯干、一个骨盆",
+            "每条可见的手臂和腿",
+            "每条肢体只有一个位置、一个关节状态和一个主要职责",
             "折翼不要求场地能够容纳完全展开的翼展",
+            "分别从对应翼根连续延伸至翼尖",
             "侧身、背身、局部裁切与自然遮挡都可使用",
             "不要求每幅同时展示面孔、两个翼根、双手和全部羽毛",
+            "单一不透明二维投影",
+            "改变机位或姿势",
+            "为每个承重的手、膝、脚、背部或骨盆",
+            "每件衣物只有一个明确位置",
             "不限定为一组固定数值",
             "不强行添加奇观",
         ),
     }
     for choice in choices[stage]:
+        assert choice in messages[0].content
+    level_choices = {
+        ContentLevel.EROTIC: {
+            StoryStage.THEMES: (
+                "每个 Theme 和每幅画面都通过部分或完整裸体",
+                "Theme 阶段直接建立上述清楚可见且非露骨的成年人感官状态",
+                "移除当前亲密接触后",
+            ),
+            StoryStage.FRAMES: (
+                "每个 Theme 和每幅画面都通过部分或完整裸体",
+                "每幅画面的冻结瞬间已经建立一项明确的双向亲密互动",
+                "不执行取水、绘画、劳作、观察环境等独立任务",
+            ),
+        },
+        ContentLevel.HARDCORE: {
+            StoryStage.THEMES: (
+                "每个 Theme 和每幅画面都呈现一项清晰可见",
+                "Theme 阶段直接建立上述已经发生且正在进行的成年人性行为",
+                "premise 指定一项主要性行为",
+            ),
+            StoryStage.FRAMES: (
+                "每个 Theme 和每幅画面都呈现一项清晰可见",
+                "每幅画面的性行为已经建立并占据视觉中心",
+                "与性行为并行的环境任务代替",
+                "闭环下装在行为开始前已经完全脱离双腿",
+                "身体内部结构始终不可见",
+            ),
+        },
+    }
+    for choice in level_choices.get(level, {}).get(stage, ()):
         assert choice in messages[0].content
     for retired in (
         "百分之八十五",
