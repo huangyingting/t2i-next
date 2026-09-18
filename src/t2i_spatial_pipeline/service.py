@@ -21,8 +21,9 @@ from .blueprint import (
     sample_scene_layer_inputs,
     semantic_hash,
 )
-from .catalog import CASTS, PoseEntry
+from .catalog import CASTS, TOPOLOGY_AUDIT_VERSION, PoseEntry
 from .compiler import (
+    PROMPT_AUDIT_VERSION,
     SceneSpec,
     combine_prompt,
     compile_geometry,
@@ -70,7 +71,7 @@ VIEWPOINTS = (
 )
 SHOT_SCALES = ("medium_close", "medium", "medium_wide", "full_body", "wide")
 ASSIGNMENT_ALGORITHM_VERSION = 3
-BULK_SCHEMA_VERSION = 1
+BULK_SCHEMA_VERSION = 2
 BULK_BATCH_SIZE = 20
 
 
@@ -915,6 +916,8 @@ async def generate_spatial_bulk(
     progress_path = runs_directory / "bulk-report.json"
     identity = {
         "schema_version": BULK_SCHEMA_VERSION,
+        "topology_audit_version": TOPOLOGY_AUDIT_VERSION,
+        "prompt_audit_version": PROMPT_AUDIT_VERSION,
         "brief": brief,
         "base_seed": base_seed,
         "count_per_cast": count_per_cast,
@@ -929,7 +932,8 @@ async def generate_spatial_bulk(
         if existing_identity != identity:
             raise ValueError(
                 f"bulk checkpoint does not match requested generation: "
-                f"{progress_path}"
+                f"{progress_path}; use a new runs directory for changed inputs "
+                "or audit rules"
             )
     else:
         progress = {

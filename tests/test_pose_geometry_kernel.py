@@ -491,6 +491,18 @@ def test_interactor_overlap_and_separation() -> None:
     assert validate_scene(Scene(actors=(first, second))).passed
 
 
+def test_projected_body_overlap_does_not_imply_solid_collision() -> None:
+    first = ActorPose(actor_id="first")
+    second = ActorPose(actor_id="second", root_position=(0, 1, 0.895))
+    first_joints = forward_kinematics(first).joints
+    second_joints = forward_kinematics(second).joints
+    for joint, position in first_joints.items():
+        other = second_joints[joint]
+        assert (position[0], position[2]) == (other[0], other[2])
+
+    assert validate_scene(Scene(actors=(first, second))).passed
+
+
 def back_contact_scene() -> Scene:
     return Scene(
         actors=(

@@ -79,6 +79,75 @@ def expand_variable_names(variable_names: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(expanded)
 
 
+def _validate_solver_options(
+    max_nfev: int, root_translation_bound_m: float
+) -> None:
+    if isinstance(max_nfev, bool) or not isinstance(max_nfev, int):
+        raise ValueError("max_nfev must be an integer")
+    if not 1 <= max_nfev <= 2000:
+        raise ValueError("max_nfev must be within [1, 2000]")
+    if (
+        not math.isfinite(root_translation_bound_m)
+        or not 0 < root_translation_bound_m <= 10
+    ):
+        raise ValueError("root_translation_bound_m must be within (0, 10]")
+
+
+class _ActorParameters:
+    def __init__(
+        self,
+        actor: ActorPose,
+        variable_names: tuple[str, ...],
+        root_translation_bound_m: float,
+    ) -> None:
+        self.actor = actor
+        self.names = expand_variable_names(variable_names)
+        for name, (lower, upper) in JOINT_LIMITS.items():
+            if (
+                name not in self.names
+                and not lower <= getattr(actor.angles, name) <= upper
+            ):
+                raise ValueError(f"Fixed joint {name} is outside its limits")
+        self.initial: list[float] = []
+        self.lower: list[float] = []
+        self.upper: list[float] = []
+        for name in self.names:
+            if name in JOINT_LIMITS:
+                lower, upper = JOINT_LIMITS[name]
+                value = getattr(actor.angles, name)
+            elif name.startswith("root_rotation_"):
+                index = "xyz".index(name[-1])
+                value = actor.root_rotation[index]
+                lower, upper = value - 180, value + 180
+            else:
+                index = "xyz".index(name[-1])
+                value = actor.root_position[index]
+                lower = value - root_translation_bound_m
+                upper = value + root_translation_bound_m
+            self.initial.append(float(np.clip(value, lower, upper)))
+            self.lower.append(lower)
+            self.upper.append(upper)
+
+    def candidate(self, values: np.ndarray) -> ActorPose:
+        angles = self.actor.angles.model_dump()
+        position = list(self.actor.root_position)
+        rotation = list(self.actor.root_rotation)
+        for name, value in zip(self.names, values, strict=True):
+            if name in JOINT_LIMITS:
+                angles[name] = float(value)
+            elif name.startswith("root_rotation_"):
+                rotation["xyz".index(name[-1])] = float(value)
+            else:
+                position["xyz".index(name[-1])] = float(value)
+        return ActorPose(
+            actor_id=self.actor.actor_id,
+            body=self.actor.body,
+            root_position=tuple(position),
+            root_rotation=tuple(rotation),
+            angles=JointAngles(**angles),
+        )
+
+
 def solve_actor(
     actor: ActorPose,
     targets: tuple[AnchorTarget, ...],
@@ -101,69 +170,20 @@ def solve_actor(
     actor = ActorPose.model_validate(actor.model_dump())
     targets = tuple(AnchorTarget.model_validate(t.model_dump()) for t in targets)
     tolerances = Tolerances.model_validate((tolerances or Tolerances()).model_dump())
-    if isinstance(max_nfev, bool) or not isinstance(max_nfev, int):
-        raise ValueError("max_nfev must be an integer")
-    if not 1 <= max_nfev <= 2000:
-        raise ValueError("max_nfev must be within [1, 2000]")
-    if (
-        not math.isfinite(root_translation_bound_m)
-        or not 0 < root_translation_bound_m <= 10
-    ):
-        raise ValueError("root_translation_bound_m must be within (0, 10]")
+    _validate_solver_options(max_nfev, root_translation_bound_m)
     if not targets:
         raise ValueError("At least one target is required")
     skeleton = forward_kinematics(actor, include_shapes=False)
     unknown = {target.anchor for target in targets} - skeleton.anchors.keys()
     if unknown:
         raise ValueError(f"Unknown anchors: {sorted(unknown)}")
-    variable_names = expand_variable_names(variable_names)
-    for name, (lower, upper) in JOINT_LIMITS.items():
-        if (
-            name not in variable_names
-            and not lower <= getattr(actor.angles, name) <= upper
-        ):
-            raise ValueError(f"Fixed joint {name} is outside its limits")
-    initial, lower_bounds, upper_bounds = [], [], []
-    angle_values = actor.angles.model_dump()
-    for name in variable_names:
-        if name in JOINT_LIMITS:
-            lower, upper = JOINT_LIMITS[name]
-            value = angle_values[name]
-        elif name.startswith("root_rotation_"):
-            index = "xyz".index(name[-1])
-            value = actor.root_rotation[index]
-            lower, upper = value - 180, value + 180
-        else:
-            index = "xyz".index(name[-1])
-            value = actor.root_position[index]
-            lower = value - root_translation_bound_m
-            upper = value + root_translation_bound_m
-        initial.append(float(np.clip(value, lower, upper)))
-        lower_bounds.append(lower)
-        upper_bounds.append(upper)
-
-    def candidate(values: np.ndarray) -> ActorPose:
-        angles = dict(angle_values)
-        position, rotation = list(actor.root_position), list(actor.root_rotation)
-        for name, value in zip(variable_names, values, strict=True):
-            if name in JOINT_LIMITS:
-                angles[name] = float(value)
-            elif name.startswith("root_rotation_"):
-                rotation["xyz".index(name[-1])] = float(value)
-            else:
-                position["xyz".index(name[-1])] = float(value)
-        return ActorPose(
-            actor_id=actor.actor_id,
-            body=actor.body,
-            root_position=tuple(position),
-            root_rotation=tuple(rotation),
-            angles=JointAngles(**angles),
-        )
-
+    parameters = _ActorParameters(actor, variable_names, root_translation_bound_m)
     normal_scale = 2 * math.sin(math.radians(tolerances.normal_degrees) / 2)
 
     def residual(values: np.ndarray) -> np.ndarray:
-        current = forward_kinematics(candidate(values), include_shapes=False)
+        current = forward_kinematics(
+            parameters.candidate(values), include_shapes=False
+        )
         result = []
         for target in targets:
             anchor = current.anchors[target.anchor]
@@ -176,19 +196,19 @@ def solve_actor(
                 )
         return np.asarray(result)
 
-    initial_array = np.asarray(initial)
-    if variable_names:
+    initial_array = np.asarray(parameters.initial)
+    if parameters.names:
         fit = least_squares(
             residual,
             initial_array,
-            bounds=(np.asarray(lower_bounds), np.asarray(upper_bounds)),
+            bounds=(np.asarray(parameters.lower), np.asarray(parameters.upper)),
             max_nfev=max_nfev,
             x_scale="jac",
             ftol=1e-10,
             xtol=1e-10,
             gtol=1e-10,
         )
-        fitted = candidate(fit.x)
+        fitted = parameters.candidate(fit.x)
         nfev, message = int(fit.nfev), str(fit.message)
     else:
         fitted, nfev, message = actor, 0, "No variables requested"

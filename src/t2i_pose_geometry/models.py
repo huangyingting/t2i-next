@@ -306,3 +306,39 @@ class SolveResult(FrozenModel):
     errors: tuple[TargetError, ...]
     message: str
     nfev: int = 0
+
+
+class SceneContactError(FrozenModel):
+    kind: Literal["object_contact", "body_contact"]
+    index: Annotated[int, Field(ge=0)]
+    parts: tuple[str, ...]
+    error_m: Annotated[float, Field(ge=0, allow_inf_nan=False)]
+    normal_error_degrees: Annotated[
+        float, Field(ge=0, le=180, allow_inf_nan=False)
+    ]
+
+
+class SceneSolveResult(FrozenModel):
+    scene: Scene
+    tolerances: Tolerances
+    converged: bool
+    errors: tuple[SceneContactError, ...]
+    report: ValidationReport
+    message: str
+    nfev: int = 0
+
+    @property
+    def accepted(self) -> bool:
+        """Only the modeled static constraints, never physical equilibrium."""
+        return self.converged and self.report.passed
+
+
+class SceneSolveRequest(FrozenModel):
+    schema_version: Literal["1.0"] = "1.0"
+    scene: Scene
+    variables_by_actor: dict[Identifier, tuple[str, ...]]
+    max_nfev: Annotated[int, Field(strict=True, ge=1, le=2000)] = 200
+    root_translation_bound_m: Annotated[
+        float, Field(gt=0, le=10, allow_inf_nan=False)
+    ] = 2.0
+    tolerances: Tolerances = Field(default_factory=Tolerances)

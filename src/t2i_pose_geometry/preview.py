@@ -16,7 +16,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .kinematics import Skeleton, forward_kinematics, matrix
-from .models import Box, Scene, Shape, ValidationReport
+from .models import Box, Scene, Shape, Tolerances, ValidationReport
 from .validation import FACE_AXES, validate_scene
 
 _RED = "#c62828"
@@ -529,7 +529,7 @@ def _report_lines(report: ValidationReport) -> list[str]:
     return lines
 
 
-def render_scene_svg(scene: Scene) -> str:
+def render_scene_svg(scene: Scene, *, tolerances: Tolerances | None = None) -> str:
     """Revalidate ``scene`` and render actual proxy volumes in three fixed panels.
 
     Front is x/z, side is y/z, and top is x/y, using one isotropic pixels-per-meter
@@ -537,7 +537,7 @@ def render_scene_svg(scene: Scene) -> str:
     or both actor anchors for body contacts.
     The returned self-contained SVG has no scripts, resources, or supplied report.
     """
-    report = validate_scene(scene)
+    report = validate_scene(scene, tolerances=tolerances)
     try:
         scene = Scene.model_validate(scene.model_dump())
     except (ValueError, TypeError, AttributeError):

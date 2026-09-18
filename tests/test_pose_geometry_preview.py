@@ -500,9 +500,11 @@ def test_validation_is_recomputed_and_cannot_be_replaced_with_forged_pass() -> N
         wraps=validate_scene,
     ) as validator:
         root = ET.fromstring(render_scene_svg(scene))
-    validator.assert_called_once_with(scene)
+    validator.assert_called_once_with(scene, tolerances=None)
     assert _status(root).startswith("FAIL")
-    assert list(inspect.signature(render_scene_svg).parameters) == ["scene"]
+    parameters = inspect.signature(render_scene_svg).parameters
+    assert list(parameters) == ["scene", "tolerances"]
+    assert parameters["tolerances"].kind == inspect.Parameter.KEYWORD_ONLY
     with pytest.raises(TypeError):
         render_scene_svg(scene, report=ValidationReport(passed=True))
 

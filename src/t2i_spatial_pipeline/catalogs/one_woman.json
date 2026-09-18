@@ -2869,10 +2869,7 @@
           ]
         }
       ],
-      "compatible_activity_ids": [
-        "low_temp_wax_sensory",
-        "ice_sensory"
-      ],
+      "compatible_activity_ids": [],
       "signature": "4cad863d30c25baac8863a99a57c5b923e58cd8eb95f6d06e7e80e7546048b49"
     },
     {
@@ -2916,10 +2913,7 @@
           ]
         }
       ],
-      "compatible_activity_ids": [
-        "low_temp_wax_sensory",
-        "ice_sensory"
-      ],
+      "compatible_activity_ids": [],
       "signature": "42165d895872bba4438fe70d710e3311ffe1515ba710e87da27d8165ac79a7ef"
     },
     {
@@ -3078,25 +3072,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "0f4888ffd0f79b2d5465a4771a8330bc4280f25962f5940b3453965b6b4310a4"
     },
@@ -3145,25 +3129,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "3e651c8f3ad3e58da558cd329aac70d80eac2bd8a0d1d3e72a3190849dc1a17f"
     },
@@ -3323,25 +3297,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "e2edbb3152bef63166f187ef4e1c8aa070a747065c7510ff3993cdce81f8cead"
     },
@@ -3390,25 +3354,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "7634ffc6721ee352aafe5871d5866bcf5b0374e9eb2c9af155a86cdf566b8f4d"
     },
@@ -3568,25 +3522,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "b2ba75ec2ae31eda1626f7f7326a3b3564d29ca7255c23a9429ea90a083067b5"
     },
@@ -3635,25 +3579,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "e647ea4ab59c2829118efadb2277b2087183fae11a531b66cb2a5bd38c01fd2d"
     },
@@ -3742,10 +3676,7 @@
           ]
         }
       ],
-      "compatible_activity_ids": [
-        "low_temp_wax_sensory",
-        "ice_sensory"
-      ],
+      "compatible_activity_ids": [],
       "signature": "49cb1c62319cb8d83cd2034c4a54a41282e3d98224ef526f11e735423e35a3e3"
     },
     {
@@ -3931,25 +3862,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "aeb2ea227e44ace4469425fc6b9b68265fb9a2d5455776b3a8476ed64da9acba"
     },
@@ -4176,25 +4097,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "23c933a5c8cd6d9edd4f5847ff5b60c44ef0d90b9c66014df99d51ae3f37f831"
     },
@@ -4421,25 +4332,15 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
         "breast_self_touch",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "8633f88ce406e2d59cb0f82d40165a184a6e911f9bcdec6936c8f25084baa99c"
     },
@@ -14307,7 +14208,7 @@
         "support_points": [
           "shoulders",
           "upper_back",
-          "both_feet"
+          "planted_foot"
         ],
         "compatible_camera_views": [
           "front_three_quarter",
@@ -14331,7 +14232,7 @@
           "support_points": [
             "shoulders",
             "upper_back",
-            "both_feet"
+            "planted_foot"
           ]
         }
       ],
@@ -14361,7 +14262,7 @@
         "low_temp_wax_sensory",
         "ice_sensory"
       ],
-      "signature": "10c1e84dd8d13ee92e7b5149797866d4bae9d5bed95bbc33756bbe065000f141"
+      "signature": "e6e26ce2886624140c527102e2cabc77e9d3329dd13e09d0c6dbb83327d888ea"
     },
     {
       "pose_id": "one_woman_p262",
@@ -14377,7 +14278,7 @@
         "support_points": [
           "shoulders",
           "upper_back",
-          "both_feet"
+          "planted_foot"
         ],
         "compatible_camera_views": [
           "front_three_quarter",
@@ -14401,12 +14302,12 @@
           "support_points": [
             "shoulders",
             "upper_back",
-            "both_feet"
+            "planted_foot"
           ]
         }
       ],
       "compatible_activity_ids": [],
-      "signature": "bd126511359022213e4de8f2c33dfedf350cd96910b433c66a090ea7ad0dd851"
+      "signature": "0ce04e0209086134f8afaad91a172f332fdbd0bb7aa3092660f6e20065ea1119"
     },
     {
       "pose_id": "one_woman_p263",
@@ -14422,7 +14323,7 @@
         "support_points": [
           "shoulders",
           "upper_back",
-          "both_feet"
+          "planted_foot"
         ],
         "compatible_camera_views": [
           "front_three_quarter",
@@ -14446,7 +14347,7 @@
           "support_points": [
             "shoulders",
             "upper_back",
-            "both_feet"
+            "planted_foot"
           ]
         }
       ],
@@ -14473,7 +14374,7 @@
         "low_temp_wax_sensory",
         "ice_sensory"
       ],
-      "signature": "929b4f2ce69d02976f5b55d35860628eb902b38ad1f826687e69ee1b075a0018"
+      "signature": "424d72f9707c38557f64fbb7841826fc18332f01dd9b55ff199995d14d7d184f"
     },
     {
       "pose_id": "one_woman_p264",
@@ -14489,7 +14390,7 @@
         "support_points": [
           "shoulders",
           "upper_back",
-          "both_feet"
+          "planted_foot"
         ],
         "compatible_camera_views": [
           "front_three_quarter",
@@ -14513,12 +14414,12 @@
           "support_points": [
             "shoulders",
             "upper_back",
-            "both_feet"
+            "planted_foot"
           ]
         }
       ],
       "compatible_activity_ids": [],
-      "signature": "f9cc017e58f9c65be558785e49e93f629db578e243728e119df99d1de4cb21c5"
+      "signature": "cf47accc10a78b3e6797b59c57ae51f89681ce2f8b57435117c577c558634aea"
     },
     {
       "pose_id": "one_woman_p265",
@@ -18517,24 +18418,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "df3cd9d2c6bca03a9ad00140d77678b3a88565c2f250a9289bb8557e268a4f3d"
     },
@@ -18583,24 +18474,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "576779db3f1a17cdde4651b7a488b75885448ad26488881ba3085e3ac6aa53f8"
     },
@@ -18785,24 +18666,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "7d96d571aa102de0cd8fc9cc8b3dc872884d660dfd0f84034df65762a15c0199"
     },
@@ -18851,24 +18722,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "65116085aa99cd502c96da1c61921dab51f4a16505bf164353b4deda75368c66"
     },
@@ -19053,24 +18914,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "e21e8e728d125118e514fa62d894113648b8998f7c180482d52f5fe0276267b7"
     },
@@ -19119,24 +18970,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "cdc22b8164b4c7a516175d0e4d2ee650b229b52b6fbaac46d7d5dc2a79fe0e0f"
     },
@@ -19321,24 +19162,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "3a005195830da9b966be7f9d7cb72e6eb94fe7ae3f0916bbcd65c8329d4c9101"
     },
@@ -19387,24 +19218,14 @@
         "manual_clitoral",
         "manual_vaginal",
         "manual_anal",
-        "vibrator_clitoral",
-        "wand_external",
-        "dildo_vaginal",
-        "dildo_anal",
         "mirror_masturbation",
         "shower_masturbation",
         "pillow_grinding",
         "thigh_squeeze",
-        "suction_toy",
-        "remote_toy",
-        "stability_ball_toy",
-        "wedge_supported_toy",
         "blindfolded_manual",
         "ankle_cuffs_quick_release",
         "collar_leash_self_pose",
-        "rope_harness_self_touch",
-        "low_temp_wax_sensory",
-        "ice_sensory"
+        "rope_harness_self_touch"
       ],
       "signature": "476f2349663c1aca6c25b35928115e62eb145e115b50137d46f78032dee7079c"
     },

@@ -257,6 +257,13 @@ declarations never exempt collisions; adjacent shapes only receive localized
 joint-region allowances. Solver success alone cannot certify a pose. These
 are synthetic proxy assumptions, not biomechanics, balance, friction, cloth,
 finger-level anatomy or rendered-image validation.
+`solve_scene` fits the contacts of all explicitly specified actors in one
+bounded optimization, rebuilding both endpoints of every body contact on each
+iteration. Every actor must have explicit variable selectors or an empty fixed
+declaration. Furniture and body dimensions remain fixed. It records per-contact
+distance/normal errors and always revalidates the complete scene, including
+uninvolved actors. Convergence and collision validity are separate requirements;
+search failure does not prove physical impossibility.
 _Avoid_: Story dependency, dynamics simulator, anatomical safety certificate
 
 **Reference Geometry**:
@@ -334,6 +341,20 @@ and compiled geometry. Every seed is replayed before its successful result
 and structural diagnostics are checkpointed together. Audit checkpoints bind
 both packaged data and generated definitions; incompatible schemas require
 an explicit restart rather than migration.
+Compiled geometry here is symbolic prose, not a numerical scene certificate.
+Partner stance and body-continuity descriptions must agree with their supports;
+the two actors in a bilateral lift cannot also control handheld props. This
+restriction does not reserve the hands of an uninvolved third actor. A vertically
+raised leg cannot also contribute to the declared planted-foot support.
+Side-relative arm reservations resolve
+to anatomical left/right hands before contact tasks are assigned; explicit
+contact hands and tool grips take precedence over unspecified hand choices.
+Compilation and topology validation share this hand allocation.
+Surface contact and projected overlap are not themselves impossible poses. Solid
+penetration requires geometric evidence, and unmodeled deformation or anatomy
+remains unverified rather than receiving an automatic pass or rejection.
+Bulk checkpoints also bind topology and prompt-audit versions, rejecting stale
+batches before reuse; changed rules require a new run directory, not migration.
 _Avoid_: Render validation, visual quality score
 
 **Structural Diagnostics**:
