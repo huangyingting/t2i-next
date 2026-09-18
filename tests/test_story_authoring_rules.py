@@ -19,9 +19,9 @@ def test_story_rules_compile_only_the_selected_content_level() -> None:
 
     for stage in StoryStage:
         text = rules.text_for(stage)
-        assert "本次使用 极致情色级（erotic）" in text
-        assert "本次使用 美学级（aesthetic）" not in text
-        assert "本次使用 赤裸裸的性描写（hardcore）" not in text
+        assert "当前画面直接呈现裸露、挑逗和非露骨亲密互动。" in text
+        assert "尺度下限是静止画面可见的形体表达" not in text
+        assert "当前画面直接、清晰地呈现角色之间的明确性行为。" not in text
 
 
 @pytest.mark.parametrize("level", list(ContentLevel))
@@ -36,7 +36,7 @@ def test_common_contracts_have_one_owner_at_every_level(level: ContentLevel) -> 
                 "Every depicted person must be an unmistakable adult.",
                 "All participants must be alert, consenting, "
                 "responsive, and able to stop.",
-                "Do not write the content-level name,",
+                "Do not write configuration metadata,",
             )
         )
     ]
@@ -64,7 +64,7 @@ def test_grade_specific_limits_are_not_promoted_to_common(level: ContentLevel) -
         )
         assert ("尺度上限为" in text) == (level == ContentLevel.AESTHETIC)
         if level == ContentLevel.HARDCORE:
-            assert "以主动接触或共同施力提供符合公共参与要求的可见证据" in text
+            assert "以主动接触或共同施力提供双方自愿参与的可见证据" in text
         elif level == ContentLevel.EROTIC:
             assert "回应视线、主动接触、相向姿态或共同施力" in text
 

@@ -59,13 +59,13 @@ def test_theme_prompt_requests_distinct_coherent_story_concepts() -> None:
 
     assert payload["story"] == request.story
     assert payload["theme_count"] == 10
-    assert payload["content_level"] == "aesthetic"
+    assert "content_level" not in payload
     assert payload["semantic_name"] is None
     assert "concise lowercase English snake_case name" in prompt
-    assert "Follow the Story Description, selected Theme authoring" in prompt
+    assert "Follow the Story Description, selected authoring" in prompt
     assert "module parameters, and assigned slot facts" in prompt
-    assert "cannot override the structured schema, program-owned IDs" in prompt
-    assert "Do not infer a known brief type" in prompt
+    assert "requested counts and slots, runtime settings, or output format" in prompt
+    assert "Never infer requirements from a filename or a known brief type" in prompt
     assert "Theme-stage facts from Frame-stage rendering detail" in prompt
     assert "unless the Story Description explicitly promotes that detail" in prompt
     assert "Do not impose narrative conflict, chronology, or a decision" in prompt
@@ -99,7 +99,9 @@ def test_prompt_can_delegate_theme_ids_to_program() -> None:
 
     payload = json.loads(messages[1].content)
     assert payload["theme_count"] == 3
-    assert payload["program_assigns_theme_ids"] is True
+    assert "program_assigns_theme_ids" not in payload
+    assert "the program assigns all Theme IDs" in messages[0].content
+    assert "Submit only semantic_name, title, premise, and style" in messages[0].content
     assert "theme_ids" not in payload
 
 
@@ -133,9 +135,9 @@ def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
     theme_payload = json.loads(theme[1].content)
     frame_payload = json.loads(frame[1].content)
     assert theme_payload["theme_count"] == 1
-    assert theme_payload["program_assigns_theme_ids"] is True
+    assert "program_assigns_theme_ids" not in theme_payload
     assert frame_payload["requested_frame_slots"] == ["F01"]
-    assert frame_payload["program_assigns_frame_ids"] is True
+    assert "program_assigns_frame_ids" not in frame_payload
     for messages, payload in ((theme, theme_payload), (frame, frame_payload)):
         assert payload["story"] == description
         assert payload["frames_per_theme"] == 1
@@ -149,8 +151,10 @@ def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
         assert plan["cast"]["male_count"] == 0
         assert plan["cast"]["total"] == 1
         assert messages[0].role == "system"
-        assert "safety rules, or resolved cast contract" in messages[0].content
-        assert "execute allocation formulas from prose" in messages[0].content
+        assert "may override safety, the required visible range" in messages[0].content
+        assert "sole authority for cast scope, sex counts" in messages[0].content
+        assert "Never recompute routing from Theme IDs" in messages[0].content
+        assert "retry order, or prose formulas" in messages[0].content
     assert resolved.fingerprint() == fingerprint
 
 
@@ -223,7 +227,9 @@ def test_prompt_can_request_one_plain_text_frame() -> None:
 
     payload = json.loads(messages[1].content)
     assert payload["requested_frame_slots"] == ["F02"]
-    assert payload["program_assigns_frame_ids"] is True
+    assert "program_assigns_frame_ids" not in payload
+    assert "The program assigns all Frame IDs" in messages[0].content
+    assert "Output no JSON, IDs," in messages[0].content
     assert payload["accepted_frames"] == [
         {"frame_id": "F01", "prose": "先前完成的画面。"}
     ]
@@ -534,9 +540,9 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     )
     assert "Assign every visible limb a consistent contact or force role" in prompt
     assert "Do not describe successive repositioning as a narrative" in prompt
-    assert "Follow the Story Description, selected Frame authoring" in prompt
+    assert "Follow the Story Description, selected authoring" in prompt
     assert (
-        "cannot override the output schema, transport format, requested slots" in prompt
+        "requested counts and slots, runtime settings, or output format" in prompt
     )
     assert "Grounded scenes require credible support" in prompt
     assert "floating or zero-gravity scenes require coherent free-flight" in prompt
@@ -552,8 +558,8 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "Resolve conditional instructions only from the current request" in prompt
     assert "never borrow a branch assigned to another alternative" in prompt
     assert "Explicit Story Description creative constraints take priority" in prompt
-    assert "cannot override safety, selected system content-level boundaries" in prompt
-    assert "typed requests, runtime settings, or deterministic input plans" in prompt
+    assert "may override safety, the required visible range and its limits" in prompt
+    assert "input_context plans govern assignments and slot identity" in prompt
     assert "rope art" not in prompt
     assert "do not mix in untranslated foreign prose" in prompt
     assert "parallel visual alternatives" in prompt
@@ -637,9 +643,13 @@ def test_system_instructions_keep_shared_rule_language_across_output_languages(
     )
 
     for prompt in prompts:
-        assert "validated request" in prompt
-        assert "immutable safety and output contracts" in prompt
-        assert "本次使用 美学级（aesthetic）" in prompt
+        assert (
+            "may override safety, the required visible range and its limits" in prompt
+        )
+        assert (
+            "requested counts and slots, runtime settings, or output format" in prompt
+        )
+        assert "尺度下限是静止画面可见的形体表达" in prompt
 
 
 @pytest.mark.parametrize(
@@ -647,26 +657,26 @@ def test_system_instructions_keep_shared_rule_language_across_output_languages(
     (
         (
             ContentLevel.AESTHETIC,
-            "本次使用 美学级（aesthetic）",
+            "尺度下限是静止画面可见的形体表达",
             (
-                "本次使用 极致情色级（erotic）",
-                "本次使用 赤裸裸的性描写（hardcore）",
+                "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
+                "当前画面直接、清晰地呈现角色之间的明确性行为",
             ),
         ),
         (
             ContentLevel.EROTIC,
-            "本次使用 极致情色级（erotic）",
+            "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
             (
-                "本次使用 美学级（aesthetic）",
-                "本次使用 赤裸裸的性描写（hardcore）",
+                "尺度下限是静止画面可见的形体表达",
+                "当前画面直接、清晰地呈现角色之间的明确性行为",
             ),
         ),
         (
             ContentLevel.HARDCORE,
-            "本次使用 赤裸裸的性描写（hardcore）",
+            "当前画面直接、清晰地呈现角色之间的明确性行为",
             (
-                "本次使用 美学级（aesthetic）",
-                "本次使用 极致情色级（erotic）",
+                "尺度下限是静止画面可见的形体表达",
+                "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
             ),
         ),
     ),
@@ -687,9 +697,13 @@ def test_prompts_compile_only_selected_content_level(
         frame_messages(request, make_theme()),
     ):
         prompt = messages[0].content
+        assert "content_level" not in json.loads(messages[1].content)
         assert required in prompt
         assert all(item not in prompt for item in excluded)
-        assert "Do not write the content-level name, CLI value" in prompt
+        assert "Do not write configuration metadata, internal IDs" in prompt
+        assert all(candidate.value not in prompt for candidate in ContentLevel)
+        assert "本次使用" not in prompt
+        assert "本级" not in prompt
         assert "Every depicted person must be an unmistakable adult" in prompt
         assert (
             "All participants must be alert, consenting, responsive, and able to stop"
@@ -735,7 +749,8 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         ),
     ):
         compiled = "\n".join(message.content for message in messages)
-        assert json.loads(messages[1].content)["content_level"] == level.value
+        assert "content_level" not in json.loads(messages[1].content)
+        assert resolved.request.content_level == level
         selected = document.authoring.selected(stage, level)
         assert all(rule in compiled for rule in getattr(base, stage.value))
         assert all(rule in compiled for rule in selected)
@@ -768,21 +783,19 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
     (
         (
             ContentLevel.AESTHETIC,
-            (
-                "在 aesthetic 级别，主导照片必须明确保持非露骨"
-            ),
+            "主导照片必须明确保持非露骨",
         ),
         (
             ContentLevel.EROTIC,
             (
-                "在 erotic 级别，每个 Frame 都必须在主导照片中"
+                "每个 Frame 都必须在主导照片中"
                 "明确可见地呈现非露骨的成年亲密互动"
             ),
         ),
         (
             ContentLevel.HARDCORE,
             (
-                "在 hardcore 级别，每个 Frame 都必须将直接露骨的"
+                "每个 Frame 都必须将直接露骨的"
                 "成年人互动置于主导照片中"
             ),
         ),
@@ -809,7 +822,8 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     )
     payload = json.loads(messages[1].content)
 
-    assert payload["content_level"] == level.value
+    assert "content_level" not in payload
+    assert resolved.request.content_level == level
     assert required_contract in compiled
     selected = document.authoring.selected(StoryStage.FRAMES, level)
     for other in document.authoring.level_refinements:

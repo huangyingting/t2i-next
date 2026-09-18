@@ -136,8 +136,9 @@ _Avoid_: Brief-type detection, story-input adapter
 **Story Content Level**:
 The system-defined visible-content floor and limits for every Narrative Frame:
 `aesthetic`, `erotic`, or `hardcore`. It changes authoring instructions, never the
-adult consent safety contract. Only the selected level is compiled into provider
-prompts; document or module refinements do not replace its definition.
+adult consent safety contract. Only its resolved concrete constraints enter
+provider prompts; the level identifier stays in configuration and frozen
+provenance. Document or module refinements do not replace its definition.
 _Avoid_: Legacy Content Level, safety mode
 
 **Story Content-Level Refinement**:
@@ -147,6 +148,11 @@ and `frames` responsibilities. Stage authoring outside this entry contains only
 level-independent common rules. Shared requirements reach both stages directly rather than
 depending on a generated Theme to restate them. Exact duplicate ownership is
 invalid; this structural check is not a natural-language conflict detector.
+Each branch's prose is self-contained for its selected level; grade-dependent
+conditions belong in those branches, not descriptions or stage common rules.
+Branches contain executable authoring requirements, not grade announcements or
+compliance-proof headers. Repeated wording within one request can be removed,
+but independently required Theme and Frame constraints must both reach the model.
 _Avoid_: Level override, duplicated grade definition, shared reference-pool dump
 
 **Nationality Default**:

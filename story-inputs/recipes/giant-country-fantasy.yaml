@@ -16,47 +16,42 @@ authoring:
   level_refinements:
     erotic:
       shared:
-      - '身体与目标契约: - “Erotic” 固定 “no ejaculation”、“no urination”、“no milk release”、“no sexual fluid release”；只允许装置水、护理液或润滑剂。'
-      - '标志性机制与想象力: - “Erotic”：访客留在平台，通过唯一 柔软末端、织物、气流 或 水 接触，可结合护理、造型、角色服务、仪式或 水疗。'
-      - “Erotic” 按作用强度选择 “flaccid” 或 “semi-erect”。
-      - 当且仅当 request.content_level 为 “erotic”：选择一种明确非插入式亲密行为。“Erotic” 只允许 标志性机制 的单一软垫末端、气流、水流或织物到达接触点，造成压痕、体毛分开、液体位移或肌肉反应；访客身体不得直接接触。
+      - '身体与目标契约: - 固定 “no ejaculation”、“no urination”、“no milk release”、“no sexual fluid release”；只允许装置水、护理液或润滑剂。'
+      - '标志性机制与想象力: - 访客留在平台，通过唯一 柔软末端、织物、气流 或 水 接触，可结合护理、造型、角色服务、仪式或 水疗。'
+      - 按作用强度选择 “flaccid” 或 “semi-erect”。
+      - 选择一种明确非插入式亲密行为。只允许 标志性机制 的单一软垫末端、气流、水流或织物到达接触点，造成压痕、体毛分开、液体位移或肌肉反应；访客身体不得直接接触。
       frames:
-      - “Erotic” 写“The single [mechanism end, fabric, airflow, or water stream] is already pressing or
-        flowing directly on the contact point, visibly [deformation].”
-      - “Erotic” 中，S1 命名的 标志性机制 必须直接作用于接触点，在 S5 和因果句中逐段写出“visitor-scale control input → giant-scale force
-        transmission → single padded mechanical end, airflow, water, or fabric strap → contact point visible
-        response”；只有该输出端可以跨过空气间隙。
-      - “Erotic” 使用“The single [soft end, fabric, airflow, or water stream] is already pressing or flowing
-        directly on the contact point, visibly [deformation].”
-      - “Erotic” 中，访客的头部、胸廓、腹部和骨盆四周必须由可见空气、背景空隙或刚性平台边界与巨人身体分隔。S5 必须逐字包含且只写一次“a visible air gap separates
-        the visitor's head, torso, abdomen, and pelvis from the giant's skin”，即使有多个访客也不得改成 “each visitor's”、“every
-        visitor's” 或 “visitors' heads”，并只让 标志性机制 的单一输出端跨过该空隙。
+      - 写“The single [mechanism end, fabric, airflow, or water stream] is already pressing or flowing directly
+          on the contact point, visibly [deformation].”
+      - S1 命名的 标志性机制 必须直接作用于接触点，在 S5 和因果句中逐段写出“visitor-scale control input → giant-scale force transmission →
+          single padded mechanical end, airflow, water, or fabric strap → contact point visible response”；只有该输出端可以跨过空气间隙。
+      - 使用“The single [soft end, fabric, airflow, or water stream] is already pressing or flowing directly on
+          the contact point, visibly [deformation].”
+      - 访客的头部、胸廓、腹部和骨盆四周必须由可见空气、背景空隙或刚性平台边界与巨人身体分隔。S5 必须逐字包含且只写一次“a visible air gap separates the visitor's head,
+          torso, abdomen, and pelvis from the giant's skin”，即使有多个访客也不得改成 “each visitor's”、“every visitor's” 或
+          “visitors' heads”，并只让 标志性机制 的单一输出端跨过该空隙。
     hardcore:
       shared:
-      - '流体与性虐恋系统: “Hardcore” 每帧最多一种主要体液，显示唯一 来源、轨迹、表面 和 落点。精液 只来自 阴茎尿道，乳汁 只来自 所选乳头，阴道液体 只来自 阴道口；肛门 只允许
-        润滑剂、水 或 灌肠液。性虐恋 器具有刚性锚点、软垫和快速释放。'
-      - “Hardcore” 口部或手部刺激 通常使用 “semi-erect” 或 “fully erect”；
-      - '暴露必要性与隐私: 当且仅当 request.content_level 为 “hardcore”：选择口交、手交、玩具插入、直接外阴刺激、直接 吸吮乳头 或自愿 性虐恋。至少一名访客以
-        嘴、一只手 或 一个玩具 已接触目标；其他人负责承重、衣物牵引、定位与高度角度调整、润滑、节奏、安全吊带、观察或流体承接。直接参与者不操作控制器。协作口交可作用同一器官的不重叠区域。'
-      - “Hardcore” 允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官，其余身体由对应工位承重并保持空气间隙。
+      - '流体与性虐恋系统: 每帧最多一种主要体液，显示唯一 来源、轨迹、表面 和 落点。精液 只来自 阴茎尿道，乳汁 只来自 所选乳头，阴道液体 只来自 阴道口；肛门 只允许 润滑剂、水 或 灌肠液。性虐恋 器具有刚性锚点、软垫和快速释放。'
+      - 口部或手部刺激 通常使用 “semi-erect” 或 “fully erect”；
+      - '暴露必要性与隐私: 选择口交、手交、玩具插入、直接外阴刺激、直接 吸吮乳头 或自愿 性虐恋。至少一名访客以 嘴、一只手 或 一个玩具 已接触目标；其他人负责承重、衣物牵引、定位与高度角度调整、润滑、节奏、安全吊带、观察或流体承接。直接参与者不操作控制器。协作口交可作用同一器官的不重叠区域。'
+      - 允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官，其余身体由对应工位承重并保持空气间隙。
       themes:
-      - '标志性机制与想象力: - 吸精与承接：仅 “Hardcore” 的 勃起阴茎 + 射精；嘴、收集杯、漏斗 或软管沿 尿道到落点 单一路径承接，禁止与 尿液 同帧，禁止 精液 来自 肛门。'
-      - '身体与目标契约: - “Hardcore” 每 主题 只选 “no release”、“pre-ejaculate”、“ejaculation”、“urination”、“vaginal
-        lubrication”、“lactation” 或 “enema/lubricant flow”。射精 要求 勃起阴茎，精液 只从 尿道 到 指定嘴部 或 收集器；排尿 只配 “flaccid/partial
-        erection”，且不得与 精液 同帧。泌乳 只配 所选乳头，乳汁 只从该 乳头 到 指定嘴部 或 收集器；其他目标不得产 乳汁。'
+      - '标志性机制与想象力: - 吸精与承接：仅限 勃起阴茎 + 射精；嘴、收集杯、漏斗 或软管沿 尿道到落点 单一路径承接，禁止与 尿液 同帧，禁止 精液 来自 肛门。'
+      - '身体与目标契约: - 每 主题 只选 “no release”、“pre-ejaculate”、“ejaculation”、“urination”、“vaginal lubrication”、“lactation”
+          或 “enema/lubricant flow”。射精 要求 勃起阴茎，精液 只从 尿道 到 指定嘴部 或 收集器；排尿 只配 “flaccid/partial erection”，且不得与 精液 同帧。泌乳
+          只配 所选乳头，乳汁 只从该 乳头 到 指定嘴部 或 收集器；其他目标不得产 乳汁。'
       - '标志性机制与想象力: - 多人角色：攀爬者、直接参与者、绳索保护者、泵操作者、节奏控制者、润滑 处理者、观察保护者、信号领队、收集者；每人必须改变因果链。'
       - '标志性机制与想象力: - 衣物揭示：巨人先请求并授权；访客用 绞盘、滑轮、绳索、夹具或多人拉拽降低 长裤、掀起 衬衫 下摆、撑开衣摆或维持窥视窗口。可加入 自愿窥视游戏、镜子 或 潜望镜，但不得偷拍、撕裂衣物或让布料悬浮。'
-      - '标志性机制与想象力: - 喝奶：仅 “Hardcore” 的 哺乳期成年女性巨人 + 所选乳头；一名访客 嘴部 直接吸吮，队友控制衣物、支撑和 收集器，乳汁 只沿 乳头到嘴 或 乳头到杯子
-        单一路径。'
+      - '标志性机制与想象力: - 喝奶：仅限 哺乳期成年女性巨人 + 所选乳头；一名访客 嘴部 直接吸吮，队友控制衣物、支撑和 收集器，乳汁 只沿 乳头到嘴 或 乳头到杯子 单一路径。'
       frames:
-      - “Hardcore” 写“The [named visitor]'s [mouth, one hand, or toy] is already in direct contact with
-        the contact point, visibly [deformation].”
-      - “Hardcore” 中，S1 命名的 标志性机制 必须直接承托、定位、稳定、驱动节奏或承接体液，在 S5 和因果句中逐段写出“visitor-scale support or control
-        input → giant-scale positioning or rhythm transmission → assigned visitor mouth, hand, or toy
-        at the contact point → visible direct-contact result”；被分配直接接触的嘴、手或玩具可以跨过空气间隙，其他身体和其他访客不得跨过。
-      - “Hardcore” 的 S5 必须改为逐字包含且只写一次“a visible air gap separates each visitor's torso, abdomen, pelvis,
-        arms, and legs from the giant's skin, with only the assigned mouth, hand, or toy reaching the
-        contact point”，只允许逐人分配的嘴、一只手或单一玩具跨过空隙；不得在 “Hardcore” 复用 “Erotic” 空隙句。
+      - 写“The [named visitor]'s [mouth, one hand, or toy] is already in direct contact with the contact point,
+          visibly [deformation].”
+      - S1 命名的 标志性机制 必须直接承托、定位、稳定、驱动节奏或承接体液，在 S5 和因果句中逐段写出“visitor-scale support or control input → giant-scale
+          positioning or rhythm transmission → assigned visitor mouth, hand, or toy at the contact point → visible
+          direct-contact result”；被分配直接接触的嘴、手或玩具可以跨过空气间隙，其他身体和其他访客不得跨过。
+      - S5 必须逐字包含且只写一次“a visible air gap separates each visitor's torso, abdomen, pelvis, arms, and legs from
+          the giant's skin, with only the assigned mouth, hand, or toy reaching the contact point”，只允许逐人分配的嘴、一只手或单一玩具跨过空隙；规定的空隙句须逐人列出身体范围及获准接触的例外，不得改用省略这些例外的句式。
   themes:
     common:
     - female_count 和 male_count 只约束从正常人类世界来到巨人国的成年访客。每帧画面总人数严格等于 1 + female_count + male_count：指定数量的正常人类访客，加一名巨人国原住民，不得出现额外脸、头、躯干、肢体或局部人物。系统为唯一巨人原住民选择成年男人或成年女人；该

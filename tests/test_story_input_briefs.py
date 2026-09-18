@@ -65,7 +65,8 @@ def authoring_pool(document, label, *, stage=StoryStage.THEMES):
 def assert_packaged_grade_contract(document: StoryDocument, level: ContentLevel):
     required = {
         ContentLevel.AESTHETIC: (
-            "本级以形体美、光影和构图为主视觉",
+            "以形体美、光影和构图为主视觉",
+            "每帧至少呈现裸露程度、贴身轮廓、姿态张力和光影塑形中的两项",
             "不得描写自慰、口交、插入或明确性行为",
         ),
         ContentLevel.EROTIC: (
@@ -77,7 +78,7 @@ def assert_packaged_grade_contract(document: StoryDocument, level: ContentLevel)
         ContentLevel.HARDCORE: (
             "当前画面直接、清晰地呈现角色之间的明确性行为",
             "不能用拥抱、亲吻、挑逗、气氛或即将发生的动作替代明确行为",
-            "器具、束缚或痛感强度本身不能把画面升级",
+            "器具、束缚或痛感强度本身不能替代这一要求",
         ),
     }
     resolved = resolve_story_input(document, InputOverrides(content_level=level))
@@ -340,7 +341,7 @@ def test_recipe_compilation_selects_only_each_stages_active_level(path):
                 if other != level
                 for rule in document.authoring.selected(stage, other)
             } - set(selected)
-            assert all(rule not in compiled for rule in excluded)
+            assert excluded.isdisjoint(getattr(resolved.rules, stage.value))
             assert isinstance(
                 resolved.context_for(stage, [resolved.plans[0].theme_id]), dict
             )
@@ -593,7 +594,7 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
         "直接刺激她的外生殖器",
         "不得添加伴侣、协助的手、嘴、倒影中的人物",
         "绝不为强化行为而增加参与者",
-        "每个 露骨级 画面 都必须直接指明正在动作的手或玩具",
+        "每个 画面 都必须直接指明正在动作的手或玩具",
         "被接触的生殖结构，例如阴蒂、外阴",
         "仅有湿润的手指、性唤起、分开的双腿、阴毛",
         "并列的成片备选，而不是按时间顺序排列的步骤",
@@ -633,11 +634,41 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
         "high-angle-intimate-liquid-editorial",
     ):
         assert not (RECIPES / f"{obsolete}.yaml").exists()
-    pose_ids = [
-        token for token in brief.split()
-        if len(token) == 4 and token.startswith("P") and token[1:].isdigit()
-    ]
-    assert pose_ids == [f"P{index:03d}" for index in range(1, 101)]
+    assert document.allocation is None
+    for level in ContentLevel:
+        resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        frames = "".join(resolved.rules.text_for(StoryStage.FRAMES).split())
+        for family in (
+            "站姿与弓步",
+            "跪姿与蹲姿",
+            "坐姿与椅子",
+            "仰卧与桥式",
+            "侧卧与蜷曲",
+            "俯卧",
+            "湿房、浴缸与水面",
+            "家具、台面与建筑支撑",
+            "一女一男贴近互动",
+            "双人编辑构图",
+        ):
+            assert family in frames, (level, family)
+        for requirement in (
+            "每个画面只选择一个主姿势",
+            "根据精确请求人数、场景尺寸、承载面、防滑条件",
+            "主要动作、液体起点与相机视线调整",
+            "可扩展创作种子，不是固定名称或穷举目录",
+            "不得为复制示例而制造危险承重、关节超限、遮挡动作起点",
+            "保持各自可靠支撑、独立肢体、无遮挡脸部及单一接触中心",
+            "不为示例增加伴侣",
+        ):
+            assert requirement in frames, (level, requirement)
+        themes = "".join(resolved.rules.text_for(StoryStage.THEMES).split())
+        for requirement in (
+            "跨主题轮换六大姿势家族",
+            "相邻主题不得重复同一姿势家族",
+            "每连续十个主题至少覆盖六种姿势家族、五种视点家族、五种绕人物方位、四档焦段",
+            "同一姿势家族和同一视点家族最多出现两次",
+        ):
+            assert requirement in themes, (level, requirement)
     # Authored conservation covers every branch, not a selected-level prompt.
     required = """
 成人亲密液体动势时尚编辑摄影
@@ -646,7 +677,7 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 高预算、经过完整造型与美术指导的成人 时尚编辑摄影
 露骨动作只是画面事件，不得取代时尚叙事
 一件 主视觉服装 或一个 主视觉配饰
-露骨级 即使下身赤裸
+即使下身赤裸
 不能只剩 裸体、性玩具和液体
 高端成人时尚杂志、奢华美妆大片
 业余色情视频截图
@@ -718,9 +749,9 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 不得解释自己如何满足 任务说明
 不得输出 自检、幕后安排、拍摄后清理计划或规则术语
 第一句必须直接从具体地点、人物或相机视点开始
-不得先写衣着锁、主题 编号、画面 编号、标题、许可声明
-衣着锁放在自然摄影描述之后
-露骨级 的主要动作与接触点必须直接可见
+不得先写主题编号、画面编号、标题
+全文不输出衣着证明、等级或液体类别声明、许可声明、合规摘要及否定合规清单
+主要动作与接触点必须直接可见
 不能 被衣摆、身体、手掌、阴影、水花、道具或构图遮住
 不得用手臂紧张、衣物下的动作、 水面波纹、表情或文字声明间接暗示
 中央水冠、离体高弧、径向 爆发式喷流 或明确 喷流 只用于从两腿之间正确生殖器开口
@@ -744,7 +775,7 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 私人泳池与浅水区：轮换仰漂星形
 不得让水面反光遮没脸和动作起点
 不固定为 50mm 正俯拍
-100 种高感官刺激姿势库
+可扩展创作种子，不是固定名称或穷举目录
 每个 画面 只选择一个主姿势
 跨 主题 轮换六大姿势家族
 相邻 主题 不得重复同一姿势家族
@@ -773,12 +804,14 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 相机、姿势、水花和道具都不得遮挡这个起点
 环境清水、 手持清水工具和储液式成人玩具只能形成下落
 不得形成主要 喷流、喷雾、高弧线 或 爆发式喷流
-任何人体液体喷射都从镜头中清楚可见、位于两腿之间的正确生殖器解剖开口开始
+女性排尿只能从两腿之间可见的尿道口开始
+女性阴道液体只能从两腿之间可见的阴道口或紧邻外阴区域开始
+男性精液只能从两腿之间可见的男性生殖器开始
 男性精液
 运行请求包含至少一名可见成年男性
 从该男性可见生殖器开始
 液体形态在 主题 和 画面 间轮换
-软水管或手持喷头可在 情色级 或 露骨级 中作为自愿外部自慰工具
+软水管或手持喷头可作为自愿外部自慰工具
 不得把高压水流、硬质喷嘴或软管插入身体
 性玩具是可选变化轴，不是每个 主题 的强制道具
 一件主要性玩具或由多个不可分离部件组成的一套单一系统
@@ -807,24 +840,22 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 普通玩具表面的 润滑剂只能形成贴附薄层、拉丝或滴落
 禁止尿道插入、宫颈穿透
 肛门玩具必须有清楚可见且大于插入部分的限位底座
-审美级 不出现可识别性玩具
-情色级 最多使用一件仅作外部接触的玩具
-露骨级 可从外部刺激、单一阴道或肛门插入
+不出现可识别性玩具
+最多使用一件仅作外部接触的玩具
+可从外部刺激、单一阴道或肛门插入
 连续十个包含 性玩具的 主题 至少覆盖五个玩具家族
 相邻玩具 主题 不得重复玩具家族、材质、颜色、固定方式和姿势组合
-审美级：
-情色级：
-露骨级：
-主表演者必须实际保留一至两件透明、半透明、湿贴、敞开、撩起或 半褪下
-主表演者下身必须完全赤裸
-当前 内容等级 唯一正确且逐字输出的衣着锁
+每位可见成年人穿一至三件
+乳头、外部生殖器、阴毛和肛门必须由不透明布料完整覆盖
+主要成年女性表演者必须实际保留一至两件透明、半透明、湿贴、敞开、撩起或半褪下
+主要成年女性表演者下身必须完全赤裸
 每个 画面 必须表现明确成人裸露和一个清楚可见的主要露骨动作
-裸体、湿衣或 挑逗姿势代替 露骨级 动作
+裸体、湿衣或挑逗姿势代替
 外部自慰、一至两根手指的单一插入
-本身也可以独立作为该 画面 唯一的主要 露骨级 液体动作
-环境清水、普通倾倒清水和其他安全舞台液本身绝不能替代 露骨级 动作
+本身也可以独立作为该画面唯一的主要液体动作
+环境清水、普通倾倒清水和其他安全舞台液本身绝不能替代露骨动作
 必须同时清楚显示上述外部自慰、单一插入或单一成人接触之一
-仅把玩具靠近身体、让液体流过裸体不算 露骨级 动作
+仅把玩具靠近身体、让液体流过裸体不算露骨动作
 同一解剖中心可有与主要动作直接相关的辅助 手部接触
 整张 画面 只描述这一类别的流动
 不得同时滴落、喷射、飞溅、形成涟漪或与主要液体混合
@@ -832,7 +863,7 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 不能用 私人、 锁闭、僻静 或 封闭 修饰温室
 禁止冷冻舱、冷库、桑拿、高温房、干冰、液氮
 各自唯一且前后一致的精确整数年龄
-同一 画面 出现两个不同年龄
+每人明确一个25–34岁的整数年龄，同一主题内保持年龄
 人物年龄统一保持在 25–34 岁的年轻成年人范围
 轮换 25–29 岁和 30–34 岁两个子段
 连续十个 主题 至少覆盖六个不同整数年龄
@@ -847,8 +878,8 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 每连续十个 主题 至少覆盖六个不同整数年龄、六种体型
 发现整套造型相似时，优先改换年龄段、体型、 脸型和发型
 相邻 主题 至少改变人物造型档案、地点家族、承载面
-只有以场所原生环境水为主的 审美级 或 情色级 批次才要求覆盖五个广义地点家族
-露骨级 或任何人物身体液体、玩具储液批次
+批次才要求覆盖五个广义地点家族和六种大型液体形态
+选择人物身体液体或玩具储液时，严格使用上述地点白名单
 白名单内至少四种兼容空间子型
 受保护私人卧室床和 受保护酒店套房床
 允许多个 主题 属于 同一广义湿区家族
@@ -858,66 +889,54 @@ def test_intimate_liquid_editorial_uses_open_ended_scene_grammar() -> None:
 同一视点家族最多出现两次
 规则优先级从高到低依次为：场景功能与物理逻辑
 必须舍弃更奇怪的地点、器具、水型或构图
-只有一个活动液体来源，且地点本来就适合该来源
-单一来源约束：每幅画面只能有一个可见的喷流、流束、喷雾、倾倒或液体运动事件
-不得把两个来源的液体组合、交叉、合并、汇合或同步
-所有淋浴喷头、软管、水龙头、环境喷雾和储液玩具都应明确处于关闭状态
-完整防水床面和吸水层清楚可见时才属于白名单
-人体液体可以有强烈、夸张、径向的编辑摄影表现
-不变成管道级、工业级或房间级水量
-环境水或储液玩具液体单独不能构成 露骨级
-仅让储液玩具向裸体流液、让液体落在身体上
-必须重写
+每幅画面只有一个活动液体来源、一个可见喷流、流束、喷雾、倾倒或液体运动事件
+禁止两源组合、交叉、合并、汇合或同步
+人体液体流动时，淋浴喷头、软管、水龙头、环境喷雾和储液玩具须关闭
+完整防水并铺吸水层的私人卧室床、酒店套房床
+体液可作强烈、夸张、径向的编辑表现
+不变成高压管道、工业水炮、无支撑间歇泉或房间级洪水
 场景合理性高于地点、水型、器具和构图多样性
-宁可重复兼容湿区，也不创造古怪组合
-只在正文结尾逐字输出当前 内容等级 的一条衣着锁
-内容等级约束：准确采用运行请求的内容等级
-露骨级请求的结尾只能使用“HARDCORE WARDROBE LOCK”
-绝不能使用“AESTHETIC WARDROBE LOCK”或“EROTIC WARDROBE LOCK”
-相邻 主题 不重复姿势 家族、双腿关系、支撑手和相机方位
-轮换 正上方俯视、高位、平视、低角度仰视、侧面轮廓、四分之三视角
-不把每张 图都拍成 高角度俯视、50mm、人物居中的俯拍全身照
-只保留一件主要玩具或一套不可分离系统
-普通玩具不主动喷液
-湿区玩具防水且 无市电连接
-任何玩具都不进行尿道插入
-画面都保持高预算成人时尚编辑摄影
-不输出临床、医疗、法证、 偷拍、网络摄像头、闭路监控、自拍或普通色情记录美学
-人数约束：准确采用请求中的女性和男性人数
-请求一名女性和零名男性，就表示恰好只有一名可见成年女性
-没有男性、男性身体部位、画外伴侣、暗示存在的男性或精液
-不得为了使用某种玩具、动作、液体来源、姿势或相机构图而增加伴侣
-在场约束：请求人数是必须准确出现的人数，不是人数上限或可选角色
-每名请求成年人都必须在每幅画面中实际可见
-请求一名女性和一名男性，就表示每幅画面都恰好有一名可见成年女性和一名可见成年男性
-不得漏掉任何一人、将任何一人移至画外
+宁可重复兼容湿区
+相邻主题不得重复年龄段、体型、脸型、发型、妆容、服装轮廓、造型主色组合、姿势家族、双腿关系、支撑手或相机方位
+批次轮换正上方俯视、高位、平视、低机位、侧面、四分之三、水面线和细节视点
+不只改角度数字或全部固定居中50mm俯拍
+只保留一件或一套不可分离系统
+湿区玩具须防水且无市电连接
+不得退化为业余色情视频截图、网络摄像头、闭路监控、偷拍、自拍、后台花絮、临床检查、医疗或法证记录、器材测试照或无美术指导的普通色情记录
+请求人数是每幅画面必须准确可见的人数，不是上限或可选角色
+不得漏人、移至画外或用玩具替代
+不得为玩具、动作、液体、姿势或机位增加伴侣
+零男性请求没有男性、男性身体部位、画外或暗示男性及精液
+只在近源流出或滴落，并清楚进行外部刺激或单一插入，不能仅向裸体流液
 多样性退化为同一白色平台上的换装
-把喷嘴、软管、控制器、纸钞、粉色腕带、白色服装
-每个 主题 的必选物
+喷嘴、软管、控制器、纸钞、粉色腕带、白衣、厚底高跟鞋及黑色竖杆都不是必选物
 """
     missing = [
         text for text in required.strip().splitlines()
         if "".join(text.split()) not in compact
     ]
     assert not missing, missing
-    wardrobe_literals = (
-        "“AESTHETIC WARDROBE LOCK: Every visible adult wears one to three "
-        "intentional fashion garments whose opaque fabric fully covers all nipples, "
-        "external genitals, pubic hair, and anus; no transparent panel, opening, "
-        "wet-clinging area, or shifted edge reveals those regions.”",
-        "“EROTIC WARDROBE LOCK: The featured adult woman visibly retains one or "
-        "two sheer, translucent, open, wet-clinging, lifted, or partially lowered "
-        "fashion garments, with each garment and its exact resting position "
-        "readable; breasts, nipples, buttocks, pubic hair, and one external genital "
-        "region may be visible, while no insertion or explicit partnered sex occurs.”",
-        "“HARDCORE WARDROBE LOCK: The featured adult woman's lower body is bare, "
-        "with no skirt, trousers, shorts, underwear, opaque bodysuit, or swimwear "
-        "covering her vulva, pubic hair, buttocks, anus, or current action area; "
-        "only one minimal upper garment plus zero to four accessories, hosiery "
-        "pieces, or footwear items may remain away from that area.”",
-    )
-    for literal in wardrobe_literals:
-        assert literal in normalized
+    assert "WARDROBE LOCK" not in normalized
+    assert "衣着锁" not in normalized
+    for level in (ContentLevel.AESTHETIC, ContentLevel.EROTIC):
+        rules = resolve_story_input(
+            document, InputOverrides(content_level=level)
+        ).rules.text_for(StoryStage.THEMES)
+        assert "以场所原生环境水为主" in rules
+        assert "覆盖五个广义地点家族和六种大型液体形态" in rules
+    for level, action in (
+        (ContentLevel.EROTIC, "软水管或手持喷头可形成外部非插入式挑逗"),
+        (ContentLevel.HARDCORE, "作为自愿外部自慰工具"),
+    ):
+        resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        for stage in StoryStage:
+            rules = resolved.rules.text_for(stage)
+            assert action in rules
+            assert "只能使用低压水流并保持喷口在身体外部" in "".join(rules.split())
+        if level == ContentLevel.HARDCORE:
+            assert "覆盖五个广义地点家族" not in resolved.rules.text_for(
+                StoryStage.THEMES
+            )
 
 
 def test_indoor_pure_desire_editorial_has_complete_pose_library() -> None:
@@ -967,9 +986,9 @@ PD100 站姿，躯干直立，一条腿向侧方伸展
 十个 主题 的批次必须至少各出现一次 正面视角、侧面视角、背面视角
 任一视角家族最多出现 两次
 十个 主题 还必须至少包含一次 倾斜机位、过肩视角
-审美级：
-情色级：
-露骨级：
+完整时尚造型覆盖乳头、外部生殖器、阴毛和肛门
+保留至少一件透明、半透明、敞开、滑肩、卷起或半褪下的时尚单品
+主要动作、接触点和参与人物必须清楚可见
 准确运行人数
 运行请求的人数是精确人数，不是上限
 每个最终 画面 输出为请求语言的一段自然、连续
@@ -1435,9 +1454,8 @@ def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
         "装饰束身上衣、刺绣胸衣、镶宝石连体衣",
         "允许深乳沟、侧面镂空、露背、裸肩",
         "乳头和生殖器上的遮盖必须稳定且不透明",
-        "在 `aesthetic` 级别",
-        "在 `erotic` 级别",
-        "在 `hardcore` 级别",
+        "每个人的乳头和生殖器都保持完全遮盖",
+        "不得呈现生殖器接触、插入、玩具、体液或露骨性行为",
         "允许部分裸露上身、裸露乳房和可见乳头",
         "明确无误、当前可见且适合严格指定人物配置的自愿成年人性行为",
         "单女性配置使用露骨独自行为",
@@ -1473,8 +1491,8 @@ def test_intimate_lifestyle_portrait_matches_reference_photo_grammar() -> None:
         "浪漫期待",
         "自觉展现魅力",
         "惆怅温柔",
-        "在 `aesthetic` 级别，优先采用亲切、俏皮、含蓄娇态",
-        "在 `erotic` 级别，允许更强的逗趣邀约",
+        "优先采用亲切、俏皮、含蓄娇态",
+        "允许更强的逗趣邀约",
         "先规划整批的表情覆盖",
         "一批有四个或更多 主题 时，以下四条路线每条至少包含一种表情",
         '"COY AND COQUETTISH"',
@@ -1573,6 +1591,10 @@ def test_miniature_giant_encounter_scopes_cast_to_miniature_people() -> None:
     assert set(document.requirements.content_levels) == {
         ContentLevel.EROTIC, ContentLevel.HARDCORE,
     }
+    assert any(
+        "巨大人物每个 主题 可选择裸体或部分穿着" in rule
+        for rule in document.authoring.themes.common
+    )
     cast = document.generation.cast
     assert cast.scope == "miniatures"
     assert [(role.id, role.sex) for role in cast.fixed_roles] == [
@@ -1749,7 +1771,7 @@ female_count 和 male_count 只约束微型人物
 体液必须来自唯一可见的身体来源
 大量且清晰可见的精液、尿液喷射、阴道液体或灌肠喷射
 每帧只选一种主要体液效果
-“Hardcore” 可使用远大于微型人物体量的强烈喷流
+可使用远大于微型人物体量的强烈喷流
 喷口、方向、受力表面、汇流路径
 束缚架、滑轮悬吊、束带、项圈、夹具、震动器、泵、扩张器
 不得只作装饰、制造伤害、遮住微型完整身体或形成第二性行为
@@ -1764,7 +1786,7 @@ female_count 和 male_count 只约束微型人物
 每人固定一个强烈轮廓特征
 和一个醒目发型、头饰或超大配饰
 同一 主题 全部 画面 一致
-“Erotic” 和 “Hardcore” 中，巨大人物每个 主题 可选择裸体或部分穿着
+巨大人物每个 主题 可选择裸体或部分穿着
 并在全部 画面 保持一致
 部分穿着可保留一至两件衣物及一件配饰
 骨盆、目标部位及其与胸腹、臀部或大腿的连续关系
@@ -1789,7 +1811,7 @@ female_count 和 male_count 只约束微型人物
 每个 画面 分别为发起者和回应者指定一个简短表情
 不得让所有人共享相同的空洞、微笑或惊讶表情
 至少一个环境中景或全景必须显示发起者和回应者的脸
-“Hardcore” 表现极度性兴奋
+表现极度性兴奋
 潮红面颊、张开的嘴唇、急促呼吸
 表情保留自然面部结构
 每人表情使用 10–15 个英文单词
@@ -2024,10 +2046,10 @@ female_count 和 male_count 只约束从正常人类世界来到巨人国的成�
 除一个明确命名的局部接触面外
 禁止整名访客横跨、趴伏或贴伏在巨人的胸部、腹部、阴阜、骨盆或大腿表面
 全部访客位于同一个 微型访客互动台 的独立编号工位
-当且仅当 request.content_level 为 “erotic”：选择一种明确非插入式亲密行为
+选择一种明确非插入式亲密行为
 单一软垫末端、气流、水流或织物到达接触点
 访客身体不得直接接触
-“Hardcore” 允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官
+允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官
 禁止 “visitor against giant torso”
 禁止 “full-body direct contact”、“body-weight contact”
 耻骨弓 上的 根部、大腿内侧上部 之间连续的 阴茎体、清楚 龟头
@@ -2062,14 +2084,14 @@ female_count 和 male_count 只约束从正常人类世界来到巨人国的成�
 目标暴露是最小充分访问
 地点必须具有画面内可见的隐私条件
 限制必须临时、无伤害且不影响同意能力
-当且仅当 request.content_level 为 “erotic”：选择一种明确非插入式亲密行为
-当且仅当 request.content_level 为 “hardcore”：选择口交、手交、玩具插入
+选择一种明确非插入式亲密行为
+选择口交、手交、玩具插入
 至少一名访客以 嘴、一只手 或 一个玩具 已接触目标
 其他人负责承重、衣物牵引、定位与高度角度调整
 润滑、节奏、安全吊带、观察或流体承接
 直接参与者不操作控制器
 不得旁观、另开动作或重复占据同一解剖位置
-“Hardcore” 每帧最多一种主要体液，显示唯一 来源、轨迹、表面 和 落点
+每帧最多一种主要体液，显示唯一 来源、轨迹、表面 和 落点
 未选择 释放 时不得出现喷射、液滴或湿痕
 它可以是简单日用品、柔性材料、家具、服务设施或机械系统
 不得用皮肤、阴毛或柔软组织承重，也不得遮住访客
@@ -2119,8 +2141,8 @@ female_count 和 male_count 只约束从正常人类世界来到巨人国的成�
 标志性机制 必须是地点原生设施或其合理延伸
 禁止无法解释来源的临时专业设备
 全部承重、锚点和传力部件属于同一功能链并固定在地面、家具或其他硬结构上
-“Erotic” 中，S1 命名的 标志性机制 必须直接作用于接触点
-“Hardcore” 中，S1 命名的 标志性机制 必须直接承托、定位、稳定、驱动节奏或承接体液
+S1 命名的 标志性机制 必须直接作用于接触点
+S1 命名的 标志性机制 必须直接承托、定位、稳定、驱动节奏或承接体液
 这属于装饰性假机制
 互动台严格分成与访客人数相等的独立工位，从画面左到右编号
 每个工位只有一人并以栏杆和背景缝隙分隔
@@ -2252,8 +2274,7 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         "human_count = 2, furry_count = 1, zero other bodies",
         "two named human women and one named adult male anthropomorphic",
         '禁止出现短语 "human man" 和 "female furry"',
-        "第一句中，先命名两名人类女性及男性兽人，再说明行为",
-        "在同一句中让第二名人类女性与其余两位之一直接接触",
+        "第一句中先命名两名人类女性及男性兽人，再说明行为",
         "阵容声明必须在同一句中继续使用以下明确接触语法",
         '"the male furry\'s penis is inside the first human woman\'s vagina, '
         "while the second human woman's hand directly contacts either the first "
@@ -2265,11 +2286,11 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         "绝不添加请求指定名额以外的角色",
         "清醒、聪慧、能够说话或明显具备推理能力的成年人",
         "兽人角色继承按确定性规则选出的请求指定名额的性别",
-        "若仅 `female_count` 非零，每名兽人都是女性",
-        "若仅 `male_count` 非零，每名兽人都是男性",
+        "若仅有一种请求指定性别的数量为正，兽人就占用该性别的一个名额",
+        "同性别群体包含一名该性别的兽人及同一性别的成年人类",
         "保持姓名、性别、代词及性解剖结构一致",
         '不得切换性别、使用 "it" 或 "they" 来回避说明性别',
-        "一名女性及零名男性，意味着一名成年女性兽人及零名人类",
+        "一名女性及零名男性对应一名女性兽人及零名人类",
         "全女性运行不包含阴茎、阴囊、睾丸",
         "仅选择与已锁定解剖结构相容的行为",
         "被拍摄的成年表演者",
@@ -2294,7 +2315,7 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         'or the solo protagonist\'s visible bodily response]."',
         '前提必须在 "Immediate response" 分句之后结束',
         "视觉风格只能放在独立的 主题 `style` 值中",
-        "在 审美级 和 情色级 级别，每个 画面 开头都要独立说明精确地点",
+        "每个 画面 开头都要独立说明精确地点",
         "不使用任何回指",
         "重新安排一个等效的决定性瞬间",
         "`F02` 不晚于 `F01`",
@@ -2308,33 +2329,31 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         "扫描每个标题、前提、`style` 及正文值",
         "排除任何引用另一 画面、自称延续内容，或推进固定时间窗口的 画面",
         "不得使用动画、漫画",
-        "在 `aesthetic` 级别",
-        "在 `erotic` 级别",
-        "在 `hardcore` 级别",
+        "让每位请求指定的成年人衣着完整，并使行动保持非情色",
+        "仅在已指明的接触需要之处，才可敞开、松开、提起、解开或移开服装",
         "展示一种已经发生的明确成年人自愿性行为",
         "前一百个英文词内",
         '精确短语 "consensual and willing"',
-        "`total_count` 等于一时，在第一句中写明兽人主角明确的独自手部接触",
-        "对于更大阵容，在前两句内让每位参与者都置于同一直接生殖器、口部或手部性行为链中",
+        "`total_count` 等于一时，指明唯一兽人主角自己的手及被触碰解剖部位",
+        "更大阵容在前两句内让每位参与者都置于同一当前、自愿的直接生殖器、口部或手部性行为链中",
         "明确说明谁的阴茎在谁的阴道或肛门内",
         '"intimate contact"、"joined bodies"、"explicit interaction"',
-        '该句开头须把图像称为 "live-action fantasy photograph"',
-        "说明请求指定的精确成人性别总数、精确 `human_count`、精确 `furry_count`",
-        "在同一个第一句中写入直接解剖接触",
+        '以 "live-action fantasy photograph" 开头',
+        "请求指定的精确成人性别总数、精确 `human_count` 与 `furry_count`",
+        "在同一句完成阵容与正在发生的直接解剖接触声明",
         "第一句绝对优先",
         "所有性解剖结构都是适合该角色的普通成年类人解剖结构",
         "绝不使用吻部形态、喙、角、利爪、尾巴、翅膀、爪垫",
         "没有成年人仅在背景旁观",
         "说明可见成年身体的精确总数",
         "第一句中逐一命名每个人类及兽人",
-        "前两句必须为每位兽人及人类参与者赋予同一性行为链中一个当前",
-        "第二位或之后的参与者不得在其他人互动时站在旁边",
+        "每位参与者都主动触碰另一位参与者或与其发生性互动",
         "自我触碰可以补充但绝不能取代与另一位参与者的接触",
-        "为每位参与者提供一个独立、无遮挡的身体位置",
+        "为每位参与者提供独立、无遮挡的头、躯干、骨盆、两条手臂、两条腿、支撑链",
         "硬性下限为 600 个由空白分隔的词",
         "目标为 750-950 个词",
         "绝不在最终文字中提及词数或长度检查",
-        "使用强制的阵容与接触首句",
+        "每个 画面 的首句在前一百个英文词内完成阵容与接触声明",
         "宽阔、干燥、水平、室温、防滑",
         "不得从固定的具名姿势目录中选择或重复",
         "创造一种新的、物理上合理的姿势",
@@ -2349,9 +2368,9 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         '"left thigh"、"left knee"、"left lower leg"、"left foot"、"right thigh"、'
         '"right knee"、"right lower leg" 和 "right foot"',
         "绝不能替代分侧图谱",
-        "在强制的 露骨级 阵容与接触句及单独一个地点句之后，立即描述骨盆支撑",
+        "在阵容与接触句及单独一个地点句之后，立即描述骨盆支撑",
         "完整的人类肢体图谱，再描述完整的兽人肢体图谱",
-        "不得在地点句与这两份肢体图谱之间插入面孔、头发、生平、神话、衣着",
+        "不得在地点句与肢体图谱之间插入面孔、头发、生平、神话、衣着",
         "让人类手臂与兽人前肢在视觉上分离",
         "让每只手、手指、前爪、利爪、物件、衣物边缘及尾巴都位于人类及兽人的嘴外",
         "不得在嘴唇附近托、遮、压、拉或抚摸面孔",
@@ -2365,9 +2384,7 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
         "绝不进行口部与生殖器接触",
         "使用 35mm 至 65mm 的四分之三身或全身相机视图",
         "相机须足够斜置，以分开重叠肢体",
-        "露骨级 画面 未在前两句及前一百个英文词内清楚指明成人性行为",
-        '露骨级 画面 用 "explicit interaction" 指代非性仪式',
-        "英文 画面 少于 600 个由空白分隔的词",
+        "若段落不足 600 词，添加新的空间、解剖、角色",
     )
     missing = [text for text in required if text not in normalized]
     assert not missing, missing
@@ -2375,6 +2392,13 @@ def test_furry_mythic_interactions_uses_original_live_action_characters() -> Non
     assert "Follow each input_context plan's cast facts exactly" in (
         resolve_story_input(document).rules.text_for(StoryStage.THEMES)
     )
+    for level in (ContentLevel.AESTHETIC, ContentLevel.EROTIC):
+        rules = resolve_story_input(
+            document, InputOverrides(content_level=level)
+        ).rules.text_for(StoryStage.FRAMES)
+        assert (
+            "每个 画面 开头都要独立说明精确地点、国家、季节或日期" in rules
+        )
 
 
 def test_dress_board_region_names_are_layout_only() -> None:
@@ -2405,7 +2429,7 @@ def test_dress_board_region_names_are_layout_only() -> None:
         "球形口塞",
         "衔杆式口塞",
         "中空口塞",
-        "所选的任何硬核级产品都可在人物视图中以佩戴状态出现",
+        "所选的任何产品都可在人物视图中以佩戴状态出现",
         "可见的低张力限制器",
         "可见呼吸通道",
         "放松的下颌",
@@ -2436,7 +2460,7 @@ def test_dress_board_region_names_are_layout_only() -> None:
         "材质平铺图必须展示两只鞋、两只手套",
         "每个画面都必须是实质不同的呈现",
         "至少改变以下四项",
-        "不得写出内部级别名称",
+        "完全通过可见服装、器具、产品、姿态、材质和光线表达所选强度",
         "“BDSM”在必要时最多出现一次",
         "未翻译的英语工作流程词汇",
         "合规式否定措辞填充最终文字",
@@ -2472,11 +2496,11 @@ def test_dress_board_region_names_are_layout_only() -> None:
         return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
 
     for label, minimum in (
-        ("精选硬核级服装原型", 8),
-        ("精选硬核级器具体系", 8),
+        ("精选服装原型", 8),
+        ("精选器具体系", 8),
         ("精选明确“BDSM”产品类别", 12),
         ("精选性玩具产品类别", 10),
-        ("精选硬核级材质与配色体系", 8),
+        ("精选材质与配色体系", 8),
     ):
         entries = pool(label)
         assert len(entries) >= minimum, label
@@ -2627,9 +2651,9 @@ def test_jav_dvd_wrap_has_complete_ascii_packaging_contract() -> None:
         "所有封面、封底及嵌入照片都严格为单人",
         "镜头外参与者、第二具身体、多余手部、局部头部",
         "前提都必须描述单人自主行为",
-        "在 aesthetic 级别",
-        "在 erotic 级别",
-        "在 hardcore 级别",
+        "使用完整不透明衣着创作挑逗性的成人时尚包装",
+        "让生殖器细节保持含蓄或被遮住",
+        "每张剧照只用一个清晰可读的主要动作、物理可信的接触几何",
         "所有插入物都必须是明确为生殖器或肛门使用设计、对身体安全的性玩具",
         "绝不插入瓶子、食物、家居物品",
         "各 Frame 是并行宣传变体",
@@ -2935,9 +2959,7 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
         "绝不用全大写姓氏",
         "每个主题和画面都只用英文 ASCII 编写",
         "将智能标点、乘号及非英文字符替换为普通 ASCII",
-        "在 aesthetic 级",
-        "在 erotic 级",
-        "在 hardcore 级",
+        "接触总数恰为人数减一",
         "写明每位参与者的人体部位与接触角色",
         "拿无关物品、指导姿势或触碰衣物均不算",
         "按 A > B > C 并继续排列阵容",
@@ -3015,8 +3037,11 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
         "one nonfacial part, allowed verb-axis pair, and valid scale",
         '"Consent:" 声明每位成年人都自由选择了与社会利害无关的娱乐',
         '"Staging:" 固定 A-B-C 或 C-B-A 空间顺序、B 居中',
-        '"Hardcore proof: Chain A > B > C.',
-        "No other sexual contact.",
+        "仅允许相邻配对的性接触，接触总数恰为人数减一",
+        "Contact 1 为 A 的一个部位接触 B 的一个部位",
+        "Contact 2 为 B 的另一个部位接触 C 的一个部位",
+        "C 绝不接触 A",
+        "绝不增加自我刺激或装饰性性接触",
         "统一的真人报纸照片蒙太奇媒介",
         '"Hybrid real-person newspaper photomontage with biting anatomical caricature:"',
         '"Exactly [requested total] East Asian adults fill the image',
@@ -3094,7 +3119,7 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
         "绝不将一张概念板分散到多个画帧、为每个区域各用一个画帧",
         '原文提示词 "Region 1:" 至 "Region 6:"',
         "每个都必须能够独立作为广告主视觉",
-        '不要将 "erotic" 或 "hardcore" 淡化成中性图像',
+        "每位成年人都保持清醒、自愿、有回应并且能够停止",
         "受控的移轴或微距式选择性对焦",
         "首先确保它在缩略图尺寸下清晰可读",
         "至少使用四个远景或中景，展示完整的成年身体",
@@ -3147,6 +3172,27 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
         assert (layout.parameters.min_views, layout.parameters.max_views) == (6, 6)
 
 
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+def test_creative_content_intensity_has_selected_level_scope(
+    level: ContentLevel,
+) -> None:
+    document = load_story_document(RECIPES / "creative.yaml")
+    intensity = "人物与内容级别：不得将要求的内容强度淡化成中性图像。"
+    adults = "人物与内容级别：每位成年人都保持清醒、自愿、有回应并且能够停止。"
+    expected = level in (ContentLevel.EROTIC, ContentLevel.HARDCORE)
+    assert intensity not in document.description
+    assert (intensity in document.authoring.level_refinements[level].shared) == expected
+    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    for stage in StoryStage:
+        common = getattr(document.authoring, stage.value).common
+        assert adults in common
+        assert intensity not in common
+        assert (intensity in document.authoring.selected(stage, level)) == expected
+        compiled = resolved.rules.text_for(stage)
+        assert compiled.count(intensity) == (1 if expected else 0)
+        assert adults in compiled
+
+
 def test_edo_warai_e_brief_respects_all_content_levels() -> None:
     document = load_story_document(RECIPES / "edo-warai-e.yaml")
     for level in ContentLevel:
@@ -3155,10 +3201,10 @@ def test_edo_warai_e_brief_respects_all_content_levels() -> None:
     normalized = " ".join(brief.split())
 
     assert document.authoring.level_refinements
-    assert "在 aesthetic 等级，让每位成年人完整穿着多层时代服饰" in normalized
+    assert "让每位成年人完整穿着多层时代服饰" in normalized
     assert "不得用屏风、扇子、被褥、衣袖、家具、策略性裁切、遥远剪影或喜剧插曲隐藏定义性内容" in normalized
-    assert "在 erotic 等级，衣袍可以敞开" in normalized
-    assert "在 hardcore 等级，成年人可部分或完全裸体" in normalized
+    assert "衣袍可以敞开" in normalized
+    assert "成年人可部分或完全裸体" in normalized
     assert "直接确立所要求内容等级的身体遮盖、衣物状态、当前互动" in normalized
     assert "每个画面开头即须使所选等级的定义性状态已经可见" in normalized
     assert "在每个画面中保留主题的露骨行为" in normalized
@@ -3536,7 +3582,7 @@ def test_magazine_cover_brief_builds_a_finished_newsstand_cover() -> None:
         "以字面 ASCII 字符 `;` 结束",
         "Frame 的最后一个字符必须是 `;`",
         "占封面约百分之六十至八十的主导主图",
-        "在 hardcore 级别",
+        "主图必须可见地呈现一个已在进行中的、露骨且双方自愿的成年性互动",
         "结果是一张平面竖版 3:4 杂志正面封面",
         "槽位数量、重复出现的位置、允许的载体、排版区域和产品版式均由配方规定",
     ):
@@ -4077,7 +4123,7 @@ def test_surreal_conceptual_portrait_has_safe_minimal_installation_contract() ->
         "通常为等效 40-105 毫米",
         "每条可见肢体连续连接到一个人的躯干",
         "不得通过物件重叠、黑暗、镜子、画框、屏幕、影子或悬挂衣物创造额外、脱离、重复、融合或无来源的解剖",
-        "在 Hardcore 等级，装置可为行为构框、呼应、计数",
+        "装置可为行为构框、呼应、计数",
         "但不得插入、束缚、悬挂、击打",
         "肩、胸、骨盆、臀部和生殖器均由不透光织物完全覆盖",
         "同一主题中的画面是平行的完成肖像",
@@ -4161,11 +4207,10 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
         "绝不写三十五岁上下、四十出头、接近六十岁",
         "清醒、能力未受损、自愿、会作出回应",
         "明确描述互动为双方同意且自愿",
-        "在每个 情色级 或 露骨级 画面的前一百个英文单词内",
         '包含精确短语 "consensual and willing"',
-        "在每个 露骨级 画面的前一百个英文单词内",
+        "画面的前一百个英文单词内",
         "说明谁的勃起阴茎在谁的阴道或肛门内",
-        "将该直接 露骨级 接触放在第一句或第二句中",
+        "接触放在第一句或第二句中",
         "不得在说出参与动作的解剖结构前，用面孔、角、服装",
         "所有词语位置检查在内部进行",
         "绝不提及开头词语、前一百词、词语位置",
@@ -4205,9 +4250,9 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
         "添加一种尺度对比和一种材料对比",
         "选择一个运动向量",
         "开放式姿态创作思路，不是固定菜单或主题编号映射",
-        "在 审美级 级别，变化以下动作",
-        "在 情色级 级别，变化非露骨的成年人布局",
-        "在 露骨级 级别，轮换物理上可信的露骨布局",
+        "变化以下动作",
+        "变化非露骨的成年人布局",
+        "轮换物理上可信的露骨布局",
         "面对面坐姿阴道或肛门性交",
         "有支撑的站立性交",
         "侧卧性交",
@@ -4264,13 +4309,20 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
         "环境保持静态，没有一个可见的当前事件",
         "组合多于一个主导灾难",
         "缺少精确的 24-135mm 焦距",
-        "将确切 露骨级 解剖结构或直接接触推迟到前两句或前一百个英文单词之后",
-        "将 情色级 或 露骨级 亲密互动安排在水下",
+        "解剖结构或直接接触推迟到前两句或前一百个英文单词之后",
         "将灰烬、尘土、淤泥、火星、雨、烟",
         '缺少 "live-action dark-fantasy feature-film frame"',
     )
     missing = [text for text in required if text not in normalized]
     assert not missing, missing
+    for level in (ContentLevel.EROTIC, ContentLevel.HARDCORE):
+        rules = resolve_story_input(
+            document, InputOverrides(content_level=level)
+        ).rules.text_for(StoryStage.FRAMES)
+        assert "画面的前一百个英文单词内" in rules
+        assert '包含精确短语 "consensual and willing"' in rules
+        assert "亲密互动安排在水下" in rules
+        assert "水高于脚踝" in rules
 
 
 def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
@@ -4357,12 +4409,12 @@ def test_angel_brief_has_dark_cinematic_exact_cast_contract() -> None:
         "每幅图像选择一种强有力的图形结构",
         "一个清晰可辨的运动向量",
         "穿过圆形天窗下射光束",
-        "在 情色级 级别，采用非露骨的成年人亲密互动",
+        "采用非露骨的成年人亲密互动",
         "一项清晰可见、已在进行的自愿成年人性行为",
-        "在每个 露骨级 画面的前一百个英文单词内",
+        "画面的前一百个英文单词内",
         "将确切性行为和当前解剖接触放在前两句中",
         "哪位成年人的阴茎位于哪位成年人的阴道或肛门内",
-        '泛化的 "point of contact" 不满足 露骨级 要求',
+        '泛化的 "point of contact" 不满足 要求',
         "一百词和前两句的位置检查在内部进行",
         "绝不提及词语位置、词数门槛",
         "暗调、低饱和度、高反差和窄色域",
@@ -4657,11 +4709,11 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
     for requirement in (
         "每个运动元素都必须是地点与当前活动的必然结果",
         "绝不只为让图像显得有动感而添加载体、道具、人物、光线或手势",
-        "若所述相机设置无法产生描述的最终图像",
+        "若相机设置无法产生描述的最终图像",
         "每个画帧返回为一个自足的英文段落，不少于 700 词",
         "目标为 850-1200 词",
         "优先用分号连接简短主谓宾分句",
-        "主题数、画帧数、女性数、男性数",
+        "绝不假定固定数量、ID 或固定输出顺序",
         "请求中的主要人物数量",
         "明显成熟、年龄不低于 25 岁的成年人",
         "请求超过两名主要成年人时，在写主题或画帧前建立内部角色台账",
@@ -4679,7 +4731,7 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
         "闪光凝固运动，绝不扩展景深",
         "精确年龄和以厘米为单位的身高",
         "自然乳房大小、形状、前突程度",
-        "脸型；眉部、眼睛及其颜色、鼻子、脸颊",
+        "脸型、眉部、眼睛及其颜色、鼻子、脸颊",
         "精确肤色与底色",
         "一个精确表情，通过视线目标",
         "一整双鞋",
@@ -4704,8 +4756,7 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
         "只有整理打包本身是可见当前活动时才允许有序收纳",
         "一只手只执行一个任务",
         "自然适配优先于多样性",
-        "在内部补全这句话：“因为这个可见的当前活动正在发生，"
-        "所以这个载体必须以这种方式运动。”",
+        "载体运动须由可见的当前活动造成",
         "若删除载体后活动不变",
         "不要混合载体类别",
         "绝不把动作引起的载体与独立环境载体配对",
@@ -4756,7 +4807,8 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
         "[selected plane]; [ND strength when needed] controls ambient exposure; "
         'no capture apparatus is visible."',
         "绝不赋予拍摄装置可见位置、材质、支撑",
-        '不要写 "camera body"、"camera mounted"、"tripod"、"gimbal"、"flash head"',
+        '以下词语出现次数必须为零："camera body"、"camera mounted"、"tripod"、'
+        '"gimbal"、"flash head"',
         "解释视点和入射光，而非硬件立在哪里",
         "封闭制作并不能成为图像中出现制作器材的理由",
         "每个画帧说明一个精确虚拟视点",
@@ -4819,19 +4871,19 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
         "可见实景发光体属于环境；拍摄照明不属于环境",
         "北京或任何其他指定城市中正常营业的公共场所",
         "封闭、出入受控的制作",
-        "以可见动作边界区分 erotic 与 hardcore",
-        'hardcore 只使用 "FLASH-FROZEN ACTION PEAK" 或 "STILL ANCHOR, MOVING WORLD"',
-        "hardcore 等级不强制服装配额或默认服装",
+        "以可见动作满足既定内容边界，不以衣物覆盖程度判定或替代动作要求",
+        '只使用 "FLASH-FROZEN ACTION PEAK" 或 "STILL ANCHOR, MOVING WORLD"',
+        "不强制服装配额或默认服装",
         "完全根据场景和当前行为选择全裸、部分着装或正在脱衣",
-        "不要为弱化 hardcore 内容或将其与 erotic 内容区分而添加衣物",
+        "不要为弱化当前行为的可见性而添加衣物",
         "在生成任何画帧前否决主题",
         "标题、设定和风格都指向同一个唯一模式与载体",
-        "否决设定未将露骨行为描述为当前接触",
-        "除非每人都有指名的直接露骨角色",
-        "服装清单若使用堆、垛、捆、散乱物品",
+        "主题设定必须呈现当前接触，而非未来意图、准备或仅脱衣",
+        "每人都须有指名的直接露骨角色",
+        "服装清单不得使用堆、垛、捆、散乱物品",
         "整齐折叠衣物、陈列式对齐、无法解释的重叠",
-        "静止锚点模式快门慢于 1/4 秒却省略必需短闪光",
-        "没有具体对焦几何理由却默认 f/5.6 或更小光圈",
+        "其身上的连续环境曝光至少低三档",
+        "不得在没有具体对焦几何理由时默认 f/5.6 或更小光圈",
         "闪光凝固载体完全位于声明的景深界限外",
         "把失焦环境载体称为清晰",
         '标题只命名一个运动创意，而非 "X and Y"',
@@ -4840,12 +4892,12 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
         "每条次要通路、天气效果、流体系统、动力系统",
         "不要把私人室内与正常运行的公共室外混合",
         "不要把搭建的复制布景称为具有真实运行的在用公共基础设施",
-        "场景回路和力学回路通过日常生活逻辑检验",
+        "场景和当前活动通过日常生活逻辑检验",
         '最后在草稿中搜索 "pile"、"heap"、"bundle"、"scattered"',
         '对于脱下物品的摆放，还要搜索 "neatly folded"、"folded into a rectangle"',
         "不要否决自身翻折的腰带",
         "这些是脱下后的物理形状，不是有序收纳",
-        "任何画帧只要有一项未通过，就静默否决并重写",
+        "所有要求均须满足，不得通过改动人物构成或放宽内容边界来解决冲突",
     ):
         assert requirement in normalized, requirement
     for excluded in (
