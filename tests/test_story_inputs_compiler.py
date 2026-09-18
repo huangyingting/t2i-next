@@ -230,7 +230,7 @@ def test_policy_preferences_are_not_immutable_core_defaults() -> None:
         assert not any("分别默认为中国籍" in rule for rule in rules)
         assert not any("场景国家默认为中国" in rule for rule in rules)
         assert any("unmistakable adult" in rule for rule in rules)
-        assert any("input plan" in rule for rule in rules)
+        assert any("input_context plans" in rule for rule in rules)
         assert any("sole authority for cast scope" in rule for rule in rules)
         assert any("including plans with no catalog entry" in rule for rule in rules)
     for rules in (resolved.rules.themes, resolved.rules.frames):

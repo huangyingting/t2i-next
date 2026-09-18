@@ -26,8 +26,13 @@ def test_views_and_background_do_not_weaken_transport_or_cast_authority():
     assert "not additional output Frames" in rules
     assert "Within each depicted view" in rules
     assert "one <FRAME>...</FRAME> block per requested_frame_slots item" in rules
-    assert "They cannot override" in rules
-    assert "resolved cast contract" in rules
+    assert (
+        "No description, authoring, module, policy, or quality setting "
+        "may override safety"
+    ) in rules
+    assert "requested counts and slots" in rules
+    assert "sole authority for cast scope" in rules
+    assert "Repeated views of one identity do not increase the cast" in rules
     assert "explicitly permitted background adults" in rules
     assert "population bounds and adult status" in rules
 
@@ -38,6 +43,9 @@ def test_theme_rules_keep_planned_slots_and_background_choices_stable():
     )
     rules = resolved.rules.text_for(StoryStage.THEMES)
 
-    assert "program-owned IDs" in rules
-    assert "execute allocation formulas from prose" in rules
+    assert "the program assigns all Theme IDs" in rules
+    assert (
+        "Never recompute routing from Theme IDs, batch position, retry order, "
+        "or prose formulas."
+    ) in rules
     assert "preserve that choice within the Theme" in rules

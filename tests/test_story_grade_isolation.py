@@ -19,7 +19,7 @@ from t2i_story_pipeline.inputs import (
 )
 from t2i_story_pipeline.models import ContentLevel, StoryStage
 from t2i_story_pipeline.prompts import frame_messages, theme_messages
-from tests.story_factories import make_theme
+from tests.story_factories import make_frame_sequence, make_theme
 from tests.test_story_input_briefs import (
     POLICIES,
     RECIPES,
@@ -27,29 +27,24 @@ from tests.test_story_input_briefs import (
     bundled_authoring_prose,
 )
 
-_ACTION_OPENINGS = (
+_RETIRED_ACTION_PRELUDES = (
     "The current fully clothed non-erotic interaction is",
     "The current erotic but non-explicit interaction is",
-)
-_OUTPUT_LITERALS = {
-    "edo-warai-e": _ACTION_OPENINGS,
-    "ming-gongbi-mixi-tu": _ACTION_OPENINGS,
-}
-_VERBATIM_OUTPUT = frozenset(
-    literal for literals in _OUTPUT_LITERALS.values() for literal in literals
+    "The current explicit consensual adult sexual act is",
 )
 _DRESS_OUTPUT_NAME_BANS = (
     "不得写出“compliant”（合规）、“safety requirement”（安全要求）或"
     "“validation”（验证）等措辞。",
 )
 _OUTPUT_NAME_BANS = _DRESS_OUTPUT_NAME_BANS
-_QUOTED = re.compile(
-    r'`[^`]*`|"[^"]*"|“[^”]*”|‘[^’]*’|(?<![A-Za-z])\'[^\'\n]+\'(?![A-Za-z])'
+_PROVIDER_CONTROL_FIELDS = frozenset(
+    ("content_level", "program_assigns_theme_ids", "program_assigns_frame_ids")
 )
 _GRADE = re.compile(
     r"(?ai:\b(?:aesthetic|hardcore|(?<!non-)erotic)\b)"
     r"|(?:审美|美学|唯美|情色|露骨|硬核)\s*(?:级别|等级|级)"
     r"|(?ai:\bcontent[- ]level proof\b)"
+    r"|(?i:" + "|".join(re.escape(value) for value in _RETIRED_ACTION_PRELUDES) + ")"
 )
 
 
@@ -57,21 +52,7 @@ def unexpected_grade_names(
     prose: str, selected: ContentLevel | None
 ) -> tuple[str, ...]:
     # Selection is internal: neither the selected nor a foreign grade belongs here.
-    # Only creative output literals are exempt.
-    literal_spans = [
-        match.span()
-        for match in _QUOTED.finditer(prose)
-        if match.group()[1:-1] in _VERBATIM_OUTPUT
-    ]
-    unexpected = []
-    for match in _GRADE.finditer(prose):
-        if any(
-            start <= match.start() and match.end() <= end
-            for start, end in literal_spans
-        ):
-            continue
-        unexpected.append(match.group())
-    return tuple(dict.fromkeys(unexpected))
+    return tuple(dict.fromkeys(match.group() for match in _GRADE.finditer(prose)))
 
 
 def selected_asset_prose(
@@ -178,12 +159,11 @@ def test_grade_guard_checks_prose_without_banning_adjectives(
 @pytest.mark.parametrize(
     "quotes", [('"', '"'), ("'", "'"), ("“", "”"), ("‘", "’"), ("`", "`")]
 )
-def test_only_exact_output_literals_survive_other_grade_mentions(quotes):
-    literal = _ACTION_OPENINGS[1]
+@pytest.mark.parametrize("literal", _RETIRED_ACTION_PRELUDES)
+def test_retired_action_preludes_are_not_exempt_when_quoted(quotes, literal):
     prose = f"必须逐字输出 {quotes[0]}{literal}{quotes[1]}。"
-    assert unexpected_grade_names(prose, ContentLevel.AESTHETIC) == ()
-    changed = prose.replace("interaction is", "interaction must be")
-    assert unexpected_grade_names(changed, ContentLevel.AESTHETIC) == ("erotic",)
+    for level in ContentLevel:
+        assert unexpected_grade_names(prose, level) == (literal,)
 
 
 @pytest.mark.parametrize("selected", tuple(ContentLevel))
@@ -220,14 +200,195 @@ def test_output_name_ban_exception_does_not_hide_grade_routing():
         )
 
 
-@pytest.mark.parametrize("name", tuple(_OUTPUT_LITERALS))
-def test_reviewed_output_literals_are_preserved_verbatim(name):
-    quoted = {
-        match.group()[1:-1]
-        for _, prose in bundled_authoring_prose(RECIPES / f"{name}.yaml")
-        for match in _QUOTED.finditer(prose)
+@pytest.mark.parametrize(
+    "name", ("edo-warai-e", "ming-gongbi-mixi-tu", "tang-guohua-figures")
+)
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+def test_painting_messages_keep_action_bounds_after_spatial_map_without_preludes(
+    name, level
+):
+    document = load_story_document(RECIPES / f"{name}.yaml")
+    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    messages = frame_messages(
+        resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+    )
+    prompt = " ".join(messages[0].content.split())
+    action_constraints = {
+        ContentLevel.AESTHETIC: (
+            "当前动作句直接描述完整穿着的成年人正在进行的非情色互动，"
+            "不添加模板化引导语。"
+        ),
+        ContentLevel.EROTIC: (
+            "当前动作句直接描述可见的感官亲密互动，保持非露骨边界，"
+            "不添加模板化引导语。"
+        ),
+        ContentLevel.HARDCORE: (
+            "当前动作句直接说明正在发生的、双方自愿的成年人明确性行为，"
+            "不添加模板化引导语。"
+        ),
     }
-    assert set(_OUTPUT_LITERALS[name]) <= quoted
+    for owner, constraint in action_constraints.items():
+        assert prompt.count(constraint) == (1 if owner == level else 0)
+    assert unexpected_grade_names(prompt, level) == ()
+    assert "不先报告内容类别" in prompt
+    if name == "edo-warai-e":
+        opening = "每个画面必须以下列四句原文开头"
+        spatial_map = "其后立即接一个最多 70 个英文单词的空间位置图句子"
+        action = "空间位置图之后，立即写一个独立的当前动作句"
+        medium_lock = "当前动作句后立即重复此确切平面媒介锁定句"
+        action_limit = "当前动作句须直接说出正在发生的行为，且不得超过 70 个英文单词"
+        assert (action_limit in prompt) == (level == ContentLevel.HARDCORE)
+    else:
+        opening = "逐字保留这五句开头原文"
+        spatial_map = "紧接着用一句紧凑的空间位置说明"
+        action = "然后写一句独立的当下动作句"
+        medium_lock = "紧接当下动作句后重复以下紧凑的媒介锁定原文"
+        assert "空间位置句与当下动作句各须少于60词" in prompt
+        assert "固定五句开头之后，任何一句都不得超过60个英语单词" in prompt
+        if name == "tang-guohua-figures":
+            assert "每个人物段为一至两句，不受六十词上限限制" in prompt
+    assert (
+        prompt.index(opening)
+        < prompt.index(spatial_map)
+        < prompt.index(action)
+        < prompt.index(medium_lock)
+    )
+
+
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+def test_provider_controls_stay_internal_without_losing_ids_or_retry_contracts(level):
+    resolved = resolve_story_input(
+        StoryDocument.model_validate(
+            {
+                "description": "中性的成年人物画面。",
+                "generation": {"theme_count": 3, "frames_per_theme": 4},
+            }
+        ),
+        InputOverrides(content_level=level),
+    )
+    restored = ResolvedStoryInput.model_validate_json(resolved.model_dump_json())
+    assert restored.fingerprint() == resolved.fingerprint()
+    accepted = make_frame_sequence(frame_count=4, theme_index=2).frames[::2]
+    for state in (resolved, restored):
+        assert state.request.content_level == level
+        assert [plan.theme_id for plan in state.plans] == ["T001", "T002", "T003"]
+        themes = theme_messages(state, count=2, existing_themes=[make_theme()])
+        theme_payload = json.loads(themes[1].content)
+        assert _PROVIDER_CONTROL_FIELDS.isdisjoint(theme_payload)
+        assert theme_payload["theme_count"] == 2
+        assert theme_payload["existing_themes"][0]["theme_id"] == "T001"
+        assert [
+            plan["theme_id"] for plan in theme_payload["input_context"]["plans"]
+        ] == ["T002", "T003"]
+        assert (
+            "Submit only semantic_name, title, premise, and style; "
+            "the program assigns all Theme IDs."
+        ) in themes[0].content
+
+        frames = frame_messages(
+            state, make_theme(2), requested_frame_ids=["F02", "F04"],
+            accepted_frames=accepted,
+        )
+        frame_payload = json.loads(frames[1].content)
+        assert _PROVIDER_CONTROL_FIELDS.isdisjoint(frame_payload)
+        assert frame_payload["theme"]["theme_id"] == "T002"
+        assert frame_payload["requested_frame_slots"] == ["F02", "F04"]
+        assert frame_payload["frames_per_theme"] == 4
+        assert [
+            frame["frame_id"] for frame in frame_payload["accepted_frames"]
+        ] == ["F01", "F03"]
+        assert frame_payload["frame_batch_format"] == (
+            "Return exactly one <FRAME>...</FRAME> block per requested "
+            "slot, in order. Tags delimit prose; do not output IDs or JSON."
+        )
+        for contract in (
+            "Return exactly one <FRAME>...</FRAME> block per "
+            "requested_frame_slots item, in the listed order.",
+            "The program assigns all Frame IDs.",
+            "Complete only requested_frame_slots, even when retrying a subset.",
+        ):
+            assert contract in frames[0].content
+
+
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+@pytest.mark.parametrize("stage", tuple(StoryStage))
+def test_relationship_messages_keep_five_sentences_and_contact_without_proofs(
+    level, stage
+):
+    document = load_story_document(RECIPES / "relationship-caricature.yaml")
+    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    messages = (
+        theme_messages(resolved, count=1, existing_themes=[])
+        if stage == StoryStage.THEMES
+        else frame_messages(
+            resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+        )
+    )
+    prompt = " ".join(messages[0].content.split())
+    contact_maps = {
+        ContentLevel.AESTHETIC: (
+            "Contact map: force chain - [EACH ADULT'S BODY PART, TARGET, AND FORCE]."
+        ),
+        ContentLevel.EROTIC: (
+            "Contact map: sensual contact - [CURRENT NON-EXPLICIT SELF-CONTACT "
+            "OR RECIPROCAL CONTACT]; force and support - "
+            "[EACH ADULT'S BODY PART, TARGET, AND FORCE]."
+        ),
+        ContentLevel.HARDCORE: (
+            "Contact map: defining sexual contact - "
+            "[CURRENT EXPLICIT ANATOMICAL CONTACT]; force and support - "
+            "[EACH ADULT'S BODY PART, TARGET, AND FORCE]."
+        ),
+    }
+    bounds = {
+        ContentLevel.AESTHETIC: (
+            "每位成年人穿完整不透明服装，共同互动不涉及性",
+        ),
+        ContentLevel.EROTIC: (
+            "不得显示露骨性行为或色情解剖接触",
+            "单人时必须有有意的感官自我接触",
+            "多人时必须有涵盖所有人的相互感官接触",
+        ),
+        ContentLevel.HARDCORE: (
+            "每个主题和画面中都显示一个清晰可见、已经发生的自愿成年性互动",
+            "不得以准备、暗示、事后或委婉语替代",
+        ),
+    }
+    assert all(bound in prompt for bound in bounds[level])
+    assert unexpected_grade_names(prompt, level) == ()
+    for owner, literal in contact_maps.items():
+        assert prompt.count(literal) == (1 if owner == level else 0)
+    assert (
+        "每个主题前提和画面的第四句紧接接触图，直接描述此刻可见的衣着、动作、"
+        "每人的主动角色、有支撑的接触几何及其承载的关系对立"
+    ) in prompt
+    assert "不加证明标题" in prompt
+    if stage == StoryStage.THEMES:
+        assert "前提必须恰用五句话" in prompt
+        sentence_markers = (
+            "主题前提第一句必须以动态阵容声明开头",
+            '第二句必须以 "Body exaggerations:" 开头',
+            '第三句必须以 "Contact map:" 开头',
+            "第四句直接说明可见动作如何通过主导隐喻机构呈现关系矛盾",
+            "第五句必须是涵盖每位成年人、场景及两个文案载体的完整",
+        )
+        assert "并包含锁定图像文案对" in prompt
+    else:
+        sentence_markers = (
+            "第一句必须是精确动态阵容声明",
+            '第二句必须是完整 "Body exaggerations:" 序列化',
+            '第三句必须是完整 "Contact map:" 序列化',
+            "第四句直接描述当前衣着、动作、主动角色、支撑几何及其承载的关系对立",
+            '第五句必须是完整 "Style map:" 序列化',
+        )
+        assert "这五个必需句完成前不得加入自由描述" in prompt
+    positions = [prompt.index(marker) for marker in sentence_markers]
+    assert positions == sorted(positions)
+    assert (
+        "五个必需开头句之后的前 80 个单词内，"
+        "须将定义该行为的当前接触和无遮挡空间关系重新描述为可见图像内容"
+        in prompt
+    ) == (stage == StoryStage.FRAMES and level == ContentLevel.HARDCORE)
 
 
 @pytest.mark.parametrize(
@@ -483,7 +644,7 @@ def test_selected_messages_and_assets_have_no_grade_announcements_or_dispatch(pa
                 )
             )
             payload = json.loads(messages[1].content)
-            assert "content_level" not in payload
+            assert _PROVIDER_CONTROL_FIELDS.isdisjoint(payload)
             for index, prose in enumerate(
                 [messages[0].content, *string_values(payload)]
             ):

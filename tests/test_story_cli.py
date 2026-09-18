@@ -177,7 +177,7 @@ def test_story_generate_reads_story_document(
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
     assert captured["request"].source_prompt_stem == "story"
-    assert "validated request" in "\n".join(
+    assert "requested counts and slots" in "\n".join(
         captured["rules"].themes
     )
     assert captured["request"].theme_count == 7

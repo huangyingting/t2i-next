@@ -3042,6 +3042,10 @@ def test_everyday_social_caricature_centers_women_and_lived_interaction() -> Non
         "Contact 2 为 B 的另一个部位接触 C 的一个部位",
         "C 绝不接触 A",
         "绝不增加自我刺激或装饰性性接触",
+        '在前提的 "Staging:" 分句之后、锁定文字对之前',
+        "直接列出 A > B > C 链及编号接触",
+        "并明确没有其他性接触",
+        "更大阵容沿用相邻链与编号扩展，仍恰有人数减一处接触",
         "统一的真人报纸照片蒙太奇媒介",
         '"Hybrid real-person newspaper photomontage with biting anatomical caricature:"',
         '"Exactly [requested total] East Asian adults fill the image',
@@ -3277,14 +3281,7 @@ def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
         "to contour-enclosed matte color shapes on the same flat three-band "
         'nishiki-e surface."'
     ) in normalized
-    for level, literal in (
-        (ContentLevel.AESTHETIC, "The current fully clothed non-erotic interaction is"),
-        (ContentLevel.EROTIC, "The current erotic but non-explicit interaction is"),
-        (ContentLevel.HARDCORE, "The current explicit consensual adult sexual act is"),
-    ):
-        assert f"“{literal}”" in "\n".join(
-            document.authoring.selected(StoryStage.FRAMES, level)
-        )
+    assert "当前动作句须直接说出正在发生的行为，且不得超过 70 个英文单词" in normalized
     for conflict in (
         "一个可解的三维布局",
         "前景、中景和背景",
@@ -3379,9 +3376,7 @@ def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
         "album leaf made from ink contours and mineral pigment, with individualized "
         'mature adult faces defined by fine line."'
     ) in normalized
-    assert '"The current explicit consensual adult sexual act is"' in "\n".join(
-        document.authoring.selected(StoryStage.FRAMES, ContentLevel.HARDCORE)
-    )
+    assert "空间位置句与当下动作句各须少于60词" in normalized
     assert "熟绢或施胶宣纸" not in normalized
     frame_contract = "\n".join(document.authoring.frames.common)
     for photography_trigger in (
@@ -3399,6 +3394,44 @@ def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
     )
     assert word_count.when_language == "english"
     assert (word_count.min_words, word_count.max_words) == (350, 750)
+
+
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+def test_tang_guohua_preserves_art_opening_and_medium_literals(level):
+    document = load_story_document(RECIPES / "tang-guohua-figures.yaml")
+    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    frames = " ".join(resolved.rules.text_for(StoryStage.FRAMES).split())
+    opening = (
+        "Full-canvas continuous-silk archival facsimile of a hand-painted antique "
+        "Tang-dynasty 绢本重彩 figure-painting panel mixing graphic 平面 color fields "
+        "with painterly 渲染. The aged prepared-silk painting extends continuously "
+        "to every canvas edge as an uninterrupted uneven warm-tea field. Every "
+        "person, garment, horse, and landscape exists as ink, mineral 平涂, and "
+        "brush 渲染 on silk; adult figures use individualized mature facial lines, "
+        "ample Tang proportions, clear joints, three bounded skin tones plus "
+        "visible flesh 渲染. Hybrid picture surface: flat 锦 and architectural "
+        "silhouettes combined with painterly washes on faces, 披帛, foliage, and "
+        "animals; no photography, no CGI, no cinematic lighting. Fine 游丝描 and "
+        "铁线描, mineral 平涂 on garment panels, wet 渲染 on flesh and landscape, "
+        "visible silk weave, rubbed fibers at one isolated edge, and small age "
+        "creases."
+    )
+    action_medium_lock = (
+        "Every person, garment, horse, and landscape exists as ink, 平涂, and 渲染 "
+        "on visibly aged silk; adults remain 工笔 figures with mature facial "
+        "specificity, Tang hairstyle, ornaments, makeup, and plausible ample "
+        "proportions, garments as 平面 panels, flesh and foliage as 画."
+    )
+    final_medium_lock = (
+        "The entire image remains a visibly aged hand-painted Tang silk figure "
+        "painting mixing 平面 mineral panels with 画 渲染, with individualized "
+        "mature adult faces defined by fine line."
+    )
+    literals = (opening, action_medium_lock, final_medium_lock)
+    for literal in literals:
+        assert frames.count(f'"{literal}"') == 1
+    positions = [frames.index(literal) for literal in literals]
+    assert positions == sorted(positions)
 
 
 def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
