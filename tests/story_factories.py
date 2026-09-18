@@ -87,6 +87,7 @@ def make_story_input(
             "validation": settings.quality,
         }
     )
+    configuration = configuration.model_copy(update={"validation": settings.quality})
     resolved = resolve_story_input(document, run_configuration=configuration)
     return ResolvedStoryInput.model_validate(
         {**resolved.model_dump(), "request": request}
@@ -97,8 +98,19 @@ def make_theme(index: int = 1) -> NarrativeTheme:
     return NarrativeTheme(
         theme_id=f"T{index:03d}",
         title=f"遗失行李的方向 {index}",
-        premise=f"两名成年人从第 {index} 条线索确认行李去向。",
-        style="1930年代北平电影风格",
+        premise=(
+            f"两名三十岁的成年人根据第 {index} 条线索，在1930年代秋夜的旧车站"
+            "确认遗失行李的去向。他们停在潮湿月台与候车室交界处，共同检查一只"
+            "带有磨损标签和新鲜裂痕的旧皮箱；左侧旅人负责稳定箱体，右侧旅人"
+            "逐项核对搭扣、提手和标签。暖色站灯、雨水反光、远处停驻列车与空旷"
+            "站台共同形成可见环境，双方始终保持成年外貌、固定身份和谨慎合作关系。"
+        ),
+        style=(
+            "采用1930年代北平黑白电影结合轻微暖色染印的视觉方案，以自然透视"
+            "中景建立人物和站台的空间关系。侧后方站灯勾勒湿润大衣、皮箱纹理和"
+            "面部轮廓，浅景深保留动作端点与警惕目光，背景列车和站柱形成克制纵深；"
+            "真实雨水、皮革、铜扣与织物质感维持写实摄影观感。"
+        ),
     )
 
 
@@ -148,6 +160,16 @@ def make_frame_sequence(
                     "镜头采用平视中景，站柱构成纵深，浅景深同时聚焦"
                     "提手与两人的警惕目光。"
                     "光线来自侧后方暖色站灯，潮湿反光烘托警惕气氛。"
+                    "画面左侧的铸铁站柱切出稳定前景，柱脚积水映出列车窗灯与人物"
+                    "小腿轮廓；中景中的旧皮箱保持完整透视，提手、搭扣、标签和箱角"
+                    "裂痕各自占据唯一位置，没有穿过手指或衣摆。两人的肩、肘、手腕"
+                    "与手指沿所属身体连续延伸，承重脚掌落在粗糙月台上，俯身者屈膝"
+                    "而不扭转脊柱。雨滴从檐口垂直落下，湿大衣贴合肩背并在肘部形成"
+                    "自然褶皱，皮箱底部因重量略微压住水面。远处列车保持次要虚化，"
+                    "蒸汽沿轨道低处散开，不遮挡人物面孔、手部动作或箱体接触点。"
+                    "两人表情分别呈现专注核对与谨慎等待，视线都具有明确落点；"
+                    "构图不添加无关路人、重复肢体、漂浮道具或第二个皮箱，"
+                    "胶片颗粒与镜头反差在整幅画面中保持一致。"
                 ),
             )
             for index in range(1, frame_count + 1)

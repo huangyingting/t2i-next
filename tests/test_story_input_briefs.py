@@ -311,12 +311,18 @@ def test_bundled_run_defaults_are_uniform_not_recipe_specific(path):
             resolve_story_input(document)
     else:
         resolved = resolve_story_input(document)
-        assert resolved.run_configuration == StoryRunConfiguration()
+        defaults = StoryRunConfiguration()
+        assert resolved.run_configuration.generation == defaults.generation
+        assert resolved.run_configuration.runtime == defaults.runtime
+        assert resolved.run_configuration.validation == resolved.quality
         assert resolved.request.theme_count == 1
         assert resolved.request.frames_per_theme == 6
         assert resolved.request.content_level == ContentLevel.AESTHETIC
         assert resolved.request.output_language == "chinese"
-        assert resolved.quality.frames.checks == ()
+        assert resolved.quality.frames.mode == "enforce"
+        assert [check.type for check in resolved.quality.frames.checks] == [
+            "prose_length"
+        ]
     configured = resolve_story_input(
         document, run_configuration=audit_run_configuration(document)
     )
@@ -337,7 +343,9 @@ def test_recipe_compilation_and_frozen_replay_select_only_active_level(
             document,
             run_configuration=configuration,
         )
-        assert resolved.run_configuration == configuration
+        assert resolved.run_configuration.generation == configuration.generation
+        assert resolved.run_configuration.runtime == configuration.runtime
+        assert resolved.run_configuration.validation == resolved.quality
         assert resolved.request.content_level == level
         assert resolved.request.theme_count == configuration.generation.theme_count
         assert resolved.request.frames_per_theme == (
@@ -390,7 +398,7 @@ def test_recipe_compilation_and_frozen_replay_select_only_active_level(
             restored = ResolvedStoryInput.model_validate_json(frozen)
             assert restored.model_dump_json() == frozen
             assert restored.fingerprint() == resolved.fingerprint()
-            assert restored.run_configuration == configuration
+            assert restored.run_configuration == resolved.run_configuration
             for stage in StoryStage:
                 assert restored.context_for(stage, theme_ids) == contexts[stage]
             assert theme_messages(restored, count=1, existing_themes=[]) == messages[0]
@@ -525,7 +533,9 @@ def test_visible_copy_is_independent_of_prompt_language_in_both_stages(
 ):
     document = load_story_document(RECIPES / f"{name}.yaml")
     resolved = resolve_story_input(document, InputOverrides(output_language=language))
-    assert resolved.quality.frames.checks == ()
+    assert [check.type for check in resolved.quality.frames.checks] == [
+        "prose_length"
+    ]
     for stage in StoryStage:
         context = resolved.context_for(stage, ["T001"])
         copy = next(m for m in context["modules"] if m["kind"] == "visible_copy")
@@ -577,7 +587,9 @@ def test_bundled_visual_recipe_accepts_external_output_constraints(language, mod
     assert "321" not in themes[0].content
     expected = ("123", "234") if language == "english" else ("321", "654")
     assert all(bound in frames[0].content for bound in expected)
-    assert resolve_story_input(document).quality.frames.checks == ()
+    default = resolve_story_input(document).quality.frames
+    assert default.mode == "enforce"
+    assert [check.type for check in default.checks] == ["prose_length"]
 
 
 def test_restroom_age_and_camera_cycles_keep_f02_identity_after_freezing():
@@ -1048,7 +1060,9 @@ def test_painting_medium_is_visual_not_a_verbatim_english_output_template(name, 
     resolved = resolve_story_input(document, InputOverrides(content_level=level))
     frames = resolved.rules.text_for(StoryStage.FRAMES)
     assert resolved.request.output_language == "chinese"
-    assert resolved.quality.frames.checks == ()
+    assert [check.type for check in resolved.quality.frames.checks] == [
+        "prose_length"
+    ]
     for marker in ("空间", "人物", "轮廓"):
         assert marker in frames
     if name == "edo-warai-e":

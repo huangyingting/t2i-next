@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from itertools import pairwise
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
 from pydantic import Field, PrivateAttr, StringConstraints, model_validator
 
@@ -110,12 +110,64 @@ class StoryRunGeneration(Model):
         return StoryCast.model_validate(values)
 
 
+def _default_validation() -> StoryQualityPolicy:
+    return StoryQualityPolicy(
+        themes={
+            "mode": "enforce",
+            "checks": [
+                {
+                    "type": "text_length",
+                    "field": "title",
+                    "min_chars": 4,
+                    "max_chars": 48,
+                },
+                {
+                    "type": "text_length",
+                    "field": "premise",
+                    "min_chars": 160,
+                    "max_chars": 520,
+                },
+                {
+                    "type": "text_length",
+                    "field": "style",
+                    "min_chars": 100,
+                    "max_chars": 360,
+                },
+            ],
+        },
+        frames={
+            "mode": "enforce",
+            "checks": [
+                {"type": "prose_length", "min_chars": 450, "max_chars": 950}
+            ],
+        },
+    )
+
+
 class StoryRunConfiguration(Model):
     """External execution configuration, frozen with every resolved input."""
 
     generation: StoryRunGeneration = Field(default_factory=StoryRunGeneration)
     runtime: StoryRuntime = Field(default_factory=StoryRuntime)
-    validation: StoryQualityPolicy = Field(default_factory=StoryQualityPolicy)
+    validation: StoryQualityPolicy = Field(
+        default_factory=lambda: _default_validation()
+    )
+
+    @model_validator(mode="after")
+    def merge_validation_defaults(self) -> Self:
+        defaults = _default_validation()
+        stages = {}
+        for name in ("themes", "frames"):
+            stage = getattr(self.validation, name)
+            default = getattr(defaults, name)
+            updates = {
+                field: getattr(default, field)
+                for field in ("mode", "checks")
+                if field not in stage.model_fields_set
+            }
+            stages[name] = stage.model_copy(update=updates) if updates else stage
+        self.validation = self.validation.model_copy(update=stages)
+        return self
 
 
 class Bounds(Model):

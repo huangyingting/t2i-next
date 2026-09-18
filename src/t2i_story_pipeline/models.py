@@ -168,7 +168,7 @@ class StoryRuntime(Model):
     concurrency: int = Field(default=8, ge=1, le=32, strict=True)
     generation_retries: int = Field(default=2, ge=0, le=5, strict=True)
     theme_batch_size: int = Field(default=10, ge=1, le=10, strict=True)
-    theme_output_tokens: int = Field(default=6000, ge=512, le=65536, strict=True)
+    theme_output_tokens: int = Field(default=12000, ge=512, le=65536, strict=True)
     frame_output_tokens: int = Field(default=32768, ge=512, le=65536, strict=True)
 
 

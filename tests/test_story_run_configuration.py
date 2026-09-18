@@ -213,9 +213,54 @@ def test_program_defaults_are_uniform_and_do_not_depend_on_recipe_identity():
     assert first.request.frames_per_theme == 6
     assert first.request.content_level == ContentLevel.AESTHETIC
     assert first.request.output_language == OutputLanguage.CHINESE
-    assert not first.quality.frames.checks
-    assert not first.quality.themes.checks
+    assert first.runtime.theme_output_tokens == 12000
+    assert first.quality.themes.mode == QualityMode.ENFORCE
+    assert [
+        (check.field, check.min_chars, check.max_chars)
+        for check in first.quality.themes.checks
+    ] == [
+        ("title", 4, 48),
+        ("premise", 160, 520),
+        ("style", 100, 360),
+    ]
+    assert first.quality.frames.mode == QualityMode.ENFORCE
+    assert [
+        (check.min_chars, check.max_chars)
+        for check in first.quality.frames.checks
+    ] == [(450, 950)]
     assert "whitespace-separated words" not in first.rules.text_for(StoryStage.FRAMES)
+
+
+@pytest.mark.parametrize(
+    ("people", "theme_bounds", "frame_bounds"),
+    [
+        (1, ((4, 48), (160, 520), (100, 360)), (450, 950)),
+        (2, ((4, 48), (160, 520), (100, 360)), (450, 950)),
+        (4, ((4, 48), (280, 640), (160, 420)), (650, 1150)),
+        (8, ((4, 48), (520, 880), (280, 540)), (1050, 1550)),
+    ],
+)
+def test_default_lengths_expand_for_additional_principal_people(
+    people, theme_bounds, frame_bounds
+):
+    resolved = resolve_story_input(
+        document(cast={"female_count": people, "male_count": 0})
+    )
+    assert tuple(
+        (check.min_chars, check.max_chars)
+        for check in resolved.quality.themes.checks
+    ) == theme_bounds
+    prose = resolved.quality.frames.checks[0]
+    assert (prose.min_chars, prose.max_chars) == frame_bounds
+
+
+def test_explicit_frame_length_override_is_not_cast_scaled():
+    resolved = resolve_story_input(
+        document(cast={"female_count": 4, "male_count": 0}),
+        InputOverrides(frame_min_chars=700),
+    )
+    prose = resolved.quality.frames.checks[0]
+    assert (prose.min_chars, prose.max_chars) == (700, 950)
 
 
 def test_external_gender_overrides_preserve_visual_structure_and_explicit_zero():
@@ -304,7 +349,7 @@ def test_visible_copy_language_remains_visual_not_prose_language(workspace):
     module = payload["input_context"]["modules"][0]
     assert module["parameters"]["copy_language"] == "english"
     assert "do not change the prose language" in messages[0].content
-    assert not resolved.quality.frames.checks
+    assert "450 to 950 characters" in messages[0].content
 
 
 def test_cli_bounds_merge_into_one_check_preserving_external_applicability():
@@ -552,8 +597,8 @@ def test_explain_supports_external_config_and_explicit_budget_overrides(
     assert frozen["request"]["output_language"] == "english"
     assert frozen["runtime"]["concurrency"] == 3
     assert [check["type"] for check in frozen["quality"]["frames"]["checks"]] == [
-        "word_count",
         "prose_length",
+        "word_count",
     ]
     if route == "yaml":
         assert frozen["request"]["female_count"] == 2
@@ -621,6 +666,7 @@ async def test_resume_uses_frozen_external_targets_and_only_retries_f02(
             "generation": {"frames_per_theme": 2, "output_language": "english"},
             "runtime": {"generation_retries": 0, "concurrency": 1},
             "validation": {
+                "themes": {"mode": "off"},
                 "frames": {
                     "mode": "enforce",
                     "checks": [{"type": "word_count", "min_words": 3, "max_words": 4}],
@@ -679,7 +725,10 @@ def test_generate_direct_story_uses_external_config_and_publishes(
         workspace,
         {
             "generation": {"frames_per_theme": 1, "output_language": "english"},
-            "validation": {"frames": {"mode": "off"}},
+            "validation": {
+                "themes": {"mode": "off"},
+                "frames": {"mode": "off"},
+            },
         },
     )
     model = RecordingModel()

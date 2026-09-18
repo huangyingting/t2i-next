@@ -297,7 +297,7 @@ async def test_studio_generates_final_story_paragraphs(tmp_path) -> None:
         StoryStage.FRAMES,
         StoryStage.FRAMES,
     ]
-    assert model.max_output_tokens == [6000, 32768, 32768]
+    assert model.max_output_tokens == [12000, 32768, 32768]
     assert result.usage.total_tokens == 45
 
 
@@ -464,8 +464,8 @@ async def test_studio_expands_budget_after_truncated_output(tmp_path) -> None:
     )
     attempts = LocalStoryRunStore(tmp_path / "runs").attempts(completed.run_id)
 
-    assert model.max_output_tokens == [6000, 32768, 32768]
-    assert attempts[0].max_output_tokens == 6000
+    assert model.max_output_tokens == [12000, 32768, 32768]
+    assert attempts[0].max_output_tokens == 12000
     assert attempts[0].outcome == StoryAttemptOutcome.TRUNCATED
     assert attempts[1].max_output_tokens == 32768
 

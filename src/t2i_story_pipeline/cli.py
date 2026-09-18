@@ -129,7 +129,7 @@ def generate_command(
         "--theme-output-tokens",
         min=512,
         max=65536,
-        help="Theme 批次初始输出预算；未配置时为 6000，受 provider 上限约束。",
+        help="Theme 批次初始输出预算；未配置时为 12000，受 provider 上限约束。",
     ),
     frame_output_tokens: int | None = typer.Option(
         None,

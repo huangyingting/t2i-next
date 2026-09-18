@@ -234,13 +234,17 @@ uv run t2i-story generate --input recipes/motion-blur-photography.yaml \
 
 质量模式支持 `off`（跳过可选检查）、`report`（记录告警但不重试）和 `enforce`
 （拒绝并有界重试）；两阶段分别用 `--theme-quality-mode`、`--frame-quality-mode`
-覆盖。默认检查列表为空，只验证基础契约。Theme 可以对 `title`、`premise`、
-`style` 分别检查长度、必含和禁止原文，在通过检查后才保存主题并开始生成 Frame。
+覆盖。缺省策略对两个阶段使用 `enforce`：Theme 的 `title`、`premise`、`style`
+分别要求 4–48、160–520、100–360 个 Unicode 字符，Frame 正文要求 450–950
+个字符；超过两名核心人物时，每增加一人，`premise`、`style` 和 Frame 的上下限
+分别增加 60、30 和 100 个字符。Theme 在通过检查后才保存并开始生成 Frame。
 Frame 可选检查包括摄影文字证据、字符长度、空白分隔词数、ASCII、必含和禁止原文；它们不是模型
 评审，也不保证叙事语义或摄影物理正确。配置的写作目标也会进入对应阶段的提示词；
 `off` 只关闭检查与质量重试，不删除目标。`--frame-min-words` / `--frame-max-words`
 和 `--frame-min-chars` / `--frame-max-chars` 可覆盖帧长度目标；
 词数按空白分隔，中文通常用字符数。
+运行配置只提供模式时保留缺省检查；显式提供某阶段的 `checks` 时完整替换该阶段
+缺省列表。字符边界只要修改为非缺省值，就按修改后的范围冻结，不再叠加多人增量。
 结构与安全契约不受开关影响。
 质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
 批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、

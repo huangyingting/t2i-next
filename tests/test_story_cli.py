@@ -255,8 +255,17 @@ def test_story_generate_direct_input_has_no_source_prompt_stem(
     assert captured["request"].content_level == "aesthetic"
     assert captured["settings"].concurrency == 8
     assert captured["settings"].generation_retries == 2
-    assert captured["settings"].quality.frames.checks == ()
-    assert captured["settings"].quality.themes.checks == ()
+    assert captured["settings"].theme_output_tokens == 12000
+    assert captured["settings"].quality.frames.mode == "enforce"
+    assert [check.type for check in captured["settings"].quality.frames.checks] == [
+        "prose_length"
+    ]
+    assert captured["settings"].quality.themes.mode == "enforce"
+    assert [check.field for check in captured["settings"].quality.themes.checks] == [
+        "title",
+        "premise",
+        "style",
+    ]
     assert "skipped" in result.output
 
 

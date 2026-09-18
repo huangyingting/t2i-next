@@ -274,13 +274,15 @@ JSON 使用 UTF-8，拒绝重复键、未知字段与非法类型。优先级为
 修补非法输入。最终请求还须满足视觉适用性、非零阵容与槽位分配契约。
 
 缺省值：1 个主题、每主题 6 帧、aesthetic、chinese、不限定男女数量、8 个并发、
-2 次额外 generation retries。不从文件名或历史配方配置猜测预算；固定槽位目录等
-视觉分配要求必须由兼容的显式请求满足，例如百姿目录需要 `--themes 100`。
+2 次额外 generation retries、Theme 批次 12000 tokens、Frame 批次 32768
+tokens。不从文件名或历史配方配置猜测预算；固定槽位目录等视觉分配要求必须由
+兼容的显式请求满足，例如百姿目录需要 `--themes 100`。
 
 `--frame-min-words`／`--frame-max-words` 使用现有的空白分词计数；
 中文长度通常应使用 `--frame-min-chars`／`--frame-max-chars`。外部配置中的
 `when_language` 保留语言适用性。CLI 只覆盖给出的长度边界，保留已有检查的另一侧
 边界与语言条件；新增检查默认不限语言，合并后上下限冲突会明确报错。
+字符边界只要修改为非缺省值，就按修改后的范围冻结，不再应用多人增量。
 声明的长度、必含／禁用文本等输出要求由同一套
 策略生成写作约束并执行检查，不再在配方正文重复维护。`off` 关闭质量检查与相关
 重试，不删除已声明的输出目标，更不能关闭安全、结构或槽位约束。
@@ -422,7 +424,7 @@ slots:
 | `concurrency` | 8 | 1–32，Theme 与 Frame 共用 |
 | `generation_retries` | 2 | 0–5 次额外生成重试 |
 | `theme_batch_size` | 10 | 1–10 |
-| `theme_output_tokens` | 6000 | 512–65536 |
+| `theme_output_tokens` | 12000 | 512–65536 |
 | `frame_output_tokens` | 32768 | 512–65536 |
 
 输出预算针对整个批次，不是每个 Theme 或 Frame。实际初始请求使用配置预算与
@@ -434,7 +436,19 @@ provider 上限的较小值；不会改写 manifest 中冻结的配置。截断�
 
 外部 JSON 运行配置中的 `validation.themes` 与 `validation.frames` 分别声明本阶段的
 `mode` 和 `checks`，不再从视觉 YAML 读取。
-两者默认均为 `report`、空检查列表；可以只启用一个阶段，也可以使用不同模式。
+两者缺省均为 `enforce`，并启用以下 Unicode 字符长度闭区间：
+
+| 输出字段 | 一至两名核心人物 | 每名额外核心人物 |
+|---|---:|---:|
+| Theme `title` | 4–48 | 不增加 |
+| Theme `premise` | 160–520 | 上下限各增加 60 |
+| Theme `style` | 100–360 | 上下限各增加 30 |
+| Frame `prose` | 450–950 | 上下限各增加 100 |
+
+多人增量使用同一运行中最大的、可精确确定的核心人物数量；不把背景人群计入逐人
+展开预算，阵容未确定时按不超过两名处理。只提供某阶段的 `mode` 会保留该阶段
+缺省检查；显式提供 `checks` 会完整替换该阶段的缺省列表。CLI 显式覆盖 Frame
+字符边界为非缺省值后按该边界冻结，不再叠加多人增量。两个阶段仍可分别使用不同模式。
 不保留旧 `validation.quality`、扁平策略或旧报告结构的解析入口。
 
 | 模式 | 行为 |
@@ -452,7 +466,8 @@ Theme 检查必须显式指定 `field: title | premise | style`，只检查该�
 - `required_text`：`values` 中每项必须逐字出现在指定字段，区分大小写。
 - `forbidden_text`：指定字段不能包含 `values` 中任一原文，区分大小写。
 - `text_length`：指定字段的 Unicode 字符长度必须位于 `min_chars` / `max_chars`
-  闭区间，默认 1 / 32768；检查参数范围为 1–32768，不改变 Theme 基础 schema。
+  闭区间；单个检查对象省略边界时的字段默认是 1 / 32768，系统缺省运行策略使用
+  上表范围。检查参数范围为 1–32768，不改变 Theme 基础 schema。
 
 Theme 批次在 checkpoint 和 Frame 入队之前执行检查。`enforce` 失败时有界重试
 整个 Theme 批次，不生成该批次的 Frame；`report` 保存告警后继续。之前批次已经
@@ -464,7 +479,8 @@ Frame 检查只针对最终 `prose`，同一种类型只能出现一次：
   “中景”“平视”“焦点”等词；英文匹配 `medium shot`、`eye-level`、`focus`
   等表达。这只是启发式检查，不验证摄影方案是否物理成立，不建议对插画等题材
   无差别启用。
-- `prose_length`：`min_chars` / `max_chars`（默认 1 / 32768）的闭区间；
+- `prose_length`：`min_chars` / `max_chars` 的闭区间；单个检查对象省略边界时
+  默认为 1 / 32768，系统缺省运行策略使用上表范围；
   按 Python Unicode 字符数计算，包含标点和空格，不是字节数、汉字数或 token 数。
 - `word_count`：`min_words`（默认1）与可选 `max_words`；按 `len(prose.split())`
   计算空白分隔单元，不做语言学分词，不以字符数代替词数。边界含端点；

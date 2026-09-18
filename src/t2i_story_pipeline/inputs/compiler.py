@@ -39,6 +39,7 @@ from t2i_story_pipeline.inputs.schema import (
 )
 from t2i_story_pipeline.models import (
     Model,
+    ProseLengthCheck,
     RuleText,
     StageAuthoring,
     StoryAuthoring,
@@ -47,11 +48,18 @@ from t2i_story_pipeline.models import (
     StoryRuleSet,
     StoryRuntime,
     StoryStage,
+    ThemeTextLengthCheck,
 )
 from t2i_story_pipeline.quality_validation import writing_constraints
 
 _POLICIES = Path(__file__).resolve().parents[1] / "rule_packs" / "policies"
 _MODULE_CONTEXT = TypeAdapter(ModuleContext)
+_DEFAULT_THEME_LENGTHS = {
+    "title": (4, 48, 0),
+    "premise": (160, 520, 60),
+    "style": (100, 360, 30),
+}
+_DEFAULT_FRAME_LENGTH = (450, 950, 100)
 
 
 class InputSource(Model):
@@ -368,6 +376,53 @@ def _effective(
     )
 
 
+def _cast_scaled_quality(
+    policy: StoryQualityPolicy,
+    plans: tuple[ThemeInputPlan, ...],
+) -> StoryQualityPolicy:
+    principal_count = max((plan.cast.principal_total or 2) for plan in plans)
+    additional_people = max(0, principal_count - 2)
+    if additional_people == 0:
+        return policy
+
+    theme_checks = []
+    for check in policy.themes.checks:
+        if isinstance(check, ThemeTextLengthCheck):
+            minimum, maximum, increment = _DEFAULT_THEME_LENGTHS[check.field]
+            if (
+                increment
+                and check.min_chars == minimum
+                and check.max_chars == maximum
+            ):
+                extra = increment * additional_people
+                check = check.model_copy(
+                    update={
+                        "min_chars": check.min_chars + extra,
+                        "max_chars": check.max_chars + extra,
+                    }
+                )
+        theme_checks.append(check)
+
+    frame_checks = []
+    for check in policy.frames.checks:
+        if isinstance(check, ProseLengthCheck):
+            minimum, maximum, increment = _DEFAULT_FRAME_LENGTH
+            if check.min_chars == minimum and check.max_chars == maximum:
+                extra = increment * additional_people
+                check = check.model_copy(
+                    update={
+                        "min_chars": check.min_chars + extra,
+                        "max_chars": check.max_chars + extra,
+                    }
+                )
+        frame_checks.append(check)
+
+    return StoryQualityPolicy(
+        themes=policy.themes.model_copy(update={"checks": tuple(theme_checks)}),
+        frames=policy.frames.model_copy(update={"checks": tuple(frame_checks)}),
+    )
+
+
 def resolve_story_input(
     document: StoryDocument,
     overrides: InputOverrides | None = None,
@@ -454,6 +509,8 @@ def resolve_story_input(
             catalog,
         )
         validate_requirements(request, plans, requirements)
+        quality = _cast_scaled_quality(configuration.validation, plans)
+        configuration = configuration.model_copy(update={"validation": quality})
 
         authoring = StoryAuthoring(
             themes=StageAuthoring(
@@ -464,7 +521,7 @@ def resolve_story_input(
             ),
         )
         rules = resolve_story_rules(
-            request, authoring=authoring, quality=configuration.validation
+            request, authoring=authoring, quality=quality
         )
         for path in system_rule_sources(request):
             text = path.read_text(encoding="utf-8-sig")

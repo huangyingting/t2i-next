@@ -109,7 +109,10 @@ def test_shared_refinements_never_replace_the_system_level(
             rules[: len(getattr(core, stage.value)) - 1]
             == getattr(core, stage.value)[:-1]
         )
-        assert rules[-1] == getattr(core, stage.value)[-1]
+        assert rules.count(getattr(core, stage.value)[-1]) == 1
+        assert rules.index(getattr(core, stage.value)[-1]) > max(
+            rules.index(rule) for rule in selected
+        )
         assert getattr(source, stage.value) == selected
         for rule in selected:
             assert rules.count(rule) == 1
