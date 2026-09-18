@@ -115,6 +115,83 @@ def _contact_issues(
     return issues
 
 
+def _body_contact_issues(
+    scene: Scene, skeletons: dict[str, Skeleton], tolerances: Tolerances
+) -> list[Issue]:
+    issues: list[Issue] = []
+    for contact in scene.body_contacts:
+        parts = (
+            contact.actor_id,
+            contact.anchor,
+            contact.target_actor_id,
+            contact.target_anchor,
+        )
+        endpoints = []
+        for actor_id, anchor_name in (
+            (contact.actor_id, contact.anchor),
+            (contact.target_actor_id, contact.target_anchor),
+        ):
+            skeleton = skeletons.get(actor_id)
+            if skeleton is None:
+                issues.append(
+                    Issue(
+                        code="unknown_actor",
+                        parts=parts,
+                        details=f"Unknown body-contact actor: {actor_id}",
+                    )
+                )
+                continue
+            anchor = skeleton.anchors.get(anchor_name)
+            if anchor is None:
+                issues.append(
+                    Issue(
+                        code="unknown_anchor",
+                        parts=parts,
+                        details=(
+                            f"Unknown body-contact anchor: {actor_id}/{anchor_name}"
+                        ),
+                    )
+                )
+                continue
+            endpoints.append(anchor)
+        if len(endpoints) != 2:
+            continue
+        source, target = endpoints
+        distance = float(np.linalg.norm(np.subtract(source.position, target.position)))
+        if distance > tolerances.contact_m:
+            issues.append(
+                Issue(
+                    code="body_contact_distance",
+                    parts=parts,
+                    details="Current FK body-surface anchors are not coincident",
+                    error_m=distance,
+                )
+            )
+        normal_error = math.degrees(
+            math.acos(
+                float(
+                    np.clip(
+                        -np.asarray(source.normal) @ np.asarray(target.normal),
+                        -1.0,
+                        1.0,
+                    )
+                )
+            )
+        )
+        if normal_error > tolerances.normal_degrees:
+            issues.append(
+                Issue(
+                    code="body_contact_normal",
+                    parts=parts,
+                    details=(
+                        f"Body-surface normals are not opposing: "
+                        f"{normal_error:.6g} degrees"
+                    ),
+                )
+            )
+    return issues
+
+
 def validate_scene(
     scene: Scene, *, tolerances: Tolerances | None = None
 ) -> ValidationReport:
@@ -253,6 +330,7 @@ def validate_scene(
                     ),
                 )
         issues.extend(_contact_issues(scene, skeletons, tolerances))
+        issues.extend(_body_contact_issues(scene, skeletons, tolerances))
     except (ArithmeticError, RuntimeError, ValueError, TypeError) as error:
         issues.append(Issue(code="geometry_error", parts=(), details=str(error)))
     return ValidationReport(passed=not issues, issues=tuple(issues))

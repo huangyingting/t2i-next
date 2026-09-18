@@ -204,6 +204,7 @@ def test_six_neutral_view_regions_remain_one_frame_and_one_person(tmp_path):
         assert layout["layout"] == "grid"
         assert (layout["rows"], layout["columns"]) == (2, 3)
         assert layout["rows"] * layout["columns"] == 6
+        assert (layout["min_views"], layout["max_views"]) == (None, None)
         if "requested_frame_slots" in payload:
             assert payload["requested_frame_slots"] == ["F01"]
             assert "subdivisions of that one renderable image" in messages[0].content

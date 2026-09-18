@@ -75,7 +75,13 @@ def capsule(
 
 
 def forward_kinematics(actor: ActorPose) -> Skeleton:
-    """Derive joint positions, outward-facing surface anchors, and solid volumes."""
+    """Derive joint positions, outward-facing surface anchors, and solid volumes.
+
+    Lap and forearm anchors use their segment's local anterior (+y) normal.
+    Knee anchors follow the shin frame for kneeling; knee_top anchors follow the
+    thigh frame, facing upward in a 90-degree seated hip pose. All anchors lie
+    on named solid surfaces; none independently modifies the joint positions.
+    """
     actor = ActorPose.model_validate(actor.model_dump())
     body, angles = actor.body, actor.angles
     origin = np.asarray(actor.root_position)
@@ -165,6 +171,35 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
         "shoulder_center",
         origin + torso @ np.array([0.0, 0.0, body.torso_length]),
     )
+    upper_torso_center = origin + torso @ np.array(
+        [0.0, 0.0, body.upper_torso_center_height]
+    )
+    solid(
+        "upper_torso",
+        "ellipsoid",
+        upper_torso_center,
+        torso,
+        (
+            body.upper_torso_half_width,
+            body.torso_depth,
+            body.upper_torso_half_height,
+        ),
+    )
+    joint_region(
+        "thorax",
+        upper_torso_center,
+        float(
+            np.linalg.norm(
+                [
+                    body.torso_half_width,
+                    body.torso_depth,
+                    body.upper_torso_half_height,
+                ]
+            )
+        )
+        + body.neck_radius,
+        ("torso", "upper_torso"),
+    )
     head_base = point(
         "head_base",
         shoulder_center + torso @ np.array([0.0, 0.0, body.neck_length]),
@@ -185,7 +220,19 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
     solid("head", "ellipsoid", head_center, head_frame, (body.head_radius,) * 3)
     joint_region("head_base", head_base, body.head_radius, ("neck", "head"))
     joint_region(
-        "neck_base", shoulder_center, body.neck_radius * 2.5, ("torso", "neck")
+        "neck_base",
+        shoulder_center,
+        body.neck_radius * 2.5,
+        ("torso", "upper_torso", "neck"),
+    )
+    collar_center = shoulder_center - torso @ np.array(
+        [0.0, 0.0, body.upper_arm_radius]
+    )
+    joint_region(
+        "collar",
+        collar_center,
+        3 * max(body.upper_arm_radius, body.neck_radius),
+        ("torso", "upper_torso", "neck", "left_clavicle", "right_clavicle"),
     )
     anchor(
         "seat",
@@ -199,6 +246,14 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
     for side, sign in (("left", -1), ("right", 1)):
         anchor(
             f"{side}_side",
+            "upper_torso",
+            upper_torso_center,
+            torso,
+            (sign * body.upper_torso_half_width, 0, 0),
+            (sign, 0, 0),
+        )
+        anchor(
+            f"{side}_flank",
             "torso",
             torso_center,
             torso,
@@ -297,6 +352,26 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             (0, 1, 0),
         )
         anchor(
+            f"{side}_knee_top",
+            f"{side}_knee_joint",
+            knee,
+            thigh_frame,
+            (0, body.knee_radius, 0),
+            (0, 1, 0),
+        )
+        anchor(
+            f"{side}_lap",
+            f"{side}_thigh",
+            hip,
+            thigh_frame,
+            (
+                0,
+                body.thigh_radius,
+                -max(0.35 * body.thigh_length, body.thigh_radius),
+            ),
+            (0, 1, 0),
+        )
+        anchor(
             f"{side}_shin",
             f"{side}_shin",
             (knee + ankle) / 2,
@@ -307,6 +382,15 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
         shoulder = point(
             f"{side}_shoulder",
             shoulder_center + torso @ np.array([sign * body.shoulder_half_width, 0, 0]),
+        )
+        shapes.append(
+            capsule(
+                f"{side}_clavicle",
+                vector(collar_center),
+                vector(shoulder),
+                body.upper_arm_radius,
+                shorten=True,
+            )
         )
         arm_frame = (
             torso
@@ -349,7 +433,12 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
                 "shoulder",
                 shoulder,
                 body.shoulder_radius,
-                ("torso", f"{side}_upper_arm"),
+                (
+                    "torso",
+                    "upper_torso",
+                    f"{side}_clavicle",
+                    f"{side}_upper_arm",
+                ),
             ),
             (
                 "elbow",
@@ -377,6 +466,14 @@ def forward_kinematics(actor: ActorPose) -> Skeleton:
             hand_center,
             hand_frame,
             (0, body.hand_thickness / 2, 0),
+            (0, 1, 0),
+        )
+        anchor(
+            f"{side}_forearm",
+            f"{side}_forearm",
+            (elbow + wrist) / 2,
+            forearm_frame,
+            (0, body.forearm_radius, 0),
             (0, 1, 0),
         )
     return Skeleton(

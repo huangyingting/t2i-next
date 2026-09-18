@@ -9,6 +9,13 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
+from t2i_pose_geometry.models import Scene, ValidationReport
+
+from .pose_reference_geometry import (
+    ReferenceGeometryError,
+    compile_reference_geometry,
+    geometry_implementation_fingerprint,
+)
 from .pose_reference_history import (
     Digest,
     ReferenceChoice,
@@ -336,9 +343,9 @@ class NeutralPose(ReferenceModel):
 
 
 class NeutralPoseLibrary(ReferenceModel):
-    schema_version: Literal["3.0"] = "3.0"
+    schema_version: Literal["4.0"] = "4.0"
     scope: Literal["clothed_adult_figure_study"] = "clothed_adult_figure_study"
-    validation_status: Literal["symbolic_only"] = "symbolic_only"
+    validation_status: Literal["geometry_required"] = "geometry_required"
     visual_validation: Literal[False] = False
     physical_validation: Literal[False] = False
     requires_render_review: Literal[True] = True
@@ -383,6 +390,7 @@ class NeutralPoseLibrary(ReferenceModel):
 
     def fingerprint(self) -> str:
         payload = self.model_dump(mode="json")
+        payload["geometry_implementation"] = geometry_implementation_fingerprint()
         payload["poses"] = [
             pose.model_dump(mode="json")
             for pose in sorted(self.poses, key=lambda item: item.pose_id)
@@ -409,12 +417,17 @@ class PoseReferenceScene(ReferenceModel):
     camera: ReferenceCamera
     subject: ReferenceSubject
     presentation: ReferencePresentation
+    geometry: Scene
     prompt: str = Field(min_length=1)
 
     @model_validator(mode="after")
     def camera_is_compatible(self) -> PoseReferenceScene:
         if not pose_accepts_camera(self.pose, self.camera):
             raise ValueError("reference camera is incompatible with pose")
+        if self.geometry != compile_reference_geometry(
+            self.pose, self.subject, self.presentation
+        ):
+            raise ValueError("reference geometry differs from its validated recipe")
         if self.prompt != render_pose_reference(
             self.pose, self.camera, self.subject, self.presentation
         ):
@@ -427,6 +440,7 @@ class PoseReferenceReport(ReferenceModel):
     visual_validation: Literal[False] = False
     physical_validation: Literal[False] = False
     requires_render_review: Literal[True] = True
+    geometry_checked_scenes: int = Field(default=0, ge=0)
     pose_count: int = Field(ge=1)
     family_counts: dict[str, int]
     body_level_counts: dict[str, int]
@@ -443,13 +457,26 @@ class PoseReferenceReport(ReferenceModel):
     mean_structural_distance: float | None = Field(default=None, ge=0, le=1)
 
 
+class ReferenceGeometryRejection(ReferenceModel):
+    pose_id: Identifier
+    subject_id: Identifier
+    presentation_id: Identifier
+    report: ValidationReport
+
+    @model_validator(mode="after")
+    def report_is_a_rejection(self) -> ReferenceGeometryRejection:
+        if self.report.passed:
+            raise ValueError("geometry rejection must contain failed checks")
+        return self
+
+
 class PoseReferenceBatch(ReferenceModel):
-    schema_version: Literal["3.0"] = "3.0"
+    schema_version: Literal["4.0"] = "4.0"
     scope: Literal["clothed_adult_figure_study"] = "clothed_adult_figure_study"
-    selection_algorithm: Literal["history_aware_family_maximin_v3"] = (
-        "history_aware_family_maximin_v3"
+    selection_algorithm: Literal["geometry_gated_family_maximin_v4"] = (
+        "geometry_gated_family_maximin_v4"
     )
-    renderer_version: Literal[3] = 3
+    renderer_version: Literal[4] = 4
     seed: int
     family_filter: Identifier | None = None
     presentation_filter: Identifier | None = None
@@ -459,6 +486,7 @@ class PoseReferenceBatch(ReferenceModel):
     history_after: ReferenceUsage
     scenes: tuple[PoseReferenceScene, ...] = Field(min_length=1)
     report: PoseReferenceReport
+    geometry_rejections: tuple[ReferenceGeometryRejection, ...] = ()
 
     @model_validator(mode="after")
     def report_matches_scenes(self) -> PoseReferenceBatch:
@@ -490,7 +518,7 @@ class PoseReferenceBatch(ReferenceModel):
 
 
 class ReferenceLibraryAudit(ReferenceModel):
-    schema_version: Literal["3.0"] = "3.0"
+    schema_version: Literal["4.0"] = "4.0"
     catalog_fingerprint: Digest
     evidence: Literal["symbolic_structure_only"] = "symbolic_structure_only"
     visual_validation: Literal[False] = False
@@ -501,20 +529,37 @@ class ReferenceLibraryAudit(ReferenceModel):
     subject_count: int = Field(ge=1)
     presentation_count: int = Field(ge=1)
     compatible_pose_camera_presentation_count: int = Field(ge=1)
+    geometry_checked_scenes: int = Field(ge=0)
+    geometry_rejections: tuple[ReferenceGeometryRejection, ...] = ()
 
 
 def audit_reference_library(library: NeutralPoseLibrary) -> ReferenceLibraryAudit:
     combinations_checked = 0
+    geometry_checked = 0
+    rejections: dict[tuple[str, str, str], ReferenceGeometryRejection] = {}
     for pose in library.poses:
         for camera, presentation in _presentation_options(library, pose):
             for subject in library.subjects:
+                try:
+                    geometry = compile_reference_geometry(pose, subject, presentation)
+                except ReferenceGeometryError as exc:
+                    key = (
+                        pose.pose_id, subject.subject_id, presentation.presentation_id
+                    )
+                    rejections[key] = ReferenceGeometryRejection(
+                        pose_id=pose.pose_id, subject_id=subject.subject_id,
+                        presentation_id=presentation.presentation_id, report=exc.report,
+                    )
+                    continue
                 PoseReferenceScene(
                     pose=pose,
                     camera=camera,
                     presentation=presentation,
                     subject=subject,
+                    geometry=geometry,
                     prompt=render_pose_reference(pose, camera, subject, presentation),
                 )
+                geometry_checked += 1
             combinations_checked += 1
     return ReferenceLibraryAudit(
         catalog_fingerprint=library.fingerprint(),
@@ -523,6 +568,8 @@ def audit_reference_library(library: NeutralPoseLibrary) -> ReferenceLibraryAudi
         subject_count=len(library.subjects),
         presentation_count=len(library.presentations),
         compatible_pose_camera_presentation_count=combinations_checked,
+        geometry_checked_scenes=geometry_checked,
+        geometry_rejections=tuple(rejections.values()),
     )
 
 
@@ -574,7 +621,9 @@ def describe_reference_scenes(
         **report.model_dump(exclude={
             "camera_counts", "presentation_counts", "subject_counts",
             "previously_used_pose_scenes", "previously_used_combination_scenes",
+            "geometry_checked_scenes",
         }),
+        geometry_checked_scenes=len(scenes),
         camera_counts=dict(sorted(Counter(
             scene.camera.camera_id for scene in scenes
         ).items())),
@@ -734,6 +783,7 @@ def render_pose_reference(
         raise ValueError("support height, extent or orientation cannot fit the pose")
     if not presentation_accepts_camera(presentation, camera):
         raise ValueError("reference camera requires more space than the environment")
+    geometry = compile_reference_geometry(pose, subject, presentation)
     realizations = {item.surface: item.description for item in presentation.supports}
     supports = "; ".join(
         f"{contact.body_part.replace('_', ' ')} on {realizations[contact.surface]}"
@@ -793,6 +843,8 @@ def render_pose_reference(
         "A non-sexual figure-study image of exactly one fully clothed adult. "
         f"{render_reference_presentation(presentation)} "
         f"{render_reference_subject(subject)} "
+        f"The pelvis is {geometry.actors[0].root_position[2]:.3f} metres "
+        "above the room floor. "
         f"The figure uses a {pose.body_level} posture with a "
         f"{pose.spine.replace('_', ' ')} spine, "
         f"forming a {pose.silhouette} silhouette. "
@@ -837,6 +889,10 @@ def sample_pose_references(
     subjects = {subject.subject_id: subject for subject in library.subjects}
     if subject_id is not None and subject_id not in subjects:
         raise ValueError(f"unknown reference subject: {subject_id}")
+    identity_rng = random.Random(seed)
+    subject = subjects[
+        subject_id if subject_id is not None else identity_rng.choice(sorted(subjects))
+    ]
     if presentation_id is not None and presentation_id not in {
         presentation.presentation_id for presentation in library.presentations
     }:
@@ -855,15 +911,34 @@ def sample_pose_references(
     )
     if not candidates:
         raise ValueError(f"unknown reference pose family: {family}")
-    options = {
-        pose.pose_id: _presentation_options(library, pose, presentation_id)
-        for pose in candidates
-    }
+    options: dict[str, list[tuple[ReferenceCamera, ReferencePresentation]]] = {}
+    rejections: dict[tuple[str, str], ReferenceGeometryRejection] = {}
+    for pose in candidates:
+        options[pose.pose_id] = []
+        for camera, presentation in _presentation_options(
+            library, pose, presentation_id
+        ):
+            try:
+                compile_reference_geometry(pose, subject, presentation)
+            except ReferenceGeometryError as exc:
+                key = (pose.pose_id, presentation.presentation_id)
+                rejections[key] = ReferenceGeometryRejection(
+                    pose_id=pose.pose_id, subject_id=subject.subject_id,
+                    presentation_id=presentation.presentation_id, report=exc.report,
+                )
+                continue
+            options[pose.pose_id].append((camera, presentation))
     candidates = [pose for pose in candidates if options[pose.pose_id]]
     if not candidates:
-        raise ValueError("no reference poses fit the selected environment and cameras")
+        raise ValueError(
+            "no reference poses fit the selected environment and cameras; "
+            f"{len(rejections)} geometry configurations rejected"
+        )
     if not 1 <= count <= len(candidates):
-        raise ValueError(f"count must be between 1 and {len(candidates)}")
+        raise ValueError(
+            f"count must be between 1 and {len(candidates)}; "
+            f"{len(rejections)} geometry configurations rejected"
+        )
     rng = random.Random(seed)
     rng.shuffle(candidates)
     selected: list[NeutralPose] = []
@@ -883,10 +958,6 @@ def sample_pose_references(
         selected.append(pose)
         family_counts[pose.family] += 1
         candidates.remove(pose)
-    identity_rng = random.Random(seed)
-    subject = subjects[
-        subject_id if subject_id is not None else identity_rng.choice(sorted(subjects))
-    ]
     camera_counts = Counter(history.camera_counts)
     presentation_counts = Counter(history.presentation_counts)
     combination_counts = Counter(history.combination_counts)
@@ -911,6 +982,7 @@ def sample_pose_references(
             camera=camera,
             subject=subject,
             presentation=presentation,
+            geometry=compile_reference_geometry(pose, subject, presentation),
             prompt=render_pose_reference(pose, camera, subject, presentation),
         ))
         camera_counts[camera.camera_id] += 1
@@ -928,4 +1000,5 @@ def sample_pose_references(
         ),
         scenes=tuple(scenes),
         report=describe_reference_scenes(tuple(scenes), history),
+        geometry_rejections=tuple(rejections.values()),
     )

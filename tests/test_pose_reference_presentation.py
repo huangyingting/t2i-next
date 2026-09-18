@@ -112,6 +112,13 @@ def test_subject_accepts_adult_age_boundary_and_requires_clothing() -> None:
         ReferenceSubject.model_validate(payload)
 
 
+@pytest.mark.parametrize("scale", [0.0, 0.84, 1.16, float("nan"), float("inf")])
+def test_subject_body_scale_is_bounded_and_finite(scale: float) -> None:
+    payload = SUBJECTS[0].model_dump() | {"body_scale": scale}
+    with pytest.raises(ValidationError):
+        ReferenceSubject.model_validate(payload)
+
+
 @pytest.mark.parametrize(
     ("model", "recipe", "field"),
     [

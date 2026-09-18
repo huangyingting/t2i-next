@@ -26,7 +26,14 @@ class FrozenModel(BaseModel):
 
 
 class BodySpec(FrozenModel):
-    """Synthetic reference body; ``scaled`` scales every linear dimension."""
+    """Synthetic reference body; ``scaled`` scales every linear dimension.
+
+    ``torso_depth`` and ``pelvis_depth`` are front/back semiaxes, not full
+    thicknesses. ``torso_half_width`` is the lower-thorax lateral semiaxis.
+    A distinct broad upper thorax encloses the shoulder centers: its lateral
+    semiaxis is ``shoulder_half_width + shoulder_radius``. Side anchors lie on
+    this upper-thorax envelope; flank anchors lie on the lower thorax.
+    """
 
     upper_arm_length: Positive = 0.30
     forearm_length: Positive = 0.26
@@ -60,6 +67,18 @@ class BodySpec(FrozenModel):
     foot_width: Positive = 0.10
     foot_thickness: Positive = 0.055
 
+    @property
+    def upper_torso_half_width(self) -> float:
+        return self.shoulder_half_width + self.shoulder_radius
+
+    @property
+    def upper_torso_half_height(self) -> float:
+        return 1.4 * self.shoulder_radius
+
+    @property
+    def upper_torso_center_height(self) -> float:
+        return self.torso_length - 0.4 * self.shoulder_radius
+
     @model_validator(mode="after")
     def coherent_dimensions(self) -> Self:
         for segment in ("upper_arm", "forearm", "thigh", "shin"):
@@ -89,6 +108,9 @@ class JointAngles(FrozenModel):
     Knee flexion bends the shin backward; elbow flexion bends the forearm
     forward. Abduction moves either side outward. Hip yaw is local +z rotation;
     shoulder/wrist rotation is right-handed about the distal (-z) axis.
+    Wrist rotation represents combined forearm/hand axial orientation, including
+    pronation from the palm-forward reference, not isolated anatomical wrist
+    twisting. Its bounded +/-180-degree range spans a full static orientation.
     Ankle flexion raises the toes (dorsiflexion). Wrist flexion bends the hand
     forward and wrist abduction moves it outward. Positive torso/head pitch
     tilts their upward axis forward. See ``JOINT_LIMITS`` for model bounds.
@@ -143,7 +165,7 @@ def _joint_limits() -> Mapping[str, tuple[float, float]]:
         "elbow_flex": (0.0, 150.0),
         "wrist_flex": (-75.0, 75.0),
         "wrist_abduction": (-35.0, 35.0),
-        "wrist_rotation": (-90.0, 90.0),
+        "wrist_rotation": (-180.0, 180.0),
     }
     for side in ("left", "right"):
         limits.update({f"{side}_{key}": value for key, value in side_limits.items()})
@@ -180,10 +202,20 @@ class Contact(FrozenModel):
     face: Face = "top"
 
 
+class BodyContact(FrozenModel):
+    """Required opposed surface-anchor contact, never a collision exemption."""
+
+    actor_id: Identifier
+    anchor: Identifier
+    target_actor_id: Identifier
+    target_anchor: Identifier
+
+
 class Scene(FrozenModel):
     actors: tuple[ActorPose, ...]
     objects: tuple[Box, ...] = ()
     contacts: tuple[Contact, ...] = ()
+    body_contacts: tuple[BodyContact, ...] = ()
 
 
 class Tolerances(FrozenModel):

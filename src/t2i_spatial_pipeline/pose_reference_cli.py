@@ -17,6 +17,10 @@ from .pose_reference import (
     sample_pose_references,
 )
 from .pose_reference_catalog import build_neutral_pose_library
+from .pose_reference_geometry import (
+    ReferenceGeometryError,
+    compile_reference_geometry,
+)
 
 app = typer.Typer(
     name="poses",
@@ -135,6 +139,12 @@ def sample_poses(
             presentation_id=presentation,
             history=previous.history_after if previous is not None else None,
         )
+        if batch.geometry_rejections:
+            typer.secho(
+                f"Rejected {len(batch.geometry_rejections)} invalid geometry "
+                "configurations; diagnostics are included in JSON output.",
+                fg=typer.colors.YELLOW, err=True,
+            )
         content = (
             "\n".join(scene.prompt for scene in batch.scenes)
             if output_format == ExportFormat.TEXT
@@ -153,11 +163,63 @@ def audit_poses(
         typer.Option(dir_okay=False, help="Write diagnostics to a new JSON file."),
     ] = None,
 ) -> None:
-    """Validate all recipes and report symbolic structural coverage."""
+    """Check structure and subject-specific static geometry for all recipes."""
     try:
         library = build_neutral_pose_library()
         report = audit_reference_library(library)
         _emit(report.model_dump_json(indent=2), output)
+        if report.geometry_rejections:
+            typer.secho(
+                f"Geometry audit rejected {len(report.geometry_rejections)} "
+                "configurations. See geometry_rejections in the report.",
+                fg=typer.colors.RED, err=True,
+            )
+            raise typer.Exit(code=1)
+    except (OSError, ValueError) as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from exc
+
+
+@app.command("preview")
+def preview_pose(
+    pose_id: Annotated[str, typer.Argument(help="Exact reference pose ID.")],
+    subject: Annotated[
+        str, typer.Option(help="Subject whose body scale is checked.")
+    ] = "mara",
+    presentation: Annotated[
+        str, typer.Option(help="Environment providing the required supports.")
+    ] = "daylight_atelier",
+    output: Annotated[
+        Path | None,
+        typer.Option(dir_okay=False, help="Write diagnostic SVG; never overwrite."),
+    ] = None,
+) -> None:
+    """Show front/side/top geometry; invalid candidates are marked and exit nonzero."""
+    from t2i_pose_geometry.preview import render_scene_svg
+
+    try:
+        library = build_neutral_pose_library()
+        poses = {pose.pose_id: pose for pose in library.poses}
+        subjects = {item.subject_id: item for item in library.subjects}
+        presentations = {item.presentation_id: item for item in library.presentations}
+        if pose_id not in poses:
+            raise ValueError(f"unknown reference pose: {pose_id}")
+        if subject not in subjects:
+            raise ValueError(f"unknown reference subject: {subject}")
+        if presentation not in presentations:
+            raise ValueError(f"unknown reference presentation: {presentation}")
+        rejection: ReferenceGeometryError | None = None
+        try:
+            geometry = compile_reference_geometry(
+                poses[pose_id], subjects[subject], presentations[presentation]
+            )
+        except ReferenceGeometryError as exc:
+            rejection = exc
+            geometry = exc.geometry
+        _emit(render_scene_svg(geometry), output)
+        if rejection is not None:
+            typer.secho(str(rejection), fg=typer.colors.RED, err=True)
+            raise typer.Exit(code=1)
     except (OSError, ValueError) as exc:
         typer.secho(str(exc), fg=typer.colors.RED, err=True)
         raise typer.Exit(code=1) from exc

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 from functools import lru_cache
 from importlib.metadata import version
 from pathlib import Path
@@ -13,6 +14,7 @@ from scipy.spatial.transform import Rotation
 
 from t2i_pose_geometry.kinematics import forward_kinematics
 from t2i_pose_geometry.models import (
+    JOINT_LIMITS,
     ActorPose,
     AnchorTarget,
     BodyContact,
@@ -37,12 +39,16 @@ _MAT_TOP = 0.02
 
 
 class ReferenceGeometryError(ValueError):
-    def __init__(self, pose_id: str, report: ValidationReport) -> None:
+    def __init__(self, pose_id: str, geometry: Scene, report: ValidationReport) -> None:
         self.pose_id = pose_id
+        self.geometry = geometry
         self.report = report
         super().__init__(
             f"{pose_id}: geometry rejected: "
-            + "; ".join(issue.detail for issue in report.issues)
+            + "; ".join(
+                f"{issue.code} ({', '.join(issue.parts)}): {issue.details}"
+                for issue in report.issues
+            )
         )
 
 
@@ -86,65 +92,73 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
         0.0 if pose.head_orientation.pitch == "neutral" else 10.0
     )
     for side in ("left", "right"):
-        angles[f"{side}_hip"] = (0.0, 0.0, 0.0)
-        angles[f"{side}_knee"] = 0.0
-        angles[f"{side}_ankle"] = 0.0
-        angles[f"{side}_shoulder"] = (12.0, 12.0, 0.0)
-        angles[f"{side}_elbow"] = 12.0
+        angles[f"{side}_shoulder_flex"] = 12.0
+        angles[f"{side}_shoulder_abduction"] = 12.0
+        angles[f"{side}_elbow_flex"] = 12.0
     if pose.legs in {"left_foot_forward", "right_foot_forward"}:
         front = "left" if pose.legs == "left_foot_forward" else "right"
         back = "right" if front == "left" else "left"
-        angles[f"{front}_hip"] = (15.0, 0.0, 0.0)
-        angles[f"{back}_hip"] = (-15.0, 0.0, 0.0)
-        angles[f"{front}_ankle"] = -15.0
-        angles[f"{back}_ankle"] = 15.0
+        angles[f"{front}_hip_flex"] = 15.0
+        angles[f"{back}_hip_flex"] = -15.0
+        angles[f"{front}_ankle_flex"] = -15.0
+        angles[f"{back}_ankle_flex"] = 15.0
     elif pose.legs in {"left_foot_on_step", "right_foot_on_step"}:
         side = "left" if pose.legs == "left_foot_on_step" else "right"
-        angles[f"{side}_hip"] = (70.0, 0.0, 0.0)
-        angles[f"{side}_knee"] = 110.0
-        angles[f"{side}_ankle"] = 40.0
+        angles[f"{side}_hip_flex"] = 75.0
+        angles[f"{side}_knee_flex"] = 110.0
+        angles[f"{side}_ankle_flex"] = 35.0
     elif pose.legs.startswith("seated_"):
         for side in ("left", "right"):
-            angles[f"{side}_hip"] = (80.0, 0.0, 0.0)
-            angles[f"{side}_knee"] = 80.0
+            angles[f"{side}_hip_flex"] = 80.0
+            angles[f"{side}_knee_flex"] = 80.0
         if pose.legs != "seated_parallel":
             side = "left" if pose.legs == "seated_left_forward" else "right"
-            angles[f"{side}_knee"] = 65.0
-            angles[f"{side}_ankle"] = -15.0
-    elif pose.legs in {"knees_on_mat", "left_half_kneel", "right_half_kneel"}:
+            angles[f"{side}_knee_flex"] = 65.0
+            angles[f"{side}_ankle_flex"] = -15.0
+    elif pose.legs in {"knees_and_toes_on_mat", "left_half_kneel", "right_half_kneel"}:
+        knee_flex = math.degrees(math.acos(
+            -(0.75 * body.foot_length - body.knee_radius) / body.shin_length
+        ))
         for side in ("left", "right"):
-            angles[f"{side}_knee"] = 90.0
-            angles[f"{side}_ankle"] = -90.0
-        if pose.legs != "knees_on_mat":
+            angles[f"{side}_knee_flex"] = knee_flex
+            angles[f"{side}_ankle_flex"] = knee_flex - 90.0
+        if pose.legs != "knees_and_toes_on_mat":
             side = "right" if pose.legs == "left_half_kneel" else "left"
-            angles[f"{side}_hip"] = (90.0, 0.0, 0.0)
-            angles[f"{side}_ankle"] = 0.0
+            angles[f"{side}_hip_flex"] = 90.0
+            angles[f"{side}_knee_flex"] = 90.0
+            angles[f"{side}_ankle_flex"] = 0.0
     elif pose.legs == "bent_knees_feet_flat":
         for side in ("left", "right"):
-            angles[f"{side}_hip"] = (125.0, 25.0, 0.0)
-            angles[f"{side}_knee"] = 145.0
-            angles[f"{side}_ankle"] = 20.0
+            angles[f"{side}_hip_flex"] = 125.0
+            angles[f"{side}_hip_abduction"] = 25.0
+            angles[f"{side}_knee_flex"] = 145.0
+            angles[f"{side}_ankle_flex"] = 20.0
     elif pose.legs == "crossed_on_mat":
         for side in ("left", "right"):
-            angles[f"{side}_hip"] = (95.0, 45.0, 35.0)
-            angles[f"{side}_knee"] = 130.0
-            angles[f"{side}_ankle"] = -15.0
+            angles[f"{side}_hip_flex"] = 95.0
+            angles[f"{side}_hip_abduction"] = 45.0
+            angles[f"{side}_hip_yaw"] = 35.0
+            angles[f"{side}_knee_flex"] = 130.0
+            angles[f"{side}_ankle_flex"] = -15.0
     elif pose.legs == "staggered_bent_knees":
         for side in ("left", "right"):
             flex = 35.0 if side == pose.resting_side else 45.0
-            angles[f"{side}_hip"] = (flex, 0.0, 0.0)
-            angles[f"{side}_knee"] = flex + 40.0
-            angles[f"{side}_ankle"] = 40.0
+            angles[f"{side}_hip_flex"] = flex
+            angles[f"{side}_knee_flex"] = flex + 30.0
+            angles[f"{side}_ankle_flex"] = 30.0
     for side, hand in (("left", pose.left_hand), ("right", pose.right_hand)):
         if hand == "forward_gesture":
-            angles[f"{side}_shoulder"] = (45.0, 15.0, 0.0)
-            angles[f"{side}_elbow"] = 35.0
+            angles[f"{side}_shoulder_flex"] = 45.0
+            angles[f"{side}_shoulder_abduction"] = 15.0
+            angles[f"{side}_elbow_flex"] = 35.0
         elif hand == "on_mat_forward":
-            angles[f"{side}_shoulder"] = (85.0, 0.0, 0.0)
-            angles[f"{side}_elbow"] = 50.0
+            angles[f"{side}_shoulder_flex"] = 85.0
+            angles[f"{side}_shoulder_abduction"] = 0.0
+            angles[f"{side}_elbow_flex"] = 50.0
         elif hand in {"on_knee", "on_lap", "across_forearm", "on_table", "on_floor"}:
-            angles[f"{side}_shoulder"] = (35.0, 20.0, 0.0)
-            angles[f"{side}_elbow"] = 55.0
+            angles[f"{side}_shoulder_flex"] = 35.0
+            angles[f"{side}_shoulder_abduction"] = 20.0
+            angles[f"{side}_elbow_flex"] = 55.0
     roll = (
         -90.0 if pose.resting_side == "left"
         else 90.0 if pose.resting_side == "right" else 0.0
@@ -198,7 +212,9 @@ def _ground_actor(pose: NeutralPose, actor: ActorPose) -> ActorPose:
                     anchor=anchor, position=(position[0], position[1], 0.0),
                     normal=(0.0, 0.0, -1.0),
                 ))
-                variables.extend((f"{side}_hip", f"{side}_knee", f"{side}_ankle"))
+                variables.extend((
+                    f"{side}_hip_flex", f"{side}_knee_flex", f"{side}_ankle_flex",
+                ))
     if targets:
         actor = solve_actor(
             actor, tuple(targets), variable_names=tuple(variables), max_nfev=160,
@@ -311,7 +327,7 @@ def _arm_targets(
         sign = -1.0 if side == "left" else 1.0
         target_anchor = None
         if placement == "on_knee":
-            target_anchor = f"{side}_knee"
+            target_anchor = f"{side}_knee_top"
         elif placement == "on_lap":
             target_anchor = f"{side}_lap"
         elif placement == "across_forearm":
@@ -320,7 +336,7 @@ def _arm_targets(
             target = skeleton.anchors[target_anchor]
             targets.append(AnchorTarget(
                 anchor=anchor, position=target.position,
-                normal=tuple(-v for v in target.normal),
+                normal=(-target.normal[0], -target.normal[1], -target.normal[2]),
             ))
             contacts.append(BodyContact(
                 actor_id="subject", anchor=anchor,
@@ -367,7 +383,12 @@ def _arm_targets(
             ))
         else:
             continue
-        variables.extend((f"{side}_shoulder", f"{side}_elbow", f"{side}_wrist"))
+        variables.extend(
+            name for name in JOINT_LIMITS
+            if name.startswith(
+                (f"{side}_shoulder_", f"{side}_elbow_", f"{side}_wrist_")
+            )
+        )
     return tuple(targets), tuple(contacts), tuple(variables)
 
 
@@ -399,7 +420,9 @@ def _rotate_scene(scene: Scene, yaw: float) -> Scene:
 
 
 @lru_cache(maxsize=256)
-def _canonical_geometry(pose: NeutralPose, body_scale: float) -> Scene:
+def _canonical_geometry(
+    pose: NeutralPose, body_scale: float,
+) -> tuple[Scene, ValidationReport]:
     body = BodySpec().scaled(body_scale)
     actor = _ground_actor(pose, _initial_actor(pose, body))
     objects, faces = _environment(pose, actor)
@@ -425,9 +448,7 @@ def _canonical_geometry(pose: NeutralPose, body_scale: float) -> Scene:
         ),
     ), _YAW[pose.pelvis_facing])
     report = validate_scene(scene)
-    if not report.passed:
-        raise ReferenceGeometryError(pose.pose_id, report)
-    return scene
+    return scene, report
 
 
 def compile_reference_geometry(
@@ -435,28 +456,12 @@ def compile_reference_geometry(
     subject: ReferenceSubject,
     presentation: ReferencePresentation,
 ) -> Scene:
-    """Bind concrete environment IDs after canonical, subject-specific validation."""
-    scene = _canonical_geometry(pose, subject.body_scale)
-    realizations = {item.surface: item for item in presentation.supports}
-    names = {
-        box.object_id: (
-            f"{realizations[box.object_id].object_id}_{box.object_id}"
-            if box.object_id in realizations
-            else box.object_id
-        )
-        for box in scene.objects
-    }
-    return Scene(
-        actors=scene.actors,
-        objects=tuple(
-            Box.model_validate(box.model_dump() | {"object_id": names[box.object_id]})
-            for box in scene.objects
-        ),
-        contacts=tuple(
-            Contact.model_validate(
-                contact.model_dump() | {"object_id": names[contact.object_id]}
-            )
-            for contact in scene.contacts
-        ),
-        body_contacts=scene.body_contacts,
-    )
+    """Resolve canonical surface IDs through the presentation's support mapping."""
+    from .pose_reference import presentation_fits_pose
+
+    if not presentation_fits_pose(presentation, pose):
+        raise ValueError("support height, extent or orientation cannot fit the pose")
+    scene, report = _canonical_geometry(pose, subject.body_scale)
+    if not report.passed:
+        raise ReferenceGeometryError(pose.pose_id, scene, report)
+    return scene

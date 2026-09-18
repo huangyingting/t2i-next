@@ -13,6 +13,7 @@ from t2i_pose_geometry import (
     JOINT_LIMITS,
     ActorPose,
     AnchorTarget,
+    BodyContact,
     BodySpec,
     Box,
     Contact,
@@ -66,6 +67,62 @@ def test_neutral_standing_has_solid_clearance_and_both_sole_contacts() -> None:
         assert sole.position[2] == pytest.approx(0, abs=1e-12)
         assert sole.normal == pytest.approx((0, 0, -1))
     assert {shape.kind for shape in skeleton.shapes} == {"capsule", "ellipsoid", "box"}
+
+
+def test_neutral_body_volumes_form_one_connected_solid() -> None:
+    shapes = forward_kinematics(ActorPose(actor_id="adult")).shapes
+    reached = {shapes[0].shape_id}
+    pending = list(shapes[1:])
+    while pending:
+        connected = [
+            shape
+            for shape in pending
+            if any(
+                other.shape_id in reached
+                and query_pair(shape, other).distance_m <= Tolerances().penetration_m
+                for other in shapes
+            )
+        ]
+        assert connected, f"Disconnected body volumes: {[s.shape_id for s in pending]}"
+        reached.update(shape.shape_id for shape in connected)
+        pending = [shape for shape in pending if shape.shape_id not in reached]
+
+
+@pytest.mark.parametrize("side,rotation", [("left", -90), ("right", 90)])
+def test_side_lying_shoulder_envelope_and_floor_contact(
+    side: str, rotation: float
+) -> None:
+    body = BodySpec()
+    actor = ActorPose(
+        actor_id="adult",
+        body=body,
+        root_position=(0, 0, body.upper_torso_half_width),
+        root_rotation=(0, rotation, 0),
+    )
+    skeleton = forward_kinematics(actor)
+    torso = next(s for s in skeleton.shapes if s.shape_id == "upper_torso")
+    for shoulder in ("left_shoulder", "right_shoulder"):
+        local = matrix(torso.rotation).T @ np.subtract(
+            skeleton.joints[shoulder], torso.center
+        )
+        assert np.linalg.norm(local / torso.radii) < 1
+    anchor = skeleton.anchors[f"{side}_side"]
+    assert anchor.position[2] == pytest.approx(0, abs=1e-12)
+    assert anchor.normal == pytest.approx((0, 0, -1), abs=1e-12)
+    shoulder = next(
+        shape for shape in skeleton.shapes if shape.shape_id == f"{side}_shoulder_joint"
+    )
+    assert Collider(shoulder).bounds()[0][2] == pytest.approx(0, abs=1e-12)
+    report = validate_scene(
+        Scene(
+            actors=(actor,),
+            objects=(Box(object_id="floor", center=(0, 0, -0.1), size=(4, 4, 0.2)),),
+            contacts=(
+                Contact(actor_id="adult", anchor=f"{side}_side", object_id="floor"),
+            ),
+        )
+    )
+    assert report.passed, report
 
 
 @pytest.mark.parametrize("gap", [0.02, 0.0, -0.03])
@@ -258,6 +315,175 @@ def test_interactor_overlap_and_separation() -> None:
     )
     second = second.model_copy(update={"root_position": (1, 0, 0.895)})
     assert validate_scene(Scene(actors=(first, second))).passed
+
+
+def back_contact_scene() -> Scene:
+    return Scene(
+        actors=(
+            ActorPose(actor_id="first"),
+            ActorPose(
+                actor_id="second",
+                root_position=(0, -0.21, 0.895),
+                root_rotation=(0, 0, 180),
+            ),
+        ),
+        body_contacts=(
+            BodyContact(
+                actor_id="first",
+                anchor="back",
+                target_actor_id="second",
+                target_anchor="back",
+            ),
+        ),
+    )
+
+
+def test_independent_body_contact_passes_and_roundtrips() -> None:
+    scene = back_contact_scene()
+    assert Scene.model_validate_json(scene.model_dump_json()) == scene
+    report = validate_scene(scene)
+    assert report.passed, report
+
+
+def test_body_contact_never_exempts_shallow_interactor_penetration() -> None:
+    scene = back_contact_scene()
+    overlapping = scene.actors[1].model_copy(
+        update={"root_position": (0, -0.209, 0.895)}
+    )
+    report = validate_scene(
+        scene.model_copy(update={"actors": (scene.actors[0], overlapping)})
+    )
+    assert not report.passed
+    assert not any(issue.code.startswith("body_contact_") for issue in report.issues)
+    assert any(
+        issue.code == "inter_actor_collision" and "torso" in issue.parts
+        for issue in report.issues
+    )
+
+
+def test_body_contact_recomputes_anchor_positions_after_actor_changes() -> None:
+    scene = back_contact_scene()
+    moved = scene.actors[1].model_copy(update={"root_position": (0, -0.25, 0.895)})
+    report = validate_scene(
+        scene.model_copy(update={"actors": (scene.actors[0], moved)})
+    )
+    errors = [issue for issue in report.issues if issue.code == "body_contact_distance"]
+    assert len(errors) == 1
+    assert errors[0].error_m == pytest.approx(0.04)
+
+
+def test_body_contact_requires_opposing_normals_even_at_identical_position() -> None:
+    actor = ActorPose(actor_id="adult")
+    report = validate_scene(
+        Scene(
+            actors=(actor,),
+            body_contacts=(
+                BodyContact(
+                    actor_id="adult",
+                    anchor="left_knee",
+                    target_actor_id="adult",
+                    target_anchor="left_knee_top",
+                ),
+            ),
+        )
+    )
+    assert not report.passed
+    assert any(issue.code == "body_contact_normal" for issue in report.issues)
+    assert not any(issue.code == "body_contact_distance" for issue in report.issues)
+
+
+@pytest.mark.parametrize(
+    ("changes", "code"),
+    [
+        ({"actor_id": "missing"}, "unknown_actor"),
+        ({"target_actor_id": "missing"}, "unknown_actor"),
+        ({"anchor": "missing"}, "unknown_anchor"),
+        ({"target_anchor": "missing"}, "unknown_anchor"),
+    ],
+)
+def test_unknown_body_contact_endpoints_fail_explicitly(
+    changes: dict[str, str], code: str
+) -> None:
+    scene = back_contact_scene()
+    contact = scene.body_contacts[0].model_copy(update=changes)
+    report = validate_scene(scene.model_copy(update={"body_contacts": (contact,)}))
+    assert not report.passed
+    assert any(issue.code == code for issue in report.issues)
+
+
+def test_seated_lap_knee_and_forearm_anchors_face_upward() -> None:
+    actor = ActorPose(
+        actor_id="adult",
+        angles=JointAngles(
+            left_hip_flex=90,
+            left_knee_flex=90,
+            right_hip_flex=90,
+            right_knee_flex=90,
+            left_elbow_flex=90,
+            right_elbow_flex=90,
+        ),
+    )
+    skeleton = forward_kinematics(actor)
+    for side in ("left", "right"):
+        for surface in ("lap", "knee_top", "forearm"):
+            anchor = skeleton.anchors[f"{side}_{surface}"]
+            assert anchor.normal == pytest.approx((0, 0, 1), abs=1e-12)
+        lap = skeleton.anchors[f"{side}_lap"]
+        hip = skeleton.joints[f"{side}_hip"]
+        assert lap.position[1] - hip[1] == pytest.approx(0.35 * actor.body.thigh_length)
+        assert lap.position[2] - hip[2] == pytest.approx(actor.body.thigh_radius)
+
+
+def test_own_lap_palm_ik_is_independently_validated_without_collision_exemptions() -> (
+    None
+):
+    actor = ActorPose(
+        actor_id="adult",
+        angles=JointAngles(
+            left_hip_flex=90,
+            left_knee_flex=90,
+            right_hip_flex=90,
+            right_knee_flex=90,
+            left_shoulder_flex=20,
+            left_shoulder_abduction=10,
+            left_shoulder_rotation=60,
+            left_elbow_flex=90,
+            left_wrist_rotation=150,
+        ),
+    )
+    lap = forward_kinematics(actor).anchors["left_lap"]
+    result = solve_actor(
+        actor,
+        (
+            AnchorTarget(
+                anchor="left_palm",
+                position=lap.position,
+                normal=tuple(-value for value in lap.normal),
+            ),
+        ),
+        tuple(
+            name
+            for name in JOINT_LIMITS
+            if name.startswith(("left_shoulder", "left_elbow", "left_wrist"))
+        ),
+        max_nfev=100,
+    )
+    assert result.converged, result
+    report = validate_scene(
+        Scene(
+            actors=(result.actor,),
+            body_contacts=(
+                BodyContact(
+                    actor_id="adult",
+                    anchor="left_palm",
+                    target_actor_id="adult",
+                    target_anchor="left_lap",
+                ),
+            ),
+        )
+    )
+    assert report.passed, report
+    assert_lengths(result.actor)
 
 
 def test_rigid_scene_rotation_preserves_contacts_and_clearance() -> None:
