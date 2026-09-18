@@ -443,6 +443,25 @@ Provider 与其他流水线一样直接复用现有 `.env` 中的 `OPENAI_*`。�
 
 ### 非露骨人物姿态参考库
 
+#### 几何工具选型
+
+静态几何检查采用本地 NumPy、SciPy 和 python-fcl，不需要云端模型、GPU 或
+下载人体权重。FCL 负责有体积形状的碰撞查询，SciPy 负责有边界的接触求解；
+人体尺寸、关节范围、接触语义和验收仍由项目明确建模，不能由库的“成功”返回值
+代替。具体版本由 `uv.lock` 固定。
+
+已比较的现成方案：
+
+| 方案 | 本项目取舍 |
+|---|---|
+| [python-fcl](https://github.com/BerkeleyAutomation/python-fcl) + [SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) | 采用；适合显式逐对检查和静态接触求解，两者使用 BSD 许可证 |
+| [MuJoCo](https://github.com/google-deepmind/mujoco) | 提供运动学和 Apache-2.0 人形模型，但默认碰撞过滤不能直接作为完整自碰撞验收 |
+| [Drake](https://drake.mit.edu/) | 有成熟的约束逆运动学；对当前有限姿势目录而言引入的模型和求解设施较重 |
+| [MyoSim](https://github.com/MyoHub/myo_sim) | 有 Apache-2.0 解剖模型，但仍需编写具体接触规则，不是现成的姿势有效性判定器 |
+
+这里使用自建的简化人体代理，不复制上述人体资产。几何通过仅适用于这个代理及
+其显式参数，不代表医学安全、衣物不穿插、动态平衡或最终生成图像已经正确。
+
 `t2i-spatial poses` 是空间模块内的独立离线工具，用于全身着装、成年人物的日常
 造型和美术参考。它不调用模型、不依赖 story/film，不组合 activity，也不修改
 `generate`/`bulk` 原有的成人活动 catalog。两者用途不同：原有24族目录继续服务

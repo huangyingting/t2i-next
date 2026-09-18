@@ -103,6 +103,7 @@ class ReferenceSubject(ReferenceModel):
     adult_age: int = Field(ge=25, strict=True)
     appearance: ReferenceText
     outfit: ReferenceText
+    body_scale: float = Field(ge=0.85, le=1.15, allow_inf_nan=False)
     coverage: Literal["fully_clothed"] = "fully_clothed"
 
 
@@ -215,6 +216,7 @@ _SUBJECTS = (
     ReferenceSubject(
         subject_id="mara",
         adult_age=32,
+        body_scale=0.98,
         appearance=(
             "Mara, a woman with deep brown skin, close-cropped black curls, "
             "dark brown eyes, and a rounded face"
@@ -227,6 +229,7 @@ _SUBJECTS = (
     ReferenceSubject(
         subject_id="elias",
         adult_age=46,
+        body_scale=1.06,
         appearance=(
             "Elias, a man with olive skin, short salt-and-pepper hair, "
             "hazel eyes, and a neatly trimmed beard"
@@ -239,6 +242,7 @@ _SUBJECTS = (
     ReferenceSubject(
         subject_id="june",
         adult_age=58,
+        body_scale=1.0,
         appearance=(
             "June, a woman with light freckled skin, a straight silver bob, "
             "gray eyes, and rectangular glasses"
@@ -251,6 +255,7 @@ _SUBJECTS = (
     ReferenceSubject(
         subject_id="ren",
         adult_age=27,
+        body_scale=0.94,
         appearance=(
             "Ren, a nonbinary adult with medium tan skin, straight black hair "
             "tied back, brown eyes, and prominent straight eyebrows"
