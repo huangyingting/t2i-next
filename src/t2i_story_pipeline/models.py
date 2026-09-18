@@ -109,13 +109,55 @@ class StageAuthoring(Model):
         default_factory=dict
     )
 
-    def selected(self, content_level: ContentLevel) -> tuple[str, ...]:
-        return self.common + self.content_levels.get(content_level, ())
-
 
 class StoryAuthoring(Model):
+    content_levels: dict[ContentLevel, tuple[RuleText, ...]] = Field(
+        default_factory=dict,
+        description="Shared topic-specific refinements, not system-level replacements.",
+    )
     themes: StageAuthoring = Field(default_factory=StageAuthoring)
     frames: StageAuthoring = Field(default_factory=StageAuthoring)
+
+    @model_validator(mode="after")
+    def level_rules_have_one_owner(self) -> StoryAuthoring:
+        for level in ContentLevel:
+            shared = self.content_levels.get(level, ())
+            if len(shared) != len(set(shared)):
+                raise ValueError(f"shared {level} refinements must not repeat rules")
+            theme_rules = self.themes.content_levels.get(level, ())
+            frame_rules = self.frames.content_levels.get(level, ())
+            if set(theme_rules) & set(frame_rules):
+                raise ValueError(
+                    f"duplicate {level} Theme/Frame refinements belong in "
+                    "authoring.content_levels"
+                )
+            for stage in StoryStage:
+                authored = getattr(self, stage.value)
+                specific = authored.content_levels.get(level, ())
+                if len(specific) != len(set(specific)):
+                    raise ValueError(
+                        f"{stage} {level} refinements must not repeat rules"
+                    )
+                if set(specific) & set(authored.common):
+                    raise ValueError(
+                        f"{stage} {level} refinements repeat stage common rules"
+                    )
+                if set(shared) & set((*authored.common, *specific)):
+                    raise ValueError(
+                        f"shared {level} refinements repeat {stage} instructions"
+                    )
+        return self
+
+    def selected(
+        self, stage: StoryStage, content_level: ContentLevel
+    ) -> tuple[str, ...]:
+        authored = getattr(self, StoryStage(stage).value)
+        level = ContentLevel(content_level)
+        return (
+            authored.common
+            + self.content_levels.get(level, ())
+            + authored.content_levels.get(level, ())
+        )
 
 
 class StoryRuntime(Model):

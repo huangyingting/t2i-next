@@ -12,6 +12,7 @@ from t2i_story_pipeline.inputs import (
     StoryDocument,
     load_story_document,
 )
+from t2i_story_pipeline.models import ContentLevel, StoryStage
 
 
 def test_document_keeps_prose_and_defaults(tmp_path):
@@ -42,6 +43,48 @@ def test_document_keeps_prose_and_defaults(tmp_path):
     assert document.validation.frames.checks == ()
     assert document.authoring.themes.common == ()
     assert document.authoring.themes.content_levels == {}
+    assert document.authoring.content_levels == {}
+
+
+def test_document_loads_shared_and_stage_specific_level_refinements(tmp_path):
+    path = tmp_path / "station.yaml"
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "id": "station",
+                "description": "A quiet station.",
+                "authoring": {
+                    "content_levels": {
+                        "aesthetic": ["Shared station texture."],
+                        "erotic": ["Unselected station texture."],
+                    },
+                    "themes": {
+                        "common": ["Choose a station."],
+                        "content_levels": {"aesthetic": ["Choose a station mood."]},
+                    },
+                    "frames": {
+                        "common": ["Render a station."],
+                        "content_levels": {"aesthetic": ["Render station details."]},
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    document = load_story_document(path)
+    assert document.authoring.content_levels[ContentLevel.AESTHETIC] == (
+        "Shared station texture.",
+    )
+    assert document.authoring.selected(StoryStage.THEMES, ContentLevel.AESTHETIC) == (
+        "Choose a station.",
+        "Shared station texture.",
+        "Choose a station mood.",
+    )
+    assert document.authoring.selected(StoryStage.FRAMES, ContentLevel.AESTHETIC) == (
+        "Render a station.",
+        "Shared station texture.",
+        "Render station details.",
+    )
 
 
 def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
@@ -105,6 +148,9 @@ def test_yaml_off_is_a_mode_not_a_boolean(tmp_path):
         'authoring: {themes: {common: ["two\\nlines"]}}',
         "authoring: {themes: [Old array interface.]}",
         "authoring: {frames: {content_levels: {unknown: [Rule.]}}}",
+        "authoring: {content_levels: {unknown: [Rule.]}}",
+        "authoring: {content_levels: {aesthetic: ['']}}",
+        'authoring: {content_levels: {aesthetic: ["two\\nlines"]}}',
         "generation:\n  theme_count: 2\n  theme_count: 3",
         "description: Another story.",
         "authoring: &rules {themes: []}",

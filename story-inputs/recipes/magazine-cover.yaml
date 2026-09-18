@@ -17,6 +17,11 @@ validation:
     checks:
     - type: ascii
 authoring:
+  content_levels:
+    aesthetic:
+    - 在 aesthetic 级别，封面使用时尚、肖像、文化、设计、旅行、食物、体育、科学、艺术或其他刊物特定主体。
+    erotic:
+    - 在 erotic 级别，主图必须可见地呈现成年裸体、非露骨亲密接触、感官身体张力或其他明确的成年情欲主体。不得将情欲锚点藏在刊头或封面标题后；排版不得遮蔽必需人体部位、决定性接触或主动参与。
   themes:
     common:
     - 所选内容级别控制可见主图，而不只是文案、情绪、服装或刊物类别。
@@ -64,12 +69,6 @@ authoring:
     - 纸张和工艺强调点；以及
     - 情绪温度。
     - 不得按 Theme ID 分配类别或布局。拒绝被时尚肖像、空白摄影棚背景、居中面孔、红色刊头、相同侧边文字堆叠、奢华措辞、单色极简或泛化名人封面表情主导的一批方案。
-    content_levels:
-      aesthetic:
-      - 在 aesthetic 级别，创作非露骨编辑封面。使用时尚、肖像、文化、设计、旅行、食物、体育、科学、艺术或其他刊物特定主体。不得添加性行为。
-      erotic:
-      - 在 erotic 级别，主图必须可见地呈现成年裸体、非露骨亲密接触、感官身体张力或其他明确的成年情欲主体。每位指定成年人保持清醒、自愿、能够回应且随时可以停止。不得将情欲锚点藏在刊头或封面标题后，也不得引入露骨性行为。
-      hardcore: []
   frames:
     common:
     - 所选内容级别控制可见主图，而不只是文案、情绪、服装或刊物类别。
@@ -133,13 +132,13 @@ authoring:
     - 环境标牌、标签、包装、屏幕、书、报纸、衣物、设备和道具必须保持空白、背向镜头、被裁掉、抽象化或模糊至不可读。它们不得与受控封面文案组合竞争。
     - 排版必须拼写正确、水平、高对比且足够大，能够阅读。最多使用两个字体家族和三种字重。保持字距、行距、基线、标点和对齐一致。不得通过不可读小字模拟编辑内容丰富。
     - 无论请求的输出语言为何，Frame 全文必须使用英语。这是渲染安全要求：非英语描述文字可能泄漏到生成封面中，成为非预期文字。以无重音 ASCII 字母音译中国姓名和地名，或在无法清晰音译时按角色标识成年人。优先使用泛称英语地点，例如描述新疆的一座桥，而非粘贴中文专名原文。完整 Frame 的每个字符都必须位于 ASCII 码点 0 至 127。单个非 ASCII 字符即可使 Frame 无效，必须完整改写。
-    - '每个 Frame 必须以这句原样英语开头："The cover contains exactly five readable English strings and zero other letters, words, numbers, symbols, pseudo-letters, or glyph-like marks." 随后立即描述主图。'
+    - 每个 Frame 必须以这句原样英语开头："The cover contains exactly five readable English strings and zero other letters, words, numbers, symbols, pseudo-letters, or glyph-like marks." 随后立即描述主图。
     - 恰好使用三个受控排版区域：
     - 1. 刊头单独横跨顶部；
     - 2. 主要专题标题单独位于最强负空间区域；以及
     - 3. 一个对齐的信息块，包含两条次要标题和季节标记，并有宽松间距。
     - 五个字符串都从左到右水平排列。不得使用竖排、旋转、拱形、环形、碎片化、重复、镜像或透视文字。信息块保持在一个位置，而非把小字分配到多个角落。不得添加装饰首字母、字母碎片、分栏装饰、伪编辑注记或类似微小字符的线性标记。
-    - '紧接专用图中文字段落之前，写出这句原样英语："The five declared English strings are the complete typographic layer; all remaining cover areas are pure photography, uninterrupted color, or blank negative space." 此后的专用段落必须是 Frame 的最后文字。'
+    - 紧接专用图中文字段落之前，写出这句原样英语："The five declared English strings are the complete typographic layer; all remaining cover areas are pure photography, uninterrupted color, or blank negative space." 此后的专用段落必须是 Frame 的最后文字。
     - 所有精确可见文案都隔离到最后段落。在此之前，只使用通用小写角色短语，例如刊头、主要专题标题、信息块和季节标记的英语称谓。Frame 更早位置不得写 Theme 标题、候选标题、次要标题、季节词，或任何连续两个及以上的大写字母序列。五个精确字符串各出现且仅出现一次，位于最后段落中各自指定的冒号之后。Frame 最后一个字符是结束季节标记条目的分号。
     - 主图是一次连贯曝光，而非无关图像的蒙太奇。它必须看起来是为本期委托拍摄，而非从普通图库选择。
     - 根据编辑主体选择裁切：
@@ -193,11 +192,6 @@ authoring:
     - 各 Theme 在刊物、主体、受众、层级、排版、颜色、摄影和工艺方面显著不同。
     - 默默改写任何未通过其中一项检查的输出。
     content_levels:
-      aesthetic:
-      - 在 aesthetic 级别，创作非露骨编辑封面。使用时尚、肖像、文化、设计、旅行、食物、体育、科学、艺术或其他刊物特定主体。不得添加性行为。
-      erotic:
-      - 在 erotic 和 hardcore 级别，排版不得遮蔽必需人体部位、决定性接触或主动参与。
-      - 在 erotic 级别，主图必须可见地呈现成年裸体、非露骨亲密接触、感官身体张力或其他明确的成年情欲主体。每位指定成年人保持清醒、自愿、能够回应且随时可以停止。不得将情欲锚点藏在刊头或封面标题后，也不得引入露骨性行为。
       hardcore:
       - 在 erotic 和 hardcore 级别，排版不得遮蔽必需人体部位、决定性接触或主动参与。
       - 在 hardcore 级别，主图必须可见地呈现一个已在进行中的、露骨且双方自愿的成年性互动。在 Frame 正文中指明涉及的人体部位及当前精确接触。每位指定成年人都有主动可见的角色，并保持清醒、自愿、能够回应且随时可以停止。单纯裸体、暗示性文案、准备行为、被遮蔽的接触或微小嵌入图像都不算满足要求。

@@ -17,6 +17,11 @@ from t2i_spatial_pipeline.pose_reference import (
     sample_pose_references,
 )
 from t2i_spatial_pipeline.pose_reference_catalog import build_neutral_pose_library
+from t2i_spatial_pipeline.pose_reference_geometry import (
+    compile_reference_geometry,
+    reference_geometry_report,
+    reference_joint_positions,
+)
 from t2i_spatial_pipeline.pose_reference_history import (
     ReferenceChoice,
     ReferenceUsage,
@@ -153,9 +158,12 @@ def test_batch_rejects_stale_history_and_inconsistent_subject() -> None:
     payload = batch.model_dump(mode="json")
     scene = batch.scenes[0]
     another = next(s for s in LIBRARY.subjects if s != batch.subject)
+    geometry = compile_reference_geometry(scene.pose, another, scene.presentation)
     replacement = PoseReferenceScene(
         pose=scene.pose, camera=scene.camera,
         subject=another, presentation=scene.presentation,
+        geometry=geometry, geometry_report=reference_geometry_report(geometry),
+        geometry_joints=reference_joint_positions(geometry),
         prompt=render_pose_reference(
             scene.pose, scene.camera, another, scene.presentation
         ),
@@ -196,6 +204,8 @@ def test_every_selected_environment_realizes_the_exact_supports() -> None:
     )
     assert report.compatible_pose_camera_presentation_count == expected
     assert report.subject_count == len(LIBRARY.subjects)
+    assert report.geometry_rejections == ()
+    assert report.geometry_checked_scenes == expected * len(LIBRARY.subjects)
     assert report.visual_validation is False
 
 

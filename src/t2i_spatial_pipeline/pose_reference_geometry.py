@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+from t2i_pose_geometry.arm_seeds import arm_seed_candidates
 from t2i_pose_geometry.kinematics import forward_kinematics
 from t2i_pose_geometry.models import (
     JOINT_LIMITS,
@@ -24,11 +25,13 @@ from t2i_pose_geometry.models import (
     JointAngles,
     Scene,
     ValidationReport,
+    Vec3,
 )
 from t2i_pose_geometry.solver import solve_actor
 from t2i_pose_geometry.validation import validate_scene
 
 from .pose_reference_presentation import ReferencePresentation, ReferenceSubject
+from .pose_reference_types import ReferenceModel
 
 if TYPE_CHECKING:
     from .pose_reference import NeutralPose
@@ -36,6 +39,27 @@ if TYPE_CHECKING:
 GEOMETRY_COMPILER_VERSION = "1.0"
 _YAW = {"front": 0.0, "left_three_quarter": 45.0, "right_three_quarter": -45.0}
 _MAT_TOP = 0.02
+_ARM_BEAM_WIDTH = 4
+
+
+class ReferenceJointPosition(ReferenceModel):
+    actor_id: str
+    joint: str
+    position: Vec3
+
+
+@lru_cache(maxsize=512)
+def reference_geometry_report(scene: Scene) -> ValidationReport:
+    return validate_scene(scene)
+
+
+@lru_cache(maxsize=512)
+def reference_joint_positions(scene: Scene) -> tuple[ReferenceJointPosition, ...]:
+    return tuple(
+        ReferenceJointPosition(actor_id=actor.actor_id, joint=joint, position=position)
+        for actor in sorted(scene.actors, key=lambda item: item.actor_id)
+        for joint, position in sorted(forward_kinematics(actor).joints.items())
+    )
 
 
 class ReferenceGeometryError(ValueError):
@@ -82,9 +106,9 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
     angles = JointAngles().model_dump()
     angles["torso_yaw"] = _YAW[pose.facing] - _YAW[pose.pelvis_facing]
     if pose.spine == "forward_inclined":
-        angles["torso_pitch"] = 30.0 if pose.body_level == "crouched" else 16.0
+        angles["torso_pitch"] = 70.0 if pose.body_level == "crouched" else 16.0
     elif pose.spine == "reclined":
-        angles["torso_pitch"] = -12.0
+        angles["torso_pitch"] = -6.0
     angles["head_yaw"] = {
         "aligned": 0.0, "gentle_left": 20.0, "gentle_right": -20.0,
     }[pose.head_orientation.yaw]
@@ -92,9 +116,9 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
         0.0 if pose.head_orientation.pitch == "neutral" else 10.0
     )
     for side in ("left", "right"):
-        angles[f"{side}_shoulder_flex"] = 12.0
-        angles[f"{side}_shoulder_abduction"] = 12.0
-        angles[f"{side}_elbow_flex"] = 12.0
+        angles[f"{side}_shoulder_flex"] = 0.0
+        angles[f"{side}_shoulder_abduction"] = 6.0
+        angles[f"{side}_elbow_flex"] = 5.0
     if pose.legs in {"left_foot_forward", "right_foot_forward"}:
         front = "left" if pose.legs == "left_foot_forward" else "right"
         back = "right" if front == "left" else "left"
@@ -104,17 +128,17 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
         angles[f"{back}_ankle_flex"] = 15.0
     elif pose.legs in {"left_foot_on_step", "right_foot_on_step"}:
         side = "left" if pose.legs == "left_foot_on_step" else "right"
-        angles[f"{side}_hip_flex"] = 75.0
-        angles[f"{side}_knee_flex"] = 110.0
-        angles[f"{side}_ankle_flex"] = 35.0
+        angles[f"{side}_hip_flex"] = 90.0
+        angles[f"{side}_knee_flex"] = 115.0
+        angles[f"{side}_ankle_flex"] = 25.0
     elif pose.legs.startswith("seated_"):
         for side in ("left", "right"):
-            angles[f"{side}_hip_flex"] = 80.0
-            angles[f"{side}_knee_flex"] = 80.0
+            angles[f"{side}_hip_flex"] = 90.0
+            angles[f"{side}_knee_flex"] = 90.0
         if pose.legs != "seated_parallel":
             side = "left" if pose.legs == "seated_left_forward" else "right"
-            angles[f"{side}_knee_flex"] = 65.0
-            angles[f"{side}_ankle_flex"] = -15.0
+            angles[f"{side}_knee_flex"] = 70.0
+            angles[f"{side}_ankle_flex"] = -20.0
     elif pose.legs in {"knees_and_toes_on_mat", "left_half_kneel", "right_half_kneel"}:
         knee_flex = math.degrees(math.acos(
             -(0.75 * body.foot_length - body.knee_radius) / body.shin_length
@@ -129,17 +153,30 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
             angles[f"{side}_ankle_flex"] = 0.0
     elif pose.legs == "bent_knees_feet_flat":
         for side in ("left", "right"):
-            angles[f"{side}_hip_flex"] = 125.0
-            angles[f"{side}_hip_abduction"] = 25.0
-            angles[f"{side}_knee_flex"] = 145.0
-            angles[f"{side}_ankle_flex"] = 20.0
-    elif pose.legs == "crossed_on_mat":
-        for side in ("left", "right"):
-            angles[f"{side}_hip_flex"] = 95.0
-            angles[f"{side}_hip_abduction"] = 45.0
-            angles[f"{side}_hip_yaw"] = 35.0
+            heading = 40.0 if side == "left" else -40.0
+            orientation = (
+                Rotation.from_euler("z", heading, degrees=True)
+                * Rotation.from_euler("x", 110.0, degrees=True)
+            ).as_euler("XYZ", degrees=True)
+            angles[f"{side}_hip_flex"] = float(orientation[0])
+            angles[f"{side}_hip_abduction"] = float(
+                orientation[1] if side == "left" else -orientation[1]
+            )
+            angles[f"{side}_hip_yaw"] = float(orientation[2])
             angles[f"{side}_knee_flex"] = 130.0
-            angles[f"{side}_ankle_flex"] = -15.0
+            angles[f"{side}_ankle_flex"] = 20.0
+    elif pose.legs == "floor_seated_bent_knees":
+        shin_angle = math.degrees(math.acos(
+            (
+                body.pelvis_half_height
+                - body.thigh_length * math.cos(math.radians(125.0))
+                - body.foot_thickness
+            ) / body.shin_length
+        ))
+        for side in ("left", "right"):
+            angles[f"{side}_hip_flex"] = 125.0
+            angles[f"{side}_knee_flex"] = 125.0 - shin_angle
+            angles[f"{side}_ankle_flex"] = -shin_angle
     elif pose.legs == "staggered_bent_knees":
         for side in ("left", "right"):
             flex = 35.0 if side == pose.resting_side else 45.0
@@ -152,10 +189,28 @@ def _initial_actor(pose: NeutralPose, body: BodySpec) -> ActorPose:
             angles[f"{side}_shoulder_abduction"] = 15.0
             angles[f"{side}_elbow_flex"] = 35.0
         elif hand == "on_mat_forward":
-            angles[f"{side}_shoulder_flex"] = 85.0
+            incline = math.degrees(math.asin(
+                (
+                    body.shoulder_radius
+                    + body.upper_arm_length * math.sin(math.radians(15))
+                    - body.hand_thickness / 2
+                ) / body.forearm_length
+            ))
+            angles[f"{side}_shoulder_flex"] = 90.0
+            angles[f"{side}_shoulder_abduction"] = -15.0
+            angles[f"{side}_shoulder_rotation"] = -90.0 if side == "left" else 90.0
+            angles[f"{side}_elbow_flex"] = 15.0 + incline
+            angles[f"{side}_wrist_flex"] = -incline
+        elif hand == "across_forearm":
+            angles[f"{side}_shoulder_flex"] = 55.0
+            angles[f"{side}_shoulder_abduction"] = -25.0
+            angles[f"{side}_shoulder_rotation"] = 70.0 if side == "left" else -70.0
+            angles[f"{side}_elbow_flex"] = 70.0
+        elif hand == "relaxed_in_front":
+            angles[f"{side}_shoulder_flex"] = 15.0
             angles[f"{side}_shoulder_abduction"] = 0.0
             angles[f"{side}_elbow_flex"] = 50.0
-        elif hand in {"on_knee", "on_lap", "across_forearm", "on_table", "on_floor"}:
+        elif hand in {"on_knee", "on_lap", "on_table", "on_floor"}:
             angles[f"{side}_shoulder_flex"] = 35.0
             angles[f"{side}_shoulder_abduction"] = 20.0
             angles[f"{side}_elbow_flex"] = 55.0
@@ -175,6 +230,7 @@ def _support_anchor(
     names = {
         "left_foot": "left_sole", "right_foot": "right_sole",
         "left_hand": "left_palm", "right_hand": "right_palm",
+        "left_knee": "left_knee_ground", "right_knee": "right_knee_ground",
         "pelvis": "seat", "upper_back": "back",
     }
     if body_part == "head":
@@ -186,11 +242,11 @@ def _ground_actor(pose: NeutralPose, actor: ActorPose) -> ActorPose:
     skeleton = forward_kinematics(actor)
     if pose.body_level == "lying":
         base = skeleton.anchors[f"{pose.resting_side}_side"].position[2] - _MAT_TOP
-    elif pose.legs == "crossed_on_mat":
+    elif pose.legs == "floor_seated_bent_knees":
         base = skeleton.anchors["seat"].position[2] - _MAT_TOP
     elif pose.body_level == "kneeling":
         side = "right" if pose.legs == "right_half_kneel" else "left"
-        base = skeleton.anchors[f"{side}_knee"].position[2] - _MAT_TOP
+        base = skeleton.anchors[f"{side}_knee_ground"].position[2] - _MAT_TOP
     else:
         ground_feet = [
             _support_anchor(c.body_part, pose.resting_side)
@@ -307,7 +363,7 @@ def _environment(
         if height <= 0:
             raise ValueError("lying head leaves no positive headrest clearance")
         objects.append(_box("headrest", (head[0], head[1], _MAT_TOP + height / 2), (
-            0.3 * scale, 0.32 * scale, height,
+            2.2 * actor.body.head_radius, 2.2 * actor.body.head_radius, height,
         )))
         faces["headrest"] = "top"
     return tuple(objects), faces
@@ -331,7 +387,14 @@ def _arm_targets(
         elif placement == "on_lap":
             target_anchor = f"{side}_lap"
         elif placement == "across_forearm":
-            target_anchor = f"{'right' if side == 'left' else 'left'}_forearm"
+            opposite = "right" if side == "left" else "left"
+            other_hand = pose.right_hand if side == "left" else pose.left_hand
+            suffix = (
+                "forearm_back"
+                if other_hand in {"on_lap", "on_knee", "on_mat_forward"}
+                else "forearm"
+            )
+            target_anchor = f"{opposite}_{suffix}"
         if target_anchor is not None:
             target = skeleton.anchors[target_anchor]
             targets.append(AnchorTarget(
@@ -358,21 +421,38 @@ def _arm_targets(
                 normal=(sign, 0.0, 0.0),
             ))
         elif placement == "on_floor":
-            foot = skeleton.anchors[f"{side}_sole"].position
+            foot_shape = next(
+                shape for shape in skeleton.shapes
+                if shape.shape_id == skeleton.anchors[f"{side}_sole"].shape_id
+            )
+            rotation = Rotation.from_euler(
+                "xyz", foot_shape.rotation, degrees=True
+            ).as_matrix()
+            foot_front = foot_shape.center[1] + float(
+                np.abs(rotation[1]) @ (np.asarray(foot_shape.size) / 2)
+            )
+            hand_clearance = math.hypot(
+                actor.body.hand_length / 2, actor.body.hand_width / 2
+            ) + 0.02 * scale
             targets.append(AnchorTarget(
                 anchor=anchor,
-                position=(sign * 0.38 * scale, foot[1] + 0.15 * scale, 0.0),
+                position=(sign * 0.38 * scale, foot_front + hand_clearance, 0.0),
                 normal=(0.0, 0.0, -1.0),
             ))
         elif placement == "on_mat_forward":
             shoulder = skeleton.joints[f"{side}_shoulder"]
-            headward = -1.0 if pose.resting_side == "left" else 1.0
+            incline = getattr(actor.angles, f"{side}_elbow_flex") - 15.0
+            reach = (
+                actor.body.upper_arm_length * math.cos(math.radians(15))
+                + actor.body.forearm_length * math.cos(math.radians(incline))
+                + actor.body.hand_length / 2
+            )
             targets.append(AnchorTarget(
                 anchor=anchor,
-                position=(shoulder[0] + headward * 0.18 * scale,
-                          shoulder[1] + 0.35 * scale, _MAT_TOP),
+                position=(shoulder[0], shoulder[1] + reach, _MAT_TOP),
                 normal=(0.0, 0.0, -1.0),
             ))
+            continue
         elif placement == "on_seat":
             seat = boxes["chair_seat"]
             targets.append(AnchorTarget(
@@ -419,24 +499,12 @@ def _rotate_scene(scene: Scene, yaw: float) -> Scene:
     )
 
 
-@lru_cache(maxsize=256)
-def _canonical_geometry(
-    pose: NeutralPose, body_scale: float,
-) -> tuple[Scene, ValidationReport]:
-    body = BodySpec().scaled(body_scale)
-    actor = _ground_actor(pose, _initial_actor(pose, body))
-    objects, faces = _environment(pose, actor)
-    targets, body_contacts, variables = _arm_targets(pose, actor, objects)
-    if targets:
-        actor = solve_actor(
-            actor, targets, variable_names=variables, max_nfev=240,
-        ).actor
-        # A forearm target can move when its own hand is also positioned.
-        targets, body_contacts, variables = _arm_targets(pose, actor, objects)
-        actor = solve_actor(
-            actor, targets, variable_names=variables, max_nfev=160,
-        ).actor
-    scene = _rotate_scene(Scene(
+def _scene_for_actor(
+    pose: NeutralPose, actor: ActorPose,
+    objects: tuple[Box, ...], faces: dict[str, str],
+) -> Scene:
+    _, body_contacts, _ = _arm_targets(pose, actor, objects)
+    return Scene(
         actors=(actor,), objects=objects, body_contacts=body_contacts,
         contacts=tuple(
             Contact(
@@ -446,8 +514,94 @@ def _canonical_geometry(
             )
             for contact in pose.supports
         ),
-    ), _YAW[pose.pelvis_facing])
-    report = validate_scene(scene)
+    )
+
+
+def _report_score(report: ValidationReport) -> tuple[int, int, float]:
+    return (
+        sum(issue.code in {"self_collision", "object_collision", "actor_collision"}
+            for issue in report.issues),
+        len(report.issues),
+        sum(abs(issue.error_m or 0.0) for issue in report.issues),
+    )
+
+
+def _fit_arms(
+    pose: NeutralPose, actor: ActorPose,
+    objects: tuple[Box, ...], faces: dict[str, str],
+) -> ActorPose:
+    beam = [actor]
+    sides: tuple[Literal["left", "right"], ...] = (
+        ("right", "left") if pose.left_hand == "across_forearm" else ("left", "right")
+    )
+    for side in sides:
+        placement = pose.left_hand if side == "left" else pose.right_hand
+        if placement in {
+            "at_side", "relaxed_in_front", "forward_gesture", "on_mat_forward"
+        }:
+            continue
+        ranked: list[tuple[tuple[int, int, float], ActorPose]] = []
+        for current in beam:
+            targets, _, variables = _arm_targets(pose, current, objects)
+            target = next(item for item in targets if item.anchor == f"{side}_palm")
+            candidates = arm_seed_candidates(current, side, target, max_candidates=16)
+            if not candidates:
+                fitted = solve_actor(
+                    current, (target,),
+                    variable_names=tuple(n for n in variables if n.startswith(side)),
+                    max_nfev=100,
+                )
+                candidates = (fitted.actor,)
+            for candidate in candidates:
+                report = validate_scene(
+                    _scene_for_actor(pose, candidate, objects, faces)
+                )
+                if report.passed:
+                    return candidate
+                ranked.append((_report_score(report), candidate))
+        ranked.sort(key=lambda item: item[0])
+        beam = [item[1] for item in ranked[:_ARM_BEAM_WIDTH]]
+    return min(
+        beam,
+        key=lambda candidate: _report_score(
+            validate_scene(_scene_for_actor(pose, candidate, objects, faces))
+        ),
+    )
+
+
+@lru_cache(maxsize=256)
+def _canonical_geometry(
+    pose: NeutralPose, body_scale: float,
+) -> tuple[Scene, ValidationReport]:
+    if body_scale != 1.0:
+        reference, _ = _canonical_geometry(pose, 1.0)
+        scaled = Scene(
+            actors=tuple(
+                _replace_actor(
+                    actor, body=actor.body.scaled(body_scale),
+                    root_position=tuple(v * body_scale for v in actor.root_position),
+                )
+                for actor in reference.actors
+            ),
+            objects=tuple(
+                Box(
+                    object_id=box.object_id,
+                    center=tuple(v * body_scale for v in box.center),
+                    size=tuple(v * body_scale for v in box.size), rotation=box.rotation,
+                )
+                for box in reference.objects
+            ),
+            contacts=reference.contacts, body_contacts=reference.body_contacts,
+        )
+        return scaled, reference_geometry_report(scaled)
+    body = BodySpec().scaled(body_scale)
+    actor = _ground_actor(pose, _initial_actor(pose, body))
+    objects, faces = _environment(pose, actor)
+    actor = _fit_arms(pose, actor, objects, faces)
+    scene = _rotate_scene(
+        _scene_for_actor(pose, actor, objects, faces), _YAW[pose.pelvis_facing]
+    )
+    report = reference_geometry_report(scene)
     return scene, report
 
 

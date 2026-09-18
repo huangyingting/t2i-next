@@ -57,10 +57,7 @@ def _compile(
         for path in _selected_paths(system_directory, stage, request)
         for rule in _read_rule_file(path)
     ]
-    stage_authoring = (
-        authoring.themes if stage == StoryStage.THEMES else authoring.frames
-    )
-    rules.extend(stage_authoring.selected(request.content_level))
+    rules.extend(authoring.selected(stage, request.content_level))
     rules.append(_output_language_rule(request))
     return tuple(rules)
 

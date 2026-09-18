@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.errors import StoryConfigurationError
 from t2i_story_pipeline.inputs import (
     CatalogDocument,
@@ -22,20 +23,31 @@ RECIPES = REPOSITORY_ROOT / "story-inputs" / "recipes"
 POLICIES = REPOSITORY_ROOT / "src" / "t2i_story_pipeline" / "rule_packs" / "policies"
 
 
+def authoring_prose(authoring: StoryAuthoring) -> Iterator[tuple[str, str]]:
+    for level, rules in authoring.content_levels.items():
+        for index, rule in enumerate(rules):
+            yield f"authoring.content_levels.{level.value}[{index}]", rule
+    for stage in StoryStage:
+        authored = getattr(authoring, stage.value)
+        for index, rule in enumerate(authored.common):
+            yield f"authoring.{stage.value}.common[{index}]", rule
+        for level, rules in authored.content_levels.items():
+            for index, rule in enumerate(rules):
+                yield (
+                    f"authoring.{stage.value}.content_levels.{level.value}[{index}]",
+                    rule,
+                )
+
+
 def story_contract(document: StoryDocument) -> str:
     """Inspect creative requirements without pretending all levels reach the model."""
     sections = [document.description]
-    for stage in (document.authoring.themes, document.authoring.frames):
-        sections.extend(stage.common)
-        for rules in stage.content_levels.values():
-            sections.extend(rules)
+    sections.extend(rule for _, rule in authoring_prose(document.authoring))
     resolved = resolve_story_input(document)
     for source in resolved.sources:
         if source.kind == "module":
-            for stage in json.loads(source.content)["authoring"].values():
-                sections.extend(stage["common"])
-                for rules in stage["content_levels"].values():
-                    sections.extend(rules)
+            module = ModuleDocument.model_validate_json(source.content)
+            sections.extend(rule for _, rule in authoring_prose(module.authoring))
         elif source.kind == "catalog":
             for entry in json.loads(source.content)["entries"]:
                 sections.extend(entry["themes"])
@@ -47,10 +59,36 @@ def story_contract(document: StoryDocument) -> str:
 
 
 def authoring_pool(document, label, *, stage=StoryStage.THEMES):
-    authored = getattr(document.authoring, stage.value)
-    rules = (*authored.common, *authored.content_levels.get(ContentLevel.HARDCORE, ()))
+    rules = document.authoring.selected(stage, ContentLevel.HARDCORE)
     prefix = f"{label}: - "
     return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
+
+
+def assert_packaged_grade_contract(document: StoryDocument, level: ContentLevel):
+    required = {
+        ContentLevel.AESTHETIC: (
+            "本级以形体美、光影和构图为主视觉",
+            "不得描写自慰、口交、插入或明确性行为",
+        ),
+        ContentLevel.EROTIC: (
+            "当前画面直接呈现裸露、挑逗和非露骨亲密互动",
+            "全裸、亲吻、抚触、跨坐和肢体交叠",
+            "不得以日常互动、构图暗示、气氛或“即将发生”替代",
+            "不出现性器官特写、插入或口部性行为、自慰",
+        ),
+        ContentLevel.HARDCORE: (
+            "当前画面直接、清晰地呈现角色之间的明确性行为",
+            "不能用拥抱、亲吻、挑逗、气氛或即将发生的动作替代明确行为",
+            "器具、束缚或痛感强度本身不能把画面升级",
+        ),
+    }
+    resolved = resolve_story_input(document, InputOverrides(content_level=level))
+    base = resolve_story_rules(resolved.request)
+    for stage in StoryStage:
+        assert all(clause in base.text_for(stage) for clause in required[level])
+        assert set(getattr(base, stage.value)) <= set(
+            getattr(resolved.rules, stage.value)
+        )
 
 
 def bundled_authoring_prose(path: Path) -> Iterator[tuple[str, str]]:
@@ -78,16 +116,7 @@ def bundled_authoring_prose(path: Path) -> Iterator[tuple[str, str]]:
         document = StoryDocument.model_validate(data)
         yield "description", document.description
         authoring = document.authoring
-    for stage in StoryStage:
-        authored = getattr(authoring, stage.value)
-        for index, rule in enumerate(authored.common):
-            yield f"authoring.{stage.value}.common[{index}]", rule
-        for level, rules in authored.content_levels.items():
-            for index, rule in enumerate(rules):
-                yield (
-                    f"authoring.{stage.value}.content_levels.{level.value}[{index}]",
-                    rule,
-                )
+    yield from authoring_prose(authoring)
 
 
 def untranslated_authoring(prose: str) -> list[str]:
@@ -107,6 +136,109 @@ def untranslated_authoring(prose: str) -> list[str]:
     )
     problems.extend(f"untranslated English prose: {run}" for run in english_runs)
     return problems
+
+
+@pytest.fixture
+def shared_authoring_document(tmp_path):
+    modules = tmp_path / "_modules"
+    modules.mkdir()
+    module_path = modules / "neutral-layout.yaml"
+    module_path.write_text(
+        yaml.safe_dump(
+            {
+                "id": "neutral-layout",
+                "kind": "layout_multiview",
+                "authoring": {
+                    "content_levels": {
+                        "aesthetic": ["模块共享的柔和纹理。"],
+                        "hardcore": ["模块未选中的强烈纹理。"],
+                    },
+                    "themes": {"common": ["模块主题布局说明。"]},
+                    "frames": {"common": ["模块画面布局说明。"]},
+                },
+            },
+            allow_unicode=True,
+        ),
+        encoding="utf-8",
+    )
+    document_path = tmp_path / "neutral.yaml"
+    document_path.write_text(
+        yaml.safe_dump(
+            {
+                "id": "neutral",
+                "description": "中性的候选场景。",
+                "modules": [
+                    {
+                        "id": "neutral-layout",
+                        "parameters": {"layout": "grid", "rows": 1, "columns": 2},
+                    }
+                ],
+                "authoring": {
+                    "content_levels": {
+                        "aesthetic": ["候选池: - 未选中的唯美候选"],
+                        "hardcore": ["候选池: - 两阶段共享候选"],
+                    },
+                    **{
+                        stage: {
+                            "common": [f"候选池: - {label}通用候选"],
+                            "content_levels": {
+                                "hardcore": [f"候选池: - {label}独有候选"]
+                            },
+                        }
+                        for stage, label in (("themes", "主题"), ("frames", "画面"))
+                    },
+                },
+            },
+            allow_unicode=True,
+        ),
+        encoding="utf-8",
+    )
+    return load_story_document(document_path), document_path, module_path
+
+
+def test_source_conservation_reads_shared_recipe_and_module_rules(
+    shared_authoring_document,
+):
+    document, document_path, module_path = shared_authoring_document
+    contract = story_contract(document)
+    resolved = resolve_story_input(document)
+    for path in (document_path, module_path):
+        fields = dict(bundled_authoring_prose(path))
+        assert "authoring.content_levels.aesthetic[0]" in fields
+        assert "authoring.content_levels.hardcore[0]" in fields
+        assert all(prose in contract for prose in fields.values())
+        assert all(not untranslated_authoring(prose) for prose in fields.values())
+        for stage in StoryStage:
+            compiled = resolved.rules.text_for(stage)
+            assert fields["authoring.content_levels.aesthetic[0]"] in compiled
+            assert fields["authoring.content_levels.hardcore[0]"] not in compiled
+
+
+@pytest.mark.parametrize(
+    ("stage", "label"), ((StoryStage.THEMES, "主题"), (StoryStage.FRAMES, "画面"))
+)
+def test_authoring_pool_reads_shared_and_stage_specific_candidates(
+    shared_authoring_document, stage, label
+):
+    document, _, _ = shared_authoring_document
+    assert authoring_pool(document, "候选池", stage=stage) == [
+        f"{label}通用候选", "两阶段共享候选", f"{label}独有候选"
+    ]
+
+
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+def test_chinese_guard_does_not_skip_shared_level_rules(level):
+    authoring = StoryAuthoring.model_validate(
+        {
+            "content_levels": {level: ["Untranslated shared instruction."]},
+            "themes": {"common": ["中文的主题说明。"]},
+            "frames": {"common": ["中文的画面说明。"]},
+        }
+    )
+    fields = dict(authoring_prose(authoring))
+    assert untranslated_authoring(
+        fields[f"authoring.content_levels.{level.value}[0]"]
+    ) == ["natural-language instruction contains no Chinese"]
 
 
 @pytest.mark.parametrize(
@@ -192,14 +324,22 @@ def test_recipe_compilation_selects_only_each_stages_active_level(path):
     document = load_story_document(path)
     for level in document.requirements.content_levels or tuple(ContentLevel):
         resolved = resolve_story_input(document, InputOverrides(content_level=level))
+        base = resolve_story_rules(resolved.request)
         for stage in StoryStage:
             authored = getattr(document.authoring, stage.value)
             compiled = resolved.rules.text_for(stage)
-            selected = authored.selected(level)
+            selected = document.authoring.selected(stage, level)
+            assert set(getattr(base, stage.value)) <= set(
+                getattr(resolved.rules, stage.value)
+            )
             assert all(rule in compiled for rule in selected)
             excluded = {
                 rule
-                for other, rules in authored.content_levels.items()
+                for levels in (
+                    document.authoring.content_levels,
+                    authored.content_levels,
+                )
+                for other, rules in levels.items()
                 if other != level
                 for rule in rules
             } - set(selected)
@@ -320,7 +460,7 @@ def test_motion_blur_partitions_removal_and_active_action_rules(stage, level):
     assert "绝不暗示不可见的投掷、画外释放者" in rules
 
     active_removal = "腾空衣物必须可见地推进当前脱衣"
-    explicit_action = "内容等级：在 hardcore 等级中，展示一个明确无误"
+    explicit_action = "当前画面直接、清晰地呈现角色之间的明确性行为"
     final_release = "照片中的运动只能是最终的手部释放"
     already_cleared = "在接触开始前就已经完全脱离双腿"
     if level == ContentLevel.HARDCORE:
@@ -416,6 +556,7 @@ def test_bilingual_recipes_keep_word_and_ascii_checks_english_only(
 
 def test_lifestyle_story_is_social_photography_not_ui() -> None:
     document = load_story_document(RECIPES / "lifestyle-story.yaml")
+    assert_packaged_grade_contract(document, ContentLevel.HARDCORE)
     brief = story_contract(document)
     normalized = " ".join(brief.split())
     required = (
@@ -451,8 +592,6 @@ def test_lifestyle_story_is_social_photography_not_ui() -> None:
         "避免横跨身体的前景肢体、脚侧极低角度",
         "应简化姿势或移动相机",
         "加入细小的生活痕迹",
-        "每个 露骨级 画面 都必须包含明确无误且已经进行中的露骨成年人行为",
-        "触碰大腿内侧",
         "当人物配置为一位女性和零位男性时，展示已经进行中的独自自慰",
         "直接刺激她的外生殖器",
         "不得添加伴侣、协助的手、嘴、倒影中的人物",
@@ -1213,8 +1352,7 @@ def test_rebuilt_inputs_have_explicit_stage_and_level_contracts() -> None:
             )
             assert resolved.request.content_level == level
             for stage in StoryStage:
-                authored = getattr(document.authoring, stage.value)
-                for rule in authored.selected(level):
+                for rule in document.authoring.selected(stage, level):
                     assert rule in resolved.rules.text_for(stage)
 
 
@@ -1889,7 +2027,9 @@ female_count 和 male_count 只约束从正常人类世界来到巨人国的成�
 除一个明确命名的局部接触面外
 禁止整名访客横跨、趴伏或贴伏在巨人的胸部、腹部、阴阜、骨盆或大腿表面
 全部访客位于同一个 微型访客互动台 的独立编号工位
-“Erotic” 只允许 标志性机制 的单一软垫末端、气流、水流或织物到达接触点
+当且仅当 request.content_level 为 “erotic”：选择一种明确非插入式亲密行为
+单一软垫末端、气流、水流或织物到达接触点
+访客身体不得直接接触
 “Hardcore” 允许被明确分配的访客嘴、一只手或单一玩具直接到达同一目标器官
 禁止 “visitor against giant torso”
 禁止 “full-body direct contact”、“body-weight contact”
@@ -1928,7 +2068,8 @@ female_count 和 male_count 只约束从正常人类世界来到巨人国的成�
 当且仅当 request.content_level 为 “erotic”：选择一种明确非插入式亲密行为
 当且仅当 request.content_level 为 “hardcore”：选择口交、手交、玩具插入
 至少一名访客以 嘴、一只手 或 一个玩具 已接触目标
-其他人负责承重、衣物牵引、定位、润滑、节奏、观察或承接
+其他人负责承重、衣物牵引、定位与高度角度调整
+润滑、节奏、安全吊带、观察或流体承接
 直接参与者不操作控制器
 不得旁观、另开动作或重复占据同一解剖位置
 “Hardcore” 每帧最多一种主要体液，显示唯一 来源、轨迹、表面 和 落点
@@ -2249,16 +2390,16 @@ def test_dress_board_region_names_are_layout_only() -> None:
         "区域名称仅作为内部版式参考",
         "将强度尺度的起点设为明显性感但不露骨的时尚",
         "要求一名女性、零名男性",
-        "允许零至一件视觉克制、对身体安全的成人产品",
+        "允许零至一件视觉克制、对身体安全的成人产品，限外部产品",
         "具有明确成人属性的产品与穿戴物时尚体系",
         "包含一至三件设计明确、对身体安全的成人产品",
         "发型、服装设计、穿搭造型和可见面部表情",
         "绝不能只靠明亮灯光",
         "后续选择绝不能削弱前面的要求",
         "有限高彩度配色",
-        "“BDSM”器具与服装设计板",
+        "具有完整、协调的“BDSM”器具体系的服装设计板",
         "总共包含三至六个“BDSM”专属设计元素",
-        "至少包含两件外部可穿戴部件",
+        "至少两件外部可穿戴器具",
         "不承重、低压力，并具有可见的释放方式",
         "即使缩成缩略图仍然强烈",
         "至少使用以下三个对比维度",
@@ -2290,7 +2431,7 @@ def test_dress_board_region_names_are_layout_only() -> None:
         "嵌有宝石的硅胶肛塞",
         "按大小渐变的肛珠",
         "带纹理的自慰套",
-        "除“BDSM”器具体系之外，使用一至三件性玩具",
+        "除三至六件“BDSM”物品外，再从精选性玩具产品类别中加入一至三件",
         "夹在乳头上",
         "夹在蕾丝",
         "不得称为乳夹",
@@ -2322,16 +2463,16 @@ def test_dress_board_region_names_are_layout_only() -> None:
         "主题标题恰好出现一次，六个区域标签各出现一次",
     ):
         assert excluded not in normalized, excluded
-    assert dress.authoring.themes.content_levels[ContentLevel.AESTHETIC]
-    assert dress.authoring.themes.content_levels[ContentLevel.HARDCORE]
+    for level in (ContentLevel.AESTHETIC, ContentLevel.HARDCORE):
+        assert (
+            dress.authoring.content_levels.get(level)
+            or dress.authoring.themes.content_levels.get(level)
+        )
     layout = next(module for module in dress.modules if module.id == "layout-multiview")
     assert layout.parameters == {"layout": "grid", "min_views": 6, "max_views": 6}
 
     def pool(label):
-        rules = (
-            *dress.authoring.themes.common,
-            *dress.authoring.themes.content_levels[ContentLevel.HARDCORE],
-        )
+        rules = dress.authoring.selected(StoryStage.THEMES, ContentLevel.HARDCORE)
         prefix = f"{label}：- "
         return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
 
@@ -3013,25 +3154,30 @@ def test_creative_brief_uses_open_ended_high_concept_ideation() -> None:
 
 def test_edo_warai_e_brief_respects_all_content_levels() -> None:
     document = load_story_document(RECIPES / "edo-warai-e.yaml")
+    for level in ContentLevel:
+        assert_packaged_grade_contract(document, level)
     brief = story_contract(document)
     normalized = " ".join(brief.split())
 
-    assert document.authoring.frames.content_levels
-    assert "aesthetic：让每位成年人完整穿着多层时代服饰" in normalized
-    assert "呈现毫不含糊的成年性感" in normalized
-    assert "明确色情但非露骨的互动" in normalized
-    assert "hardcore：在每个主题与画面中呈现已经发生的露骨、自愿成年性行为" in normalized
+    assert (
+        document.authoring.content_levels
+        or document.authoring.frames.content_levels
+    )
+    assert "在 aesthetic 等级，让每位成年人完整穿着多层时代服饰" in normalized
     assert "不得用屏风、扇子、被褥、衣袖、家具、策略性裁切、遥远剪影或喜剧插曲隐藏定义性内容" in normalized
     assert "在 erotic 等级，衣袍可以敞开" in normalized
     assert "在 hardcore 等级，成年人可部分或完全裸体" in normalized
     assert "直接确立所要求内容等级的身体遮盖、衣物状态、当前互动" in normalized
     assert "每个画面开头即须使所选等级的定义性状态已经可见" in normalized
     assert "在每个画面中保留主题的露骨行为" in normalized
-    aesthetic = document.authoring.frames.content_levels[ContentLevel.AESTHETIC]
+    aesthetic = document.authoring.selected(
+        StoryStage.FRAMES, ContentLevel.AESTHETIC
+    )
     for level in (ContentLevel.EROTIC, ContentLevel.HARDCORE):
         resolved = resolve_story_input(document, InputOverrides(content_level=level))
         frames = resolved.rules.text_for(StoryStage.FRAMES)
-        assert all(rule not in frames for rule in aesthetic)
+        selected = document.authoring.selected(StoryStage.FRAMES, level)
+        assert all(rule not in frames for rule in aesthetic if rule not in selected)
 
 
 def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
@@ -3070,7 +3216,7 @@ def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
         "仅返回正面描述所描绘场景的正文",
         "默默执行所有规则",
         "每个词都必须属于图像生成描述",
-        "直接说出正在发生的行为",
+        "通过说出行为而非受限解剖词保持视觉明确",
         "普鲁士蓝仅限于 1820 年代及之后的场景",
         "不得添加技术拍摄规格",
         "光学景深模糊",
@@ -3099,7 +3245,7 @@ def test_edo_warai_e_requires_live_action_ukiyo_e_evidence() -> None:
         (ContentLevel.HARDCORE, "The current explicit consensual adult sexual act is"),
     ):
         assert f"“{literal}”" in "\n".join(
-            document.authoring.frames.content_levels[level]
+            document.authoring.selected(StoryStage.FRAMES, level)
         )
     for conflict in (
         "一个可解的三维布局",
@@ -3196,7 +3342,7 @@ def test_ming_gongbi_mixi_tu_owns_historical_painting_contract() -> None:
         'mature adult faces defined by fine line."'
     ) in normalized
     assert '"The current explicit consensual adult sexual act is"' in "\n".join(
-        document.authoring.frames.content_levels[ContentLevel.HARDCORE]
+        document.authoring.selected(StoryStage.FRAMES, ContentLevel.HARDCORE)
     )
     assert "熟绢或施胶宣纸" not in normalized
     frame_contract = "\n".join(document.authoring.frames.common)
@@ -3272,8 +3418,7 @@ def test_pose_brief_selects_a_varied_text_free_six_pose_group() -> None:
     assert layout.parameters == {"layout": "grid", "min_views": 6, "max_views": 6}
 
     def pool(label, *, stage=StoryStage.THEMES):
-        authored = getattr(document.authoring, stage.value)
-        rules = (*authored.common, *authored.content_levels[ContentLevel.HARDCORE])
+        rules = document.authoring.selected(stage, ContentLevel.HARDCORE)
         prefix = f"{label}：- "
         return [rule.removeprefix(prefix) for rule in rules if rule.startswith(prefix)]
 
@@ -3524,6 +3669,7 @@ def test_near_future_plans_preserve_world_seed_and_action_cycles() -> None:
 
 def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
     document = load_story_document(RECIPES / "near-future-intimacy-realism.yaml")
+    assert_packaged_grade_contract(document, ContentLevel.HARDCORE)
     brief = story_contract(document)
     normalized = " ".join(brief.split())
     assert len(brief) < 54_000
@@ -3595,7 +3741,6 @@ def test_near_future_intimacy_uses_compact_conditional_contract() -> None:
         "一至三件个人配饰",
         "裸体不取消造型要求",
         "脱下衣物的精确位置",
-        "一个清楚可见且正在进行的明确性动作",
         "独自自慰、伴侣引导的自慰、双方各自自慰",
         "双方同意的 BDSM",
         "本规则覆盖下文所有场景种子、技术类别、模块",
@@ -3972,6 +4117,8 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
     from t2i_story_pipeline.models import AsciiCheck, WordCountCheck
 
     document = load_story_document(RECIPES / "demon-lord.yaml")
+    for level in ContentLevel:
+        assert_packaged_grade_contract(document, level)
     normalized = " ".join(story_contract(document).split())
     assert document.policy == "standard-story"
     assert document.generation.output_language == "chinese"
@@ -4098,9 +4245,6 @@ def test_demon_lord_brief_has_gendered_sovereign_dark_fantasy_contract() -> None
         "电影青橙调色",
         "避免平板灰雾、仅有混浊中间调的表现",
         "每条可见肢体都通过自然关节连续连接",
-        "在 审美级 级别，每个人始终被不透明成人衣物完全遮盖",
-        "不呈现插入、露骨口部与生殖器接触",
-        "一项清晰可见、已在进行的自愿成年人性行为",
         "单人阵容使用可见的成年人自慰",
         "多位成年人时，保持精确阵容可见",
         "普通成年类人性解剖结构",
@@ -4509,6 +4653,8 @@ def _legacy_motion_blur_photography_contract() -> None:
 
 def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
     document = load_story_document(RECIPES / "motion-blur-photography.yaml")
+    for level in (ContentLevel.EROTIC, ContentLevel.HARDCORE):
+        assert_packaged_grade_contract(document, level)
     normalized = " ".join(story_contract(document).split())
     assert document.generation.output_language == "english"
     assert set(document.requirements.output_languages) == {"english"}
@@ -4682,16 +4828,7 @@ def test_motion_blur_photography_locks_cast_and_physical_motion() -> None:
         "北京或任何其他指定城市中正常营业的公共场所",
         "封闭、出入受控的制作",
         "以可见动作边界区分 erotic 与 hardcore",
-        "全裸也可以属于 erotic",
-        "部分着装也可以属于 hardcore",
-        "让成年人的性张力明确且强烈",
-        "erotic 可使用连贯的挑逗性服装、局部裸体或全裸",
-        "边界是所描绘的动作，而非衣物覆盖程度",
         'hardcore 只使用 "FLASH-FROZEN ACTION PEAK" 或 "STILL ANCHOR, MOVING WORLD"',
-        "已经进行中的露骨行为是强制要求",
-        "不构成 hardcore",
-        "为未来行为脱衣、准备接触通道、靠近身体部位",
-        "必须描绘此刻的露骨接触，而非仅作承诺",
         "hardcore 等级不强制服装配额或默认服装",
         "完全根据场景和当前行为选择全裸、部分着装或正在脱衣",
         "不要为弱化 hardcore 内容或将其与 erotic 内容区分而添加衣物",

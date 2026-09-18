@@ -251,8 +251,8 @@ def _source(
         id=value.id or "direct-story",
         path=str(path) if path is not None else None,
         content=value.model_dump_json(),
-        themes=authoring.themes.selected(request.content_level),
-        frames=authoring.frames.selected(request.content_level),
+        themes=authoring.selected(StoryStage.THEMES, request.content_level),
+        frames=authoring.selected(StoryStage.FRAMES, request.content_level),
         requirements=getattr(value, "requirements", None),
     )
 

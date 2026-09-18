@@ -31,6 +31,11 @@ from t2i_spatial_pipeline.pose_reference import (
     structural_distance,
 )
 from t2i_spatial_pipeline.pose_reference_catalog import build_neutral_pose_library
+from t2i_spatial_pipeline.pose_reference_geometry import (
+    compile_reference_geometry,
+    reference_geometry_report,
+    reference_joint_positions,
+)
 from t2i_spatial_pipeline.pose_reference_presentation import (
     presentation_accepts_camera,
     presentation_supports,
@@ -80,9 +85,12 @@ def test_every_pose_compiles_all_declared_geometry(pose_id: str) -> None:
             ) and presentation_accepts_camera(item, camera)
         )
         prompt = render_pose_reference(pose, camera, subject, presentation)
+        geometry = compile_reference_geometry(pose, subject, presentation)
         scene = PoseReferenceScene(
             pose=pose, camera=camera, subject=subject,
             presentation=presentation, prompt=prompt,
+            geometry=geometry, geometry_report=reference_geometry_report(geometry),
+            geometry_joints=reference_joint_positions(geometry),
         )
         assert scene.prompt.isascii()
         assert "\n" not in prompt
@@ -98,7 +106,9 @@ def test_every_pose_compiles_all_declared_geometry(pose_id: str) -> None:
             assert value.replace("_", " ") in prompt
         for side, placement in (("left", pose.left_hand), ("right", pose.right_hand)):
             if placement == "on_mat_forward":
-                assert f"The {side} forearm and palm rest on the mat" in prompt
+                assert f"The {side} palm rests on the mat" in prompt
+            elif placement == "relaxed_in_front":
+                assert f"The {side} hand is held loosely" in prompt
             elif placement == "on_knee":
                 assert f"own {side} knee" in prompt
             elif placement == "across_forearm":
@@ -136,7 +146,7 @@ def test_every_pose_compiles_all_declared_geometry(pose_id: str) -> None:
         ),
         (
             "standing_parallel_relaxed",
-            {"legs": "crossed_on_mat"},
+            {"legs": "floor_seated_bent_knees"},
             "leg configuration contradicts body level",
         ),
         (
@@ -510,6 +520,7 @@ def test_reference_modules_have_no_pipeline_or_activity_dependencies() -> None:
         "pose_reference.py", "pose_reference_catalog.py", "pose_reference_cli.py",
         "pose_reference_types.py", "pose_reference_history.py",
         "pose_reference_presentation.py",
+        "pose_reference_geometry.py",
     ):
         tree = ast.parse((package / name).read_text(encoding="utf-8"))
         relative_imports = {
@@ -520,6 +531,7 @@ def test_reference_modules_have_no_pipeline_or_activity_dependencies() -> None:
         assert relative_imports <= {
             "pose_reference", "pose_reference_catalog", "pose_reference_types",
             "pose_reference_history", "pose_reference_presentation",
+            "pose_reference_geometry", "pose_reference_types",
         }
         absolute_imports = {
             node.module.split(".")[0]
@@ -536,6 +548,7 @@ def test_reference_modules_have_no_pipeline_or_activity_dependencies() -> None:
             "__future__", "random", "collections", "itertools", "typing",
             "pydantic", "os", "enum", "pathlib", "typer",
             "hashlib", "json",
+            "t2i_pose_geometry", "numpy", "scipy", "math", "functools", "importlib",
         }
 
 

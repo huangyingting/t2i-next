@@ -6,13 +6,14 @@ from pathlib import Path
 import pytest
 import yaml
 
+from t2i_story_pipeline.authoring_rules import resolve_story_rules
 from t2i_story_pipeline.inputs import (
     InputOverrides,
     StoryDocument,
     load_story_document,
     resolve_story_input,
 )
-from t2i_story_pipeline.models import ContentLevel, NarrativeFrame
+from t2i_story_pipeline.models import ContentLevel, NarrativeFrame, StoryStage
 from t2i_story_pipeline.prompts import (
     frame_messages as compile_frame_messages,
 )
@@ -551,7 +552,8 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "Resolve conditional instructions only from the current request" in prompt
     assert "never borrow a branch assigned to another alternative" in prompt
     assert "Explicit Story Description creative constraints take priority" in prompt
-    assert "cannot override safety, typed requests, runtime settings" in prompt
+    assert "cannot override safety, selected system content-level boundaries" in prompt
+    assert "typed requests, runtime settings, or deterministic input plans" in prompt
     assert "rope art" not in prompt
     assert "do not mix in untranslated foreign prose" in prompt
     assert "parallel visual alternatives" in prompt
@@ -690,6 +692,64 @@ def test_prompts_compile_only_selected_content_level(
         assert "不要把内容等级名称、英文名或合规说明写进生成内容" in prompt
 
 
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(level):
+    document = load_story_document(
+        REPOSITORY_ROOT / "story-inputs" / "recipes" / "avantgarde.yaml"
+    )
+    shared = document.authoring.content_levels
+    assert shared[ContentLevel.HARDCORE]
+    assert all(
+        anchor in " ".join(shared[ContentLevel.HARDCORE])
+        for anchor in ("发型", "服装", "配饰")
+    )
+    resolved = resolve_story_input(
+        document,
+        InputOverrides(
+            content_level=level, frames_per_theme=1, female_count=1, male_count=0
+        ),
+    )
+    base = resolve_story_rules(resolved.request)
+    for stage, messages in (
+        (
+            StoryStage.THEMES,
+            compile_theme_messages(resolved, count=1, existing_themes=[]),
+        ),
+        (
+            StoryStage.FRAMES,
+            compile_frame_messages(
+                resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+            ),
+        ),
+    ):
+        compiled = "\n".join(message.content for message in messages)
+        assert json.loads(messages[1].content)["content_level"] == level.value
+        selected = document.authoring.selected(stage, level)
+        assert all(rule in compiled for rule in getattr(base, stage.value))
+        assert all(rule in compiled for rule in selected)
+        assert all(compiled.count(rule) == 1 for rule in shared.get(level, ()))
+        for other_level in ContentLevel:
+            if other_level != level:
+                assert all(
+                    rule not in compiled
+                    for rule in document.authoring.selected(stage, other_level)
+                    if rule not in selected
+                )
+        other_stage = (
+            StoryStage.FRAMES if stage == StoryStage.THEMES else StoryStage.THEMES
+        )
+        other_duties = set(document.authoring.selected(other_stage, level)) - set(
+            selected
+        )
+        assert other_duties
+        assert all(rule not in compiled for rule in other_duties)
+        if stage == StoryStage.THEMES:
+            for prefix, count in (
+                ("发型灵感：", 65), ("服装灵感：", 156), ("配饰灵感：", 92)
+            ):
+                assert sum(rule.startswith(prefix) for rule in selected) == count
+
+
 @pytest.mark.parametrize(
     ("level", "required_contract"),
     (
@@ -738,10 +798,16 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
 
     assert payload["content_level"] == level.value
     assert required_contract in compiled
-    selected = document.authoring.frames.selected(level)
-    for other, rules in document.authoring.frames.content_levels.items():
-        if other != level:
-            assert all(rule not in compiled for rule in rules if rule not in selected)
+    selected = document.authoring.selected(StoryStage.FRAMES, level)
+    for levels in (
+        document.authoring.content_levels,
+        document.authoring.frames.content_levels,
+    ):
+        for other, rules in levels.items():
+            if other != level:
+                assert all(
+                    rule not in compiled for rule in rules if rule not in selected
+                )
     assert "内容级别可见性锚点" in compiled
     assert "不能满足所选内容级别" in compiled
 

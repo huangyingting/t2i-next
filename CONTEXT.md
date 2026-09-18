@@ -71,7 +71,9 @@ The immutable ordered authoring rules compiled for the Theme and Frame stages
 of one story run. Built-in rules define only stage semantics and universal
 contracts; the named standard-story policy owns project defaults. Explicit modules
 and Story Document authoring rules are selected for the current stage and level,
-before the output-language rule. The resolved set is frozen with the run and
+before the output-language rule. Shared level refinements have one source owner;
+each stage receives its common rules, the shared selected-level refinements, and
+its own selected-level instructions. The resolved set is frozen with the run and
 reused on resume.
 _Avoid_: Story Description, Prompt Generation rules, per-input special case
 
@@ -127,15 +129,25 @@ _Avoid_: Hidden warnings, model score
 The rule that medium, layout, regions, views, scale systems, visual hierarchy,
 and other subject-specific presentation behavior live in the Story Description
 and explicit typed modules rather than filename branches. Descriptions cannot
-override immutable schema, safety, or resolved numeric requirements.
+override immutable schema, safety, selected system content-level boundaries,
+or resolved numeric requirements.
 _Avoid_: Brief-type detection, story-input adapter
 
 **Story Content Level**:
-The requested visible-content floor for every Narrative Frame: `aesthetic`,
-`erotic`, or `hardcore`. It changes authoring instructions, never the adult
-consent safety contract. Only the selected level is compiled into provider
-prompts.
+The system-defined visible-content floor and limits for every Narrative Frame:
+`aesthetic`, `erotic`, or `hardcore`. It changes authoring instructions, never the
+adult consent safety contract. Only the selected level is compiled into provider
+prompts; document or module refinements do not replace its definition.
 _Avoid_: Legacy Content Level, safety mode
+
+**Story Content-Level Refinement**:
+A topic-specific requirement compatible with the selected system level.
+Requirements shared by Theme planning and Frame execution live once in
+`authoring.content_levels`; genuinely different stage tasks stay in that stage's
+`content_levels`. Shared requirements reach both stages directly rather than
+depending on a generated Theme to restate them. Exact duplicate ownership is
+invalid; this structural check is not a natural-language conflict detector.
+_Avoid_: Level override, duplicated grade definition, shared reference-pool dump
 
 **Nationality Default**:
 Chinese nationality assigned independently to each person whose nationality

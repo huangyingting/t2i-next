@@ -17,6 +17,11 @@ from t2i_spatial_pipeline.pose_reference import (
     sample_pose_references,
 )
 from t2i_spatial_pipeline.pose_reference_catalog import build_neutral_pose_library
+from t2i_spatial_pipeline.pose_reference_geometry import (
+    compile_reference_geometry,
+    reference_geometry_report,
+    reference_joint_positions,
+)
 from t2i_spatial_pipeline.pose_reference_presentation import (
     ReferenceCamera,
     ReferencePresentation,
@@ -73,11 +78,10 @@ def test_supporting_hands_cannot_silently_become_light_contacts(pose_id: str) ->
         NeutralPose.model_validate(payload)
 
 
-def test_upright_kneeling_records_shins_and_insteps() -> None:
+def test_upright_kneeling_records_knees_and_toe_ends() -> None:
     pose = POSES["kneeling_upright_centered"]
     assert {c.body_part for c in pose.supports} == {
-        "left_knee", "right_knee", "left_shin", "right_shin",
-        "left_instep", "right_instep",
+        "left_knee", "right_knee", "left_toes", "right_toes",
     }
     assert all(c.surface == "mat" and c.load_bearing for c in pose.supports)
 
@@ -248,10 +252,13 @@ def test_present_but_unsuitable_table_is_rejected_everywhere(
     assert not presentation_fits_pose(presentation, pose)
     with pytest.raises(ValueError, match="height, extent or orientation"):
         render_pose_reference(pose, LIBRARY.cameras[0], SUBJECT, presentation)
+    geometry = compile_reference_geometry(pose, SUBJECT, ATELIER)
     with pytest.raises(ValidationError, match="height, extent or orientation"):
         PoseReferenceScene(
             pose=pose, camera=LIBRARY.cameras[0], subject=SUBJECT,
             presentation=presentation, prompt="A stale but nonempty prompt.",
+            geometry=geometry, geometry_report=reference_geometry_report(geometry),
+            geometry_joints=reference_joint_positions(geometry),
         )
     library_payload = LIBRARY.model_dump(mode="json")
     library_payload["presentations"][0] = payload
@@ -300,10 +307,12 @@ def test_camera_does_not_force_outward_turned_head_back_to_lens(side: str) -> No
 def test_reports_do_not_claim_physical_or_visual_validation() -> None:
     audit = audit_reference_library(LIBRARY)
     batch = sample_pose_references(LIBRARY, seed=42, count=48)
-    assert batch.schema_version == audit.schema_version == "3.0"
-    assert LIBRARY.schema_version == "3.0"
-    assert batch.renderer_version == 3
-    assert batch.selection_algorithm == "history_aware_family_maximin_v3"
+    assert batch.schema_version == audit.schema_version == "4.0"
+    assert LIBRARY.schema_version == "4.0"
+    assert batch.renderer_version == 4
+    assert batch.selection_algorithm == "geometry_gated_family_maximin_v4"
+    assert batch.report.geometry_checked_scenes == 48
+    assert batch.geometry_rejections == ()
     for record in (LIBRARY, audit, audit.pose_report, batch.report):
         assert record.physical_validation is False
         assert record.visual_validation is False
@@ -316,9 +325,9 @@ def test_reports_do_not_claim_physical_or_visual_validation() -> None:
     assert batch == PoseReferenceBatch.model_validate_json(batch.model_dump_json())
 
 
-@pytest.mark.parametrize("version", ["1.0", "2.0"])
+@pytest.mark.parametrize("version", ["1.0", "2.0", "3.0"])
 def test_superseded_batches_are_rejected_without_migration(version: str) -> None:
     payload = sample_pose_references(LIBRARY, seed=1, count=1).model_dump()
     payload["schema_version"] = version
-    with pytest.raises(ValidationError, match="3.0"):
+    with pytest.raises(ValidationError, match="4.0"):
         PoseReferenceBatch.model_validate(payload)

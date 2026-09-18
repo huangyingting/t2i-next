@@ -49,14 +49,16 @@ def test_story_content_level_rules_match_prompt_pipeline() -> None:
 def test_story_rules_append_selected_authoring_in_stage_order() -> None:
     authoring = StoryAuthoring.model_validate(
         {
-            stage: {
-                "common": ["Shared authored rule.", f"User {stage} rule."],
-                "content_levels": {
-                    "aesthetic": ["User aesthetic rule."],
-                    "erotic": ["Unselected erotic rule."],
-                },
-            }
-            for stage in ("themes", "frames")
+            "content_levels": {
+                "aesthetic": ["User aesthetic rule."],
+                "erotic": ["Unselected erotic rule."],
+            },
+            **{
+                stage: {
+                    "common": ["Shared authored rule.", f"User {stage} rule."],
+                }
+                for stage in ("themes", "frames")
+            },
         }
     )
     request = make_story_request(content_level=ContentLevel.AESTHETIC)
@@ -114,9 +116,7 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
         "multi-view.yaml": (
             "A full-bleed [two/three/four]-view hard-cut tiled composition",
         ),
-        "dress.yaml": (
-            "恰好包含六个互不重叠的视图区",
-        ),
+        "dress.yaml": ("恰好包含六个互不重叠的视图区",),
         "edo-warai-e.yaml": (
             "平坦、分隔的色块",
             "中性外部词语",
@@ -138,11 +138,13 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
             (document.description, *resolved.rules.themes, *resolved.rules.frames)
         )
         assert all(phrase in story for phrase in phrases), (
-            filename, [phrase for phrase in phrases if phrase not in story]
+            filename,
+            [phrase for phrase in phrases if phrase not in story],
         )
         if filename == "creative.yaml":
             layout = next(
-                module for module in resolved.modules
+                module
+                for module in resolved.modules
                 if module.kind == "layout_multiview"
             )
             assert layout.parameters.layout == "grid"

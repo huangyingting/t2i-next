@@ -13,8 +13,11 @@ from t2i_pose_geometry.models import Scene, ValidationReport
 
 from .pose_reference_geometry import (
     ReferenceGeometryError,
+    ReferenceJointPosition,
     compile_reference_geometry,
     geometry_implementation_fingerprint,
+    reference_geometry_report,
+    reference_joint_positions,
 )
 from .pose_reference_history import (
     Digest,
@@ -46,23 +49,24 @@ BalanceBias = Literal["unbiased", "left", "right"]
 Legs = Literal[
     "parallel_feet", "left_foot_forward", "right_foot_forward",
     "right_foot_on_step", "left_foot_on_step", "seated_parallel",
-    "seated_left_forward", "seated_right_forward", "crossed_on_mat",
-    "knees_on_mat", "left_half_kneel", "right_half_kneel",
+    "seated_left_forward", "seated_right_forward", "floor_seated_bent_knees",
+    "knees_and_toes_on_mat", "left_half_kneel", "right_half_kneel",
     "bent_knees_feet_flat", "staggered_bent_knees",
 ]
 HandPlacement = Literal[
     "at_side", "on_lap", "on_knee", "across_forearm", "forward_gesture",
     "on_wall", "on_table", "on_seat", "on_floor", "on_mat_forward",
+    "relaxed_in_front",
 ]
 BodyPart = Literal[
     "left_foot", "right_foot", "left_knee", "right_knee",
     "left_hand", "right_hand", "pelvis", "upper_back", "left_side", "right_side",
     "head",
-    "left_shin", "right_shin", "left_instep", "right_instep",
+    "left_toes", "right_toes",
 ]
 _CONTACT_SURFACES: dict[BodyPart, frozenset[Surface]] = {
-    "left_foot": frozenset(("floor", "step")),
-    "right_foot": frozenset(("floor", "step")),
+    "left_foot": frozenset(("floor", "mat", "step")),
+    "right_foot": frozenset(("floor", "mat", "step")),
     "left_knee": frozenset(("mat",)),
     "right_knee": frozenset(("mat",)),
     "left_hand": frozenset(("floor", "mat", "wall", "table", "chair_seat")),
@@ -72,10 +76,8 @@ _CONTACT_SURFACES: dict[BodyPart, frozenset[Surface]] = {
     "left_side": frozenset(("mat",)),
     "right_side": frozenset(("mat",)),
     "head": frozenset(("headrest",)),
-    "left_shin": frozenset(("mat",)),
-    "right_shin": frozenset(("mat",)),
-    "left_instep": frozenset(("mat",)),
-    "right_instep": frozenset(("mat",)),
+    "left_toes": frozenset(("mat",)),
+    "right_toes": frozenset(("mat",)),
 }
 
 
@@ -107,8 +109,8 @@ _LEG_LEVELS: dict[Legs, BodyLevel] = {
     "seated_parallel": "seated",
     "seated_left_forward": "seated",
     "seated_right_forward": "seated",
-    "crossed_on_mat": "seated",
-    "knees_on_mat": "kneeling",
+    "floor_seated_bent_knees": "seated",
+    "knees_and_toes_on_mat": "kneeling",
     "left_half_kneel": "kneeling",
     "right_half_kneel": "kneeling",
     "bent_knees_feet_flat": "crouched",
@@ -258,14 +260,15 @@ class NeutralPose(ReferenceModel):
             expected_leg_contacts = {"left_foot": "step", "right_foot": "floor"}
         elif self.body_level in {"standing", "crouched"}:
             expected_leg_contacts = {"left_foot": "floor", "right_foot": "floor"}
-        elif self.legs == "knees_on_mat":
+        elif self.legs == "knees_and_toes_on_mat":
             expected_leg_contacts = {
                 "left_knee": "mat", "right_knee": "mat",
-                "left_shin": "mat", "right_shin": "mat",
-                "left_instep": "mat", "right_instep": "mat",
+                "left_toes": "mat", "right_toes": "mat",
             }
-        elif self.legs == "crossed_on_mat":
-            expected_leg_contacts = {"pelvis": "mat"}
+        elif self.legs == "floor_seated_bent_knees":
+            expected_leg_contacts = {
+                "pelvis": "mat", "left_foot": "mat", "right_foot": "mat",
+            }
         elif self.body_level == "seated":
             expected_leg_contacts = {
                 "pelvis": "chair_seat", "left_foot": "floor", "right_foot": "floor"
@@ -418,6 +421,8 @@ class PoseReferenceScene(ReferenceModel):
     subject: ReferenceSubject
     presentation: ReferencePresentation
     geometry: Scene
+    geometry_report: ValidationReport
+    geometry_joints: tuple[ReferenceJointPosition, ...] = Field(min_length=1)
     prompt: str = Field(min_length=1)
 
     @model_validator(mode="after")
@@ -428,6 +433,10 @@ class PoseReferenceScene(ReferenceModel):
             self.pose, self.subject, self.presentation
         ):
             raise ValueError("reference geometry differs from its validated recipe")
+        if self.geometry_report != reference_geometry_report(self.geometry):
+            raise ValueError("reference geometry report differs from its geometry")
+        if self.geometry_joints != reference_joint_positions(self.geometry):
+            raise ValueError("reference joints differ from forward kinematics")
         if self.prompt != render_pose_reference(
             self.pose, self.camera, self.subject, self.presentation
         ):
@@ -557,6 +566,8 @@ def audit_reference_library(library: NeutralPoseLibrary) -> ReferenceLibraryAudi
                     presentation=presentation,
                     subject=subject,
                     geometry=geometry,
+                    geometry_report=reference_geometry_report(geometry),
+                    geometry_joints=reference_joint_positions(geometry),
                     prompt=render_pose_reference(pose, camera, subject, presentation),
                 )
                 geometry_checked += 1
@@ -724,13 +735,19 @@ def _render_hand(side: Literal["left", "right"], placement: HandPlacement) -> st
             )
         case "on_mat_forward":
             return (
-                f"The {side} forearm and palm rest on the mat in front of the ribs, "
-                "with the elbow ahead of the torso, not trapped underneath it."
+                f"The {side} palm rests on the mat in front of the ribs, "
+                "with the elbow raised clear of the mat ahead of the torso, "
+                "not trapped underneath it."
             )
         case "on_floor":
             return (
                 f"The {side} palm rests flat on the floor ahead of the same-side "
                 "foot, with room for the forearm outside the bent knee."
+            )
+        case "relaxed_in_front":
+            return (
+                f"The {side} hand is held loosely in front of the lower torso, "
+                "with a softly bent elbow."
             )
         case _:
             return f"The {side} hand is {placement.replace('_', ' ')}."
@@ -812,7 +829,7 @@ def render_pose_reference(
     )
     if pose.body_level == "lying":
         posture_detail = (
-            f"The {pose.resting_side} side of the torso and pelvis rests on the mat. "
+            f"The {pose.resting_side} side of the upper torso rests on the mat. "
             "Keep the bent knees staggered, with the lower shin slightly forward "
             "so the leg outlines are not exactly superimposed. The headrest fills "
             "the gap beneath the head, keeping the neck in line with the spine."
@@ -822,13 +839,16 @@ def render_pose_reference(
             "The pelvis stays above the floor between the bent legs; both heels "
             "remain grounded, with space between the knees for the inclined torso."
         )
-    elif pose.legs == "knees_on_mat":
+    elif pose.legs == "knees_and_toes_on_mat":
         posture_detail = (
-            "The pelvis stays above the knees, not seated on the heels; the shins "
-            "and relaxed tops of the feet lie behind the knees on the same mat."
+            "The pelvis stays above the knees, not seated on the heels; the knees "
+            "and toe ends meet the mat, with heels lifted and shins inclined."
         )
-    elif pose.legs == "crossed_on_mat":
-        posture_detail = "The pelvis rests on the mat, not suspended above the feet."
+    elif pose.legs == "floor_seated_bent_knees":
+        posture_detail = (
+            "The pelvis and both soles rest on the mat, with the feet in front "
+            "and the knees bent; the pelvis is not suspended above the feet."
+        )
     elif pose.spine == "reclined":
         posture_detail = (
             "Leave space between the pelvis and the back support for the torso's "
@@ -862,7 +882,8 @@ def render_pose_reference(
         "All supporting furniture stays stable in its declared position. "
         f"{render_reference_camera(camera)} "
         "Show the face, action-relevant hands and accessible contact boundaries. "
-        "Allow natural overlap of crossed legs and hidden undersides of contacts; "
+        "Allow natural overlap consistent with the declared leg arrangement "
+        "and hidden undersides of contacts; "
         "do not expose them by moving supports or adding limbs. "
         "Preserve the declared body orientation and "
         "support chain; place the camera toward the visible side of the face "
@@ -977,12 +998,15 @@ def sample_pose_references(
                 camera_counts[option[0].camera_id],
             ),
         )
+        geometry = compile_reference_geometry(pose, subject, presentation)
         scenes.append(PoseReferenceScene(
             pose=pose,
             camera=camera,
             subject=subject,
             presentation=presentation,
-            geometry=compile_reference_geometry(pose, subject, presentation),
+            geometry=geometry,
+            geometry_report=reference_geometry_report(geometry),
+            geometry_joints=reference_joint_positions(geometry),
             prompt=render_pose_reference(pose, camera, subject, presentation),
         ))
         camera_counts[camera.camera_id] += 1

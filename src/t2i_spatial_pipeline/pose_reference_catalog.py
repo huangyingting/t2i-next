@@ -59,7 +59,10 @@ def _pose(
         spine=spine,
         pelvis_facing="front" if spine == "gentle_twist" else facing,
         facing=facing,
-        head_orientation=HeadOrientation(yaw="aligned", pitch="neutral"),
+        head_orientation=HeadOrientation(
+            yaw="aligned",
+            pitch="slightly_lowered" if spine == "reclined" else "neutral",
+        ),
         silhouette=silhouette,
         balance_bias=bias,
         resting_side=resting_side,
@@ -98,10 +101,13 @@ def build_neutral_pose_library() -> NeutralPoseLibrary:
     headrest = SupportContact(body_part="head", surface="headrest")
     kneeling = (
         _LEFT_KNEE, _RIGHT_KNEE,
-        SupportContact(body_part="left_shin", surface="mat"),
-        SupportContact(body_part="right_shin", surface="mat"),
-        SupportContact(body_part="left_instep", surface="mat"),
-        SupportContact(body_part="right_instep", surface="mat"),
+        SupportContact(body_part="left_toes", surface="mat"),
+        SupportContact(body_part="right_toes", surface="mat"),
+    )
+    floor_seated = (
+        _MAT_SEAT,
+        SupportContact(body_part="left_foot", surface="mat"),
+        SupportContact(body_part="right_foot", surface="mat"),
     )
     left_mat = SupportContact(
         body_part="left_hand", surface="mat", load_bearing=False
@@ -113,19 +119,21 @@ def build_neutral_pose_library() -> NeutralPoseLibrary:
         _pose("standing_parallel", "relaxed"),
         _pose(
             "standing_parallel", "turn_left", spine="gentle_twist",
-            facing="left_three_quarter", left="across_forearm",
+            facing="left_three_quarter",
+            left="across_forearm", right="relaxed_in_front",
         ),
         _pose(
             "standing_parallel", "turn_right", spine="gentle_twist",
-            facing="right_three_quarter", right="across_forearm",
+            facing="right_three_quarter",
+            right="across_forearm", left="relaxed_in_front",
         ),
         _pose(
             "standing_shifted", "left", silhouette="arc", bias="left",
-            left="across_forearm",
+            left="across_forearm", right="relaxed_in_front",
         ),
         _pose(
             "standing_shifted", "right", silhouette="arc", bias="right",
-            right="across_forearm",
+            right="across_forearm", left="relaxed_in_front",
         ),
         _pose(
             "standing_shifted", "inclined", spine="forward_inclined",
@@ -189,7 +197,8 @@ def build_neutral_pose_library() -> NeutralPoseLibrary:
             "step_supported", "turned", spine="gentle_twist",
             facing="left_three_quarter", silhouette="diagonal",
             bias="left", legs="right_foot_on_step",
-            left="across_forearm", supports=(_LEFT_FOOT, right_step),
+            left="across_forearm", right="relaxed_in_front",
+            supports=(_LEFT_FOOT, right_step),
         ),
         _pose(
             "seated_upright", "centered", level="seated",
@@ -243,58 +252,58 @@ def build_neutral_pose_library() -> NeutralPoseLibrary:
             supports=(*seated, chair_back),
         ),
         _pose(
-            "seated_sideways", "left", level="seated", spine="gentle_twist",
+            "seated_sideways", "left", level="seated",
             facing="left_three_quarter", silhouette="diagonal",
             legs="seated_parallel",
-            left="on_knee", right="at_side", supports=seated,
+            left="on_knee", right="on_lap", supports=seated,
         ),
         _pose(
-            "seated_sideways", "right", level="seated", spine="gentle_twist",
+            "seated_sideways", "right", level="seated",
             facing="right_three_quarter", silhouette="diagonal",
             legs="seated_parallel",
-            left="at_side", right="on_knee", supports=seated,
+            left="on_lap", right="on_knee", supports=seated,
         ),
         _pose(
-            "seated_sideways", "extended", level="seated", spine="gentle_twist",
+            "seated_sideways", "extended", level="seated",
             facing="left_three_quarter", silhouette="diagonal",
             legs="seated_left_forward",
             left="on_lap", right="forward_gesture", supports=seated,
         ),
         _pose(
             "floor_seated", "centered", level="seated",
-            silhouette="triangle", legs="crossed_on_mat",
-            left="on_knee", right="on_knee", supports=(_MAT_SEAT,),
+            silhouette="triangle", legs="floor_seated_bent_knees",
+            left="on_knee", right="on_knee", supports=floor_seated,
             cameras=_LOW_CAMERAS,
         ),
         _pose(
             "floor_seated", "left", level="seated", spine="gentle_twist",
             facing="left_three_quarter", silhouette="triangle",
-            legs="crossed_on_mat",
-            left="on_knee", right="across_forearm", supports=(_MAT_SEAT,),
+            legs="floor_seated_bent_knees",
+            left="on_knee", right="across_forearm", supports=floor_seated,
             cameras=_LOW_CAMERAS,
         ),
         _pose(
             "floor_seated", "right", level="seated", spine="gentle_twist",
             facing="right_three_quarter", silhouette="triangle",
-            legs="crossed_on_mat",
-            left="across_forearm", right="on_knee", supports=(_MAT_SEAT,),
+            legs="floor_seated_bent_knees",
+            left="across_forearm", right="on_knee", supports=floor_seated,
             cameras=_LOW_CAMERAS,
         ),
         _pose(
             "kneeling_upright", "centered", level="kneeling",
-            legs="knees_on_mat",
+            legs="knees_and_toes_on_mat",
             left="at_side", right="at_side", supports=kneeling,
             cameras=_LOW_CAMERAS,
         ),
         _pose(
             "kneeling_upright", "left", level="kneeling", spine="gentle_twist",
-            facing="left_three_quarter", legs="knees_on_mat",
+            facing="left_three_quarter", legs="knees_and_toes_on_mat",
             left="forward_gesture", right="at_side",
             supports=kneeling, cameras=_LOW_CAMERAS,
         ),
         _pose(
             "kneeling_upright", "right", level="kneeling", spine="gentle_twist",
-            facing="right_three_quarter", legs="knees_on_mat",
+            facing="right_three_quarter", legs="knees_and_toes_on_mat",
             left="at_side", right="forward_gesture",
             supports=kneeling, cameras=_LOW_CAMERAS,
         ),

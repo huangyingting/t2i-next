@@ -263,7 +263,10 @@ story-inputs/recipes/
 
 系统拥有不可变格式与安全契约，`standard-story` 命名策略拥有中国籍/中国地点的
 项目缺省偏好。输入只选择需要的模块；独有创作留在 description 和对应阶段
-`authoring.<stage>.common`，等级变体放在对应阶段的 `content_levels`，只编译当前等级。
+`authoring.<stage>.common`。系统独占内容等级定义；两阶段共用的题材等级细化放在
+`authoring.content_levels`，真正不同的规划与画面任务才分别放在
+`authoring.themes.content_levels` 和 `authoring.frames.content_levels`。
+只编译当前等级，细化不替换系统边界；同一等级规则的重复归属会明确报错。
 字母/姿态由本地计划分配到 Theme 槽位，每批只发送所选项目，不让模型自行续数。
 小于26个字母时使用目录明确的多样性顺序，26个时A–Z，大于26个时覆盖全部再复用。
 其他已有编号规则用有界循环目录表达；条件Frame分配仅对匹配的帧数生效，
