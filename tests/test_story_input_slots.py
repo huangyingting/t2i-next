@@ -80,8 +80,10 @@ def test_cycles_use_global_indices_without_catalog_exhaustion(
         f"slot-{index % period}" for index in range(count)
     ]
     rebatched = resolve_story_input(
-        document, InputOverrides(theme_batch_size=1),
-        run_configuration=configuration, asset_root=tmp_path
+        document,
+        InputOverrides(theme_batch_size=1),
+        run_configuration=configuration,
+        asset_root=tmp_path,
     )
     assert rebatched.plans == resolved.plans
 
@@ -89,8 +91,9 @@ def test_cycles_use_global_indices_without_catalog_exhaustion(
 def test_cycle_context_and_frame_retry_survive_asset_removal(tmp_path: Path) -> None:
     path = write_catalog(tmp_path, 30)
     resolved = resolve_story_input(
-        cycle_document(), InputOverrides(theme_count=100, frames_per_theme=2),
-        asset_root=tmp_path
+        cycle_document(),
+        InputOverrides(theme_count=100, frames_per_theme=2),
+        asset_root=tmp_path,
     )
     frozen = resolved.model_dump_json()
     path.unlink()
@@ -192,14 +195,18 @@ def test_invalid_frame_selections_fail_explicitly(
     "assignment",
     [
         {"slots": []},
-        {"slots": [
-            {"frame_id": f"F{index:02d}", "rules": ["A view."]}
-            for index in range(1, 8)
-        ]},
+        {
+            "slots": [
+                {"frame_id": f"F{index:02d}", "rules": ["A view."]}
+                for index in range(1, 8)
+            ]
+        },
         {"frames_per_theme": 1, "slots": [{"frame_id": "F01", "rules": ["A view."]}]},
         {
-            "slots": [{"frame_id": "F01", "rules": ["One view."]},
-                      {"frame_id": "F03", "rules": ["Missing second view."]}],
+            "slots": [
+                {"frame_id": "F01", "rules": ["One view."]},
+                {"frame_id": "F03", "rules": ["Missing second view."]},
+            ],
         },
         {
             "slots": [{"frame_id": "F01", "rules": ["One view."]}] * 2,

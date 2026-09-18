@@ -35,7 +35,12 @@ def test_document_keeps_prose_and_defaults(tmp_path):
     configuration = resolve_story_input(document).run_configuration
     assert configuration == StoryRunConfiguration()
     assert set(document.model_dump()) == {
-        "id", "description", "cast", "authoring", "modules", "requirements",
+        "id",
+        "description",
+        "cast",
+        "authoring",
+        "modules",
+        "requirements",
         "allocation",
     }
     assert document.authoring.themes.common == ()

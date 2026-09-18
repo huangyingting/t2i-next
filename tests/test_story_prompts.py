@@ -123,9 +123,7 @@ def test_description_cannot_replace_typed_counts_cast_or_slot_routing():
     assert [plan.theme_id for plan in resolved.plans] == ["T001", "T002"]
     assert all(plan.entry is None for plan in resolved.plans)
 
-    theme = compile_theme_messages(
-        resolved, count=1, existing_themes=[make_theme()]
-    )
+    theme = compile_theme_messages(resolved, count=1, existing_themes=[make_theme()])
     frame = compile_frame_messages(
         resolved, make_theme(2), requested_frame_ids=["F01"], accepted_frames=[]
     )
@@ -308,10 +306,10 @@ def test_scoped_cast_context_counts_the_giant_as_one_additional_fixed_role():
             {
                 "description": "Adult miniature travelers meet one giant adult guide.",
                 "cast": {
-                        "female_count": 2,
-                        "male_count": 0,
-                        "scope": "miniatures",
-                        "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
+                    "female_count": 2,
+                    "male_count": 0,
+                    "scope": "miniatures",
+                    "fixed_roles": [{"id": "giant", "sex": "theme_choice"}],
                 },
             }
         ),
@@ -372,11 +370,11 @@ def test_background_bands_do_not_become_a_global_eight_person_cap(
             {
                 "description": "Adult travelers and background adults share a station.",
                 "cast": {
-                        "scope": "principal_adults",
-                        "female_count": female_count,
-                        "male_count": 0,
-                        "fixed_roles": roles,
-                        "background_counts": bands,
+                    "scope": "principal_adults",
+                    "female_count": female_count,
+                    "male_count": 0,
+                    "fixed_roles": roles,
+                    "background_counts": bands,
                 },
             }
         ),
@@ -531,9 +529,7 @@ def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:
     assert "Assign every visible limb a consistent contact or force role" in prompt
     assert "Do not describe successive repositioning as a narrative" in prompt
     assert "Follow the Story Description, selected authoring" in prompt
-    assert (
-        "requested counts and slots, runtime settings, or output format" in prompt
-    )
+    assert "requested counts and slots, runtime settings, or output format" in prompt
     assert "Grounded scenes require credible support" in prompt
     assert "floating or zero-gravity scenes require coherent free-flight" in prompt
     assert "exposure may visibly record motion through blur or light trails" in prompt
@@ -764,7 +760,9 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         assert all(rule not in compiled for rule in other_duties)
         if stage == StoryStage.THEMES:
             for prefix, count in (
-                ("发型灵感：", 65), ("服装灵感：", 156), ("配饰灵感：", 92)
+                ("发型灵感：", 65),
+                ("服装灵感：", 156),
+                ("配饰灵感：", 92),
             ):
                 assert sum(rule.startswith(prefix) for rule in selected) == count
 
@@ -778,15 +776,11 @@ def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(leve
         ),
         (
             ContentLevel.EROTIC,
-            (
-                "主导照片中呈现非露骨的亲密互动"
-            ),
+            ("主导照片中呈现非露骨的亲密互动"),
         ),
         (
             ContentLevel.HARDCORE,
-            (
-                "直接露骨的互动置于主导照片中"
-            ),
+            ("直接露骨的互动置于主导照片中"),
         ),
     ),
 )

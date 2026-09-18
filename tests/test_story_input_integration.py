@@ -59,7 +59,8 @@ def planned_input(tmp_path):
                                     ],
                                 }
                                 for frame_id, viewpoint in (
-                                    ("F01", "front"), ("F02", "rear")
+                                    ("F01", "front"),
+                                    ("F02", "rear"),
                                 )
                             ],
                         },
@@ -128,11 +129,14 @@ def planned_input(tmp_path):
         encoding="utf-8",
     )
     resolved = resolve_story_input(
-        load_story_document(document_path), asset_root=assets,
+        load_story_document(document_path),
+        asset_root=assets,
         run_configuration=StoryRunConfiguration(
             generation={"theme_count": 4, "frames_per_theme": 1},
             runtime={
-                "theme_batch_size": 2, "concurrency": 1, "generation_retries": 1,
+                "theme_batch_size": 2,
+                "concurrency": 1,
+                "generation_retries": 1,
             },
         ),
     )
@@ -207,9 +211,7 @@ async def test_catalog_assignments_are_independent_of_theme_batch_boundaries(
     original, paths = planned_input
     resolved = resolve_story_input(
         load_story_document(paths[0]),
-        InputOverrides(
-            theme_batch_size=batch_size, frames_per_theme=frames_per_theme
-        ),
+        InputOverrides(theme_batch_size=batch_size, frames_per_theme=frames_per_theme),
         asset_root=paths[1].parent.parent,
         run_configuration=original.run_configuration,
     )

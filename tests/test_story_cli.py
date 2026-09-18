@@ -132,16 +132,28 @@ def test_story_generate_reads_story_document(
     configuration_path = write_run_configuration(
         tmp_path,
         generation={
-            "theme_count": 7, "frames_per_theme": 3, "output_language": "english",
+            "theme_count": 7,
+            "frames_per_theme": 3,
+            "output_language": "english",
         },
         runtime={
-            "concurrency": 3, "generation_retries": 0, "theme_batch_size": 3,
-            "theme_output_tokens": 12000, "frame_output_tokens": 20000,
+            "concurrency": 3,
+            "generation_retries": 0,
+            "theme_batch_size": 3,
+            "theme_output_tokens": 12000,
+            "frame_output_tokens": 20000,
         },
         validation={
-            "themes": {"mode": "enforce", "checks": [
-                {"type": "forbidden_text", "field": "title", "values": ["UNWANTED"]},
-            ]},
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {
+                        "type": "forbidden_text",
+                        "field": "title",
+                        "values": ["UNWANTED"],
+                    },
+                ],
+            },
             "frames": {"mode": "report", "checks": [{"type": "camera_evidence"}]},
         },
     )
@@ -189,9 +201,7 @@ def test_story_generate_reads_story_document(
     assert captured["request"].female_count == 2
     assert captured["request"].male_count == 1
     assert captured["request"].source_prompt_stem == "story"
-    assert "requested counts and slots" in "\n".join(
-        captured["rules"].themes
-    )
+    assert "requested counts and slots" in "\n".join(captured["rules"].themes)
     assert captured["request"].theme_count == 7
     assert captured["request"].frames_per_theme == 3
     assert captured["request"].output_language == "english"
@@ -400,9 +410,7 @@ def test_story_resume_uses_frozen_run_settings(tmp_path, monkeypatch) -> None:
             )
         ),
     )
-    snapshot = store.create(
-        make_story_input(make_story_request(), settings), settings
-    )
+    snapshot = store.create(make_story_input(make_story_request(), settings), settings)
     captured = {}
 
     async def fake_resume(run_id, current_provider, settings, current_store):
@@ -443,9 +451,7 @@ def test_story_runs_lists_resumable_command(tmp_path) -> None:
         tmp_path / "prompts",
     )
     settings = StoryRunSettings(provider=StoryProviderSettings(model="test-model"))
-    snapshot = store.create(
-        make_story_input(make_story_request(), settings), settings
-    )
+    snapshot = store.create(make_story_input(make_story_request(), settings), settings)
 
     result = CliRunner().invoke(
         app,
@@ -468,17 +474,26 @@ def test_explicit_cli_options_override_run_json_and_preserve_zero(
     configuration_path = write_run_configuration(
         tmp_path,
         generation={
-            "theme_count": 7, "frames_per_theme": 3, "content_level": "erotic",
-            "output_language": "english", "female_count": 1,
+            "theme_count": 7,
+            "frames_per_theme": 3,
+            "content_level": "erotic",
+            "output_language": "english",
+            "female_count": 1,
         },
         runtime={
-            "concurrency": 3, "generation_retries": 2, "theme_batch_size": 4,
-            "theme_output_tokens": 12000, "frame_output_tokens": 20000,
+            "concurrency": 3,
+            "generation_retries": 2,
+            "theme_batch_size": 4,
+            "theme_output_tokens": 12000,
+            "frame_output_tokens": 20000,
         },
         validation={
-            "themes": {"mode": "enforce", "checks": [
-                {"type": "required_text", "field": "style", "values": ["rain"]},
-            ]},
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {"type": "required_text", "field": "style", "values": ["rain"]},
+                ],
+            },
             "frames": {"mode": "enforce", "checks": [{"type": "camera_evidence"}]},
         },
     )
@@ -571,16 +586,28 @@ def test_resume_freezes_document_rules_and_quality_without_reading_source(
         tmp_path,
         generation={"frames_per_theme": 1},
         runtime={
-            "generation_retries": 0, "theme_batch_size": 1,
-            "theme_output_tokens": 512, "frame_output_tokens": 1024,
+            "generation_retries": 0,
+            "theme_batch_size": 1,
+            "theme_output_tokens": 512,
+            "frame_output_tokens": 1024,
         },
         validation={
-            "themes": {"mode": "enforce", "checks": [
-                {"type": "forbidden_text", "field": "title", "values": ["UNWANTED"]},
-            ]},
-            "frames": {"mode": "enforce", "checks": [
-                {"type": "required_text", "values": ["station clock"]},
-            ]},
+            "themes": {
+                "mode": "enforce",
+                "checks": [
+                    {
+                        "type": "forbidden_text",
+                        "field": "title",
+                        "values": ["UNWANTED"],
+                    },
+                ],
+            },
+            "frames": {
+                "mode": "enforce",
+                "checks": [
+                    {"type": "required_text", "values": ["station clock"]},
+                ],
+            },
         },
     )
     model = FakeStoryModel([make_theme_batch(), make_frame_sequence(frame_count=1)])
@@ -648,9 +675,14 @@ def test_report_mode_publishes_plain_prose_and_displays_quality_warnings(
     configuration_path = write_run_configuration(
         tmp_path,
         generation={"frames_per_theme": 1},
-        validation={"frames": {"mode": "report", "checks": [
-            {"type": "required_text", "values": ["station clock"]},
-        ]}},
+        validation={
+            "frames": {
+                "mode": "report",
+                "checks": [
+                    {"type": "required_text", "values": ["station clock"]},
+                ],
+            }
+        },
     )
     sequence = make_frame_sequence(frame_count=1)
     model = FakeStoryModel([make_theme_batch(), sequence])
@@ -715,10 +747,18 @@ def test_explain_json_is_provider_free_and_preserves_explicit_overrides(
             encoding="utf-8",
         )
         configuration_path = write_run_configuration(
-            tmp_path, validation={
-                "themes": {"mode": "enforce", "checks": [
-                    {"type": "required_text", "field": "title", "values": ["clock"]},
-                ]},
+            tmp_path,
+            validation={
+                "themes": {
+                    "mode": "enforce",
+                    "checks": [
+                        {
+                            "type": "required_text",
+                            "field": "title",
+                            "values": ["clock"],
+                        },
+                    ],
+                },
                 "frames": {"mode": "enforce", "checks": [{"type": "camera_evidence"}]},
             },
         )

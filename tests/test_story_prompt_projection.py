@@ -95,16 +95,19 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
         prompt = messages[0].content
         payload = json.loads(messages[1].content)
         assert prompt == restored.rules.text_for(stage)
-        assert not {
-            "content_level",
-            "program_assigns_theme_ids",
-            "program_assigns_frame_ids",
-        } & payload.keys()
+        assert (
+            not {
+                "content_level",
+                "program_assigns_theme_ids",
+                "program_assigns_frame_ids",
+            }
+            & payload.keys()
+        )
         assert payload["output_language"] == restored.request.output_language.value
         assert payload["frames_per_theme"] == 2
-        assert [
-            plan["theme_id"] for plan in payload["input_context"]["plans"]
-        ] == ["T001"]
+        assert [plan["theme_id"] for plan in payload["input_context"]["plans"]] == [
+            "T001"
+        ]
         if stage == StoryStage.THEMES:
             assert payload["theme_count"] == 1
             assert "the program assigns all Theme IDs" in prompt
@@ -120,7 +123,8 @@ def test_selected_rules_reach_both_stages_without_selection_metadata(level):
         for candidate, rule in refinements.items():
             assert (rule in prompt) == (candidate == level)
         safety = [
-            line for line in (SYSTEM / "safety.rules").read_text().splitlines()
+            line
+            for line in (SYSTEM / "safety.rules").read_text().splitlines()
             if line and not line.startswith("#")
         ]
         assert safety

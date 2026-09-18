@@ -140,7 +140,9 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
             "六区域广告概念板",
         ),
         "multi-view.yaml": (
-            "A full-bleed [two/three/four]-view hard-cut tiled composition",
+            "两个、三个或四个视图",
+            "互不重叠的矩形区域覆盖画布的 100%",
+            "硬切边界",
         ),
         "dress.yaml": ("恰好包含六个互不重叠的视图区",),
         "edo-warai-e.yaml": (

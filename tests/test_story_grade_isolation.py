@@ -39,7 +39,16 @@ _DRESS_OUTPUT_NAME_BANS = (
 )
 _OUTPUT_NAME_BANS = _DRESS_OUTPUT_NAME_BANS
 _PROVIDER_CONTROL_FIELDS = frozenset(
-    ("content_level", "program_assigns_theme_ids", "program_assigns_frame_ids")
+    (
+        "content_level",
+        "program_assigns_theme_ids",
+        "program_assigns_frame_ids",
+        "validation",
+        "quality",
+        "quality_mode",
+        "mode",
+        "checks",
+    )
 )
 _GRADE = re.compile(
     r"(?ai:\b(?:aesthetic|hardcore|(?<!non-)erotic)\b)"
@@ -210,8 +219,8 @@ def test_painting_messages_keep_visible_action_and_medium_without_templates(
 ):
     document = load_story_document(RECIPES / f"{name}.yaml")
     resolved = resolve_story_input(
-        document, InputOverrides(content_level=level),
-        run_configuration=audit_run_configuration(document),
+        document,
+        run_configuration=audit_run_configuration(document, content_level=level),
     )
     messages = frame_messages(
         resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
@@ -267,7 +276,9 @@ def test_provider_controls_stay_internal_without_losing_ids_or_retry_contracts(l
         ) in themes[0].content
 
         frames = frame_messages(
-            state, make_theme(2), requested_frame_ids=["F02", "F04"],
+            state,
+            make_theme(2),
+            requested_frame_ids=["F02", "F04"],
             accepted_frames=accepted,
         )
         frame_payload = json.loads(frames[1].content)
@@ -275,9 +286,10 @@ def test_provider_controls_stay_internal_without_losing_ids_or_retry_contracts(l
         assert frame_payload["theme"]["theme_id"] == "T002"
         assert frame_payload["requested_frame_slots"] == ["F02", "F04"]
         assert frame_payload["frames_per_theme"] == 4
-        assert [
-            frame["frame_id"] for frame in frame_payload["accepted_frames"]
-        ] == ["F01", "F03"]
+        assert [frame["frame_id"] for frame in frame_payload["accepted_frames"]] == [
+            "F01",
+            "F03",
+        ]
         assert frame_payload["frame_batch_format"] == (
             "Return exactly one <FRAME>...</FRAME> block per requested "
             "slot, in order. Tags delimit prose; do not output IDs or JSON."
@@ -309,7 +321,9 @@ def test_relationship_messages_keep_visual_contact_and_carriers_without_template
     bounds = {
         ContentLevel.AESTHETIC: ("不透明", "普通动作", "劳动"),
         ContentLevel.EROTIC: (
-            "非露骨", "自我接触", "相互感官接触",
+            "非露骨",
+            "自我接触",
+            "相互感官接触",
         ),
         ContentLevel.HARDCORE: ("生殖器", "口部", "手部", "接触"),
     }
@@ -438,7 +452,8 @@ def test_motion_public_setting_is_visual_and_safety_is_always_system_owned(level
             )
             assert "前 100 个英文词" not in messages[0].content
             safety = next(
-                source for source in state.sources
+                source
+                for source in state.sources
                 if source.kind == "system" and source.id.endswith("safety.rules")
             )
             assert all(
@@ -455,22 +470,27 @@ def test_motion_frames_define_camera_contract_once_and_scope_subject_blur(level)
     )
     prompt = " ".join(messages[0].content.split())
     for visual_fact in (
-        "拍摄系统不进入图像", "设备、人员、轮廓、阴影或反射",
-        "快门时间和闪光时长不同", "1/2000", "1/10000",
-        "焦平面", "前景过渡", "背景过渡",
+        "拍摄系统不进入图像",
+        "设备、人员、轮廓、阴影或反射",
+        "快门时间和闪光时长不同",
+        "1/2000",
+        "1/10000",
+        "焦平面",
+        "前景过渡",
+        "背景过渡",
     ):
         assert visual_fact in prompt
     assert "Captured from a [height]" not in prompt
     assert '"camera body"' not in prompt
     for instruction in (
-        '"SUBJECT MOTION BLUR"',
-        "相机不是锁定或固定的",
-        "说明摇摄轴心、起始方位角、结束方位角和被追踪平面",
+        "主体运动模糊采用摇摄而非锁定机位",
+        "静止环境反向拖成条纹",
+        "摇摄轴心、起止方位角和被追踪平面一致",
         "摇摄主体的快门时间约为 1/15 至 1/4 秒",
-        "将被追踪的最近眼睛或面部平面置于焦点",
+        "主体运动模糊对焦最近眼睛或面部平面",
     ):
         assert (instruction in prompt) == (level != ContentLevel.HARDCORE)
-    forbidden_mode = "多身体露骨接触绝不使用同步摇摄或长曝光主体模糊"
+    forbidden_mode = "不用同步摇摄或长曝光主体模糊表现多身体露骨接触"
     assert (forbidden_mode in prompt) == (level == ContentLevel.HARDCORE)
 
 
@@ -547,7 +567,8 @@ def test_selected_messages_and_assets_have_no_grade_announcements_or_dispatch(pa
     violations = []
     for level in document.requirements.content_levels or tuple(ContentLevel):
         resolved = resolve_story_input(
-            document, InputOverrides(content_level=level),
+            document,
+            InputOverrides(content_level=level),
             run_configuration=audit_run_configuration(document),
         )
         assert resolved.request.content_level == level
@@ -559,7 +580,9 @@ def test_selected_messages_and_assets_have_no_grade_announcements_or_dispatch(pa
                 theme_messages(resolved, count=1, existing_themes=[])
                 if stage == StoryStage.THEMES
                 else frame_messages(
-                    resolved, make_theme(), requested_frame_ids=["F01"],
+                    resolved,
+                    make_theme(),
+                    requested_frame_ids=["F01"],
                     accepted_frames=[],
                 )
             )

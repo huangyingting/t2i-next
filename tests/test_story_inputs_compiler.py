@@ -428,10 +428,10 @@ def test_invalid_scoped_or_over_capacity_cast_defaults(cast: dict[str, object]) 
 def test_fixed_roles_count_toward_capacity_but_leave_sex_to_theme() -> None:
     value = document(
         cast={
-                "scope": "visitors",
-                "female_count": 6,
-                "male_count": 1,
-                "fixed_roles": [{"id": "host", "sex": "theme_choice"}],
+            "scope": "visitors",
+            "female_count": 6,
+            "male_count": 1,
+            "fixed_roles": [{"id": "host", "sex": "theme_choice"}],
         },
     )
     resolved = resolve_story_input(
@@ -449,10 +449,10 @@ def test_cast_scope_is_a_plain_named_group_not_a_catalog_or_executable_key() -> 
     resolved = resolve_story_input(
         document(
             cast={
-                    "scope": "ordinary visitors",
-                    "female_count": 1,
-                    "male_count": 0,
-                    "fixed_roles": [{"id": "host", "sex": "male"}],
+                "scope": "ordinary visitors",
+                "female_count": 1,
+                "male_count": 0,
+                "fixed_roles": [{"id": "host", "sex": "male"}],
             }
         )
     )
@@ -514,7 +514,8 @@ def test_independent_module_kinds_combine_without_overwriting_constraints(
         asset_root,
         "layout",
         requirements={
-            "female_count": {"max": 4}, "content_levels": ["aesthetic", "erotic"]
+            "female_count": {"max": 4},
+            "content_levels": ["aesthetic", "erotic"],
         },
     )
     module(
@@ -528,7 +529,7 @@ def test_independent_module_kinds_combine_without_overwriting_constraints(
         modules=[
             {"id": "layout", "parameters": {"layout": "grid"}},
             {"id": "copy", "parameters": {"product": "poster"}},
-        ]
+        ],
     )
     assert len(resolve_story_input(value, asset_root=asset_root).modules) == 2
     with pytest.raises(StoryConfigurationError, match="copy.*female_count"):
@@ -705,8 +706,10 @@ def test_alphabet_plans_are_run_global_not_batch_local(
         assert payload["entry"]["frames"] == [f"Frame fact for {letter}."]
         assert plan.catalog_id == "neutral-alphabet"
     rebatched = resolve_story_input(
-        value, InputOverrides(theme_batch_size=1),
-        run_configuration=configuration, asset_root=asset_root
+        value,
+        InputOverrides(theme_batch_size=1),
+        run_configuration=configuration,
+        asset_root=asset_root,
     )
     assert resolved.plans == rebatched.plans
     assert not any("Theme fact for" in rule for rule in resolved.rules.themes)
@@ -833,7 +836,8 @@ def test_resume_uses_full_frozen_snapshot_after_assets_disappear(
     module(asset_root, "material", "silk_painting")
     resolved = resolve_story_input(
         allocated(modules=[{"id": "material"}]),
-        InputOverrides(theme_count=27), asset_root=asset_root
+        InputOverrides(theme_count=27),
+        asset_root=asset_root,
     )
     frozen = resolved.model_dump_json()
     fingerprint = resolved.fingerprint()
@@ -886,7 +890,8 @@ def test_resume_rejects_corrupted_frozen_plans(asset_root: Path, mutation: str) 
     module(asset_root, "material", "silk_painting")
     resolved = resolve_story_input(
         allocated(modules=[{"id": "material"}]),
-        InputOverrides(theme_count=27), asset_root=asset_root
+        InputOverrides(theme_count=27),
+        asset_root=asset_root,
     )
     data = resolved.model_dump(mode="json")
     if mutation == "missing":
@@ -984,9 +989,7 @@ def test_context_modules_follow_selected_stage_authoring(
         asset_root,
         "copy",
         "visible_copy",
-        authoring={
-            "level_refinements": {"aesthetic": {"frames": ["Visible copy."]}}
-        },
+        authoring={"level_refinements": {"aesthetic": {"frames": ["Visible copy."]}}},
     )
     module(asset_root, "silk", "silk_painting")
     resolved = resolve_story_input(
@@ -1032,10 +1035,10 @@ def test_context_preserves_scoped_cast_without_allocation_and_is_detached(
     resolved = resolve_story_input(
         document(
             cast={
-                    "scope": "visitors",
-                    "female_count": 0,
-                    "male_count": 1,
-                    "fixed_roles": [{"id": "host", "sex": "theme_choice"}],
+                "scope": "visitors",
+                "female_count": 0,
+                "male_count": 1,
+                "fixed_roles": [{"id": "host", "sex": "theme_choice"}],
             }
         )
     )
@@ -1076,7 +1079,8 @@ def test_context_preserves_different_per_theme_cast_facts(
             requirements={"cast_constraints": "unspecified"},
             allocation={"type": "fixed_slots", "catalog": "cast-table"},
         ),
-        InputOverrides(theme_count=2), asset_root=asset_root,
+        InputOverrides(theme_count=2),
+        asset_root=asset_root,
     )
     context = resolved.context_for(stage, ["T001", "T002"])
     casts = [plan["cast"] for plan in context["plans"]]
@@ -1100,10 +1104,10 @@ def test_background_bands_preserve_model_choice_and_count_every_adult(
     resolved = resolve_story_input(
         document(
             cast={
-                    "scope": "primary_people",
-                    "female_count": 2,
-                    "male_count": 1,
-                    "background_counts": bands,
+                "scope": "primary_people",
+                "female_count": 2,
+                "male_count": 1,
+                "background_counts": bands,
             }
         )
     )
@@ -1138,10 +1142,10 @@ def test_background_bands_reject_invalid_ranges_overlaps_and_duplicates(
     with pytest.raises(ValidationError):
         document(
             cast={
-                    "scope": "primary_people",
-                    "female_count": 1,
-                    "male_count": 1,
-                    "background_counts": bands,
+                "scope": "primary_people",
+                "female_count": 1,
+                "male_count": 1,
+                "background_counts": bands,
             }
         )
 
@@ -1160,8 +1164,8 @@ def test_background_population_needs_explicit_scope_and_both_principal_counts(
     with pytest.raises(ValidationError):
         document(
             cast={
-                    **cast,
-                    "background_counts": [{"min": 0, "max": 30}],
+                **cast,
+                "background_counts": [{"min": 0, "max": 30}],
             }
         )
 
@@ -1169,11 +1173,11 @@ def test_background_population_needs_explicit_scope_and_both_principal_counts(
 def test_background_capacity_does_not_relax_requested_plus_fixed_limit() -> None:
     value = document(
         cast={
-                "scope": "visitors",
-                "female_count": 7,
-                "male_count": 0,
-                "fixed_roles": [{"id": "host", "sex": "theme_choice"}],
-                "background_counts": [{"min": 0, "max": 30}],
+            "scope": "visitors",
+            "female_count": 7,
+            "male_count": 0,
+            "fixed_roles": [{"id": "host", "sex": "theme_choice"}],
+            "background_counts": [{"min": 0, "max": 30}],
         }
     )
     resolved = resolve_story_input(value)
@@ -1206,10 +1210,10 @@ def test_exact_population_only_when_determined(
     resolved = resolve_story_input(
         document(
             cast={
-                    "scope": "primary_people",
-                    "female_count": 1,
-                    "male_count": 1,
-                    "background_counts": bands,
+                "scope": "primary_people",
+                "female_count": 1,
+                "male_count": 1,
+                "background_counts": bands,
             }
         )
     )
@@ -1240,13 +1244,13 @@ def test_background_snapshot_roundtrip_and_corruption_rejection(field: str) -> N
     resolved = resolve_story_input(
         document(
             cast={
-                    "scope": "primary_people",
-                    "female_count": 1,
-                    "male_count": 1,
-                    "background_counts": [
-                        {"min": 0, "max": 0},
-                        {"min": 2, "max": 30},
-                    ],
+                "scope": "primary_people",
+                "female_count": 1,
+                "male_count": 1,
+                "background_counts": [
+                    {"min": 0, "max": 0},
+                    {"min": 2, "max": 30},
+                ],
             }
         )
     )
@@ -1277,7 +1281,8 @@ def test_context_rehydrates_after_assets_disappear(asset_root: Path) -> None:
     )
     resolved = resolve_story_input(
         allocated(modules=[{"id": "material"}]),
-        InputOverrides(theme_count=27), asset_root=asset_root
+        InputOverrides(theme_count=27),
+        asset_root=asset_root,
     )
     expected = resolved.context_for(StoryStage.FRAMES, ["T026", "T027"])
     frozen = resolved.model_dump_json()
@@ -1333,8 +1338,10 @@ def test_cyclic_slots_use_global_ordinal_and_wrap_only_after_complete_cycle(
     ]
     for batch_size in (1, 7, 10):
         rebatched = resolve_story_input(
-            value, InputOverrides(theme_batch_size=batch_size),
-            run_configuration=configuration, asset_root=asset_root
+            value,
+            InputOverrides(theme_batch_size=batch_size),
+            run_configuration=configuration,
+            asset_root=asset_root,
         )
         assert rebatched.plans == resolved.plans
 
@@ -1481,8 +1488,9 @@ def test_cyclic_context_preserves_existing_explicit_frame_assignments(
     }
     write_yaml(path, catalog)
     resolved = resolve_story_input(
-        cyclic_document(), InputOverrides(theme_count=5, frames_per_theme=2),
-        asset_root=asset_root
+        cyclic_document(),
+        InputOverrides(theme_count=5, frames_per_theme=2),
+        asset_root=asset_root,
     )
     theme_context = resolved.context_for(StoryStage.THEMES, ["T005"])
     assert theme_context["plans"][0]["frame_slots"] == []
@@ -1560,10 +1568,12 @@ def test_frame_assignment_schema_accepts_complete_bounded_slot_tables(
     "value",
     [
         {"slots": []},
-        {"slots": [
-            {"frame_id": f"F{index:02d}", "rules": ["View."]}
-            for index in range(1, 8)
-        ]},
+        {
+            "slots": [
+                {"frame_id": f"F{index:02d}", "rules": ["View."]}
+                for index in range(1, 8)
+            ]
+        },
         {"frames_per_theme": 1, "slots": [{"frame_id": "F01", "rules": ["View."]}]},
         {
             "slots": [
@@ -1610,8 +1620,9 @@ def test_frame_context_follows_requested_ids_without_reindexing_saved_slot_facts
     }
     write_yaml(path, catalog)
     resolved = resolve_story_input(
-        cyclic_document(), InputOverrides(theme_count=5, frames_per_theme=2),
-        asset_root=asset_root
+        cyclic_document(),
+        InputOverrides(theme_count=5, frames_per_theme=2),
+        asset_root=asset_root,
     )
     frozen = resolved.model_dump_json()
     shutil.rmtree(asset_root / "_catalogs")
@@ -1664,7 +1675,8 @@ def test_visual_cycles_do_not_impose_execution_count_minimums(
     assert [plan.entry.id for plan in resolved.plans] == ids[:3]
     for count in (1, 2):
         selected = resolve_story_input(
-            value, InputOverrides(theme_count=count, theme_quality_mode="off"),
+            value,
+            InputOverrides(theme_count=count, theme_quality_mode="off"),
             asset_root=asset_root,
         )
         assert [plan.entry.id for plan in selected.plans] == ids[:count]

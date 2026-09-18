@@ -265,7 +265,8 @@ def test_module_shared_refinement_controls_stage_projection_and_frozen_replay(
     ],
 )
 def test_refinements_reject_ambiguous_ownership_and_invalid_shapes(
-    authoring: dict[str, object], error: str,
+    authoring: dict[str, object],
+    error: str,
 ) -> None:
     with pytest.raises(ValidationError, match=error):
         StoryAuthoring.model_validate(authoring)
@@ -309,7 +310,9 @@ def test_cross_stage_common_rules_keep_their_stage_ownership() -> None:
         (StoryStage.FRAMES, "Render composition."),
     ):
         assert authoring.selected(stage, ContentLevel.AESTHETIC) == (
-            "Common palette.", "Shared layout.", specific,
+            "Common palette.",
+            "Shared layout.",
+            specific,
         )
 
 
@@ -362,10 +365,18 @@ def test_offline_explain_selects_shared_rules_and_rejects_duplicate_ownership(
     path = tmp_path / "neutral.yaml"
     path.write_text(yaml.safe_dump(source), encoding="utf-8")
     result = CliRunner().invoke(
-        app, [
-            "explain", "--input", str(path), "--content-level", "erotic",
-            "--theme-quality-mode", "off", "--frame-quality-mode", "off",
-        ]
+        app,
+        [
+            "explain",
+            "--input",
+            str(path),
+            "--content-level",
+            "erotic",
+            "--theme-quality-mode",
+            "off",
+            "--frame-quality-mode",
+            "off",
+        ],
     )
     payload = json.loads(result.stdout)
     assert result.exit_code == (2 if invalid else 0), result.stdout
