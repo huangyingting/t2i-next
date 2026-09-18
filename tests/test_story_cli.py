@@ -312,14 +312,14 @@ def test_story_generate_loads_explicit_module_assets(tmp_path, monkeypatch) -> N
     assert "Custom frame composition rule." in captured["rules"].frames
 
 
-def test_story_generate_never_discovers_legacy_rules_inside_story_inputs(
+def test_story_generate_never_discovers_rules_from_working_directory(
     tmp_path,
     monkeypatch,
 ) -> None:
-    rules_dir = tmp_path / "story-inputs" / "rules"
+    rules_dir = tmp_path / "rules"
     rules_dir.mkdir(parents=True)
     (rules_dir / "common.rules").write_text(
-        "Shared story-input rule.\n",
+        "Unexpected working-directory rule.\n",
         encoding="utf-8",
     )
     captured = {}
@@ -340,8 +340,8 @@ def test_story_generate_never_discovers_legacy_rules_inside_story_inputs(
     result = CliRunner().invoke(app, ["generate", "直接输入的故事"])
 
     assert result.exit_code == 0
-    assert "Shared story-input rule." not in captured["rules"].themes
-    assert "Shared story-input rule." not in captured["rules"].frames
+    assert "Unexpected working-directory rule." not in captured["rules"].themes
+    assert "Unexpected working-directory rule." not in captured["rules"].frames
 
 
 def test_story_generate_rejects_story_and_document_together(

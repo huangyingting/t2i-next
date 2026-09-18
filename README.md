@@ -47,7 +47,7 @@ uv run python scripts/refine-text-file.py \
 `t2i_film_style_pipeline` 从一名导演的明确作品集合提炼结构化、可摄影执行的
 视觉档案，并在同一命令中生成最终提示词。它自带完整、独立的 Profile、common、
 Theme、Frame、模型、provider、checkpoint 和发布实现，不 import 或调用
-`t2i_story_pipeline`，也不依赖 `story-inputs/` 中的描述文档或规则。
+`t2i_story_pipeline`，也不依赖 `recipes/` 中的视觉配方。
 它只加载仓库根目录的 `.env.film`，不会读取通用 `.env`。该配置文件仅保留 film
 所需的后端、模型、认证、推理、token、超时和重试项。它为每部输入电影提取原作成年人物
 与实际场景锚点，Theme 和 Frame 必须使用同一部电影的原作人物与场景，不得跨片
@@ -182,7 +182,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story generate \
-  --input story-inputs/recipes/motion-blur-photography.yaml \
+  --input recipes/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic
@@ -228,7 +228,7 @@ authoring:
 ```
 
 ```bash
-uv run t2i-story generate --input story-inputs/recipes/motion-blur-photography.yaml \
+uv run t2i-story generate --input recipes/motion-blur-photography.yaml \
   --run-config story-run.json
 ```
 
@@ -254,13 +254,13 @@ story 流水线的可复用作者规则使用独立的 `StoryRuleSet`，不在�
 另一条流水线逐字相同。story 内置规则位于
 `src/t2i_story_pipeline/rule_packs/system/`，只描述通用 Theme/Frame 阶段职责、
 schema、人物一致性和内容等级。媒介、版式、区域、视图、比例关系及其他特定视觉
-行为由配方描述及其显式模块定义，Python 不识别具体 `story-inputs/recipes/*.yaml`
+行为由配方描述及其显式模块定义，Python 不识别具体 `recipes/*.yaml`
 类型。
 
-输入已逐份移入新子目录。输入编译器位于 `src/t2i_story_pipeline/inputs/`：
+视觉配方位于仓库根目录的 `recipes/`，输入编译器位于 `src/t2i_story_pipeline/inputs/`：
 
 ```text
-story-inputs/recipes/
+recipes/
 ├── multi-view.yaml
 ├── human-typography.yaml
 ├── miniature-open-composition.yaml
@@ -302,7 +302,7 @@ story-inputs/recipes/
 可以在加载模型配置前离线检查最终输入、规则来源和全部槽位：
 
 ```bash
-uv run t2i-story explain --input story-inputs/recipes/human-typography.yaml --themes 26
+uv run t2i-story explain --input recipes/human-typography.yaml --themes 26
 ```
 
 默认输出 JSON，`--format text` 输出摘要；无效输入退出2，不创建run或调用模型。
@@ -336,7 +336,7 @@ issues 继续反馈给模型。认证错误不会盲目重试。
 （1男1女、2女、3女、1男2女、2男1女），每组 100 themes × 6 frames：
 
 ```bash
-./scripts/generate-story-cast-matrix.sh story-inputs/recipes/motion-blur-photography.yaml
+./scripts/generate-story-cast-matrix.sh recipes/motion-blur-photography.yaml
 ```
 
 最终 TXT 默认统一写入 `prompts/YYYY-MM-DD/hardcore/`，所有可恢复 run 记录在

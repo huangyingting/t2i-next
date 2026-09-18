@@ -27,7 +27,7 @@ from t2i_story_pipeline.prompts import frame_messages, theme_messages
 from tests.story_factories import make_theme
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-RECIPES = REPOSITORY_ROOT / "story-inputs" / "recipes"
+RECIPES = REPOSITORY_ROOT / "recipes"
 POLICIES = REPOSITORY_ROOT / "src" / "t2i_story_pipeline" / "rule_packs" / "policies"
 
 
@@ -289,7 +289,6 @@ def test_all_bundled_authoring_is_chinese_except_literal_anchors(path):
 def test_story_inputs_are_yaml_documents_with_matching_ids():
     paths = sorted(RECIPES.glob("*.yaml"))
     assert len(paths) == 48
-    assert not list(RECIPES.parent.glob("*.yaml"))
     assert not list(RECIPES.glob("*.txt"))
     for path in paths:
         document = load_story_document(path)

@@ -708,7 +708,7 @@ def test_prompts_compile_only_selected_content_level(
 @pytest.mark.parametrize("level", tuple(ContentLevel))
 def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(level):
     document = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "recipes" / "avantgarde.yaml"
+        REPOSITORY_ROOT / "recipes" / "avantgarde.yaml"
     )
     refinements = document.authoring.level_refinements
     assert refinements[ContentLevel.HARDCORE].shared
@@ -789,7 +789,7 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     required_contract: str,
 ) -> None:
     document = load_story_document(
-        REPOSITORY_ROOT / "story-inputs" / "recipes" / "post-layout.yaml"
+        REPOSITORY_ROOT / "recipes" / "post-layout.yaml"
     )
     resolved = resolve_story_input(
         document,

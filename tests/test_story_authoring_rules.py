@@ -159,7 +159,7 @@ def test_specialized_story_inputs_own_their_presentation_contracts() -> None:
 
     for filename, phrases in required_contracts.items():
         document = load_story_document(
-            REPOSITORY_ROOT / "story-inputs" / "recipes" / filename
+            REPOSITORY_ROOT / "recipes" / filename
         )
         resolved = resolve_story_input(document)
         story = "\n".join(

@@ -13,7 +13,7 @@ store = LocalStoryRunStore(
     Path("runs"),
     Path("prompts"),
 )
-document_path = Path("story-inputs/recipes/multi-view.yaml")
+document_path = Path("recipes/multi-view.yaml")
 resolved = resolve_story_input(
     load_story_document(document_path),
     run_configuration=load_run_configuration(Path("story-run.json")),
@@ -262,9 +262,9 @@ YAML 只定义视觉内容：人物构成、外观、关系、动作、媒介、
 ```
 
 ```bash
-uv run t2i-story generate --input story-inputs/recipes/motion-blur-photography.yaml \
+uv run t2i-story generate --input recipes/motion-blur-photography.yaml \
   --run-config story-run.json --frames 4
-uv run t2i-story explain --input story-inputs/recipes/motion-blur-photography.yaml \
+uv run t2i-story explain --input recipes/motion-blur-photography.yaml \
   --run-config story-run.json --frame-min-chars 500 --frame-max-chars 2500 --format json
 ```
 
@@ -290,8 +290,8 @@ JSON 使用 UTF-8，拒绝重复键、未知字段与非法类型。优先级为
 
 ### 输入子目录与受控模块
 
-当前配方位于 `story-inputs/recipes/`，共享模块位于相邻 `_modules/`，目录数据位于
-`_catalogs/`。资产根默认相对 YAML 文档，`--assets-dir` 可显式覆盖。不再按当前
+当前配方位于仓库根目录的 `recipes/`，共享模块位于 `recipes/_modules/`，目录数据位于
+`recipes/_catalogs/`。资产根默认相对 YAML 文档，`--assets-dir` 可显式覆盖。不再按当前
 工作目录发现 `rules/`；不存在旧 `documents.py` 或 Story `--rules-dir` 入口。
 
 配方、模块、目录和包内策略的 YAML 自然语言内容统一使用中文，包括描述、创作
@@ -337,6 +337,13 @@ JSON 使用 UTF-8，拒绝重复键、未知字段与非法类型。优先级为
 其中独有的视觉要求和摄影参数，不以减少字数为由丢失画面事实。评估使用相同输入与
 相同既有 Theme 样本，分别比较编译后的请求长度、约束保留和阶段／等级适用性；
 字符数下降不等于已验证模型生成质量改善。
+
+视觉多样性依赖开放的变化空间，而不是更长的候选清单。配方应区分题材身份与可选
+表现：例如 `recipes/angel.yaml` 保留真人实拍、一位计入阵容的核心天使及一对羽翼，
+但不把暗调、低饱和、宏伟建筑、大型事件或三层纵深设为每幅必选条件。
+Theme 固定身份、场所和基本情境，Frame 在同一时间窗口内变化姿态、羽翼开合、
+景别、机位、焦点与相容的局部照明。遮挡或裁切仍须保持人物归属与动作可理解，
+不要求所有身体细节在所有构图中同时可见。可选方向不配置轮转次数或执行配额。
 
 加载时拒绝同一条等级规则在 Theme／Frame 重复、在共享与阶段块重复，或与该阶段
 `common` 重复；无规则的等级或职责分支可以省略。旧的 `authoring.content_levels`
@@ -608,7 +615,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story generate \
-  --input story-inputs/recipes/motion-blur-photography.yaml \
+  --input recipes/motion-blur-photography.yaml \
   --themes 100 \
   --frames 6 \
   --content-level erotic \
@@ -624,7 +631,7 @@ uv run t2i-story generate \
 
 ```bash
 uv run t2i-story explain \
-  --input story-inputs/recipes/human-typography.yaml --themes 26 --format json
+  --input recipes/human-typography.yaml --themes 26 --format json
 ```
 
 `explain` 与 `generate` 共享同一个解析器及覆盖模型，不读取provider配置、不创建run。

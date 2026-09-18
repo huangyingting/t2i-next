@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1] / "story-inputs" / "recipes"
+ROOT = Path(__file__).resolve().parents[1] / "recipes"
 CONTROL_PROSE = re.compile(
     r"(?:至少|不超过|最多|最少|不少于|前)\s*"
     r"(?:[1-9]\d{1,3}|[一二三四五六七八九十百千]{2,})\s*"

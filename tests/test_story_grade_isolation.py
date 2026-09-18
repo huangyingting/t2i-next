@@ -740,6 +740,69 @@ def test_real_messages_keep_current_features_without_other_grade_prose(name, lev
             assert all(marker in compiled for marker in _FRAME_FEATURES[name][level])
             assert "前 100 个英文词" not in compiled
             assert "前一百个英文单词" not in compiled
-            if name in ("demon-lord", "angel") and level != ContentLevel.AESTHETIC:
+            if name == "demon-lord" and level != ContentLevel.AESTHETIC:
                 assert "不高于脚踝" in compiled
                 assert "任何面孔、胸部、骨盆、性接触或呼吸通道都不得浸没" in compiled
+
+
+@pytest.mark.parametrize("level", tuple(ContentLevel))
+@pytest.mark.parametrize("stage", tuple(StoryStage))
+def test_angel_visual_choices_reach_each_stage_without_fixed_style_locks(level, stage):
+    document = load_story_document(RECIPES / "angel.yaml")
+    resolved = resolve_story_input(
+        document,
+        InputOverrides(content_level=level, female_count=1, male_count=1),
+    )
+    messages = (
+        theme_messages(resolved, count=1, existing_themes=[])
+        if stage == StoryStage.THEMES
+        else frame_messages(
+            resolved,
+            make_theme(),
+            requested_frame_ids=["F01", "F02"],
+            accepted_frames=[],
+        )
+    )
+    compiled = "\n".join(message.content for message in messages)
+    payload = json.loads(messages[1].content)
+    assert payload["story"] == document.description
+    assert resolved.plans[0].cast.total == 2
+    for identity in ("恰好有一位核心天使", "恰好一对翅膀", "无翼人类"):
+        assert identity in compiled
+    assert "Safety is an immutable instruction contract" in messages[0].content
+    assert all(
+        rule in messages[0].content
+        for rule in document.authoring.selected(stage, level)
+    )
+    choices = {
+        StoryStage.THEMES: (
+            "姿态、双翼开合、具体接触布局、景别、机位、焦点和局部照明留给各 Frame",
+            "不要求每个主题都有大型场面事件",
+            "明亮、中间调或暗调曝光均可成立",
+            "普通居所、狭窄工作间",
+            "不是封闭职业清单",
+        ),
+        StoryStage.FRAMES: (
+            "同一时间窗口中的平行画面方案",
+            "折翼不要求场地能够容纳完全展开的翼展",
+            "侧身、背身、局部裁切与自然遮挡都可使用",
+            "不要求每幅同时展示面孔、两个翼根、双手和全部羽毛",
+            "不限定为一组固定数值",
+            "不强行添加奇观",
+        ),
+    }
+    for choice in choices[stage]:
+        assert choice in messages[0].content
+    for retired in (
+        "百分之八十五",
+        "百分之六十至七十五",
+        "百分之五",
+        "不超过两个柔和色相族",
+        "恰好选择一个在可见瞬间已发生的主导大型场面事件",
+        "每幅图像构建三个清晰可辨的层次",
+        "清晰可辨的双手与面孔",
+        "24mm 至 135mm 范围内一个精确焦距",
+        "整个身体占据区域都干燥、处于室温",
+        "不高于脚踝",
+    ):
+        assert retired not in compiled
