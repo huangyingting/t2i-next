@@ -158,7 +158,7 @@ def test_json_loader_accepts_closed_typed_external_configuration(workspace):
     [
         None,
         [],
-        {"policy": "standard-story"},
+        {"policy": "legacy"},
         {"safety": False},
         {"generation": {"cast": {}}},
         {"generation": {"theme_count": "2"}},

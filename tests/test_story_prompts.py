@@ -519,27 +519,22 @@ def test_catalog_cast_context_keeps_each_themes_total_and_sex_minima(tmp_path):
     assert resolved.request.male_count is None
 
 
-def test_prompts_default_unspecified_people_and_setting_to_china() -> None:
+def test_prompts_do_not_add_nationality_or_country_defaults() -> None:
     request = make_story_request()
 
-    for stage, messages in (
-        (
-            "Theme 的 premise",
-            theme_messages(
-                request,
-                count=1,
-                existing_themes=[],
-            ),
+    for messages in (
+        theme_messages(
+            request,
+            count=1,
+            existing_themes=[],
         ),
-        ("Frame", frame_messages(request, make_theme())),
+        frame_messages(request, make_theme()),
     ):
         prompt = messages[0].content
 
-        assert "未指定时，每个人物分别默认为中国籍" in prompt
-        assert "不得根据地点、姓名、语言、肤色或外貌推断国籍" in prompt
-        assert f"必须在每个 {stage} 中明确写出人物国籍" in prompt
-        assert "否则场景国家默认为中国" in prompt
-        assert f"必须在每个 {stage} 中明确写出场景所在国家" in prompt
+        assert "中国籍" not in prompt
+        assert "场景国家" not in prompt
+        assert "人物国籍" not in prompt
 
 
 def test_frame_prompt_prioritizes_coherent_standalone_prose() -> None:

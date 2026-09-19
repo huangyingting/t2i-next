@@ -352,12 +352,12 @@ recipes/
 └── _catalogs/                  # 字母表、固定姿态及有界循环槽位
 ```
 
-全部配方、模块、目录和包内策略的 YAML 自然语言使用中文；字段名、ID、枚举、
+全部配方、模块和目录的 YAML 自然语言使用中文；字段名、ID、枚举、
 文件名与真正画内文字的原文不变。中文输入规则不意味着只能生成中文；
 画内文案语言也不强制整段描述使用同一种语言。
 
-系统拥有不可变格式与安全契约，`standard-story` 命名策略拥有中国籍/中国地点的
-项目缺省偏好。输入只选择需要的模块；独有创作留在 description 和对应阶段
+系统拥有不可变格式与安全契约，不设置人物国籍或场景国家缺省值。输入只选择需要
+的模块；独有创作留在 description 和对应阶段
 `authoring.<stage>.common`。系统独占内容等级定义；配方只通过
 `authoring.level_refinements.<level>` 细化，在该块内用 `shared`、`themes`、
 `frames` 区分共同约束与阶段任务，不再保留三个分散的等级映射入口。
@@ -465,9 +465,9 @@ prompts root 和 runs directory。
 
 Provider 直接复用共享的 `OPENAI_*` 环境变量；完整说明见
 [独立故事生成器](docs/story-pipeline.md)。
-Story Description 未明确人物国籍时，该人物缺省为中国籍；未明确故事发生国家
-或可确定国家的地点时，场景缺省位于中国。Theme premise 和每个最终 Frame 都会
-明确写出人物国籍与故事发生国家。
+Story pipeline 不补写未指定的人物国籍或场景国家，也不要求 Theme premise 和
+最终 Frame 固定输出国籍、国家或“所在国家”。Story Description 明确指定的
+国籍与地点仍按普通视觉事实保留。
 
 ## 独立空间提示词生成器
 

@@ -310,7 +310,6 @@ async def test_catalog_plans_survive_batch_retry_and_offline_resume(
         "document",
         "catalog",
         "module",
-        "policy",
         "system",
     }
     resumed_model = RoutedStoryModel()

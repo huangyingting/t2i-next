@@ -106,17 +106,15 @@ def test_story_rules_append_selected_authoring_in_stage_order() -> None:
     assert "Unselected erotic rule." not in rules.themes + rules.frames
 
 
-def test_core_is_universal_and_named_policy_owns_nationality_defaults() -> None:
+def test_resolved_rules_do_not_add_nationality_or_setting_defaults() -> None:
     request = make_story_request()
     core = resolve_story_rules(request)
     resolved = make_story_input(request)
-    policy = next(source for source in resolved.sources if source.kind == "policy")
-    assert policy.id == "standard-story"
     for stage in StoryStage:
         assert "默认为中国籍" not in core.text_for(stage)
         assert "场景国家默认为中国" not in core.text_for(stage)
-        assert "默认为中国籍" in resolved.rules.text_for(stage)
-        assert "场景国家默认为中国" in resolved.rules.text_for(stage)
+        assert "默认为中国籍" not in resolved.rules.text_for(stage)
+        assert "场景国家默认为中国" not in resolved.rules.text_for(stage)
 
 
 def test_story_rules_fingerprint_changes_with_authored_rules() -> None:

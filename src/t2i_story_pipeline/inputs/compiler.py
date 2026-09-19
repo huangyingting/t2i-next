@@ -34,7 +34,6 @@ from t2i_story_pipeline.inputs.schema import (
     InputRequirements,
     ModuleContext,
     ModuleDocument,
-    PolicyDocument,
     StoryDocument,
     StoryRunConfiguration,
     default_validation,
@@ -54,7 +53,6 @@ from t2i_story_pipeline.models import (
 )
 from t2i_story_pipeline.quality_validation import writing_constraints
 
-_POLICIES = Path(__file__).resolve().parents[1] / "rule_packs" / "policies"
 _MODULE_CONTEXT = TypeAdapter(ModuleContext)
 
 
@@ -62,7 +60,7 @@ class InputSource(Model):
     """Self-contained source content and the selected rules owned by that source."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
-    kind: Literal["document", "system", "policy", "module", "catalog"]
+    kind: Literal["document", "system", "module", "catalog"]
     id: str
     path: str | None = None
     content: str
@@ -118,11 +116,6 @@ class ResolvedStoryInput(Model):
         ):
             raise ValueError("runtime or quality differs from frozen run_configuration")
         _validate_source(documents[0], document, self.request)
-        policies = [source for source in self.sources if source.kind == "policy"]
-        if len(policies) != 1:
-            raise ValueError("resolved input must freeze exactly one named policy")
-        policy = PolicyDocument.model_validate_json(policies[0].content)
-        _validate_source(policies[0], policy, self.request)
         catalogs = [
             CatalogDocument.model_validate_json(source.content)
             for source in self.sources
@@ -315,8 +308,8 @@ def _requirements(
 
 
 def _source(
-    kind: Literal["document", "policy", "module", "catalog"],
-    value: StoryDocument | PolicyDocument | ModuleDocument | CatalogDocument,
+    kind: Literal["document", "module", "catalog"],
+    value: StoryDocument | ModuleDocument | CatalogDocument,
     path: Path | None,
     request: StoryRequest,
 ) -> InputSource:
@@ -342,7 +335,7 @@ def _rule_lines(content: str) -> tuple[str, ...]:
 
 def _validate_source(
     source: InputSource,
-    value: StoryDocument | PolicyDocument | ModuleDocument | CatalogDocument,
+    value: StoryDocument | ModuleDocument | CatalogDocument,
     request: StoryRequest,
 ) -> None:
     expected = _source(
@@ -474,12 +467,7 @@ def resolve_story_input(
                 "explicit asset_root or source_path is required for assets"
             )
         request = configuration.generation.request(document)
-        policy_path = _POLICIES / "standard-story.yaml"
-        policy = load_yaml_model(policy_path, PolicyDocument)
-        sources = [
-            _source("document", document, source_path, request),
-            _source("policy", policy, policy_path, request),
-        ]
+        sources = [_source("document", document, source_path, request)]
         modules: list[ModuleContext] = []
         dimensions: dict[str, str] = {}
         for reference in document.modules:

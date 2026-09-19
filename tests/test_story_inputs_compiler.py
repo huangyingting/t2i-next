@@ -223,7 +223,7 @@ def test_authoring_rejects_old_arrays_unknown_levels_and_multiline_rules(
         StoryAuthoring.model_validate(authoring)
 
 
-def test_policy_preferences_are_not_immutable_core_defaults() -> None:
+def test_resolved_input_has_no_nationality_or_country_defaults() -> None:
     resolved = resolve_story_input(document())
     core = resolve_story_rules(resolved.request)
     for rules in (core.themes, core.frames):
@@ -234,13 +234,9 @@ def test_policy_preferences_are_not_immutable_core_defaults() -> None:
         assert any("sole authority for cast scope" in rule for rule in rules)
         assert any("including plans with no catalog entry" in rule for rule in rules)
     for rules in (resolved.rules.themes, resolved.rules.frames):
-        assert any("分别默认为中国籍" in rule for rule in rules)
-        assert any("场景国家默认为中国" in rule for rule in rules)
-    policy = next(source for source in resolved.sources if source.kind == "policy")
-    assert policy.id == "standard-story"
-    assert "每个 Theme 的 premise" in policy.themes[0]
-    assert "每个 Frame" in policy.frames[0]
-    assert json.loads(policy.content)["id"] == "standard-story"
+        assert not any("分别默认为中国籍" in rule for rule in rules)
+        assert not any("场景国家默认为中国" in rule for rule in rules)
+    assert all(source.kind != "policy" for source in resolved.sources)
 
 
 def test_overrides_preserve_zero_and_ignore_none() -> None:

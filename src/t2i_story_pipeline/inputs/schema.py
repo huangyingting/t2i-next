@@ -374,8 +374,3 @@ class CatalogDocument(Model):
         if self.diversity_order is not None and set(self.diversity_order) != set(ids):
             raise ValueError("catalog diversity_order must be a full permutation")
         return self
-
-
-class PolicyDocument(Model):
-    id: Literal["standard-story"]
-    authoring: StoryAuthoring

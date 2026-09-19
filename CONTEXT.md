@@ -105,9 +105,8 @@ _Avoid_: Recipe-specific shadow profile, safety switch, implicit directory looku
 **Story Rule Set**:
 The immutable ordered authoring rules compiled for the Theme and Frame stages
 of one story run. Built-in rules define only stage semantics and universal
-contracts and mandatory safety; the program-selected standard-story policy owns
-project defaults. Explicit modules
-and Story Document authoring rules are selected for the current stage and level,
+contracts and mandatory safety. Explicit modules and Story Document authoring
+rules are selected for the current stage and level,
 before the output-language rule. Shared level refinements have one source owner;
 each stage receives its common rules, the shared selected-level refinements, and
 its own selected-level instructions. The resolved set is frozen with the run and
@@ -205,18 +204,6 @@ Branches contain executable authoring requirements, not grade announcements or
 compliance-proof headers. Repeated wording within one request can be removed,
 but independently required Theme and Frame constraints must both reach the model.
 _Avoid_: Level override, duplicated grade definition, shared reference-pool dump
-
-**Nationality Default**:
-Chinese nationality assigned independently to each person whose nationality
-is not explicit in the Story Description. Setting, name, language, and
-appearance are not nationality declarations.
-_Avoid_: Ethnicity inference, setting inference
-
-**Setting Default**:
-China as the country containing the story setting when the Story Description
-does not state a country or a place that identifies one. An unspecified
-studio, room, or landscape is not permission to invent a foreign setting.
-_Avoid_: Foreign setting invention, location inference
 
 **Story Semantic Name**:
 A short lowercase English snake_case name summarizing the whole Story
