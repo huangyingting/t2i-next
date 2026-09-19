@@ -16,6 +16,11 @@ from t2i_film_style_pipeline.prompt_models import (
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
 
 _REQUIRED_EXPRESSION_GUIDANCE = (
+    "先确定人物当前实际进行的行为，再选择最适合该行为的表情",
+    "动作目的、用力程度、身体受力和注意对象是首要依据",
+    "不得先挑表情再倒推行为",
+    "用力反应不等同于愤怒",
+    "动作适配优先于表情多样性与风格修饰",
     "当前可见事件、人物关系、当前动作和关注对象",
     "不得用心理独白、不可见的秘密或新编身世解释情绪",
     "至少用眉眼、眼睑、嘴角、嘴唇、下颌、面颊或额头中的两项",
@@ -29,20 +34,25 @@ _REQUIRED_EXPRESSION_GUIDANCE = (
     "克制不等于面无表情",
     "不得为了远景可读性刻意夸张表情",
     "多人可以共享同一种主要情绪",
+    "相近行为可以自然产生相似表情，不强迫人物做不同表情",
     "不得按性别、名单顺序或固定角色模板分配反应",
     "当前批次和 accepted_frame_prose",
-    "至少在反应强弱、面部状态组合、关注对象或回应方式中的一项形成可见差异",
+    "动作、用力程度或关注对象有实际差异时",
+    "不以表情差异配额取代行为适配",
     "不强制每帧使用不同情绪标签",
     "不是按时间发展的连续情节",
     "情绪有可见情境依据、面部状态相容且视线可达",
 )
 _REQUIRED_PARTICIPANT_GUIDANCE = (
+    "先定当前行为，再选择最适合该行为的表情",
+    "用力程度、身体受力和注意对象为首要依据",
+    "动作适配优先于表情多样性与风格修饰",
     "当前可见事件与人物关系的依据",
     "面部状态相互协调",
     "唯一且自然可达的视线落点",
     "表演幅度符合当前情境与已有作品依据",
     "可共享主要情绪",
-    "不得复制其他人物或其他 Frame 的整套表情方案",
+    "行为相近可有相似表情，但不得无依据套用模板",
     "不得改变已确定的位置、朝向与支点",
 )
 
@@ -85,13 +95,8 @@ def test_expression_guidance_reaches_theme_frames_and_selective_retry(
     )
     resolved = resolve_film_style_rules(request)
     rules = FilmPromptRuleSet(themes=resolved.themes, frames=resolved.frames)
-    themes = theme_messages(
-        request, rules, start_index=1, count=1, existing_themes=[]
-    )
-    assert (
-        "不预先固定每个 Frame 的表情、反应强度或视线落点"
-        in themes[0].content
-    )
+    themes = theme_messages(request, rules, start_index=1, count=1, existing_themes=[])
+    assert "不预先固定每个 Frame 的表情、反应强度或视线落点" in themes[0].content
     assert "不把情绪升级写成必须逐帧发展的情节" in themes[0].content
 
     initial = frame_messages(
@@ -115,8 +120,7 @@ def test_expression_guidance_reaches_theme_frames_and_selective_retry(
     accepted = NarrativeFrame(
         frame_id="F01",
         prose="; ".join(
-            f"{name} {expression}"
-            for name, expression in zip(names, expressions, strict=False)
+            f"{name} {expressions[index]}" for index, name in enumerate(names)
         ),
     )
     retry = frame_messages(
@@ -129,6 +133,10 @@ def test_expression_guidance_reaches_theme_frames_and_selective_retry(
     for messages in (initial, retry):
         for requirement in _REQUIRED_EXPRESSION_GUIDANCE:
             assert requirement in messages[0].content
+        assert (
+            "至少在反应强弱、面部状态组合、关注对象或回应方式中的一项形成可见差异"
+            not in messages[0].content
+        )
         payload = json.loads(messages[1].content)
         assert payload["output_language"] == language.value
         assert payload["theme_cast_requirement"] == {
