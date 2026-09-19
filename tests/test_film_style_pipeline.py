@@ -272,7 +272,7 @@ def test_director_rules_own_theme_and_frame_workflow() -> None:
         and "七项中的至少五项" in rule
         for rule in rules.themes
     )
-    assert any("固定的主题编号菜单" in rule for rule in rules.themes)
+    assert any("不提供固定人数或角色菜单" in rule for rule in rules.themes)
     assert any("完全独立的图像提示词" in rule for rule in rules.frames)
     assert any(
         "每个画面必须明确写出完整摄影方案" in rule

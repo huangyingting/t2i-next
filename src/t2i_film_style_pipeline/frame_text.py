@@ -1,53 +1,21 @@
-"""Exact frozen-prefix handling, independent of punctuation inside film names."""
+"""Read the exact source sentence from the frozen compiled film context."""
 
 from __future__ import annotations
 
-from t2i_film_style_pipeline.prompt_models import (
-    FilmPromptRequest,
-    NarrativeTheme,
-    OutputLanguage,
-)
+import re
 
 
-def canonical_anchor_sentence(
-    request: FilmPromptRequest,
-    theme: NarrativeTheme,
-    scene: str | None,
-) -> str | None:
-    if scene is None:
-        return None
-    characters = [item.canonical_name for item in theme.selected_cast]
-    if request.output_language == OutputLanguage.ENGLISH:
-        return (
-            f"The original characters {', '.join(characters)} are in the "
-            f'canonical setting "{scene}". '
-        )
-    return f"原作人物{'、'.join(characters)}位于原作场景“{scene}”。"
+def source_sentence(context: str) -> str | None:
+    match = re.search(
+        r"(?:每个 Frame 必须准确且只在第一句使用以下来源说明：|"
+        r"Every Frame must use this source sentence exactly once "
+        r"as its first sentence:)"
+        r"\s*\n[“\"]([^\r\n]+)[”\"](?:\r?\n|$)",
+        context,
+    )
+    return match.group(1) if match else None
 
 
-def anchor_insertion(request: FilmPromptRequest, sentence: str) -> str:
-    separator = " " if request.output_language == OutputLanguage.ENGLISH else ""
-    return separator + sentence
-
-
-def frame_body(
-    request: FilmPromptRequest,
-    theme: NarrativeTheme,
-    prose: str,
-    *,
-    strip_anchor: bool = True,
-) -> str:
-    source = request.frame_source_sentence
-    if not prose.startswith(source):
-        return prose
-    body = prose[len(source) :]
-    if strip_anchor:
-        for scene in request.source_films[theme.source_work_index].anchors.scenes:
-            sentence = canonical_anchor_sentence(
-                request, theme, scene.canonical_name
-            )
-            if sentence is not None:
-                insertion = anchor_insertion(request, sentence)
-                if body.startswith(insertion):
-                    return body[len(insertion) :]
-    return body
+def frame_body(context: str, prose: str) -> str:
+    source = source_sentence(context)
+    return prose[len(source) :] if source and prose.startswith(source) else prose

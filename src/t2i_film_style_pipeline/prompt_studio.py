@@ -10,6 +10,7 @@ from time import perf_counter
 from pydantic import BaseModel, ValidationError
 
 from t2i_film_style_pipeline.diversity import (
+    duplicate_theme_issues,
     normalize_frame_anchor_prefix,
     normalize_theme_anchor_terms,
 )
@@ -62,6 +63,7 @@ GenerateResponse = Callable[
     Awaitable[ModelResponse],
 ]
 
+
 class FilmPromptStudio:
     """Turn one film context directly into final prose image prompts."""
 
@@ -99,9 +101,7 @@ class FilmPromptStudio:
                 "当前生成配置与 film prompt run manifest 不一致"
             )
         if snapshot.rules != self._rules:
-            raise FilmStyleStorageError(
-                "当前 film prompt rules 与 run 冻结规则不一致"
-            )
+            raise FilmStyleStorageError("当前 film prompt rules 与 run 冻结规则不一致")
         self._emit(f"继续 Run：{run_id}")
         return await self._drive(snapshot, restarting=True)
 
@@ -141,10 +141,7 @@ class FilmPromptStudio:
 
         def needs_frames(theme: NarrativeTheme) -> bool:
             sequence = existing_frames.get(theme.theme_id)
-            return (
-                sequence is None
-                or len(sequence.frames) != request.frames_per_theme
-            )
+            return sequence is None or len(sequence.frames) != request.frames_per_theme
 
         async def generate_theme_frames(theme: NarrativeTheme) -> None:
             try:
@@ -222,8 +219,7 @@ class FilmPromptStudio:
         ):
             self._store.fail(
                 snapshot.run_id,
-                "; ".join(causes)
-                or "Theme 或 Frame Sequence 尚未完整",
+                "; ".join(causes) or "Theme 或 Frame Sequence 尚未完整",
             )
             raise self._incomplete(snapshot, tuple(causes))
         if snapshot.manifest.semantic_name is None:
@@ -339,6 +335,9 @@ class FilmPromptStudio:
                 for theme in candidate_themes:
                     if self._theme_validator is not None:
                         self._theme_validator(request, theme)
+                duplicates = duplicate_theme_issues(candidate_themes, themes)
+                if duplicates:
+                    raise FilmStyleContractError("; ".join(duplicates))
                 target[:] = candidate_themes
 
             operation_id = f"themes-T{start_index:03d}-T{start_index + count - 1:03d}"
@@ -542,8 +541,7 @@ class FilmPromptStudio:
                     remaining_ids = [
                         frame_id
                         for frame_id in remaining_ids
-                        if f"{theme.theme_id}-{frame_id}"
-                        not in accepted_this_attempt
+                        if f"{theme.theme_id}-{frame_id}" not in accepted_this_attempt
                     ]
             except FilmStyleProviderError as exc:
                 self._record_attempt(

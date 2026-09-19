@@ -16,6 +16,7 @@ from t2i_film_style_pipeline.content_validation import (
     contains_clothing_state_conflict,
     content_level_evidence_complete,
 )
+from t2i_film_style_pipeline.frame_text import frame_body, source_sentence
 from t2i_film_style_pipeline.prompt_models import (
     ContentLevel,
     FilmPromptRequest,
@@ -24,9 +25,9 @@ from t2i_film_style_pipeline.prompt_models import (
 )
 
 _NOVELTY_AXES = (
-    "优先使用账本中较少出现的原作作品、场景或人物组合",
+    "优先使用完整历史主题中较少出现的原作作品、场景或人物组合",
     "改变稳定的人物关系与权力张力，但不固定 Frame 动作发起者",
-    "选择账本中较少出现的内容路径或互动范围",
+    "选择完整历史主题中较少出现的内容路径或互动范围",
     "改变场景内部的空间层次、人物距离和调度范围",
     "改变主要景别、机位方向、透视和焦点层级的组合",
     "改变主光来源、明暗关系、色彩重音和材质重点",
@@ -354,34 +355,6 @@ class FilmPromptDiversityReport(_Model):
     frame_coverage: dict[str, dict[str, int]]
 
 
-def theme_diversity_ledger(
-    request: FilmPromptRequest,
-    existing_themes: list[NarrativeTheme],
-) -> dict[str, object]:
-    return {
-        "used_titles": [theme.title for theme in existing_themes],
-        "used_theme_signatures": [
-            {
-                "theme_id": theme.theme_id,
-                "premise_excerpt": _excerpt(theme.premise, limit=180),
-                "style_excerpt": _excerpt(theme.style, limit=140),
-            }
-            for theme in existing_themes
-        ],
-        "coverage_counts": _coverage_counts(
-            (
-                " ".join((theme.title, theme.premise, theme.style))
-                for theme in existing_themes
-            ),
-            _COVERAGE_TERMS,
-        ),
-        "source_anchor_mentions": _anchor_usage(
-            request.context,
-            existing_themes,
-        ),
-    }
-
-
 def current_theme_diversity_contracts(
     request: FilmPromptRequest,
     *,
@@ -406,19 +379,6 @@ def current_theme_diversity_contracts(
     for offset in range(count):
         absolute_index = start_index + offset - 1
         contract: dict[str, object] = {"output_position": offset + 1}
-        if request.female_count is not None or request.male_count is not None:
-            contract["cast_size_requirement"] = {
-                "female_count": request.female_count,
-                "male_count": request.male_count,
-                "mode": (
-                    "非 null 的性别人数必须严格采用；null 的性别人数"
-                    "由当前 Theme 决定"
-                ),
-            }
-        elif request.content_level == ContentLevel.AESTHETIC:
-            contract["cast_size_requirement"] = "选择一至两名原作成年人"
-        else:
-            contract["cast_size_requirement"] = "恰好选择两名原作成年人"
         for name, values, digest_index in axes:
             contract[name] = values[
                 (absolute_index + digest[digest_index]) % len(values)
@@ -450,12 +410,10 @@ def theme_anchor_contract(
         group
         for group in anchor_groups
         if any(
-            anchor.casefold() in normalized_premise
-            for anchor in group["characters"]
+            anchor.casefold() in normalized_premise for anchor in group["characters"]
         )
         or any(
-            _scene_anchor_mentioned(anchor, theme.premise)
-            for anchor in group["scenes"]
+            _scene_anchor_mentioned(anchor, theme.premise) for anchor in group["scenes"]
         )
     ]
     selected_characters: list[str] = []
@@ -501,9 +459,7 @@ def normalize_theme_anchor_terms(
         if request.output_language.value == "english"
         else f"原作场景为“{scene}”。"
     )
-    return theme.model_copy(
-        update={"premise": f"{theme.premise.rstrip()}{sentence}"}
-    )
+    return theme.model_copy(update={"premise": f"{theme.premise.rstrip()}{sentence}"})
 
 
 def normalize_frame_anchor_prefix(
@@ -515,16 +471,36 @@ def normalize_frame_anchor_prefix(
     anchor_sentence = contract["deterministic_anchor_sentence"]
     if not anchor_sentence:
         return prose
-    without_anchor = prose.replace(str(anchor_sentence), "", 1)
-    first_sentence = re.match(r"^.*?[。.!]", without_anchor)
-    if first_sentence is None:
-        return f"{anchor_sentence}{without_anchor}"
-    split_at = first_sentence.end()
-    return (
-        f"{without_anchor[:split_at]}"
-        f"{anchor_sentence}"
-        f"{without_anchor[split_at:]}"
-    )
+    source = source_sentence(request.context)
+    if source is None or not prose.startswith(source):
+        return prose
+    body = prose[len(source) :]
+    separator = " " if request.output_language.value == "english" else ""
+    insertion = separator + str(anchor_sentence)
+    if body.lstrip().startswith(str(anchor_sentence)):
+        return prose
+    return source + insertion + body
+
+
+def duplicate_theme_issues(
+    candidates: list[NarrativeTheme],
+    existing: list[NarrativeTheme],
+) -> tuple[str, ...]:
+    def key(theme: NarrativeTheme) -> tuple[str, str]:
+        return (_normalize(theme.premise), _normalize(theme.style))
+
+    seen = {key(theme): theme.theme_id for theme in existing}
+    issues = []
+    for theme in candidates:
+        signature = key(theme)
+        if signature in seen:
+            issues.append(
+                f"{theme.theme_id} repeats {seen[signature]}: "
+                "premise and style must form a new Theme, not just a new title."
+            )
+        else:
+            seen[signature] = theme.theme_id
+    return tuple(issues)
 
 
 def participant_frame_contracts(
@@ -558,10 +534,6 @@ def participant_frame_contracts(
             contract: dict[str, object] = {
                 "frame_slot": frame_id,
                 "participant_count": len(characters),
-                "requested_cast_counts": {
-                    "female_count": request.female_count,
-                    "male_count": request.male_count,
-                },
                 "required_active_participants": characters,
                 "participation_requirement": (
                     "required_active_participants 中每个人都必须通过具体可见"
@@ -569,7 +541,7 @@ def participant_frame_contracts(
                     "回应者、装饰人物或无动作人物"
                 ),
                 "interaction_topology_requirement": (
-                    "模型根据输入男女数量、人物身体条件、场景与当前内容路径"
+                    "模型根据 Theme 已选阵容、人物身体条件、场景与当前内容路径"
                     "自行设计互动拓扑；程序不预设核心二人组、角色类别、配对"
                     "数量、接触顺序或空间站位。每个人都必须成为至少一条可见"
                     "动作或接触链的明确端点，并写清动作主客体"
@@ -589,19 +561,13 @@ def participant_frame_contracts(
                 ),
             }
             if request.content_level == ContentLevel.HARDCORE:
-                contract["hardcore_group_realization"] = (
-                    _hardcore_group_realization(
-                        route_name,
-                        characters,
-                    )
+                contract["hardcore_group_realization"] = _hardcore_group_realization(
+                    route_name,
+                    characters,
                 )
             group_contracts.append(contract)
     return {
         "participants": participant_contracts,
-        "requested_cast_counts": {
-            "female_count": request.female_count,
-            "male_count": request.male_count,
-        },
         "selected_participant_count": len(characters),
         "group_frame_contracts": group_contracts,
     }
@@ -664,9 +630,7 @@ def current_frame_diversity_contracts(
                 "required_level_evidence": list(
                     _FRAME_LEVEL_EVIDENCE[request.content_level]
                 ),
-                "required_route_evidence": list(
-                    route["required_visible_evidence"]
-                ),
+                "required_route_evidence": list(route["required_visible_evidence"]),
                 "variation_requirement": (
                     "与同 Theme 其他 Frame 改变姿态类别、核心互动链、"
                     "景别或摄影机方位中的至少三项"
@@ -683,11 +647,7 @@ def build_diversity_report(
         " ".join((item.theme.title, item.theme.premise, item.theme.style))
         for item in result.themes
     ]
-    frame_texts = [
-        frame.prose
-        for item in result.themes
-        for frame in item.frames
-    ]
+    frame_texts = [frame.prose for item in result.themes for frame in item.frames]
     content_evidence_complete = sum(
         content_level_evidence_complete(
             result.request.content_level,
@@ -709,7 +669,7 @@ def build_diversity_report(
     for item in result.themes:
         contract = theme_anchor_contract(result.request, item.theme)
         for frame in item.frames:
-            body = _frame_body(frame.prose)
+            body = frame_body(result.request.context, frame.prose)
             narrative_body = _without_anchor_sentence(
                 body,
                 contract["deterministic_anchor_sentence"],
@@ -723,10 +683,7 @@ def build_diversity_report(
             missing = (
                 not characters
                 or scene is None
-                or any(
-                    term not in body
-                    for term in contract["required_exact_terms"]
-                )
+                or any(term not in body for term in contract["required_exact_terms"])
             )
             forbidden = any(
                 term in body
@@ -767,22 +724,17 @@ def build_diversity_report(
         anchor_forbidden_term_frames=anchor_forbidden,
         character_anchor_complete_frames=character_anchor_complete,
         scene_anchor_complete_frames=scene_anchor_complete,
-        participant_description_complete_slots=(
-            participant_description_complete
-        ),
+        participant_description_complete_slots=(participant_description_complete),
         participant_face_complete_slots=participant_face_complete,
         participant_gaze_complete_slots=participant_gaze_complete,
         participant_support_complete_slots=participant_support_complete,
         participant_slot_count=participant_slot_count,
         clothing_state_conflict_frames=sum(
-            contains_clothing_state_conflict(text)
-            for text in frame_texts
+            contains_clothing_state_conflict(text) for text in frame_texts
         ),
         theme_similarity=_similarity_metrics(theme_texts),
         frame_similarity=_similarity_metrics(frame_texts),
-        same_theme_frame_similarity=_pair_similarity_metrics(
-            same_theme_pairs
-        ),
+        same_theme_frame_similarity=_pair_similarity_metrics(same_theme_pairs),
         theme_coverage=_coverage_counts(
             theme_texts,
             _COVERAGE_TERMS,
@@ -794,30 +746,6 @@ def build_diversity_report(
                 **_FRAME_COVERAGE_TERMS,
             },
         ),
-    )
-
-
-def _excerpt(value: str, *, limit: int) -> str:
-    compact = " ".join(value.split())
-    return compact if len(compact) <= limit else compact[:limit].rstrip()
-
-
-def _anchor_usage(
-    context: str,
-    themes: list[NarrativeTheme],
-) -> dict[str, int]:
-    anchors = _context_anchor_names(context)
-    return {
-        anchor: sum(anchor.casefold() in theme.premise.casefold() for theme in themes)
-        for anchor in anchors
-    }
-
-
-def _context_anchor_names(context: str) -> tuple[str, ...]:
-    return tuple(
-        name
-        for group in _context_anchor_groups(context)
-        for name in (*group["characters"], *group["scenes"])
     )
 
 
@@ -936,8 +864,7 @@ def _scene_anchor_mentioned(anchor: str, value: str) -> bool:
         gap = suffix_index - prefix_index - len(prefix)
         candidates.append((len(prefix) + len(suffix), gap))
     return any(
-        matched >= len(normalized_anchor) and gap <= 40
-        for matched, gap in candidates
+        matched >= len(normalized_anchor) and gap <= 40 for matched, gap in candidates
     )
 
 
@@ -964,10 +891,7 @@ def _participant_evidence(
     value: str,
     character: str,
 ) -> dict[str, bool]:
-    indexes = [
-        match.start()
-        for match in re.finditer(re.escape(character), value)
-    ]
+    indexes = [match.start() for match in re.finditer(re.escape(character), value)]
     if not indexes:
         return {
             "description": False,
@@ -975,10 +899,7 @@ def _participant_evidence(
             "gaze": False,
             "support": False,
         }
-    windows = [
-        value[index : min(len(value), index + 320)]
-        for index in indexes
-    ]
+    windows = [value[index : min(len(value), index + 320)] for index in indexes]
     face_terms = (
         "眉",
         "眼睑",
@@ -1074,10 +995,6 @@ def _participant_evidence(
             for window in normalized_windows
         ),
     }
-
-
-def _frame_body(value: str) -> str:
-    return re.split(r"[。.!]\s*", value, maxsplit=1)[-1]
 
 
 def _coverage_counts(

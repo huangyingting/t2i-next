@@ -18,8 +18,6 @@ def make_prompt_request(
     *,
     theme_count: int = 1,
     frames_per_theme: int = 2,
-    female_count: int | None = None,
-    male_count: int | None = None,
     content_level: ContentLevel = ContentLevel.AESTHETIC,
     output_language: OutputLanguage = OutputLanguage.CHINESE,
     source_prompt_stem: str | None = None,
@@ -32,8 +30,6 @@ def make_prompt_request(
         ),
         theme_count=theme_count,
         frames_per_theme=frames_per_theme,
-        female_count=female_count,
-        male_count=male_count,
         content_level=content_level,
         output_language=output_language,
         source_prompt_stem=source_prompt_stem,
@@ -57,7 +53,7 @@ def make_theme_batch(
 ) -> NarrativeThemeBatch:
     return NarrativeThemeBatch(
         semantic_name=semantic_name,
-        themes=[make_theme(index) for index in range(start, start + count)]
+        themes=[make_theme(index) for index in range(start, start + count)],
     )
 
 
@@ -67,18 +63,14 @@ def make_frame_sequence(
     theme_index: int = 1,
 ) -> NarrativeFrameSequence:
     actions = (
-        "左侧人物正在握紧旧皮箱提手，右侧人物保持俯身姿态，"
-        "指节与皮革受力处清晰可见",
-        "右侧人物正在掀起旧皮箱搭扣，左侧人物保持半蹲姿态，"
-        "铜扣与指腹接触处清晰可见",
+        "左侧人物正在握紧旧皮箱提手，右侧人物保持俯身姿态，指节与皮革受力处清晰可见",
+        "右侧人物正在掀起旧皮箱搭扣，左侧人物保持半蹲姿态，铜扣与指腹接触处清晰可见",
         "左侧人物正在按住皮箱上的行李标签，右侧人物保持直立姿态，"
         "纸张边缘因压力贴紧皮革",
         "右侧人物正在指向箱角的新鲜裂痕，左侧人物保持俯身姿态，"
         "裂口纤维与指尖处于同一焦点",
-        "左侧人物正在托住皮箱下沉的箱底，右侧人物保持屈膝姿态，"
-        "皮革底面因承重形成浅凹",
-        "右侧人物正在扣合皮箱锁舌，左侧人物保持直立姿态，"
-        "锁舌与锁孔在指尖下准确咬合",
+        "左侧人物正在托住皮箱下沉的箱底，右侧人物保持屈膝姿态，皮革底面因承重形成浅凹",
+        "右侧人物正在扣合皮箱锁舌，左侧人物保持直立姿态，锁舌与锁孔在指尖下准确咬合",
     )
     return NarrativeFrameSequence(
         frames=[
@@ -105,8 +97,6 @@ def make_prompt_result(
     *,
     theme_count: int = 1,
     frames_per_theme: int = 2,
-    female_count: int | None = None,
-    male_count: int | None = None,
     content_level: ContentLevel = ContentLevel.AESTHETIC,
     source_prompt_stem: str | None = None,
 ) -> FilmPromptResult:
@@ -116,8 +106,6 @@ def make_prompt_result(
         request=make_prompt_request(
             theme_count=theme_count,
             frames_per_theme=frames_per_theme,
-            female_count=female_count,
-            male_count=male_count,
             content_level=content_level,
             source_prompt_stem=source_prompt_stem,
         ),

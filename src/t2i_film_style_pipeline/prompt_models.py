@@ -16,7 +16,6 @@ from pydantic import (
     Field,
     StringConstraints,
     create_model,
-    model_validator,
 )
 
 
@@ -131,21 +130,8 @@ class FilmPromptRequest(Model):
     prompt_filename_stem: SourcePromptStem | None = None
     theme_count: int = Field(default=1, ge=1, le=100)
     frames_per_theme: int = Field(default=6, ge=1, le=6)
-    female_count: int | None = Field(default=None, ge=0, le=8)
-    male_count: int | None = Field(default=None, ge=0, le=8)
     content_level: ContentLevel = ContentLevel.AESTHETIC
     output_language: OutputLanguage = OutputLanguage.CHINESE
-
-    @model_validator(mode="after")
-    def cast_constraints_fit(self) -> FilmPromptRequest:
-        counts = tuple(
-            count for count in (self.female_count, self.male_count) if count is not None
-        )
-        if self.female_count == 0 and self.male_count == 0:
-            raise ValueError("人物约束不能同时为零")
-        if sum(counts) > 8:
-            raise ValueError("每个主题最多包含八名角色")
-        return self
 
 
 class NarrativeTheme(Model):

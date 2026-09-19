@@ -88,20 +88,6 @@ def generate_command(
         max=6,
         help="每个主题的平行画面数。",
     ),
-    female_count: int | None = typer.Option(
-        None,
-        "--female-count",
-        min=0,
-        max=8,
-        help="可选女性人数约束；默认由场景需要决定。",
-    ),
-    male_count: int | None = typer.Option(
-        None,
-        "--male-count",
-        min=0,
-        max=8,
-        help="可选男性人数约束；默认由场景需要决定。",
-    ),
     concurrency: int = typer.Option(
         8,
         "--concurrency",
@@ -114,7 +100,7 @@ def generate_command(
         "--theme-batch-size",
         min=1,
         max=10,
-        help="每次模型调用批量生成的 Theme 数；默认 5 以便及时更新多样性账本。",
+        help="每次模型调用批量生成的 Theme 数；默认 5，每批带上全部历史主题。",
     ),
     content_level: ContentLevel = typer.Option(
         ContentLevel.AESTHETIC,
@@ -167,15 +153,11 @@ def generate_command(
             output_filename_stem=filename_stem,
             theme_count=themes,
             frames_per_theme=frames,
-            female_count=female_count,
-            male_count=male_count,
             content_level=content_level,
             output_language=output_language,
         )
         rules = resolve_film_style_rules(
-            request.prompt_request(
-                "BRIEF\n\nDirector-work film scene generation."
-            ),
+            request.prompt_request("BRIEF\n\nDirector-work film scene generation."),
             user_directory=rules_dir,
         )
         film_provider = load_film_style_provider_settings()

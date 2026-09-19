@@ -46,70 +46,6 @@ from t2i_film_style_pipeline.prompt_storage import (
 )
 
 _RUN_ID = re.compile(r"\d{8}T\d{6}Z-[a-f0-9]{8}")
-_COUNT_NAMES = (
-    "zero",
-    "one",
-    "two",
-    "three",
-    "four",
-    "five",
-    "six",
-    "seven",
-    "eight",
-)
-
-
-def _cast_slug(request: FilmPromptRequest) -> str:
-    female_count = request.female_count
-    male_count = request.male_count
-    if female_count is None and male_count is None:
-        return "unspecified_cast"
-    if female_count is not None and male_count is not None:
-        parts = []
-        if female_count:
-            parts.append(
-                f"{_COUNT_NAMES[female_count]}_"
-                f"{'woman' if female_count == 1 else 'women'}"
-            )
-        if male_count:
-            parts.append(
-                f"{_COUNT_NAMES[male_count]}_{'man' if male_count == 1 else 'men'}"
-            )
-        return "_".join(parts)
-
-    parts = []
-    if female_count is None:
-        parts.append("unspecified_women")
-    else:
-        parts.append(
-            f"{_COUNT_NAMES[female_count]}_{'woman' if female_count == 1 else 'women'}"
-        )
-    if male_count is None:
-        parts.append("unspecified_men")
-    else:
-        parts.append(
-            f"{_COUNT_NAMES[male_count]}_{'man' if male_count == 1 else 'men'}"
-        )
-    return "_".join(parts)
-
-
-def _numeric_cast_slug(request: FilmPromptRequest) -> str:
-    def count_slug(
-        value: int | None,
-        singular: str,
-        plural: str,
-    ) -> str:
-        if value is None:
-            return f"unspecified_{plural}"
-        noun = singular if value == 1 else plural
-        return f"{value}_{noun}"
-
-    return "_".join(
-        (
-            count_slug(request.female_count, "woman", "women"),
-            count_slug(request.male_count, "man", "men"),
-        )
-    )
 
 
 def _normalize_source_prompt_stem(value: str) -> str:
@@ -129,12 +65,11 @@ def _prompt_filename_stem(
     if request.prompt_filename_stem is not None:
         return _normalize_source_prompt_stem(request.prompt_filename_stem)
     if request.source_prompt_stem is None:
-        return f"{semantic_name}_{_cast_slug(request)}"
+        return semantic_name
     return "_".join(
         (
             _normalize_source_prompt_stem(request.source_prompt_stem),
             request.content_level.value,
-            _numeric_cast_slug(request),
         )
     )
 

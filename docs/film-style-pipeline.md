@@ -69,10 +69,6 @@ uv run t2i-film-style generate "张艺谋" \
   --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
-  --female-count 1 \
-  --male-count 1 \
-  --validate-themes \
-  --validate-frames \
   --content-level aesthetic \
   --concurrency 8 \
   --theme-batch-size 5 \
@@ -89,6 +85,17 @@ uv run t2i-film-style generate "张艺谋" \
 `--theme-batch-size` 控制单次 Theme 模型调用批量返回的独立 Theme 数，范围为
 1–10，默认 5；`--concurrency` 是 Theme 批次与 Frame 调用共同遵守的全局并发
 上限。
+
+电影流程不再接收 `--female-count`、`--male-count` 或对应 API 字段。
+每个 Theme 自由选择 **1–4 名不同的原作成年人，至少一名女性**；每个 Theme
+可以采用不同组合，但其全部 Frame 保持同一组人物。人数不按等级固定为一人
+或两人，不为凑人数复制角色，也不引入额外的原作/原创角色选择协议。
+此改动不修改任何 content-level 规则。阵容要求交给模型执行，不把姓名出现次数
+当作人数校验，也不宣称能证明自由文本中的实际身体数量。
+旧请求中的人数或额外阵容字段不再读取或迁移；需要按当前格式新建运行。
+输出文件名也不再自动拼接固定人数后缀，显式文件名前缀仍照常保留。
+内容语义校验默认关闭；确有需要时才使用 `--validate-themes` / `--validate-frames`。
+schema、批次数量、ID、单段正文、checkpoint 和发布完整性检查保留。
 
 完成后 CLI 输出：
 
@@ -183,15 +190,18 @@ Theme 不再压缩成一句风格总结。`premise` 通常使用三至五句完�
 可以继续展开，不设固定字数上限。film-style 的 Theme 批次输出预算为
 12,000 tokens。
 
-跨 Theme 批次的避重不再回传所有既有 Theme 全文。程序建立紧凑的
-`diversity_ledger`，保存全部已用标题、每个 Theme 的 premise/style 短摘要、来源
-锚点使用次数，以及内容路径、空间、摄影和光线覆盖计数。当前批次每个输出位置还会
+跨 Theme 批次的避重恢复完整历史：`existing_themes` 包含此前每个已接受 Theme 的
+ID、标题、完整 premise 与 style，不截断、不摘要、不只保留最近两个。resume
+从同一批完整 checkpoint 重建历史。模型必须比较全部历史及当前批次内部候选，
+不能只换标题、措辞、小道具或机位就把相同情境与视觉组织当作新 Theme。
+程序额外拦截规范化后 premise/style 完全重复的主题，不依赖可选内容校验，
+使用已有的有界生成重试；没有新增语义评审调用或相似度拒绝阈值。
+这一检查不保证识别换词后的语义重复；完整历史的输入 token 成本高于短摘要。
+当前批次每个输出位置仍会
 得到一个 `current_batch_diversity_contracts` 条目，以请求上下文哈希和 Theme 顺序
 稳定分配内容路径重点、关系张力、空间策略、摄影策略、光线策略和两个优先变化维度。
 合同只指定高层变化轴，不分配具体作品、动作、姿态、动作发起者、接触链或精确镜头。
-模型在
-输出前比较候选与全局账本；若作品场景、人物组合、关系或内容路径、空间调度、摄影
-光线中有四项重复，就在当前调用内自行重构，不增加额外验证调用或重试 token。
+这些高层方向不能代替完整历史比较，也不能把自由阵容固化成主题编号对应的菜单。
 
 OpenAI-compatible prompt provider 默认对 Theme 使用 `0.85` temperature，对 Frame
 使用 `0.6`；可分别通过 `OPENAI_THEME_TEMPERATURE` 和
@@ -218,14 +228,13 @@ Frame 使用同一路径，只在姿态、核心互动链、动作发起者、�
 Hardcore 的四条路径为明确性行为、器具形成的无插入 BDSM 控制链、命令式开放展示
 和外部器具或受控自我刺激。合同只约束高层证据，不固定人物姿势或身体拓扑；同一
 F-ID 在选择性重试和恢复后保持不变。
-未显式指定 `female_count` 与 `male_count` 时，美学级 Theme 选择一至两名成年人，
-极致情色级与赤裸明确级 Theme 恰好选择两名成年人，降低多人身体拓扑复杂度和
-Frame 漏写 Theme 人物的风险；任一人数约束存在时严格采用请求值。极致情色级的
+各等级的人数均由 Theme 在一至四名原作成年人中自由选择，至少包含一名女性。
+极致情色级的
 Frame 合同要求明显裸露或半解服装、实际非生殖器接触、具体欲望或愉悦表情，以及
 皮肤或材质触觉四项同时出现。
-显式请求任意三人及以上的 N 人阵容时，`participant_frame_contracts` 为每个人建立
-独立描述义务，并按每个 F-ID 生成通用 `group_frame_contracts`。合同只携带输入的
-`requested_cast_counts`、Theme 实际选中的 `required_active_participants` 及逐人
+Theme 自行选择三至四人时，`participant_frame_contracts` 为每个人建立
+独立描述义务，并按每个 F-ID 生成通用 `group_frame_contracts`。合同只携带
+Theme 实际选中的 `required_active_participants` 及逐人
 参与要求，不预设核心二人组、观察者、回应者、外围人物、固定角色、配对数量、
 接触顺序或空间站位。
 模型根据人数、场景与身体拓扑自行设计适合当前画面的互动网络，不从程序提供的

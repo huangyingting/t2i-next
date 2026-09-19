@@ -9,7 +9,6 @@ from t2i_film_style_pipeline.diversity import (
     current_theme_diversity_contracts,
     participant_frame_contracts,
     theme_anchor_contract,
-    theme_diversity_ledger,
 )
 from t2i_film_style_pipeline.prompt_models import (
     FilmPromptRequest,
@@ -19,13 +18,6 @@ from t2i_film_style_pipeline.prompt_models import (
     NarrativeTheme,
 )
 from t2i_film_style_pipeline.prompt_provider import ChatMessage
-
-
-def _cast_constraints(request: FilmPromptRequest) -> dict[str, int | None]:
-    return {
-        "female_count": request.female_count,
-        "male_count": request.male_count,
-    }
 
 
 def theme_messages(
@@ -54,16 +46,14 @@ def theme_messages(
             content=json.dumps(
                 {
                     "film_context": request.context,
-                    "cast_constraints": _cast_constraints(request),
                     "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "semantic_name": semantic_name,
                     **identity_payload,
                     "frames_per_theme": request.frames_per_theme,
-                    "diversity_ledger": theme_diversity_ledger(
-                        request,
-                        existing_themes,
-                    ),
+                    "existing_themes": [
+                        theme.model_dump(mode="json") for theme in existing_themes
+                    ],
                     "current_batch_diversity_contracts": (
                         current_theme_diversity_contracts(
                             request,
@@ -96,7 +86,6 @@ def frame_messages(
             content=json.dumps(
                 {
                     "film_context": request.context,
-                    "cast_constraints": _cast_constraints(request),
                     "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "theme": theme.model_dump(mode="json"),
@@ -121,9 +110,7 @@ def frame_messages(
                         )
                     ),
                     "program_assigns_frame_ids": True,
-                    "accepted_frame_prose": [
-                        frame.prose for frame in accepted_frames
-                    ],
+                    "accepted_frame_prose": [frame.prose for frame in accepted_frames],
                     "frame_batch_format": (
                         "Return exactly one <FRAME>...</FRAME> block for each "
                         "requested_frame_slots item, in the listed order."

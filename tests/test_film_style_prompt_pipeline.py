@@ -91,16 +91,14 @@ class FakePromptModel:
         value = next(self._values)
         if isinstance(value, Exception):
             raise value
-        if (
-            isinstance(value, NarrativeThemeBatch)
-            and issubclass(response_model, NarrativeThemeDraftBatch)
+        if isinstance(value, NarrativeThemeBatch) and issubclass(
+            response_model, NarrativeThemeDraftBatch
         ):
             value = response_model.model_validate(
                 {
                     "semantic_name": value.semantic_name,
                     "themes": [
-                        theme.model_dump(exclude={"theme_id"})
-                        for theme in value.themes
+                        theme.model_dump(exclude={"theme_id"}) for theme in value.themes
                     ],
                 }
             )
@@ -144,9 +142,7 @@ def make_pipeline_request() -> FilmStylePromptRequest:
 def make_film_theme_batch():
     batch = make_theme_batch()
     for theme in batch.themes:
-        theme.premise = (
-            f"原作成年人物无名与飞雪位于秦宫大殿。{theme.premise}"
-        )
+        theme.premise = f"原作成年人物无名与飞雪位于秦宫大殿。{theme.premise}"
     return batch
 
 
@@ -197,10 +193,8 @@ def make_settings(
     )
 
 
-def test_theme_messages_use_compact_global_diversity_ledger() -> None:
-    request = make_pipeline_request().prompt_request(
-        "BRIEF\n\nDirector scene context."
-    )
+def test_theme_messages_include_complete_history_without_excerpts() -> None:
+    request = make_pipeline_request().prompt_request("BRIEF\n\nDirector scene context.")
     existing = make_theme_batch(start=1, count=2).themes
     existing[0].premise = "甲" * 400
     existing[0].style = "乙" * 400
@@ -222,27 +216,18 @@ def test_theme_messages_use_compact_global_diversity_ledger() -> None:
         )[1].content
     )
 
-    assert "existing_themes" not in payload
-    assert payload["diversity_ledger"]["used_titles"] == [
-        theme.title for theme in existing
+    assert "diversity_ledger" not in payload
+    assert "cast_constraints" not in payload
+    assert payload["existing_themes"] == [
+        theme.model_dump(mode="json") for theme in existing
     ]
-    signatures = payload["diversity_ledger"]["used_theme_signatures"]
-    assert [item["theme_id"] for item in signatures] == ["T001", "T002"]
-    assert len(signatures[0]["premise_excerpt"]) == 180
-    assert len(signatures[0]["style_excerpt"]) == 140
-    assert "coverage_counts" in payload["diversity_ledger"]
-    assert "source_anchor_mentions" in payload["diversity_ledger"]
     contracts = payload["current_batch_diversity_contracts"]
     assert [contract["output_position"] for contract in contracts] == [1, 2]
     assert all(len(contract["novelty_priorities"]) == 2 for contract in contracts)
-    assert all(
-        contract["cast_size_requirement"] == "选择一至两名原作成年人"
-        for contract in contracts
-    )
+    assert all("cast_size_requirement" not in contract for contract in contracts)
     assert all(
         {
             "content_route_emphasis",
-            "cast_size_requirement",
             "relationship_dynamic",
             "spatial_strategy",
             "camera_strategy",
@@ -251,17 +236,20 @@ def test_theme_messages_use_compact_global_diversity_ledger() -> None:
         <= contract.keys()
         for contract in contracts
     )
-    assert contracts == json.loads(
-        theme_messages(
-            request,
-            rules,
-            start_index=3,
-            count=2,
-            existing_themes=existing,
-            semantic_name="film_run",
-            program_assigns_ids=True,
-        )[1].content
-    )["current_batch_diversity_contracts"]
+    assert (
+        contracts
+        == json.loads(
+            theme_messages(
+                request,
+                rules,
+                start_index=3,
+                count=2,
+                existing_themes=existing,
+                semantic_name="film_run",
+                program_assigns_ids=True,
+            )[1].content
+        )["current_batch_diversity_contracts"]
+    )
 
     all_contracts = [
         contract
@@ -302,10 +290,10 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
         frames_per_theme=5,
         content_level=ContentLevel.HARDCORE,
     )
-    theme = make_theme_batch().themes[0].model_copy(
-        update={
-            "premise": "原作成年人物林岚与陈默位于木构内厅。"
-        }
+    theme = (
+        make_theme_batch()
+        .themes[0]
+        .model_copy(update={"premise": "原作成年人物林岚与陈默位于木构内厅。"})
     )
     rules = FilmPromptRuleSet(
         themes=("Theme rule.",),
@@ -328,23 +316,17 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
         "required_scene": "木构内厅",
         "required_exact_terms": ["林岚", "陈默", "木构内厅"],
         "forbidden_other_anchor_terms_in_body": ["河岸长廊"],
-        "deterministic_anchor_sentence": (
-            "原作人物林岚、陈默位于原作场景“木构内厅”。"
-        ),
+        "deterministic_anchor_sentence": ("原作人物林岚、陈默位于原作场景“木构内厅”。"),
     }
     participant_contract = payload["participant_frame_contracts"]
     assert [
-        item["canonical_name"]
-        for item in participant_contract["participants"]
+        item["canonical_name"] for item in participant_contract["participants"]
     ] == ["林岚", "陈默"]
     assert participant_contract["group_frame_contracts"] == []
     contracts = payload["current_frame_diversity_contracts"]
     assert [contract["frame_slot"] for contract in contracts] == frame_ids
     assert len({contract["content_route"] for contract in contracts}) == 1
-    assert all(
-        contract["required_level_evidence"] == []
-        for contract in contracts
-    )
+    assert all(contract["required_level_evidence"] == [] for contract in contracts)
     assert all(contract["required_route_evidence"] for contract in contracts)
 
     retry_payload = json.loads(
@@ -381,6 +363,8 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
 def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
     request = FilmPromptRequest(
         context=(
+            "每个 Frame 必须准确且只在第一句使用以下来源说明：\n"
+            "“这是固定来源句。”\n\n"
             "原作人物与场景锚点\n"
             "### 《测试作品》\n"
             "原作成年人物\n"
@@ -393,12 +377,12 @@ def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
         ),
         frames_per_theme=4,
     )
-    theme = make_theme_batch().themes[0].model_copy(
-        update={
-            "premise": (
-                "林岚、陈默与周遥三名原作成年人位于公寓阳台。"
-            )
-        }
+    theme = (
+        make_theme_batch()
+        .themes[0]
+        .model_copy(
+            update={"premise": ("林岚、陈默与周遥三名原作成年人位于公寓阳台。")}
+        )
     )
     payload = json.loads(
         frame_messages(
@@ -415,8 +399,7 @@ def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
 
     participant_contract = payload["participant_frame_contracts"]
     assert [
-        item["canonical_name"]
-        for item in participant_contract["participants"]
+        item["canonical_name"] for item in participant_contract["participants"]
     ] == ["林岚", "陈默", "周遥"]
     contracts = participant_contract["group_frame_contracts"]
     assert [contract["frame_slot"] for contract in contracts] == [
@@ -426,8 +409,7 @@ def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
         "F04",
     ]
     assert all(
-        contract["required_active_participants"]
-        == ["林岚", "陈默", "周遥"]
+        contract["required_active_participants"] == ["林岚", "陈默", "周遥"]
         for contract in contracts
     )
     assert all(contract["participant_count"] == 3 for contract in contracts)
@@ -447,16 +429,9 @@ def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
         "原作人物林岚、陈默、周遥位于原作场景“公寓阳台”。"
         "三人在狭小水泥阳台上纳凉。"
     )
-    assert (
-        normalize_frame_anchor_prefix(request, theme, normalized)
-        == normalized
-    )
+    assert normalize_frame_anchor_prefix(request, theme, normalized) == normalized
     modified_scene_theme = theme.model_copy(
-        update={
-            "premise": (
-                "林岚、陈默与周遥三名原作成年人位于狭小公寓的水泥阳台。"
-            )
-        }
+        update={"premise": ("林岚、陈默与周遥三名原作成年人位于狭小公寓的水泥阳台。")}
     )
     normalized_theme = normalize_theme_anchor_terms(
         request,
@@ -488,8 +463,7 @@ def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
         for contract in hardcore_contracts
     )
     assert all(
-        "role_assignment"
-        not in contract["hardcore_group_realization"]
+        "role_assignment" not in contract["hardcore_group_realization"]
         for contract in hardcore_contracts
     )
 
@@ -518,12 +492,12 @@ def test_eight_person_frame_contract_remains_role_agnostic() -> None:
         frames_per_theme=5,
         content_level=ContentLevel.HARDCORE,
     )
-    theme = make_theme_batch().themes[0].model_copy(
-        update={
-            "premise": (
-                f"{'、'.join(names)}八名原作成年人位于公寓客厅。"
-            )
-        }
+    theme = (
+        make_theme_batch()
+        .themes[0]
+        .model_copy(
+            update={"premise": (f"{'、'.join(names)}八名原作成年人位于公寓客厅。")}
+        )
     )
     rules = FilmPromptRuleSet(
         themes=("Theme rule.",),
@@ -541,9 +515,7 @@ def test_eight_person_frame_contract_remains_role_agnostic() -> None:
     )
 
     participant_contract = payload["participant_frame_contracts"]
-    contracts = participant_contract[
-        "group_frame_contracts"
-    ]
+    contracts = participant_contract["group_frame_contracts"]
     assert participant_contract["selected_participant_count"] == 8
     assert len(contracts) == 5
     for contract in contracts:
@@ -565,24 +537,23 @@ def test_eight_person_frame_contract_remains_role_agnostic() -> None:
             accepted_frames=[],
         )[1].content
     )
-    assert retry_payload["participant_frame_contracts"][
-        "group_frame_contracts"
-    ][0] == contracts[2]
+    assert (
+        retry_payload["participant_frame_contracts"]["group_frame_contracts"][0]
+        == contracts[2]
+    )
 
 
 @pytest.mark.asyncio
 async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
     request = make_pipeline_request()
     theme_batch = make_film_theme_batch()
-    theme_batch.themes[0].premise = (
-        "这是一段不包含原作人物、场景或内容证据的普通主题描述。"
-    )
+    theme_batch.themes[
+        0
+    ].premise = "这是一段不包含原作人物、场景或内容证据的普通主题描述。"
     sequence = make_film_frame_sequence()
     for index, frame in enumerate(sequence.frames, start=1):
         frame.prose = f"第 {index} 个没有来源、锚点或摄影证据的未验证画面正文。"
-    prompt_model = FakePromptModel(
-        [theme_batch, frame_batch_text(sequence)]
-    )
+    prompt_model = FakePromptModel([theme_batch, frame_batch_text(sequence)])
     store = LocalFilmStyleRunStore(tmp_path / "runs")
 
     completed = await FilmStylePromptStudio(
@@ -612,9 +583,7 @@ async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
         == 2
     )
     assert (
-        report["anchor_complete_frames"]
-        + report["anchor_missing_required_frames"]
-        >= 2
+        report["anchor_complete_frames"] + report["anchor_missing_required_frames"] >= 2
     )
     assert report["character_anchor_complete_frames"] == 0
     assert report["scene_anchor_complete_frames"] == 0
@@ -687,8 +656,7 @@ async def test_pipeline_generates_frames_while_next_theme_is_in_flight(
                 batch = make_theme_batch(start=start, count=2)
                 for theme in batch.themes:
                     theme.premise = (
-                        f"原作成年人物无名与飞雪位于秦宫大殿。"
-                        f"{theme.premise}"
+                        f"原作成年人物无名与飞雪位于秦宫大殿。{theme.premise}"
                     )
                 value = response_model.model_validate(
                     {
@@ -729,9 +697,7 @@ async def test_pipeline_generates_frames_while_next_theme_is_in_flight(
                 sequence = make_film_frame_sequence()
                 return TextModelResponse(
                     text=frame_batch_text(
-                        NarrativeFrameSequence(
-                            frames=[sequence.frames[0]]
-                        )
+                        NarrativeFrameSequence(frames=[sequence.frames[0]])
                     ),
                     usage=TokenUsage(total_tokens=10),
                 )
@@ -770,17 +736,15 @@ async def test_pipeline_generates_frames_while_next_theme_is_in_flight(
 async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
     request = make_pipeline_request()
     bad_sequence = make_film_frame_sequence()
-    bad_sequence.frames[0].prose = (
-        f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
-    )
+    bad_sequence.frames[
+        0
+    ].prose = f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
     prompt_model = FakePromptModel(
         [
             make_film_theme_batch(),
             frame_batch_text(bad_sequence),
             frame_batch_text(
-                NarrativeFrameSequence(
-                    frames=[make_film_frame_sequence().frames[0]]
-                )
+                NarrativeFrameSequence(frames=[make_film_frame_sequence().frames[0]])
             ),
         ]
     )
@@ -810,14 +774,16 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
     anchor_sentence = retry_payload["theme_anchor_contract"][
         "deterministic_anchor_sentence"
     ]
-    expected_accepted = make_film_frame_sequence().frames[1].prose.replace(
-        source_sentence,
-        source_sentence + anchor_sentence,
-        1,
+    expected_accepted = (
+        make_film_frame_sequence()
+        .frames[1]
+        .prose.replace(
+            source_sentence,
+            source_sentence + anchor_sentence,
+            1,
+        )
     )
-    assert retry_payload["accepted_frame_prose"] == [
-        expected_accepted
-    ]
+    assert retry_payload["accepted_frame_prose"] == [expected_accepted]
 
 
 @pytest.mark.asyncio
@@ -830,9 +796,9 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     store = LocalFilmStyleRunStore(tmp_path / "runs")
     film_model = FakeFilmModel()
     partial_sequence = make_film_frame_sequence()
-    partial_sequence.frames[1].prose = (
-        f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
-    )
+    partial_sequence.frames[
+        1
+    ].prose = f"{frame_source_sentence(make_request())}抱歉，我无法协助创作这个画面。"
     first_prompt_model = FakePromptModel(
         [make_film_theme_batch(), frame_batch_text(partial_sequence)]
     )
@@ -857,19 +823,13 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     assert failed.manifest.profile_run_id is not None
     assert failed.manifest.prompt_run_id is not None
     assert film_model.calls == 1
-    prompt_run = next(
-        (tmp_path / "runs" / run_id / "prompt-runs").iterdir()
-    )
+    prompt_run = next((tmp_path / "runs" / run_id / "prompt-runs").iterdir())
     assert (prompt_run / "frames/T001/F01.json").is_file()
     assert not (prompt_run / "frames/T001/F02.json").exists()
 
     resumed_sequence = make_film_frame_sequence()
     resumed_prompt_model = FakePromptModel(
-        [
-            frame_batch_text(
-                NarrativeFrameSequence(frames=[resumed_sequence.frames[1]])
-            )
-        ]
+        [frame_batch_text(NarrativeFrameSequence(frames=[resumed_sequence.frames[1]]))]
     )
     completed = await FilmStylePromptStudio(
         film_model,
@@ -899,9 +859,7 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
         source_sentence + anchor_sentence,
         1,
     )
-    assert resumed_payload["accepted_frame_prose"] == [
-        expected_accepted
-    ]
+    assert resumed_payload["accepted_frame_prose"] == [expected_accepted]
     assert store.inspect(run_id).manifest.status == FilmStyleRunStatus.COMPLETED
 
 

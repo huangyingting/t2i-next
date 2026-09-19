@@ -72,8 +72,6 @@ class FilmStylePromptRequest(_Model):
     )
     theme_count: int = Field(default=1, ge=1, le=100)
     frames_per_theme: int = Field(default=6, ge=1, le=6)
-    female_count: int | None = Field(default=None, ge=0, le=8)
-    male_count: int | None = Field(default=None, ge=0, le=8)
     content_level: ContentLevel = ContentLevel.AESTHETIC
     output_language: OutputLanguage = OutputLanguage.CHINESE
 
@@ -89,8 +87,6 @@ class FilmStylePromptRequest(_Model):
             ),
             theme_count=self.theme_count,
             frames_per_theme=self.frames_per_theme,
-            female_count=self.female_count,
-            male_count=self.male_count,
             content_level=self.content_level,
             output_language=self.output_language,
         )
@@ -170,9 +166,7 @@ class LocalFilmStyleRunStore:
         staging: Path | None = None
         try:
             self._runs_root.mkdir(parents=True, exist_ok=True)
-            staging = Path(
-                tempfile.mkdtemp(prefix=f".{run_id}-", dir=self._runs_root)
-            )
+            staging = Path(tempfile.mkdtemp(prefix=f".{run_id}-", dir=self._runs_root))
             (staging / "profile-runs").mkdir()
             (staging / "prompt-runs").mkdir()
             _write_json(staging / "request.json", request)
@@ -321,9 +315,7 @@ class LocalFilmStyleRunStore:
             update={
                 "status": FilmStyleRunStatus.COMPLETED,
                 "prompt_file": str(prompt_file.resolve()),
-                "diversity_report_file": str(
-                    diversity_report_file.resolve()
-                ),
+                "diversity_report_file": str(diversity_report_file.resolve()),
                 "updated_at": _now(),
                 "error": None,
             }
@@ -548,9 +540,7 @@ class FilmStylePromptStudio:
                 return self._store.complete(
                     run_id,
                     prompt_file=completed_prompt.published.prompt_file,
-                    diversity_report_file=(
-                        completed_prompt.diversity_report_file
-                    ),
+                    diversity_report_file=(completed_prompt.diversity_report_file),
                 )
             except FilmStylePipelineError as exc:
                 self._store.fail(run_id, str(exc))

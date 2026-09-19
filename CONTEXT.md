@@ -60,6 +60,15 @@ existing requirements; it is not a semantic validator or a guarantee of correct
 body counts in arbitrary prose.
 _Avoid_: Fixed cast matrix, cloned identity to fill a count, inferred gender total
 
+**Film Theme History**:
+All accepted Themes' full title, premise and style, sent to subsequent Theme
+batches and rebuilt from checkpoints on resume. New Themes must differ from
+the entire history and their batch peers, not just rename or paraphrase an old
+composition. A normalized exact premise/style duplicate is rejected through the
+existing bounded retry mechanism; no additional model review stage is added.
+This does not prove semantic uniqueness and costs more input tokens than excerpts.
+_Avoid_: Truncated ledger, recent-only memory, semantic duplicate guarantee
+
 ## Standalone Story Generation
 
 The `t2i_story_pipeline` package is independent from Prompt Generation above.
