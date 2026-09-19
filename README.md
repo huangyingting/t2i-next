@@ -80,6 +80,39 @@ uv run t2i-film-style resume RUN_ID
 ```
 
 恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
+
+仓库中的 `asian-directors.csv` 可通过安全的批处理脚本逐行生成
+`aesthetic` 提示词。每个导演—电影记录依次运行 1 女、1 女 1 男、2 女 1 男、
+2 女 2 男、3 女 1 男五种阵容；每项固定生成 50 个 Theme、每个 Theme 4 个 Frame。
+脚本不传 `--scene`，由电影 Profile 和 Theme 从该行作品中选择原作人物与场景。
+先用一行 dry-run 核对命令：
+
+```bash
+uv run python scripts/generate-asian-directors-aesthetic.py \
+  --dry-run \
+  --max-rows 1
+```
+
+确认后执行全部记录：
+
+```bash
+uv run python scripts/generate-asian-directors-aesthetic.py
+```
+
+成功作业会写入
+`runs/asian-directors-aesthetic/batch-state.jsonl`；再次执行时自动跳过成功作业，
+每个作业的 Film checkpoint 则隔离在
+`runs/asian-directors-aesthetic/runs/<job-id>/`。失败或中断后再次执行脚本时，
+它会发现该目录中唯一的顶层 run ID，并调用 `t2i-film-style resume`，继续已有的
+Profile、Theme 和 Frame checkpoint，而不是重新 generate。即使进程在失败事件写入
+批处理状态前被终止，独立作业目录仍可用于发现和恢复 run；若一个作业目录异常包含
+多个顶层 run，脚本会明确报错而不猜测。`--start-row` 和 `--max-rows` 可分段处理，
+`--stop-on-error` 可在首次失败时停止。脚本默认串行启动顶层作业，每个作业内仍将
+`--concurrency 8` 传给 Film pipeline；可用 `--concurrency` 和
+`--theme-batch-size` 调整。当前 CSV 有 267 行，因此完整运行包含 1,335 个顶层
+作业、66,750 个 Theme 和 267,000 个 Frame；执行前应先确认模型配额、时间和
+存储预算。脚本仅支持真人电影及 `aesthetic`，不会生成或接受其他内容等级。
+
 电影流程的男女数量完全由 `--female-count` 和 `--male-count` 控制，默认分别为
 **1 和 0**；例如 `--female-count 3 --male-count 0` 固定每个 Theme 为三女零男，
 `--female-count 0 --male-count 5` 固定为零女五男。两项均为非负整数，不设人数
