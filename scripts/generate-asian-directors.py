@@ -91,7 +91,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(
         description=(
-            "Generate aesthetic Film prompts for every director-film row and "
+            "Generate Film prompts for every director-film row and "
             "the built-in five-cast matrix."
         )
     )
@@ -110,13 +110,13 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "--runs-dir",
         type=Path,
-        default=repo_root / "runs" / "asian-directors-aesthetic" / "runs",
+        default=repo_root / "runs" / "asian-directors" / "runs",
         help="Film run checkpoint directory.",
     )
     parser.add_argument(
         "--state-file",
         type=Path,
-        default=repo_root / "runs" / "asian-directors-aesthetic" / "batch-state.jsonl",
+        default=repo_root / "runs" / "asian-directors" / "batch-state.jsonl",
         help="Append-only completion and failure ledger.",
     )
     parser.add_argument(
