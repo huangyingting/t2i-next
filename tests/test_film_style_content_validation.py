@@ -12,6 +12,7 @@ from t2i_film_style_pipeline.prompt_models import (
     NarrativeFrame,
     NarrativeTheme,
 )
+from tests.film_prompt_factories import make_selected_cast, make_source_films
 from tests.test_film_style_pipeline import make_profile, make_request
 
 
@@ -23,7 +24,11 @@ def make_film_request() -> FilmStyleRequest:
 
 
 def make_prompt_request(level: ContentLevel) -> FilmPromptRequest:
-    return FilmPromptRequest(context="电影场景上下文", content_level=level)
+    return FilmPromptRequest(
+        frame_source_sentence=frame_source_sentence(make_film_request()),
+        context="电影场景上下文", content_level=level,
+        source_films=make_source_films(),
+    )
 
 
 def make_validation_profile():
@@ -33,6 +38,8 @@ def make_validation_profile():
 
 def make_theme(premise: str) -> NarrativeTheme:
     return NarrativeTheme(
+        source_work_index=0,
+        selected_cast=make_selected_cast(),
         theme_id="T001",
         title="测试主题",
         premise=f"原作人物无名与飞雪位于秦宫大殿。{premise}",
@@ -351,6 +358,8 @@ def test_theme_requires_original_character_and_scene_anchors() -> None:
     validator = FilmStyleContentValidator(film_request, make_validation_profile())
     request = make_prompt_request(ContentLevel.AESTHETIC)
     theme = NarrativeTheme(
+        source_work_index=0,
+        selected_cast=make_selected_cast(),
         theme_id="T001",
         title="缺少锚点",
         premise="两名成年人在一间书房里相互注视。",

@@ -62,6 +62,8 @@ uv run t2i-film-style generate "张艺谋" \
   --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
+  --female-count 2 \
+  --male-count 0 \
   --theme-batch-size 4 \
   --concurrency 8 \
   --validate-themes \
@@ -80,6 +82,14 @@ uv run t2i-film-style resume RUN_ID
 ```
 
 恢复时复用已经完成的视觉档案、Theme 和 Frame，不重新生成已有 checkpoint。
+男女数量约束来自显式 CLI/API 字段，不从文件名或场景正文猜测。原作成年人物锚点
+包含性别信息；每个 Theme 结构化选择同一部作品中的不同原作身份，并校验人数、
+性别与身份唯一性。原作锚点无法满足请求时明确失败，不复制同一人物、不改性别、
+不降低请求人数。人物约束是必需契约，不依赖可选的内容质量检查开关。
+请求冻结 `source_films`，Theme 冻结 `source_work_index` 与 `selected_cast`，
+恢复和发布使用同一组事实；旧数据格式直接拒绝，不做兼容迁移。
+结构化选择能验证阵容元数据，但不能证明任意自由文本没有重复身体；镜像、
+多视图和正常的重复提名也不能按姓名出现次数算作额外人物。
 Profile 保持严格结构化输出；Theme 只返回不含 ID 的轻量结构，由程序分配
 `theme_id`。Theme producer 每次批量生成 `--theme-batch-size` 个 Theme；批次
 checkpoint 后，每个 Theme 独立进入有界 Frame queue，producer 随即生成下一批，
@@ -249,6 +259,8 @@ Frame 可选检查包括摄影文字证据、字符长度、空白分隔词数�
 缺省列表。用户长度检查默认固定，CLI 显式覆盖任一字符边界也使该检查固定，
 即使数字与默认值相同；不再按数值猜测配置来源。每个 Theme 的有效范围冻结后
 统一用于写作目标、检查、发布及 resume。
+长正文另以有效字符范围的整数中点作为建议写作目标，帮助模型规划内容；这不是
+新的接受阈值，原有闭区间和重试条件不变，标题与精确长度不强制取中点。
 结构与安全契约不受开关影响。
 质量策略随 run 冻结；告警写入 attempts 和完整结果，CLI 分阶段显示检查状态。
 批次和预算可分别用 `--theme-batch-size`、`--theme-output-tokens`、
@@ -259,6 +271,9 @@ Theme 去重上下文不再反复传输所有完整正文：保留全部历史�
 加上最近两个完整 Theme；完整 checkpoint 仍用于 Frame 生成。相同摘要或相同
 premise/style 组合会拒绝，同一 Theme 中完全重复的 Frame 也会拒绝；这不等于
 识别所有语义重复。Frame 重试会带上所有失败槽位的问题及有界的上一版正文。
+Theme 必须明确具体事件或静态视觉命题，Frame 在其人物、地点和时间边界内变化，
+不能另开无关任务。肢体占用和衣物结构的静默自检属于写作要求，不冒充本地语义
+或物理正确性证明，实际内容质量仍须通过真实输出抽查。
 可用 `uv run t2i-story diagnostics <run-id> --format json` 查看首轮接受率、
 重试、失败类别和已记录 token，用量缺失不被当作免费调用。
 

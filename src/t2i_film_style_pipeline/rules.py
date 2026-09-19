@@ -6,14 +6,14 @@ from pathlib import Path
 
 from t2i_film_style_pipeline.errors import FilmStyleConfigurationError
 from t2i_film_style_pipeline.models import FilmStyleRuleSet
-from t2i_film_style_pipeline.prompt_models import FilmPromptRequest, OutputLanguage
+from t2i_film_style_pipeline.prompt_models import FilmPromptOptions, OutputLanguage
 
 _SYSTEM_RULES_DIRECTORY = Path(__file__).resolve().parent / "rule_packs" / "system"
 _STAGE_FILENAMES = ("themes.rules", "frames.rules")
 
 
 def resolve_film_style_rules(
-    request: FilmPromptRequest,
+    request: FilmPromptOptions,
     *,
     user_directory: Path | None = None,
 ) -> FilmStyleRuleSet:
@@ -59,7 +59,7 @@ def resolve_film_style_rules(
 
 def _compile(
     stage_filename: str,
-    request: FilmPromptRequest,
+    request: FilmPromptOptions,
     system_directory: Path,
     user_directory: Path | None,
 ) -> tuple[str, ...]:
@@ -81,7 +81,7 @@ def _compile(
 def _selected_paths(
     directory: Path,
     stage_filename: str,
-    request: FilmPromptRequest,
+    request: FilmPromptOptions,
 ) -> tuple[Path, ...]:
     return (
         directory / "common.rules",
@@ -120,7 +120,7 @@ def _read_rule_file(path: Path, *, required: bool) -> tuple[str, ...]:
     )
 
 
-def _output_language_rule(request: FilmPromptRequest) -> str:
+def _output_language_rule(request: FilmPromptOptions) -> str:
     if request.output_language == OutputLanguage.ENGLISH:
         return (
             "所有自然语言输出字段必须使用准确、流畅的英文。只有电影场景上下文"

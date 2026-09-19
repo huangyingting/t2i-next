@@ -27,6 +27,7 @@ from t2i_story_pipeline.models import (
     TextLengthBounds,
     ThemeEffectiveQuality,
     ThemeQualityPolicy,
+    ThemeTextLengthCheck,
     WordCountCheck,
 )
 
@@ -99,6 +100,16 @@ def writing_constraints(
                 f"Write {target} using {check.min_chars} to {check.max_chars} "
                 "characters, counting spaces and punctuation."
             )
+            if check.min_chars < check.max_chars and not (
+                isinstance(check, ThemeTextLengthCheck) and check.field == "title"
+            ):
+                midpoint = (check.min_chars + check.max_chars) // 2
+                instruction += (
+                    f" Aim for about {midpoint} characters as a drafting target, "
+                    "not an additional acceptance condition. Plan the relevant "
+                    "subject, action and spatial detail before writing; do not "
+                    "stop near the minimum or pad with repetition and decoration."
+                )
         elif isinstance(check, WordCountCheck):
             maximum = (
                 f" and at most {check.max_words}" if check.max_words is not None else ""

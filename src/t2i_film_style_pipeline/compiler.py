@@ -6,6 +6,7 @@ from t2i_film_style_pipeline.models import (
     FilmStyleProfile,
     FilmStyleRequest,
     FilmWorkReference,
+    exact_film_style_profile_model,
 )
 
 
@@ -46,6 +47,10 @@ def compile_film_context(
     *,
     scene_direction: str | None = None,
 ) -> str:
+    request = FilmStyleRequest.model_validate(request)
+    profile = exact_film_style_profile_model(len(request.works)).model_validate(
+        profile.model_dump()
+    )
     section = (
         _compile_english(request, profile, scene_direction)
         if request.output_language == "english"
@@ -76,6 +81,7 @@ def _compile_chinese(
                 "原作成年人物",
                 *(
                     f"- {character.canonical_name}："
+                    f"gender={character.gender.value}；"
                     f"{character.identity_and_appearance}；"
                     f"原作服装：{character.canonical_costume}；"
                     f"服装短语：{'、'.join(character.costume_features)}"
@@ -196,6 +202,7 @@ def _compile_english(
                 "Adult characters from the film",
                 *(
                     f"- {character.canonical_name}: "
+                    f"gender={character.gender.value}; "
                     f"{character.identity_and_appearance}; "
                     f"canonical costume: {character.canonical_costume}; "
                     f"required costume phrases: "

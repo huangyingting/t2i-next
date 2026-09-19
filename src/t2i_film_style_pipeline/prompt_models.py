@@ -19,6 +19,12 @@ from pydantic import (
     model_validator,
 )
 
+from t2i_film_style_pipeline.models import (
+    CharacterGender,
+    FilmCastSource,
+    ShortText,
+)
+
 
 def _single_line(value: str) -> str:
     if "\n" in value or "\r" in value:
@@ -33,7 +39,7 @@ def _usable_source_prompt_stem(value: str) -> str:
 
 
 class Model(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", revalidate_instances="always")
 
 
 Text = Annotated[
@@ -125,19 +131,16 @@ class FilmPromptRuleSet(Model):
         return hashlib.sha256(payload).hexdigest()
 
 
-class FilmPromptRequest(Model):
-    context: FilmContextText
-    source_prompt_stem: SourcePromptStem | None = None
-    prompt_filename_stem: SourcePromptStem | None = None
+class FilmPromptOptions(Model):
     theme_count: int = Field(default=1, ge=1, le=100)
     frames_per_theme: int = Field(default=6, ge=1, le=6)
-    female_count: int | None = Field(default=None, ge=0, le=8)
-    male_count: int | None = Field(default=None, ge=0, le=8)
+    female_count: int | None = Field(default=None, ge=0, le=8, strict=True)
+    male_count: int | None = Field(default=None, ge=0, le=8, strict=True)
     content_level: ContentLevel = ContentLevel.AESTHETIC
     output_language: OutputLanguage = OutputLanguage.CHINESE
 
     @model_validator(mode="after")
-    def cast_constraints_fit(self) -> FilmPromptRequest:
+    def cast_constraints_fit(self) -> FilmPromptOptions:
         counts = tuple(
             count for count in (self.female_count, self.male_count) if count is not None
         )
@@ -148,7 +151,82 @@ class FilmPromptRequest(Model):
         return self
 
 
-class NarrativeTheme(Model):
+class FilmPromptRequest(FilmPromptOptions):
+    context: FilmContextText
+    frame_source_sentence: StyleText = Field(
+        description="Exact compiler-produced source sentence, including punctuation",
+    )
+    source_prompt_stem: SourcePromptStem | None = None
+    prompt_filename_stem: SourcePromptStem | None = None
+    source_films: tuple[FilmCastSource, ...] = Field(
+        min_length=1, max_length=12,
+        description="Frozen source films and original-character/scene anchors",
+    )
+
+    @model_validator(mode="after")
+    def cast_is_feasible(self) -> FilmPromptRequest:
+        works = [(film.work.title.casefold(), film.work.year)
+                 for film in self.source_films]
+        if len(works) != len(set(works)):
+            raise ValueError("source films must be unique")
+        if not self.feasible_work_indices():
+            raise ValueError(
+                "requested cast is impossible within any single frozen source film: "
+                f"female_count={self.female_count}, male_count={self.male_count}; "
+                "unknown gender cannot satisfy explicit counts"
+            )
+        return self
+
+    def feasible_work_indices(self) -> list[int]:
+        feasible = []
+        for index, film in enumerate(self.source_films):
+            genders = [item.gender for item in film.anchors.adult_characters]
+            if any(
+                requested is not None and genders.count(gender) < requested
+                for gender, requested in (
+                    (CharacterGender.FEMALE, self.female_count),
+                    (CharacterGender.MALE, self.male_count),
+                )
+            ):
+                continue
+            if self.female_count is not None or self.male_count is not None:
+                available = sum(
+                    genders.count(gender) if requested is None else requested
+                    for gender, requested in (
+                        (CharacterGender.FEMALE, self.female_count),
+                        (CharacterGender.MALE, self.male_count),
+                    )
+                )
+                if not available:
+                    continue
+            feasible.append(index)
+        return feasible
+
+
+class SelectedFilmCharacter(Model):
+    canonical_name: ShortText
+    gender: CharacterGender
+
+
+class FilmThemeCast(Model):
+    source_work_index: int = Field(
+        ge=0, le=11, strict=True,
+        description="Zero-based index of one feasible film in source_films",
+    )
+    selected_cast: tuple[SelectedFilmCharacter, ...] = Field(
+        min_length=1, max_length=8,
+        description="Unique original identities and fixed genders from that film",
+    )
+
+    @model_validator(mode="after")
+    def unique_selected_identities(self) -> FilmThemeCast:
+        names = [item.canonical_name.casefold() for item in self.selected_cast]
+        if len(names) != len(set(names)):
+            raise ValueError("duplicate selected identity")
+        return self
+
+
+class NarrativeTheme(FilmThemeCast):
     theme_id: ThemeId
     title: Text = Field(description="简洁自然的主题标题")
     premise: PremiseText = Field(
@@ -159,7 +237,7 @@ class NarrativeTheme(Model):
     )
 
 
-class NarrativeThemeDraft(Model):
+class NarrativeThemeDraft(FilmThemeCast):
     title: Text = Field(description="简洁自然的主题标题")
     premise: PremiseText = Field(
         description="完整的人物、地点与当前情境前提，不包含写作指令"
@@ -214,6 +292,18 @@ class FilmPromptResult(Model):
     request: FilmPromptRequest
     themes: list[NarrativeThemeResult] = Field(min_length=1, max_length=100)
     usage: TokenUsage
+
+    @model_validator(mode="after")
+    def selected_cast_matches_request(self) -> FilmPromptResult:
+        from t2i_film_style_pipeline.cast_validation import validate_selected_cast
+        from t2i_film_style_pipeline.errors import FilmStyleContractError
+
+        for item in self.themes:
+            try:
+                validate_selected_cast(self.request, item.theme)
+            except FilmStyleContractError as exc:
+                raise ValueError(str(exc)) from exc
+        return self
 
 
 @lru_cache(maxsize=10)

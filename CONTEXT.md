@@ -44,6 +44,27 @@ One independently renderable still image containing only currently visible
 facts.
 _Avoid_: Shot description, scene
 
+## Work-Specific Film Generation
+
+The `t2i_film_style_pipeline` package has its own profiles, requests, Themes,
+Frames, rules and persistence; it does not reuse Standalone Story Generation.
+
+**Film Source Cast**:
+The frozen original adult identities and their declared genders for each source
+film. A Film Theme selects distinct identities from exactly one source film,
+subject to explicit female and male constraints. An impossible requested cast
+fails rather than cloning an identity, changing gender, or silently reducing
+counts. Required cast contracts apply independently of optional quality checks
+and remain authoritative through checkpoints, resume and publication.
+_Avoid_: Name-mention count, filename-derived cast, anonymous substitute
+
+**Film Selected Cast**:
+A Theme's structured references to its source identities. Repeated mentions,
+reflections or permitted multiple views do not create new identities. Validation
+of this selection is not semantic proof that arbitrary Frame prose depicts the
+correct number of bodies or contains no physical contradictions.
+_Avoid_: Clone-free prose guarantee, inferred gender
+
 ## Standalone Story Generation
 
 The `t2i_story_pipeline` package is independent from Prompt Generation above.
@@ -133,6 +154,10 @@ Applicable text constraints are projected into concrete writing targets using th
 same stage and language applicability as validation. Disabling quality checks
 does not erase configured output targets or mandatory safety. No model evaluator
 is invoked.
+Long-form character ranges also suggest their integer midpoint for drafting,
+without changing inclusive acceptance bounds. Titles and exact-length constraints
+do not acquire this suggestion. Writing guidance is not a guarantee of first-pass
+length, narrative consistency, or physical correctness.
 _Avoid_: Safety switch, semantic guarantee, automatic review stage
 
 **Story Quality Report**:
@@ -219,6 +244,9 @@ The model submits these fields
 without an ID; the program assigns the Narrative Theme ID. Differences between Narrative
 Themes come from story events rather than prop, color, or camera substitutions.
 The premise is a bounded story seed, not a scene-by-scene action list.
+Its concrete event or static visual proposition is shared by all Frames, including
+the same subjects, place and time window. Non-narrative descriptions keep their
+own organizing principle rather than acquiring an invented plot.
 _Avoid_: Legacy Theme, variant label
 
 **Theme Diversity Signature**:
@@ -229,6 +257,8 @@ recent full Themes are repeated. Full Theme checkpoints remain authoritative for
 Frame generation and resume. Matching signatures or matching premise/style text
 are rejected deterministically, but different wording is not proof of semantic
 novelty. This is coverage memory, not a new generation or review stage.
+Its situation identifies the premise's actual action and object or static
+relationship, rather than a generic topic that leaves Frames to invent new tasks.
 _Avoid_: Truncated premise, rolling window that forgets older Themes, quality score
 
 **Narrative Frame**:

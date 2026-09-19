@@ -15,6 +15,7 @@ from t2i_film_style_pipeline.errors import (
     FilmStyleProviderError,
     FilmStyleRunIncompleteError,
 )
+from t2i_film_style_pipeline.models import FilmCastSource, FilmWorkReference
 from t2i_film_style_pipeline.models import TokenUsage as FilmTokenUsage
 from t2i_film_style_pipeline.pipeline import (
     FilmStylePipelineSettings,
@@ -35,6 +36,7 @@ from t2i_film_style_pipeline.prompt_models import (
     NarrativeFrameSequence,
     NarrativeThemeBatch,
     NarrativeThemeDraftBatch,
+    SelectedFilmCharacter,
     TokenUsage,
 )
 from t2i_film_style_pipeline.prompt_provider import (
@@ -58,6 +60,40 @@ from t2i_film_style_pipeline.provider import (
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
 from tests.film_prompt_factories import make_frame_sequence, make_theme_batch
 from tests.test_film_style_pipeline import make_profile, make_request
+
+
+def custom_source_films(
+    names: list[str], scenes: list[str]
+) -> tuple[FilmCastSource, ...]:
+    anchors = make_profile().work_anchors[0]
+    return (
+        FilmCastSource(
+            work=FilmWorkReference(title="测试作品"),
+            anchors=anchors.model_copy(update={
+                "adult_characters": tuple(
+                    anchors.adult_characters[0].model_copy(update={
+                        "canonical_name": name,
+                        "gender": "female" if index % 2 == 0 else "male",
+                    })
+                    for index, name in enumerate(names)
+                ),
+                "scenes": tuple(
+                    anchors.scenes[0].model_copy(update={"canonical_name": name})
+                    for name in scenes
+                ),
+            }),
+        ),
+    )
+
+
+def custom_selected_cast(names: list[str]) -> tuple[SelectedFilmCharacter, ...]:
+    return tuple(
+        SelectedFilmCharacter(
+            canonical_name=name,
+            gender="female" if index % 2 == 0 else "male",
+        )
+        for index, name in enumerate(names)
+    )
 
 
 class FakeFilmModel:
@@ -199,7 +235,7 @@ def make_settings(
 
 def test_theme_messages_use_compact_global_diversity_ledger() -> None:
     request = make_pipeline_request().prompt_request(
-        "BRIEF\n\nDirector scene context."
+        "BRIEF\n\nDirector scene context.", make_profile()
     )
     existing = make_theme_batch(start=1, count=2).themes
     existing[0].premise = "甲" * 400
@@ -291,6 +327,10 @@ def test_theme_messages_use_compact_global_diversity_ledger() -> None:
 
 def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
     request = FilmPromptRequest(
+        frame_source_sentence="这是固定来源句。",
+        source_films=custom_source_films(
+            ["林岚", "陈默"], ["木构内厅", "河岸长廊"]
+        ),
         context=(
             "原作人物与场景锚点\n"
             "- 林岚：成年人物\n"
@@ -304,6 +344,7 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
     )
     theme = make_theme_batch().themes[0].model_copy(
         update={
+            "selected_cast": custom_selected_cast(["林岚", "陈默"]),
             "premise": "原作成年人物林岚与陈默位于木构内厅。"
         }
     )
@@ -324,6 +365,11 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
     )
 
     assert payload["theme_anchor_contract"] == {
+        "source_work_index": 0,
+        "selected_cast": [
+            {"canonical_name": "林岚", "gender": "female"},
+            {"canonical_name": "陈默", "gender": "male"},
+        ],
         "required_characters": ["林岚", "陈默"],
         "required_scene": "木构内厅",
         "required_exact_terms": ["林岚", "陈默", "木构内厅"],
@@ -380,6 +426,10 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
 
 def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
     request = FilmPromptRequest(
+        frame_source_sentence="这是固定来源句。",
+        source_films=custom_source_films(
+            ["林岚", "陈默", "周遥"], ["公寓阳台"]
+        ),
         context=(
             "原作人物与场景锚点\n"
             "### 《测试作品》\n"
@@ -395,6 +445,7 @@ def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
     )
     theme = make_theme_batch().themes[0].model_copy(
         update={
+            "selected_cast": custom_selected_cast(["林岚", "陈默", "周遥"]),
             "premise": (
                 "林岚、陈默与周遥三名原作成年人位于公寓阳台。"
             )
@@ -506,6 +557,8 @@ def test_eight_person_frame_contract_remains_role_agnostic() -> None:
         "顾宁",
     ]
     request = FilmPromptRequest(
+        frame_source_sentence="这是固定来源句。",
+        source_films=custom_source_films(names, ["公寓客厅"]),
         context=(
             "原作人物与场景锚点\n"
             "### 《测试作品》\n"
@@ -520,6 +573,7 @@ def test_eight_person_frame_contract_remains_role_agnostic() -> None:
     )
     theme = make_theme_batch().themes[0].model_copy(
         update={
+            "selected_cast": custom_selected_cast(names),
             "premise": (
                 f"{'、'.join(names)}八名原作成年人位于公寓客厅。"
             )
@@ -575,11 +629,11 @@ async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
     request = make_pipeline_request()
     theme_batch = make_film_theme_batch()
     theme_batch.themes[0].premise = (
-        "这是一段不包含原作人物、场景或内容证据的普通主题描述。"
+        "无名与飞雪两名成年人。这是一段不包含场景或内容证据的普通主题描述。"
     )
     sequence = make_film_frame_sequence()
     for index, frame in enumerate(sequence.frames, start=1):
-        frame.prose = f"第 {index} 个没有来源、锚点或摄影证据的未验证画面正文。"
+        frame.prose = f"无名与飞雪。第 {index} 个没有来源或摄影证据的未验证画面正文。"
     prompt_model = FakePromptModel(
         [theme_batch, frame_batch_text(sequence)]
     )
@@ -594,7 +648,7 @@ async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
             validate_frames=False,
         ),
         resolve_film_style_rules(
-            request.prompt_request("BRIEF\n\nDirector scene context.")
+            request.prompt_request("BRIEF\n\nDirector scene context.", make_profile())
         ),
     ).run(request, prompts_directory=tmp_path / "prompts")
 
@@ -616,9 +670,9 @@ async def test_pipeline_can_disable_all_semantic_validation(tmp_path) -> None:
         + report["anchor_missing_required_frames"]
         >= 2
     )
-    assert report["character_anchor_complete_frames"] == 0
+    assert report["character_anchor_complete_frames"] == 2
     assert report["scene_anchor_complete_frames"] == 0
-    assert report["participant_slot_count"] == 0
+    assert report["participant_slot_count"] == 4
     assert report["participant_description_complete_slots"] == 0
     assert report["participant_face_complete_slots"] == 0
     assert report["participant_gaze_complete_slots"] == 0
@@ -751,7 +805,7 @@ async def test_pipeline_generates_frames_while_next_theme_is_in_flight(
             validate_frames=False,
         ),
         resolve_film_style_rules(
-            request.prompt_request("BRIEF\n\nDirector scene context.")
+            request.prompt_request("BRIEF\n\nDirector scene context.", make_profile())
         ),
     ).run(request, prompts_directory=tmp_path / "prompts")
 
@@ -791,7 +845,7 @@ async def test_pipeline_retries_rejected_film_frame_content(tmp_path) -> None:
         LocalFilmStyleRunStore(tmp_path / "runs"),
         make_settings(generation_retries=1),
         resolve_film_style_rules(
-            request.prompt_request("BRIEF\n\nDirector scene context.")
+            request.prompt_request("BRIEF\n\nDirector scene context.", make_profile())
         ),
     ).run(request, prompts_directory=tmp_path / "prompts")
 
@@ -825,7 +879,7 @@ async def test_pipeline_resumes_prompt_without_regenerating_profile(tmp_path) ->
     request = make_pipeline_request()
     settings = make_settings()
     rules = resolve_film_style_rules(
-        request.prompt_request("BRIEF\n\nDirector scene context.")
+        request.prompt_request("BRIEF\n\nDirector scene context.", make_profile())
     )
     store = LocalFilmStyleRunStore(tmp_path / "runs")
     film_model = FakeFilmModel()
@@ -910,7 +964,7 @@ async def test_pipeline_can_resume_after_profile_provider_failure(tmp_path) -> N
     request = make_pipeline_request()
     settings = make_settings()
     rules = resolve_film_style_rules(
-        request.prompt_request("BRIEF\n\nDirector scene context.")
+        request.prompt_request("BRIEF\n\nDirector scene context.", make_profile())
     )
     store = LocalFilmStyleRunStore(tmp_path / "runs")
 

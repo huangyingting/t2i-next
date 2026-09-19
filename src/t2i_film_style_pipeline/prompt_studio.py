@@ -9,6 +9,10 @@ from time import perf_counter
 
 from pydantic import BaseModel, ValidationError
 
+from t2i_film_style_pipeline.cast_validation import (
+    validate_cast_prose,
+    validate_selected_cast,
+)
 from t2i_film_style_pipeline.diversity import (
     normalize_frame_anchor_prefix,
     normalize_theme_anchor_terms,
@@ -308,6 +312,8 @@ class FilmPromptStudio:
                             title=draft.title,
                             premise=draft.premise,
                             style=draft.style,
+                            source_work_index=draft.source_work_index,
+                            selected_cast=draft.selected_cast,
                         )
                         for draft, theme_id in zip(
                             value.themes,
@@ -323,6 +329,9 @@ class FilmPromptStudio:
                         strict=True,
                     ):
                         theme.theme_id = theme_id
+                for theme in candidate_themes:
+                    validate_selected_cast(request, theme)
+                    validate_cast_prose(request, theme, theme.premise)
                 candidate_themes = [
                     normalize_theme_anchor_terms(request, theme)
                     for theme in candidate_themes
@@ -477,6 +486,7 @@ class FilmPromptStudio:
                     strict=True,
                 ):
                     try:
+                        validate_cast_prose(request, theme, prose)
                         prose = normalize_frame_anchor_prefix(
                             request,
                             theme,
@@ -716,7 +726,7 @@ class FilmPromptStudio:
                 error = exc
                 outcome = FilmPromptAttemptOutcome.PROVIDER_ERROR
                 attempt_issues = (str(exc),)
-            except FilmStyleContractError as exc:
+            except (FilmStyleContractError, ValidationError) as exc:
                 error = exc
                 outcome = FilmPromptAttemptOutcome.REJECTED
                 attempt_issues = (str(exc),)

@@ -53,6 +53,7 @@ def make_profile() -> FilmStyleProfile:
                 adult_characters=(
                     FilmCharacterAnchor(
                         canonical_name="无名",
+                        gender="male",
                         identity_and_appearance=(
                             "成年秦国刺客，黑发束冠，神态克制。"
                         ),
@@ -61,6 +62,7 @@ def make_profile() -> FilmStyleProfile:
                     ),
                     FilmCharacterAnchor(
                         canonical_name="飞雪",
+                        gender="female",
                         identity_and_appearance=(
                             "成年赵国剑客，长黑发，姿态冷峻。"
                         ),
@@ -89,6 +91,7 @@ def make_profile() -> FilmStyleProfile:
                 adult_characters=(
                     FilmCharacterAnchor(
                         canonical_name="小妹",
+                        gender="female",
                         identity_and_appearance=(
                             "成年舞伎与武者，长黑发，动作轻盈。"
                         ),
@@ -97,6 +100,7 @@ def make_profile() -> FilmStyleProfile:
                     ),
                     FilmCharacterAnchor(
                         canonical_name="金捕头",
+                        gender="male",
                         identity_and_appearance=(
                             "成年捕快，束发，神态警觉。"
                         ),
@@ -144,10 +148,10 @@ def make_profile() -> FilmStyleProfile:
 
 
 def make_profile_rules() -> tuple[str, ...]:
-    from t2i_film_style_pipeline.prompt_models import FilmPromptRequest
+    from t2i_film_style_pipeline.prompt_models import FilmPromptOptions
 
     return resolve_film_style_rules(
-        FilmPromptRequest(context="Director scene context")
+        FilmPromptOptions()
     ).profile
 
 
@@ -178,7 +182,9 @@ def test_prompt_request_uses_short_director_filename() -> None:
         content_level=ContentLevel.HARDCORE,
     )
 
-    prompt_request = request.prompt_request("BRIEF\n\nDirector scene context")
+    prompt_request = request.prompt_request(
+        "BRIEF\n\nDirector scene context", make_profile()
+    )
 
     assert prompt_request.prompt_filename_stem == "张艺谋"
     assert prompt_request.source_prompt_stem is None
@@ -190,7 +196,9 @@ def test_prompt_request_accepts_explicit_english_filename() -> None:
         output_filename_stem="Zhang_Yimou",
     )
 
-    prompt_request = request.prompt_request("BRIEF\n\nDirector scene context")
+    prompt_request = request.prompt_request(
+        "BRIEF\n\nDirector scene context", make_profile()
+    )
 
     assert prompt_request.prompt_filename_stem == "Zhang_Yimou"
 
@@ -226,7 +234,7 @@ def test_compile_film_context_injects_profile_after_brief_header() -> None:
         "《十面埋伏》（2004）原作人物与场景重新构图的电影画面。"
     ) in compiled
     assert "原作人物与场景锚点" in compiled
-    assert "- 无名：成年秦国刺客" in compiled
+    assert "- 无名：gender=male；成年秦国刺客" in compiled
     assert "- 秦宫大殿：原作情境：秦王在大殿尽端接受无名觐见" in compiled
     assert "环境短语：深远中轴、黑色殿柱、石质地面" in compiled
     assert "道具短语：长剑、烛台" in compiled
@@ -249,11 +257,10 @@ def test_profile_prompt_uses_only_work_metadata() -> None:
 
 
 def test_director_rules_own_theme_and_frame_workflow() -> None:
-    from t2i_film_style_pipeline.prompt_models import ContentLevel, FilmPromptRequest
+    from t2i_film_style_pipeline.prompt_models import ContentLevel, FilmPromptOptions
 
     rules = resolve_film_style_rules(
-        FilmPromptRequest(
-            context="Director scene context",
+        FilmPromptOptions(
             content_level=ContentLevel.HARDCORE,
         )
     )

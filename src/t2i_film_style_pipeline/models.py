@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from enum import StrEnum
 from functools import lru_cache
 from typing import Annotated
 
@@ -39,7 +40,7 @@ def contains_image_geometry(value: str) -> bool:
 
 
 class Model(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", revalidate_instances="always")
 
 
 ShortText = Annotated[
@@ -93,8 +94,15 @@ class FilmStyleRequest(Model):
         return self
 
 
+class CharacterGender(StrEnum):
+    FEMALE = "female"
+    MALE = "male"
+    UNKNOWN = "unknown"
+
+
 class FilmCharacterAnchor(Model):
     canonical_name: ShortText
+    gender: CharacterGender
     identity_and_appearance: TraitText
     canonical_costume: TraitText
     costume_features: tuple[ShortText, ...] = Field(min_length=1, max_length=8)
@@ -117,6 +125,19 @@ class FilmWorkAnchors(Model):
         max_length=12,
     )
     scenes: tuple[FilmSceneAnchor, ...] = Field(min_length=1, max_length=12)
+
+    @model_validator(mode="after")
+    def unique_identities(self) -> FilmWorkAnchors:
+        for items in (self.adult_characters, self.scenes):
+            names = [item.canonical_name.casefold() for item in items]
+            if len(names) != len(set(names)):
+                raise ValueError("canonical identities must be unique within a film")
+        return self
+
+
+class FilmCastSource(Model):
+    work: FilmWorkReference
+    anchors: FilmWorkAnchors
 
 
 class FilmStyleRuleSet(Model):
@@ -217,6 +238,15 @@ class FilmStyleResult(Model):
     profile: FilmStyleProfile
     compiled_context: CompiledBriefText
     usage: TokenUsage
+
+    @model_validator(mode="after")
+    def profile_matches_source_works(self) -> FilmStyleResult:
+        if (
+            len(self.profile.work_anchors) != len(self.request.works)
+            or len(self.profile.work_style_summaries) != len(self.request.works)
+        ):
+            raise ValueError("profile anchors and summaries must match source works")
+        return self
 
 
 @lru_cache(maxsize=12)

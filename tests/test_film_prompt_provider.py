@@ -27,6 +27,11 @@ async def test_film_prompt_provider_generates_structured_theme(
         semantic_name="lantern_chamber",
         themes=[
             {
+                "source_work_index": 0,
+                "selected_cast": [
+                    {"canonical_name": "人物甲", "gender": "female"},
+                    {"canonical_name": "人物乙", "gender": "male"},
+                ],
                 "title": "灯下对坐",
                 "premise": "两名成年人物在内宅厢房对坐。",
                 "style": "以固定中景和实景灯组织封闭空间。",

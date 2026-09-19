@@ -16,6 +16,11 @@ from t2i_film_style_pipeline.content_validation import (
     contains_clothing_state_conflict,
     content_level_evidence_complete,
 )
+from t2i_film_style_pipeline.frame_text import (
+    anchor_insertion,
+    canonical_anchor_sentence,
+    frame_body,
+)
 from t2i_film_style_pipeline.prompt_models import (
     ContentLevel,
     FilmPromptRequest,
@@ -376,7 +381,7 @@ def theme_diversity_ledger(
             _COVERAGE_TERMS,
         ),
         "source_anchor_mentions": _anchor_usage(
-            request.context,
+            request,
             existing_themes,
         ),
     }
@@ -439,47 +444,29 @@ def theme_anchor_contract(
     request: FilmPromptRequest,
     theme: NarrativeTheme,
 ) -> dict[str, object]:
-    anchor_groups = _context_anchor_groups(request.context)
+    anchor_groups = _source_anchor_groups(request)
     anchors = tuple(
         anchor
         for group in anchor_groups
         for anchor in (*group["characters"], *group["scenes"])
     )
-    normalized_premise = theme.premise.casefold()
-    selected_groups = [
-        group
-        for group in anchor_groups
-        if any(
-            anchor.casefold() in normalized_premise
-            for anchor in group["characters"]
-        )
-        or any(
-            _scene_anchor_mentioned(anchor, theme.premise)
-            for anchor in group["scenes"]
-        )
+    selected_characters = [item.canonical_name for item in theme.selected_cast]
+    selected_scenes = [
+        anchor
+        for anchor in anchor_groups[theme.source_work_index]["scenes"]
+        if _scene_anchor_mentioned(anchor, theme.premise)
     ]
-    selected_characters: list[str] = []
-    selected_scenes: list[str] = []
-    if len(selected_groups) == 1:
-        selected_characters = [
-            anchor
-            for anchor in selected_groups[0]["characters"]
-            if anchor.casefold() in normalized_premise
-        ]
-        selected_scenes = [
-            anchor
-            for anchor in selected_groups[0]["scenes"]
-            if _scene_anchor_mentioned(anchor, theme.premise)
-        ]
     required = [*selected_characters, *selected_scenes]
     forbidden = [anchor for anchor in anchors if anchor not in required]
     scene = selected_scenes[0] if len(selected_scenes) == 1 else None
-    anchor_sentence = _anchor_sentence(
+    anchor_sentence = canonical_anchor_sentence(
         request,
         selected_characters,
         scene,
     )
     return {
+        "source_work_index": theme.source_work_index,
+        "selected_cast": [item.model_dump(mode="json") for item in theme.selected_cast],
         "required_characters": selected_characters,
         "required_scene": scene,
         "required_exact_terms": required,
@@ -515,16 +502,14 @@ def normalize_frame_anchor_prefix(
     anchor_sentence = contract["deterministic_anchor_sentence"]
     if not anchor_sentence:
         return prose
-    without_anchor = prose.replace(str(anchor_sentence), "", 1)
-    first_sentence = re.match(r"^.*?[。.!]", without_anchor)
-    if first_sentence is None:
-        return f"{anchor_sentence}{without_anchor}"
-    split_at = first_sentence.end()
-    return (
-        f"{without_anchor[:split_at]}"
-        f"{anchor_sentence}"
-        f"{without_anchor[split_at:]}"
-    )
+    source = request.frame_source_sentence
+    if not prose.startswith(source):
+        return prose
+    insertion = anchor_insertion(request, str(anchor_sentence))
+    body = prose[len(source):]
+    if body.startswith(insertion):
+        return prose
+    return source + insertion + body
 
 
 def participant_frame_contracts(
@@ -709,11 +694,10 @@ def build_diversity_report(
     for item in result.themes:
         contract = theme_anchor_contract(result.request, item.theme)
         for frame in item.frames:
-            body = _frame_body(frame.prose)
-            narrative_body = _without_anchor_sentence(
-                body,
-                contract["deterministic_anchor_sentence"],
+            body = frame_body(
+                result.request, item.theme, frame.prose, strip_anchor=False
             )
+            narrative_body = frame_body(result.request, item.theme, frame.prose)
             characters = list(contract["required_characters"])
             scene = contract["required_scene"]
             character_anchor_complete += bool(characters) and all(
@@ -803,114 +787,32 @@ def _excerpt(value: str, *, limit: int) -> str:
 
 
 def _anchor_usage(
-    context: str,
+    request: FilmPromptRequest,
     themes: list[NarrativeTheme],
 ) -> dict[str, int]:
-    anchors = _context_anchor_names(context)
+    anchors = tuple(
+        name
+        for group in _source_anchor_groups(request)
+        for name in (*group["characters"], *group["scenes"])
+    )
     return {
         anchor: sum(anchor.casefold() in theme.premise.casefold() for theme in themes)
         for anchor in anchors
     }
 
 
-def _context_anchor_names(context: str) -> tuple[str, ...]:
-    return tuple(
-        name
-        for group in _context_anchor_groups(context)
-        for name in (*group["characters"], *group["scenes"])
-    )
-
-
-def _context_anchor_groups(
-    context: str,
+def _source_anchor_groups(
+    request: FilmPromptRequest,
 ) -> tuple[dict[str, tuple[str, ...]], ...]:
-    block = context
-    for start, end in (
-        ("原作人物与场景锚点", "\n\n色彩"),
-        ("CHARACTER AND SETTING ANCHORS", "\n\nPALETTE"),
-    ):
-        if start in context:
-            block = context.split(start, 1)[1].split(end, 1)[0]
-            break
-    sections = re.split(r"(?m)^###\s+.+$", block)
-    groups = []
-    materialized_sections = sections[1:] if len(sections) > 1 else sections
-    for section in materialized_sections:
-        character_block = _heading_block(
-            section,
-            ("原作成年人物", "ORIGINAL ADULT CHARACTERS"),
-            ("原作场景", "ORIGINAL SETTINGS", "ORIGINAL SCENES"),
-        )
-        scene_block = _heading_block(
-            section,
-            ("原作场景", "ORIGINAL SETTINGS", "ORIGINAL SCENES"),
-            (),
-        )
-        if character_block is None or scene_block is None:
-            typed = _typed_bullet_names(section)
-            if typed["characters"] or typed["scenes"]:
-                groups.append(typed)
-            continue
-        characters = _bullet_names(character_block)
-        scenes = _bullet_names(scene_block)
-        if characters or scenes:
-            groups.append({"characters": characters, "scenes": scenes})
-    return tuple(groups)
-
-
-def _heading_block(
-    value: str,
-    headings: tuple[str, ...],
-    end_headings: tuple[str, ...],
-) -> str | None:
-    start_match = re.search(
-        rf"(?m)^(?:{'|'.join(re.escape(item) for item in headings)})\s*$",
-        value,
-        re.IGNORECASE,
-    )
-    if start_match is None:
-        return None
-    tail = value[start_match.end() :]
-    if not end_headings:
-        return tail
-    end_match = re.search(
-        rf"(?m)^(?:{'|'.join(re.escape(item) for item in end_headings)})\s*$",
-        tail,
-        re.IGNORECASE,
-    )
-    return tail[: end_match.start()] if end_match is not None else tail
-
-
-def _bullet_names(value: str) -> tuple[str, ...]:
     return tuple(
-        match.group(1).strip()
-        for match in re.finditer(r"(?m)^-\s+([^：:\n]+)[：:]", value)
-        if match.group(1).strip()
+        {
+            "characters": tuple(
+                item.canonical_name for item in film.anchors.adult_characters
+            ),
+            "scenes": tuple(item.canonical_name for item in film.anchors.scenes),
+        }
+        for film in request.source_films
     )
-
-
-def _typed_bullet_names(value: str) -> dict[str, tuple[str, ...]]:
-    characters = []
-    scenes = []
-    for match in re.finditer(
-        r"(?m)^-\s+([^：:\n]+)[：:]\s*([^\n]*)",
-        value,
-    ):
-        name = match.group(1).strip()
-        description = match.group(2).casefold()
-        if not name:
-            continue
-        if any(
-            term in description
-            for term in ("场景", "setting", "location", "environment")
-        ):
-            scenes.append(name)
-        else:
-            characters.append(name)
-    return {
-        "characters": tuple(characters),
-        "scenes": tuple(scenes),
-    }
 
 
 def _scene_anchor_mentioned(anchor: str, value: str) -> bool:
@@ -939,25 +841,6 @@ def _scene_anchor_mentioned(anchor: str, value: str) -> bool:
         matched >= len(normalized_anchor) and gap <= 40
         for matched, gap in candidates
     )
-
-
-def _anchor_sentence(
-    request: FilmPromptRequest,
-    characters: list[str],
-    scene: str | None,
-) -> str | None:
-    if not characters or scene is None:
-        return None
-    if request.output_language.value == "english":
-        return (
-            f"The original characters {', '.join(characters)} are in the "
-            f'canonical setting "{scene}". '
-        )
-    return f"原作人物{'、'.join(characters)}位于原作场景“{scene}”。"
-
-
-def _without_anchor_sentence(value: str, sentence: object) -> str:
-    return value.replace(str(sentence), "", 1) if sentence else value
 
 
 def _participant_evidence(
@@ -1074,10 +957,6 @@ def _participant_evidence(
             for window in normalized_windows
         ),
     }
-
-
-def _frame_body(value: str) -> str:
-    return re.split(r"[。.!]\s*", value, maxsplit=1)[-1]
 
 
 def _coverage_counts(

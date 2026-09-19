@@ -55,6 +55,10 @@ def theme_messages(
                 {
                     "film_context": request.context,
                     "cast_constraints": _cast_constraints(request),
+                    "source_films": [
+                        film.model_dump(mode="json") for film in request.source_films
+                    ],
+                    "feasible_source_work_indices": request.feasible_work_indices(),
                     "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "semantic_name": semantic_name,
@@ -97,6 +101,10 @@ def frame_messages(
                 {
                     "film_context": request.context,
                     "cast_constraints": _cast_constraints(request),
+                    "selected_source_film": request.source_films[
+                        theme.source_work_index
+                    ].model_dump(mode="json"),
+                    "frame_source_sentence": request.frame_source_sentence,
                     "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "theme": theme.model_dump(mode="json"),

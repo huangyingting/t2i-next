@@ -6,7 +6,7 @@ import unicodedata
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Annotated
 
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 if TYPE_CHECKING:
     from t2i_story_pipeline.models import NarrativeTheme, NarrativeThemeDraft
@@ -20,10 +20,19 @@ MemoryText = Annotated[
 class ThemeDiversity(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    subject: MemoryText
-    setting: MemoryText
-    situation: MemoryText
-    visual: MemoryText
+    subject: MemoryText = Field(description="Actual subjects and their relationship")
+    setting: MemoryText = Field(
+        description="Specific place and time or spatial context"
+    )
+    situation: MemoryText = Field(
+        description=(
+            "Concrete shared action and its object, or static visual proposition; "
+            "must match premise, not a generic topic or a sequence of events"
+        )
+    )
+    visual: MemoryText = Field(
+        description="Distinguishing visual organization, not generic genre labels"
+    )
 
     def key(self) -> tuple[str, ...]:
         return tuple(

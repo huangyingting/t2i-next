@@ -98,6 +98,29 @@ def test_later_theme_batches_preserve_the_run_semantic_name() -> None:
     assert "If semantic_name is supplied, return it exactly" in prompt
 
 
+def test_theme_proposition_and_frame_physical_checks_are_stage_scoped():
+    resolved = resolve_story_input(
+        StoryDocument(description="One adult arranges a static library display."),
+        InputOverrides(female_count=1, male_count=0, frames_per_theme=1),
+    )
+    themes = compile_theme_messages(resolved, count=1, existing_themes=[])[0].content
+    frames = compile_frame_messages(
+        resolved, make_theme(), requested_frame_ids=["F01"], accepted_frames=[]
+    )[0].content
+    assert "for a static design" in themes
+    assert "specific object or problem" in themes
+    assert "not merely a general theme such as cooperation" in themes
+    assert "Do not impose narrative conflict" in themes
+    assert "new problem, task, place or subject relationship" in frames
+    assert "parallel visual alternatives" in frames
+    assert "same identity to meet a count" in frames
+    assert "compatible simultaneous roles" in frames
+    assert "independently detachable upper and lower pieces" in frames
+    assert "same facial template" in frames
+    assert "return only complete image prose" in frames
+    assert "compatible simultaneous roles" not in themes
+
+
 def test_prompt_can_delegate_theme_ids_to_program() -> None:
     request = make_story_request(theme_count=3)
     messages = theme_messages(
@@ -112,8 +135,7 @@ def test_prompt_can_delegate_theme_ids_to_program() -> None:
     assert "the program assigns all Theme IDs" in messages[0].content
     assert (
         "Submit only semantic_name and each Theme's "
-        "title, premise, style, and diversity"
-        in messages[0].content
+        "title, premise, style, and diversity" in messages[0].content
     )
     assert "theme_ids" not in payload
 
@@ -720,9 +742,7 @@ def test_prompts_compile_only_selected_content_level(
 
 @pytest.mark.parametrize("level", tuple(ContentLevel))
 def test_avantgarde_shared_refinements_preserve_base_grade_and_stage_duties(level):
-    document = load_story_document(
-        REPOSITORY_ROOT / "recipes" / "avantgarde.yaml"
-    )
+    document = load_story_document(REPOSITORY_ROOT / "recipes" / "avantgarde.yaml")
     refinements = document.authoring.level_refinements
     assert refinements[ContentLevel.HARDCORE].shared
     assert all(
@@ -801,9 +821,7 @@ def test_post_layout_prompt_compiles_dominant_hero_content_contract(
     level: ContentLevel,
     required_contract: str,
 ) -> None:
-    document = load_story_document(
-        REPOSITORY_ROOT / "recipes" / "post-layout.yaml"
-    )
+    document = load_story_document(REPOSITORY_ROOT / "recipes" / "post-layout.yaml")
     resolved = resolve_story_input(
         document,
         InputOverrides(

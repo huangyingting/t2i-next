@@ -91,9 +91,10 @@ class FilmPromptRunIncompleteError(FilmStylePipelineError):
         self.missing_themes = missing_themes
         self.missing_frames = missing_frames
         self.causes = causes
+        detail = f"；原因：{'; '.join(causes)}" if causes else ""
         super().__init__(
             f"Run {run_id} 尚未完成：缺少 {missing_themes} 个 Theme、"
-            f"{missing_frames} 个 Frame Sequence；请执行 resume {run_id}"
+            f"{missing_frames} 个 Frame Sequence{detail}；请执行 resume {run_id}"
         )
 
 

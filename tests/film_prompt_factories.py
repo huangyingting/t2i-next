@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from t2i_film_style_pipeline.compiler import frame_source_sentence
+from t2i_film_style_pipeline.models import FilmCastSource
 from t2i_film_style_pipeline.prompt_models import (
     ContentLevel,
     FilmPromptRequest,
@@ -10,8 +12,26 @@ from t2i_film_style_pipeline.prompt_models import (
     NarrativeThemeBatch,
     NarrativeThemeResult,
     OutputLanguage,
+    SelectedFilmCharacter,
     TokenUsage,
 )
+from tests.test_film_style_pipeline import make_profile, make_request
+
+
+def make_source_films() -> tuple[FilmCastSource, ...]:
+    return tuple(
+        FilmCastSource(work=work, anchors=anchors)
+        for work, anchors in zip(
+            make_request().works, make_profile().work_anchors, strict=True
+        )
+    )
+
+
+def make_selected_cast() -> tuple[SelectedFilmCharacter, ...]:
+    return (
+        SelectedFilmCharacter(canonical_name="无名", gender="male"),
+        SelectedFilmCharacter(canonical_name="飞雪", gender="female"),
+    )
 
 
 def make_prompt_request(
@@ -25,6 +45,8 @@ def make_prompt_request(
     source_prompt_stem: str | None = None,
 ) -> FilmPromptRequest:
     return FilmPromptRequest(
+        frame_source_sentence=frame_source_sentence(make_request()),
+        source_films=make_source_films(),
         context=(
             "1930年代秋夜，两名三十岁的成年人在旧车站重逢。"
             "他们双方自愿拥抱，彼此回应且任何一方都可以停止。"
@@ -42,9 +64,11 @@ def make_prompt_request(
 
 def make_theme(index: int = 1) -> NarrativeTheme:
     return NarrativeTheme(
+        source_work_index=0,
+        selected_cast=make_selected_cast(),
         theme_id=f"T{index:03d}",
         title=f"遗失行李的方向 {index}",
-        premise=f"两名成年人从第 {index} 条线索确认行李去向。",
+        premise=f"无名与飞雪两名成年人从第 {index} 条线索确认行李去向。",
         style="1930年代北平电影风格",
     )
 
@@ -87,7 +111,7 @@ def make_frame_sequence(
                 prose=(
                     "1930年代北平电影风格，"
                     f"1930年代秋夜，旧车站第{theme_index}站台。"
-                    f"两名三十岁的成年人停在第{index}根站柱旁，"
+                    f"无名与飞雪两名三十岁的成年人停在第{index}根站柱旁，"
                     "短发被雨水打湿，深色大衣沾着月台水汽，"
                     "紧绷的目光落在同一只旧皮箱上。"
                     f"此刻，{actions[index - 1]}。"

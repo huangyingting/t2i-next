@@ -93,14 +93,14 @@ def generate_command(
         "--female-count",
         min=0,
         max=8,
-        help="可选女性人数约束；默认由场景需要决定。",
+        help="女性独立原作身份的精确人数；默认未指定，不能靠分身补足。",
     ),
     male_count: int | None = typer.Option(
         None,
         "--male-count",
         min=0,
         max=8,
-        help="可选男性人数约束；默认由场景需要决定。",
+        help="男性独立原作身份的精确人数；零表示排除，默认未指定。",
     ),
     concurrency: int = typer.Option(
         8,
@@ -173,9 +173,7 @@ def generate_command(
             output_language=output_language,
         )
         rules = resolve_film_style_rules(
-            request.prompt_request(
-                "BRIEF\n\nDirector-work film scene generation."
-            ),
+            request,
             user_directory=rules_dir,
         )
         film_provider = load_film_style_provider_settings()

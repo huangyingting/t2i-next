@@ -425,7 +425,10 @@ class NarrativeThemeDraft(Model):
     )
     title: Text = Field(description="简洁自然的主题标题")
     premise: PremiseText = Field(
-        description="完整的人物、地点与当前情境前提，不包含写作指令"
+        description=(
+            "所有 Frame 共用的具体事件或视觉命题，以及稳定的人物、地点和时间范围；"
+            "不是泛泛的题材标签、多个事件的列表或写作指令"
+        )
     )
     style: StyleText = Field(
         description="完整、具体、可执行的视觉方案，不包含写作指令或内部字段"

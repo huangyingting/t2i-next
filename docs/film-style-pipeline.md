@@ -29,7 +29,8 @@ provider 配置。
 结构化档案同时包含：
 
 - 每部输入电影各自的一句风格总结，顺序与 `--work` 一致；
-- 每部电影中可用的原作成年人物、原作服装、实际场景、环境特征及场景道具锚点；
+- 每部电影中可用的唯一原作成年人物、固定 `gender`（`female`、`male`、
+  `unknown`）、原作服装、实际场景、环境特征及场景道具锚点；
 - 跨全部输入作品合成的一句直接、可见的视觉概述；
 - 色彩、构图、调度、镜头、光线、运动、美术、材质与成片规则。
 
@@ -59,6 +60,10 @@ Frame 规则区分场地方向、人物自身的解剖左右和画面左右，�
 这些是模型创作规则，不是人体坐标、受力、可达性或遮挡求解器；规则加载测试
 仅证明约束传入模型，不证明生成正文或最终图像已经满足它们。此模块仍不导入
 spatial 的姿态库，已有输出不会因此被重写或自动认证。
+肢体职责按同一瞬间的实际兼容性判断，允许前臂支撑与同侧手指轻触等兼容细节，
+但不允许同一只手在分离位置同时承重和抓握；一件式衣物的领口、袖孔、腰部与
+下摆必须作为同一连续衣物追踪，不能当作独立上衣与下装移动。这些同样只是写作
+自检约束，不是新增确定性身体或布料模拟。
 
 ## CLI
 
@@ -69,8 +74,8 @@ uv run t2i-film-style generate "张艺谋" \
   --filename-stem Zhang_Yimou \
   --themes 8 \
   --frames 1 \
-  --female-count 1 \
-  --male-count 1 \
+  --female-count 2 \
+  --male-count 0 \
   --validate-themes \
   --validate-frames \
   --content-level aesthetic \
@@ -89,6 +94,53 @@ uv run t2i-film-style generate "张艺谋" \
 `--theme-batch-size` 控制单次 Theme 模型调用批量返回的独立 Theme 数，范围为
 1–10，默认 5；`--concurrency` 是 Theme 批次与 Frame 调用共同遵守的全局并发
 上限。
+
+### 人数与原作身份契约
+
+`--female-count`、`--male-count`（Python/JSON 中同名下划线字段）是独立原作
+身份的精确数量，每项为 0–8 的整数，已指定数量合计不得超过八，两项不得同时
+为零。省略或 `null` 表示仅该性别人数未指定；零不是省略。Python API 不接受
+布尔值、字符串或小数充当数量。文件名中的 `f3m0`、`--scene` 和编译上下文
+都不是结构化人数的替代输入；批量调用必须显式传递这两个字段，不能从文件名
+推定请求已经得到执行。
+
+Profile 按电影收录不重复的 `canonical_name`，同一人物的别名、衣着变化、
+不同时刻或镜中倒影不能成为新身份。性别来自原作事实，未知时必须标为 `unknown`；
+不得因为下游人数要求改变性别或补造人物。生成并冻结 Profile 后，程序先检查是否
+至少有一部电影自身拥有足够的相应性别锚点；不能把不同影片的人员库存相加。
+例如某片只收录一名已知女性时，`female_count=3, male_count=0` 在 Theme 调用
+之前明确失败，不会生成三个同名身体。可行性仅相对于本次生成/冻结的锚点，不是
+对整部电影所有实际人物的穷举判定；失败不会自动重新生成 Profile 来凑人数。
+
+每个 Theme 必须返回 `source_work_index`（`source_films` 的零起始下标）及
+`selected_cast`，后者是包含 `canonical_name`、`gender` 的唯一身份列表，长度
+为 1–8。所有选定身份必须来自这同一部电影，性别必须与其冻结锚点相同，已指定
+人数必须逐项精确吻合。有任一明确人数约束时不选择 `unknown` 性别；两项都未
+指定时可以使用原作性别未知的人物，但不得改写为已知性别。
+
+这些是始终启用的结构化契约，不受 `--validate-themes`、`--validate-frames`
+控制。Theme 接受、store checkpoint/读取、恢复和发布均重新核对。Theme premise
+和模型返回的原始 Frame 正文还须出现每个选定 canonical name，且不得出现已知但
+未选定的其他原作人物名；只核对名字是否出现，不统计重复提及次数作为人数。
+倒影须明确归属于同一身份、同一姿态，不能算作额外人物或承担另一套独立动作。
+
+**限制：** Profile 本身来自模型，并非外部电影事实数据库；名字唯一不证明别名
+背后一定是不同的真实原作身份。结构化名单与名字存在检查也不能语义证明任意
+自由正文没有重复身体、匿名第三人、矛盾人数或错误性别描写。禁止分身、漏人、
+换性别、用镜像凑人数和保持逐人身体归属是额外的写作要求，不是新增的 LLM 审核
+阶段或人体求解器；本改动不增加模型调用，不改变 Frame 的单段自然语言格式。
+
+当前 Python 接口：`FilmStylePromptRequest.prompt_request(context, profile)` 从
+同一份冻结 Profile 建立必填 `FilmPromptRequest.source_films`，每项包含 `work`
+及完整 `anchors`，并冻结编译器生成的完整 `frame_source_sentence` 字符串。
+直接使用 `FilmPromptStudio` 的调用者也必须提供这两个字段，不能
+再从上下文项目符号反向推断 cast。规则解析只需 `FilmPromptOptions`，顶层请求和
+prompt 请求均继承它，无需在 Profile 生成前伪造一个 prompt 请求。
+Theme、request 和 Profile 的新字段在 JSON schema、provider payload、checkpoint
+及 result 中保持一致。缺少 gender、selected_cast、source_films 或
+frame_source_sentence 的旧记录不受
+支持，也没有迁移、适配或默认猜测；必须以当前格式开启新运行。恢复还会核对
+父请求人数、Profile 来源与子运行冻结请求，显式冲突不会静默回退。
 
 完成后 CLI 输出：
 
@@ -134,6 +186,8 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
   的结构与硬验证约束。
 - `content_validation.py`：验证拒绝文本、来源句、内容等级和图像几何禁项；只定义
   可确定判断的发布门槛，不承担创作规则。
+- `cast_validation.py`：始终启用的原作身份、固定性别、精确数量和名字存在契约，
+  不从名字提及次数推断人数，也不对任意正文作语义无分身认证。
 - `pipeline.py`：负责阶段编排、checkpoint 和恢复。顶层 `rules.json` 同时冻结
   Profile、Theme、Frame 三组规则；film prompt 子运行只接收执行 Theme/Frame 所需
   的两组规则。
@@ -142,11 +196,12 @@ Profile 阶段加载 `profile.rules`；Theme 和 Frame 阶段按
   不复用其他 pipeline 的模型、provider、storage 或 studio。
 
 模型输出边界按阶段区分：Profile 的人物、服装、场景、环境和道具档案继续使用严格
-结构化提交；Theme 只提交 `semantic_name`、`title`、`premise` 和 `style`，不再让
+结构化提交；Theme 批次提交 `semantic_name`，各 Theme 提交 `source_work_index`、
+`selected_cast`、`title`、`premise` 和 `style`，不再让
 模型生成 `theme_id`；Frame 不提交 JSON 或工具参数。每个 Theme 只调用模型一次，
 使用 `<FRAME>...</FRAME>` 标签批量返回该 Theme 的全部纯自然语言正文；程序拆分
 批次、按顺序分配 `F01`、`F02` 等 Frame ID、构造 Pydantic 领域对象并写入
-checkpoint。每个纯文本 Frame 仍须通过全部语义发布门槛；任一 Frame 失败时重试
+checkpoint。每个纯文本 Frame 均须通过 cast 契约及已启用的语义发布门槛；任一 Frame 失败时重试
 时立即逐帧 checkpoint 同批次中已通过的画面，只把失败槽位组成较小批次重新生成；
 run 中断后恢复也只请求尚未通过的槽位。
 
@@ -203,15 +258,30 @@ temperature；`reasoning_effort=none` 仍允许使用分阶段 temperature。Cop
 一句普通来源说明开头，例如“这是一个基于张艺谋导演的《大红灯笼高高挂》（1991）
 原作人物与场景重新构图的电影画面。”随后使用角色 canonical_name 和场景
 canonical_name，依次描述环境、人物、动作与互动、镜头、光线和成片质感。
-Frame payload 中的 `theme_anchor_contract` 把 Theme 实际采用的人物与场景列为
+Frame payload 中的 `theme_anchor_contract` 直接从结构化 `selected_cast` 读取人物，
+从该作品的冻结场景锚点匹配 Theme 场景，不再从 prose 推测人物名单。人物与场景列为
 `required_exact_terms`，并把上下文内其他 canonical anchor 列为
 `forbidden_other_anchor_terms_in_body`。每帧必须在固定来源首句后的画面正文中
 逐字复用全部 required anchors，且不能出现任何 forbidden anchor；来源首句中的
 作品标题即使包含同名人物字样也不计入禁止项。
 模型返回后，程序在写入 checkpoint 前将 `deterministic_anchor_sentence` 幂等地
-放到固定来源首句之后。该自然语言句由 `required_characters` 与 `required_scene`
-构造，不消耗模型 token，也不触发重试。它只保证 canonical 字符串存在；逐人物
+放到固定来源首句之后。边界只取冻结的完整 `frame_source_sentence` 的精确前缀
+长度，不按第一个句号切分；`Sherlock Jr. (1924)`、导演姓名缩写及人物名中的
+句点均保留。正文不以完整来源句开头时不猜测插入位置，也不改写原文；启用来源
+验证时仍会拒绝这种输出。该自然语言句由 `required_characters` 与 `required_scene`
+构造，不消耗模型 token，也不触发重试。原始模型正文须先通过选定人物名存在检查，
+不能靠插入该句补足缺失人物名；该句不证明每个人有独立且不重复的身体。逐人物
 诊断会先移除该句，再检查模型正文是否真正描述了每个人。
+接受、存储检查和诊断共用精确前缀移除逻辑：完整来源句不充当人物名证据，紧随
+其后的程序锚点句也不充当人物名证据；正文其他位置的相同文字不会被删除。
+
+离线可行性检查使用实例方法，不存在模块级 `prompt_request` 函数：
+`from t2i_film_style_pipeline.pipeline import FilmStylePromptRequest, LocalFilmStyleRunStore`。
+用 `store.inspect(run_id)` 读取顶层请求，`store.discover_profile(run_id)` 读取
+`(result, profile_file, context_file)`；修改请求人数后通过
+`FilmStylePromptRequest.model_validate(...)` 创建实例，再调用
+`request.prompt_request(result.compiled_context, result.profile)`。
+不可行人数会抛出 `pydantic.ValidationError`；这些读取和验证不调用 provider。
 `current_frame_diversity_contracts` 按 `frame_slot` 重申 Theme 已锁定的内容路径及其
 必须同时可见的证据。不同 Theme 按确定性合同分配不同路径，同一 Theme 的全部
 Frame 使用同一路径，只在姿态、核心互动链、动作发起者、景别、机位和光线中变化。
@@ -270,7 +340,7 @@ Hardcore Frame 只允许一条核心互动链，可以选择明确性行为路�
 最终提示词不输出母风格、Theme 风格、视觉档案等内部术语，也不输出由 App 决定的
 画幅比例、分辨率或横竖方向。
 
-Theme 和 Frame 的 film-style 专用语义验证默认关闭。使用 `--validate-themes`
+除始终启用的 cast 契约外，Theme 和 Frame 的 film-style 专用语义验证默认关闭。使用 `--validate-themes`
 启用 Theme 验证，使用 `--validate-frames` 启用 Frame 验证；开关状态写入顶层
 run settings，resume 保持创建 run 时的选择。启用后，拒绝或无法协助文本、缺失或
 重复的指定来源句、内容等级越界或降级、画幅与尺寸信息都会被拒绝，并通过 film
