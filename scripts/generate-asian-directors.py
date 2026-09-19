@@ -31,7 +31,7 @@ CASTS = (
 )
 THEME_COUNT = 50
 FRAMES_PER_THEME = 4
-CONTENT_LEVEL = "aesthetic"
+CONTENT_LEVEL = "hardcore"
 RUN_ID_PATTERN = re.compile(r"\d{8}T\d{6}Z-[a-f0-9]{8}")
 
 
@@ -122,7 +122,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=8,
+        default=16,
         choices=range(1, 33),
         metavar="1..32",
         help="Concurrency passed to each Film run.",
@@ -130,7 +130,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "--theme-batch-size",
         type=int,
-        default=5,
+        default=10,
         choices=range(1, 11),
         metavar="1..10",
         help="Theme batch size passed to each Film run.",
