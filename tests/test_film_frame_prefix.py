@@ -26,12 +26,13 @@ from t2i_film_style_pipeline.prompt_models import (
     NarrativeTheme,
     NarrativeThemeBatch,
     NarrativeThemeResult,
-    SelectedFilmCharacter,
+    SourceFilmCharacter,
     TokenUsage,
 )
 from t2i_film_style_pipeline.prompt_run_store import LocalFilmPromptRunStore
 from t2i_film_style_pipeline.prompt_studio import FilmPromptStudio
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
+from tests.film_prompt_factories import make_authored_character
 from tests.test_film_style_pipeline import make_profile
 from tests.test_film_style_prompt_pipeline import FakePromptModel, make_settings
 
@@ -92,8 +93,8 @@ def make_sherlock_request(
     theme = NarrativeTheme(
         source_work_index=0,
         selected_cast=tuple(
-            SelectedFilmCharacter(
-                canonical_name=item.canonical_name, gender=item.gender
+            SourceFilmCharacter(
+                origin="source", canonical_name=item.canonical_name, gender=item.gender
             )
             for item in characters[:2]
         ),
@@ -185,6 +186,33 @@ def test_frozen_source_sentence_survives_json_and_is_required() -> None:
         FilmPromptRequest.model_validate(
             request.model_dump(exclude={"frame_source_sentence"})
         )
+
+
+def test_mixed_origin_prefix_preserves_periods_without_false_canon_attribution():
+    request, theme = make_sherlock_request()
+    request = request.model_copy(update={"female_count": 3, "male_count": 0})
+    theme = theme.model_copy(
+        update={
+            "selected_cast": (
+                theme.selected_cast[1],
+                make_authored_character(1).model_copy(update={"name": "Ms. A. Vale"}),
+                make_authored_character(2).model_copy(update={"name": "B. Moss"}),
+            ),
+            "premise": (
+                "The Girl, Ms. A. Vale and B. Moss are in the Movie Theater Auditorium."
+            ),
+        }
+    )
+    body = " The Girl watches Ms. A. Vale and B. Moss examine a reel."
+    raw = request.frame_source_sentence + body
+    normalized = normalize_frame_anchor_prefix(request, theme, raw)
+    assert normalized.startswith(request.frame_source_sentence + " ")
+    assert (
+        "original characters The Girl and the authored adult characters" in normalized
+    )
+    assert frame_body(request, theme, normalized) == body
+    assert normalize_frame_anchor_prefix(request, theme, normalized) == normalized
+    validate_cast_prose(request, theme, normalized)
 
 
 @pytest.mark.asyncio

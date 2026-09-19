@@ -5,14 +5,15 @@ import re
 import pytest
 
 from t2i_film_style_pipeline.errors import FilmStyleConfigurationError
-from t2i_film_style_pipeline.prompt_models import ContentLevel, FilmPromptOptions
+from t2i_film_style_pipeline.prompt_models import ContentLevel, FilmPromptRequest
 from t2i_film_style_pipeline.rules import resolve_film_style_rules
 
 
 def make_prompt_request(
     content_level: ContentLevel = ContentLevel.AESTHETIC,
-) -> FilmPromptOptions:
-    return FilmPromptOptions(
+) -> FilmPromptRequest:
+    return FilmPromptRequest(
+        context="BRIEF\n\nDirector-work film scene generation.",
         content_level=content_level,
     )
 
@@ -188,7 +189,8 @@ def test_every_builtin_film_style_rule_is_written_in_chinese(
     output_language,
 ) -> None:
     rules = resolve_film_style_rules(
-        FilmPromptOptions(
+        FilmPromptRequest(
+            context="BRIEF\n\nDirector-work film scene generation.",
             output_language=output_language,
         )
     )

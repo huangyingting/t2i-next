@@ -111,9 +111,11 @@ def test_theme_proposition_and_frame_physical_checks_are_stage_scoped():
     assert "specific object or problem" in themes
     assert "not merely a general theme such as cooperation" in themes
     assert "Do not impose narrative conflict" in themes
+    assert "under mandatory system requirements" in themes
     assert "new problem, task, place or subject relationship" in frames
     assert "parallel visual alternatives" in frames
     assert "same identity to meet a count" in frames
+    assert "Continuity rules do not replace those requirements" in frames
     assert "compatible simultaneous roles" in frames
     assert "independently detachable upper and lower pieces" in frames
     assert "same facial template" in frames

@@ -49,21 +49,16 @@ _Avoid_: Shot description, scene
 The `t2i_film_style_pipeline` package has its own profiles, requests, Themes,
 Frames, rules and persistence; it does not reuse Standalone Story Generation.
 
-**Film Source Cast**:
-The frozen original adult identities and their declared genders for each source
-film. A Film Theme selects distinct identities from exactly one source film,
-subject to explicit female and male constraints. An impossible requested cast
-fails rather than cloning an identity, changing gender, or silently reducing
-counts. Required cast contracts apply independently of optional quality checks
-and remain authoritative through checkpoints, resume and publication.
-_Avoid_: Name-mention count, filename-derived cast, anonymous substitute
-
-**Film Selected Cast**:
-A Theme's structured references to its source identities. Repeated mentions,
-reflections or permitted multiple views do not create new identities. Validation
-of this selection is not semantic proof that arbitrary Frame prose depicts the
-correct number of bodies or contains no physical contradictions.
-_Avoid_: Clone-free prose guarantee, inferred gender
+**Film Theme Cast**:
+One to four distinct original adult characters chosen by the model for each Theme,
+including at least one woman. The composition can vary between Themes but stays
+consistent within that Theme's Frames. There are no fixed female/male count
+options or additional source-versus-authored cast-selection schemas. Repeated
+mentions, reflections and permitted multiple views do not add identities.
+The selection guidance applies to every content level without changing its
+existing requirements; it is not a semantic validator or a guarantee of correct
+body counts in arbitrary prose.
+_Avoid_: Fixed cast matrix, cloned identity to fill a count, inferred gender total
 
 ## Standalone Story Generation
 

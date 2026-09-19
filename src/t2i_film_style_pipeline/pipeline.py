@@ -15,9 +15,8 @@ from enum import StrEnum
 from pathlib import Path
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from t2i_film_style_pipeline.compiler import frame_source_sentence
 from t2i_film_style_pipeline.content_validation import FilmStyleContentValidator
 from t2i_film_style_pipeline.errors import (
     FilmStylePipelineError,
@@ -25,17 +24,16 @@ from t2i_film_style_pipeline.errors import (
     FilmStyleStorageError,
 )
 from t2i_film_style_pipeline.models import (
-    FilmCastSource,
-    FilmStyleProfile,
     FilmStyleRequest,
     FilmStyleResult,
     FilmStyleRuleSet,
     SceneDirectionText,
 )
 from t2i_film_style_pipeline.prompt_models import (
-    FilmPromptOptions,
+    ContentLevel,
     FilmPromptRequest,
     FilmPromptRuleSet,
+    OutputLanguage,
 )
 from t2i_film_style_pipeline.prompt_provider import FilmPromptModel
 from t2i_film_style_pipeline.prompt_run_store import (
@@ -63,7 +61,7 @@ class FilmStyleRunStatus(StrEnum):
     COMPLETED = "completed"
 
 
-class FilmStylePromptRequest(FilmPromptOptions):
+class FilmStylePromptRequest(_Model):
     film_style: FilmStyleRequest
     scene_direction: SceneDirectionText | None = None
     output_filename_stem: str | None = Field(
@@ -72,27 +70,19 @@ class FilmStylePromptRequest(FilmPromptOptions):
         max_length=80,
         pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$",
     )
-
-    @model_validator(mode="after")
-    def consistent_language(self) -> FilmStylePromptRequest:
-        if self.film_style.output_language != self.output_language.value:
-            raise ValueError("profile and prompt output_language conflict")
-        return self
+    theme_count: int = Field(default=1, ge=1, le=100)
+    frames_per_theme: int = Field(default=6, ge=1, le=6)
+    female_count: int | None = Field(default=None, ge=0, le=8)
+    male_count: int | None = Field(default=None, ge=0, le=8)
+    content_level: ContentLevel = ContentLevel.AESTHETIC
+    output_language: OutputLanguage = OutputLanguage.CHINESE
 
     def prompt_request(
         self,
         context: str,
-        profile: FilmStyleProfile,
     ) -> FilmPromptRequest:
         return FilmPromptRequest(
             context=context,
-            frame_source_sentence=frame_source_sentence(self.film_style),
-            source_films=tuple(
-                FilmCastSource(work=work, anchors=anchors)
-                for work, anchors in zip(
-                    self.film_style.works, profile.work_anchors, strict=True
-                )
-            ),
             prompt_filename_stem=(
                 self.output_filename_stem
                 or _short_filename_stem(self.film_style.director)
@@ -167,7 +157,6 @@ class LocalFilmStyleRunStore:
         *,
         prompts_directory: Path,
     ) -> FilmStyleRunSnapshot:
-        request = FilmStylePromptRequest.model_validate(request)
         run_id = _new_run_id()
         now = _now()
         manifest = FilmStyleRunManifest(
@@ -388,10 +377,6 @@ class LocalFilmStyleRunStore:
             raise FilmStyleStorageError(
                 f"Run {run_id} profile child ID does not match its manifest"
             )
-        if result.request != snapshot.request.film_style:
-            raise FilmStyleStorageError(
-                f"Run {run_id} frozen profile source conflicts with parent request"
-            )
         compiled_context_file = candidates[0].parent / "compiled-context.txt"
         try:
             compiled_context = compiled_context_file.read_text(
@@ -479,7 +464,6 @@ class FilmStylePromptStudio:
     async def resume(self, run_id: str) -> CompletedFilmStylePromptRun:
         snapshot = self._store.inspect(run_id)
         if snapshot.completed is not None:
-            self._validate_completed_cast(snapshot)
             self._emit(f"Run 已完成：{run_id}")
             return snapshot.completed
         if snapshot.settings != self._settings:
@@ -497,7 +481,6 @@ class FilmStylePromptStudio:
         with self._store.lock(run_id):
             snapshot = self._store.start(run_id)
             if snapshot.completed is not None:
-                self._validate_completed_cast(snapshot)
                 return snapshot.completed
             try:
                 film_result, compiled_context_file = await self._profile(snapshot)
@@ -511,7 +494,7 @@ class FilmStylePromptStudio:
                     or self._store.discover_prompt_run_id(run_id)
                 )
                 prompt_request = snapshot.request.prompt_request(
-                    film_result.compiled_context, film_result.profile
+                    film_result.compiled_context
                 )
                 prompt_rules = FilmPromptRuleSet(
                     themes=snapshot.rules.themes,
@@ -539,10 +522,6 @@ class FilmStylePromptStudio:
                     self._emit(f"Prompt checkpoint 已创建：{prompt_run_id}")
                 elif snapshot.manifest.prompt_run_id is None:
                     self._store.checkpoint_prompt(run_id, prompt_run_id)
-                if prompt_store.inspect(prompt_run_id).request != prompt_request:
-                    raise FilmStyleStorageError(
-                        "frozen prompt request conflicts with parent counts or profile"
-                    )
                 completed_prompt = await FilmPromptStudio(
                     self._prompt_model,
                     prompt_store,
@@ -573,7 +552,7 @@ class FilmStylePromptStudio:
                         completed_prompt.diversity_report_file
                     ),
                 )
-            except (FilmStylePipelineError, ValidationError) as exc:
+            except FilmStylePipelineError as exc:
                 self._store.fail(run_id, str(exc))
                 raise FilmStyleRunIncompleteError(run_id, str(exc)) from exc
 
@@ -611,22 +590,6 @@ class FilmStylePromptStudio:
     def _emit(self, message: str) -> None:
         if self._on_progress is not None:
             self._on_progress(message)
-
-    def _validate_completed_cast(self, snapshot: FilmStyleRunSnapshot) -> None:
-        run_id = snapshot.manifest.run_id
-        discovered = self._store.discover_profile(run_id)
-        if discovered is None or snapshot.manifest.prompt_run_id is None:
-            raise FilmStyleStorageError("completed run is missing frozen cast sources")
-        result, _, _ = discovered
-        child = LocalFilmPromptRunStore(
-            self._store.prompt_runs_directory(run_id)
-        ).inspect(snapshot.manifest.prompt_run_id)
-        if child.completed is None or child.request != snapshot.request.prompt_request(
-            result.compiled_context, result.profile
-        ):
-            raise FilmStyleStorageError(
-                "completed prompt request conflicts with parent counts or profile"
-            )
 
 
 def _completed_from_manifest(

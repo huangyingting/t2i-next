@@ -97,10 +97,6 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
             "4",
             "--frames",
             "1",
-            "--female-count",
-            "1",
-            "--male-count",
-            "0",
             "--theme-batch-size",
             "3",
             "--validate-themes",
@@ -121,8 +117,6 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
     assert captured["request"].output_filename_stem == "Zhang_Yimou"
     assert captured["request"].theme_count == 4
     assert captured["request"].frames_per_theme == 1
-    assert captured["request"].female_count == 1
-    assert captured["request"].male_count == 0
     assert captured["settings"].prompt.theme_batch_size == 3
     assert captured["settings"].prompt.theme_output_tokens == 12000
     assert captured["settings"].validate_themes is True

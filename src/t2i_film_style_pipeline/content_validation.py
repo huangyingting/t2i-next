@@ -5,10 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from t2i_film_style_pipeline.cast_validation import validate_selected_cast
 from t2i_film_style_pipeline.compiler import frame_source_sentence
 from t2i_film_style_pipeline.errors import FilmStyleContractError
-from t2i_film_style_pipeline.frame_text import frame_body
 from t2i_film_style_pipeline.models import (
     FilmStyleProfile,
     FilmStyleRequest,
@@ -469,14 +467,11 @@ class FilmStyleContentValidator:
         request: FilmPromptRequest,
         theme: NarrativeTheme,
     ) -> None:
-        validate_selected_cast(request, theme)
         self._validate_output(theme.premise, label=f"{theme.theme_id} premise")
-        selection = self._observed_anchors(
+        self._selected_anchors(
             theme.premise,
             label=f"{theme.theme_id} premise",
-            selected_work_index=theme.source_work_index,
         )
-        self._validate_cast_selection(theme, selection)
         self._validate_content_level(
             request,
             theme.premise,
@@ -490,7 +485,6 @@ class FilmStyleContentValidator:
         theme: NarrativeTheme,
         frame: NarrativeFrame,
     ) -> None:
-        validate_selected_cast(request, theme)
         label = f"{theme.theme_id}-{frame.frame_id}"
         prose = frame.prose
         self._validate_output(prose, label=label)
@@ -522,16 +516,11 @@ class FilmStyleContentValidator:
                 f"{label} 画面正文过短，无法完整覆盖环境、人物、互动、"
                 "摄影和光线"
             )
-        theme_anchors = self._observed_anchors(
+        theme_anchors = self._selected_anchors(
             theme.premise,
             label=f"{theme.theme_id} premise",
-            selected_work_index=theme.source_work_index,
         )
-        self._validate_cast_selection(theme, theme_anchors)
-        body = frame_body(request, theme, prose, strip_anchor=False)
-        frame_anchors = self._observed_anchors(
-            body, label=label, selected_work_index=theme.source_work_index
-        )
+        frame_anchors = self._selected_anchors(prose, label=label)
         if (
             frame_anchors.work_index != theme_anchors.work_index
             or frame_anchors.scene_name != theme_anchors.scene_name
@@ -545,7 +534,7 @@ class FilmStyleContentValidator:
                 f"（{required_characters}）与场景 canonical_name"
                 f"（{theme_anchors.scene_name}），且不得加入其他电影的人物或场景"
             )
-        self._validate_anchor_details(body, frame_anchors, label=label)
+        self._validate_anchor_details(prose, frame_anchors, label=label)
         missing_camera_evidence = [
             evidence
             for evidence, pattern in _CAMERA_EVIDENCE[
@@ -597,12 +586,11 @@ class FilmStyleContentValidator:
                     "或材质触觉；缺少" + "、".join(missing)
                 )
 
-    def _observed_anchors(
+    def _selected_anchors(
         self,
         value: str,
         *,
         label: str,
-        selected_work_index: int,
     ) -> _AnchorSelection:
         normalized = value.casefold()
         matches: list[tuple[int, frozenset[str], tuple[str, ...]]] = []
@@ -632,17 +620,11 @@ class FilmStyleContentValidator:
                 f"{label} 必须使用同一部输入电影的原作成年人物 canonical_name "
                 "与原作场景 canonical_name"
             )
-        selected_match = next(
-            (match for match in matches if match[0] == selected_work_index), None
-        )
-        if len(matches) > 1 and (
-            selected_match is None
-            or any(match[1:] != selected_match[1:] for match in matches)
-        ):
+        if len(matches) > 1:
             raise FilmStyleContractError(
                 f"{label} 不得跨电影混合原作人物与场景锚点"
             )
-        work_index, character_names, scene_names = selected_match or matches[0]
+        work_index, character_names, scene_names = matches[0]
         if len(scene_names) != 1:
             raise FilmStyleContractError(
                 f"{label} 必须选择且只选择一个原作场景 canonical_name"
@@ -652,20 +634,6 @@ class FilmStyleContentValidator:
             character_names=character_names,
             scene_name=scene_names[0],
         )
-
-    @staticmethod
-    def _validate_cast_selection(
-        theme: NarrativeTheme, selection: _AnchorSelection
-    ) -> None:
-        if (
-            selection.work_index != theme.source_work_index
-            or selection.character_names
-            != frozenset(item.canonical_name for item in theme.selected_cast)
-        ):
-            raise FilmStyleContractError(
-                f"{theme.theme_id}: prose anchors conflict with authoritative "
-                "selected_cast or source_work_index"
-            )
 
     def _validate_anchor_details(
         self,

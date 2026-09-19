@@ -19,17 +19,12 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from t2i_film_style_pipeline.cast_validation import (
-    validate_cast_prose,
-    validate_selected_cast,
-)
 from t2i_film_style_pipeline.diversity import (
     FilmPromptDiversityReport,
     build_diversity_report,
 )
 from t2i_film_style_pipeline.errors import (
     FilmPromptRunNotFoundError,
-    FilmStyleContractError,
     FilmStyleStorageError,
 )
 from t2i_film_style_pipeline.prompt_models import (
@@ -263,7 +258,6 @@ class LocalFilmPromptRunStore:
         settings: FilmPromptRunSettings,
         rules: FilmPromptRuleSet,
     ) -> FilmPromptRunSnapshot:
-        request = FilmPromptRequest.model_validate(request)
         if self._prompts_root is None:
             raise FilmStyleStorageError("创建 film prompt run 需要 prompts 目录")
         run_id = self._new_run_id()
@@ -349,7 +343,7 @@ class LocalFilmPromptRunStore:
                 )
         except FilmStyleStorageError:
             raise
-        except (OSError, ValidationError, ValueError, FilmStyleContractError) as exc:
+        except (OSError, ValidationError, ValueError) as exc:
             raise FilmStyleStorageError(
                 f"Run {run_id} 的 checkpoint 损坏：{exc}"
             ) from exc
@@ -428,9 +422,6 @@ class LocalFilmPromptRunStore:
         snapshot = self.inspect(run_id)
         if snapshot.completed is not None:
             raise FilmStyleStorageError(f"Run {run_id} 已完成，不能写入 checkpoint")
-        for theme in themes:
-            validate_selected_cast(snapshot.request, theme)
-            validate_cast_prose(snapshot.request, theme, theme.premise)
         expected_start = len(snapshot.themes) + 1
         expected_ids = [
             f"T{index:03d}"
@@ -479,11 +470,6 @@ class LocalFilmPromptRunStore:
                 raise FilmStyleStorageError(
                     f"Frame checkpoint 缺少 Theme checkpoint：{theme_id}"
                 )
-            theme = NarrativeTheme.model_validate_json(
-                (directory / "themes" / f"{theme_id}.json").read_text(encoding="utf-8")
-            )
-            validate_selected_cast(request, theme)
-            validate_cast_prose(request, theme, frame.prose)
             expected_ids = {
                 f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
             }
@@ -507,7 +493,7 @@ class LocalFilmPromptRunStore:
             self._touch_manifest(directory)
         except FilmStyleStorageError:
             raise
-        except (OSError, ValidationError, FilmStyleContractError) as exc:
+        except (OSError, ValidationError) as exc:
             raise FilmStyleStorageError(
                 f"Run {run_id} 无法写入 Frame checkpoint：{exc}"
             ) from exc
@@ -691,8 +677,6 @@ class LocalFilmPromptRunStore:
         themes: list[NarrativeTheme] = []
         for path in sorted((directory / "themes").glob("T*.json")):
             theme = NarrativeTheme.model_validate_json(path.read_text(encoding="utf-8"))
-            validate_selected_cast(request, theme)
-            validate_cast_prose(request, theme, theme.premise)
             if path.stem != theme.theme_id:
                 raise FilmStyleStorageError(
                     f"Theme checkpoint 文件名与内容不匹配：{path.name}"
@@ -711,7 +695,6 @@ class LocalFilmPromptRunStore:
         themes: tuple[NarrativeTheme, ...],
     ) -> dict[str, NarrativeFrameSequence]:
         theme_ids = {theme.theme_id for theme in themes}
-        themes_by_id = {theme.theme_id: theme for theme in themes}
         expected_frame_ids = {
             f"F{index:02d}" for index in range(1, request.frames_per_theme + 1)
         }
@@ -729,9 +712,6 @@ class LocalFilmPromptRunStore:
             for path in sorted(theme_directory.glob("F*.json")):
                 frame = NarrativeFrame.model_validate_json(
                     path.read_text(encoding="utf-8")
-                )
-                validate_cast_prose(
-                    request, themes_by_id[theme_directory.name], frame.prose
                 )
                 if path.stem != frame.frame_id:
                     raise FilmStyleStorageError(

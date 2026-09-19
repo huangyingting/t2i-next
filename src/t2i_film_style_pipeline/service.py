@@ -57,10 +57,7 @@ class FilmStyleStudio:
         )
         if not isinstance(response.value, FilmStyleProfile):
             raise TypeError("film-style model returned an unexpected value")
-        profile = exact_film_style_profile_model(len(request.works)).model_validate(
-            response.value.model_dump()
-        )
-        profile = _normalize_source_labels(profile, request)
+        profile = _normalize_source_labels(response.value, request)
         run_id = _new_run_id()
         compiled = compile_film_context(
             request,

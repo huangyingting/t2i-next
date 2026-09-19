@@ -7,10 +7,6 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from t2i_film_style_pipeline.cast_validation import (
-    validate_cast_prose,
-    validate_selected_cast,
-)
 from t2i_film_style_pipeline.errors import FilmStyleStorageError
 from t2i_film_style_pipeline.prompt_models import FilmPromptResult
 from t2i_film_style_pipeline.prompt_persistence import durable_mkdir, fsync_directory
@@ -25,12 +21,6 @@ def publish_film_prompt(
     result: FilmPromptResult,
     prompt_file: Path,
 ) -> PublishedFilmPrompt:
-    result = FilmPromptResult.model_validate(result)
-    for item in result.themes:
-        validate_selected_cast(result.request, item.theme)
-        validate_cast_prose(result.request, item.theme, item.theme.premise)
-        for frame in item.frames:
-            validate_cast_prose(result.request, item.theme, frame.prose)
     prompt_file = prompt_file.resolve()
     prompt_text = (
         "\n".join(

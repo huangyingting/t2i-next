@@ -11,11 +11,12 @@ from t2i_film_style_pipeline.prompt_models import (
 
 def canonical_anchor_sentence(
     request: FilmPromptRequest,
-    characters: list[str],
+    theme: NarrativeTheme,
     scene: str | None,
 ) -> str | None:
-    if not characters or scene is None:
+    if scene is None:
         return None
+    characters = [item.canonical_name for item in theme.selected_cast]
     if request.output_language == OutputLanguage.ENGLISH:
         return (
             f"The original characters {', '.join(characters)} are in the "
@@ -41,10 +42,9 @@ def frame_body(
         return prose
     body = prose[len(source) :]
     if strip_anchor:
-        characters = [item.canonical_name for item in theme.selected_cast]
         for scene in request.source_films[theme.source_work_index].anchors.scenes:
             sentence = canonical_anchor_sentence(
-                request, characters, scene.canonical_name
+                request, theme, scene.canonical_name
             )
             if sentence is not None:
                 insertion = anchor_insertion(request, sentence)
