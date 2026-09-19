@@ -21,6 +21,8 @@ def make_prompt_request(
     content_level: ContentLevel = ContentLevel.AESTHETIC,
     output_language: OutputLanguage = OutputLanguage.CHINESE,
     source_prompt_stem: str | None = None,
+    female_count: int = 1,
+    male_count: int = 1,
 ) -> FilmPromptRequest:
     return FilmPromptRequest(
         context=(
@@ -33,6 +35,8 @@ def make_prompt_request(
         content_level=content_level,
         output_language=output_language,
         source_prompt_stem=source_prompt_stem,
+        female_count=female_count,
+        male_count=male_count,
     )
 
 

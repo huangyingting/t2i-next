@@ -131,6 +131,9 @@ class FilmPromptStudio:
     ) -> CompletedFilmPromptRun:
         request = snapshot.request
         rules = snapshot.rules
+        self._emit(
+            f"Theme 固定人数：女性 {request.female_count}，男性 {request.male_count}"
+        )
         themes = list(snapshot.themes)
         existing_frames = dict(snapshot.frames)
         semaphore = asyncio.Semaphore(self._settings.concurrency)

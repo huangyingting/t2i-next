@@ -58,7 +58,7 @@ def make_sherlock_request(
         }
     )
     request = FilmStylePromptRequest(
-        film_style=film, output_language=language
+        film_style=film, output_language=language, female_count=1, male_count=1
     ).prompt_request(compile_film_context(film, profile))
     assert source_sentence(request.context) == frame_source_sentence(film)
     theme = NarrativeTheme(

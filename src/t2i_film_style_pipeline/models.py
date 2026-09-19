@@ -114,7 +114,6 @@ class FilmSceneAnchor(Model):
 class FilmWorkAnchors(Model):
     adult_characters: tuple[FilmCharacterAnchor, ...] = Field(
         min_length=1,
-        max_length=12,
     )
     scenes: tuple[FilmSceneAnchor, ...] = Field(min_length=1, max_length=12)
 

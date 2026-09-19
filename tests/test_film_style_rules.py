@@ -84,7 +84,7 @@ def test_frame_rules_define_low_complexity_body_topology() -> None:
 
     assert "主要支撑面和承重部位" in text
     assert "骨盆、躯干和头部各自唯一的朝向与高度" in text
-    assert "每条可见手臂和腿分配一个且仅一个作用" in text
+    assert "每条可见手臂和腿在该瞬间相互兼容的用途" in text
     assert "谁的哪个部位接触谁的哪个部位或哪件物体" in text
     assert "除共同互动所需动作外不得增加无意义辅助接触" in text
     assert "扶膝、握腕或环颈不能被写成全身支撑" in text
@@ -94,18 +94,18 @@ def test_frame_rules_define_low_complexity_body_topology() -> None:
     assert "必须为每个人分别写清一条闭合承重链" in text
     assert "为呈现面部而调整摄影机" in text
     assert "不得让衣袖、衣襟或肩带滑落、褪至或堆在手臂" in text
-    assert "身体拓扑和动作可读性优先于" in text
+    assert "依次保证支撑与关节合理、接触可达、摄影与自然遮挡协调" in text
     assert "不得把两个方案混入同一画面" in text
     assert "实际存在的接触链或动作链" in text
     assert "画面是动作完成后的一个静态受力瞬间" in text
     assert "每张脸与对方的颈侧、胸前、肩后和头发之间保留可见间隔" in text
-    assert "每人的重心落在自己的支撑多边形内" in text
-    assert "不得使用悬空骨盆、无支点深度俯折" in text
-    assert "每条接触链所需的手、手臂、腿或物体必须具有可见的进入路径" in text
-    assert "头颈方向必须与胸骨朝向自然一致" in text
+    assert "重心投影须落在实际支撑范围内" in text
+    assert "不得使用无承托的悬空骨盆、无支点深度俯折" in text
+    assert "每条接触链所需的手、手臂、腿或物体必须具有空间上可达的进入路径" in text
+    assert "头颈转向须处于自然关节活动范围内" in text
     assert "必须为每个人分别用一句话选定以下一种完整衣物状态" in text
     assert "所有决定性接触部位及其进入路径不得被仍穿着的衣物覆盖" in text
-    assert "每条肢体只有一个职责" in text
+    assert "同一肢体的用途兼容" in text
     assert "人物朝向与高低关系" in text
     assert "theme_anchor_contract 冻结当前 Theme 已选择的原作锚点" in text
     assert "程序会在固定作品来源首句之后确定性插入" in text

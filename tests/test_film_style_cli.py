@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pytest
 from typer.main import get_command
 from typer.testing import CliRunner
 
@@ -27,9 +28,14 @@ def test_generate_defaults_semantic_validation_off() -> None:
     assert defaults["validate_themes"] is False
     assert defaults["validate_frames"] is False
     assert defaults["theme_batch_size"] == 5
+    assert defaults["female_count"] == 1
+    assert defaults["male_count"] == 0
 
 
-def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
+@pytest.mark.parametrize("female_count,male_count", [(3, 0), (0, 5), (6, 2)])
+def test_generate_compiles_repeated_work_options(
+    tmp_path, monkeypatch, female_count, male_count
+) -> None:
     captured = {}
     original_resolve_rules = film_style_cli.resolve_film_style_rules
 
@@ -97,6 +103,10 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
             "4",
             "--frames",
             "1",
+            "--female-count",
+            str(female_count),
+            "--male-count",
+            str(male_count),
             "--theme-batch-size",
             "3",
             "--validate-themes",
@@ -110,20 +120,22 @@ def test_generate_compiles_repeated_work_options(tmp_path, monkeypatch) -> None:
 
     assert result.exit_code == 0
     assert captured["request"].film_style.director == "张艺谋"
-    assert [
-        work.year for work in captured["request"].film_style.works
-    ] == [2002, 2004]
+    assert [work.year for work in captured["request"].film_style.works] == [2002, 2004]
     assert captured["request"].scene_direction == "只生成雨夜室内场景。"
     assert captured["request"].output_filename_stem == "Zhang_Yimou"
     assert captured["request"].theme_count == 4
     assert captured["request"].frames_per_theme == 1
+    assert captured["request"].female_count == female_count
+    assert captured["request"].male_count == male_count
+    child = captured["request"].prompt_request("A film scene.")
+    assert child.female_count == female_count
+    assert child.male_count == male_count
     assert captured["settings"].prompt.theme_batch_size == 3
     assert captured["settings"].prompt.theme_output_tokens == 12000
     assert captured["settings"].validate_themes is True
     assert captured["settings"].validate_frames is True
     assert any(
-        "每个画面都是完全独立的图像提示词" in rule
-        for rule in captured["rules"].frames
+        "每个画面都是完全独立的图像提示词" in rule for rule in captured["rules"].frames
     )
     assert captured["rules_user_directory"] is None
     assert captured["prompts_directory"] == tmp_path / "prompts"

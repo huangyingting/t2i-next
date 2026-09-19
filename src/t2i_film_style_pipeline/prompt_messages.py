@@ -20,6 +20,14 @@ from t2i_film_style_pipeline.prompt_models import (
 from t2i_film_style_pipeline.prompt_provider import ChatMessage
 
 
+def _cast_requirement(request: FilmPromptRequest) -> dict[str, int]:
+    return {
+        "participant_count": request.female_count + request.male_count,
+        "female_count": request.female_count,
+        "male_count": request.male_count,
+    }
+
+
 def theme_messages(
     request: FilmPromptRequest,
     rules: FilmPromptRuleSet,
@@ -51,6 +59,13 @@ def theme_messages(
                     "semantic_name": semantic_name,
                     **identity_payload,
                     "frames_per_theme": request.frames_per_theme,
+                    "current_batch_cast_requirements": [
+                        {
+                            "output_position": position,
+                            **_cast_requirement(request),
+                        }
+                        for position in range(1, count + 1)
+                    ],
                     "existing_themes": [
                         theme.model_dump(mode="json") for theme in existing_themes
                     ],
@@ -89,6 +104,7 @@ def frame_messages(
                     "content_level": request.content_level.value,
                     "output_language": request.output_language.value,
                     "theme": theme.model_dump(mode="json"),
+                    "theme_cast_requirement": _cast_requirement(request),
                     "theme_anchor_contract": theme_anchor_contract(
                         request,
                         theme,

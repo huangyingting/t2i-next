@@ -31,6 +31,7 @@ from t2i_film_style_pipeline.models import (
 )
 from t2i_film_style_pipeline.prompt_models import (
     ContentLevel,
+    FilmCastConstraints,
     FilmPromptRequest,
     FilmPromptRuleSet,
     OutputLanguage,
@@ -61,7 +62,7 @@ class FilmStyleRunStatus(StrEnum):
     COMPLETED = "completed"
 
 
-class FilmStylePromptRequest(_Model):
+class FilmStylePromptRequest(FilmCastConstraints):
     film_style: FilmStyleRequest
     scene_direction: SceneDirectionText | None = None
     output_filename_stem: str | None = Field(
@@ -87,6 +88,8 @@ class FilmStylePromptRequest(_Model):
             ),
             theme_count=self.theme_count,
             frames_per_theme=self.frames_per_theme,
+            female_count=self.female_count,
+            male_count=self.male_count,
             content_level=self.content_level,
             output_language=self.output_language,
         )

@@ -136,6 +136,8 @@ def make_pipeline_request() -> FilmStylePromptRequest:
         film_style=make_request(),
         theme_count=1,
         frames_per_theme=2,
+        female_count=1,
+        male_count=1,
     )
 
 
@@ -279,6 +281,8 @@ def test_theme_messages_include_complete_history_without_excerpts() -> None:
 
 def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
     request = FilmPromptRequest(
+        female_count=1,
+        male_count=1,
         context=(
             "原作人物与场景锚点\n"
             "- 林岚：成年人物\n"
@@ -362,6 +366,8 @@ def test_frame_messages_freeze_anchors_and_balance_content_routes() -> None:
 
 def test_three_person_frame_contract_requires_everyone_to_participate() -> None:
     request = FilmPromptRequest(
+        female_count=2,
+        male_count=1,
         context=(
             "每个 Frame 必须准确且只在第一句使用以下来源说明：\n"
             "“这是固定来源句。”\n\n"
@@ -480,6 +486,8 @@ def test_eight_person_frame_contract_remains_role_agnostic() -> None:
         "顾宁",
     ]
     request = FilmPromptRequest(
+        female_count=4,
+        male_count=4,
         context=(
             "原作人物与场景锚点\n"
             "### 《测试作品》\n"

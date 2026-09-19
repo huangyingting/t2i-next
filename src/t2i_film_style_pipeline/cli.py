@@ -88,6 +88,18 @@ def generate_command(
         max=6,
         help="每个主题的平行画面数。",
     ),
+    female_count: int = typer.Option(
+        1,
+        "--female-count",
+        min=0,
+        help="每个 Theme 的固定女性人数；允许为零，不设人数上限。",
+    ),
+    male_count: int = typer.Option(
+        0,
+        "--male-count",
+        min=0,
+        help="每个 Theme 的固定男性人数；允许为零，男女数量不能同时为零。",
+    ),
     concurrency: int = typer.Option(
         8,
         "--concurrency",
@@ -153,6 +165,8 @@ def generate_command(
             output_filename_stem=filename_stem,
             theme_count=themes,
             frames_per_theme=frames,
+            female_count=female_count,
+            male_count=male_count,
             content_level=content_level,
             output_language=output_language,
         )

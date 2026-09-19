@@ -50,15 +50,19 @@ The `t2i_film_style_pipeline` package has its own profiles, requests, Themes,
 Frames, rules and persistence; it does not reuse Standalone Story Generation.
 
 **Film Theme Cast**:
-One to four distinct original adult characters chosen by the model for each Theme,
-including at least one woman. The composition can vary between Themes but stays
-consistent within that Theme's Frames. There are no fixed female/male count
-options or additional source-versus-authored cast-selection schemas. Repeated
+`female_count` and `male_count` fix the corresponding totals for every Theme and
+Frame, defaulting to one and zero respectively. Each is a nonnegative integer
+with no configured upper bound; their sum must be positive. Female-only and
+male-only casts are allowed. Omitting one parameter uses its own default,
+not random selection or inference. Both values are frozen in the request and
+reused for all batches, retries and resumes; there is no random cast plan.
+The model selects the specified number of distinct original adult identities.
+No additional source-versus-authored cast-selection schemas are used. Repeated
 mentions, reflections and permitted multiple views do not add identities.
 The selection guidance applies to every content level without changing its
 existing requirements; it is not a semantic validator or a guarantee of correct
 body counts in arbitrary prose.
-_Avoid_: Fixed cast matrix, cloned identity to fill a count, inferred gender total
+_Avoid_: Model-chosen or random total, cloned identity, inferred gender total
 
 **Film Theme History**:
 All accepted Themes' full title, premise and style, sent to subsequent Theme

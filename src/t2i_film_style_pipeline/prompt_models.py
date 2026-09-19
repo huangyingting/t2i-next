@@ -16,6 +16,7 @@ from pydantic import (
     Field,
     StringConstraints,
     create_model,
+    model_validator,
 )
 
 
@@ -124,7 +125,18 @@ class FilmPromptRuleSet(Model):
         return hashlib.sha256(payload).hexdigest()
 
 
-class FilmPromptRequest(Model):
+class FilmCastConstraints(Model):
+    female_count: int = Field(default=1, ge=0)
+    male_count: int = Field(default=0, ge=0)
+
+    @model_validator(mode="after")
+    def cast_counts_fit(self) -> FilmCastConstraints:
+        if self.female_count + self.male_count == 0:
+            raise ValueError("女性和男性人数不能同时为零")
+        return self
+
+
+class FilmPromptRequest(FilmCastConstraints):
     context: FilmContextText
     source_prompt_stem: SourcePromptStem | None = None
     prompt_filename_stem: SourcePromptStem | None = None

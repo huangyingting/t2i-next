@@ -32,14 +32,20 @@ from tests.test_film_style_prompt_pipeline import make_settings
 
 
 @pytest.mark.parametrize("level", list(ContentLevel))
-def test_all_levels_share_free_one_to_four_cast_and_full_history(level):
-    request = make_prompt_request(content_level=level, theme_count=100)
+def test_all_levels_share_parameter_controlled_cast_and_full_history(level):
+    request = make_prompt_request(
+        content_level=level, theme_count=100, female_count=0, male_count=6
+    )
     resolved = resolve_film_style_rules(request)
     rules = FilmPromptRuleSet(themes=resolved.themes, frames=resolved.frames)
     existing = [make_theme(index) for index in range(1, 100)]
     payload = json.loads(
         theme_messages(
-            request, rules, start_index=100, count=1, existing_themes=existing
+            request,
+            rules,
+            start_index=100,
+            count=1,
+            existing_themes=existing,
         )[1].content
     )
     assert payload["existing_themes"] == [
@@ -48,23 +54,39 @@ def test_all_levels_share_free_one_to_four_cast_and_full_history(level):
     assert {"cast_constraints", "diversity_ledger"}.isdisjoint(payload)
     assert "不得生成重复的 Theme" in "\n".join(rules.themes)
     for stage in (rules.themes, rules.frames):
-        assert "一至四名不同的原作成年人，至少包含一名女性" in "\n".join(stage)
+        assert "人数完全由请求中的男女数量决定" in "\n".join(stage)
+        assert "不要求至少一名女性" in "\n".join(stage)
     assert all(
         "cast_size_requirement" not in item
         for item in payload["current_batch_diversity_contracts"]
     )
     frame_payload = json.loads(
         frame_messages(
-            request, existing[0], rules, requested_frame_ids=["F01"], accepted_frames=[]
+            request,
+            existing[0],
+            rules,
+            requested_frame_ids=["F01"],
+            accepted_frames=[],
         )[1].content
     )
     assert "cast_constraints" not in frame_payload
     assert "requested_cast_counts" not in frame_payload["participant_frame_contracts"]
+    assert payload["current_batch_cast_requirements"] == [
+        {
+            "output_position": 1,
+            "participant_count": 6,
+            "female_count": 0,
+            "male_count": 6,
+        }
+    ]
+    assert frame_payload["theme_cast_requirement"] == {
+        "participant_count": 6,
+        "female_count": 0,
+        "male_count": 6,
+    }
 
 
-@pytest.mark.parametrize(
-    "field", ["female_count", "male_count", "selected_cast", "source_films"]
-)
+@pytest.mark.parametrize("field", ["selected_cast", "source_films"])
 def test_removed_film_cast_fields_are_rejected_not_silently_ignored(field):
     for model, data in (
         (FilmPromptRequest, {"context": "A film scene."}),
@@ -74,13 +96,15 @@ def test_removed_film_cast_fields_are_rejected_not_silently_ignored(field):
             model.model_validate({**data, field: 1})
 
 
-@pytest.mark.parametrize("option", ["--female-count", "--male-count"])
-def test_removed_count_cli_options_fail_before_provider_setup(option):
+@pytest.mark.parametrize(
+    ("option", "value"), [("--female-count", "-1"), ("--male-count", "-1")]
+)
+def test_invalid_count_cli_options_fail_before_provider_setup(option, value):
     result = CliRunner().invoke(
-        app, ["generate", "Director", "--work", "Film (2000)", option, "1"]
+        app, ["generate", "Director", "--work", "Film (2000)", option, value]
     )
     assert result.exit_code == 2
-    assert f"No such option: {option}" in result.output
+    assert "Invalid value" in result.output
 
 
 def test_exact_theme_duplicate_detection_ignores_title_and_checks_batch_and_history():
